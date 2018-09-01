@@ -8,16 +8,15 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_piggy_list.*
+import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
-import xyz.hisname.fireflyiii.repository.dao.DbWorker
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoPiggyViewModel
@@ -33,7 +32,6 @@ class ListPiggyFragment: BaseFragment() {
     private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java)}
     private val piggyVM: DaoPiggyViewModel by lazy { getViewModel(DaoPiggyViewModel::class.java) }
     private var piggyDataBase: AppDatabase? = null
-    private lateinit var dbWorker: DbWorker
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -43,8 +41,6 @@ class ListPiggyFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         piggyDataBase = AppDatabase.getInstance(requireContext())
-        dbWorker = DbWorker("piggyWorkerThread")
-        dbWorker.start()
         displayView()
         pullToRefresh()
         initFab()
@@ -56,15 +52,14 @@ class ListPiggyFragment: BaseFragment() {
 
         model.getPiggyBanks(baseUrl, accessToken).observe(this, Observer {
             if(it.getError() == null){
-                dataAdapter = ArrayList(it.getPiggy()?.data)
-                piggyAdapter = PiggyRecyclerAdapter(dataAdapter){ piggyData: PiggyData -> itemClicked(piggyData)}
                 showData(it.getPiggy()!!.data.toMutableList())
                 it.getPiggy()!!.data.forEachIndexed { _, element ->
-                    insertDataIntoDb(element)
+                    launch {
+                        piggyDataBase?.piggyDataDao()?.addPiggy(element)
+                    }
                 }
             } else {
                 piggyVM.getPiggyBank().observe(this, Observer { piggyData ->
-                    piggyAdapter = PiggyRecyclerAdapter(piggyData) { data: PiggyData -> itemClicked(data)}
                     showData(piggyData)
                     toastInfo("Loaded data from cache")
                 })
@@ -75,16 +70,10 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun showData(piggyData: MutableList<PiggyData>){
+        piggyAdapter = PiggyRecyclerAdapter(piggyData) { data: PiggyData -> itemClicked(data)}
         recycler_view.adapter = piggyAdapter
         piggyAdapter = recycler_view.adapter as PiggyRecyclerAdapter
         piggyAdapter.update(piggyData)
-    }
-
-    private fun insertDataIntoDb(piggyData: PiggyData){
-        val task = Runnable {
-            piggyDataBase?.piggyDataDao()?.addPiggy(piggyData)
-        }
-        dbWorker.postTask(task)
     }
 
     private fun itemClicked(piggyData: PiggyData){
@@ -149,7 +138,6 @@ class ListPiggyFragment: BaseFragment() {
     override fun onDetach() {
         super.onDetach()
         RetrofitBuilder.destroyInstance()
-        dbWorker.quit()
         AppDatabase.destroyInstance()
 
     }

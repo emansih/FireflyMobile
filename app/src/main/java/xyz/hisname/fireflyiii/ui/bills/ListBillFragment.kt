@@ -17,10 +17,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_bill.*
+import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
-import xyz.hisname.fireflyiii.repository.dao.DbWorker
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.BillsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoBillsViewModel
@@ -35,8 +35,6 @@ class ListBillFragment: BaseFragment() {
     private lateinit var billsAdapter: BillsRecyclerAdapter
     private var dataAdapter = ArrayList<BillData>()
     private var billDatabase: AppDatabase? = null
-    private lateinit var dbWorker: DbWorker
-    private val threadName = "billWorkerThread"
     private val billsVM: DaoBillsViewModel by lazy { getViewModel(DaoBillsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -62,7 +60,6 @@ class ListBillFragment: BaseFragment() {
                 happyFace.isInvisible = true
                 recycler_view.isVisible = true
                 addBillButton.isVisible = true
-                billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
                 if(billsAdapter.itemCount == 0){
                     recycler_view.isVisible = false
                     happyFaceText.isInvisible = false
@@ -70,7 +67,9 @@ class ListBillFragment: BaseFragment() {
                 } else {
                     showData(dataAdapter)
                     it.getBill()!!.data.forEachIndexed { _, element ->
-                        insertDataIntoDb(element)
+                        launch {
+                            billDatabase?.billDataDao()?.addBill(element)
+                        }
                     }
                 }
             } else {
@@ -91,7 +90,6 @@ class ListBillFragment: BaseFragment() {
                             toastInfo("Please try again later")
                         }
                     } else {
-                        billsAdapter = BillsRecyclerAdapter(billData) { data: BillData -> itemClicked(data)}
                         showData(billData)
                         toastInfo("Loaded data from cache")
                     }
@@ -103,14 +101,10 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun showData(billData: MutableList<BillData>){
+        billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
         recycler_view.adapter = billsAdapter
         billsAdapter = recycler_view.adapter as BillsRecyclerAdapter
         billsAdapter.update(billData)
-    }
-
-    private fun insertDataIntoDb(billBillData: BillData){
-        val task = Runnable { billDatabase?.billDataDao()?.addBill(billBillData) }
-        dbWorker.postTask(task)
     }
 
     private fun itemClicked(billData: BillData){
@@ -171,19 +165,14 @@ class ListBillFragment: BaseFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         requireActivity().activity_toolbar.title = "Bills"
-        dbWorker = DbWorker(threadName)
-        dbWorker.start()
     }
 
     override fun onResume() {
         super.onResume()
         requireActivity().activity_toolbar.title = "Bills"
-        dbWorker = DbWorker(threadName)
-        dbWorker.start()
     }
 
     override fun onDetach() {
-        dbWorker.quit()
         AppDatabase.destroyInstance()
         RetrofitBuilder.destroyInstance()
         super.onDetach()
