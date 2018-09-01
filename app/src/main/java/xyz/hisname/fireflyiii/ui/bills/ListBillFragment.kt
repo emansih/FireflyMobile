@@ -103,8 +103,10 @@ class ListBillFragment: BaseFragment() {
     private fun showData(billData: MutableList<BillData>){
         billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
         recycler_view.adapter = billsAdapter
-        billsAdapter = recycler_view.adapter as BillsRecyclerAdapter
-        billsAdapter.update(billData)
+        billsAdapter.apply {
+            recycler_view.adapter as BillsRecyclerAdapter
+            update(billData)
+        }
     }
 
     private fun itemClicked(billData: BillData){

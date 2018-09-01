@@ -49,7 +49,6 @@ class ListPiggyFragment: BaseFragment() {
     private fun displayView(){
         swipeContainer.isRefreshing = true
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
-
         model.getPiggyBanks(baseUrl, accessToken).observe(this, Observer {
             if(it.getError() == null){
                 showData(it.getPiggy()!!.data.toMutableList())
@@ -72,8 +71,10 @@ class ListPiggyFragment: BaseFragment() {
     private fun showData(piggyData: MutableList<PiggyData>){
         piggyAdapter = PiggyRecyclerAdapter(piggyData) { data: PiggyData -> itemClicked(data)}
         recycler_view.adapter = piggyAdapter
-        piggyAdapter = recycler_view.adapter as PiggyRecyclerAdapter
-        piggyAdapter.update(piggyData)
+        piggyAdapter.apply {
+            recycler_view.adapter as PiggyRecyclerAdapter
+            update(piggyData)
+        }
     }
 
     private fun itemClicked(piggyData: PiggyData){
@@ -102,13 +103,14 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        addPiggyButton.translationY = (6 * 56).toFloat()
-        addPiggyButton.animate()
-                .translationY(0.toFloat())
-                .setInterpolator(OvershootInterpolator(1.toFloat()))
-                .setStartDelay(300)
-                .setDuration(400)
-                .start()
+        addPiggyButton.apply {
+            translationY = (6 * 56).toFloat()
+            animate().translationY(0.toFloat())
+                    .setInterpolator(OvershootInterpolator(1.toFloat()))
+                    .setStartDelay(300)
+                    .setDuration(400)
+                    .start()
+        }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if(dy > 0 && addPiggyButton.isShown){
