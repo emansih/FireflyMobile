@@ -1,0 +1,28 @@
+package xyz.hisname.fireflyiii.repository.models.piggy
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.math.BigDecimal
+
+@Entity
+data class PiggyAttributes(
+        @PrimaryKey(autoGenerate = true)
+        val piggyPlaceHolder: Long,
+        val updated_at: String,
+        val created_at: String,
+        val name: String,
+        val currency_id: Int,
+        val currency_code: String,
+        val currency_symbol: String,
+        val currency_dp: Int,
+        val target_amount: BigDecimal,
+        val percentage: Double,
+        val current_amount: BigDecimal,
+        val left_to_save: BigDecimal,
+        val save_per_month: BigDecimal,
+        val start_date: String,
+        val target_date: String?,
+        val order: Int?,
+        val active: Boolean,
+        val notes: String?
+)

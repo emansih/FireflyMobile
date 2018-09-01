@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Firefly III Mobile</string>
+    <string name="required_field">Required Field</string>
+    <string name="bill_due_today">Your bill is due today!</string>
+    <string name="bill_due_future">Bill due on %1$s, %2$s</string>
+    <string name="bill_due_past">Bill due %1$d days ago</string>
+    <string name="next_bill">Next bill is %1$s, %2$s</string>
+    <string name="bill_due_tomorrow">Bill due tomorrow</string>
+    <string name="bill_due_yesterday">Bill due yesterday</string>
+    <string name="error_loading_bills">Error loading bills</string>
+    <string name="unable_ping_server">Unable to reach server</string>
+    <string name="authorization_error">Authorization Error</string>
+    <string name="timeout_connecting">Timeout connecting to server</string>
+    <string name="syncing_account">Syncing your account…</string>
+    <string name="no_bills">Hurray! You have no bills</string>
+    <string name="bill_amount">-%1$s %2$s</string>
+    <string name="no_browser_installed">No application can handle this request. Please install a web browser</string>
+    <string name="target_date">Target Date: %1$s</string>
+    <string name="no_target_date">No target date set</string>
+    <string name="min_amount_save_per_month">Minimum amount to save per month: %1$s %2$s</string>
+    <string name="user_did_it">You did it!</string>
+    <string name="amount">%1$s / %2$s</string>
+    <string name="edit">Edit</string>
+    <string name="target_due_today">Target due today</string>
+    <string name="one_more_day_to_target">1 more day to your target!</string>
+    <string name="target_missed">You miss your target by %1$d days</string>
+    <string name="yesterday_target">Oh no! Your target was yesterday</string>
+    <string name="days_to_go">%1$d days to go</string>
+    <string name="get_confirmation">Are you sure?</string>
+    <string name="irreversible_action">This action is irreversible.</string>
+    <string name="delete_bill">Delete Bill</string>
+    <string name="delete_piggy">Delete Piggy Bank</string>
+    <string name="piggy_bank_deleted">Piggy bank deleted</string>
+    <string name="bill_deleted">Bill deleted</string>
+    <string name="generic_delete_error">An error occurred while deleting</string>
+    <string name="overview">Overview</string>
+    <string name="income">Income</string>
+    <string name="expense">Expense</string>
+    <string name="welcome">Welcome!</string>
+    <string name="authentication_failed">Authentication Failed</string>
+    <string name="authentication_failed_message">There was an issue retrieving access token from your Firefly III instance. " +
+                        "Ensure you are using %1$s as your redirect URI in your Firefly III config.</string>
+    <string name="details">Details</string>
+    <string name="view_report">View Report</string>
+</resources>
