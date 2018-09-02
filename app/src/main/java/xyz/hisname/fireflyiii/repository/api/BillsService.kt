@@ -21,7 +21,7 @@ interface BillsService {
                    @Field("amount_min") amountMin: String, @Field("amount_max") amountMax: String,
                    @Field("date") date: String, @Field("repeat_freq") repeatFreq: String,
                    @Field("skip") skip: String, @Field("automatch") automatch: String,
-                   @Field("active") active: String, @Field("currency_id") currencyId: String,
+                   @Field("active") active: String, @Field("currency_code") currencyCode: String,
                    @Field("notes") notes: String?
     ): Call<BillsModel>
 

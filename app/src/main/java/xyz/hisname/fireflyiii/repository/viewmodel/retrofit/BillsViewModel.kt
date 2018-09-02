@@ -20,10 +20,8 @@ class BillsViewModel: ViewModel() {
         val billResponse: MutableLiveData<BillApiResponse> = MutableLiveData()
         val billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
         billsService?.getBills()?.enqueue(retrofitCallback({ response ->
-            launch {
-                if (response.isSuccessful) {
-                    withContext(UI){ billResponse.postValue(BillApiResponse(response.body())) }
-                }
+            if (response.isSuccessful) {
+                billResponse.postValue(BillApiResponse(response.body()))
             }
         })
         { throwable ->  billResponse.postValue(BillApiResponse(throwable))})
@@ -38,10 +36,8 @@ class BillsViewModel: ViewModel() {
         val billResponse: MutableLiveData<BillApiResponse> = MutableLiveData()
         val billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
         billsService?.deleteBillById(id)?.enqueue(retrofitCallback({ response ->
-            launch {
-                if (response.isSuccessful) {
-                    withContext(UI){ billResponse.postValue(BillApiResponse(response.body())) }
-                }
+            if (response.isSuccessful) {
+                billResponse.postValue(BillApiResponse(response.body()))
             }
         })
         { throwable -> billResponse.postValue(BillApiResponse(throwable))})
@@ -59,14 +55,10 @@ class BillsViewModel: ViewModel() {
         billsService?.createBill(name, match, amountMin, amountMax, date,
                 repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
-                    launch {
-                        if (response.isSuccessful) {
-                            withContext(UI) { billResponse.postValue(BillApiResponse(response.body())) }
-                        }
-                    }})
-        { throwable -> billResponse.postValue(BillApiResponse(throwable))})
-        apiResponse.addSource(billResponse){ apiResponse.value = it
-        }
+                    billResponse.postValue(BillApiResponse(String(response.errorBody()?.bytes()!!)))
+                })
+        { throwable -> billResponse.postValue(BillApiResponse(throwable)) })
+        apiResponse.addSource(billResponse){ apiResponse.value = it }
         return apiResponse
     }
 }

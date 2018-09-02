@@ -9,6 +9,13 @@ import java.util.*
 
 object DateTimeUtil {
 
+    fun getCalToString(date: String): String{
+        return Instant.ofEpochMilli(parseLong(date))
+                .atOffset(OffsetDateTime.now().offset)
+                .toLocalDate()
+                .toString()
+    }
+
     /*
     Takes in end date in yyyy-MM-dd format
     Output difference in *DAYS*

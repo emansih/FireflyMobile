@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name="xyz.hisname.fireflyiii.ui.HomeActivity"/>
+        <activity android:name=".ui.bills.AddBillActivity" />
 
 
     </application>
