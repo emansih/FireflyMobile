@@ -1,9 +1,11 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.piggy_list_item.view.*
@@ -28,7 +30,14 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
         holder.piggyName.text = piggyData?.name
         holder.goalAmount.text = piggyData?.currency_symbol + " " + piggyData?.target_amount
         holder.amountSaved.text = piggyData?.currency_symbol + " " + piggyData?.current_amount.toString()
-        holder.piggyProgress.progress = piggyData!!.percentage.toInt()
+        if(piggyData!!.percentage <= 15.toDouble()){
+            holder.piggyProgress.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_red_700),
+                    PorterDuff.Mode.SRC_IN)
+        } else if(piggyData.percentage <= 50.toDouble()){
+            holder.piggyProgress.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_green_500),
+                    PorterDuff.Mode.SRC_IN)
+        }
+        holder.piggyProgress.progress = piggyData.percentage.toInt()
         val targetDate = piggyData.target_date
         holder.timeLeft.let {
             if(targetDate != null){

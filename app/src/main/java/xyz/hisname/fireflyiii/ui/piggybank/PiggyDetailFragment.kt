@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.animation.ObjectAnimator
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
 import android.view.animation.AccelerateInterpolator
@@ -56,6 +57,13 @@ class PiggyDetailFragment: BaseDetailFragment() {
         val deleteButton = requireActivity().findViewById<Button>(R.id.deletePiggyButton)
         deleteButton.setText(R.string.delete_piggy)
         piggyBankName.text = name
+        if(percentage <= 15.toDouble()){
+            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
+                    R.color.md_red_700), PorterDuff.Mode.SRC_IN)
+        } else if(percentage <= 50.toDouble()){
+            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
+                    R.color.md_green_500), PorterDuff.Mode.SRC_IN)
+        }
         amountPercentage.text = percentage.toString() + "%"
         if(!targetDate.isNullOrBlank()){
             if(DateTimeUtil.getDaysDifference(targetDate).toInt() <= 3){
@@ -82,8 +90,8 @@ class PiggyDetailFragment: BaseDetailFragment() {
             if(it.getError() == null){
                 launch {
                     dao.deletePiggyBank(piggyId)
-                        toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
-                        activity?.supportFragmentManager?.popBackStack()
+                    toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
+                    activity?.supportFragmentManager?.popBackStack()
                 }
             } else {
                 ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
