@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.bills
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -60,6 +60,7 @@ class ListBillFragment: BaseFragment() {
                 happyFace.isInvisible = true
                 recycler_view.isVisible = true
                 addBillButton.isVisible = true
+                billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
                 if(billsAdapter.itemCount == 0){
                     recycler_view.isVisible = false
                     happyFaceText.isInvisible = false
@@ -101,7 +102,6 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun showData(billData: MutableList<BillData>){
-        billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
         recycler_view.adapter = billsAdapter
         billsAdapter.apply {
             recycler_view.adapter as BillsRecyclerAdapter
@@ -128,13 +128,10 @@ class ListBillFragment: BaseFragment() {
                     .setStartDelay(300)
                     .setDuration(400)
                     .start()
+
             setOnClickListener{
-                val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-                requireActivity().supportFragmentManager.beginTransaction()
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .replace(R.id.fragment_container, AddBillDialog().apply { arguments = bundle })
-                        .addToBackStack(null)
-                        .commit()
+                val addBillActivity = Intent(requireContext(), AddBillActivity::class.java)
+                startActivity(addBillActivity)
             }
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
