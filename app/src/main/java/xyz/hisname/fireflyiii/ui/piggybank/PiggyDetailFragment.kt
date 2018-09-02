@@ -35,11 +35,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     private val currencyCode: String by lazy { arguments?.getString("currencyCode") as String }
     private val targetAmount: BigDecimal by lazy { arguments?.getSerializable("targetAmount") as BigDecimal }
     private val name: String by lazy { arguments?.getString("name") as String }
-    /*
-        `kotlin.TypeCastException: null cannot be cast to non-null type kotlin.String` is thrown
-        if user does not set target date and we use lazy init
-     */
-    private var targetDate: String? = ""
+    private val targetDate: String? by lazy { arguments?.getString("targetDate")  }
     private val minPerMonth: BigDecimal by lazy{ arguments?.getSerializable("savePerMonth") as BigDecimal }
     private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val dao: DaoPiggyViewModel by lazy { getViewModel(DaoPiggyViewModel::class.java) }
@@ -51,7 +47,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        targetDate = arguments?.getString("targetDate")
         setupProgressBar(percentage.toInt())
         setupWidgets()
         deletePiggy()
