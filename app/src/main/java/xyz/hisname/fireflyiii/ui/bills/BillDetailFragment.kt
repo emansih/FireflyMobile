@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.bills
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
@@ -51,9 +50,9 @@ class BillDetailFragment: BaseDetailFragment(){
         billAmount_textView.text = currencyCode + String.format(billMin.toString()) +  "-" +
                 String.format(billMax.toString())
         if(date == null){
-            billDue.text = resources.getString(R.string.no_target_date)
+            billDue_textView.text = resources.getString(R.string.no_target_date)
         } else {
-            billDue.text = date
+            billDue_textView.text = date
         }
         val deleteButton = requireActivity().findViewById<Button>(R.id.deleteBillButton)
         deleteButton.setText(R.string.delete_piggy)

@@ -5,61 +5,106 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/billName_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/billNameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_marginTop="80dp"
-        android:layout_marginStart="40dp"
-        android:drawableStart="@drawable/ic_information_outline"
-        android:drawablePadding="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/billAmount_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_cash"
-        android:drawablePadding="12dp"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="40dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/billName_textView"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/billName_ImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tint="@color/md_pink_300"
+            android:src="@drawable/rounded_rectangle"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/billDue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="40dp"
-        android:textSize="20sp"
-        android:drawablePadding="12dp"
-        android:drawableStart="@drawable/ic_calendar_blank"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/billAmount_textView"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/billName_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:drawableStart="@drawable/ic_information_outline"
+            android:layout_marginStart="68dp"
+            app:layout_constraintTop_toTopOf="@+id/billName_ImageView"
+            app:layout_constraintBottom_toBottomOf="@+id/billName_ImageView"
+            app:layout_constraintStart_toStartOf="@+id/billName_ImageView"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/billDueDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="40dp"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/billDue"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/billDueReminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/billAmountLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_marginTop="20dp"
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/billDueDate"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/billNameLayout">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/billAmount_ImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tint="@color/md_red_300"
+            android:src="@drawable/rounded_rectangle"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/billAmount_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:drawableStart="@drawable/ic_cash"
+            android:layout_marginStart="68dp"
+            app:layout_constraintTop_toTopOf="@+id/billAmount_ImageView"
+            app:layout_constraintBottom_toBottomOf="@+id/billAmount_ImageView"
+            app:layout_constraintStart_toStartOf="@+id/billAmount_ImageView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/billDueLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/billAmountLayout">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/billDue_ImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/rounded_rectangle"/>
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/billDue_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginStart="68dp"
+            android:drawableStart="@drawable/ic_calendar_blank"
+            app:layout_constraintTop_toTopOf="@+id/billDue_ImageView"
+            app:layout_constraintBottom_toBottomOf="@+id/billDue_ImageView"
+            app:layout_constraintStart_toStartOf="@+id/billDue_ImageView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <include layout="@layout/delete_button_layout"
         android:id="@+id/deleteBillButton"
