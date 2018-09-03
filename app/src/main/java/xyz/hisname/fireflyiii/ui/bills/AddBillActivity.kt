@@ -76,10 +76,21 @@ class AddBillActivity: AppCompatActivity() {
 
     private fun validateInput(): Boolean{
         var shouldContinue = true
-        if(amount_max_edittext.text.toString().toInt() < amount_min_edittext.text.toString().toInt()){
-            amount_max_layout.error = "Max amount should be more than min amount"
-            amount_min_layout.error = "Min amount should be less than max amount"
+
+        if(amount_max_edittext.text.toString().isBlank()){
+            amount_max_layout.error = "Please enter a value"
             shouldContinue = false
+        }
+        if(amount_min_edittext.text.toString().isBlank()){
+            amount_min_layout.error = "Please enter a value"
+            shouldContinue = false
+        }
+        if(shouldContinue) {
+            if (amount_max_edittext.text.toString().toInt() < amount_min_edittext.text.toString().toInt()) {
+                amount_max_layout.error = "Max amount should be more than min amount"
+                amount_min_layout.error = "Min amount should be less than max amount"
+                shouldContinue = false
+            }
         }
         if(!amount_max_edittext.text.toString().isDigitsOnly()){
             amount_max_layout.error = "Please enter numbers only"
