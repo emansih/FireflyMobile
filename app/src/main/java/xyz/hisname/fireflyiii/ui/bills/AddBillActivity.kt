@@ -134,10 +134,10 @@ class AddBillActivity: AppCompatActivity() {
     }
 
     private fun checkEmptiness(){
-        if(skip_edittext.text.toString().isEmpty() || bill_date.text.toString().isEmpty() ||
-                note_edittext.text.toString().isEmpty() || amount_max_edittext.text.toString().isEmpty() ||
-                amount_min_edittext.text.toString().isEmpty() || bill_name_edittext.text.toString().isEmpty()
-        || bill_match_edittext.text.toString().isEmpty() || currency_code_edittext.text.toString().isEmpty()){
+        if(skip_edittext.text.toString().isBlank() && bill_date.text.toString().isBlank() &&
+                note_edittext.text.toString().isBlank() && amount_max_edittext.text.toString().isBlank() &&
+                amount_min_edittext.text.toString().isBlank() && bill_name_edittext.text.toString().isBlank()
+        && bill_match_edittext.text.toString().isBlank() && currency_code_edittext.text.toString().isBlank()){
             toastInfo("No information entered. Bill not saved")
             finish()
         } else {
