@@ -22,6 +22,7 @@ import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.AuthViewModel
+import xyz.hisname.fireflyiii.util.extension.getString
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
@@ -100,9 +101,9 @@ class LoginActivity: AppCompatActivity() {
 
     private fun getAccessCode(){
         firefly_submit_button.setOnClickListener {
-            fireflyUrl = firefly_url_edittext.text.toString()
-            fireflyId = firefly_id_edittext.text.toString()
-            fireflySecretKey =  firefly_secret_edittext.text.toString()
+            fireflyUrl = firefly_url_edittext.getString()
+            fireflyId = firefly_id_edittext.getString()
+            fireflySecretKey =  firefly_secret_edittext.getString()
             if(fireflyUrl.isEmpty() or fireflyId.isEmpty() or fireflySecretKey.isEmpty()){
                 when {
                     fireflyUrl.isEmpty() -> firefly_url_edittext.error = resources.getString(R.string.required_field)
