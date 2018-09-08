@@ -57,11 +57,11 @@ class AddBillActivity: AppCompatActivity() {
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, monthOfYear)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                bill_date.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
+                bill_date_edittext.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
             }
         }
 
-        bill_date.setOnClickListener {
+        bill_date_edittext.setOnClickListener {
             DatePickerDialog(this, startDate, calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
@@ -72,65 +72,64 @@ class AddBillActivity: AppCompatActivity() {
 
     private fun validateInput(): Boolean{
         var shouldContinue = true
-
         if(amount_max_edittext.isBlank()){
-            amount_max_layout.error = resources.getString(R.string.required_field)
+            amount_max_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         if(amount_min_edittext.isBlank()){
-            amount_min_layout.error = resources.getString(R.string.required_field)
+            amount_min_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         if(shouldContinue) {
             if (amount_max_edittext.getDigits() < amount_min_edittext.getDigits()) {
-                amount_max_layout.error = "Max amount should be more than min amount"
-                amount_min_layout.error = "Min amount should be less than max amount"
+                amount_max_edittext.error = "Max amount should be more than min amount"
+                amount_min_edittext.error = "Min amount should be less than max amount"
                 shouldContinue = false
             }
         }
         if(!amount_max_edittext.isDigitsOnly()){
-            amount_max_layout.error = "Please enter numbers only"
+            amount_max_edittext.error = "Please enter numbers only"
             shouldContinue = false
         }
         if(!amount_min_edittext.isDigitsOnly()){
-            amount_min_layout.error = "Please enter numbers only"
+            amount_min_edittext.error = "Please enter numbers only"
             shouldContinue = false
         }
         if(bill_name_edittext.isBlank()){
-            bill_name_layout.error = resources.getString(R.string.required_field)
+            bill_name_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         if(amount_min_edittext.isBlank()) {
-            amount_min_layout.error = resources.getString(R.string.required_field)
+            amount_min_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         if(amount_max_edittext.isBlank()){
-            amount_max_layout.error = resources.getString(R.string.required_field)
+            amount_max_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
 
-        if(bill_date.isBlank()){
-            bill_date_layout.error = resources.getString(R.string.required_field)
+        if(bill_date_edittext.isBlank()){
+            bill_date_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         if(!skip_edittext.isDigitsOnly()){
-            skip_layout.error = resources.getString(R.string.required_field)
+            skip_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
 
         if(skip_edittext.isBlank()){
-            skip_layout.error = resources.getString(R.string.required_field)
+            skip_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         if(currency_code_edittext.isBlank()){
-            currency_code_layout.error = resources.getString(R.string.required_field)
+            currency_code_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         return shouldContinue
     }
 
     private fun checkEmptiness(){
-        if(skip_edittext.isBlank() && bill_date.isBlank() &&
+        if(skip_edittext.isBlank() && bill_date_edittext.isBlank() &&
                 note_edittext.isBlank() && amount_max_edittext.isBlank() &&
                 amount_min_edittext.isBlank() && bill_name_edittext.isBlank()
         && bill_match_edittext.isBlank() && currency_code_edittext.isBlank()){
@@ -168,7 +167,7 @@ class AddBillActivity: AppCompatActivity() {
                         repeat_spinner.selectedItem.toString().substring(1)
                 model.addBill(baseUrl,accessToken,bill_name_edittext.getString(),
                         bill_match_edittext.getString(),amount_min_edittext.getString(),
-                        amount_max_edittext.getString(), bill_date.getString(), repeatFreq,
+                        amount_max_edittext.getString(), bill_date_edittext.getString(), repeatFreq,
                         skip_edittext.getString(), "1", "1",
                         currency_code_edittext.getString(), notes)
                         .observe(this, Observer {

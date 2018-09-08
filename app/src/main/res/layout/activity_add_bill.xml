@@ -35,103 +35,72 @@
                     app:layout_scrollFlags="scroll|enterAlways|snap"/>
             </com.google.android.material.appbar.AppBarLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/bill_name_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Bill Name"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@+id/activity_appbar"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/bill_name_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
-                android:maxLines="1" />
+                android:hint="Bill Name"
+                android:maxLines="1"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/activity_appbar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/bill_match_layout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bill_match_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
                 android:hint="Words to match on, comma separated"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                app:layout_constraintTop_toBottomOf="@+id/bill_name_layout"
+                app:layout_constraintTop_toBottomOf="@+id/bill_name_edittext"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/bill_match_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/amount_min_layout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/amount_min_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
                 android:hint="Minimum Amount"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/bill_match_layout"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@+id/bill_match_edittext"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/amount_min_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/amount_max_layout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/amount_max_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
                 android:hint="Maximum Amount"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/amount_min_layout"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@+id/amount_min_edittext"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/amount_max_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/bill_date_layout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bill_date_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusable="false"
+                android:inputType="date"
+                android:maxLines="1"
                 android:hint="Date"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/amount_max_layout">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/bill_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:inputType="date"
-                    android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+                app:layout_constraintTop_toBottomOf="@+id/amount_max_edittext"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/repeat_textview"
@@ -141,7 +110,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/bill_date_layout" />
+                app:layout_constraintTop_toBottomOf="@+id/bill_date_edittext" />
 
             <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/repeat_spinner"
@@ -155,67 +124,47 @@
                 app:layout_constraintEnd_toEndOf="parent">
             </androidx.appcompat.widget.AppCompatSpinner>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/skip_layout"
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/skip_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLines="1"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="8dp"
                 android:hint="How often the bill is skipped"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/repeat_spinner"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/skip_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/currency_code_layout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/currency_code_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="8dp"
                 android:hint="Currency Code"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/skip_layout"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@+id/skip_edittext"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/currency_code_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/note_layout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/note_edittext"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Notes(optional)"
+                android:layout_height="300dp"
                 android:gravity="top"
+                android:inputType="text|textMultiLine"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                app:layout_constraintTop_toBottomOf="@+id/currency_code_layout"
+                android:hint="Notes(optional)"
+                app:layout_constraintTop_toBottomOf="@+id/currency_code_edittext"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/note_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:gravity="top"
-                    android:inputType="text|textMultiLine" />
-            </com.google.android.material.textfield.TextInputLayout>
+                app:layout_constraintEnd_toEndOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
-
