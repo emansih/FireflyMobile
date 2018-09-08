@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_add_bill.*
@@ -21,10 +20,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastError
-import xyz.hisname.fireflyiii.util.extension.toastInfo
-import xyz.hisname.fireflyiii.util.extension.toastSuccess
+import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
 class AddBillActivity: AppCompatActivity() {
@@ -77,67 +73,67 @@ class AddBillActivity: AppCompatActivity() {
     private fun validateInput(): Boolean{
         var shouldContinue = true
 
-        if(amount_max_edittext.text.toString().isBlank()){
-            amount_max_layout.error = "Please enter a value"
+        if(amount_max_edittext.isBlank()){
+            amount_max_layout.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
-        if(amount_min_edittext.text.toString().isBlank()){
-            amount_min_layout.error = "Please enter a value"
+        if(amount_min_edittext.isBlank()){
+            amount_min_layout.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         if(shouldContinue) {
-            if (amount_max_edittext.text.toString().toInt() < amount_min_edittext.text.toString().toInt()) {
+            if (amount_max_edittext.getDigits() < amount_min_edittext.getDigits()) {
                 amount_max_layout.error = "Max amount should be more than min amount"
                 amount_min_layout.error = "Min amount should be less than max amount"
                 shouldContinue = false
             }
         }
-        if(!amount_max_edittext.text.toString().isDigitsOnly()){
+        if(!amount_max_edittext.isDigitsOnly()){
             amount_max_layout.error = "Please enter numbers only"
             shouldContinue = false
         }
-        if(!amount_min_edittext.text.toString().isDigitsOnly()){
+        if(!amount_min_edittext.isDigitsOnly()){
             amount_min_layout.error = "Please enter numbers only"
             shouldContinue = false
         }
-        if(bill_name_edittext.text.toString().isBlank() || bill_name_edittext.text.toString().isEmpty()){
-            bill_name_layout.error = "Please enter a name"
+        if(bill_name_edittext.isBlank()){
+            bill_name_layout.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
-        if(amount_min_edittext.text.toString().isBlank() || amount_min_edittext.text.toString().isEmpty()) {
-            amount_min_layout.error = "Please enter a value"
+        if(amount_min_edittext.isBlank()) {
+            amount_min_layout.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
-        if(amount_max_edittext.text.toString().isBlank() || amount_max_edittext.text.toString().isEmpty()){
-            amount_max_layout.error = "Please enter a value"
-            shouldContinue = false
-        }
-
-        if(bill_date.text.toString().isBlank() || bill_date.text.toString().isEmpty()){
-            bill_date_layout.error = "Please select a date"
-            shouldContinue = false
-        }
-        if(!skip_edittext.text.toString().isDigitsOnly()){
-            skip_layout.error = "Please enter numbers only"
+        if(amount_max_edittext.isBlank()){
+            amount_max_layout.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
 
-        if(skip_edittext.text.toString().isBlank() || skip_edittext.text.toString().isEmpty()){
-            skip_layout.error = "Please enter a value"
+        if(bill_date.isBlank()){
+            bill_date_layout.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
-        if(currency_code_edittext.text.toString().isBlank() || currency_code_edittext.text.toString().isEmpty()){
-            currency_code_layout.error = "Please enter a value"
+        if(!skip_edittext.isDigitsOnly()){
+            skip_layout.error = resources.getString(R.string.required_field)
+            shouldContinue = false
+        }
+
+        if(skip_edittext.isBlank()){
+            skip_layout.error = resources.getString(R.string.required_field)
+            shouldContinue = false
+        }
+        if(currency_code_edittext.isBlank()){
+            currency_code_layout.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
         return shouldContinue
     }
 
     private fun checkEmptiness(){
-        if(skip_edittext.text.toString().isBlank() && bill_date.text.toString().isBlank() &&
-                note_edittext.text.toString().isBlank() && amount_max_edittext.text.toString().isBlank() &&
-                amount_min_edittext.text.toString().isBlank() && bill_name_edittext.text.toString().isBlank()
-        && bill_match_edittext.text.toString().isBlank() && currency_code_edittext.text.toString().isBlank()){
+        if(skip_edittext.isBlank() && bill_date.isBlank() &&
+                note_edittext.isBlank() && amount_max_edittext.isBlank() &&
+                amount_min_edittext.isBlank() && bill_name_edittext.isBlank()
+        && bill_match_edittext.isBlank() && currency_code_edittext.isBlank()){
             toastInfo("No information entered. Bill not saved")
             finish()
         } else {
@@ -163,31 +159,30 @@ class AddBillActivity: AppCompatActivity() {
         if(item?.itemId == R.id.menu_item_save){
             if(validateInput()){
                 ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-                val notes: String? = if(note_edittext.text.toString().isBlank()){
+                val notes: String? = if(note_edittext.isBlank()){
                     null
                 } else {
-                    note_edittext.text.toString()
+                    note_edittext.getString()
                 }
                 val repeatFreq = repeat_spinner.selectedItem.toString().substring(0,1).toLowerCase() +
                         repeat_spinner.selectedItem.toString().substring(1)
-                model.addBill(baseUrl,accessToken,bill_name_edittext.text.toString(),
-                        bill_match_edittext.text.toString(),amount_min_edittext.text.toString(),
-                        amount_max_edittext.text.toString(), bill_date.text.toString(), repeatFreq,
-                        skip_edittext.text.toString(), "1", "1",
-                        currency_code_edittext.text.toString(), notes)
+                model.addBill(baseUrl,accessToken,bill_name_edittext.getString(),
+                        bill_match_edittext.getString(),amount_min_edittext.getString(),
+                        amount_max_edittext.getString(), bill_date.getString(), repeatFreq,
+                        skip_edittext.getString(), "1", "1",
+                        currency_code_edittext.getString(), notes)
                         .observe(this, Observer {
+                            ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
                             if(it.getErrorMessage() != null) {
                                 val errorMessage = it.getErrorMessage()
                                 val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
                                 // This error parsing is sick...
-                                ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
                                 when {
                                     gson.errors.name != null -> toastError(gson.errors.name[0])
                                     gson.errors.currency_code != null -> toastError(gson.errors.currency_code[0])
                                     else -> toastError("Error occurred while saving bill")
                                 }
                             } else if(it.getError() != null){
-                                ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
                                 if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
                                     toastError(resources.getString(R.string.unable_ping_server))
                                 } else {
