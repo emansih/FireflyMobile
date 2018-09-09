@@ -82,14 +82,6 @@ class AddBillActivity: BaseActivity() {
                 shouldContinue = false
             }
         }
-        if(!amount_max_edittext.isDigitsOnly()){
-            amount_max_edittext.error = "Please enter numbers only"
-            shouldContinue = false
-        }
-        if(!amount_min_edittext.isDigitsOnly()){
-            amount_min_edittext.error = "Please enter numbers only"
-            shouldContinue = false
-        }
         if(bill_name_edittext.isBlank()){
             bill_name_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
@@ -170,21 +162,19 @@ class AddBillActivity: BaseActivity() {
                             if(it.getErrorMessage() != null) {
                                 val errorMessage = it.getErrorMessage()
                                 val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
-                                // This error parsing is sick...
                                 when {
                                     gson.errors.name != null -> toastError(gson.errors.name[0])
                                     gson.errors.currency_code != null -> toastError(gson.errors.currency_code[0])
+                                    gson.errors.amount_min != null -> toastError(gson.errors.amount_min[0])
+                                    gson.errors.repeat_freq != null -> toastError(gson.errors.repeat_freq[0])
+                                    gson.errors.automatch != null -> toastError(gson.errors.automatch[0])
                                     else -> toastError("Error occurred while saving bill")
                                 }
                             } else if(it.getError() != null){
                                 if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
                                     toastError(resources.getString(R.string.unable_ping_server))
-                                } else {
-                                    // yea this is weird
-                                    toastSuccess("Bill saved")
-                                    finish()
                                 }
-                            } else {
+                            } else if(it.getSuccess() != null){
                                 toastSuccess("Bill saved")
                                 finish()
                             }

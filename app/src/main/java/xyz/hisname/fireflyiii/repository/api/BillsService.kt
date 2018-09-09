@@ -4,6 +4,7 @@ import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.BILL_API_ENDPONT
 import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
+import xyz.hisname.fireflyiii.repository.models.bills.success.BillSucessModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/bills.html
 interface BillsService {
@@ -23,7 +24,7 @@ interface BillsService {
                    @Field("skip") skip: String, @Field("automatch") automatch: String,
                    @Field("active") active: String, @Field("currency_code") currencyCode: String,
                    @Field("notes") notes: String?
-    ): Call<BillsModel>
+    ): Call<BillSucessModel>
 
     @DELETE("$BILL_API_ENDPONT/{id}")
     fun deleteBillById(@Path("id") id: String): Call<BillsModel>

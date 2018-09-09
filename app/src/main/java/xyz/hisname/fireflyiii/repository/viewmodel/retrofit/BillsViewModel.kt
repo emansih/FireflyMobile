@@ -55,7 +55,12 @@ class BillsViewModel: ViewModel() {
         billsService?.createBill(name, match, amountMin, amountMax, date,
                 repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
-                    billResponse.postValue(BillApiResponse(String(response.errorBody()?.bytes()!!)))
+                    val errorBody = String(response.errorBody()?.bytes()!!)
+                    if(response.isSuccessful){
+                        billResponse.postValue(BillApiResponse(response.body()))
+                    } else {
+                        billResponse.postValue(BillApiResponse(errorBody))
+                    }
                 })
         { throwable -> billResponse.postValue(BillApiResponse(throwable)) })
         apiResponse.addSource(billResponse){ apiResponse.value = it }
