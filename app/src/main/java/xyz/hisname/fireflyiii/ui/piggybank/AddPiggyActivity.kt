@@ -7,9 +7,11 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_piggy_create.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.piggy.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -77,16 +79,6 @@ class AddPiggyActivity: BaseActivity() {
             target_amount_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
-        if(shouldContinue){
-            if(!target_amount_edittext.isDigitsOnly()){
-                target_amount_edittext.error = "Please enter numbers only"
-                shouldContinue = false
-            }
-        }
-        if(!current_amount_edittext.isBlank() && !current_amount_edittext.isDigitsOnly()){
-            current_amount_edittext.error = "Please enter numbers only"
-            shouldContinue = false
-        }
         return shouldContinue
     }
 
@@ -94,7 +86,7 @@ class AddPiggyActivity: BaseActivity() {
         if(piggy_name_edittext.isBlank() and account_id_edittext.isBlank() and
                 target_amount_edittext.isBlank() and current_amount_edittext.isBlank() and
                 start_date_edittext.isBlank() and target_date_edittext.isBlank() and note_edittext.isBlank()){
-            toastInfo("No information entered. Bill not saved")
+            toastInfo("No information entered. Piggy bank not saved")
             finish()
         } else {
             AlertDialog.Builder(this)
@@ -114,23 +106,23 @@ class AddPiggyActivity: BaseActivity() {
         if (item?.itemId == R.id.menu_item_save) {
             if (validateInput()) {
                 ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-                val currentAmount = if (current_amount_edittext.isBlank()) {
-                    ""
+                val currentAmount: String? = if (current_amount_edittext.isBlank()) {
+                    null
                 } else {
                     current_amount_edittext.getString()
                 }
                 val startDate = if (start_date_edittext.isBlank()) {
-                    ""
+                    null
                 } else {
                     start_date_edittext.getString()
                 }
                 val targetDate = if (target_date_edittext.isBlank()) {
-                    ""
+                    null
                 } else {
                     target_date_edittext.getString()
                 }
                 val notes = if (note_edittext.isBlank()) {
-                    ""
+                    null
                 } else {
                     note_edittext.getString()
                 }
@@ -138,8 +130,28 @@ class AddPiggyActivity: BaseActivity() {
                         currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
                         .observe(this, Observer {
                             ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
-
-
+                            if(it.getErrorMessage() != null){
+                                val errorMessage = it.getErrorMessage()
+                                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                                when {
+                                    gson.errors.name != null -> toastError(gson.errors.name[0])
+                                    gson.errors.account_id != null -> toastError(gson.errors.account_id[0])
+                                    gson.errors.current_amount != null -> toastError(gson.errors.current_amount[0])
+                                    else -> toastError("Error occurred while saving bill")
+                                }
+                            } else if(it.getError() != null){
+                                if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
+                                    toastError(resources.getString(R.string.unable_ping_server))
+                                } else if(it.getError().toString()
+                                                .startsWith("com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY")){
+                                    // yea this is weird
+                                    toastSuccess("Piggy bank saved")
+                                    finish()
+                                }
+                            } else {
+                                toastSuccess("Piggy bank saved")
+                                finish()
+                            }
                         })
             }
         }

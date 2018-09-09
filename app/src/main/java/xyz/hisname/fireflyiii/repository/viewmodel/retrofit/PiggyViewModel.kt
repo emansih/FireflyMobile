@@ -41,8 +41,8 @@ class PiggyViewModel: ViewModel() {
     }
 
     fun addPiggyBank(baseUrl: String?, accessToken: String?, piggyName: String, accountId: String,
-                     currentAmount: String, notes: String, startDate: String, targetAmount: String,
-                     targetDate: String): LiveData<PiggyApiResponse>{
+                     currentAmount: String?, notes: String?, startDate: String?, targetAmount: String,
+                     targetDate: String?): LiveData<PiggyApiResponse>{
         val apiResponse: MediatorLiveData<PiggyApiResponse> =  MediatorLiveData()
         val piggy: MutableLiveData<PiggyApiResponse> = MutableLiveData()
         val piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
@@ -50,7 +50,11 @@ class PiggyViewModel: ViewModel() {
                 targetDate, notes)?.enqueue(retrofitCallback({ response ->
             piggy.postValue(PiggyApiResponse(String(response.errorBody()?.bytes()!!)))
         })
-        { throwable -> apiResponse.postValue(PiggyApiResponse(throwable)) })
+        { throwable ->
+            run {
+                apiResponse.postValue(PiggyApiResponse(throwable))
+            }
+        })
         apiResponse.addSource(piggy){ apiResponse.value = it }
         return apiResponse
 

@@ -9,11 +9,13 @@ class PiggyApiResponse() {
     constructor(piggyList: PiggyModel?): this(){
         this.piggyList = piggyList
         this.error = null
+        this.errorMessage = null
     }
 
     constructor(error: Throwable): this(){
         this.error = error
         this.piggyList = null
+        this.errorMessage = null
     }
 
     constructor(errorMessage: String): this(){
