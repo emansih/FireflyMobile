@@ -1,15 +1,12 @@
 package xyz.hisname.fireflyiii.ui.bills
 
 import android.app.DatePickerDialog
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_add_bill.*
@@ -19,15 +16,13 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddBillActivity: AppCompatActivity() {
+class AddBillActivity: BaseActivity() {
 
-    private val sharedPref: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
-    private val baseUrl: String by lazy { sharedPref.getString("fireflyUrl", "") }
-    private val accessToken: String by lazy { sharedPref.getString("access_token","") }
     private val model: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?){

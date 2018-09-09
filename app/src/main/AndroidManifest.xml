@@ -29,6 +29,7 @@
         </activity>
         <activity android:name="xyz.hisname.fireflyiii.ui.HomeActivity"/>
         <activity android:name=".ui.bills.AddBillActivity" />
+        <activity android:name=".ui.piggybank.AddPiggyActivity" />
 
 
     </application>

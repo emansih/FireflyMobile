@@ -1,9 +1,6 @@
 package xyz.hisname.fireflyiii.ui
 
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -15,17 +12,15 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
 
-class HomeActivity: AppCompatActivity(){
+class HomeActivity: BaseActivity(){
 
     private var result: Drawer? = null
-    private lateinit var sharedPref: SharedPreferences
-    private var baseUrl: String? = null
-    private var accessToken: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +30,6 @@ class HomeActivity: AppCompatActivity(){
         setUpDrawer(savedInstanceState)
         supportActionBar?.title = ""
         setNavIcon()
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-        accessToken = sharedPref.getString("access_token","")
-        baseUrl = sharedPref.getString("fireflyUrl", "")
         if(savedInstanceState == null){
             val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
             supportFragmentManager.beginTransaction()

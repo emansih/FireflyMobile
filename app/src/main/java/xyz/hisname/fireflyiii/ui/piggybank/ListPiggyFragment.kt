@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -110,6 +111,9 @@ class ListPiggyFragment: BaseFragment() {
                     .setStartDelay(300)
                     .setDuration(400)
                     .start()
+            setOnClickListener{
+                startActivity(Intent(requireContext(), AddPiggyActivity::class.java))
+            }
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

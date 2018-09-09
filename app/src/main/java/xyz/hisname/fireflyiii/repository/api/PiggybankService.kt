@@ -23,7 +23,7 @@ interface PiggybankService {
     @FormUrlEncoded
     @POST(PIGGY_BANK_API_ENDPOINT)
     fun createNewPiggyBank(@Field("name") name: String, @Field("account_id") accountId: String,
-                           @Field("target_amount") targetAmount: String, @Field("current_amount") currentAmount: String?,
-                           @Field("start_date") startDate: String?, @Field("target_date") targetDate: String?,
-                           @Field("notes") notes: String?)
+                           @Field("target_amount") targetAmount: String, @Field("current_amount") currentAmount: String,
+                           @Field("start_date") startDate: String, @Field("target_date") targetDate: String,
+                           @Field("notes") notes: String): Call<PiggyModel>
 }

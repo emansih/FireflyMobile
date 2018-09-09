@@ -4,6 +4,7 @@ class PiggyApiResponse() {
 
     private var error: Throwable? = null
     private var piggyList: PiggyModel? = null
+    private var errorMessage: String? = null
 
     constructor(piggyList: PiggyModel?): this(){
         this.piggyList = piggyList
@@ -15,20 +16,21 @@ class PiggyApiResponse() {
         this.piggyList = null
     }
 
-    fun getPiggy(): PiggyModel? {
-        return piggyList
+    constructor(errorMessage: String): this(){
+        this.errorMessage = errorMessage
+        this.piggyList = null
+        this.error = null
     }
 
-    fun setPiggy(piggyList: PiggyModel?) {
-        this.piggyList = piggyList
+    fun getPiggy(): PiggyModel? {
+        return piggyList
     }
 
     fun getError(): Throwable? {
         return error
     }
 
-    fun setError(error: Throwable) {
-        this.error = error
+    fun getErrorMessage(): String?{
+        return errorMessage
     }
-
 }
