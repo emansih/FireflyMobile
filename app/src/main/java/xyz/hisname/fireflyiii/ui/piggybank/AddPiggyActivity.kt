@@ -142,13 +142,10 @@ class AddPiggyActivity: BaseActivity() {
                             } else if(it.getError() != null){
                                 if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
                                     toastError(resources.getString(R.string.unable_ping_server))
-                                } else if(it.getError().toString()
-                                                .startsWith("com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_ARRAY")){
-                                    // yea this is weird
-                                    toastSuccess("Piggy bank saved")
-                                    finish()
+                                } else {
+                                    toastError("Error saving piggy bank")
                                 }
-                            } else {
+                            } else if(it.getSuccess() != null){
                                 toastSuccess("Piggy bank saved")
                                 finish()
                             }

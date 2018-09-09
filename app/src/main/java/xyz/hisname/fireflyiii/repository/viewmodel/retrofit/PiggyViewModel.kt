@@ -48,12 +48,16 @@ class PiggyViewModel: ViewModel() {
         val piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.createNewPiggyBank(piggyName, accountId, targetAmount, currentAmount, startDate,
                 targetDate, notes)?.enqueue(retrofitCallback({ response ->
-            piggy.postValue(PiggyApiResponse(String(response.errorBody()?.bytes()!!)))
+            // For some weird reason i needed to create a new variable for this
+            val errorBody = String(response.errorBody()?.bytes()!!)
+            if(response.isSuccessful){
+                piggy.postValue(PiggyApiResponse(response.body()))
+            } else {
+                piggy.postValue(PiggyApiResponse(errorBody))
+            }
         })
         { throwable ->
-            run {
-                apiResponse.postValue(PiggyApiResponse(throwable))
-            }
+            apiResponse.postValue(PiggyApiResponse(throwable))
         })
         apiResponse.addSource(piggy){ apiResponse.value = it }
         return apiResponse
