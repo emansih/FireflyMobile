@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_piggy_list.*
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
@@ -54,9 +57,9 @@ class ListPiggyFragment: BaseFragment() {
             if(it.getError() == null){
                 showData(it.getPiggy()!!.data.toMutableList())
                 it.getPiggy()!!.data.forEachIndexed { _, element ->
-                    launch {
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
                         piggyDataBase?.piggyDataDao()?.addPiggy(element)
-                    }
+                    })
                 }
             } else {
                 piggyVM.getPiggyBank().observe(this, Observer { piggyData ->

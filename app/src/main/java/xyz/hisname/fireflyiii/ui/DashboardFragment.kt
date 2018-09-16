@@ -8,6 +8,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.android.Main
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.coroutineScope
+import kotlinx.coroutines.experimental.withContext
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Data
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
@@ -75,6 +81,17 @@ class DashboardFragment: BaseFragment() {
         })
         sumText.text = (depositSum - withdrawSum).toString()
         swipeContainer.isRefreshing = false
+    }
+
+    suspend fun calculateTransactions(){
+        coroutineScope{
+            val deposit = async{ }
+            val withdrawal = async {  }
+            withContext(Dispatchers.Main){
+
+            }
+        }
+
     }
 
     private fun setRefreshing(){

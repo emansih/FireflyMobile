@@ -14,9 +14,8 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.Main
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoPiggyViewModel
@@ -90,13 +89,13 @@ class PiggyDetailFragment: BaseDetailFragment() {
     override fun deleteItem() {
         model.deletePiggyBank(baseUrl,accessToken,piggyId.toString()).observe(this, Observer{
             if(it.getError() == null){
-                launch {
+                GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, null, {
                     dao.deletePiggyBank(piggyId)
-                    withContext(UI){
+                    withContext(Dispatchers.Main){
                         toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
                     }
                     activity?.supportFragmentManager?.popBackStack()
-                }
+                })
             } else {
                 ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
                 val error = it.getError()

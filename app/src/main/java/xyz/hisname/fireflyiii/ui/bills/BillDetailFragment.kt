@@ -9,9 +9,8 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_bill_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.Main
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.BillsViewModel
@@ -84,13 +83,13 @@ class BillDetailFragment: BaseDetailFragment(){
     override fun deleteItem() {
         model.deleteBill(baseUrl, accessToken, billId.toString()).observe(this, Observer { it ->
             if (it.getError() == null) {
-                launch {
+                GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, null, {
                     dao.deleteBill(billId)
-                    withContext(UI){
+                    withContext(Dispatchers.Main){
                         toastSuccess(resources.getString(R.string.bill_deleted))
                         activity?.supportFragmentManager?.popBackStack()
                     }
-                }
+                })
             } else {
                 val error = it.getError()
                 val parentLayout: View = requireActivity().findViewById(R.id.coordinatorlayout)

@@ -16,9 +16,9 @@ import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_login.*
 import xyz.hisname.fireflyiii.R
 import kotlinx.android.synthetic.main.progress_overlay.*
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.Main
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.AuthViewModel
@@ -91,12 +91,12 @@ class LoginActivity: AppCompatActivity() {
     }
 
     private fun startHomeIntent(){
-        launch(UI){
+        GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, null, {
             delay(1234) //heh
             startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
-        }
+        })
     }
 
     private fun getAccessCode(){

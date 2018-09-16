@@ -2,7 +2,10 @@ package xyz.hisname.fireflyiii.ui.base
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.android.Main
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.channels.actor
 import kotlinx.coroutines.experimental.launch
@@ -13,14 +16,14 @@ abstract class DiffUtilAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.A
     protected var dataSet: List<D> = listOf()
     private val diffCallback by lazy(LazyThreadSafetyMode.NONE) { DiffCallback() }
     private val eventActor =
-            actor<List<D>>(capacity = Channel.CONFLATED) {
+            GlobalScope.actor<List<D>>(Dispatchers.Default, capacity = Channel.CONFLATED, block = {
                 for (list in channel) internalUpdate(list)
-            }
+            })
 
     fun update (list: List<D>) = eventActor.offer(list)
 
     private suspend fun internalUpdate(list: List<D>) {
-        launch(UI) {
+        GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, null, {
             dataSet = list
             DiffUtil.calculateDiff(diffCallback.apply { newList = list },false)
                     .dispatchUpdatesTo(this@DiffUtilAdapter)
@@ -29,7 +32,7 @@ abstract class DiffUtilAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.A
             `java.lang.IndexOutOfBoundsException: Inconsistency detected. Invalid item`
             */
             notifyDataSetChanged()
-        }.join()
+        }).join()
     }
 
     private inner class DiffCallback : DiffUtil.Callback() {

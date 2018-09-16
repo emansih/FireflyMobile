@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_bill.*
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
@@ -68,9 +71,9 @@ class ListBillFragment: BaseFragment() {
                 } else {
                     showData(dataAdapter)
                     it.getBill()!!.data.forEachIndexed { _, element ->
-                        launch {
+                        GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
                             billDatabase?.billDataDao()?.addBill(element)
-                        }
+                        })
                     }
                 }
             } else {
