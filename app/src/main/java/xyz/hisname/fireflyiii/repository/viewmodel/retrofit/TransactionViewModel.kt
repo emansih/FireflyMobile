@@ -11,13 +11,12 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class TransactionViewModel:ViewModel() {
 
-
     fun getTransactions(baseUrl: String?, accessToken: String?, start: String, end: String, type: String):
             LiveData<TransactionApiResponse>{
         val apiResponse: MediatorLiveData<TransactionApiResponse> = MediatorLiveData()
         val transaction: MutableLiveData<TransactionApiResponse> = MutableLiveData()
-        val transService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
-        transService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
+        val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
+        transactionService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 transaction.value = TransactionApiResponse(response.body())
             }
@@ -26,5 +25,4 @@ class TransactionViewModel:ViewModel() {
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return apiResponse
     }
-
 }

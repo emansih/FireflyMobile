@@ -8,12 +8,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.android.Main
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.coroutineScope
-import kotlinx.coroutines.experimental.withContext
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Data
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
@@ -21,14 +15,18 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.extension.toastError
+import xyz.hisname.fireflyiii.util.extension.zipLiveData
 import java.util.*
 
 class DashboardFragment: BaseFragment() {
 
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
     private var dataAdapter = ArrayList<Data>()
-    private var depositSum: Int = 0
-    private var withdrawSum: Int = 0
+    private var depositSum = 0
+    private var withdrawSum = 0
+    private var transaction = 0
+    private var isThereError = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -37,69 +35,70 @@ class DashboardFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getTransactions()
+        loadTransaction()
         setRefreshing()
     }
 
-    private fun getTransactions(){
+
+    private fun loadTransaction(){
         swipeContainer.isRefreshing = true
-        model.getTransactions(baseUrl, accessToken, "01-08-2018", DateTimeUtil.getEndDateOfCurrentMonth(), "withdrawals")
-                .observe(this, Observer { withDrawResponse ->
-                    if (withDrawResponse.getError() == null) {
-                        dataAdapter = ArrayList(withDrawResponse.getTransaction()?.data)
-                        if (dataAdapter.size == 0) {
-                            // no withdrawal
-                            withdrawSum = 0
-                            withdrawText.text = "0"
-                        } else {
-                            withDrawResponse.getTransaction()?.data?.forEachIndexed { _, element ->
-                                withdrawSum += Math.abs(element.attributes.amount)
-                            }
-                            withdrawText.text = withdrawSum.toString()
-                        }
-                    } else {
-                        // Error
+        val withdrawals = model.getTransactions(baseUrl, accessToken,
+                DateTimeUtil.getStartDateOfCurrentMonth(), DateTimeUtil.getEndDateOfCurrentMonth(), "withdrawals")
+        val deposits = model.getTransactions(baseUrl, accessToken,
+                DateTimeUtil.getStartDateOfCurrentMonth(), DateTimeUtil.getEndDateOfCurrentMonth(), "deposits")
+        zipLiveData(withdrawals, deposits).observe(this, Observer {
+            if(it.first.getError() == null){
+                dataAdapter = ArrayList(it.first.getTransaction()?.data)
+                if (dataAdapter.size == 0) {
+                    // no withdrawal
+                    withdrawSum = 0
+                    withdrawText.text = "0"
+                }  else {
+                    it.first.getTransaction()?.data?.forEachIndexed { _, element ->
+                        withdrawSum += Math.abs(element.attributes.amount)
                     }
-                })
-        model.getTransactions(baseUrl, accessToken, "01-08-2018", DateTimeUtil.getEndDateOfCurrentMonth(), "deposits").observe(this, Observer { depositResponse ->
-            if (depositResponse.getError() == null) {
-                dataAdapter = ArrayList(depositResponse.getTransaction()?.data)
+                    withdrawText.text = withdrawSum.toString()
+                }
+            } else {
+                isThereError = true
+                swipeContainer.isRefreshing = false
+            }
+            if(it.second.getError() == null){
+                dataAdapter = ArrayList(it.second.getTransaction()?.data)
                 if (dataAdapter.size == 0) {
                     // no deposit
                     depositSum = 0
                     incomeDigit.text = "0"
-                } else {
-                    depositResponse.getTransaction()?.data?.forEachIndexed { _, element ->
+                }  else {
+                    it.second.getTransaction()?.data?.forEachIndexed { _, element ->
                         depositSum += Math.abs(element.attributes.amount)
                     }
-                    incomeDigit.text = depositSum.toString()
+                    incomeDigit.text = withdrawSum.toString()
                 }
             } else {
-                // Error
+                isThereError = true
+                swipeContainer.isRefreshing = false
             }
-
+            transaction = depositSum - withdrawSum
+            sumText.text = transaction.toString()
         })
-        sumText.text = (depositSum - withdrawSum).toString()
+        if(isThereError){
+            toastError("There is an issue loading transactions")
+        }
         swipeContainer.isRefreshing = false
     }
 
-    suspend fun calculateTransactions(){
-        coroutineScope{
-            val deposit = async{ }
-            val withdrawal = async {  }
-            withContext(Dispatchers.Main){
-
-            }
-        }
-
-    }
 
     private fun setRefreshing(){
         swipeContainer.setOnRefreshListener {
             // Reset values first before doing network calls
             depositSum = 0
+            incomeDigit.text = "--.--"
             withdrawSum = 0
-            getTransactions()
+            withdrawText.text = "--.--"
+            transaction = 0
+            sumText.text = "--.--"
+            loadTransaction()
         }
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
