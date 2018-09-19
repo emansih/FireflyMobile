@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -17,133 +16,34 @@
         android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-           android:layout_width="match_parent"
-           android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-           <androidx.cardview.widget.CardView
-               android:id="@+id/overviewCard"
-               android:layout_width="match_parent"
-               android:layout_height="200dp"
-               android:stateListAnimator="@animator/lift_on_touch"
-               android:clickable="true"
-               android:focusable="true"
-               android:foreground="?android:attr/selectableItemBackground"
-               card_view:targetApi="lollipop"
-               app:cardUseCompatPadding="true"
-               app:cardPreventCornerOverlap="false"
-               app:cardCornerRadius="2dp"
-               app:cardElevation="2dp"
-               app:layout_constraintStart_toStartOf="parent"
-               app:layout_constraintEnd_toEndOf="parent">
+            <FrameLayout
+                android:id="@+id/overviewFrame"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-               <androidx.constraintlayout.widget.ConstraintLayout
-                   android:layout_marginStart="8dp"
-                   android:layout_marginEnd="8dp"
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent">
+            </FrameLayout>
 
-                   <androidx.appcompat.widget.AppCompatTextView
-                       android:id="@+id/overviewText"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:textColor="@color/md_black_1000"
-                       android:textSize="30sp"
-                       android:textStyle="bold"
-                       android:text="@string/overview"/>
+            <FrameLayout
+                android:id="@+id/walletFrame"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/overviewFrame"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-                   <androidx.appcompat.widget.AppCompatTextView
-                       android:id="@+id/fullreport"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:text="@string/view_report"
-                       android:layout_marginTop="5dp"
-                       app:layout_constraintStart_toStartOf="@+id/overviewText"
-                       app:layout_constraintTop_toBottomOf="@+id/overviewText"/>
+            </FrameLayout>
 
-                   <View
-                       android:id="@+id/linedivider"
-                       android:layout_width="match_parent"
-                       android:layout_height="1dp"
-                       android:background="#E1E1E1"
-                       android:layout_marginTop="5dp"
-                       app:layout_constraintStart_toStartOf="@id/fullreport"
-                       app:layout_constraintTop_toBottomOf="@id/fullreport"
-                       app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                   <androidx.appcompat.widget.AppCompatTextView
-                       android:id="@+id/incomeText"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:text="@string/income"
-                       android:textSize="20sp"
-                       android:textStyle="bold"
-                       android:layout_marginTop="12dp"
-                       app:layout_constraintStart_toStartOf="@id/overviewText"
-                       app:layout_constraintTop_toBottomOf="@id/linedivider" />
-
-                   <androidx.appcompat.widget.AppCompatTextView
-                       android:id="@+id/expenseText"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:text="@string/expense"
-                       android:textSize="20sp"
-                       android:textStyle="bold"
-                       android:layout_marginTop="12dp"
-                       app:layout_constraintStart_toStartOf="@id/incomeText"
-                       app:layout_constraintTop_toBottomOf="@id/incomeText" />
-
-                   <androidx.appcompat.widget.AppCompatTextView
-                       android:id="@+id/incomeDigit"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:textSize="20sp"
-                       android:text="--.--"
-                       app:layout_constraintTop_toTopOf="@+id/incomeText"
-                       app:layout_constraintEnd_toEndOf="parent"/>
-
-                   <androidx.appcompat.widget.AppCompatTextView
-                       android:id="@+id/withdrawText"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:textSize="20sp"
-                       android:text="--.--"
-                       android:textColor="@color/md_red_500"
-                       app:layout_constraintTop_toBottomOf="@+id/incomeDigit"
-                       app:layout_constraintTop_toTopOf="@+id/expenseText"
-                       app:layout_constraintEnd_toEndOf="parent"/>
-
-                   <View
-                       android:id="@+id/sumDivider"
-                       android:layout_width="150dp"
-                       android:layout_height="1dp"
-                       android:layout_marginTop="8dp"
-                       android:background="#E1E1E1"
-                       app:layout_constraintTop_toBottomOf="@+id/withdrawText"
-                       app:layout_constraintEnd_toEndOf="parent"/>
-
-                   <androidx.appcompat.widget.AppCompatTextView
-                       android:id="@+id/sumText"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       android:layout_marginTop="8dp"
-                       android:text="--.--"
-                       android:textSize="20sp"
-                       app:layout_constraintTop_toBottomOf="@+id/sumDivider"
-                       app:layout_constraintEnd_toEndOf="parent"/>
-
-                   <androidx.appcompat.widget.AppCompatImageView
-                       android:id="@+id/overviewImage"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
-                       app:srcCompat="@drawable/ic_arrow_right"
-                       app:layout_constraintTop_toTopOf="@+id/overviewText"
-                       app:layout_constraintBottom_toBottomOf="@+id/fullreport"
-                       app:layout_constraintEnd_toEndOf="parent"/>
-
-               </androidx.constraintlayout.widget.ConstraintLayout>
-
-           </androidx.cardview.widget.CardView>
-       </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

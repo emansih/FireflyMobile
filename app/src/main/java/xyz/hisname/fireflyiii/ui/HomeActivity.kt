@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
+import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
@@ -163,7 +164,7 @@ class HomeActivity: BaseActivity(){
             supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
             supportFragmentManager.backStackEntryCount == 0 -> {
                 val fragment = supportFragmentManager.findFragmentByTag("dash")
-                if(fragment is  DashboardFragment){
+                if(fragment is DashboardFragment){
                     finish()
                 } else {
                     result?.setSelection(1)
