@@ -33,7 +33,7 @@
             <FrameLayout
                 android:id="@+id/walletFrame"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="150dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="12dp"
                 app:layout_constraintTop_toBottomOf="@+id/overviewFrame"
