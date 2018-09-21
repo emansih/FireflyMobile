@@ -15,8 +15,8 @@ interface TransactionService {
     an empty string to it.
     */
     @GET(TRANSACTION_API_ENDPOINT)
-    fun getAllTransactions(@Query("start") startDate: String,
-                           @Query("end") endDate: String,
+    fun getAllTransactions(@Query("start") startDate: String?,
+                           @Query("end") endDate: String?,
                            @Query("type") type: String): Call<TransactionModel>
 
     @GET("$TRANSACTION_API_ENDPOINT/{id}")

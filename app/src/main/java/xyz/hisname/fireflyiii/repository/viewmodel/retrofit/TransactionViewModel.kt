@@ -11,7 +11,7 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class TransactionViewModel:ViewModel() {
 
-    fun getTransactions(baseUrl: String?, accessToken: String?, start: String, end: String, type: String):
+    fun getTransactions(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
             LiveData<TransactionApiResponse>{
         val apiResponse: MediatorLiveData<TransactionApiResponse> = MediatorLiveData()
         val transaction: MutableLiveData<TransactionApiResponse> = MutableLiveData()

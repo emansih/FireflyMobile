@@ -10,7 +10,7 @@ data class Attributes(
         val identifier: Int,
         val journal_id: Int,
         val reconciled: Boolean,
-        val amount: Int,
+        val amount: Double,
         val currency_id: Int,
         val currency_code: String,
         val currency_symbol: String,

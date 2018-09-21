@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_dashboard_overview.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.Data
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -15,12 +15,13 @@ import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
+import java.math.BigDecimal
 import java.util.ArrayList
 
 class OverviewFragment: BaseFragment() {
 
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
-    private var dataAdapter = ArrayList<Data>()
+    private var dataAdapter = ArrayList<TransactionData>()
     private var depositSum = 0
     private var withdrawSum = 0
     private var transaction = 0
@@ -50,7 +51,7 @@ class OverviewFragment: BaseFragment() {
                     withdrawText.text = "0"
                 }  else {
                     it.first.getTransaction()?.data?.forEachIndexed { _, element ->
-                        withdrawSum += Math.abs(element.attributes.amount)
+                        withdrawSum += Math.abs(element.attributes.amount.toInt())
                     }
                     withdrawText.text = withdrawSum.toString()
                 }
@@ -65,7 +66,7 @@ class OverviewFragment: BaseFragment() {
                     incomeDigit.text = "0"
                 }  else {
                     it.second.getTransaction()?.data?.forEachIndexed { _, element ->
-                        depositSum += Math.abs(element.attributes.amount)
+                        depositSum += Math.abs(element.attributes.amount.toInt())
                     }
                     incomeDigit.text = withdrawSum.toString()
                 }

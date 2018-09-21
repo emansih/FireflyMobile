@@ -30,6 +30,9 @@ class DashboardFragment: BaseFragment() {
         requireFragmentManager().beginTransaction()
                 .replace(R.id.walletFrame, WalletFragment().apply { arguments = bundle })
                 .commit()
+        requireFragmentManager().beginTransaction()
+                .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })
+                .commit()
         swipeContainer.isRefreshing = false
         setRefreshing()
     }
@@ -39,11 +42,15 @@ class DashboardFragment: BaseFragment() {
             swipeContainer.isRefreshing = true
             requireFragmentManager().beginTransaction().remove(OverviewFragment()).commit()
             requireFragmentManager().beginTransaction().remove(WalletFragment()).commit()
+            requireFragmentManager().beginTransaction().remove(RecentTransactionFragment()).commit()
             requireFragmentManager().beginTransaction()
                     .replace(R.id.overviewFrame, OverviewFragment().apply { arguments = bundle })
                     .commit()
             requireFragmentManager().beginTransaction()
                     .replace(R.id.walletFrame, WalletFragment().apply { arguments = bundle })
+                    .commit()
+            requireFragmentManager().beginTransaction()
+                    .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })
                     .commit()
             swipeContainer.isRefreshing = false
         }
