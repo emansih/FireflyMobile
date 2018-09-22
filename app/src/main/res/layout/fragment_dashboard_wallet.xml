@@ -29,65 +29,135 @@
             android:layout_height="match_parent">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/accountText"
+                android:id="@+id/account_list_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/md_black_1000"
-                android:textSize="30sp"
-                android:text="Account"
+                android:text="List of Accounts"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toTopOf="@id/linedivider"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <View
-                android:id="@+id/linedivider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E1E1E1"
-                android:layout_marginTop="5dp"
-                app:layout_constraintTop_toBottomOf="@+id/accountText"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cashLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="4dp"
+                android:background="@color/md_orange_500"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toStartOf="@+id/creditLayout"
+                app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/cashTextView"
-                android:layout_width="wrap_content"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/cashImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/rectangle"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cashTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Cash"
+                    android:textColor="@color/white"
+                    app:layout_constraintStart_toStartOf="@+id/cashImageView"
+                    app:layout_constraintTop_toBottomOf="@+id/cashImageView" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cashText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cashTextView"
+                    app:layout_constraintStart_toStartOf="@+id/cashTextView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/creditLayout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Cash"
-                android:textSize="20sp"
-                android:textStyle="bold"
                 android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@id/linedivider"/>
+                android:layout_marginEnd="4dp"
+                android:background="@color/md_purple_500"
+                app:layout_constraintStart_toEndOf="@+id/cashLayout"
+                app:layout_constraintEnd_toStartOf="@+id/bankLayout"
+                app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/cashText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="--.--"
-                app:layout_constraintTop_toTopOf="@+id/cashTextView"
-                app:layout_constraintBottom_toBottomOf="@+id/cashTextView"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/creditImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/rectangle"/>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/creditTextView"
-                android:layout_width="wrap_content"
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/creditTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Credit Card"
+                    android:textColor="@color/white"
+                    app:layout_constraintStart_toStartOf="@+id/creditImageView"
+                    app:layout_constraintTop_toBottomOf="@+id/creditImageView" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/creditText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/creditTextView"
+                    app:layout_constraintStart_toStartOf="@+id/creditTextView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bankLayout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Credit Card"
-                android:textSize="20sp"
-                android:textStyle="bold"
                 android:layout_marginTop="12dp"
-                app:layout_constraintStart_toStartOf="@id/cashTextView"
-                app:layout_constraintTop_toBottomOf="@id/cashTextView" />
+                android:layout_marginEnd="4dp"
+                android:background="@color/md_blue_500"
+                app:layout_constraintStart_toEndOf="@+id/creditLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/creditText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:text="--.--"
-                app:layout_constraintTop_toTopOf="@+id/creditTextView"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/bankImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/rectangle"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/bankTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Bank Account"
+                    android:textColor="@color/white"
+                    app:layout_constraintStart_toStartOf="@+id/bankImageView"
+                    app:layout_constraintTop_toBottomOf="@+id/bankImageView" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/bankText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/bankTextView"
+                    app:layout_constraintStart_toStartOf="@+id/bankTextView" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

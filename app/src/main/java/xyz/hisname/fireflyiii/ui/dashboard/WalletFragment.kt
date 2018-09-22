@@ -20,6 +20,7 @@ class WalletFragment: BaseFragment() {
     private var dataAdapter = ArrayList<Data>()
     private var creditCard: Int = 0
     private var cash: Int = 0
+    private var bank: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -30,6 +31,7 @@ class WalletFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         getCreditCard()
         getCash()
+        getBankBalance()
     }
 
     private fun getCreditCard(){
@@ -40,7 +42,7 @@ class WalletFragment: BaseFragment() {
                     creditText.text = "0"
                 } else {
                     it.getAccounts()?.data?.forEachIndexed { _, element ->
-                        creditCard += Math.abs(element.attributes.current_balance)
+                        creditCard += Math.abs(element.attributes.current_balance.toInt())
 
                     }
                     creditText.text = creditCard.toString()
@@ -57,7 +59,7 @@ class WalletFragment: BaseFragment() {
                     cashText.text = "0"
                 } else {
                     it.getAccounts()?.data?.forEachIndexed { _, element ->
-                        cash += Math.abs(element.attributes.current_balance)
+                        cash += Math.abs(element.attributes.current_balance.toInt())
 
                     }
                     cashText.text = cash.toString()
@@ -65,5 +67,21 @@ class WalletFragment: BaseFragment() {
             }
         })
 
+    }
+
+    private fun getBankBalance(){
+        model.getAccountType(baseUrl,accessToken,"asset").observe(this, Observer {
+            if(it.getError() == null){
+                dataAdapter = ArrayList(it.getAccounts()?.data)
+                if(dataAdapter.size == 0){
+                    bankText.text = "0"
+                } else {
+                    it.getAccounts()?.data?.forEachIndexed { _, element ->
+                        bank += Math.abs(element.attributes.current_balance.toInt())
+                    }
+                    bankText.text = bank.toString()
+                }
+            }
+        })
     }
 }

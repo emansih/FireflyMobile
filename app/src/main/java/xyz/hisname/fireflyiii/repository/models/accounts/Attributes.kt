@@ -8,7 +8,7 @@ data class Attributes(
         val type: String,
         val currency_id: Int,
         val currency_code: String,
-        val current_balance: Int,
+        val current_balance: Double,
         val current_balance_date: String,
         val notes: Any,
         val monthly_payment_date: Any,
