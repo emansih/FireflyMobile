@@ -86,7 +86,7 @@
                 android:layout_marginEnd="4dp"
                 android:background="@color/md_purple_500"
                 app:layout_constraintStart_toEndOf="@+id/cashLayout"
-                app:layout_constraintEnd_toStartOf="@+id/bankLayout"
+                app:layout_constraintEnd_toStartOf="@+id/assetsLayout"
                 app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -119,7 +119,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/bankLayout"
+                android:id="@+id/assetsLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -130,31 +130,31 @@
                 app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/bankImageView"
+                    android:id="@+id/assetsImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:srcCompat="@drawable/rectangle"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/bankTextView"
+                    android:id="@+id/assetsTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
-                    android:text="Bank Account"
+                    android:text="Assets"
                     android:textColor="@color/white"
-                    app:layout_constraintStart_toStartOf="@+id/bankImageView"
-                    app:layout_constraintTop_toBottomOf="@+id/bankImageView" />
+                    app:layout_constraintStart_toStartOf="@+id/assetsImageView"
+                    app:layout_constraintTop_toBottomOf="@+id/assetsImageView" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/bankText"
+                    android:id="@+id/assetsText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:layout_marginBottom="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/bankTextView"
-                    app:layout_constraintStart_toStartOf="@+id/bankTextView" />
+                    app:layout_constraintTop_toBottomOf="@+id/assetsTextView"
+                    app:layout_constraintStart_toStartOf="@+id/assetsTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

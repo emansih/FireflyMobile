@@ -20,7 +20,7 @@ class WalletFragment: BaseFragment() {
     private var dataAdapter = ArrayList<Data>()
     private var creditCard: Int = 0
     private var cash: Int = 0
-    private var bank: Int = 0
+    private var assets: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -74,12 +74,12 @@ class WalletFragment: BaseFragment() {
             if(it.getError() == null){
                 dataAdapter = ArrayList(it.getAccounts()?.data)
                 if(dataAdapter.size == 0){
-                    bankText.text = "0"
+                    assetsText.text = "0"
                 } else {
                     it.getAccounts()?.data?.forEachIndexed { _, element ->
-                        bank += Math.abs(element.attributes.current_balance.toInt())
+                        assets += Math.abs(element.attributes.current_balance.toInt())
                     }
-                    bankText.text = bank.toString()
+                    assetsText.text = assets.toString()
                 }
             }
         })
