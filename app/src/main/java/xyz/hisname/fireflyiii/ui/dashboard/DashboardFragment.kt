@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
 import androidx.core.os.bundleOf
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.util.DeviceUtil
 import xyz.hisname.fireflyiii.util.extension.create
 
 class DashboardFragment: BaseFragment() {
@@ -24,6 +27,24 @@ class DashboardFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         swipeContainer.isRefreshing = true
+        animateCard(overviewFrame,walletFrame,recentTransactionFrame)
+        setUpCards()
+        swipeContainer.isRefreshing = false
+        setRefreshing()
+    }
+
+    private fun animateCard(vararg frameLayout: FrameLayout){
+        for(frames in frameLayout){
+            frames.translationY = DeviceUtil.getScreenHeight(requireContext()).toFloat()
+            frames.animate()
+                    .translationY(0.toFloat())
+                    .setInterpolator(DecelerateInterpolator(5.toFloat()))
+                    .setDuration(3000)
+                    .start()
+        }
+    }
+
+    private fun setUpCards(){
         requireFragmentManager().beginTransaction()
                 .replace(R.id.overviewFrame, OverviewFragment().apply { arguments = bundle })
                 .commit()
@@ -33,8 +54,6 @@ class DashboardFragment: BaseFragment() {
         requireFragmentManager().beginTransaction()
                 .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })
                 .commit()
-        swipeContainer.isRefreshing = false
-        setRefreshing()
     }
 
     private fun setRefreshing(){
@@ -43,15 +62,7 @@ class DashboardFragment: BaseFragment() {
             requireFragmentManager().beginTransaction().remove(OverviewFragment()).commit()
             requireFragmentManager().beginTransaction().remove(WalletFragment()).commit()
             requireFragmentManager().beginTransaction().remove(RecentTransactionFragment()).commit()
-            requireFragmentManager().beginTransaction()
-                    .replace(R.id.overviewFrame, OverviewFragment().apply { arguments = bundle })
-                    .commit()
-            requireFragmentManager().beginTransaction()
-                    .replace(R.id.walletFrame, WalletFragment().apply { arguments = bundle })
-                    .commit()
-            requireFragmentManager().beginTransaction()
-                    .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })
-                    .commit()
+            setUpCards()
             swipeContainer.isRefreshing = false
         }
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
