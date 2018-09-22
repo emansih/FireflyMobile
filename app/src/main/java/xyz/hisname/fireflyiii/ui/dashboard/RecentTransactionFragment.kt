@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,14 +35,17 @@ class RecentTransactionFragment: BaseFragment() {
     }
 
     private fun loadTransaction(){
+        transactionLoader.bringToFront()
         recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
         recentTransactionList.addItemDecoration(DividerItemDecoration(recentTransactionList.context,
                 DividerItemDecoration.VERTICAL))
         model.getTransactions(baseUrl,accessToken, null,null,"all").observe(this, Observer {
             if(it.getError() == null) {
                 dataAdapter = ArrayList(it.getTransaction()?.data)
+                transactionLoader.hide()
                 if (dataAdapter.size == 0) {
-
+                    recentTransactionList.isGone = true
+                    noTransactionText.isVisible = true
                 } else {
                     if(dataAdapter.size <= 5){
                         rtAdapter = RecentTransactionRecyclerAdapter(it.getTransaction()?.data!!.toMutableList())
