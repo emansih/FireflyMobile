@@ -72,6 +72,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:layout_marginBottom="4dp"
+                    android:text="--.--"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cashTextView"
                     app:layout_constraintStart_toStartOf="@+id/cashTextView" />
@@ -111,6 +112,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
+                    android:text="--.--"
                     android:layout_marginBottom="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/creditTextView"
@@ -152,6 +154,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:layout_marginBottom="4dp"
+                    android:text="--.--"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/assetsTextView"
                     app:layout_constraintStart_toStartOf="@+id/assetsTextView" />

@@ -36,9 +36,9 @@ class RecentTransactionRecyclerAdapter(private val items: MutableList<Transactio
         if(transactionData.amount.toString().startsWith("-")){
             // Negative value means it's a withdrawal
             holder.transactionAmountText.setTextColor(ContextCompat.getColor(context, R.color.md_red_500))
-            holder.transactionAmountText.text = transactionData.amount.toString()
+            holder.transactionAmountText.text = "-" + transactionData.currency_symbol + Math.abs(transactionData.amount)
         } else {
-            holder.transactionAmountText.text = transactionData.amount.toString()
+            holder.transactionAmountText.text = transactionData.currency_symbol + transactionData.amount.toString()
         }
     }
 
