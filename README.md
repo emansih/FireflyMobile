@@ -20,11 +20,10 @@ In order to start using this software, you have to create a new client in your F
 6. Copy the client secret that you have just created
 7. Paste it into the mobile app login screen under `secret` field
 
-![1](art/firefly-web-oauth-dialog.png)
+| Ensure you use http://empty as your redirect URL | Copy this    | Paste it on your Android device    |
+| ------------------------------ | ------------------------------ | ------------------------------ |
+| ![1](art/firefly-web-oauth-dialog.png) | ![2](art/firefly-web-oauth-string.png) | ![3](art/firefly-mobile-oauth.jpg) |
 
-![2](art/firefly-web-oauth-string.png)
-
-![3](art/firefly-mobile-oauth.jpg)
 
 ### License
 ```
