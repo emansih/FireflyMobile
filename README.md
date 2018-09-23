@@ -10,7 +10,21 @@ Icons in this app are taken from:
 1. [Flaticon](https://www.flaticon.com/free-icon/piggy-bank-with-dollar-coin_21239)
 2. [Material Design Icons](https://materialdesignicons.com)
 
-License
+### Authentication
+In order to start using this software, you have to create a new client in your Firefly Instance. 
+1. Login to your Firefly instance
+2. Click on `Options`, then `profile`
+3. Scroll down to `OAuth Clients` section and click on `Create New Client`
+4. Use any name and ensure you are using `http://empty` as your redirect URL. 
+5. Click `save`
+6. Copy the client secret that you have just created
+7. Paste it into the mobile app login screen under `secret` field
+
+[](art/firefly-web-oauth-dialog.png)
+[](art/firefly-web-oauth-string.png)
+[](art/firefly-mobile-oauth.png)
+
+### License
 ```
     Copyright (C) 2018 Daniel Quah(emansih)
 
