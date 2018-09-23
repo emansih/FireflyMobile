@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.ui
 
 import android.os.Bundle
 import android.preference.PreferenceManager
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -70,6 +71,10 @@ class HomeActivity: BaseActivity(){
         val dashboard = PrimaryDrawerItem()
                 .withIdentifier(1)
                 .withName("Dashboard")
+                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_deep_orange_500))
+                .withIconTintingEnabled(true)
+                .withIcon(R.drawable.ic_view_dashboard)
         val account = ExpandableDrawerItem().withName("Accounts")
                 .withIdentifier(2)
                 .withSelectable(false)
@@ -112,13 +117,25 @@ class HomeActivity: BaseActivity(){
                 )
         val moneyManagement = ExpandableDrawerItem().withName("Money Management")
                 .withIdentifier(14)
+                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_green_500))
+                .withIconTintingEnabled(true)
+                .withIcon(R.drawable.ic_euro_sign)
                 .withSelectable(false)
                 .withSubItems(
                         SecondaryDrawerItem().withName("Piggy Banks")
                                 .withLevel(4)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_red_500))
+                                .withIconTintingEnabled(true)
+                                .withIcon(R.drawable.ic_sort_descending)
                                 .withIdentifier(15),
                         SecondaryDrawerItem().withName("Bills")
                                 .withLevel(4)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_amber_500))
+                                .withIconTintingEnabled(true)
+                                .withIcon(R.drawable.ic_calendar_blank)
                                 .withIdentifier(16),
                         SecondaryDrawerItem().withName("Rules")
                                 .withLevel(4)
