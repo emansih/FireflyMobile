@@ -4,7 +4,7 @@ An unofficial Android client for [Firefly III](https://github.com/firefly-iii/fi
 
 This software is under heavy development and should be considered alpha quality as it might work in unexpected ways. 
 
-Other alternative include [this software](https://github.com/mconway/firefly-app/) written by mcconway using Ionic framework. 
+Other alternative include [this software](https://github.com/mconway/firefly-app/) written by mconway using Ionic framework. 
 
 Icons in this app are taken from:
 1. [Flaticon](https://www.flaticon.com/free-icon/piggy-bank-with-dollar-coin_21239)
