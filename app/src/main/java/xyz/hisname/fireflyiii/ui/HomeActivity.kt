@@ -136,13 +136,13 @@ class HomeActivity: BaseActivity(){
                                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_amber_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(R.drawable.ic_calendar_blank)
-                                .withIdentifier(16),
+                                .withIdentifier(16)/*,
                         SecondaryDrawerItem().withName("Rules")
                                 .withLevel(4)
                                 .withIdentifier(17),
                         SecondaryDrawerItem().withName("Recurring Transactions")
                                 .withLevel(4)
-                                .withIdentifier(18)
+                                .withIdentifier(18)*/
 
                 )
         result = DrawerBuilder()
@@ -150,8 +150,8 @@ class HomeActivity: BaseActivity(){
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(dashboard, account, budgets, categories, tags, reports,
-                        transactions, moneyManagement)
+                .addDrawerItems(dashboard, /*account, budgets, categories, tags, reports,
+                        transactions,*/ moneyManagement)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
                         drawerItem.identifier == 1L -> {
