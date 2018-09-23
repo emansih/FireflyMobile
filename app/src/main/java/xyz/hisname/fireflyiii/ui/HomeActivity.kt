@@ -1,15 +1,20 @@
 package xyz.hisname.fireflyiii.ui
 
 import android.os.Bundle
+import android.preference.PreferenceManager
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.mikepenz.materialdrawer.AccountHeader
+import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.ExpandableDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
+import com.mikepenz.materialdrawer.model.interfaces.IProfile
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -22,11 +27,15 @@ import xyz.hisname.fireflyiii.util.DeviceUtil
 class HomeActivity: BaseActivity(){
 
     private var result: Drawer? = null
+    private lateinit var headerResult: AccountHeader
+    private var profile: IProfile<*>? = null
+    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
         animateToolbar()
+        setUpHeader(savedInstanceState)
         setSupportActionBar(activity_toolbar)
         setUpDrawer(savedInstanceState)
         supportActionBar?.title = ""
@@ -38,7 +47,23 @@ class HomeActivity: BaseActivity(){
                     .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
                     .commit()
         }
+    }
 
+    private fun setUpHeader(savedInstanceState: Bundle?){
+        val role = sharedPref.getString("userRole", "")
+        val email = sharedPref.getString("userEmail","")
+        profile = ProfileDrawerItem()
+                .withName(email)
+                .withEmail(role)
+                .withIcon(R.drawable.ic_piggy_bank)
+        headerResult = AccountHeaderBuilder()
+                .withActivity(this)
+                .withTranslucentStatusBar(true)
+                .withSelectionListEnabledForSingleProfile(false)
+                .withCompactStyle(true)
+                .addProfiles(profile)
+                .withSavedInstance(savedInstanceState)
+                .build()
     }
 
     private fun setUpDrawer(savedInstanceState: Bundle?){
@@ -107,7 +132,7 @@ class HomeActivity: BaseActivity(){
                 .withActivity(this)
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
-                .withSavedInstance(savedInstanceState)
+                .withAccountHeader(headerResult)
                 .addDrawerItems(dashboard, account, budgets, categories, tags, reports,
                         transactions, moneyManagement)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
@@ -137,7 +162,7 @@ class HomeActivity: BaseActivity(){
                 .withOnDrawerNavigationListener {
                     onBackPressed()
                     true
-               }
+                }
                 .withSavedInstance(savedInstanceState)
                 .build()
         supportActionBar?.setHomeButtonEnabled(true)

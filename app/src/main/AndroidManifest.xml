@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="xyz.hisname.fireflyiii.ui.LoginActivity"
+        <activity android:name="xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
