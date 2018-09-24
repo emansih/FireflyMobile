@@ -106,7 +106,6 @@ class TransactionFragment: BaseFragment() {
             }
         }
         rtAdapter.notifyDataSetChanged()
-        println("response: " + response.getTransaction()?.data)
     }
 
     override fun onAttach(context: Context){
