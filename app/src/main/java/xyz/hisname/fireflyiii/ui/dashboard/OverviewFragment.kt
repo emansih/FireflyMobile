@@ -15,7 +15,6 @@ import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
-import java.math.BigDecimal
 import java.util.ArrayList
 
 class OverviewFragment: BaseFragment() {
@@ -39,9 +38,9 @@ class OverviewFragment: BaseFragment() {
     }
     private fun loadTransaction(){
         val withdrawals = model.getTransactions(baseUrl, accessToken,
-                DateTimeUtil.getStartDateOfCurrentMonth(), DateTimeUtil.getEndDateOfCurrentMonth(), "withdrawals")
+                DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "withdrawals")
         val deposits = model.getTransactions(baseUrl, accessToken,
-                DateTimeUtil.getStartDateOfCurrentMonth(), DateTimeUtil.getEndDateOfCurrentMonth(), "deposits")
+                DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "deposits")
         zipLiveData(withdrawals, deposits).observe(this, Observer {
             if(it.first.getError() == null){
                 dataAdapter = ArrayList(it.first.getTransaction()?.data)

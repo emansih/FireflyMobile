@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.util
 import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.TextStyle
+import org.threeten.bp.temporal.TemporalAdjusters.*
 import java.lang.Long.parseLong
 import java.util.*
 
@@ -36,17 +37,27 @@ object DateTimeUtil {
     }
 
     // Returns end of month date in yyyy-MM-dd (2018-01-04)
-    fun getEndDateOfCurrentMonth(): String{
+    fun getEndOfMonth(): String{
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
         return localDate.withDayOfMonth(localDate.lengthOfMonth()).toString()
     }
 
-    fun getStartDateOfCurrentMonth(): String{
+    fun getStartOfMonth(): String{
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
-        return localDate.year.toString() + "-" + localDate.monthValue.toString() +
-                "-" + "01"
+        return localDate.with(firstDayOfMonth()).toString()
     }
 
+    fun getStartOfYear(): String {
+        val localDateTime = LocalDate.now()
+        val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
+        return localDate.with(firstDayOfYear()).toString()
+    }
+
+    fun getEndOfYear(): String {
+        val localDateTime = LocalDate.now()
+        val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
+        return localDate.with(lastDayOfYear()).toString()
+    }
 }
