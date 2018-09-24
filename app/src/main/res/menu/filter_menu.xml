@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/menu_item_week"
+        android:title="Filter by Week"
+        android:showAsAction="never" />
+
+    <item android:id="@+id/menu_item_month"
+        android:title="Filter by Month"
+        android:showAsAction="never" />
+
+    <item android:id="@+id/menu_item_year"
+        android:title="Filter by Year"
+        android:showAsAction="never" />
+
+</menu>
