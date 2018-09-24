@@ -29,10 +29,5 @@ abstract class BaseDetailFragment: BaseFragment(){
         activity?.activity_toolbar?.title = resources.getString(R.string.details)
     }
 
-    inline fun consume(f: () -> Unit): Boolean {
-        f()
-        return true
-    }
-
     abstract fun deleteItem()
 }

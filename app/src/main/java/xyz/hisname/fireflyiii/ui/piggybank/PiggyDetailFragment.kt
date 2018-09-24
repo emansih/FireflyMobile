@@ -22,6 +22,7 @@ import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoPiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.consume
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastSuccess

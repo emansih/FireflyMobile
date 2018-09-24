@@ -11,3 +11,8 @@ fun ViewGroup.inflate(layoutRes: Int, attachToRoot: Boolean = false): View {
 fun LayoutInflater.create(layoutRes: Int, container: ViewGroup?, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layoutRes,container,attachToRoot)
 }
+
+inline fun consume(f: () -> Unit): Boolean {
+    f()
+    return true
+}
