@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.dashboard
+package xyz.hisname.fireflyiii.ui.transaction
 
 import android.content.Context
 import android.view.View
@@ -12,8 +12,8 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class RecentTransactionRecyclerAdapter(private val items: MutableList<TransactionData>):
-        DiffUtilAdapter<TransactionData, RecentTransactionRecyclerAdapter.RtAdapter>() {
+class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>):
+        DiffUtilAdapter<TransactionData, TransactionRecyclerAdapter.RtAdapter>() {
 
     private lateinit var context: Context
 

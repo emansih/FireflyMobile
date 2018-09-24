@@ -21,6 +21,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
@@ -102,24 +103,34 @@ class HomeActivity: BaseActivity(){
                 .withIdentifier(9)
                 .withName("Reports")
         val transactions = ExpandableDrawerItem().withName("Transactions")
+                .withIcon(R.drawable.ic_refresh)
                 .withIdentifier(10)
                 .withSelectable(false)
                 .withSubItems(
                         SecondaryDrawerItem().withName("Expenses")
                                 .withLevel(3)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_blue_grey_500))
+                                .withIconTintingEnabled(true)
+                                .withIcon(R.drawable.ic_arrow_left)
                                 .withIdentifier(11),
                         SecondaryDrawerItem().withName("Revenue / Income")
                                 .withLevel(3)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_grey_500))
+                                .withIconTintingEnabled(true)
+                                .withIcon(R.drawable.ic_arrow_right)
                                 .withIdentifier(12),
                         SecondaryDrawerItem().withName("Transfers")
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_green_500))
+                                .withIconTintingEnabled(true)
+                                .withIcon(R.drawable.ic_bank_transfer)
                                 .withLevel(3)
                                 .withIdentifier(13)
                 )
         val moneyManagement = ExpandableDrawerItem().withName("Money Management")
                 .withIdentifier(14)
-                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_green_500))
-                .withIconTintingEnabled(true)
                 .withIcon(R.drawable.ic_euro_sign)
                 .withSelectable(false)
                 .withSubItems(
@@ -150,8 +161,8 @@ class HomeActivity: BaseActivity(){
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(dashboard, /*account, budgets, categories, tags, reports,
-                        transactions,*/ moneyManagement)
+                .addDrawerItems(dashboard, transactions,/*account, budgets, categories, tags, reports,
+                        ,*/ moneyManagement)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
                         drawerItem.identifier == 1L -> {
@@ -161,6 +172,21 @@ class HomeActivity: BaseActivity(){
                                             DashboardFragment().apply { arguments = bundle }, "dash")
                                     .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
                                     .commit()
+                        }
+                        drawerItem.identifier == 11L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl,
+                                    "access_token" to accessToken, "transactionType" to "expenses")
+                            changeFragment(TransactionFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 12L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl,
+                                    "access_token" to accessToken, "transactionType" to "income")
+                            changeFragment(TransactionFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 13L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl,
+                                    "access_token" to accessToken, "transactionType" to "transfers")
+                            changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 15L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)

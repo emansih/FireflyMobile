@@ -12,12 +12,14 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 import xyz.hisname.fireflyiii.util.extension.create
 
 class DashboardFragment: BaseFragment() {
 
-    private val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken) }
+    private val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
+            "transactionType" to "all") }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -52,7 +54,7 @@ class DashboardFragment: BaseFragment() {
                 .replace(R.id.walletFrame, WalletFragment().apply { arguments = bundle })
                 .commit()
         requireFragmentManager().beginTransaction()
-                .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })
+                .replace(R.id.recentTransactionFrame, TransactionFragment().apply { arguments = bundle })
                 .commit()
     }
 
@@ -61,7 +63,7 @@ class DashboardFragment: BaseFragment() {
             swipeContainer.isRefreshing = true
             requireFragmentManager().beginTransaction().remove(OverviewFragment()).commit()
             requireFragmentManager().beginTransaction().remove(WalletFragment()).commit()
-            requireFragmentManager().beginTransaction().remove(RecentTransactionFragment()).commit()
+            requireFragmentManager().beginTransaction().remove(TransactionFragment()).commit()
             setUpCards()
             swipeContainer.isRefreshing = false
         }
