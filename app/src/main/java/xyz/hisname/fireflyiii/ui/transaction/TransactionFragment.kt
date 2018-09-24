@@ -132,7 +132,7 @@ class TransactionFragment: BaseFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId) {
         R.id.menu_item_week -> consume {
-           // loadTransaction()
+            loadTransaction(DateTimeUtil.getStartOfWeek(), DateTimeUtil.getEndOfWeek())
         }
         R.id.menu_item_month -> consume {
             loadTransaction(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())

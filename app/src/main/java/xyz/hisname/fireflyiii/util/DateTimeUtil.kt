@@ -3,7 +3,9 @@ package xyz.hisname.fireflyiii.util
 import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.TextStyle
+import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAdjusters.*
+import org.threeten.bp.temporal.WeekFields
 import java.lang.Long.parseLong
 import java.util.*
 
@@ -59,5 +61,18 @@ object DateTimeUtil {
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
         return localDate.with(lastDayOfYear()).toString()
+    }
+
+    fun getStartOfWeek(): String {
+        val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(firstDayOfWeek)).toString()
+    }
+
+    fun getEndOfWeek(): String {
+        val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+        val lastDayOfWeek = DayOfWeek.of(((firstDayOfWeek.value + 5) %
+                DayOfWeek.values().size) + 1)
+        return LocalDate.now().with(TemporalAdjusters.nextOrSame(lastDayOfWeek)).toString()
+
     }
 }
