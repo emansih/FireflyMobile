@@ -82,6 +82,7 @@ class LoginFragment: Fragment() {
                     intent.data = ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
                             "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri()
                     startActivity(intent)
+                    requireActivity().finish()
                 } catch (exception: ActivityNotFoundException){
                     // this user doesn't have a browser installed on their device?!
                     toastError(resources.getString(R.string.no_browser_installed))

@@ -17,7 +17,6 @@ import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
-import xyz.hisname.fireflyiii.util.extension.zipLiveData
 
 class OnboardingFragment: Fragment() {
 
@@ -25,7 +24,6 @@ class OnboardingFragment: Fragment() {
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
     private val baseUrl: String by lazy { arguments?.getString("fireflyUrl") ?: "" }
     private val accessToken: String by lazy { arguments?.getString("access_token") ?: "" }
-    private var isThereError = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -38,38 +36,24 @@ class OnboardingFragment: Fragment() {
     }
 
     private fun getUser(){
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
-        zipLiveData(model.getUser(baseUrl,accessToken), model.userSystem(baseUrl,accessToken)).observe(this, Observer { data ->
-            if(data.first.getUserData() != null){
-                ObjectAnimator.ofInt(onboarding_progress,"progress", 20).start()
-                sharedPref.edit{
-                    putString("userEmail", data.first.getUserData()?.userData?.userAttributes?.email)
-                    putString("userRole", data.first.getUserData()?.userData?.userAttributes?.role)
-                }
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
+        model.getUser(baseUrl,accessToken).observe(this, Observer {
+            if(it.getError() == null){
                 ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()
-            } else {
-                isThereError = true
-            }
-            if(data.second.getUserSystem() != null){
-                ObjectAnimator.ofInt(onboarding_progress,"progress", 70).start()
-                val systemInfo = data.second.getUserSystem()?.systemData
-                sharedPref.edit {
-                    putString("api_version", systemInfo?.api_version)
-                    putString("system_driver", systemInfo?.driver)
-                    putString("os", systemInfo?.os)
-                    putString("php_version", systemInfo?.php_version)
-                    putString("version", systemInfo?.version)
+                sharedPref.edit{
+                    putString("userEmail", it.getUserData()?.userData?.userAttributes?.email)
+                    putString("userRole", it.getUserData()?.userData?.userAttributes?.role)
                 }
-                ObjectAnimator.ofInt(onboarding_progress,"progress", 100).start()
-            } else {
-                isThereError = true
-            }
-            if(isThereError){
-                toastError("There was some issue retrieving your data")
-            } else {
-                startActivity(Intent(requireContext(), HomeActivity::class.java))
+                ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
+                startActivity(Intent(requireActivity(), HomeActivity::class.java))
                 requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 requireActivity().finish()
+            } else {
+                if(it.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
+                    toastError(resources.getString(R.string.unable_ping_server))
+                } else {
+                    toastError("There was some issue retrieving your data")
+                }
             }
         })
     }
