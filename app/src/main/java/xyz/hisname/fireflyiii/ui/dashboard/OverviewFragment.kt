@@ -4,18 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_dashboard_overview.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.report.OverviewReportFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
-import java.util.ArrayList
+import java.util.*
 
 class OverviewFragment: BaseFragment() {
 
@@ -34,7 +36,9 @@ class OverviewFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        fullreport.text = resources.getString(R.string.view_report, DateTimeUtil.getCurrentMonth())
         loadTransaction()
+        viewReport()
     }
     private fun loadTransaction(){
         val withdrawals = model.getTransactions(baseUrl, accessToken,
@@ -79,4 +83,14 @@ class OverviewFragment: BaseFragment() {
             toastError("There is an issue loading transactions")
         }
     }
+
+    private fun viewReport(){
+        val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken) }
+        overviewCard.setOnClickListener{
+            requireFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, OverviewReportFragment().apply { arguments = bundle })
+                    .commit()
+        }
+    }
+
 }

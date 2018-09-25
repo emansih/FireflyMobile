@@ -73,6 +73,11 @@ object DateTimeUtil {
         val lastDayOfWeek = DayOfWeek.of(((firstDayOfWeek.value + 5) %
                 DayOfWeek.values().size) + 1)
         return LocalDate.now().with(TemporalAdjusters.nextOrSame(lastDayOfWeek)).toString()
+    }
 
+    fun getCurrentMonth(): String {
+        val localDateTime = LocalDate.now()
+        val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
+        return localDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
     }
 }

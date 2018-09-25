@@ -41,7 +41,6 @@
                 android:id="@+id/fullreport"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/view_report"
                 android:layout_marginTop="5dp"
                 app:layout_constraintStart_toStartOf="@+id/overviewText"
                 app:layout_constraintTop_toBottomOf="@+id/overviewText"/>
