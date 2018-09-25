@@ -48,7 +48,14 @@ class BillsRecyclerAdapter(private val items: MutableList<BillData>, private val
                     }
                 }
             }
-            itemView.billName.text = billResponse?.name
+            val billName = billResponse?.name
+            if(billName != null){
+                if(billName.length >= 17){
+                    itemView.billName.text = billName.substring(0,17) + "..."
+                } else {
+                    itemView.billName.text = billName
+                }
+            }
             itemView.setOnClickListener{clickListener(billData)}
             itemView.billAmount.text = context.getString(R.string.bill_amount, billResponse?.currency_code,
                     DecimalFormat("0.00").format(billResponse?.amount_max).toString())
