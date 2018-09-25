@@ -26,9 +26,17 @@ In order to start using this software, you have to create a new client in your F
 
 
 ### Screenshots
-|  |   |  |
-| ------------------------- | ------------------------- | ------------------------- | ------------------------- |
-| ![1](art/screenshot1.png) | ![2](art/screenshot2.png) | ![3](art/screenshot3.jpg) | ![4](art/screenshot4.jpg) |
+
+| Dashboard | Piggy Bank | Adding Piggy Bank  | Showing Piggy Bank Details |
+| :-: | :-: | :-: | :-: |
+| ![1](art/screenshot1.png) | ![3](art/screenshot3.png) | ![4](art/screenshot4.png) | ![5](art/screenshot5.png) |
+
+| Transactions | Bills |
+| :-: | :-: |
+| ![2](art/screenshot2.png) | ![6](art/screenshot6.png) |
+
+
+
 Thanks to [Screener - Better Screenshots](https://play.google.com/store/apps/details?id=de.toastcode.screener&hl=en) for the device frame!
 
 ### License
