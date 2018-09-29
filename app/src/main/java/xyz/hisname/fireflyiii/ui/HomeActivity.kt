@@ -231,8 +231,7 @@ class HomeActivity: BaseActivity(){
             result?.isDrawerOpen!! -> result?.closeDrawer()
             supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
             supportFragmentManager.backStackEntryCount == 0 -> {
-                val fragment = supportFragmentManager.findFragmentByTag("dash")
-                if(fragment is DashboardFragment){
+                if(supportFragmentManager.findFragmentByTag("dash") is DashboardFragment){
                     finish()
                 } else {
                     result?.setSelection(1)

@@ -45,6 +45,19 @@ object DateTimeUtil {
         return localDate.withDayOfMonth(localDate.lengthOfMonth()).toString()
     }
 
+    fun getEndOfMonth(duration: Long): String{
+        val localDateTime = LocalDate.now()
+        val previousMonth = localDateTime.minusMonths(duration)
+        val previousLocalDate =
+                LocalDate.of(previousMonth.year, previousMonth.monthValue, previousMonth.dayOfMonth)
+        return previousLocalDate.withDayOfMonth(previousMonth.lengthOfMonth()).toString()
+    }
+
+    fun getStartOfMonth(duration: Long): String {
+        val localDateTime = LocalDate.now()
+        return localDateTime.minusMonths(duration).toString()
+    }
+
     fun getStartOfMonth(): String{
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
@@ -79,5 +92,21 @@ object DateTimeUtil {
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
         return localDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+    }
+
+    fun getCurrentMonthShortName(): String{
+        val localDateTime = LocalDate.now()
+        val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
+        return localDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+    }
+
+    fun getPreviousMonth(duration: Long): String{
+        val localDateTime = LocalDate.now()
+        return localDateTime.minusMonths(duration).month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+    }
+
+    fun getPreviousMonthShortName(duration: Long): String{
+        val localDateTime = LocalDate.now()
+        return localDateTime.minusMonths(duration).month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
     }
 }

@@ -11,7 +11,6 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.report.OverviewReportFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -85,10 +84,11 @@ class OverviewFragment: BaseFragment() {
     }
 
     private fun viewReport(){
-        val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken) }
+        val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
+                "expense" to withdrawSum.toString(), "income" to depositSum.toString()) }
         overviewCard.setOnClickListener{
             requireFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, OverviewReportFragment().apply { arguments = bundle })
+                    .replace(R.id.fragment_container, ReportFragment().apply { arguments = bundle }, "report")
                     .commit()
         }
     }

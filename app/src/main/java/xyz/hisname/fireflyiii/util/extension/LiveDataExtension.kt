@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.util.extension
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import xyz.hisname.fireflyiii.util.Sixple
 
 internal fun <T: ViewModel> Fragment.getViewModel(modelClass: Class<T>, viewModelFactory: ViewModelProvider.Factory? = null): T {
     return viewModelFactory?.let { ViewModelProviders.of(this, it).get(modelClass) } ?:
@@ -50,6 +51,55 @@ fun <A, B> zipLiveData(a: LiveData<A>, b: LiveData<B>): LiveData<Pair<A, B>> {
         }
         addSource(b) {
             lastB = it
+            update()
+        }
+    }
+}
+
+fun <A, B, C, D, E, F> zipLiveData(a: LiveData<A>, b: LiveData<B>, c: LiveData<C>, d: LiveData<D>, e: LiveData<E>,
+                                   f: LiveData<F>): LiveData<Sixple<A, B, C, D, E, F>> {
+    return MediatorLiveData<Sixple<A, B, C, D, E, F>>().apply {
+        var lastA: A? = null
+        var lastB: B? = null
+        var lastC: C? = null
+        var lastD: D? = null
+        var lastE: E? = null
+        var lastF: F? = null
+
+        fun update() {
+            val localLastA = lastA
+            val localLastB = lastB
+            val localLastC = lastC
+            val localLastD = lastD
+            val localLastE = lastE
+            val localLastF = lastF
+            if (localLastA != null && localLastB != null && localLastC != null && localLastD != null &&
+                    localLastE != null && localLastF != null)
+                this.value = Sixple(localLastA, localLastB, localLastC, localLastD, localLastE, localLastF)
+        }
+
+        addSource(a) {
+            lastA = it
+            update()
+        }
+        addSource(b) {
+            lastB = it
+            update()
+        }
+        addSource(c){
+            lastC = it
+            update()
+        }
+        addSource(d){
+            lastD = it
+            update()
+        }
+        addSource(e){
+            lastE = it
+            update()
+        }
+        addSource(f){
+            lastF = it
             update()
         }
     }
