@@ -1,12 +1,10 @@
 package xyz.hisname.fireflyiii.repository.api
 
 import retrofit2.Call
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.TRANSACTION_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
+import xyz.hisname.fireflyiii.repository.models.transaction.sucess.TransactionSucessModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/transactions.html
 interface TransactionService {
@@ -25,4 +23,12 @@ interface TransactionService {
     @DELETE("$TRANSACTION_API_ENDPOINT/{id}")
     fun deleteTransactionById(@Path("id") id: String)
 
+    @FormUrlEncoded
+    @POST(TRANSACTION_API_ENDPOINT)
+    fun addTransaction(@Field("type") type: String, @Field("description") description: String,
+                       @Field("date") date: String, @Field("piggy_bank_name") piggyBankName: String?,
+                       @Field("bill_name") billName: String?, @Field("transactions[0][amount]") amount: String,
+                       @Field("transactions[0][source_name]") sourceName: String?,
+                       @Field("transactions[0][destination_name]") destionationName: String?,
+                       @Field("transactions[0][currency_code]") currency: String): Call<TransactionSucessModel>
 }

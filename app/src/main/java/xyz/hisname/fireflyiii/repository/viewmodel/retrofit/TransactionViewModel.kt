@@ -25,4 +25,28 @@ class TransactionViewModel:ViewModel() {
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return apiResponse
     }
+
+    fun addTransaction(baseUrl: String?, accessToken: String?, type: String, description: String,
+                       date: String, piggyBankName: String?, billName: String?, amount: String,
+                       sourceName: String?, destinationName: String?, currencyName: String): LiveData<TransactionApiResponse>{
+        val apiResponse: MediatorLiveData<TransactionApiResponse> = MediatorLiveData()
+        val transaction: MutableLiveData<TransactionApiResponse> = MutableLiveData()
+        val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
+        transactionService?.addTransaction(type,description,date,piggyBankName,billName,
+                amount,sourceName,destinationName,currencyName)?.enqueue(retrofitCallback({ response ->
+            val errorBody = response.errorBody()
+            var errorBodyMessage = ""
+            if(errorBody != null){
+                errorBodyMessage = String(errorBody.bytes())
+            }
+            if (response.isSuccessful) {
+                transaction.postValue(TransactionApiResponse(response.body()))
+            } else {
+                transaction.postValue(TransactionApiResponse(errorBodyMessage))
+            }
+        })
+        { throwable ->  transaction.value = TransactionApiResponse(throwable)})
+        apiResponse.addSource(transaction) { apiResponse.value = it }
+        return apiResponse
+    }
 }

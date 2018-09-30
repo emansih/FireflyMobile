@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_dashboard_wallet.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.accounts.Data
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
@@ -17,7 +17,7 @@ import java.util.ArrayList
 class WalletFragment: BaseFragment() {
 
     private val model: AccountsViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
-    private var dataAdapter = ArrayList<Data>()
+    private var dataAdapter = ArrayList<AccountData>()
     private var creditCard: Int = 0
     private var cash: Int = 0
     private var assets: Int = 0

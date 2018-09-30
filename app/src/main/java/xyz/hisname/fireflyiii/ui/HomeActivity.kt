@@ -23,6 +23,7 @@ import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
+import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
 
@@ -244,11 +245,18 @@ class HomeActivity: BaseActivity(){
     private fun setNavIcon(){
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount >= 1){
-                // show back icon and lock nav drawer
-                val drawerLayout = result?.drawerLayout
-                drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
-                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                if(supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment){
+                    val drawerLayout = result?.drawerLayout
+                    drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                    result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                } else {
+                    // show back icon and lock nav drawer
+                    val drawerLayout = result?.drawerLayout
+                    drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                    result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
+                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                }
             } else {
                 val drawerLayout = result?.drawerLayout
                 drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)

@@ -109,4 +109,8 @@ object DateTimeUtil {
         val localDateTime = LocalDate.now()
         return localDateTime.minusMonths(duration).month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
     }
+
+    fun getTodayDate(): String{
+        return LocalDate.now().toString()
+    }
 }

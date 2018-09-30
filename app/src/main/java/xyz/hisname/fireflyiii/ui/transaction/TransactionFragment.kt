@@ -3,13 +3,15 @@ package xyz.hisname.fireflyiii.ui.transaction
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.widget.Toolbar
+import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
 import xyz.hisname.fireflyiii.R
@@ -43,10 +45,12 @@ class TransactionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(!Objects.equals(transactionType, "all")){
-            val toolbar = requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
-            toolbar.overflowIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_filter)
+            requireActivity().activity_toolbar.overflowIcon =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_filter)
             recentTransactionText.isVisible = false
             linedivider.isVisible = false
+            requireActivity().globalFAB.isVisible = true
+            setupFab()
         }
         loadTransaction(startDate, endDate)
     }
@@ -111,7 +115,7 @@ class TransactionFragment: BaseFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         if(!Objects.equals(transactionType, "all")){
-            activity?.activity_toolbar?.title = transactionType.substring(0,1).toUpperCase() +
+            requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
                     transactionType.substring(1)
         }
     }
@@ -119,9 +123,49 @@ class TransactionFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         if(!Objects.equals(transactionType, "all")){
-            activity?.activity_toolbar?.title = transactionType.substring(0,1).toUpperCase() +
+            requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
                     transactionType.substring(1)
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        requireActivity().globalFAB.isGone = true
+    }
+
+    private fun setupFab(){
+        requireActivity().globalFAB.apply {
+            translationY = (6 * 56).toFloat()
+            animate().translationY(0.toFloat())
+                    .setInterpolator(OvershootInterpolator(1.toFloat()))
+                    .setStartDelay(300)
+                    .setDuration(400)
+                    .start()
+            setOnClickListener {
+                val bundle = bundleOf("fireflyUrl" to baseUrl,
+                        "access_token" to accessToken, "transactionType" to transactionType)
+                requireFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container,
+                                AddTransactionFragment().apply { arguments = bundle } ,"addTrans")
+                        .addToBackStack(null)
+                        .commit()
+                requireActivity().globalFAB.isVisible = false
+            }
+        }
+        recentTransactionList.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if(dy > 0 && requireActivity().globalFAB.isShown){
+                    requireActivity().globalFAB.hide()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if(newState == RecyclerView.SCROLL_STATE_IDLE){
+                    requireActivity().globalFAB.show()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -141,5 +185,4 @@ class TransactionFragment: BaseFragment() {
         }
         else -> super.onOptionsItemSelected(item)
     }
-
 }
