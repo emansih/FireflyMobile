@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.UserInfoViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.util.extension.create
@@ -36,6 +37,7 @@ class OnboardingFragment: Fragment() {
     }
 
     private fun getUser(){
+        RetrofitBuilder.destroyInstance()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
         model.getUser(baseUrl,accessToken).observe(this, Observer {
             if(it.getError() == null){
