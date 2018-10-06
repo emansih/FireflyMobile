@@ -23,6 +23,7 @@ import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
+import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
@@ -157,13 +158,21 @@ class HomeActivity: BaseActivity(){
                                 .withIdentifier(18)*/
 
                 )
+        val settings = PrimaryDrawerItem()
+                .withIdentifier(19)
+                .withName("Settings")
+                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_teal_500))
+                .withIconTintingEnabled(true)
+                .withIcon(R.drawable.ic_settings)
+
         result = DrawerBuilder()
                 .withActivity(this)
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(dashboard, transactions,/*account, budgets, categories, tags, reports,
-                        ,*/ moneyManagement)
+                        ,*/ moneyManagement,settings)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
                         drawerItem.identifier == 1L -> {
@@ -196,6 +205,9 @@ class HomeActivity: BaseActivity(){
                         drawerItem.identifier == 16L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
                             changeFragment(ListBillFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 19L -> {
+                            changeFragment(SettingsFragment())
                         }
                         else -> {
 
