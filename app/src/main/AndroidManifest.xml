@@ -27,10 +27,20 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
-        <activity android:name="xyz.hisname.fireflyiii.ui.HomeActivity"/>
+        <activity android:name="xyz.hisname.fireflyiii.ui.HomeActivity" />
+
         <activity android:name=".ui.bills.AddBillActivity" />
         <activity android:name=".ui.piggybank.AddPiggyActivity" />
 
+        <receiver android:name=".repository.GenericReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="firefly.hisname.ADD_PIGGY_BANK" />
+
+            </intent-filter>
+
+        </receiver>
 
     </application>
 
