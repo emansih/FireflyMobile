@@ -11,15 +11,6 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class BillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    /*
-
-            model.addBill(baseUrl,accessToken,bill_name_edittext.getString(),
-                        bill_match_edittext.getString(),amount_min_edittext.getString(),
-                        amount_max_edittext.getString(), bill_date_edittext.getString(), repeatFreq,
-                        skip_edittext.getString(), "1", "1",
-                        currency_code_edittext.getString(), notes)
-
-     */
     override fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
         val billMatch = inputData.getString("billMatch") ?: ""
@@ -56,7 +47,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
             }
         })
         { throwable ->
-            notif.showBillNotification(throwable.message.toString(), "Error adding Piggy Bank")
+            notif.showBillNotification(throwable.message.toString(), "Error adding Bill")
             Result.FAILURE
         })
         return Result.SUCCESS
