@@ -6,46 +6,48 @@ import android.content.ContextWrapper
 import android.app.NotificationManager
 import android.app.NotificationChannel
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import xyz.hisname.fireflyiii.R
+import java.util.*
 
 
 class NotificationUtils(base: Context) : ContextWrapper(base) {
 
-    @Volatile private var notificationManager: NotificationManager? = null
-    private val PIGGY_BANK_CHANNEL_ID = "xyz.hisname.fireflyiii.PIGGY_BANK"
-    private val PIGGY_BANK_CHANNEL_NAME = "Piggy Bank"
-
-    private val manager: NotificationManager?
-        get() {
-            if (notificationManager == null) {
-                synchronized(NotificationUtils::class.java) {
-                    notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                }
-            }
-            return notificationManager
-        }
+    private var notificationManager: NotificationManagerCompat = NotificationManagerCompat.from(this)
+    private val manager: NotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
 
-    fun showPiggyBankNotification(contextText: String) {
+    fun showPiggyBankNotification(contextText: String, contextTitle: String) {
+        val PIGGY_BANK_CHANNEL_ID = "xyz.hisname.fireflyiii.PIGGY_BANK"
+        val PIGGY_BANK_CHANNEL_NAME = "Piggy Bank"
+        val GROUP_ID = "xyz.hisname.fireflyiii.PIGGY_BANK"
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val piggybankChannel = NotificationChannel(PIGGY_BANK_CHANNEL_ID,
-                    PIGGY_BANK_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
-            piggybankChannel.enableLights(true)
-            piggybankChannel.description = "Shows Piggy Bank result"
-            piggybankChannel.enableVibration(false)
-            piggybankChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-            manager?.createNotificationChannel(piggybankChannel)
+                    PIGGY_BANK_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT).apply {
+                enableLights(true)
+                description = "Shows Piggy Bank result"
+                enableVibration(false)
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
+            manager.createNotificationChannel(piggybankChannel)
         }
-        val notificationBuilder = NotificationCompat.Builder(this,  PIGGY_BANK_CHANNEL_ID)
-        notificationBuilder.setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.drawable.ic_sort_descending)
-                .setContentTitle("Piggy bank")
-                .setContentText(contextText)
-        notificationManager?.notify(1, notificationBuilder.build())
+        val groupBuilder = NotificationCompat.Builder(this, PIGGY_BANK_CHANNEL_ID).apply {
+            setContentText(contextText)
+            setGroup(GROUP_ID)
+            setSmallIcon(R.drawable.ic_sort_descending)
+            setGroupSummary(true)
+            setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
+            setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY)
+        }
+        notificationManager.notify(createNotificationId(), groupBuilder.build())
 
+    }
+
+    private fun createNotificationId(): Int{
+        val random = Random()
+        var i = random.nextInt(99 + 1)
+        i += 1
+        return i
     }
 }
