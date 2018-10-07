@@ -8,12 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.fragment_piggy_list.*
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
@@ -36,10 +38,11 @@ class ListPiggyFragment: BaseFragment() {
     private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java)}
     private val piggyVM: DaoPiggyViewModel by lazy { getViewModel(DaoPiggyViewModel::class.java) }
     private var piggyDataBase: AppDatabase? = null
+    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_piggy_list, container)
+        return inflater.create(R.layout.base_swipe_layout, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,7 +110,8 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        addPiggyButton.apply {
+        fab.apply {
+            isVisible = true
             translationY = (6 * 56).toFloat()
             animate().translationY(0.toFloat())
                     .setInterpolator(OvershootInterpolator(1.toFloat()))
@@ -120,14 +124,14 @@ class ListPiggyFragment: BaseFragment() {
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(dy > 0 && addPiggyButton.isShown){
-                    addPiggyButton.hide()
+                if(dy > 0 && fab.isShown){
+                    fab.hide()
                 }
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if(newState == RecyclerView.SCROLL_STATE_IDLE){
-                    addPiggyButton.show()
+                    fab.show()
                 }
                 super.onScrollStateChanged(recyclerView, newState)
             }
@@ -148,6 +152,6 @@ class ListPiggyFragment: BaseFragment() {
         super.onDetach()
         RetrofitBuilder.destroyInstance()
         AppDatabase.destroyInstance()
-
+        fab.isGone = true
     }
 }

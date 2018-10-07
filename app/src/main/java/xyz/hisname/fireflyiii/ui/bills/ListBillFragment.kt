@@ -9,11 +9,13 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_bill.*
@@ -39,6 +41,8 @@ class ListBillFragment: BaseFragment() {
     private var dataAdapter = ArrayList<BillData>()
     private var billDatabase: AppDatabase? = null
     private val billsVM: DaoBillsViewModel by lazy { getViewModel(DaoBillsViewModel::class.java) }
+    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -62,7 +66,7 @@ class ListBillFragment: BaseFragment() {
                 happyFaceText.isInvisible = true
                 happyFace.isInvisible = true
                 recycler_view.isVisible = true
-                addBillButton.isVisible = true
+                fab.isVisible = true
                 billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
                 if(billsAdapter.itemCount == 0){
                     recycler_view.isVisible = false
@@ -90,7 +94,7 @@ class ListBillFragment: BaseFragment() {
                                 isInvisible = false
                                 text = resources.getString(R.string.unable_ping_server)
                             }
-                            addBillButton.isVisible = false
+                            fab.isVisible = false
                             toastInfo("Please try again later")
                         }
                     } else {
@@ -124,7 +128,7 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        addBillButton.apply {
+        fab.apply {
             translationY = (6 * 56).toFloat()
             animate().translationY(0.toFloat())
                     .setInterpolator(OvershootInterpolator(1.toFloat()))
@@ -139,14 +143,14 @@ class ListBillFragment: BaseFragment() {
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                 if(dy > 0 && addBillButton.isShown){
-                     addBillButton.hide()
+                 if(dy > 0 && fab.isShown){
+                     fab.hide()
                  }
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if(newState == RecyclerView.SCROLL_STATE_IDLE){
-                    addBillButton.show()
+                    fab.show()
                 }
                 super.onScrollStateChanged(recyclerView, newState)
             }
@@ -177,6 +181,7 @@ class ListBillFragment: BaseFragment() {
     override fun onDetach() {
         AppDatabase.destroyInstance()
         RetrofitBuilder.destroyInstance()
+        fab.isGone = true
         super.onDetach()
     }
 }
