@@ -148,6 +148,11 @@ class ListPiggyFragment: BaseFragment() {
         activity?.activity_toolbar?.title = "Piggy Bank"
     }
 
+    override fun onStop() {
+        super.onStop()
+        fab.isGone = true
+    }
+
     override fun onDetach() {
         super.onDetach()
         RetrofitBuilder.destroyInstance()

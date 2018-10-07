@@ -178,6 +178,11 @@ class ListBillFragment: BaseFragment() {
         requireActivity().activity_toolbar.title = "Bills"
     }
 
+    override fun onStop() {
+        super.onStop()
+        fab.isGone = true
+    }
+
     override fun onDetach() {
         AppDatabase.destroyInstance()
         RetrofitBuilder.destroyInstance()
