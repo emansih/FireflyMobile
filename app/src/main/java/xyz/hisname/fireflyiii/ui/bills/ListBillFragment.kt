@@ -98,6 +98,8 @@ class ListBillFragment: BaseFragment() {
                             toastInfo("Please try again later")
                         }
                     } else {
+                        dataAdapter = ArrayList(billData)
+                        billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
                         showData(billData)
                         toastInfo("Loaded data from cache")
                     }
