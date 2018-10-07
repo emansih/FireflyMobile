@@ -49,7 +49,10 @@ class PiggyViewModel: ViewModel() {
         piggyBankService?.createNewPiggyBank(piggyName, accountId, targetAmount, currentAmount, startDate,
                 targetDate, notes)?.enqueue(retrofitCallback({ response ->
             // For some weird reason i needed to create a new variable for this
-            val errorBody = String(response.errorBody()?.bytes()!!)
+            var errorBody = ""
+            if (response.errorBody() != null) {
+                errorBody = String(response.errorBody()?.bytes()!!)
+            }
             if(response.isSuccessful){
                 piggy.postValue(PiggyApiResponse(response.body()))
             } else {
