@@ -33,6 +33,8 @@ class BillDetailFragment: BaseDetailFragment(){
     private val billMin: BigDecimal by lazy { arguments?.getSerializable("billMin") as BigDecimal }
     private val billMax: BigDecimal by lazy { arguments?.getSerializable("billMax") as BigDecimal }
     private val billName: String by lazy { arguments?.getString("billName") as String }
+    private val billFreq: String by lazy { arguments?.getString("freq") as String }
+    private val billNotes: String by lazy { arguments?.getString("notes") ?: "" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -46,16 +48,18 @@ class BillDetailFragment: BaseDetailFragment(){
 
     private fun setUpWidgets(){
         deleteBill()
-        billName_textView.text = billName
-        billAmount_textView.text = currencyCode + String.format(billMin.toString()) +  "-" +
+        billNameText.text = billName
+        amountText.text = currencyCode + String.format(billMin.toString()) +  "-" +
                 String.format(billMax.toString())
         if(date == null){
-            billDue_textView.text = resources.getString(R.string.no_target_date)
+            nextDateText.text = resources.getString(R.string.no_target_date)
         } else {
-            billDue_textView.text = date
+            nextDateText.text = date
         }
+        freqText.text = billFreq
+        notesText.text = billNotes
         val deleteButton = requireActivity().findViewById<Button>(R.id.deleteBillButton)
-        deleteButton.setText(R.string.delete_piggy)
+        deleteButton.setText(R.string.delete_bill)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId){

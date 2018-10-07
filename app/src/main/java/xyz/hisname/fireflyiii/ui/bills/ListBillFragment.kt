@@ -122,7 +122,8 @@ class ListBillFragment: BaseFragment() {
         val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
                 "billId" to billData.billId, "billName" to billData.billAttributes?.name,
                 "currencyCode" to billData.billAttributes?.currency_code, "billMax" to billData.billAttributes?.amount_max,
-                "billMin" to billData.billAttributes?.amount_min, "date" to billData.billAttributes?.date)
+                "billMin" to billData.billAttributes?.amount_min, "date" to billData.billAttributes?.date,
+                "freq" to billData.billAttributes?.repeat_freq, "notes" to billData.billAttributes?.markdown)
         requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, BillDetailFragment().apply { arguments = bundle })
                 .addToBackStack(null)
