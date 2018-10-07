@@ -5,10 +5,13 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.app.NotificationManager
 import android.app.NotificationChannel
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import java.util.*
 
 
@@ -67,6 +70,25 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
             setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY)
         }
         notificationManager.notify(createNotificationId(), groupBuilder.build())
+    }
+
+    fun showNotSignedIn(){
+        val ERROR_CHANNEL_ID = "xyz.hisname.fireflyiii.ERROR"
+        val GROUP_ID = "xyz.hisname.fireflyiii.NOT_SIGNED_IN"
+        val onboarding = Intent(this, OnboardingActivity::class.java)
+        val onboardingIntent = NotificationCompat.Action(R.drawable.app_icon,
+                "Click here to sign in",
+                PendingIntent.getActivity(this, 0, onboarding, PendingIntent.FLAG_CANCEL_CURRENT))
+
+        val notificationBuilder = NotificationCompat.Builder(this, ERROR_CHANNEL_ID).apply {
+            setContentTitle("Error communicating with Firefly")
+            setContentText("It appears you are not signed in. Please sign in before continuing.")
+            setGroup(GROUP_ID)
+            addAction(onboardingIntent)
+            setSmallIcon(R.drawable.ic_perm_identity_black_24dp)
+            setGroupSummary(true)
+        }
+        notificationManager.notify(createNotificationId(), notificationBuilder.build())
     }
 
     private fun createNotificationId(): Int{
