@@ -44,19 +44,35 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/amountTextView"
+                android:id="@+id/minAmountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Amount"
+                android:text="Min Amount"
                 android:textStyle="bold"
                 app:layout_constraintTop_toBottomOf="@+id/billlinedivider"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/amountText"
+                android:id="@+id/maxAmountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@+id/amountTextView"
+                android:layout_marginTop="12dp"
+                android:text="Max Amount"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/minAmountTextView"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/maxAmountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/maxAmountTextView"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/minAmountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/minAmountTextView"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <View
@@ -66,7 +82,7 @@
                 android:background="#E1E1E1"
                 android:layout_marginTop="5dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/amountText"
+                app:layout_constraintTop_toBottomOf="@id/maxAmountTextView"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -139,17 +155,53 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:inputType="textMultiLine"
-                app:layout_constraintTop_toBottomOf="@+id/notesTextView"/>
+                app:layout_constraintTop_toBottomOf="@+id/notesTextView"
+                />
+
+            <View
+                android:id="@+id/noteslinedivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E1E1E1"
+                android:layout_marginTop="5dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/notesText"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/reminderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                android:text="Remind me on"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/noteslinedivider" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/reminderSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/reminderTextView"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/reminderDateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/reminderSpinner"
+                app:layout_constraintStart_toStartOf="@+id/reminderSpinner"
+                app:layout_constraintEnd_toEndOf="@+id/reminderSpinner"/>
 
             <include layout="@layout/delete_button_layout"
                 android:id="@+id/deleteBillButton"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="80dp"
-                app:layout_constraintTop_toBottomOf="@+id/notesText"
+                android:layout_marginTop="120dp"
+                app:layout_constraintTop_toBottomOf="@+id/reminderTextView"
                 app:layout_constraintStart_toStartOf="@+id/billLayout"
                 app:layout_constraintEnd_toEndOf="@+id/billLayout"/>
-
 
             <include layout="@layout/progress_overlay"/>
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.content.Intent
+import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -41,7 +42,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
             setSmallIcon(R.drawable.ic_sort_descending)
             setGroupSummary(true)
             setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
-            setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY)
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
         }
         notificationManager.notify(createNotificationId(), groupBuilder.build())
 
@@ -55,7 +56,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
             val billChannel = NotificationChannel(BILL_CHANNEL_ID,
                     BILL_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT).apply {
                 enableLights(true)
-                description = "Shows adding of Bills result"
+                description = "Show Bill Notifications"
                 enableVibration(false)
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             }
@@ -67,7 +68,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
             setSmallIcon(R.drawable.ic_calendar_blank)
             setGroupSummary(true)
             setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
-            setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY)
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
         }
         notificationManager.notify(createNotificationId(), groupBuilder.build())
     }
@@ -89,6 +90,32 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
             setGroupSummary(true)
         }
         notificationManager.notify(createNotificationId(), notificationBuilder.build())
+    }
+
+    fun showBillDueDate(contextText: String, contextTitle: String){
+        val BILL_CHANNEL_ID = "xyz.hisname.fireflyiii.BILL_REMINDER"
+        val BILL_CHANNEL_NAME = "Bill Reminder"
+        val GROUP_ID = "xyz.hisname.fireflyiii.BILL"
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val billChannel = NotificationChannel(BILL_CHANNEL_ID,
+                    BILL_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH).apply {
+                enableLights(true)
+                description = "Show Bill Reminder Notifications"
+                enableVibration(true)
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
+            manager.createNotificationChannel(billChannel)
+        }
+        val groupBuilder = NotificationCompat.Builder(this, BILL_CHANNEL_ID).apply {
+            setContentText(contextText)
+            setGroup(GROUP_ID)
+            setSound(RingtoneManager.getDefaultUri(Notification.DEFAULT_SOUND))
+            setSmallIcon(R.drawable.ic_information_outline)
+            setGroupSummary(true)
+            setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+        }
+        notificationManager.notify(createNotificationId(), groupBuilder.build())
     }
 
     private fun createNotificationId(): Int{

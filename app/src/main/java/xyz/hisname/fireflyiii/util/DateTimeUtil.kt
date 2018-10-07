@@ -113,4 +113,14 @@ object DateTimeUtil {
     fun getTodayDate(): String{
         return LocalDate.now().toString()
     }
+
+    fun getWeeksBefore(date: String, weeks: Long): String {
+        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        return localDate.minusWeeks(weeks).toString()
+    }
+
+    fun getDaysBefore(date: String, days: Long): String{
+        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        return localDate.minusDays(days).toString()
+    }
 }
