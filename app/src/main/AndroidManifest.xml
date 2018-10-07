@@ -37,6 +37,7 @@
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="firefly.hisname.ADD_PIGGY_BANK" />
+                <action android:name="firefly.hisname.ADD_BILL"/>
 
             </intent-filter>
 

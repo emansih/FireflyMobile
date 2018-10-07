@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.work.*
+import xyz.hisname.fireflyiii.repository.workers.BillWorker
 import xyz.hisname.fireflyiii.repository.workers.PiggyBankWorker
 
 class GenericReceiver: BroadcastReceiver(){
@@ -26,6 +27,25 @@ class GenericReceiver: BroadcastReceiver(){
                             .build())
                     .build()
             WorkManager.getInstance().enqueue(piggybankWork)
+        } else if(intent.action == "firefly.hisname.ADD_BILL"){
+            val billData = Data.Builder()
+                    .putString("name", intent.getStringExtra("name"))
+                    .putString("billMatch", intent.getStringExtra("billMatch"))
+                    .putString("minAmount", intent.getStringExtra("minAmount"))
+                    .putString("maxAmount", intent.getStringExtra("maxAmount"))
+                    .putString("billDate", intent.getStringExtra("billDate"))
+                    .putString("repeatFreq", intent.getStringExtra("repeatFreq"))
+                    .putString("skip", intent.getStringExtra("skip"))
+                    .putString("currencyCode", intent.getStringExtra("currencyCode"))
+                    .putString("notes", intent.getStringExtra("notes"))
+                    .build()
+            val billWork = OneTimeWorkRequest.Builder(BillWorker::class.java)
+                    .setInputData(billData)
+                    .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build())
+                    .build()
+            WorkManager.getInstance().enqueue(billWork)
         }
     }
 

@@ -44,6 +44,31 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
 
     }
 
+    fun showBillNotification(contextText: String, contextTitle: String){
+        val BILL_CHANNEL_ID = "xyz.hisname.fireflyiii.BILL"
+        val BILL_CHANNEL_NAME = "Bills"
+        val GROUP_ID = "xyz.hisname.fireflyiii.BILL"
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val billChannel = NotificationChannel(BILL_CHANNEL_ID,
+                    BILL_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT).apply {
+                enableLights(true)
+                description = "Shows adding of Bills result"
+                enableVibration(false)
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
+            manager.createNotificationChannel(billChannel)
+        }
+        val groupBuilder = NotificationCompat.Builder(this, BILL_CHANNEL_ID).apply {
+            setContentText(contextText)
+            setGroup(GROUP_ID)
+            setSmallIcon(R.drawable.ic_calendar_blank)
+            setGroupSummary(true)
+            setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
+            setGroupAlertBehavior(Notification.GROUP_ALERT_SUMMARY)
+        }
+        notificationManager.notify(createNotificationId(), groupBuilder.build())
+    }
+
     private fun createNotificationId(): Int{
         val random = Random()
         var i = random.nextInt(99 + 1)
