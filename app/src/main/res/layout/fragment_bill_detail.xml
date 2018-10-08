@@ -158,48 +158,13 @@
                 app:layout_constraintTop_toBottomOf="@+id/notesTextView"
                 />
 
-            <View
-                android:id="@+id/noteslinedivider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E1E1E1"
-                android:layout_marginTop="5dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/notesText"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/reminderTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:layout_marginTop="12dp"
-                android:text="Remind me on"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noteslinedivider" />
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/reminderSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@+id/reminderTextView"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/reminderDateText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@+id/reminderSpinner"
-                app:layout_constraintStart_toStartOf="@+id/reminderSpinner"
-                app:layout_constraintEnd_toEndOf="@+id/reminderSpinner"/>
 
             <include layout="@layout/delete_button_layout"
                 android:id="@+id/deleteBillButton"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="120dp"
-                app:layout_constraintTop_toBottomOf="@+id/reminderTextView"
+                app:layout_constraintTop_toBottomOf="@+id/notesText"
                 app:layout_constraintStart_toStartOf="@+id/billLayout"
                 app:layout_constraintEnd_toEndOf="@+id/billLayout"/>
 

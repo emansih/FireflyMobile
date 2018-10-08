@@ -1,15 +1,11 @@
 package xyz.hisname.fireflyiii.ui.bills
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.*
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.work.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_bill_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
@@ -19,17 +15,13 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.BillsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoBillsViewModel
-import xyz.hisname.fireflyiii.repository.workers.BillReminderWorker
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
-import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.consume
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
 import java.math.BigDecimal
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 class BillDetailFragment: BaseDetailFragment(){
 
@@ -68,101 +60,7 @@ class BillDetailFragment: BaseDetailFragment(){
         notesText.text = billNotes
         val deleteButton = requireActivity().findViewById<Button>(R.id.deleteBillButton)
         deleteButton.setText(R.string.delete_bill)
-        val spinnerValues = arrayListOf("No reminder" , "1 Day Before","2 Days Before",
-                "1 Week before", date, "Custom Date")
-        val dataAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, spinnerValues)
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        reminderSpinner.adapter = dataAdapter
-        reminderSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
 
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val billWorker = OneTimeWorkRequest.Builder(BillReminderWorker::class.java)
-                        .addTag("billworker")
-                val billData = Data.Builder()
-                        .putString("name", billName)
-                        .putString("date", date)
-                        .build()
-                when(position) {
-                    // Custom Date
-                    5 -> {
-                        val calendar = Calendar.getInstance()
-                        val reminderDate = DatePickerDialog.OnDateSetListener {
-                            _, year, monthOfYear, dayOfMonth ->
-                            run {
-                                calendar.set(Calendar.YEAR, year)
-                                calendar.set(Calendar.MONTH, monthOfYear)
-                                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                                WorkManager.getInstance().cancelAllWorkByTag("billworker")
-                                val chosenDate = DateTimeUtil.getCalToString(calendar.timeInMillis.toString())
-                                reminderDateText.text = chosenDate
-                                val builder = billWorker.setInitialDelay(
-                                        DateTimeUtil.getDaysDifference(chosenDate).toLong(), TimeUnit.DAYS)
-                                        .setInputData(billData)
-                                        .build()
-                                WorkManager.getInstance().enqueue(builder)
-                            }
-                        }
-
-                        val dateDialog = DatePickerDialog(requireContext(), reminderDate, calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                        dateDialog.datePicker.minDate = System.currentTimeMillis() - 1000
-                        dateDialog.show()
-                    }
-                    // Bill day itself
-                    4 -> {
-                        reminderDateText.text = date
-                        //cancel previous worker
-                        WorkManager.getInstance().cancelAllWorkByTag("billworker")
-                        val builder = billWorker.setInitialDelay(
-                                DateTimeUtil.getDaysDifference(date).toLong(), TimeUnit.DAYS)
-                                .setInputData(billData)
-                                .build()
-                        WorkManager.getInstance().enqueue(builder)
-                    }
-                    // 1 week before
-                    3 ->  {
-                        WorkManager.getInstance().cancelAllWorkByTag("billworker")
-                        val chosenDate = DateTimeUtil.getWeeksBefore(date, 1)
-                        reminderDateText.text = chosenDate
-                        val builder = billWorker.setInitialDelay(
-                                DateTimeUtil.getDaysDifference(chosenDate).toLong(), TimeUnit.DAYS)
-                                .setInputData(billData)
-                                .build()
-                        WorkManager.getInstance().enqueue(builder)
-                    }
-                    // 2 days before
-                    2 -> {
-                        WorkManager.getInstance().cancelAllWorkByTag("billworker")
-                        val chosenDate = DateTimeUtil.getDaysBefore(date, 2)
-                        reminderDateText.text = chosenDate
-                        val builder = billWorker.setInitialDelay(
-                                DateTimeUtil.getDaysDifference(chosenDate).toLong(), TimeUnit.DAYS)
-                                .setInputData(billData)
-                                .build()
-                        WorkManager.getInstance().enqueue(builder)
-                    }
-                    // 1 day before
-                    1 -> {
-                        WorkManager.getInstance().cancelAllWorkByTag("billworker")
-                        val chosenDate = DateTimeUtil.getDaysBefore(date, 1)
-                        reminderDateText.text = chosenDate
-                        val builder = billWorker.setInitialDelay(
-                                DateTimeUtil.getDaysDifference(chosenDate).toLong(), TimeUnit.DAYS)
-                                .setInputData(billData)
-                                .build()
-                        WorkManager.getInstance().enqueue(builder)
-                    }
-                    // no reminder
-                    0 -> {
-                        reminderDateText.text = ""
-                        WorkManager.getInstance().cancelAllWorkByTag("billworker")
-                    }
-                }
-            }
-
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId){

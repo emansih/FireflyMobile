@@ -36,12 +36,8 @@ class AddBillActivity: BaseActivity() {
         bill_create_toolbar.setNavigationOnClickListener {
             checkEmptiness()
         }
-        val spinnerValue = ArrayList<String>()
-        spinnerValue.add(Constants.WEEKLY)
-        spinnerValue.add(Constants.MONTHLY)
-        spinnerValue.add(Constants.QUARTERLY)
-        spinnerValue.add(Constants.HALF_YEARLY)
-        spinnerValue.add(Constants.YEARLY)
+        val spinnerValue = arrayOf(Constants.WEEKLY, Constants.MONTHLY,
+                Constants.QUARTERLY, Constants.HALF_YEARLY, Constants.YEARLY)
         val dataAdapter = ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, spinnerValue)
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         repeat_spinner.adapter = dataAdapter
@@ -61,8 +57,6 @@ class AddBillActivity: BaseActivity() {
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
-
-
     }
 
     private fun validateInput(): Boolean{

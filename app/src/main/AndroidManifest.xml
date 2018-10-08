@@ -32,7 +32,7 @@
         <activity android:name=".ui.bills.AddBillActivity" />
         <activity android:name=".ui.piggybank.AddPiggyActivity" />
 
-        <receiver android:name=".repository.GenericReceiver"
+        <receiver android:name=".GenericReceiver"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />

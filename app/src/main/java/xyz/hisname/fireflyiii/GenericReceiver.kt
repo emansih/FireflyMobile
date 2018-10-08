@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository
+package xyz.hisname.fireflyiii
 
 import android.content.BroadcastReceiver
 import android.content.Context
