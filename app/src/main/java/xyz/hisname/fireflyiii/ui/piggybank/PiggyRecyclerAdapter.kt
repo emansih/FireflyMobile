@@ -25,54 +25,49 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
         return PiggyHolder(parent.inflate(R.layout.piggy_list_item))
     }
 
-    override fun onBindViewHolder(holder: PiggyHolder, position: Int) {
-        val piggyData = items[position].piggyAttributes
-        holder.piggyName.text = piggyData?.name
-        holder.goalAmount.text = piggyData?.currency_symbol + " " + piggyData?.target_amount
-        holder.amountSaved.text = piggyData?.currency_symbol + " " + piggyData?.current_amount.toString()
-        if(piggyData!!.percentage <= 15.toDouble()){
-            holder.piggyProgress.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_red_700),
-                    PorterDuff.Mode.SRC_IN)
-        } else if(piggyData.percentage <= 50.toDouble()){
-            holder.piggyProgress.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_green_500),
-                    PorterDuff.Mode.SRC_IN)
-        }
-        holder.piggyProgress.progress = piggyData.percentage.toInt()
-        val targetDate = piggyData.target_date
-        holder.timeLeft.let {
-            if(targetDate != null){
-                if(piggyData.percentage.toInt() != 100){
-                    val daysDiff = DateTimeUtil.getDaysDifference(targetDate).toInt()
-                    when{
-                        daysDiff == 0 -> it.text = context.getString(R.string.target_due_today)
-                        daysDiff == 1 -> it.text = context.getString(R.string.one_more_day_to_target)
-                        daysDiff < 0 -> {
-                            val inverseMath = Math.abs(daysDiff)
-                            it.text =  context.getString(R.string.target_missed,inverseMath)
-                        }
-                        daysDiff == -1 -> it.text = context.getString(R.string.yesterday_target)
-                        daysDiff >= 0 -> it.text = context.getString(R.string.days_to_go, daysDiff)
+    override fun onBindViewHolder(holder: PiggyHolder, position: Int) = (holder as PiggyHolder).bind(items[position],clickListener)
 
-                    }
-                } else {
-                    it.text = context.getString(R.string.user_did_it)
-                }
-            } else {
-                it.text = context.getString(R.string.no_target_date)
-            }
-        }
-        holder.piggyId.text = items[position].piggyId.toString()
-        holder.piggyId.setOnClickListener{clickListener(items[position])}
-    }
 
     override fun getItemCount() = items.size
 
-    inner class PiggyHolder(view: View): RecyclerView.ViewHolder(view) {
-        val piggyName: TextView = view.piggyName
-        val amountSaved: TextView = view.currently_saved
-        val goalAmount: TextView = view.goal_save
-        val piggyProgress: ContentLoadingProgressBar = view.goal_progress_bar
-        val timeLeft: TextView = view.timeLeft
-        val piggyId: TextView = view.piggyId
+    inner class PiggyHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+        fun bind(piggyData: PiggyData, clickListener: (PiggyData) -> Unit){
+            val piggyBankData = piggyData.piggyAttributes
+            itemView.piggyName.text = piggyBankData?.name
+            itemView.goal_save.text = piggyBankData?.currency_symbol + " " + piggyBankData?.target_amount
+            itemView.currently_saved.text = piggyBankData?.currency_symbol + " " + piggyBankData?.current_amount.toString()
+            if(piggyBankData!!.percentage <= 15.toDouble()){
+                itemView.goal_progress_bar.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_red_700),
+                        PorterDuff.Mode.SRC_IN)
+            } else if(piggyBankData.percentage <= 50.toDouble()){
+                itemView.goal_progress_bar.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_green_500),
+                        PorterDuff.Mode.SRC_IN)
+            }
+            itemView.goal_progress_bar.progress = piggyBankData.percentage.toInt()
+            val targetDate = piggyBankData.target_date
+            itemView.timeLeft.let {
+                if(targetDate != null){
+                    if(piggyBankData.percentage.toInt() != 100){
+                        val daysDiff = DateTimeUtil.getDaysDifference(targetDate).toInt()
+                        when{
+                            daysDiff == 0 -> it.text = context.getString(R.string.target_due_today)
+                            daysDiff == 1 -> it.text = context.getString(R.string.one_more_day_to_target)
+                            daysDiff < 0 -> {
+                                val inverseMath = Math.abs(daysDiff)
+                                it.text =  context.getString(R.string.target_missed,inverseMath)
+                            }
+                            daysDiff == -1 -> it.text = context.getString(R.string.yesterday_target)
+                            daysDiff >= 0 -> it.text = context.getString(R.string.days_to_go, daysDiff)
+
+                        }
+                    } else {
+                        it.text = context.getString(R.string.user_did_it)
+                    }
+                } else {
+                    it.text = context.getString(R.string.no_target_date)
+                }
+            }
+            itemView.piggyCard.setOnClickListener{clickListener(piggyData)}
+        }
     }
 }

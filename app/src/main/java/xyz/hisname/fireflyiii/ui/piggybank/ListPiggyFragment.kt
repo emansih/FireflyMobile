@@ -33,7 +33,6 @@ import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 class ListPiggyFragment: BaseFragment() {
 
-    private lateinit var piggyAdapter: PiggyRecyclerAdapter
     private var dataAdapter = ArrayList<PiggyData>()
     private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java)}
     private val piggyVM: DaoPiggyViewModel by lazy { getViewModel(DaoPiggyViewModel::class.java) }
@@ -58,7 +57,8 @@ class ListPiggyFragment: BaseFragment() {
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
         model.getPiggyBanks(baseUrl, accessToken).observe(this, Observer {
             if(it.getError() == null){
-                showData(it.getPiggy()!!.data.toMutableList())
+                recycler_view.adapter = PiggyRecyclerAdapter(it.getPiggy()!!.data.toMutableList()) {
+                    data: PiggyData -> itemClicked(data) }
                 it.getPiggy()!!.data.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
                         piggyDataBase?.piggyDataDao()?.addPiggy(element)
@@ -66,22 +66,13 @@ class ListPiggyFragment: BaseFragment() {
                 }
             } else {
                 piggyVM.getPiggyBank().observe(this, Observer { piggyData ->
-                    showData(piggyData)
+                    recycler_view.adapter = PiggyRecyclerAdapter(piggyData) { data: PiggyData -> itemClicked(data) }
                     toastInfo("Loaded data from cache")
                 })
 
             }
             swipeContainer.isRefreshing = false
         })
-    }
-
-    private fun showData(piggyData: MutableList<PiggyData>){
-        piggyAdapter = PiggyRecyclerAdapter(piggyData) { data: PiggyData -> itemClicked(data)}
-        recycler_view.adapter = piggyAdapter
-        piggyAdapter.apply {
-            recycler_view.adapter as PiggyRecyclerAdapter
-            update(piggyData)
-        }
     }
 
     private fun itemClicked(piggyData: PiggyData){
