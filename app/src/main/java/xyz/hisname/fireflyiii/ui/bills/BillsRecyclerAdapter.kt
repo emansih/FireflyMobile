@@ -65,8 +65,7 @@ class BillsRecyclerAdapter(private val items: MutableList<BillData>, private val
                 itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
 
             }
-            itemView.billId.text = billData.billId.toString()
-            itemView.billId.setOnClickListener{clickListener(billData)}
+            itemView.billCard.setOnClickListener{clickListener(billData)}
         }
     }
 }

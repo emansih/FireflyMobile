@@ -14,9 +14,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:stateListAnimator="@animator/lift_on_touch"
-        card_view:targetApi="lollipop"
+        android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
+        card_view:targetApi="lollipop"
         app:cardUseCompatPadding="true"
         app:cardPreventCornerOverlap="false"
         app:cardCornerRadius="2dp"
@@ -61,13 +62,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/billName"
                 app:layout_constraintBottom_toBottomOf="@+id/billName"/>
-
-            <TextView
-                android:id="@+id/billId"
-                android:textColor="#0000ffff"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
