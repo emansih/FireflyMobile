@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
@@ -33,12 +34,13 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     private val currentAmount: BigDecimal by lazy { arguments?.getSerializable("currentAmount") as BigDecimal }
     private val percentage: Double by lazy { arguments?.getDouble("percentage") as Double  }
-    private val leftToSave: BigDecimal by lazy { arguments?.getSerializable("leftToSave") as BigDecimal }
+    private val notes: String by lazy { arguments?.getString("notes") ?: "" }
+    private val dateStarted: String by lazy { arguments?.getString("startDate") ?: "" }
     private val piggyId: Long by lazy { arguments?.getLong("piggyId") as Long  }
     private val currencyCode: String by lazy { arguments?.getString("currencyCode") as String }
     private val targetAmount: BigDecimal by lazy { arguments?.getSerializable("targetAmount") as BigDecimal }
     private val name: String by lazy { arguments?.getString("name") as String }
-    private val targetDate: String? by lazy { arguments?.getString("targetDate")  }
+    private val targetDate: String by lazy { arguments?.getString("targetDate")  ?: "" }
     private val minPerMonth: BigDecimal by lazy{ arguments?.getSerializable("savePerMonth") as BigDecimal }
     private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val dao: DaoPiggyViewModel by lazy { getViewModel(DaoPiggyViewModel::class.java) }
@@ -67,7 +69,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                     R.color.md_green_500), PorterDuff.Mode.SRC_IN)
         }
         amountPercentage.text = percentage.toString() + "%"
-        if(!targetDate.isNullOrBlank()){
+        if(!targetDate.isBlank()){
             if(DateTimeUtil.getDaysDifference(targetDate).toInt() <= 3){
                 piggyBankTargetDate.text = resources.getString(R.string.target_date, targetDate)
                 piggyBankTargetDate.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
@@ -147,13 +149,15 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId){
         R.id.menu_item_edit -> consume {
-            val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-                    "piggyId" to piggyId, "piggyName" to name, "targetAmount" to targetAmount)
-          /*  requireActivity().supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, addPiggy)
-                    .addToBackStack(null)
-                    .commit()*/
+            val bundle = bundleOf("piggyId" to piggyId, "piggyName" to name, "targetAmount" to targetAmount,
+                    "currentAmount" to currentAmount, "startDate" to dateStarted,"targetDate" to targetDate,
+                    "notes" to notes)
+            println("detail: target: " + targetDate)
+            println("detail: start: " + dateStarted)
+            val addPiggy = Intent(requireContext(), AddPiggyActivity::class.java).apply{
+                putExtras(bundle)
+            }
+            startActivity(addPiggy)
         }
         else -> super.onOptionsItemSelected(item)
     }

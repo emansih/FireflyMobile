@@ -23,7 +23,6 @@ class AddPiggyActivity: BaseActivity() {
 
     private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_piggy_create)
@@ -63,6 +62,14 @@ class AddPiggyActivity: BaseActivity() {
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
+        piggy_name_edittext.setText(intent.getStringExtra("piggyName"))
+        val targetAmount = intent.getSerializableExtra("targetAmount") ?: ""
+        target_amount_edittext.setText(targetAmount.toString())
+        val currentAmount = intent.getSerializableExtra("currentAmount") ?: ""
+        current_amount_edittext.setText(currentAmount.toString())
+        start_date_edittext.setText(intent.getStringExtra("startDate") ?: DateTimeUtil.getTodayDate())
+        target_date_edittext.setText(intent.getStringExtra("targetDate") ?: "")
+        note_edittext.setText(intent.getStringExtra("notes"))
     }
 
     private fun validateInput(): Boolean {
@@ -146,7 +153,7 @@ class AddPiggyActivity: BaseActivity() {
                                     toastError("Error saving piggy bank")
                                 }
                             } else if(it.getSuccess() != null){
-                                toastSuccess("Piggy bank saved")
+                               toastSuccess("Piggy bank saved")
                                 finish()
                             }
                         })

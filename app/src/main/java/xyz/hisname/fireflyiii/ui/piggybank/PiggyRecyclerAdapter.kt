@@ -25,7 +25,7 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
         return PiggyHolder(parent.inflate(R.layout.piggy_list_item))
     }
 
-    override fun onBindViewHolder(holder: PiggyHolder, position: Int) = (holder as PiggyHolder).bind(items[position],clickListener)
+    override fun onBindViewHolder(holder: PiggyHolder, position: Int) = holder.bind(items[position],clickListener)
 
 
     override fun getItemCount() = items.size
