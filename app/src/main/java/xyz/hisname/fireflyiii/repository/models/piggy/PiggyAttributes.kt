@@ -20,7 +20,7 @@ data class PiggyAttributes(
         val current_amount: BigDecimal,
         val left_to_save: BigDecimal,
         val save_per_month: BigDecimal,
-        val start_date: String,
+        val start_date: String?,
         val target_date: String?,
         val order: Int?,
         val active: Boolean,
