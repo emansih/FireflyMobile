@@ -30,7 +30,6 @@ class DashboardFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         swipeContainer.isRefreshing = true
         animateCard(overviewFrame,walletFrame,recentTransactionFrame)
-        setUpCards()
         swipeContainer.isRefreshing = false
         setRefreshing()
     }
@@ -44,6 +43,7 @@ class DashboardFragment: BaseFragment() {
                     .setDuration(3000)
                     .start()
         }
+        setUpCards()
     }
 
     private fun setUpCards(){
@@ -64,7 +64,7 @@ class DashboardFragment: BaseFragment() {
             requireFragmentManager().beginTransaction().remove(OverviewFragment()).commit()
             requireFragmentManager().beginTransaction().remove(WalletFragment()).commit()
             requireFragmentManager().beginTransaction().remove(TransactionFragment()).commit()
-            setUpCards()
+            animateCard(overviewFrame,walletFrame,recentTransactionFrame)
             swipeContainer.isRefreshing = false
         }
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
