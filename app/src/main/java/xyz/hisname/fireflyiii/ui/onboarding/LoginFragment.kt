@@ -7,8 +7,10 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
@@ -27,9 +29,10 @@ import java.util.concurrent.TimeUnit
 
 class LoginFragment: Fragment() {
 
+    private val baseUrl: String by lazy { sharedPref.getString("fireflyUrl","") ?: "" }
     private lateinit var fireflyUrl: String
-    private lateinit var fireflyId: String
-    private lateinit var fireflySecretKey: String
+    private val fireflyId: String by lazy { sharedPref.getString("fireflyId","") ?: "" }
+    private val fireflySecretKey: String by lazy { sharedPref.getString("fireflySecretKey","") ?: "" }
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
     private val model by lazy { getViewModel(AuthViewModel::class.java) }
 
@@ -45,6 +48,9 @@ class LoginFragment: Fragment() {
         when {
             Objects.equals(argument, "LOGIN") -> {
                 user_details_layout.isVisible = true
+                firefly_url_edittext.setText(baseUrl)
+                firefly_id_edittext.setText(fireflyId)
+                firefly_secret_edittext.setText(fireflySecretKey)
                 getAccessCode()
             }
             Objects.equals(argument, "REFRESH_TOKEN") -> {
@@ -59,8 +65,8 @@ class LoginFragment: Fragment() {
     private fun getAccessCode(){
         firefly_submit_button.setOnClickListener {
             fireflyUrl = firefly_url_edittext.getString()
-            fireflyId = firefly_id_edittext.getString()
-            fireflySecretKey =  firefly_secret_edittext.getString()
+            val fireflyId = firefly_id_edittext.getString()
+            val fireflySecretKey =  firefly_secret_edittext.getString()
             if(fireflyUrl.isEmpty() or fireflyId.isEmpty() or fireflySecretKey.isEmpty()){
                 when {
                     fireflyUrl.isEmpty() -> firefly_url_edittext.error = resources.getString(R.string.required_field)
@@ -82,7 +88,6 @@ class LoginFragment: Fragment() {
                     intent.data = ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
                             "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri()
                     startActivity(intent)
-                    requireActivity().finish()
                 } catch (exception: ActivityNotFoundException){
                     // this user doesn't have a browser installed on their device?!
                     toastError(resources.getString(R.string.no_browser_installed))
@@ -97,18 +102,16 @@ class LoginFragment: Fragment() {
             Currently we only checked if the refresh token is `old`
         */
         ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-        model.getRefreshToken(fireflyUrl, sharedPref.getString("refresh_token", ""), fireflySecretKey)
+        model.getRefreshToken(baseUrl, sharedPref.getString("refresh_token", ""), fireflySecretKey)
                 .observe(this, Observer {
                     if(it.getError() == null) {
-                        run {
-                            sharedPref.edit {
-                                putString("refresh_token", it.getAuth()?.refresh_token)
-                                putString("access_token", it.getAuth()?.access_token)
-                                // Dirty hack for now...
-                                // TODO: use `putLong()` method instead of `putString()`
-                                putString("expires_at", (System.currentTimeMillis() +
-                                        TimeUnit.MINUTES.toMillis(it.getAuth()?.expires_in!!.toLong())).toString())
-                            }
+                        val refreshtoken = it.getAuth()?.refresh_token ?: ""
+                        sharedPref.edit {
+                            putString("refresh_token", refreshtoken)
+                            putString("access_token", it.getAuth()?.access_token)
+                            putLong("expires_at", (System.currentTimeMillis() +
+                                    TimeUnit.MINUTES.toMillis(it.getAuth()?.expires_in!!.toLong())))
+
                         }
                         startHomeIntent()
                     } else {
@@ -128,5 +131,61 @@ class LoginFragment: Fragment() {
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             requireActivity().finish()
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val uri = requireActivity().intent.data
+        if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
+            val code = uri.getQueryParameter("code")
+            if(code != null) {
+                val sharedPref= PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val baseUrl= sharedPref.getString("fireflyUrl","") ?: ""
+                val fireflyId = sharedPref.getString("fireflyId","") ?: ""
+                val fireflySecretKey= sharedPref.getString("fireflySecretKey","") ?: ""
+                ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+                model.getAccessToken(baseUrl, code,fireflyId,fireflySecretKey).observe(this, Observer {
+                    if(it.getAuth() != null) {
+                        toastSuccess(resources.getString(R.string.welcome))
+                        val refreshtoken = it.getAuth()?.refresh_token ?: ""
+                        sharedPref.edit {
+                            putString("refresh_token", refreshtoken)
+                            putString("access_token", it.getAuth()?.access_token)
+                            putLong("expires_at", (System.currentTimeMillis() +
+                                    TimeUnit.MINUTES.toMillis(it.getAuth()!!.expires_in)))
+                        }
+                        val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to it.getAuth()?.access_token)
+                        requireActivity().supportFragmentManager.beginTransaction()
+                                .replace(R.id.fragment_container, OnboardingFragment().apply { arguments = bundle })
+                                .commit()
+                    } else {
+                        ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
+                        val error = it.getError()
+                        if(error == null){
+                            toastInfo("There was an error communicating with your server")
+                        } else {
+                            if (error.localizedMessage.startsWith("Unable to resolve host")) {
+                                toastInfo(resources.getString(R.string.unable_ping_server))
+                            } else {
+                                toastInfo("There was an error communicating with your server")
+                            }
+                        }
+                    }
+                })
+            } else {
+                showDialog()
+            }
+        }
+    }
+
+    private fun showDialog(){
+        ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.authentication_failed))
+                .setMessage(resources.getString(R.string.authentication_failed_message, Constants.REDIRECT_URI))
+                .setPositiveButton("OK") { _, _ ->
+                }
+                .create()
+                .show()
     }
 }

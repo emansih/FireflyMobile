@@ -13,6 +13,7 @@
         android:theme="@style/AppTheme">
 
         <activity android:name="xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity"
+            android:launchMode="singleTop"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

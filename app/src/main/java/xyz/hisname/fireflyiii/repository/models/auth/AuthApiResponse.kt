@@ -11,7 +11,7 @@ class AuthApiResponse() {
         this.error = null
     }
 
-    constructor(error: Throwable): this(){
+    constructor(error: Throwable?): this(){
         this.error = error
         this.auth = null
     }
@@ -21,16 +21,8 @@ class AuthApiResponse() {
         return auth
     }
 
-    fun setAuth(billsList: AuthModel?) {
-        this.auth = billsList
-    }
-
     fun getError(): Throwable? {
         return error
-    }
-
-    fun setError(error: Throwable) {
-        this.error = error
     }
 
 }
