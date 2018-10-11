@@ -2,13 +2,30 @@
 
 An unofficial Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 
-This software is under heavy development and should be considered alpha quality as it might work in unexpected ways. 
+### Disclaimer
+This software is using Firefly III APIs. It is under heavy development and should be considered alpha quality as it might work in unexpected ways. In order to use this app, you must first [setup](https://firefly-iii.readthedocs.io/en/latest/installation/server.html) a [Firefly III](https://firefly-iii.org/) instance. 
 
 Other alternative include [this software](https://github.com/mconway/firefly-app/) written by mconway using Ionic framework. 
 
-Icons in this app are taken from:
-1. [Flaticon](https://www.flaticon.com/free-icon/piggy-bank-with-dollar-coin_21239)
-2. [Material Design Icons](https://materialdesignicons.com)
+### Customization
+
+**Change the default oAuth callback URL**
+
+1. Change `config.hostname` value in `config.properties` to your desired value.
+2. Change  the host value for `manifestPlaceholders = [host: "empty"]` in `build.gradle` to your desired value.
+
+Ensure *both* values **are the same**.
+
+### Building APK
+With your device plugged into your PC and ADB enabled
+```bash
+git clone https://github.com/emansih/FireflyMobile.git
+cd FireflyMobile
+./gradlew clean installDebug
+```
+
+Note: An APK is provided in the [release page](https://github.com/emansih/FireflyMobile/releases) for convienent purposes. All APKs
+are signed with the same release key, this ensure that the APK comes from me and your financial data will not be exposed to nefarious actors. The APK SHA256 public key is `40:F2:02:B8:CC:D1:68:87:56:8A:F7:9E:27:44:5B:E1:82:51:CC:B9:1E:89:08:8B:04:3D:2F:35:A2:0D:C3:8F`. All commits in this repo are signed with my GPG key and the public key can be found on [keybase](https://keybase.io/hisname/pgp_keys.asc) and [Github](https://api.github.com/users/emansih/gpg_keys)
 
 ### Authentication
 In order to start using this software, you have to create a new client in your Firefly Instance. 
@@ -38,6 +55,17 @@ In order to start using this software, you have to create a new client in your F
 
 
 Thanks to [Screener - Better Screenshots](https://play.google.com/store/apps/details?id=de.toastcode.screener&hl=en) for the device frame!
+
+Icons in this app are taken from:
+1. [Flaticon](https://www.flaticon.com/free-icon/piggy-bank-with-dollar-coin_21239)
+2. [Material Design Icons](https://materialdesignicons.com)
+
+
+### Known Limitations
+Heh... I left this to the last.
+
+1. When upgrading between Firefly III versions, your oAuth access token will be invalidated. It is a known bug in Firefly III. A workaround will be to clear app data and re-sign in again. (See [#1648](https://github.com/firefly-iii/firefly-iii/issues/1648) for more info)
+
 
 ### License
 ```
