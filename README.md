@@ -20,7 +20,7 @@ Ensure *both* values **are the same**.
 
 There are many write up on the internet with regards to certificate pinning. This project shall not go into details.
 <sup>[1](https://developer.android.com/training/articles/security-ssl)</sup> <sup>[2](https://medium.com/@appmattus/android-security-ssl-pinning-1db8acb6621e)</sup>
-<sup>[3](https://security.stackexchange.com/a/29990)</sup> To enable certificate pinning: 
+<sup>[3](https://security.stackexchange.com/a/29990)</sup>
 
 A quote from [okhttp docs](http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html)
 
@@ -29,6 +29,8 @@ Pinning certificates limits your server team's abilities to update their TLS cer
 you take on additional operational complexity and limit your ability to migrate between certificate authorities. Do not use certificate pinning without the blessing of your server's TLS administrator!
 
 If you are still brave, carry on reading. 
+
+To enable certificate pinning: 
 
 1. Run [`cert_pinning.sh`](scripts/cert_pinning.sh) 
 ```bash
