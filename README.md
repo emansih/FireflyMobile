@@ -11,10 +11,48 @@ Other alternative include [this software](https://github.com/mconway/firefly-app
 
 **Change the default oAuth callback URL**
 
-1. Change `config.hostname` value in `config.properties` to your desired value.
-2. Change  the host value for `manifestPlaceholders = [host: "empty"]` in `build.gradle` to your desired value.
+1. Change `config.hostname` value in [`config.properties`](app/config.properties) to your desired value.
+2. Change  the host value for `manifestPlaceholders = [host: "empty"]` in [`build.gradle`](app/build.gradle) to your desired value.
 
 Ensure *both* values **are the same**.
+
+**Certificate pinning**
+
+There are many write up on the internet with regards to certificate pinning. This project shall not go into details.
+<sup>[1](https://developer.android.com/training/articles/security-ssl)</sup> <sup>[2](https://medium.com/@appmattus/android-security-ssl-pinning-1db8acb6621e)</sup>
+<sup>[3](https://security.stackexchange.com/a/29990)</sup> To enable certificate pinning: 
+
+A quote from [okhttp docs](http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html)
+
+>Warning: Certificate Pinning is Dangerous!
+Pinning certificates limits your server team's abilities to update their TLS certificates. By pinning certificates, 
+you take on additional operational complexity and limit your ability to migrate between certificate authorities. Do not use certificate pinning without the blessing of your server's TLS administrator!
+
+If you are still brave, carry on reading. 
+
+1. Run [`cert_pinning.sh`](scripts/cert_pinning.sh) 
+```bash
+$ ./cert.sh www.google.com
+/C=US/ST=California/L=Mountain View/O=Google LLC/CN=www.google.com
+47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
+/C=US/O=Google Trust Services/CN=Google Internet Authority G3
+f8NnEFZxQ4ExFOhSN7EiFWtiudZQVD2oY60uauV/n78=
+```
+###### Script requires bash and openssl to run.
+
+2. Copy the lower-case host name or wildcard pattern to `config.host` in
+[`config.properties`](app/config.properties)
+
+3. Copy the sha256 value hash of the certificate's Subject Public Key Info to `config.certpinnervalue` in 
+[`config.properties`](app/config.properties)
+
+If you have been following correctly and by using the output from above, your config will be as follows
+
+```
+config.host="www.google.com"
+config.certpinnervalue="47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
+```
+
 
 ### Building APK
 With your device plugged into your PC and ADB enabled

@@ -15,17 +15,23 @@ android {
         vectorDrawables.useSupportLibrary = true
         def appConfigFile = file('config.properties')
         def hostName = ""
+        def certPin = ""
+        def certHost = ""
         if(appConfigFile.exists()){
             Properties appConfig = new Properties()
             appConfig.load(new FileInputStream(appConfigFile))
             if(appConfig['config.hostname'] != null){
                 hostName = appConfig['config.hostname']
+                certPin = appConfig['config.certpinnervalue']
+                certHost = appConfig['config.host']
                 manifestPlaceholders = [host: "empty"]
             }
         } else {
             throw new FileNotFoundException("$appConfigFile not found!")
         }
         buildConfigField("String", "HOSTNAME", hostName)
+        buildConfigField("String", "CERTPIN", certPin)
+        buildConfigField("String", "CERTHOST", certHost)
     }
     buildTypes {
         release {
