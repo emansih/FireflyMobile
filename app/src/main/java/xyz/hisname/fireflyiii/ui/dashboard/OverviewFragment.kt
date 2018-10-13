@@ -70,7 +70,7 @@ class OverviewFragment: BaseFragment() {
                     it.second.getTransaction()?.data?.forEachIndexed { _, element ->
                         depositSum += Math.abs(element.attributes.amount.toInt())
                     }
-                    incomeDigit.text = withdrawSum.toString()
+                    incomeDigit.text = depositSum.toString()
                 }
             } else {
                 isThereError = true
