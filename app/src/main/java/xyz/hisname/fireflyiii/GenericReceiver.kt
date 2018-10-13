@@ -8,6 +8,7 @@ import android.preference.PreferenceManager
 import androidx.work.*
 import xyz.hisname.fireflyiii.repository.workers.BillWorker
 import xyz.hisname.fireflyiii.repository.workers.PiggyBankWorker
+import xyz.hisname.fireflyiii.repository.workers.TranscationWorker
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
@@ -21,42 +22,73 @@ class GenericReceiver: BroadcastReceiver(){
             val notif = NotificationUtils(context)
             notif.showNotSignedIn()
         } else {
-            if (intent.action == "firefly.hisname.ADD_PIGGY_BANK") {
-                val piggyData = Data.Builder()
-                        .putString("name", intent.getStringExtra("name"))
-                        .putString("accountId", intent.getStringExtra("accountId"))
-                        .putString("targetAmount", intent.getStringExtra("targetAmount"))
-                        .putString("currentAmount", intent.getStringExtra("currentAmount"))
-                        .putString("startDate", intent.getStringExtra("startDate"))
-                        .putString("endDate", intent.getStringExtra("endDate"))
-                        .putString("notes", intent.getStringExtra("notes"))
-                        .build()
-                val piggybankWork = OneTimeWorkRequest.Builder(PiggyBankWorker::class.java)
-                        .setInputData(piggyData)
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .build())
-                        .build()
-                WorkManager.getInstance().enqueue(piggybankWork)
-            } else if (intent.action == "firefly.hisname.ADD_BILL") {
-                val billData = Data.Builder()
-                        .putString("name", intent.getStringExtra("name"))
-                        .putString("billMatch", intent.getStringExtra("billMatch"))
-                        .putString("minAmount", intent.getStringExtra("minAmount"))
-                        .putString("maxAmount", intent.getStringExtra("maxAmount"))
-                        .putString("billDate", intent.getStringExtra("billDate"))
-                        .putString("repeatFreq", intent.getStringExtra("repeatFreq"))
-                        .putString("skip", intent.getStringExtra("skip"))
-                        .putString("currencyCode", intent.getStringExtra("currencyCode"))
-                        .putString("notes", intent.getStringExtra("notes"))
-                        .build()
-                val billWork = OneTimeWorkRequest.Builder(BillWorker::class.java)
-                        .setInputData(billData)
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .build())
-                        .build()
-                WorkManager.getInstance().enqueue(billWork)
+            when {
+                intent.action == "firefly.hisname.ADD_PIGGY_BANK" -> {
+                    val piggyData = Data.Builder()
+                            .putString("name", intent.getStringExtra("name"))
+                            .putString("accountId", intent.getStringExtra("accountId"))
+                            .putString("targetAmount", intent.getStringExtra("targetAmount"))
+                            .putString("currentAmount", intent.getStringExtra("currentAmount"))
+                            .putString("startDate", intent.getStringExtra("startDate"))
+                            .putString("endDate", intent.getStringExtra("endDate"))
+                            .putString("notes", intent.getStringExtra("notes"))
+                            .build()
+                    val piggybankWork = OneTimeWorkRequest.Builder(PiggyBankWorker::class.java)
+                            .setInputData(piggyData)
+                            .setConstraints(Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build())
+                            .build()
+                    WorkManager.getInstance().enqueue(piggybankWork)
+                }
+                intent.action == "firefly.hisname.ADD_BILL" -> {
+                    val billData = Data.Builder()
+                            .putString("name", intent.getStringExtra("name"))
+                            .putString("billMatch", intent.getStringExtra("billMatch"))
+                            .putString("minAmount", intent.getStringExtra("minAmount"))
+                            .putString("maxAmount", intent.getStringExtra("maxAmount"))
+                            .putString("billDate", intent.getStringExtra("billDate"))
+                            .putString("repeatFreq", intent.getStringExtra("repeatFreq"))
+                            .putString("skip", intent.getStringExtra("skip"))
+                            .putString("currencyCode", intent.getStringExtra("currencyCode"))
+                            .putString("notes", intent.getStringExtra("notes"))
+                            .build()
+                    val billWork = OneTimeWorkRequest.Builder(BillWorker::class.java)
+                            .setInputData(billData)
+                            .setConstraints(Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build())
+                            .build()
+                    WorkManager.getInstance().enqueue(billWork)
+                }
+                intent.action == "firefly.hisname.ADD_DEPOSIT" -> {
+                    val depositData = Data.Builder()
+                            .putString("description", intent.getStringExtra("description"))
+                            .putString("date", intent.getStringExtra("date"))
+                            .putString("amount", intent.getStringExtra("amount"))
+                            .putString("currency", intent.getStringExtra("currency"))
+                            .putString("destinationName", intent.getStringExtra("destinationName"))
+                    transactionWork(depositData, "deposit")
+                }
+                intent.action == "firefly.hisname.ADD_WITHDRAW" -> {
+                    val withdrawData = Data.Builder()
+                            .putString("description", intent.getStringExtra("description"))
+                            .putString("date", intent.getStringExtra("date"))
+                            .putString("amount", intent.getStringExtra("amount"))
+                            .putString("currency", intent.getStringExtra("currency"))
+                            .putString("sourceName", intent.getStringExtra("sourceName"))
+                    transactionWork(withdrawData, "withdrawal")
+                }
+                intent.action == "firefly.hisname.ADD_TRANSFER" -> {
+                    val transferData = Data.Builder()
+                            .putString("description", intent.getStringExtra("description"))
+                            .putString("date", intent.getStringExtra("date"))
+                            .putString("amount", intent.getStringExtra("amount"))
+                            .putString("currency", intent.getStringExtra("currency"))
+                            .putString("sourceName", intent.getStringExtra("sourceName"))
+                            .putString("destinationName", intent.getStringExtra("destinationName"))
+                    transactionWork(transferData, "transfer")
+                }
             }
         }
         val action = intent.getStringExtra("transaction_notif")
@@ -72,6 +104,16 @@ class GenericReceiver: BroadcastReceiver(){
             context.startActivity(intent)
         }
 
+    }
+
+    private fun transactionWork(data: Data.Builder, type: String){
+        val transactionWork = OneTimeWorkRequest.Builder(TranscationWorker::class.java)
+                .setInputData(data.putString("transactionType" ,type).build())
+                .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build())
+                .build()
+        WorkManager.getInstance().enqueue(transactionWork)
     }
 
 }

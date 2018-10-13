@@ -22,6 +22,8 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
 
     private var notificationManager: NotificationManagerCompat = NotificationManagerCompat.from(this)
     private val manager: NotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    private val TRANSACTION_CHANNEL_ID = "xyz.hisname.fireflyiii.TRANSACTION"
+    private val TRANSACTION_CHANNEL_NAME = "Transaction"
 
 
     fun showPiggyBankNotification(contextText: String, contextTitle: String) {
@@ -95,8 +97,6 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
     }
 
     fun showTransactionPersistentNotification(){
-        val TRANSACTION_CHANNEL_ID = "xyz.hisname.fireflyiii.TRANSACTION"
-        val TRANSACTION_CHANNEL_NAME = "Transaction"
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val transactionChannel = NotificationChannel(TRANSACTION_CHANNEL_ID,
                     TRANSACTION_CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE).apply {
@@ -137,6 +137,29 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
                     .bigText("Tap here to add transactions!"))
         }
         notificationManager.notify("transaction_notif",12345, notificationBuilder.build())
+    }
+
+    fun showTransactionNotification(contextText: String, contextTitle: String){
+        val GROUP_ID = "xyz.hisname.fireflyiii.Transaction"
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val transactionChannel = NotificationChannel(TRANSACTION_CHANNEL_ID,
+                    TRANSACTION_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT).apply {
+                enableLights(true)
+                description = "Show Transaction Notifications"
+                enableVibration(false)
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
+            manager.createNotificationChannel(transactionChannel)
+        }
+        val groupBuilder = NotificationCompat.Builder(this, TRANSACTION_CHANNEL_ID).apply {
+            setContentText(contextText)
+            setGroup(GROUP_ID)
+            setSmallIcon(R.drawable.ic_refresh)
+            setGroupSummary(true)
+            setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+        }
+        notificationManager.notify(createNotificationId(), groupBuilder.build())
     }
 
     private fun createNotificationId(): Int{
