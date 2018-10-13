@@ -7,12 +7,14 @@ import android.app.NotificationManager
 import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.content.Intent
-import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import xyz.hisname.fireflyiii.GenericReceiver
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
+import xyz.hisname.fireflyiii.ui.piggybank.AddPiggyActivity
 import java.util.*
 
 
@@ -92,6 +94,50 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
         notificationManager.notify(createNotificationId(), notificationBuilder.build())
     }
 
+    fun showTransactionPersistentNotification(){
+        val TRANSACTION_CHANNEL_ID = "xyz.hisname.fireflyiii.TRANSACTION"
+        val TRANSACTION_CHANNEL_NAME = "Transaction"
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val transactionChannel = NotificationChannel(TRANSACTION_CHANNEL_ID,
+                    TRANSACTION_CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE).apply {
+                description = "Shows Persistent Transaction Notifications"
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            }
+            manager.createNotificationChannel(transactionChannel)
+        }
+        val expenseIntent = Intent(this, GenericReceiver::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("transaction_notif", "expense")
+
+        }
+        val expensePendingIntent: PendingIntent =
+                PendingIntent.getBroadcast(this, 0, expenseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val incomeIntent = Intent(this, GenericReceiver::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("transaction_notif", "income")
+        }
+        val incomePendingIntent: PendingIntent =
+                PendingIntent.getBroadcast(this, 1, incomeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val transferIntent = Intent(this, GenericReceiver::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("transaction_notif", "transfer")
+        }
+        val transferPendingIntent: PendingIntent =
+                PendingIntent.getBroadcast(this, 2, transferIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val notificationBuilder = NotificationCompat.Builder(this, TRANSACTION_CHANNEL_ID).apply {
+            setContentText("Add transactions anytime anywhere")
+            setSmallIcon(R.drawable.ic_refresh)
+            setAutoCancel(false)
+            setOngoing(true)
+            addAction(R.drawable.ic_arrow_left, "Expenses", expensePendingIntent)
+            addAction(R.drawable.ic_arrow_right, "Income", incomePendingIntent)
+            addAction(R.drawable.ic_bank_transfer, "Transfer", transferPendingIntent)
+            setStyle(NotificationCompat.BigTextStyle()
+                    .setBigContentTitle("Transactions shortcut")
+                    .bigText("Tap here to add transactions!"))
+        }
+        notificationManager.notify("transaction_notif",12345, notificationBuilder.build())
+    }
 
     private fun createNotificationId(): Int{
         val random = Random()

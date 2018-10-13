@@ -44,12 +44,34 @@ class HomeActivity: BaseActivity(){
         setUpDrawer(savedInstanceState)
         supportActionBar?.title = ""
         setNavIcon()
-        if(savedInstanceState == null){
-            val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, DashboardFragment().apply { arguments = bundle }, "dash")
-                    .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
-                    .commit()
+        if(intent.getStringExtra("transaction") != null) {
+            val transaction = intent.getStringExtra("transaction")
+            when (transaction) {
+                "expense" -> {
+                    val bundle = bundleOf("fireflyUrl" to baseUrl,
+                            "access_token" to accessToken, "transactionType" to "expenses")
+                    changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
+                }
+                "income" -> {
+                    val bundle = bundleOf("fireflyUrl" to baseUrl,
+                            "access_token" to accessToken, "transactionType" to "income")
+                    changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
+
+                }
+                "transfer" -> {
+                    val bundle = bundleOf("fireflyUrl" to baseUrl,
+                            "access_token" to accessToken, "transactionType" to "transfers")
+                    changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
+                }
+            }
+        } else {
+            if (savedInstanceState == null) {
+                val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, DashboardFragment().apply { arguments = bundle }, "dash")
+                        .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
+                        .commit()
+            }
         }
     }
 
@@ -239,6 +261,13 @@ class HomeActivity: BaseActivity(){
                 .commit()
     }
 
+    private fun changeFragment(fragment: Fragment, tag: String){
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment, tag)
+                .addToBackStack(null)
+                .commit()
+    }
+
     override fun onBackPressed() {
         when {
             result?.isDrawerOpen!! -> result?.closeDrawer()
@@ -257,17 +286,20 @@ class HomeActivity: BaseActivity(){
     private fun setNavIcon(){
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount >= 1){
-                if(supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment){
-                    val drawerLayout = result?.drawerLayout
-                    drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                    result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
-                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                } else {
-                    // show back icon and lock nav drawer
-                    val drawerLayout = result?.drawerLayout
-                    drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                    result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
-                    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                when {
+                    supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment -> {
+                        val drawerLayout = result?.drawerLayout
+                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                        result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
+                        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    }
+                    else -> {
+                        // show back icon and lock nav drawer
+                        val drawerLayout = result?.drawerLayout
+                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                        result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
+                        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    }
                 }
             } else {
                 val drawerLayout = result?.drawerLayout

@@ -16,5 +16,15 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Transaction"
+        android:summary="Add Transaction anytime anywhere">
+
+        <CheckBoxPreference
+            android:key="persistent_notification"
+            android:title="Show Notification Shortcut">
+        </CheckBoxPreference>
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

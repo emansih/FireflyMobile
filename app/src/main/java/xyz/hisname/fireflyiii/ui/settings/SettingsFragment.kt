@@ -9,9 +9,12 @@ import xyz.hisname.fireflyiii.R
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.widget.Toast
+import androidx.core.app.NotificationManagerCompat
+import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
+import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 
@@ -24,6 +27,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
         setAccountSection()
+        setTransactionSection()
     }
 
     private fun setAccountSection(){
@@ -50,6 +54,20 @@ class SettingsFragment: PreferenceFragmentCompat() {
             RetrofitBuilder.destroyInstance()
             true
         }
+    }
+
+    private fun setTransactionSection(){
+        val transactionPref = findPreference("persistent_notification") as CheckBoxPreference
+        val notification = NotificationUtils(requireContext())
+        transactionPref.setOnPreferenceChangeListener { _, newValue ->
+           if(newValue == true){
+               notification.showTransactionPersistentNotification()
+           } else {
+               NotificationManagerCompat.from(requireContext()).cancel("transaction_notif",12345)
+           }
+            true
+        }
+
     }
 
     override fun setDivider(divider: Drawable) {

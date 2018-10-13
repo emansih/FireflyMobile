@@ -5,7 +5,9 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_base.*
@@ -103,9 +105,9 @@ class AddTransactionFragment: BaseFragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
-        if(item?.itemId == R.id.menu_item_save){
+        if(item.itemId == R.id.menu_item_save){
             val billName: String? = if(billEditText.isBlank()){
                 null
             } else {
@@ -170,5 +172,14 @@ class AddTransactionFragment: BaseFragment() {
         return true
     }
 
+    override fun onDestroyView() {
+        val bundle = bundleOf("fireflyUrl" to baseUrl,
+                "access_token" to accessToken, "transactionType" to transactionType)
+        requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, TransactionFragment().apply { arguments = bundle })
+                .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
+                .commit()
+        super.onDestroyView()
+    }
 
 }

@@ -8,6 +8,7 @@ import android.preference.PreferenceManager
 import androidx.work.*
 import xyz.hisname.fireflyiii.repository.workers.BillWorker
 import xyz.hisname.fireflyiii.repository.workers.PiggyBankWorker
+import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
 class GenericReceiver: BroadcastReceiver(){
@@ -58,6 +59,19 @@ class GenericReceiver: BroadcastReceiver(){
                 WorkManager.getInstance().enqueue(billWork)
             }
         }
+        val action = intent.getStringExtra("transaction_notif")
+        if(action != null){
+            // close the notification tray
+            context.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+            val intent = Intent(context, HomeActivity::class.java)
+            when (action) {
+                "expense" -> intent.putExtra("transaction", "expense")
+                "income" -> intent.putExtra("transaction", "income")
+                "transfer" -> intent.putExtra("transaction", "transfer")
+            }
+            context.startActivity(intent)
+        }
+
     }
 
 }

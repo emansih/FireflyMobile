@@ -23,6 +23,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.AuthViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -125,6 +126,9 @@ class LoginFragment: Fragment() {
     }
 
     private fun startHomeIntent(){
+        if(sharedPref.getBoolean("persistent_notification",false)){
+            NotificationUtils(requireContext()).showTransactionPersistentNotification()
+        }
         GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, null, {
             delay(1234) //heh
             startActivity(Intent(requireContext(), HomeActivity::class.java))
