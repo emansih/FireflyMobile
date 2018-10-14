@@ -7,6 +7,13 @@ This software is using Firefly III APIs. It is under heavy development and shoul
 
 Other alternative include [this software](https://github.com/mconway/firefly-app/) written by mconway using Ionic framework. 
 
+### Features
+
+✔ Offline: View offline data(partial support)
+✔ Automation: Add data non-interactively allowing powerful automation. Read the [wiki](https://github.com/emansih/FireflyMobile/wiki/Automation-via-Android-Intents) for more info.
+✔ Reporting: Financial reports give you overview of your spending and income 
+
+
 ### Customization
 
 **Change the default oAuth callback URL**
