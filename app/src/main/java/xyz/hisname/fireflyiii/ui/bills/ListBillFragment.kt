@@ -13,7 +13,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
@@ -59,7 +58,7 @@ class ListBillFragment: BaseFragment() {
 
     private fun displayView(){
         swipeContainer.isRefreshing = true
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        runLayoutAnimation(recycler_view)
         model.getBill(baseUrl, accessToken).observe(this, Observer {
             if(it.getError() == null){
                 dataAdapter = ArrayList(it.getBill()?.data)

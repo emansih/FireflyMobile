@@ -36,8 +36,7 @@ class RulesFragment: BaseFragment() {
 
     private fun showRules(){
         swipeContainer.isRefreshing = true
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-       // recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        runLayoutAnimation(recycler_view)
         model.getAllRules(baseUrl, accessToken).observe(this, Observer {
             if(it.getError() == null){
                 recycler_view.adapter = RulesRecyclerAdapter(it.getRules()?.data!!.toMutableList())
