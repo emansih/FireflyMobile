@@ -8,13 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="hintTextAppearance">@style/HintText</item>
-        <item name="android:paddingBottom">8dp</item>
-    </style>
-
-    <style name="HintText" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="android:textColor">@android:color/black</item>
+    <style name="AppTheme.MaterialAboutActivity.Fragment" parent="Theme.Mal.Light">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="DialogAnimation">

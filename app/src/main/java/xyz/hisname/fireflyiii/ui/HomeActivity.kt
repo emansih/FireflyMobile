@@ -18,6 +18,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IProfile
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
@@ -188,13 +189,21 @@ class HomeActivity: BaseActivity(){
                 .withIconTintingEnabled(true)
                 .withIcon(R.drawable.ic_settings)
 
+        val about = PrimaryDrawerItem()
+                .withIdentifier(20)
+                .withName("About")
+                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_pink_500))
+                .withIconTintingEnabled(true)
+                .withIcon(R.drawable.ic_perm_identity_black_24dp)
+
         result = DrawerBuilder()
                 .withActivity(this)
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(dashboard, transactions,/*account, budgets, categories, tags, reports,
-                        ,*/ moneyManagement,settings)
+                        ,*/ moneyManagement,settings, about)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
                         drawerItem.identifier == 1L -> {
@@ -230,6 +239,9 @@ class HomeActivity: BaseActivity(){
                         }
                         drawerItem.identifier == 19L -> {
                             changeFragment(SettingsFragment())
+                        }
+                        drawerItem.identifier == 20L -> {
+                            changeFragment(AboutFragment())
                         }
                         else -> {
 

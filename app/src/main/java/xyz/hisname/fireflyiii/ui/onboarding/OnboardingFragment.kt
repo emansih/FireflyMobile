@@ -18,6 +18,7 @@ import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
+import xyz.hisname.fireflyiii.util.extension.zipLiveData
 
 class OnboardingFragment: Fragment() {
 
@@ -39,19 +40,23 @@ class OnboardingFragment: Fragment() {
     private fun getUser(){
         RetrofitBuilder.destroyInstance()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
-        model.getUser(baseUrl,accessToken).observe(this, Observer {
-            if(it.getError() == null){
+        zipLiveData(model.getUser(baseUrl,accessToken), model.userSystem(baseUrl, accessToken))
+                .observe(this, Observer {
+            if(it.first.getError() == null && it.second.getError() == null){
                 ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()
                 sharedPref.edit{
-                    putString("userEmail", it.getUserData()?.userData?.userAttributes?.email)
-                    putString("userRole", it.getUserData()?.userData?.userAttributes?.role)
+                    putString("userEmail", it.first.getUserData()?.userData?.userAttributes?.email)
+                    putString("userRole", it.first.getUserData()?.userData?.userAttributes?.role)
+                    putString("server_version", it.second.getUserSystem()?.systemData?.version)
+                    putString("api_version", it.second.getUserSystem()?.systemData?.api_version)
+                    putString("user_os", it.second.getUserSystem()?.systemData?.os)
                 }
                 ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
                 startActivity(Intent(requireActivity(), HomeActivity::class.java))
                 requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 requireActivity().finish()
-            } else {
-                if(it.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
+            }else {
+                if(it.first.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
                     toastError(resources.getString(R.string.unable_ping_server))
                 } else {
                     toastError("There was some issue retrieving your data")
