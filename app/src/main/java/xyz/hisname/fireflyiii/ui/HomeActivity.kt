@@ -24,6 +24,7 @@ import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
+import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
@@ -172,10 +173,15 @@ class HomeActivity: BaseActivity(){
                                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_amber_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(R.drawable.ic_calendar_blank)
-                                .withIdentifier(16)/*,
+                                .withIdentifier(16),
                         SecondaryDrawerItem().withName("Rules")
                                 .withLevel(4)
-                                .withIdentifier(17),
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_brown_500))
+                                .withIconTintingEnabled(true)
+                                // Rules -> ruler icon, get it?
+                                .withIcon(R.drawable.ic_ruler)
+                                .withIdentifier(17)/*,
                         SecondaryDrawerItem().withName("Recurring Transactions")
                                 .withLevel(4)
                                 .withIdentifier(18)*/
@@ -188,7 +194,6 @@ class HomeActivity: BaseActivity(){
                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_teal_500))
                 .withIconTintingEnabled(true)
                 .withIcon(R.drawable.ic_settings)
-
         val about = PrimaryDrawerItem()
                 .withIdentifier(20)
                 .withName("About")
@@ -236,6 +241,10 @@ class HomeActivity: BaseActivity(){
                         drawerItem.identifier == 16L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
                             changeFragment(ListBillFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 17L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
+                            changeFragment(RulesFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 19L -> {
                             changeFragment(SettingsFragment())
