@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 import xyz.hisname.fireflyiii.util.extension.create
 
@@ -54,7 +54,7 @@ class DashboardFragment: BaseFragment() {
                 .replace(R.id.walletFrame, WalletFragment().apply { arguments = bundle })
                 .commit()
         requireFragmentManager().beginTransaction()
-                .replace(R.id.recentTransactionFrame, TransactionFragment().apply { arguments = bundle })
+                .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })
                 .commit()
     }
 
@@ -63,7 +63,7 @@ class DashboardFragment: BaseFragment() {
             swipeContainer.isRefreshing = true
             requireFragmentManager().beginTransaction().remove(OverviewFragment()).commit()
             requireFragmentManager().beginTransaction().remove(WalletFragment()).commit()
-            requireFragmentManager().beginTransaction().remove(TransactionFragment()).commit()
+            requireFragmentManager().beginTransaction().remove(RecentTransactionFragment()).commit()
             animateCard(overviewFrame,walletFrame,recentTransactionFrame)
             swipeContainer.isRefreshing = false
         }

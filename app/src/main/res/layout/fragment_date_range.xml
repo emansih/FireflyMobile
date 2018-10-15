@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/applyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?android:attr/borderlessButtonStyle"
+        android:text="Apply"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/startDateEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Start Date"
+        android:focusable="false"
+        android:inputType="date"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/arrowRange"
+        app:layout_constraintTop_toTopOf="@+id/endDateEditText"/>
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/endDateEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:hint="End Date"
+        android:focusable="false"
+        android:inputType="date"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@+id/applyButton"
+        app:layout_constraintStart_toEndOf="@+id/arrowRange"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/arrowRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_arrow_right"
+        app:layout_constraintTop_toTopOf="@+id/startDateEditText"
+        app:layout_constraintBottom_toBottomOf="@+id/startDateEditText"
+        app:layout_constraintStart_toEndOf="@id/startDateEditText"
+        app:layout_constraintEnd_toStartOf="@+id/endDateEditText"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

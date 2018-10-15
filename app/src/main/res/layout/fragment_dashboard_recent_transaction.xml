@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/md_black_1000"
                 android:textSize="30sp"
-                android:text="Recent Transaction"
+                android:text="Recent Transactions"
                 android:layout_marginTop="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/linedivider"
                 app:layout_constraintTop_toTopOf="parent"/>

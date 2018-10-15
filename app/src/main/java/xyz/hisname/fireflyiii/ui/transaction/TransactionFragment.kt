@@ -9,23 +9,20 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
+import kotlinx.android.synthetic.main.base_swipe_layout.*
+import kotlinx.android.synthetic.main.fragment_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionApiResponse
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.consume
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import java.util.*
 
-class TransactionFragment: BaseFragment() {
+class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener {
 
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
     private var dataAdapter = ArrayList<TransactionData>()
@@ -36,96 +33,69 @@ class TransactionFragment: BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        if(!Objects.equals(transactionType, "all")) {
-            setHasOptionsMenu(true)
-        }
-        return inflater.create(R.layout.fragment_dashboard_recent_transaction, container)
+        setHasOptionsMenu(true)
+        return inflater.create(R.layout.fragment_transaction, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if(!Objects.equals(transactionType, "all")){
-            requireActivity().activity_toolbar.overflowIcon =
+        requireActivity().activity_toolbar.overflowIcon =
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_filter)
-            recentTransactionText.isVisible = false
-            linedivider.isVisible = false
-            requireActivity().globalFAB.isVisible = true
-            setupFab()
-        }
+        noTransactionText.isVisible = false
+        requireActivity().globalFAB.isVisible = true
+        setupFab()
         loadTransaction(startDate, endDate)
+        pullToRefresh()
     }
 
     private fun loadTransaction(startDate: String?, endDate: String?){
         dataAdapter.clear()
-        transactionLoader.bringToFront()
-        transactionLoader.show()
-        recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
-        recentTransactionList.addItemDecoration(DividerItemDecoration(recentTransactionList.context,
-                DividerItemDecoration.VERTICAL))
+        swipeContainer.isRefreshing = true
+        runLayoutAnimation(recycler_view)
         model.getTransactions(baseUrl,accessToken, startDate, endDate,transactionType).observe(this, Observer {
             if(it.getError() == null) {
                 dataAdapter = ArrayList(it.getTransaction()?.data)
-                transactionLoader.hide()
                 if (dataAdapter.size == 0) {
-                    recentTransactionList.isGone = true
+                    recycler_view.isGone = true
                     noTransactionText.isVisible = true
+                    noTransactionImage.isVisible = true
+                    when {
+                        Objects.equals("expenses", transactionType) ->
+                            noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_left))
+                        Objects.equals("transfers", transactionType) ->
+                            noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bank_transfer))
+                        Objects.equals("income", transactionType) ->
+                            noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_right))
+                    }
                 } else {
-                    processData(transactionType, it)
+                    recycler_view.isVisible = true
+                    noTransactionText.isGone = true
+                    noTransactionImage.isGone = true
+                    rtAdapter = TransactionRecyclerAdapter(it.getTransaction()?.data!!.toMutableList(), "no_type")
+                    recycler_view.adapter = rtAdapter
+                    rtAdapter.apply {
+                        recycler_view.adapter as TransactionRecyclerAdapter
+                        update(it.getTransaction()?.data!!.toMutableList())
+                    }
+                    rtAdapter.notifyDataSetChanged()
                 }
+                swipeContainer.isRefreshing = false
             }
         })
     }
 
-    private fun processData(transactionType: String, response: TransactionApiResponse){
-        if(Objects.equals(transactionType, "all")) {
-            if (dataAdapter.size <= 5) {
-                recentTransactionList.isVisible = true
-                noTransactionText.isGone = true
-                rtAdapter = TransactionRecyclerAdapter(response.getTransaction()?.data!!.toMutableList())
-                recentTransactionList.adapter = rtAdapter
-                rtAdapter.apply {
-                    recentTransactionList.adapter as TransactionRecyclerAdapter
-                    update(response.getTransaction()?.data!!.toMutableList())
-                }
-            } else {
-                recentTransactionList.isVisible = true
-                noTransactionText.isGone = true
-                // More than 5 index in json so we get first 5 only
-                dataAdapter.subList(5, dataAdapter.size).clear()
-                rtAdapter = TransactionRecyclerAdapter(dataAdapter)
-                recentTransactionList.adapter = rtAdapter
-                rtAdapter.apply {
-                    recentTransactionList.adapter as TransactionRecyclerAdapter
-                    update(dataAdapter)
-                }
-            }
-        } else {
-            recentTransactionList.isVisible = true
-            noTransactionText.isGone = true
-            rtAdapter = TransactionRecyclerAdapter(response.getTransaction()?.data!!.toMutableList())
-            recentTransactionList.adapter = rtAdapter
-            rtAdapter.apply {
-                recentTransactionList.adapter as TransactionRecyclerAdapter
-                update(response.getTransaction()?.data!!.toMutableList())
-            }
-        }
-        rtAdapter.notifyDataSetChanged()
-    }
-
     override fun onAttach(context: Context){
         super.onAttach(context)
-        if(!Objects.equals(transactionType, "all")){
-            requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
-                    transactionType.substring(1)
-        }
+        requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
+                transactionType.substring(1)
+
     }
 
     override fun onResume() {
         super.onResume()
-        if(!Objects.equals(transactionType, "all")){
-            requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
-                    transactionType.substring(1)
-        }
+        requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
+                transactionType.substring(1)
+
     }
 
     override fun onDetach() {
@@ -152,7 +122,7 @@ class TransactionFragment: BaseFragment() {
                 requireActivity().globalFAB.isVisible = false
             }
         }
-        recentTransactionList.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if(dy > 0 && requireActivity().globalFAB.isShown){
                     requireActivity().globalFAB.hide()
@@ -173,16 +143,28 @@ class TransactionFragment: BaseFragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId) {
-        R.id.menu_item_week -> consume {
-            loadTransaction(DateTimeUtil.getStartOfWeek(), DateTimeUtil.getEndOfWeek())
+    private fun pullToRefresh(){
+        dataAdapter.clear()
+        swipeContainer.setOnRefreshListener {
+            loadTransaction(startDate, endDate)
         }
-        R.id.menu_item_month -> consume {
-            loadTransaction(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
-        }
-        R.id.menu_item_year -> consume {
-            loadTransaction(DateTimeUtil.getStartOfYear(), DateTimeUtil.getEndOfYear())
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
+        R.id.menu_item_filter -> consume {
+            val bottomSheetFragment = DateRangeFragment()
+            bottomSheetFragment.show(requireFragmentManager(), "daterangefrag" )
+            bottomSheetFragment.setDateListener(this)
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+    override fun onComplete(startDate: String, endDate: String) {
+        loadTransaction(startDate,endDate)
+    }
+
 }

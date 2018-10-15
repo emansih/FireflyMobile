@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -11,15 +12,20 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.extension.inflate
+import java.util.*
 
-class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>):
+class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>, private val type: String):
         DiffUtilAdapter<TransactionData, TransactionRecyclerAdapter.RtAdapter>() {
 
     private lateinit var context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RtAdapter {
         context = parent.context
-        return RtAdapter(parent.inflate(R.layout.recent_transaction_list))
+        return if(Objects.equals("recent", type)){
+            RtAdapter(parent.inflate(R.layout.recent_transaction_list))
+        } else {
+            RtAdapter(parent.inflate(R.layout.transaction_list))
+        }
     }
 
     override fun getItemCount() = items.size
