@@ -1,12 +1,14 @@
 package xyz.hisname.fireflyiii.ui.bills
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_add_bill.*
@@ -166,7 +168,23 @@ class AddBillActivity: BaseActivity() {
                                 }
                             } else if(it.getError() != null){
                                 if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
-                                    toastError(resources.getString(R.string.unable_ping_server))
+                                    val billBroadcast = Intent("firefly.hisname.ADD_BILL")
+                                    val extras = bundleOf(
+                                            "name" to bill_name_edittext.getString(),
+                                            "billMatch" to bill_match_edittext.getString(),
+                                            "minAmount" to amount_min_edittext.getString(),
+                                            "maxAmount" to amount_max_edittext.getString(),
+                                            "billDate" to bill_date_edittext.getString(),
+                                            "repeatFreq" to repeatFreq,
+                                            "skip" to skip_edittext.getString(),
+                                            "currencyCode" to currency_code_edittext.getString(),
+                                            "notes" to notes)
+                                    billBroadcast.putExtras(extras)
+                                    sendBroadcast(billBroadcast)
+                                    toastOffline(getString(R.string.data_added_when_user_online, "Bill"))
+                                    finish()
+                                } else {
+                                    toastError("Error saving bill")
                                 }
                             } else if(it.getSuccess() != null){
                                 toastSuccess("Bill saved")

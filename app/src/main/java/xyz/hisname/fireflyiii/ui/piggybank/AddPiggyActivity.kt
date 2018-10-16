@@ -1,11 +1,13 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_piggy_create.*
@@ -148,7 +150,21 @@ class AddPiggyActivity: BaseActivity() {
                                 }
                             } else if(it.getError() != null){
                                 if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
-                                    toastError(resources.getString(R.string.unable_ping_server))
+                                    val piggyBroadcast = Intent("firefly.hisname.ADD_PIGGY_BANK")
+                                    val extras = bundleOf(
+                                            "name" to piggy_name_edittext.getString(),
+                                            "accountId" to account_id_edittext.getString(),
+                                            "targetAmount" to target_amount_edittext.getString(),
+                                            "currentAmount" to currentAmount,
+                                            "startDate" to startDate,
+                                            "endDate" to targetDate,
+                                            "notes" to notes
+                                    )
+                                    piggyBroadcast.putExtras(extras)
+                                    sendBroadcast(piggyBroadcast)
+                                    toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
+                                    toastInfo("Piggy bank will be added when you are back online")
+                                    finish()
                                 } else {
                                     toastError("Error saving piggy bank")
                                 }
