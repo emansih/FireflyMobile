@@ -21,10 +21,12 @@ class TranscationWorker(private val context: Context, workerParameters: WorkerPa
         val transactionCurrency = inputData.getString("currency") ?: ""
         val destinationName = inputData.getString("destinationName") ?: ""
         val sourceName = inputData.getString("sourceName") ?: ""
+        val piggyBank = inputData.getString("piggyBankName")
+        val billName = inputData.getString("billName")
         val transactionService = RetrofitBuilder.getClient(baseUrl, accessToken)?.
                 create(TransactionService::class.java)
-        transactionService?.addTransaction(transactionType, transactionDescription, transactionDate, null,
-                null, transactionAmount,sourceName, destinationName, transactionCurrency)?.enqueue(
+        transactionService?.addTransaction(transactionType, transactionDescription, transactionDate, piggyBank,
+                billName, transactionAmount,sourceName, destinationName, transactionCurrency)?.enqueue(
                 retrofitCallback({ response ->
                     var errorBody = ""
                     if (response.errorBody() != null) {

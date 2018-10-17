@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.ui.transaction
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -165,6 +166,49 @@ class AddTransactionFragment: BaseFragment() {
                         gson.errors.bill_name != null -> billEditText.error = "Invalid Bill Name"
                         gson.errors.piggy_bank_name != null -> piggyBankName.error = "Invalid Piggy Bank Name"
                         else -> toastError("Error occurred while saving transaction", Toast.LENGTH_LONG)
+                    }
+                } else if(it.getError() != null){
+                    if(it.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
+                        if(Objects.equals("transfers", convertString(true))){
+                            val transferBroadcast = Intent("firefly.hisname.ADD_TRANSFER")
+                            val extras = bundleOf(
+                                    "description" to descriptionEditText.getString(),
+                                    "date" to transactionDateEditText.getString(),
+                                    "amount" to transactionAmountEditText.getString(),
+                                    "currency" to currencyEditText.getString(),
+                                    "sourceName" to sourceName,
+                                    "destinationName" to destinationName,
+                                    "piggyBankName" to piggyBank
+                            )
+                            transferBroadcast.putExtras(extras)
+                            requireActivity().sendBroadcast(transferBroadcast)
+                            toastOffline(getString(R.string.data_added_when_user_online, "Transfer"))
+                        } else if(Objects.equals("deposit", convertString(true))){
+                            val transferBroadcast = Intent("firefly.hisname.ADD_DEPOSIT")
+                            val extras = bundleOf(
+                                    "description" to descriptionEditText.getString(),
+                                    "date" to transactionDateEditText.getString(),
+                                    "amount" to transactionAmountEditText.getString(),
+                                    "currency" to currencyEditText.getString(),
+                                    "destinationName" to destinationName
+                            )
+                            transferBroadcast.putExtras(extras)
+                            requireActivity().sendBroadcast(transferBroadcast)
+                            toastOffline(getString(R.string.data_added_when_user_online, "Deposit"))
+                        } else if(Objects.equals("withdrawal", convertString(true))){
+                            val withdrawalBroadcast = Intent("firefly.hisname.ADD_WITHDRAW")
+                            val extras = bundleOf(
+                                    "description" to descriptionEditText.getString(),
+                                    "date" to transactionDateEditText.getString(),
+                                    "amount" to transactionAmountEditText.getString(),
+                                    "currency" to currencyEditText.getString(),
+                                    "sourceName" to sourceName,
+                                    "billName" to billName
+                            )
+                            withdrawalBroadcast.putExtras(extras)
+                            requireActivity().sendBroadcast(withdrawalBroadcast)
+                            toastOffline(getString(R.string.data_added_when_user_online, "Withdrawal"))
+                        }
                     }
                 }
             })

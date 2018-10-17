@@ -69,6 +69,7 @@ class GenericReceiver: BroadcastReceiver(){
                             .putString("amount", intent.getStringExtra("amount"))
                             .putString("currency", intent.getStringExtra("currency"))
                             .putString("destinationName", intent.getStringExtra("destinationName"))
+                            .putString("billName", intent.getStringExtra("billName"))
                     transactionWork(depositData, "deposit")
                 }
                 intent.action == "firefly.hisname.ADD_WITHDRAW" -> {
@@ -88,6 +89,7 @@ class GenericReceiver: BroadcastReceiver(){
                             .putString("currency", intent.getStringExtra("currency"))
                             .putString("sourceName", intent.getStringExtra("sourceName"))
                             .putString("destinationName", intent.getStringExtra("destinationName"))
+                            .putString("piggyBankName", intent.getStringExtra("piggyBankName"))
                     transactionWork(transferData, "transfer")
                 }
             }
