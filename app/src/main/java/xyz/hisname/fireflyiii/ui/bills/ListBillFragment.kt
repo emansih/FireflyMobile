@@ -22,7 +22,6 @@ import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoBillsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -34,7 +33,6 @@ class ListBillFragment: BaseFragment() {
     private lateinit var billsAdapter: BillsRecyclerAdapter
     private var dataAdapter = ArrayList<BillData>()
     private var billDatabase: AppDatabase? = null
-    private val billsVM: DaoBillsViewModel by lazy { getViewModel(DaoBillsViewModel::class.java) }
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
 
 
