@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_piggy_create.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.ErrorModel
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.PiggyViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -23,7 +23,7 @@ import java.util.*
 
 class AddPiggyActivity: BaseActivity() {
 
-    private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
+    private val model by lazy { getViewModel(PiggyBankViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -18,24 +17,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_bill.*
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.GlobalScope
-import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.BillsViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoBillsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastInfo
+import xyz.hisname.fireflyiii.util.extension.toastError
 
 class ListBillFragment: BaseFragment() {
 
-    private val model: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
+    private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private lateinit var billsAdapter: BillsRecyclerAdapter
     private var dataAdapter = ArrayList<BillData>()
     private var billDatabase: AppDatabase? = null
@@ -57,64 +52,28 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun displayView(){
+        val viewModel = billViewModel.getBill(baseUrl,accessToken)
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        model.getBill(baseUrl, accessToken).observe(this, Observer {
-            if(it.getError() == null){
-                dataAdapter = ArrayList(it.getBill()?.data)
-                happyFaceText.isInvisible = true
-                happyFace.isInvisible = true
-                recycler_view.isVisible = true
-                fab.isVisible = true
-                billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
-                if(billsAdapter.itemCount == 0){
-                    recycler_view.isVisible = false
-                    happyFaceText.isInvisible = false
-                    happyFace.isInvisible = false
-                } else {
-                    showData(dataAdapter)
-                    it.getBill()!!.data.forEachIndexed { _, element ->
-                        GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
-                            billDatabase?.billDataDao()?.addBill(element)
-                        })
-                    }
-                }
-            } else {
-                billsVM.getAllBills().observe(this, Observer { billData ->
-                    if(billData.isEmpty() || billData == null){
-                        if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
-                            recycler_view.isVisible = false
-                            happyFace.apply {
-                                isVisible = false
-                                setImageDrawable(ContextCompat.getDrawable(requireContext(),
-                                        R.drawable.ic_cloud_off))
-                            }
-                            happyFaceText.apply {
-                                isInvisible = false
-                                text = resources.getString(R.string.unable_ping_server)
-                            }
-                            fab.isVisible = false
-                            toastInfo("Please try again later")
-                        }
-                    } else {
-                        dataAdapter = ArrayList(billData)
-                        billsAdapter = BillsRecyclerAdapter(dataAdapter) { billData: BillData -> itemClicked(billData)}
-                        showData(billData)
-                        toastInfo("Loaded data from cache")
-                    }
-
-                })
+        viewModel.apiResponse.observe(this, Observer {
+            if(it.getErrorMessage() != null){
+                toastError(it.getErrorMessage().toString())
             }
-            swipeContainer.isRefreshing = false
         })
-    }
 
-    private fun showData(billData: MutableList<BillData>){
-        recycler_view.adapter = billsAdapter
-        billsAdapter.apply {
-            recycler_view.adapter as BillsRecyclerAdapter
-            update(billData)
-        }
+        viewModel.databaseData?.observe(this, Observer {
+            swipeContainer.isRefreshing = false
+            if(it.isNotEmpty()) {
+                happyFaceText.isVisible = false
+                happyFace.isVisible = false
+                recycler_view.isVisible = true
+                recycler_view.adapter = BillsRecyclerAdapter(it) { data: BillData -> itemClicked(data) }
+            } else {
+                happyFaceText.isVisible = true
+                happyFace.isVisible = true
+                recycler_view.isVisible = false
+            }
+        })
     }
 
     private fun itemClicked(billData: BillData){

@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.ErrorModel
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.BillsViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil

@@ -15,11 +15,8 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.Main
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.PiggyViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoPiggyViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -42,8 +39,8 @@ class PiggyDetailFragment: BaseDetailFragment() {
     private val name: String by lazy { arguments?.getString("name") as String }
     private val targetDate: String by lazy { arguments?.getString("targetDate")  ?: "" }
     private val minPerMonth: BigDecimal by lazy{ arguments?.getSerializable("savePerMonth") as BigDecimal }
-    private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
-    private val dao: DaoPiggyViewModel by lazy { getViewModel(DaoPiggyViewModel::class.java) }
+    private val piggyBankViewModel by lazy { getViewModel(PiggyBankViewModel::class.java)}
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -90,30 +87,19 @@ class PiggyDetailFragment: BaseDetailFragment() {
     }
 
     override fun deleteItem() {
-        model.deletePiggyBank(baseUrl,accessToken,piggyId.toString()).observe(this, Observer{
+        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+        piggyBankViewModel.deletePiggyBank(baseUrl,accessToken, piggyId.toString()).observe(this, Observer {
             if(it.getError() == null){
-                GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, null, {
-                    dao.deletePiggyBank(piggyId)
-                    withContext(Dispatchers.Main){
-                        toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
-                    }
-                    activity?.supportFragmentManager?.popBackStack()
-                })
+                toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
+                requireFragmentManager().popBackStack()
             } else {
-                ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
-                val error = it.getError()
-                val parentLayout: View = requireActivity().findViewById(R.id.coordinatorlayout)
-                if (error!!.localizedMessage.startsWith("Unable to resolve host")) {
-                    val snack = Snackbar.make(parentLayout, R.string.unable_ping_server, Snackbar.LENGTH_SHORT)
-                    snack.view.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_red_600))
-                    snack.setAction("OK") {}.show()
-                } else {
-                    Snackbar.make(parentLayout, R.string.generic_delete_error, Snackbar.LENGTH_LONG)
-                            .setAction("Retry") {
-                                deleteItem()
-                            }
-                            .show()
-                }
+                Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
+                        R.string.generic_delete_error, Snackbar.LENGTH_LONG)
+                        .setAction("Retry") {
+                            deleteItem()
+                        }
+                        .show()
+
             }
         })
     }
@@ -125,8 +111,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
                     .setTitle(R.string.get_confirmation)
                     .setMessage(R.string.irreversible_action)
                     .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                        dialog.dismiss()
-                        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
                         deleteItem()
                     }
                     .setNegativeButton(android.R.string.no){dialog, _ ->
@@ -139,12 +123,12 @@ class PiggyDetailFragment: BaseDetailFragment() {
     }
 
     private fun setupProgressBar(percentage: Int){
-        val objectAnimator = ObjectAnimator.ofInt(piggyBankProgressBar, "progress",
-                0, percentage)
-        // 1000ms = 1s
-        objectAnimator.duration = 1000
-        objectAnimator.interpolator = AccelerateInterpolator()
-        objectAnimator.start()
+        ObjectAnimator.ofInt(piggyBankProgressBar, "progress",
+                0, percentage).apply {
+            // 1000ms = 1s
+            duration = 1000
+            interpolator = AccelerateInterpolator()
+        }.start()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId){
@@ -152,8 +136,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
             val bundle = bundleOf("piggyId" to piggyId, "piggyName" to name, "targetAmount" to targetAmount,
                     "currentAmount" to currentAmount, "startDate" to dateStarted,"targetDate" to targetDate,
                     "notes" to notes)
-            println("detail: target: " + targetDate)
-            println("detail: start: " + dateStarted)
             val addPiggy = Intent(requireContext(), AddPiggyActivity::class.java).apply{
                 putExtras(bundle)
             }

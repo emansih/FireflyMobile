@@ -15,62 +15,60 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.GlobalScope
-import kotlinx.coroutines.experimental.launch
+import kotlinx.android.synthetic.main.fragment_piggy.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.PiggyViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.room.DaoPiggyViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastInfo
+import xyz.hisname.fireflyiii.util.extension.toastError
 
 class ListPiggyFragment: BaseFragment() {
 
     private var dataAdapter = ArrayList<PiggyData>()
-    private val model: PiggyViewModel by lazy { getViewModel(PiggyViewModel::class.java)}
-    private val piggyVM: DaoPiggyViewModel by lazy { getViewModel(DaoPiggyViewModel::class.java) }
-    private var piggyDataBase: AppDatabase? = null
+    private val piggyBankViewModel by lazy { getViewModel(PiggyBankViewModel::class.java)}
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
+   // private val viewmodel by lazy { piggyBankViewModel.getPiggyBank(baseUrl,accessToken) }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.base_swipe_layout, container)
+        return inflater.create(R.layout.fragment_piggy, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        piggyDataBase = AppDatabase.getInstance(requireContext())
         displayView()
         pullToRefresh()
         initFab()
     }
 
     private fun displayView(){
+        val viewModel = piggyBankViewModel.getPiggyBank(baseUrl, accessToken)
+        dataAdapter.clear()
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        model.getPiggyBanks(baseUrl, accessToken).observe(this, Observer {
-            if(it.getError() == null){
-                recycler_view.adapter = PiggyRecyclerAdapter(it.getPiggy()!!.data.toMutableList()) {
-                    data: PiggyData -> itemClicked(data) }
-                it.getPiggy()!!.data.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
-                        piggyDataBase?.piggyDataDao()?.addPiggy(element)
-                    })
-                }
-            } else {
-                piggyVM.getPiggyBank().observe(this, Observer { piggyData ->
-                    recycler_view.adapter = PiggyRecyclerAdapter(piggyData) { data: PiggyData -> itemClicked(data) }
-                    toastInfo("Loaded data from cache")
-                })
-
+        viewModel.apiResponse.observe(this, Observer {
+            if(it.getErrorMessage() != null){
+                toastError(it.getErrorMessage().toString())
             }
+        })
+
+        viewModel.databaseData?.observe(this, Observer {
             swipeContainer.isRefreshing = false
+            if(it.isNotEmpty()) {
+                piggybankText.isVisible = false
+                piggyImage.isVisible = false
+                recycler_view.isVisible = true
+                recycler_view.adapter = PiggyRecyclerAdapter(it) { data: PiggyData -> itemClicked(data) }
+            } else {
+                piggybankText.isVisible = true
+                piggyImage.isVisible = true
+                recycler_view.isVisible = false
+            }
         })
     }
 
@@ -90,7 +88,6 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun pullToRefresh(){
-        dataAdapter.clear()
         swipeContainer.setOnRefreshListener {
             displayView()
         }
