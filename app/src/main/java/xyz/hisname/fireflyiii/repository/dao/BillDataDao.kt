@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository.dao.bill
+package xyz.hisname.fireflyiii.repository.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

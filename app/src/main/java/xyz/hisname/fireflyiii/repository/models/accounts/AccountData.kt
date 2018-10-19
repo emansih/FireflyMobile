@@ -1,8 +1,21 @@
 package xyz.hisname.fireflyiii.repository.models.accounts
 
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
+
+@Entity(tableName = "accounts")
 data class AccountData(
-        val type: String,
-        val id: String,
-        val attributes: Attributes,
-        val links: Links
+        @Ignore
+        var type: String = "",
+        @PrimaryKey(autoGenerate = false)
+        @SerializedName("id")
+        var accountId: Long? = null,
+        @Embedded
+        @SerializedName("attributes")
+        var accountAttributes: Attributes? = null,
+        @Ignore
+        var links: Links? = null
 )

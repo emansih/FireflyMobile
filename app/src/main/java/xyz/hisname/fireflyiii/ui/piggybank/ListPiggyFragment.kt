@@ -31,7 +31,6 @@ class ListPiggyFragment: BaseFragment() {
     private var dataAdapter = ArrayList<PiggyData>()
     private val piggyBankViewModel by lazy { getViewModel(PiggyBankViewModel::class.java)}
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
-   // private val viewmodel by lazy { piggyBankViewModel.getPiggyBank(baseUrl,accessToken) }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
