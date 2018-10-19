@@ -25,7 +25,7 @@
         app:layout_constraintTop_toBottomOf="@id/descriptionEditText"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
         android:id="@+id/sourceEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
         app:layout_constraintTop_toBottomOf="@id/transactionDateEditText"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatEditText
+    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
         android:id="@+id/destinationEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -15,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.transaction.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -22,13 +24,15 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
-
+import kotlin.collections.ArrayList
 
 
 class AddTransactionFragment: BaseFragment() {
 
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val accountDatabase by lazy { AppDatabase.getInstance(requireActivity())?.accountDataDao() }
+    private var accounts = ArrayList<String>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -38,6 +42,18 @@ class AddTransactionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+        accountDatabase?.getAssetAccount()?.observe(this, Observer {
+            if(it.isNotEmpty()) {
+                it.forEachIndexed { _, accountData ->
+                    accounts.add(accountData.accountAttributes?.name!!)
+                }
+                val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, accounts)
+                destinationEditText.threshold = 0
+                destinationEditText.setAdapter(adapter)
+                sourceEditText.threshold = 0
+                sourceEditText.setAdapter(adapter)
+            }
+        })
         setupWidgets()
     }
 
