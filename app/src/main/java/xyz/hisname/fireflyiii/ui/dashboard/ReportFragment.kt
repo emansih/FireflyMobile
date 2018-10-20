@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.view.isVisible
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.*
@@ -18,6 +19,7 @@ import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_report.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionApiResponse
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -86,23 +88,18 @@ class ReportFragment: BaseFragment() {
                         depositSum += Math.abs(element.attributes.amount.toInt())
                     }
                 }
+                setPieChartData()
+            } else {
+                overviewChart.setNoDataText("No data found")
             }
-            setPieChartData()
         })
     }
 
     private fun setPieChartData(){
-        val entries = ArrayList<PieEntry>()
-        val labels = ArrayList<String>()
-        labels.add("Income")
-        labels.add("Expenses")
-        entries.add(PieEntry(depositSum.toFloat(), "Deposit"))
-        entries.add(PieEntry(withdrawSum.toFloat(), "Withdraw"))
-        val dataset = PieDataSet(entries, "")
+        val dataset = PieDataSet(arrayListOf(PieEntry(depositSum.toFloat(), "Deposit"),
+                PieEntry(withdrawSum.toFloat(), "Withdraw")), "")
         val dataColor = ArrayList<Int>()
-        for(c in ColorTemplate.MATERIAL_COLORS){
-            dataColor.add(c)
-        }
+        for(c in ColorTemplate.MATERIAL_COLORS){ dataColor.add(c) }
         dataset.apply {
             setDrawIcons(false)
             sliceSpace = 2f
@@ -122,36 +119,12 @@ class ReportFragment: BaseFragment() {
     }
 
     private fun getHistoricalData(){
-        val oneMonthAgo =
-                zipLiveData(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(1),
-                DateTimeUtil.getEndOfMonth(1), "withdrawals"),
-                model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(1),
-                        DateTimeUtil.getEndOfMonth(1), "deposits"))
-        val twoMonthAgo =
-                zipLiveData(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(2),
-                        DateTimeUtil.getEndOfMonth(2), "withdrawals"),
-                        model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(2),
-                                DateTimeUtil.getEndOfMonth(2), "deposits"))
-        val threeMonthAgo =
-                zipLiveData(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(3),
-                DateTimeUtil.getEndOfMonth(3), "withdrawals"),
-                model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(3),
-                        DateTimeUtil.getEndOfMonth(3), "deposits"))
-        val fourMonthAgo =
-                zipLiveData(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(4),
-                        DateTimeUtil.getEndOfMonth(4), "withdrawals"),
-                        model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(4),
-                                DateTimeUtil.getEndOfMonth(4), "deposits"))
-        val fiveMonthAgo =
-                zipLiveData(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(5),
-                        DateTimeUtil.getEndOfMonth(5), "withdrawals"),
-                        model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(5),
-                                DateTimeUtil.getEndOfMonth(5), "deposits"))
-        val sixMonthAgo = zipLiveData(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(6),
-                DateTimeUtil.getEndOfMonth(6), "withdrawals"),
-                model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(6),
-                        DateTimeUtil.getEndOfMonth(6), "deposits"))
-
+        val oneMonthAgo = getMonthData(1)
+        val twoMonthAgo = getMonthData(2)
+        val threeMonthAgo = getMonthData(3)
+        val fourMonthAgo = getMonthData(4)
+        val fiveMonthAgo = getMonthData(5)
+        val sixMonthAgo = getMonthData(6)
         zipLiveData(oneMonthAgo,twoMonthAgo, threeMonthAgo, fourMonthAgo, fiveMonthAgo, sixMonthAgo).observe(this, Observer {
             // 1 month ago
             if (it.first.first.getTransaction() != null) {
@@ -290,6 +263,13 @@ class ReportFragment: BaseFragment() {
         })
     }
 
+    private fun getMonthData(duration: Long): LiveData<Pair<TransactionApiResponse, TransactionApiResponse>>{
+        return zipLiveData(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(duration),
+                DateTimeUtil.getEndOfMonth(duration), "withdrawals"),
+                model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(duration),
+                        DateTimeUtil.getEndOfMonth(duration), "deposits"))
+    }
+
     private fun setUpBarChart(){
         val withDrawalHistory = arrayListOf(
                 BarEntry(month1With.toFloat(), month1With.toFloat()),
@@ -338,14 +318,13 @@ class ReportFragment: BaseFragment() {
 
     private fun setBalanceHistory(){
         val balanceHistory = arrayListOf(
-                Entry(month1.toFloat(), month1.toFloat()),
-                        Entry(month2.toFloat(), month2.toFloat()),
-                        Entry(month3.toFloat(), month3.toFloat()),
-                        Entry(month4.toFloat(), month4.toFloat()),
-                        Entry(month5.toFloat(), month5.toFloat()),
-                        Entry(month6.toFloat(), month6.toFloat()))
+                Entry(1f,month1.toFloat()),
+                Entry(2f, month2.toFloat()),
+                Entry(3f,month3.toFloat()),
+                Entry(4f,month4.toFloat()),
+                Entry(5f,month5.toFloat()),
+                Entry(6f, month6.toFloat()))
         val balanceSet = LineDataSet(balanceHistory, "Balance")
-        val monthsAxis = lineChart.xAxis
         val balanceAxis = lineChart.axisRight
         balanceAxis.isEnabled = false
         val yAxisLeft = lineChart.axisLeft
@@ -356,12 +335,20 @@ class ReportFragment: BaseFragment() {
             color = getColor(R.color.colorPrimaryDark)
             valueFormatter = LargeValueFormatter()
         }
-        val formatter = IAxisValueFormatter { value, axis -> getMonths()[value.toInt()] }
-        monthsAxis.granularity = 1f
-        monthsAxis.valueFormatter = formatter
+        val formatter = IAxisValueFormatter { value, axis ->
+            if(value >= 0 ) {
+                if (value <= getMonths().size - 1) {
+                    return@IAxisValueFormatter getMonths()[value.toInt()]
+                }
+            }
+            ""
+        }
+
         lineChart.apply {
             description.text = "Balance last 5 months"
-            xAxis.valueFormatter = IndexAxisValueFormatter(getMonths())
+            xAxis.granularity = 1f
+            xAxis.setCenterAxisLabels(true)
+            xAxis.valueFormatter = formatter
             animateY(1000)
             setTouchEnabled(true)
             data = LineData(balanceSet)
