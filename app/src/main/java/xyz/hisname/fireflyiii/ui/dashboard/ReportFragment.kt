@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.*
@@ -21,17 +20,16 @@ import kotlinx.android.synthetic.main.fragment_report.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
+import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
 import kotlin.collections.ArrayList
 
-class ReportFragment: Fragment() {
+class ReportFragment: BaseFragment() {
 
-    private val baseUrl: String by lazy { arguments?.getString("fireflyUrl") ?: "" }
-    private val accessToken: String by lazy { arguments?.getString("access_token") ?: "" }
-    private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val model by lazy { getViewModel(TransactionViewModel::class.java) }
     private var depositSum = 0
     private var withdrawSum = 0
     private var dataAdapter = ArrayList<TransactionData>()
@@ -156,7 +154,9 @@ class ReportFragment: Fragment() {
 
         zipLiveData(oneMonthAgo,twoMonthAgo, threeMonthAgo, fourMonthAgo, fiveMonthAgo, sixMonthAgo).observe(this, Observer {
             // 1 month ago
-            dataAdapter = ArrayList(it.first.first.getTransaction()?.data)
+            if (it.first.first.getTransaction() != null) {
+                dataAdapter = ArrayList(it.first.first.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month1With = 0
             } else {
@@ -164,7 +164,9 @@ class ReportFragment: Fragment() {
                     month1With += Math.abs(element.attributes.amount.toInt())
                 }
             }
-            dataAdapter = ArrayList(it.first.second.getTransaction()?.data)
+            if (it.first.second.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.first.second.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month1Depot = 0
             } else {
@@ -174,7 +176,9 @@ class ReportFragment: Fragment() {
             }
             month1 = month1Depot - month1With
             // 2 month ago
-            dataAdapter = ArrayList(it.second.first.getTransaction()?.data)
+            if (it.second.first.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.second.first.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month2With = 0
             } else {
@@ -182,7 +186,9 @@ class ReportFragment: Fragment() {
                     month2With += Math.abs(element.attributes.amount.toInt())
                 }
             }
-            dataAdapter = ArrayList(it.second.second.getTransaction()?.data)
+            if (it.second.second.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.second.second.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month2Depot = 0
             } else {
@@ -192,7 +198,9 @@ class ReportFragment: Fragment() {
             }
             month2 = month2Depot - month2With
             // 3 month ago
-            dataAdapter = ArrayList(it.third.first.getTransaction()?.data)
+            if (it.third.first.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.third.first.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month3With = 0
             } else {
@@ -200,7 +208,9 @@ class ReportFragment: Fragment() {
                     month3With += Math.abs(element.attributes.amount.toInt())
                 }
             }
-            dataAdapter = ArrayList(it.third.second.getTransaction()?.data)
+            if (it.third.second.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.third.second.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month3Depot = 0
             } else {
@@ -210,7 +220,9 @@ class ReportFragment: Fragment() {
             }
             month3 = month3Depot - month3With
             // 4 month ago
-            dataAdapter = ArrayList(it.fourth.first.getTransaction()?.data)
+            if (it.fourth.first.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.fourth.first.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month4With = 0
             } else {
@@ -218,7 +230,9 @@ class ReportFragment: Fragment() {
                     month4With += Math.abs(element.attributes.amount.toInt())
                 }
             }
-            dataAdapter = ArrayList(it.fourth.second.getTransaction()?.data)
+            if (it.fourth.second.getTransaction()?.data != null){
+                dataAdapter = ArrayList(it.fourth.second.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month4Depot = 0
             } else {
@@ -228,7 +242,9 @@ class ReportFragment: Fragment() {
             }
             month4 = month4Depot - month4With
             // 5 month ago
-            dataAdapter = ArrayList(it.fifth.first.getTransaction()?.data)
+            if(it.fifth.first.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.fifth.first.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month5With = 0
             } else {
@@ -236,7 +252,9 @@ class ReportFragment: Fragment() {
                     month5With += Math.abs(element.attributes.amount.toInt())
                 }
             }
-            dataAdapter = ArrayList(it.fifth.second.getTransaction()?.data)
+            if(it.fifth.second.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.fifth.second.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month5Depot = 0
             } else {
@@ -246,7 +264,9 @@ class ReportFragment: Fragment() {
             }
             month5 = month5Depot - month5With
             // 6 month ago
-            dataAdapter = ArrayList(it.sixth.first.getTransaction()?.data)
+            if(it.sixth.first.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.sixth.first.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month6With = 0
             } else {
@@ -254,7 +274,9 @@ class ReportFragment: Fragment() {
                     month6With += Math.abs(element.attributes.amount.toInt())
                 }
             }
-            dataAdapter = ArrayList(it.sixth.second.getTransaction()?.data)
+            if(it.sixth.second.getTransaction()?.data != null) {
+                dataAdapter = ArrayList(it.sixth.second.getTransaction()?.data)
+            }
             if (dataAdapter.size == 0) {
                 month6Depot = 0
             } else {
