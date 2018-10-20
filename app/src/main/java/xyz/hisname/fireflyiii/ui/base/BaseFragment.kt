@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
-import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 
 abstract class BaseFragment: Fragment(){
@@ -18,8 +17,7 @@ abstract class BaseFragment: Fragment(){
     val accessToken: String by lazy { arguments?.getString("access_token") ?: "" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val appBar = requireActivity().findViewById<AppBarLayout>(R.id.activity_appbar)
-        appBar.setExpanded(true,true)
+        requireActivity().findViewById<AppBarLayout>(R.id.activity_appbar)?.setExpanded(true,true)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
