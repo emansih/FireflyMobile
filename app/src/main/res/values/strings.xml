@@ -16,14 +16,14 @@
     <string name="bill_amount">-%1$s %2$s</string>
     <string name="no_browser_installed">No application can handle this request. Please install a web browser</string>
     <string name="target_date">Target Date: %1$s</string>
-    <string name="no_target_date">No target date set</string>
+    <string name="no_target_date">No date set</string>
     <string name="min_amount_save_per_month">Minimum amount to save per month: %1$s %2$s</string>
     <string name="user_did_it">You did it!</string>
     <string name="amount">%1$s / %2$s</string>
     <string name="edit">Edit</string>
-    <string name="target_due_today">Target due today</string>
+    <string name="due_today">Due today</string>
     <string name="one_more_day_to_target">1 more day to your target!</string>
-    <string name="target_missed">You miss your target by %1$d days</string>
+    <string name="target_missed">Missed by %1$d days</string>
     <string name="yesterday_target">Oh no! Your target was yesterday</string>
     <string name="days_to_go">%1$d days to go</string>
     <string name="get_confirmation">Are you sure?</string>

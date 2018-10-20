@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.PorterDuff
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.widget.ContentLoadingProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
@@ -34,6 +32,13 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
         fun bind(piggyData: PiggyData, clickListener: (PiggyData) -> Unit){
             val piggyBankData = piggyData.piggyAttributes
             itemView.piggyName.text = piggyBankData?.name
+            if(piggyBankData?.name != null){
+                if(piggyBankData.name.length >= 19){
+                    itemView.piggyName.text = piggyBankData.name.substring(0,19) + "..."
+                } else {
+                    itemView.piggyName.text = piggyBankData.name
+                }
+            }
             itemView.goal_save.text = piggyBankData?.currency_symbol + " " + piggyBankData?.target_amount
             itemView.currently_saved.text = piggyBankData?.currency_symbol + " " + piggyBankData?.current_amount.toString()
             if(piggyBankData!!.percentage <= 15.toDouble()){
@@ -50,7 +55,7 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
                     if(piggyBankData.percentage.toInt() != 100){
                         val daysDiff = DateTimeUtil.getDaysDifference(targetDate).toInt()
                         when{
-                            daysDiff == 0 -> it.text = context.getString(R.string.target_due_today)
+                            daysDiff == 0 -> it.text = context.getString(R.string.due_today)
                             daysDiff == 1 -> it.text = context.getString(R.string.one_more_day_to_target)
                             daysDiff < 0 -> {
                                 val inverseMath = Math.abs(daysDiff)
