@@ -25,22 +25,38 @@
         app:layout_constraintTop_toBottomOf="@id/descriptionEditText"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sourceTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:text="Source Account"
+        app:layout_constraintTop_toBottomOf="@id/transactionDateEditText"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/sourceEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:hint="Source Account"
-        app:layout_constraintTop_toBottomOf="@id/transactionDateEditText"
+        app:layout_constraintTop_toBottomOf="@id/sourceTextView"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/destinationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:text="Destination Account"
+        app:layout_constraintTop_toBottomOf="@id/sourceEditText"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/destinationEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Destination Account"
         android:layout_margin="12dp"
-        app:layout_constraintTop_toBottomOf="@id/sourceEditText"
+        app:layout_constraintTop_toBottomOf="@id/destinationTextView"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatEditText

@@ -47,11 +47,10 @@ class AddTransactionFragment: BaseFragment() {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
                 }
-                val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, accounts)
-                destinationEditText.threshold = 0
-                destinationEditText.setAdapter(adapter)
-                sourceEditText.threshold = 0
-                sourceEditText.setAdapter(adapter)
+                val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, accounts)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                sourceEditText.adapter = adapter
+                destinationEditText.adapter = adapter
             }
         })
         setupWidgets()
@@ -130,103 +129,80 @@ class AddTransactionFragment: BaseFragment() {
             } else {
                 billEditText.getString()
             }
-            val sourceName: String? = if(sourceEditText.isBlank()){
-                null
-            } else {
-                sourceEditText.getString()
-            }
-            val destinationName: String? = if(destinationEditText.isBlank()){
-                null
-            } else {
-                destinationEditText.getString()
-            }
             val piggyBank: String? = if(piggyBankName.isBlank()){
                 null
             } else {
                 piggyBankName.getString()
             }
             ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-            model.addTransaction(baseUrl, accessToken, convertString(true),
-                    descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
-                    billName, transactionAmountEditText.getString(), sourceName, destinationName,
-                    currencyEditText.getString()).observe(this, Observer {
-                if (it.getSuccess() != null) {
-                    toastSuccess("Transaction Added")
-                    requireFragmentManager().popBackStack()
-                } else if(it.getErrorMessage() != null){
-                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-                    val errorMessage = it.getErrorMessage()
-                    val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
-                    when {
-                        gson.errors.transactions_destination_name != null -> {
-                            if(gson.errors.transactions_destination_name.contains("is required")){
-                                destinationEditText.error = "Destination Account Required"
-                            } else {
-                                destinationEditText.error = "Invalid Destination Account"
+                model.addTransaction(baseUrl, accessToken, convertString(true),
+                        descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
+                        billName, transactionAmountEditText.getString(), sourceEditText.selectedItem.toString(),
+                        destinationEditText.selectedItem.toString(),
+                        currencyEditText.getString()).observe(this, Observer { transactionResponse ->
+                    if (transactionResponse.getSuccess() != null) {
+                        toastSuccess("Transaction Added")
+                        requireFragmentManager().popBackStack()
+                    } else if(transactionResponse.getErrorMessage() != null){
+                        ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                        val errorMessage = transactionResponse.getErrorMessage()
+                        val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                        when {
+                            gson.errors.transactions_currency != null -> {
+                                if(gson.errors.transactions_currency.contains("is required")){
+                                    currencyEditText.error = "Currency Code Required"
+                                } else {
+                                    currencyEditText.error = "Invalid Currency Code"
+                                }
                             }
+                            gson.errors.bill_name != null -> billEditText.error = "Invalid Bill Name"
+                            gson.errors.piggy_bank_name != null -> piggyBankName.error = "Invalid Piggy Bank Name"
+                            else -> toastError("Error occurred while saving transaction", Toast.LENGTH_LONG)
                         }
-                        gson.errors.transactions_currency != null -> {
-                            if(gson.errors.transactions_currency.contains("is required")){
-                                currencyEditText.error = "Currency Code Required"
-                            } else {
-                                currencyEditText.error = "Invalid Currency Code"
+                    } else if(transactionResponse.getError() != null){
+                        if(transactionResponse.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
+                            if(Objects.equals("transfers", convertString(true))){
+                                val transferBroadcast = Intent("firefly.hisname.ADD_TRANSFER")
+                                val extras = bundleOf(
+                                        "description" to descriptionEditText.getString(),
+                                        "date" to transactionDateEditText.getString(),
+                                        "amount" to transactionAmountEditText.getString(),
+                                        "currency" to currencyEditText.getString(),
+                                        "sourceName" to sourceEditText.selectedItem.toString(),
+                                        "destinationName" to destinationEditText.selectedItem.toString(),
+                                        "piggyBankName" to piggyBank
+                                )
+                                transferBroadcast.putExtras(extras)
+                                requireActivity().sendBroadcast(transferBroadcast)
+                                toastOffline(getString(R.string.data_added_when_user_online, "Transfer"))
+                            } else if(Objects.equals("deposit", convertString(true))){
+                                val transferBroadcast = Intent("firefly.hisname.ADD_DEPOSIT")
+                                val extras = bundleOf(
+                                        "description" to descriptionEditText.getString(),
+                                        "date" to transactionDateEditText.getString(),
+                                        "amount" to transactionAmountEditText.getString(),
+                                        "currency" to currencyEditText.getString(),
+                                        "destinationName" to destinationEditText.selectedItem.toString()
+                                )
+                                transferBroadcast.putExtras(extras)
+                                requireActivity().sendBroadcast(transferBroadcast)
+                                toastOffline(getString(R.string.data_added_when_user_online, "Deposit"))
+                            } else if(Objects.equals("withdrawal", convertString(true))){
+                                val withdrawalBroadcast = Intent("firefly.hisname.ADD_WITHDRAW")
+                                val extras = bundleOf(
+                                        "description" to descriptionEditText.getString(),
+                                        "date" to transactionDateEditText.getString(),
+                                        "amount" to transactionAmountEditText.getString(),
+                                        "currency" to currencyEditText.getString(),
+                                        "sourceName" to sourceEditText.selectedItem.toString(),
+                                        "billName" to billName
+                                )
+                                withdrawalBroadcast.putExtras(extras)
+                                requireActivity().sendBroadcast(withdrawalBroadcast)
+                                toastOffline(getString(R.string.data_added_when_user_online, "Withdrawal"))
                             }
-                        }
-                        gson.errors.transactions_source_name != null  -> {
-                            if(gson.errors.transactions_source_name.contains("is required")){
-                                sourceEditText.error = "Source Account Required"
-                            } else {
-                                sourceEditText.error = "Invalid Source Account"
-                            }
-                        }
-                        gson.errors.bill_name != null -> billEditText.error = "Invalid Bill Name"
-                        gson.errors.piggy_bank_name != null -> piggyBankName.error = "Invalid Piggy Bank Name"
-                        else -> toastError("Error occurred while saving transaction", Toast.LENGTH_LONG)
-                    }
-                } else if(it.getError() != null){
-                    if(it.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
-                        if(Objects.equals("transfers", convertString(true))){
-                            val transferBroadcast = Intent("firefly.hisname.ADD_TRANSFER")
-                            val extras = bundleOf(
-                                    "description" to descriptionEditText.getString(),
-                                    "date" to transactionDateEditText.getString(),
-                                    "amount" to transactionAmountEditText.getString(),
-                                    "currency" to currencyEditText.getString(),
-                                    "sourceName" to sourceName,
-                                    "destinationName" to destinationName,
-                                    "piggyBankName" to piggyBank
-                            )
-                            transferBroadcast.putExtras(extras)
-                            requireActivity().sendBroadcast(transferBroadcast)
-                            toastOffline(getString(R.string.data_added_when_user_online, "Transfer"))
-                        } else if(Objects.equals("deposit", convertString(true))){
-                            val transferBroadcast = Intent("firefly.hisname.ADD_DEPOSIT")
-                            val extras = bundleOf(
-                                    "description" to descriptionEditText.getString(),
-                                    "date" to transactionDateEditText.getString(),
-                                    "amount" to transactionAmountEditText.getString(),
-                                    "currency" to currencyEditText.getString(),
-                                    "destinationName" to destinationName
-                            )
-                            transferBroadcast.putExtras(extras)
-                            requireActivity().sendBroadcast(transferBroadcast)
-                            toastOffline(getString(R.string.data_added_when_user_online, "Deposit"))
-                        } else if(Objects.equals("withdrawal", convertString(true))){
-                            val withdrawalBroadcast = Intent("firefly.hisname.ADD_WITHDRAW")
-                            val extras = bundleOf(
-                                    "description" to descriptionEditText.getString(),
-                                    "date" to transactionDateEditText.getString(),
-                                    "amount" to transactionAmountEditText.getString(),
-                                    "currency" to currencyEditText.getString(),
-                                    "sourceName" to sourceName,
-                                    "billName" to billName
-                            )
-                            withdrawalBroadcast.putExtras(extras)
-                            requireActivity().sendBroadcast(withdrawalBroadcast)
-                            toastOffline(getString(R.string.data_added_when_user_online, "Withdrawal"))
                         }
                     }
-                }
             })
         }
         return true

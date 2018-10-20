@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
@@ -13,6 +14,7 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_piggy_create.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.piggy.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -24,6 +26,8 @@ import java.util.*
 class AddPiggyActivity: BaseActivity() {
 
     private val model by lazy { getViewModel(PiggyBankViewModel::class.java) }
+    private val accountDatabase by lazy { AppDatabase.getInstance(this)?.accountDataDao() }
+    private var accounts = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +68,16 @@ class AddPiggyActivity: BaseActivity() {
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
+        accountDatabase?.getAssetAccount()?.observe(this, Observer {
+            if(it.isNotEmpty()) {
+                it.forEachIndexed { _, accountData ->
+                    accounts.add(accountData.accountAttributes?.name!!)
+                }
+                val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, accounts)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                account_id_edittext.adapter = adapter
+            }
+        })
         piggy_name_edittext.setText(intent.getStringExtra("piggyName"))
         val targetAmount = intent.getSerializableExtra("targetAmount") ?: ""
         target_amount_edittext.setText(targetAmount.toString())
@@ -80,10 +94,6 @@ class AddPiggyActivity: BaseActivity() {
             piggy_name_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
         }
-        if(account_id_edittext.isBlank()){
-            account_id_edittext.error = resources.getString(R.string.required_field)
-            shouldContinue = false
-        }
         if(target_amount_edittext.isBlank()){
             target_amount_edittext.error = resources.getString(R.string.required_field)
             shouldContinue = false
@@ -92,7 +102,7 @@ class AddPiggyActivity: BaseActivity() {
     }
 
     private fun checkEmptiness(){
-        if(piggy_name_edittext.isBlank() and account_id_edittext.isBlank() and
+        if(piggy_name_edittext.isBlank() and
                 target_amount_edittext.isBlank() and current_amount_edittext.isBlank() and
                 start_date_edittext.isBlank() and target_date_edittext.isBlank() and note_edittext.isBlank()){
             toastInfo("No information entered. Piggy bank not saved")
@@ -135,44 +145,45 @@ class AddPiggyActivity: BaseActivity() {
                 } else {
                     note_edittext.getString()
                 }
-                model.addPiggyBank(baseUrl, accessToken, piggy_name_edittext.getString(), account_id_edittext.getString(),
-                        currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
-                        .observe(this, Observer {
-                            ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
-                            if(it.getErrorMessage() != null){
-                                val errorMessage = it.getErrorMessage()
-                                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
-                                when {
-                                    gson.errors.name != null -> toastError(gson.errors.name[0])
-                                    gson.errors.account_id != null -> toastError(gson.errors.account_id[0])
-                                    gson.errors.current_amount != null -> toastError(gson.errors.current_amount[0])
-                                    else -> toastError("Error occurred while saving bill")
-                                }
-                            } else if(it.getError() != null){
-                                if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
-                                    val piggyBroadcast = Intent("firefly.hisname.ADD_PIGGY_BANK")
-                                    val extras = bundleOf(
-                                            "name" to piggy_name_edittext.getString(),
-                                            "accountId" to account_id_edittext.getString(),
-                                            "targetAmount" to target_amount_edittext.getString(),
-                                            "currentAmount" to currentAmount,
-                                            "startDate" to startDate,
-                                            "endDate" to targetDate,
-                                            "notes" to notes
-                                    )
-                                    piggyBroadcast.putExtras(extras)
-                                    sendBroadcast(piggyBroadcast)
-                                    toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
-                                    toastInfo("Piggy bank will be added when you are back online")
+                accountDatabase?.getAssetAccount(account_id_edittext.selectedItem.toString())?.observe(this, Observer { accountData ->
+                    model.addPiggyBank(baseUrl, accessToken, piggy_name_edittext.getString(), accountData[0].accountId.toString(),
+                            currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
+                            .observe(this, Observer {
+                                ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
+                                if (it.getErrorMessage() != null) {
+                                    val errorMessage = it.getErrorMessage()
+                                    val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                                    when {
+                                        gson.errors.name != null -> toastError(gson.errors.name[0])
+                                        gson.errors.account_id != null -> toastError(gson.errors.account_id[0])
+                                        gson.errors.current_amount != null -> toastError(gson.errors.current_amount[0])
+                                        else -> toastError("Error occurred while saving bill")
+                                    }
+                                } else if (it.getError() != null) {
+                                    if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
+                                        val piggyBroadcast = Intent("firefly.hisname.ADD_PIGGY_BANK")
+                                        val extras = bundleOf(
+                                                "name" to piggy_name_edittext.getString(),
+                                                "accountId" to accountData[0].accountId.toString(),
+                                                "targetAmount" to target_amount_edittext.getString(),
+                                                "currentAmount" to currentAmount,
+                                                "startDate" to startDate,
+                                                "endDate" to targetDate,
+                                                "notes" to notes
+                                        )
+                                        piggyBroadcast.putExtras(extras)
+                                        sendBroadcast(piggyBroadcast)
+                                        toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
+                                        finish()
+                                    } else {
+                                        toastError("Error saving piggy bank")
+                                    }
+                                } else if (it.getSuccess() != null) {
+                                    toastSuccess("Piggy bank saved")
                                     finish()
-                                } else {
-                                    toastError("Error saving piggy bank")
                                 }
-                            } else if(it.getSuccess() != null){
-                               toastSuccess("Piggy bank saved")
-                                finish()
-                            }
-                        })
+                            })
+                })
             }
         }
         return super.onOptionsItemSelected(item)
