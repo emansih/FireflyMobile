@@ -7,47 +7,49 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
+import xyz.hisname.fireflyiii.ui.HomeActivity
+import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import java.util.*
 
 
 class OnboardingActivity: AppCompatActivity() {
 
     private val fireflyUrl by lazy { sharedPref.getString("fireflyUrl","") ?: "" }
-    private val fireflyId by lazy { sharedPref.getString("fireflyId","") ?: ""}
     private val fireflySecretKey by lazy { sharedPref.getString("fireflySecretKey","") ?: "" }
     private val fireflyAccessTokenExpiry by lazy { sharedPref.getLong("expires_at",0) }
-    private val userEmail by lazy { sharedPref.getString("userEmail","") ?: ""}
-    private val userRole by lazy { sharedPref.getString("userRole", "") ?: "" }
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
+    private val authMethod  by lazy { sharedPref.getString("auth_method","") ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
         when {
-            fireflyUrl.isEmpty() or fireflyId.isEmpty() or fireflySecretKey.isEmpty()
-                    or(fireflyAccessTokenExpiry == 0L) -> {
-                val bundle = bundleOf("ACTION" to "LOGIN")
+            fireflyUrl.isEmpty() or fireflySecretKey.isEmpty() -> {
                 supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
+                        .replace(R.id.fragment_container, AuthChooserFragment())
                         .commit()
             }
-            System.currentTimeMillis() > fireflyAccessTokenExpiry -> {
-                val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
-                supportFragmentManager.beginTransaction()
+            Objects.equals("oauth", authMethod) -> {
+                if(System.currentTimeMillis() > fireflyAccessTokenExpiry){
+                    val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
+                    supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
                         .commit()
-            }
-            userEmail.isEmpty() or userRole.isEmpty() -> {
-                val bundle = bundleOf("fireflyUrl" to fireflyUrl, "access_token" to sharedPref.getString("access_token",""))
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, OnboardingFragment().apply { arguments = bundle })
-                        .commit()
+                } else {
+                    if(sharedPref.getBoolean("persistent_notification",false)){
+                        NotificationUtils(this).showTransactionPersistentNotification()
+                    }
+                    val homeIntent = Intent(this, HomeActivity::class.java)
+                    startActivity(homeIntent)
+                }
             }
             else -> {
-                val bundle = bundleOf("ACTION" to "HOME")
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
-                        .commit()
+                if(sharedPref.getBoolean("persistent_notification",false)){
+                    NotificationUtils(this).showTransactionPersistentNotification()
+                }
+                val homeIntent = Intent(this, HomeActivity::class.java)
+                startActivity(homeIntent)
             }
         }
     }

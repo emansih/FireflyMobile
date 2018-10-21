@@ -356,6 +356,8 @@ class ReportFragment: BaseFragment() {
         }
     }
 
+
+
     private fun getMonths(): ArrayList<String>{
         return arrayListOf(DateTimeUtil.getPreviousMonthShortName(1),
                 DateTimeUtil.getPreviousMonthShortName(2),

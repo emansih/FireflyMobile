@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.extension.toastInfo
+import java.util.*
 
 
 class SettingsFragment: PreferenceFragmentCompat() {
@@ -41,6 +42,12 @@ class SettingsFragment: PreferenceFragmentCompat() {
         accessTokenPref.apply {
             title = "Access Token"
             summary = fireflySecretKey
+        }
+        val authMethod = findPreference("auth_method")
+        if(Objects.equals(sharedPref.getString("auth_method", ""), "oauth")){
+            authMethod.summary = "OAuth Authentication"
+        } else {
+            authMethod.summary = "Personal Access Authentication"
         }
 
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->

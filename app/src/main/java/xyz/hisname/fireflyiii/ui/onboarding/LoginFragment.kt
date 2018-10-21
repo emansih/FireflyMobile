@@ -7,6 +7,7 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
@@ -15,7 +16,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_login.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
 import xyz.hisname.fireflyiii.Constants
@@ -36,7 +36,7 @@ class LoginFragment: Fragment() {
     private val fireflySecretKey: String by lazy { sharedPref.getString("fireflySecretKey","") ?: "" }
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
     private val model by lazy { getViewModel(AuthViewModel::class.java) }
-
+    private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -48,7 +48,6 @@ class LoginFragment: Fragment() {
         val argument = arguments?.getString("ACTION")
         when {
             Objects.equals(argument, "LOGIN") -> {
-                user_details_layout.isVisible = true
                 firefly_url_edittext.setText(baseUrl)
                 firefly_id_edittext.setText(fireflyId)
                 firefly_secret_edittext.setText(fireflySecretKey)
@@ -56,9 +55,6 @@ class LoginFragment: Fragment() {
             }
             Objects.equals(argument, "REFRESH_TOKEN") -> {
                 refreshToken()
-            }
-            Objects.equals(argument, "HOME") -> {
-                startHomeIntent()
             }
         }
     }
@@ -102,7 +98,7 @@ class LoginFragment: Fragment() {
             token again. Is it really a bug? Anyway, the client does not play well in this scenario.
             Currently we only checked if the refresh token is `old`
         */
-        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+        ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
         model.getRefreshToken(baseUrl, sharedPref.getString("refresh_token", ""), fireflySecretKey)
                 .observe(this, Observer {
                     if(it.getError() == null) {
@@ -116,7 +112,7 @@ class LoginFragment: Fragment() {
                         }
                         startHomeIntent()
                     } else {
-                        ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
+                        ProgressBar.animateView(progressOverlay, View.GONE, 0.toFloat(), 200)
                         val error = it.getError()
                         if(error!!.localizedMessage.startsWith("Unable to resolve host")){
                             toastInfo(resources.getString(R.string.unable_ping_server))
@@ -147,8 +143,9 @@ class LoginFragment: Fragment() {
                 val baseUrl= sharedPref.getString("fireflyUrl","") ?: ""
                 val fireflyId = sharedPref.getString("fireflyId","") ?: ""
                 val fireflySecretKey= sharedPref.getString("fireflySecretKey","") ?: ""
-                ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+                ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 model.getAccessToken(baseUrl, code,fireflyId,fireflySecretKey).observe(this, Observer {
+                    ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                     if(it.getAuth() != null) {
                         toastSuccess(resources.getString(R.string.welcome))
                         val refreshtoken = it.getAuth()?.refresh_token ?: ""
@@ -157,13 +154,15 @@ class LoginFragment: Fragment() {
                             putString("access_token", it.getAuth()?.access_token)
                             putLong("expires_at", (System.currentTimeMillis() +
                                     TimeUnit.MINUTES.toMillis(it.getAuth()!!.expires_in)))
+                            putString("auth_method", "oauth")
                         }
+                        val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
+                        frameLayout.removeAllViews()
                         val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to it.getAuth()?.access_token)
                         requireActivity().supportFragmentManager.beginTransaction()
-                                .replace(R.id.fragment_container, OnboardingFragment().apply { arguments = bundle })
+                                .add(R.id.bigger_fragment_container, OnboardingFragment().apply { arguments = bundle })
                                 .commit()
                     } else {
-                        ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
                         val error = it.getError()
                         if(error == null){
                             toastInfo("There was an error communicating with your server")
@@ -183,7 +182,7 @@ class LoginFragment: Fragment() {
     }
 
     private fun showDialog(){
-        ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
+        ProgressBar.animateView(progressOverlay, View.GONE, 0.toFloat(), 200)
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.authentication_failed))
                 .setMessage(resources.getString(R.string.authentication_failed_message, Constants.REDIRECT_URI))
