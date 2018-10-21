@@ -160,6 +160,7 @@ class LoginFragment: Fragment() {
                         frameLayout.removeAllViews()
                         val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to it.getAuth()?.access_token)
                         requireActivity().supportFragmentManager.beginTransaction()
+                                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                                 .add(R.id.bigger_fragment_container, OnboardingFragment().apply { arguments = bundle })
                                 .commit()
                     } else {

@@ -74,5 +74,16 @@ class OnboardingActivity: AppCompatActivity() {
         super.onDestroy()
         RetrofitBuilder.destroyInstance()
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+    }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+
+    }
 }
 

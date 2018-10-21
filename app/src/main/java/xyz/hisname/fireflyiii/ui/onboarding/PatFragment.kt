@@ -61,6 +61,7 @@ class PatFragment: Fragment() {
                         val bundle = bundleOf("fireflyUrl" to fireflyUrl, "access_token"
                                 to firefly_secret_edittext.getString())
                         requireActivity().supportFragmentManager.beginTransaction()
+                                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                                 .add(R.id.bigger_fragment_container, OnboardingFragment().apply { arguments = bundle })
                                 .commit()
                         toastSuccess(resources.getString(R.string.welcome))

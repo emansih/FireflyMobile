@@ -23,12 +23,14 @@ class AuthChooserFragment: Fragment(){
         oauthButton.setOnClickListener {
             val bundle = bundleOf("ACTION" to "LOGIN")
             requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                     .addToBackStack(null)
                     .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
                     .commit()
         }
         accessTokenButton.setOnClickListener {
             requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                     .addToBackStack(null)
                     .replace(R.id.fragment_container, PatFragment())
                     .commit()
