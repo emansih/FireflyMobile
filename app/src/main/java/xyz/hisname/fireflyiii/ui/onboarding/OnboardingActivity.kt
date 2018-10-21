@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.android.Main
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.ui.HomeActivity
@@ -40,16 +42,25 @@ class OnboardingActivity: AppCompatActivity() {
                     if(sharedPref.getBoolean("persistent_notification",false)){
                         NotificationUtils(this).showTransactionPersistentNotification()
                     }
-                    val homeIntent = Intent(this, HomeActivity::class.java)
-                    startActivity(homeIntent)
+                    GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, null, {
+                        delay(1234) //heh
+                        startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                        finish()
+                    })
+
                 }
             }
             else -> {
                 if(sharedPref.getBoolean("persistent_notification",false)){
                     NotificationUtils(this).showTransactionPersistentNotification()
                 }
-                val homeIntent = Intent(this, HomeActivity::class.java)
-                startActivity(homeIntent)
+                GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, null, {
+                    delay(1234) //heh
+                    startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                })
             }
         }
     }
