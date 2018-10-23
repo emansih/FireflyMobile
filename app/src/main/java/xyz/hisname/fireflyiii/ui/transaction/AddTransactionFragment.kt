@@ -112,7 +112,7 @@ class AddTransactionFragment: BaseFragment() {
     private fun convertString(pleaseLowerCase: Boolean): String{
         var convertedString = ""
         when {
-            Objects.equals(transactionType, "expenses") -> convertedString = if(pleaseLowerCase){
+            Objects.equals(transactionType, "expense") -> convertedString = if(pleaseLowerCase){
                 "withdrawal"
             } else {
                 "Withdrawal"

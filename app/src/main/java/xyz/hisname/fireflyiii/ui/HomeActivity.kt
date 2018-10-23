@@ -221,7 +221,7 @@ class HomeActivity: BaseActivity(){
                         }
                         drawerItem.identifier == 11L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "transactionType" to "expenses")
+                                    "access_token" to accessToken, "transactionType" to "expense")
                             changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 12L -> {
