@@ -86,14 +86,14 @@ class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener 
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
+        activity?.activity_toolbar?.title = transactionType.substring(0,1).toUpperCase() +
                 transactionType.substring(1)
 
     }
 
     override fun onResume() {
         super.onResume()
-        requireActivity().activity_toolbar.title = transactionType.substring(0,1).toUpperCase() +
+        activity?.activity_toolbar?.title = transactionType.substring(0,1).toUpperCase() +
                 transactionType.substring(1)
 
     }
