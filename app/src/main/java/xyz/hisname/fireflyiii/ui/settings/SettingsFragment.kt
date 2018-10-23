@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -13,8 +14,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import kotlinx.android.synthetic.main.activity_base.*
+import kotlinx.coroutines.experimental.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
+import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 import java.util.*
 
@@ -24,6 +28,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
     private val fireflyUrl by lazy { sharedPref.getString("fireflyUrl","") ?: "" }
     private val fireflySecretKey by lazy { sharedPref.getString("fireflySecretKey","") ?: "" }
+    private val appDb by lazy { AppDatabase.getInstance(requireContext()) }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -44,6 +49,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
             summary = fireflySecretKey
         }
         val authMethod = findPreference("auth_method")
+
+        val logout = findPreference("logout")
         if(Objects.equals(sharedPref.getString("auth_method", ""), "oauth")){
             authMethod.summary = "OAuth Authentication"
         } else {
@@ -59,6 +66,18 @@ class SettingsFragment: PreferenceFragmentCompat() {
         accessTokenPref.setOnPreferenceChangeListener { preference, newValue  ->
             preference.summary = newValue.toString()
             RetrofitBuilder.destroyInstance()
+            true
+        }
+
+        logout.setOnPreferenceClickListener {
+            GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, null, {
+                appDb?.clearAllTables()
+                sharedPref.edit().clear().apply()
+            })
+            val loginActivity = Intent(requireActivity(), OnboardingActivity::class.java)
+            startActivity(loginActivity)
+            RetrofitBuilder.destroyInstance()
+            requireActivity().finish()
             true
         }
     }

@@ -14,10 +14,15 @@
             android:title="Access Token">
         </EditTextPreference>
 
-        <ListPreference
+        <Preference
             android:key="auth_method"
             android:title="Authentication Method">
-        </ListPreference>
+        </Preference>
+
+        <Preference
+            android:key="logout"
+            android:title="Logout">
+        </Preference>
 
     </PreferenceCategory>
 
