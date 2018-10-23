@@ -129,12 +129,12 @@ class ListBillFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        requireActivity().activity_toolbar.title = "Bills"
+        activity?.activity_toolbar?.title = "Bills"
     }
 
     override fun onResume() {
         super.onResume()
-        requireActivity().activity_toolbar.title = "Bills"
+        activity?.activity_toolbar?.title = "Bills"
     }
 
     override fun onStop() {
