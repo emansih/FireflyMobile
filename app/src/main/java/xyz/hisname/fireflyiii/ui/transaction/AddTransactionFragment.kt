@@ -33,6 +33,10 @@ class AddTransactionFragment: BaseFragment() {
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
     private val accountDatabase by lazy { AppDatabase.getInstance(requireActivity())?.accountDataDao() }
     private var accounts = ArrayList<String>()
+    private val piggyBankDatabase by lazy { AppDatabase.getInstance(requireActivity())?.piggyDataDao() }
+    private var piggyBank = ArrayList<String>()
+    private val billDatabase by lazy { AppDatabase.getInstance(requireActivity())?.billDataDao() }
+    private val bill = ArrayList<String>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -52,6 +56,26 @@ class AddTransactionFragment: BaseFragment() {
                 sourceAutoComplete.setAdapter(adapter)
                 destinationAutoComplete.threshold = 1
                 destinationAutoComplete.setAdapter(adapter)
+            }
+        })
+        piggyBankDatabase?.getPiggy()?.observe(this, Observer {
+            if(it.isNotEmpty()){
+               it.forEachIndexed { _,piggyData ->
+                   piggyBank.add(piggyData.piggyAttributes?.name!!)
+               }
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, piggyBank)
+                piggyBankName.threshold = 1
+                piggyBankName.setAdapter(adapter)
+            }
+        })
+        billDatabase?.getAllBill()?.observe(this, Observer {
+            if(it.isNotEmpty()){
+                it.forEachIndexed { _,billData ->
+                    bill.add(billData.billAttributes?.name!!)
+                }
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
+                billEditText.threshold = 1
+                billEditText.setAdapter(adapter)
             }
         })
         setupWidgets()
