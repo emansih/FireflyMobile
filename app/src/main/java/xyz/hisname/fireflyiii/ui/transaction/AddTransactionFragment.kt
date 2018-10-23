@@ -43,14 +43,15 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         accountDatabase?.getAssetAccount()?.observe(this, Observer {
-            if(it.isNotEmpty()) {
+            if (it.isNotEmpty()) {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
                 }
-                val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, accounts)
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                sourceEditText.adapter = adapter
-                destinationEditText.adapter = adapter
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, accounts)
+                sourceAutoComplete.threshold = 1
+                sourceAutoComplete.setAdapter(adapter)
+                destinationAutoComplete.threshold = 1
+                destinationAutoComplete.setAdapter(adapter)
             }
         })
         setupWidgets()
@@ -137,8 +138,8 @@ class AddTransactionFragment: BaseFragment() {
             ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
                 model.addTransaction(baseUrl, accessToken, convertString(true),
                         descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
-                        billName, transactionAmountEditText.getString(), sourceEditText.selectedItem.toString(),
-                        destinationEditText.selectedItem.toString(),
+                        billName, transactionAmountEditText.getString(), sourceAutoComplete.getString(),
+                        destinationAutoComplete.getString(),
                         currencyEditText.getString()).observe(this, Observer { transactionResponse ->
                     if (transactionResponse.getSuccess() != null) {
                         toastSuccess("Transaction Added")
@@ -157,6 +158,9 @@ class AddTransactionFragment: BaseFragment() {
                             }
                             gson.errors.bill_name != null -> billEditText.error = "Invalid Bill Name"
                             gson.errors.piggy_bank_name != null -> piggyBankName.error = "Invalid Piggy Bank Name"
+                            gson.errors.transactions_destination_name != null -> destinationAutoComplete.error = "Invalid Destination Account"
+                            gson.errors.transactions_source_name != null -> sourceAutoComplete.error = "Invalid Source Account"
+
                             else -> toastError("Error occurred while saving transaction", Toast.LENGTH_LONG)
                         }
                     } else if(transactionResponse.getError() != null){
@@ -168,8 +172,8 @@ class AddTransactionFragment: BaseFragment() {
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
-                                        "sourceName" to sourceEditText.selectedItem.toString(),
-                                        "destinationName" to destinationEditText.selectedItem.toString(),
+                                        "sourceName" to sourceAutoComplete.getString(),
+                                        "destinationName" to descriptionEditText.getString(),
                                         "piggyBankName" to piggyBank
                                 )
                                 transferBroadcast.putExtras(extras)
@@ -182,7 +186,7 @@ class AddTransactionFragment: BaseFragment() {
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
-                                        "destinationName" to destinationEditText.selectedItem.toString()
+                                        "destinationName" to descriptionEditText.getString()
                                 )
                                 transferBroadcast.putExtras(extras)
                                 requireActivity().sendBroadcast(transferBroadcast)
@@ -194,7 +198,7 @@ class AddTransactionFragment: BaseFragment() {
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
-                                        "sourceName" to sourceEditText.selectedItem.toString(),
+                                        "sourceName" to sourceAutoComplete.getString(),
                                         "billName" to billName
                                 )
                                 withdrawalBroadcast.putExtras(extras)
