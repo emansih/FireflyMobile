@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.repository.api
 import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.BILL_API_ENDPONT
+import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
 import xyz.hisname.fireflyiii.repository.models.bills.success.BillSucessModel
 
@@ -14,7 +15,7 @@ interface BillsService {
 
 
     @GET("$BILL_API_ENDPONT/{id}")
-    fun getBillById(@Path("id") id: String): Call<BillsModel>
+    fun getBillById(@Path("id") id: String): Call<BillData>
 
     @FormUrlEncoded
     @POST(BILL_API_ENDPONT)

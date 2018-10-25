@@ -30,7 +30,6 @@ import xyz.hisname.fireflyiii.util.extension.toastError
 class ListBillFragment: BaseFragment() {
 
     private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
-    private lateinit var billsAdapter: BillsRecyclerAdapter
     private var dataAdapter = ArrayList<BillData>()
     private var billDatabase: AppDatabase? = null
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
@@ -75,15 +74,10 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun itemClicked(billData: BillData){
-        val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-                "billId" to billData.billId, "billName" to billData.billAttributes?.name,
-                "currencyCode" to billData.billAttributes?.currency_code, "billMax" to billData.billAttributes?.amount_max,
-                "billMin" to billData.billAttributes?.amount_min, "date" to billData.billAttributes?.date,
-                "freq" to billData.billAttributes?.repeat_freq, "notes" to billData.billAttributes?.markdown)
-        requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, BillDetailFragment().apply { arguments = bundle })
-                .addToBackStack(null)
-                .commit()
+        val billDetail = Intent(requireActivity(), BillDetailActivity::class.java).apply {
+            putExtras(bundleOf("billId" to billData.billId))
+        }
+        startActivity(billDetail)
     }
 
     private fun initFab(){

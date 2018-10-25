@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment as SupportFragment
 fun Context.toastInfo(message: String, duration: Int = Toast.LENGTH_SHORT) =
         Toasty.info(this, message, duration).show()
 
-fun Context.toastError(message: String, duration: Int = Toast.LENGTH_SHORT) =
-        Toasty.error(this, message, duration).show()
+fun Context.toastError(message: String?, duration: Int = Toast.LENGTH_SHORT) =
+        Toasty.error(this, message.toString(), duration).show()
 
 fun Context.toastSuccess(message: String, duration: Int = Toast.LENGTH_SHORT) =
         Toasty.success(this, message, duration).show()
@@ -23,7 +23,7 @@ fun Context.toastOffline(message: String, duration: Int = Toast.LENGTH_SHORT) =
 fun SupportFragment.toastInfo(message: String, duration: Int = Toast.LENGTH_SHORT) =
         requireActivity().toastInfo(message, duration)
 
-fun SupportFragment.toastError(message: String, duration: Int = Toast.LENGTH_SHORT) =
+fun SupportFragment.toastError(message: String?, duration: Int = Toast.LENGTH_SHORT) =
         requireActivity().toastError(message, duration)
 
 fun SupportFragment.toastSuccess(message: String, duration: Int = Toast.LENGTH_SHORT) =

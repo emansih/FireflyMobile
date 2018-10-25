@@ -6,6 +6,7 @@ import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
+import okhttp3.ResponseBody
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.BillsService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
@@ -56,8 +57,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
                 })
             }
         })
-        { throwable -> billResponse.postValue(BillApiResponse(throwable))})
-
+        { throwable -> billResponse.postValue(BillApiResponse(throwable)) })
         apiResponse.addSource(billResponse){ apiResponse.value = it }
         return apiResponse
     }
@@ -84,6 +84,26 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         { throwable -> billResponse.postValue(BillApiResponse(throwable)) })
         apiResponse.addSource(billResponse){ apiResponse.value = it }
         return apiResponse
+    }
+
+    fun getBillById(id: Long, baseUrl: String, accessToken: String): BillResponse{
+        val apiResponse = MediatorLiveData<BillApiResponse>()
+        val billResponse: MutableLiveData<BillApiResponse> = MutableLiveData()
+        billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
+        billsService?.getBillById(id.toString())?.enqueue(retrofitCallback({ response ->
+            if (!response.isSuccessful) {
+                var errorBody = ""
+                if (response.errorBody() != null) {
+                    errorBody = String(response.errorBody()?.bytes()!!)
+                }
+                billResponse.postValue(BillApiResponse(errorBody))
+            }
+        })
+        { throwable ->  billResponse.postValue(BillApiResponse(throwable))})
+        apiResponse.addSource(billResponse) {
+            apiResponse.value = it
+        }
+        return BillResponse(billDatabase?.getBillById(id), apiResponse)
     }
 }
 
