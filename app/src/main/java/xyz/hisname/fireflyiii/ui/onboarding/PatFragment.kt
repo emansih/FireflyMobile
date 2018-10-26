@@ -32,6 +32,7 @@ class PatFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fireflySignIn.setOnClickListener {
+            hideKeyboard()
             if(firefly_url_edittext.isBlank() or firefly_secret_edittext.isBlank()){
                 if(firefly_url_edittext.isBlank()) {
                     firefly_url_edittext.showRequiredError()

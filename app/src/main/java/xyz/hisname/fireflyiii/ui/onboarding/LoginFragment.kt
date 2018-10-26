@@ -61,6 +61,7 @@ class LoginFragment: Fragment() {
 
     private fun getAccessCode(){
         firefly_submit_button.setOnClickListener {
+            hideKeyboard()
             fireflyUrl = firefly_url_edittext.getString()
             val fireflyId = firefly_id_edittext.getString()
             val fireflySecretKey =  firefly_secret_edittext.getString()

@@ -190,6 +190,7 @@ class AddTransactionFragment: BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         if(item.itemId == R.id.menu_item_save){
+            hideKeyboard()
             val billName: String? = if(billEditText.isBlank()){
                 null
             } else {

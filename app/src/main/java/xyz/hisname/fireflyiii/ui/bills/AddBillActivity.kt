@@ -219,6 +219,7 @@ class AddBillActivity: BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if(item?.itemId == R.id.menu_item_save){
+            hideKeyboard()
             if(validateInput()){
                 ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
                 notes = if(note_edittext.isBlank()){

@@ -1,8 +1,12 @@
 package xyz.hisname.fireflyiii.util.extension
 
+import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.Fragment as SupportFragment
 
 fun ViewGroup.inflate(layoutRes: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
@@ -15,4 +19,17 @@ fun LayoutInflater.create(layoutRes: Int, container: ViewGroup?, attachToRoot: B
 inline fun consume(f: () -> Unit): Boolean {
     f()
     return true
+}
+
+fun SupportFragment.hideKeyboard() {
+    requireActivity().hideKeyboard()
+}
+
+fun Activity.hideKeyboard() {
+    hideKeyboard(if (currentFocus == null) View(this) else currentFocus)
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
