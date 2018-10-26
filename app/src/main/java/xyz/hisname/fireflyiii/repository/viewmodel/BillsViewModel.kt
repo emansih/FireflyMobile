@@ -86,6 +86,30 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         return apiResponse
     }
 
+    fun updateBill(baseUrl: String?, accessToken: String?, billId: String, name: String, match: String,
+                   amountMin: String, amountMax: String, date: String, repeatFreq: String,
+                   skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<BillApiResponse>{
+        val apiResponse = MediatorLiveData<BillApiResponse>()
+        val billResponse: MutableLiveData<BillApiResponse> = MutableLiveData()
+        billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
+        billsService?.updateBill(billId, name, match, amountMin, amountMax, date,
+                repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
+                { response ->
+                    var errorBody = ""
+                    if (response.errorBody() != null) {
+                        errorBody = String(response.errorBody()?.bytes()!!)
+                    }
+                    if(response.isSuccessful){
+                        billResponse.postValue(BillApiResponse(response.body()))
+                    } else {
+                        billResponse.postValue(BillApiResponse(errorBody))
+                    }
+                })
+        { throwable -> billResponse.postValue(BillApiResponse(throwable)) })
+        apiResponse.addSource(billResponse){ apiResponse.value = it }
+        return apiResponse
+    }
+
     fun getBillById(id: Long, baseUrl: String, accessToken: String): BillResponse{
         val apiResponse = MediatorLiveData<BillApiResponse>()
         val billResponse: MutableLiveData<BillApiResponse> = MutableLiveData()

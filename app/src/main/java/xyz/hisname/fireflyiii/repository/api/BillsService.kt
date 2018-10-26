@@ -30,4 +30,15 @@ interface BillsService {
     @DELETE("$BILL_API_ENDPONT/{id}")
     fun deleteBillById(@Path("id") id: String): Call<BillsModel>
 
+    @FormUrlEncoded
+    @PUT("$BILL_API_ENDPONT/{id}")
+    fun updateBill(@Path("id") id: String, @Field("name") name: String, @Field("match") match: String,
+                   @Field("amount_min") amountMin: String, @Field("amount_max") amountMax: String,
+                   @Field("date") date: String, @Field("repeat_freq") repeatFreq: String,
+                   @Field("skip") skip: String, @Field("automatch") automatch: String,
+                   @Field("active") active: String, @Field("currency_code") currencyCode: String,
+                   @Field("notes") notes: String?
+    ): Call<BillSucessModel>
+
+
 }

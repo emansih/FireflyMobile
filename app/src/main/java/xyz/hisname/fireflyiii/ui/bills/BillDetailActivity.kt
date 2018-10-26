@@ -13,12 +13,14 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_bill_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -31,6 +33,8 @@ class BillDetailActivity: BaseActivity(){
     private var billList: MutableList<BillDetailData> = ArrayList()
     private val billVM by lazy { getViewModel(BillsViewModel::class.java) }
     private val billResponse by lazy { billVM.getBillById(intent.getLongExtra("billId", 0), baseUrl, accessToken) }
+    private var billAttribute: BillAttributes? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bill_detail)
@@ -46,7 +50,7 @@ class BillDetailActivity: BaseActivity(){
     private fun showData(){
         billResponse.databaseData?.observe(this, Observer {
             if(it.size == 1) {
-                val billAttribute = it[0].billAttributes
+                billAttribute = it[0].billAttributes
                 billName.text = billAttribute?.name
                 val billDataArray = arrayListOf(
                         BillDetailData("Updated At", billAttribute?.updated_at,
@@ -73,14 +77,14 @@ class BillDetailActivity: BaseActivity(){
                             BillDetailData("Pay Dates", "No dates found",
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         } else {
-                            BillDetailData("Pay Dates", billAttribute.pay_dates.toString(),
+                            BillDetailData("Pay Dates", billAttribute?.pay_dates.toString(),
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         },
-                        if (billAttribute.paid_dates.isEmpty()) {
+                        if (billAttribute?.paid_dates!!.isEmpty()) {
                             BillDetailData("Paid Dates", "No dates found",
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         } else {
-                            BillDetailData("Paid Dates", billAttribute.pay_dates.toString(),
+                            BillDetailData("Paid Dates", billAttribute?.pay_dates.toString(),
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         }
                 )
@@ -98,9 +102,10 @@ class BillDetailActivity: BaseActivity(){
 
     private fun editBill(){
         editBillFab.setOnClickListener {
-            // TODO: Add update logic here
+            val data = Gson()
             val billDetail = Intent(this, AddBillActivity::class.java).apply {
-                putExtras(bundleOf("billId" to intent.getLongExtra("billId", 0)))
+                putExtras(bundleOf("billId" to intent.getLongExtra("billId", 0),
+                        "status" to "UPDATE", "billData" to data.toJson(billAttribute)))
             }
             startActivity(billDetail)
         }
