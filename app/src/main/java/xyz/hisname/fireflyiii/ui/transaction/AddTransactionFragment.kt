@@ -8,6 +8,7 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
@@ -33,6 +34,8 @@ class AddTransactionFragment: BaseFragment() {
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
     private val accountDatabase by lazy { AppDatabase.getInstance(requireActivity())?.accountDataDao() }
     private var accounts = ArrayList<String>()
+    private var sourceAccounts = ArrayList<String>()
+    private var destinationAccounts = ArrayList<String>()
     private val piggyBankDatabase by lazy { AppDatabase.getInstance(requireActivity())?.piggyDataDao() }
     private var piggyBank = ArrayList<String>()
     private val billDatabase by lazy { AppDatabase.getInstance(requireActivity())?.billDataDao() }
@@ -46,38 +49,76 @@ class AddTransactionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        accountDatabase?.getAssetAccount()?.observe(this, Observer {
-            if (it.isNotEmpty()) {
-                it.forEachIndexed { _, accountData ->
-                    accounts.add(accountData.accountAttributes?.name!!)
+        if(Objects.equals(transactionType, "transfers")){
+            zipLiveData(accountDatabase?.getAssetAccount()!!, piggyBankDatabase?.getPiggy()!!)
+                    .observe(this, Observer {
+                        it.first.forEachIndexed { _, accountData ->
+                            accounts.add(accountData.accountAttributes?.name!!)
+                        }
+                        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
+                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        sourceSpinner.isVisible = true
+                        sourceAutoComplete.isGone = true
+                        sourceSpinner.adapter = spinnerAdapter
+                        destinationAutoComplete.isGone = true
+                        destinationSpinner.isVisible = true
+                        destinationSpinner.adapter = spinnerAdapter
+                        it.second.forEachIndexed { _,piggyData ->
+                            piggyBank.add(piggyData.piggyAttributes?.name!!)
+                        }
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, piggyBank)
+                        piggyBankName.threshold = 1
+                        piggyBankName.setAdapter(adapter)
+                    })
+        } else if(Objects.equals(transactionType, "income")){
+            zipLiveData(accountDatabase?.getRevenueAccount()!!, accountDatabase?.getAssetAccount()!!)
+                    .observe(this , Observer {
+                        it.first.forEachIndexed { _, accountData ->
+                            sourceAccounts.add(accountData.accountAttributes?.name!!)
+                        }
+                        it.second.forEachIndexed { _, accountData ->
+                            destinationAccounts.add(accountData.accountAttributes?.name!!)
+                        }
+                        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, destinationAccounts)
+                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        destinationSpinner.adapter = spinnerAdapter
+                        destinationAutoComplete.isVisible = false
+                        val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, sourceAccounts)
+                        sourceAutoComplete.threshold = 1
+                        sourceAutoComplete.setAdapter(autocompleteAdapter)
+                        sourceSpinner.isVisible = false
+                    })
+        } else {
+            zipLiveData(accountDatabase?.getAssetAccount()!!, accountDatabase?.getAllAccounts()!!)
+                    .observe(this, Observer {
+                        // Spinner for source account
+                        it.first.forEachIndexed { _, accountData ->
+                            sourceAccounts.add(accountData.accountAttributes?.name!!)
+                        }
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sourceAccounts)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        sourceAutoComplete.isVisible = false
+                        sourceSpinner.adapter = adapter
+                        // This is used for auto complete for destination account
+                        it.second.forEachIndexed { _, accountData ->
+                            destinationAccounts.add(accountData.accountAttributes?.name!!)
+                        }
+                        val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, destinationAccounts)
+                        destinationAutoComplete.threshold = 1
+                        destinationAutoComplete.setAdapter(autocompleteAdapter)
+                        destinationSpinner.isVisible = false
+                    })
+            billDatabase?.getAllBill()?.observe(this, Observer {
+                if(it.isNotEmpty()){
+                    it.forEachIndexed { _,billData ->
+                        bill.add(billData.billAttributes?.name!!)
+                    }
+                    val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
+                    billEditText.threshold = 1
+                    billEditText.setAdapter(adapter)
                 }
-                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, accounts)
-                sourceAutoComplete.threshold = 1
-                sourceAutoComplete.setAdapter(adapter)
-                destinationAutoComplete.threshold = 1
-                destinationAutoComplete.setAdapter(adapter)
-            }
-        })
-        piggyBankDatabase?.getPiggy()?.observe(this, Observer {
-            if(it.isNotEmpty()){
-               it.forEachIndexed { _,piggyData ->
-                   piggyBank.add(piggyData.piggyAttributes?.name!!)
-               }
-                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, piggyBank)
-                piggyBankName.threshold = 1
-                piggyBankName.setAdapter(adapter)
-            }
-        })
-        billDatabase?.getAllBill()?.observe(this, Observer {
-            if(it.isNotEmpty()){
-                it.forEachIndexed { _,billData ->
-                    bill.add(billData.billAttributes?.name!!)
-                }
-                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
-                billEditText.threshold = 1
-                billEditText.setAdapter(adapter)
-            }
-        })
+            })
+        }
         setupWidgets()
     }
 
@@ -98,7 +139,7 @@ class AddTransactionFragment: BaseFragment() {
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
-        if(Objects.equals(transactionType, "expenses")){
+        if(Objects.equals(transactionType, "expense")){
             billEditText.isVisible = true
         } else if(Objects.equals(transactionType, "transfers")){
             piggyBankName.isVisible = true
@@ -159,11 +200,23 @@ class AddTransactionFragment: BaseFragment() {
             } else {
                 piggyBankName.getString()
             }
+            var sourceAccount = ""
+            var destinationAccount = ""
+            if(Objects.equals("expense", transactionType)){
+                sourceAccount = sourceSpinner.selectedItem.toString()
+                destinationAccount = destinationAutoComplete.getString()
+            } else if(Objects.equals("transfers", transactionType)){
+                sourceAccount = sourceSpinner.selectedItem.toString()
+                destinationAccount = destinationSpinner.selectedItem.toString()
+            } else if(Objects.equals("income", transactionType)){
+                sourceAccount = sourceAutoComplete.getString()
+                destinationAccount = destinationSpinner.selectedItem.toString()
+            }
             ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
                 model.addTransaction(baseUrl, accessToken, convertString(true),
                         descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
-                        billName, transactionAmountEditText.getString(), sourceAutoComplete.getString(),
-                        destinationAutoComplete.getString(),
+                        billName, transactionAmountEditText.getString(), sourceAccount,
+                        destinationAccount,
                         currencyEditText.getString()).observe(this, Observer { transactionResponse ->
                     if (transactionResponse.getSuccess() != null) {
                         toastSuccess("Transaction Added")
@@ -184,7 +237,7 @@ class AddTransactionFragment: BaseFragment() {
                             gson.errors.piggy_bank_name != null -> piggyBankName.error = "Invalid Piggy Bank Name"
                             gson.errors.transactions_destination_name != null -> destinationAutoComplete.error = "Invalid Destination Account"
                             gson.errors.transactions_source_name != null -> sourceAutoComplete.error = "Invalid Source Account"
-
+                            gson.errors.transaction_destination_id != null -> toastError(gson.errors.transaction_destination_id[0])
                             else -> toastError("Error occurred while saving transaction", Toast.LENGTH_LONG)
                         }
                     } else if(transactionResponse.getError() != null){
@@ -196,8 +249,8 @@ class AddTransactionFragment: BaseFragment() {
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
-                                        "sourceName" to sourceAutoComplete.getString(),
-                                        "destinationName" to descriptionEditText.getString(),
+                                        "sourceName" to sourceAccount,
+                                        "destinationName" to destinationAccount,
                                         "piggyBankName" to piggyBank
                                 )
                                 transferBroadcast.putExtras(extras)
@@ -210,7 +263,7 @@ class AddTransactionFragment: BaseFragment() {
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
-                                        "destinationName" to descriptionEditText.getString()
+                                        "destinationName" to destinationAccount
                                 )
                                 transferBroadcast.putExtras(extras)
                                 requireActivity().sendBroadcast(transferBroadcast)
@@ -222,7 +275,7 @@ class AddTransactionFragment: BaseFragment() {
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
-                                        "sourceName" to sourceAutoComplete.getString(),
+                                        "sourceName" to sourceAccount,
                                         "billName" to billName
                                 )
                                 withdrawalBroadcast.putExtras(extras)
@@ -241,7 +294,6 @@ class AddTransactionFragment: BaseFragment() {
                 "access_token" to accessToken, "transactionType" to transactionType)
         requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, TransactionFragment().apply { arguments = bundle })
-                .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
                 .commit()
         super.onDestroyView()
     }
