@@ -51,8 +51,8 @@ class ListPiggyFragment: BaseFragment() {
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
         viewModel.apiResponse.observe(this, Observer {
-            if(it.getErrorMessage() != null){
-                toastError(it.getErrorMessage().toString())
+            if(it.getError() != null){
+                toastError(it.getError()?.message)
             }
         })
 
