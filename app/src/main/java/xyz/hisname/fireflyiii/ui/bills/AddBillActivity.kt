@@ -20,11 +20,12 @@ import xyz.hisname.fireflyiii.repository.models.bills.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
+import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddBillActivity: BaseActivity() {
+class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
 
     private val model: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private var billAttribute: BillAttributes? = null
@@ -34,8 +35,10 @@ class AddBillActivity: BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_bill)
-        billAttribute = Gson().fromJson(intent.getSerializableExtra("billData").toString(),
-                BillAttributes::class.java)
+        if(intent.getStringExtra("status") != null) {
+            billAttribute = Gson().fromJson(intent.getSerializableExtra("billData").toString(),
+                    BillAttributes::class.java)
+        }
         setupWidgets()
     }
 
@@ -76,6 +79,14 @@ class AddBillActivity: BaseActivity() {
             skip_edittext.setText(billAttribute?.skip.toString())
             currency_code_edittext.setText(billAttribute?.currency_code)
             note_edittext.setText(billAttribute?.markdown)
+        }
+        currency_code_edittext.setOnClickListener{
+            val currencyListFragment = CurrencyListFragment().apply {
+                bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
+            }
+            currencyListFragment.show(supportFragmentManager, "currencyList" )
+            currencyListFragment.setCurrencyListener(this)
+
         }
     }
 
@@ -241,5 +252,9 @@ class AddBillActivity: BaseActivity() {
 
     override fun onBackPressed() {
         checkEmptiness()
+    }
+
+    override fun onCurrencyClickListener(currency: String) {
+        currency_code_edittext.setText(currency)
     }
 }

@@ -22,13 +22,14 @@ import xyz.hisname.fireflyiii.repository.models.transaction.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AddTransactionFragment: BaseFragment() {
+class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteListener {
 
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
@@ -147,6 +148,14 @@ class AddTransactionFragment: BaseFragment() {
         descriptionEditText.isFocusable = true
         descriptionEditText.isFocusableInTouchMode = true
         descriptionEditText.requestFocus()
+        currencyEditText.setOnClickListener{
+            val currencyListFragment = CurrencyListFragment().apply {
+                bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
+            }
+            currencyListFragment.show(requireFragmentManager(), "currencyList" )
+            currencyListFragment.setCurrencyListener(this)
+
+        }
     }
 
     // well...:(
@@ -297,6 +306,10 @@ class AddTransactionFragment: BaseFragment() {
                 .replace(R.id.fragment_container, TransactionFragment().apply { arguments = bundle })
                 .commit()
         super.onDestroyView()
+    }
+
+    override fun onCurrencyClickListener(currency: String) {
+        currencyEditText.setText(currency)
     }
 
 }

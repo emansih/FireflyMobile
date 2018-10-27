@@ -20,10 +20,9 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.consume
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 import java.util.*
 
-class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener {
+class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener{
 
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
     private var dataAdapter = ArrayList<TransactionData>()

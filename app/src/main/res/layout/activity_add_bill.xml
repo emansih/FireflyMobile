@@ -148,6 +148,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="8dp"
                 android:hint="Currency Code"
+                android:focusable="false"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/skip_edittext"
                 app:layout_constraintEnd_toEndOf="parent"/>

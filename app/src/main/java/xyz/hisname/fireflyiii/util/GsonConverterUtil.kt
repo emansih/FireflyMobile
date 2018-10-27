@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.Relationships
+import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import java.math.BigDecimal
 
@@ -49,6 +50,17 @@ object GsonConverterUtil{
         return Gson().fromJson(value,type)
     }
 
+    @TypeConverter
+    @JvmStatic
+    fun toCurrencyAttributes(currencyAttributes: CurrencyAttributes): String {
+        return Gson().toJson(currencyAttributes)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromCurrencyAttributes(attributes: String): CurrencyAttributes {
+        return Gson().fromJson(attributes, CurrencyAttributes::class.java)
+    }
 
     @TypeConverter
     @JvmStatic
@@ -67,7 +79,6 @@ object GsonConverterUtil{
     fun toBillAttributes(billAttributes: BillAttributes): String {
         return Gson().toJson(billAttributes)
     }
-
 
     @TypeConverter
     @JvmStatic

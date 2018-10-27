@@ -23,7 +23,7 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddPiggyActivity: BaseActivity() {
+class AddPiggyActivity: BaseActivity(){
 
     private val model by lazy { getViewModel(PiggyBankViewModel::class.java) }
     private val accountDatabase by lazy { AppDatabase.getInstance(this)?.accountDataDao() }
