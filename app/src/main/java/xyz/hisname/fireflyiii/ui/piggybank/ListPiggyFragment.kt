@@ -137,8 +137,6 @@ class ListPiggyFragment: BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
-        RetrofitBuilder.destroyInstance()
-        AppDatabase.destroyInstance()
         fab.isGone = true
     }
 }

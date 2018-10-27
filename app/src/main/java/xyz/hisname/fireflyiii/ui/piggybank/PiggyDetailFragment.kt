@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -19,7 +20,6 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
-import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
@@ -27,6 +27,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PiggyDetailFragment: BaseDetailFragment() {
 
@@ -47,12 +48,12 @@ class PiggyDetailFragment: BaseDetailFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val piggyBank = piggyBankViewModel.getPiggyBankById(piggyId, baseUrl, accessToken)
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        piggyList.clear()
         piggyBank.databaseData?.observe(this, Observer {
-            println("size: " + it.size)
-            println("it: $it")
             if(it.size == 1) {
                 piggyAttribute = it[0].piggyAttributes
-                val piggyDataArray = arrayListOf(
+                val piggy = arrayListOf(
                         BaseDetailModel("Created At", piggyAttribute?.created_at,
                                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_create).sizeDp(24)),
                         BaseDetailModel("Updated At", piggyAttribute?.updated_at,
@@ -82,17 +83,14 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 currentAmount = piggyAttribute?.current_amount
                 percentage = piggyAttribute!!.percentage
                 currencyCode = piggyAttribute!!.currency_code
-                runLayoutAnimation(recycler_view)
-                piggyList.addAll(piggyDataArray)
+                piggyList.addAll(piggy)
             }
             setupProgressBar(percentage)
             setupWidgets()
-            recycler_view.adapter?.notifyDataSetChanged()
         })
         recycler_view.adapter = BaseDetailRecyclerAdapter(piggyList)
         piggyBank.apiResponse.observe(this, Observer {
             if(it.getError() != null){
-                println("it: " + it.getError())
                 toastError(it.getError()?.message)
             }
         })
@@ -119,6 +117,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
                     piggyBankViewModel.deletePiggyBank(baseUrl,accessToken, piggyId.toString()).observe(this, Observer {
+                        ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                         if(it.getError() == null){
                             toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
                             requireFragmentManager().popBackStack()
@@ -162,8 +161,8 @@ class PiggyDetailFragment: BaseDetailFragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun onDestroy() {
+        super.onDestroy()
+        piggyList.clear()
     }
 }

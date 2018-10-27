@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import kotlinx.coroutines.experimental.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.PiggybankService
@@ -17,9 +18,10 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val piggyDataBase by lazy { AppDatabase.getInstance(application)?.piggyDataDao() }
     private var piggyBankService: PiggybankService? = null
+    private val apiLiveData: MutableLiveData<PiggyApiResponse> = MutableLiveData()
+
 
     fun getPiggyBank(baseUrl: String?, accessToken: String?): PiggyResponse{
-        val apiLiveData: MutableLiveData<PiggyApiResponse> = MutableLiveData()
         val apiResponse: MediatorLiveData<PiggyApiResponse> =  MediatorLiveData()
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.getPiggyBanks()?.enqueue(retrofitCallback({ response ->
@@ -44,7 +46,6 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun deletePiggyBank(baseUrl: String?, accessToken: String?,id: String): LiveData<PiggyApiResponse>{
-        val apiLiveData: MutableLiveData<PiggyApiResponse> = MutableLiveData()
         val apiResponse: MediatorLiveData<PiggyApiResponse> =  MediatorLiveData()
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.deletePiggyBankById(id)?.enqueue(retrofitCallback({ response ->
@@ -70,7 +71,6 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
                      currentAmount: String?, notes: String?, startDate: String?, targetAmount: String,
                      targetDate: String?): LiveData<PiggyApiResponse>{
         val apiResponse: MediatorLiveData<PiggyApiResponse> =  MediatorLiveData()
-        val piggy: MutableLiveData<PiggyApiResponse> = MutableLiveData()
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.createNewPiggyBank(piggyName, accountId, targetAmount, currentAmount, startDate,
                 targetDate, notes)?.enqueue(retrofitCallback({ response ->
@@ -79,22 +79,21 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
                 errorBody = String(response.errorBody()?.bytes()!!)
             }
             if(response.isSuccessful){
-                piggy.postValue(PiggyApiResponse(response.body()))
+                apiLiveData.postValue(PiggyApiResponse(response.body()))
             } else {
-                piggy.postValue(PiggyApiResponse(errorBody))
+                apiLiveData.postValue(PiggyApiResponse(errorBody))
             }
         })
         { throwable ->
             apiResponse.postValue(PiggyApiResponse(throwable))
         })
-        apiResponse.addSource(piggy){ apiResponse.value = it }
+        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         return apiResponse
 
     }
 
     fun getPiggyBankById(id: Long, baseUrl: String, accessToken: String): PiggyResponse{
         val apiResponse = MediatorLiveData<PiggyApiResponse>()
-        val piggyResponse: MutableLiveData<PiggyApiResponse> = MutableLiveData()
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.getPiggyBankById(id.toString())?.enqueue(retrofitCallback({ response ->
             if (!response.isSuccessful) {
@@ -102,15 +101,14 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
                 if (response.errorBody() != null) {
                     errorBody = String(response.errorBody()?.bytes()!!)
                 }
-                piggyResponse.postValue(PiggyApiResponse(errorBody))
+                apiLiveData.postValue(PiggyApiResponse(errorBody))
             }
         })
-        { throwable ->  piggyResponse.postValue(PiggyApiResponse(throwable))})
-        apiResponse.addSource(piggyResponse) {
+        { throwable ->  apiLiveData.postValue(PiggyApiResponse(throwable))})
+        apiResponse.addSource(apiLiveData) {
             apiResponse.value = it
         }
         return PiggyResponse(piggyDataBase?.getPiggyById(id), apiResponse)
-
     }
 }
 
