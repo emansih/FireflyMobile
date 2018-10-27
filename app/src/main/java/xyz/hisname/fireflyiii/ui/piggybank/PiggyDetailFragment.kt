@@ -6,41 +6,38 @@ import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
 import android.view.animation.AccelerateInterpolator
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
-import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.extension.consume
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastSuccess
+import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
+import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
 import java.util.*
 
 class PiggyDetailFragment: BaseDetailFragment() {
 
-    private val currentAmount: BigDecimal by lazy { arguments?.getSerializable("currentAmount") as BigDecimal }
-    private val percentage: Double by lazy { arguments?.getDouble("percentage") as Double  }
-    private val notes: String by lazy { arguments?.getString("notes") ?: "" }
-    private val dateStarted: String by lazy { arguments?.getString("startDate") ?: "" }
-    private val piggyId: Long by lazy { arguments?.getLong("piggyId") as Long  }
-    private val currencyCode: String by lazy { arguments?.getString("currencyCode") as String }
-    private val targetAmount: BigDecimal by lazy { arguments?.getSerializable("targetAmount") as BigDecimal }
-    private val name: String by lazy { arguments?.getString("name") as String }
-    private val targetDate: String by lazy { arguments?.getString("targetDate")  ?: "" }
-    private val minPerMonth: BigDecimal by lazy{ arguments?.getSerializable("savePerMonth") as BigDecimal }
     private val piggyBankViewModel by lazy { getViewModel(PiggyBankViewModel::class.java)}
-
+    private val piggyId: Long by lazy { arguments?.getLong("piggyId") as Long  }
+    private var piggyAttribute: PiggyAttributes? = null
+    private var currentAmount: BigDecimal? = 0.toBigDecimal()
+    private var percentage: Int = 0
+    private lateinit var currencyCode: String
+    private var piggyList: MutableList<BaseDetailModel> = ArrayList()
+    private var piggyName: String? = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -49,82 +46,102 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupProgressBar(percentage.toInt())
-        setupWidgets()
-        deletePiggy()
-    }
-
-    private fun setupWidgets(){
-        val deleteButton = requireActivity().findViewById<Button>(R.id.deletePiggyButton)
-        deleteButton.setText(R.string.delete_piggy)
-        piggyBankName.text = name
-        if(percentage <= 15.toDouble()){
-            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
-                    R.color.md_red_700), PorterDuff.Mode.SRC_IN)
-        } else if(percentage <= 50.toDouble()){
-            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
-                    R.color.md_green_500), PorterDuff.Mode.SRC_IN)
-        }
-        amountPercentage.text = percentage.toString() + "%"
-        if(!targetDate.isBlank()){
-            if(DateTimeUtil.getDaysDifference(targetDate).toInt() <= 3){
-                piggyBankTargetDate.text = resources.getString(R.string.target_date, targetDate)
-                piggyBankTargetDate.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+        val piggyBank = piggyBankViewModel.getPiggyBankById(piggyId, baseUrl, accessToken)
+        piggyBank.databaseData?.observe(this, Observer {
+            println("size: " + it.size)
+            println("it: $it")
+            if(it.size == 1) {
+                piggyAttribute = it[0].piggyAttributes
+                val piggyDataArray = arrayListOf(
+                        BaseDetailModel("Created At", piggyAttribute?.created_at,
+                                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_create).sizeDp(24)),
+                        BaseDetailModel("Updated At", piggyAttribute?.updated_at,
+                                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update).sizeDp(24)),
+                        BaseDetailModel("Left To Save", piggyAttribute?.left_to_save.toString(),
+                                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_save).sizeDp(24)),
+                        BaseDetailModel("Save Per Month", piggyAttribute?.save_per_month.toString(),
+                                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_save).sizeDp(24)),
+                        if (piggyAttribute?.start_date != null) {
+                            BaseDetailModel("Start Date", piggyAttribute?.start_date,
+                                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
+                        } else {
+                            BaseDetailModel("Start Date", "No Date Set",
+                                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
+                        },
+                        if (piggyAttribute?.target_date != null) {
+                            BaseDetailModel("Target Date", piggyAttribute?.target_date,
+                                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
+                        } else {
+                            BaseDetailModel("Target Date", "No Date Set",
+                                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
+                        },
+                        BaseDetailModel("Notes", piggyAttribute?.notes,
+                                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_note).sizeDp(24))
+                )
+                piggyName = piggyAttribute?.name
+                currentAmount = piggyAttribute?.current_amount
+                percentage = piggyAttribute!!.percentage
+                currencyCode = piggyAttribute!!.currency_code
+                runLayoutAnimation(recycler_view)
+                piggyList.addAll(piggyDataArray)
             }
-            if(Objects.equals(targetAmount, currentAmount)){
-                piggyBankTargetDate.text = ""
-            }
-        } else {
-            piggyBankTargetDate.text = resources.getString(R.string.no_target_date)
-        }
-        amount.text = resources.getString(R.string.amount, currentAmount.toString(), targetAmount.toString())
-        currencyCodeTextView.text = currencyCode
-        if(Objects.equals(targetAmount, currentAmount)){
-            toastSuccess(resources.getString(R.string.user_did_it), Toast.LENGTH_LONG)
-        }
-        min_per_month.text = resources.getString(R.string.min_amount_save_per_month,
-                currencyCode, minPerMonth.toString())
-    }
-
-    override fun deleteItem() {
-        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-        piggyBankViewModel.deletePiggyBank(baseUrl,accessToken, piggyId.toString()).observe(this, Observer {
-            if(it.getError() == null){
-                toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
-                requireFragmentManager().popBackStack()
-            } else {
-                Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
-                        R.string.generic_delete_error, Snackbar.LENGTH_LONG)
-                        .setAction("Retry") {
-                            deleteItem()
-                        }
-                        .show()
-
+            setupProgressBar(percentage)
+            setupWidgets()
+            recycler_view.adapter?.notifyDataSetChanged()
+        })
+        recycler_view.adapter = BaseDetailRecyclerAdapter(piggyList)
+        piggyBank.apiResponse.observe(this, Observer {
+            if(it.getError() != null){
+                println("it: " + it.getError())
+                toastError(it.getError()?.message)
             }
         })
     }
 
-
-    private fun deletePiggy(){
-        deletePiggyButton.setOnClickListener{
-            AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.get_confirmation)
-                    .setMessage(R.string.irreversible_action)
-                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                        deleteItem()
-                    }
-                    .setNegativeButton(android.R.string.no){dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-
+    private fun setupWidgets(){
+        if(percentage <= 15){
+            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
+                    R.color.md_red_700), PorterDuff.Mode.SRC_IN)
+        } else if(percentage <= 50){
+            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
+                    R.color.md_green_500), PorterDuff.Mode.SRC_IN)
         }
-
+        amount.text = currentAmount.toString()
+        amountPercentage.text = percentage.toString() + "%"
+        currencyCodeTextView.text = currencyCode
+        piggyBankName.text = piggyName
     }
 
+    override fun deleteItem() {
+        AlertDialog.Builder(requireContext())
+                .setTitle(R.string.get_confirmation)
+                .setMessage(R.string.irreversible_action)
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+                    piggyBankViewModel.deletePiggyBank(baseUrl,accessToken, piggyId.toString()).observe(this, Observer {
+                        if(it.getError() == null){
+                            toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
+                            requireFragmentManager().popBackStack()
+                        } else {
+                            Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
+                                    R.string.generic_delete_error, Snackbar.LENGTH_LONG)
+                                    .setAction("Retry") { _ ->
+                                        deleteItem()
+                                    }
+                                    .show()
+
+                        }
+                    })
+                }
+                .setNegativeButton(android.R.string.no){dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+    }
+
+
     private fun setupProgressBar(percentage: Int){
-        ObjectAnimator.ofInt(piggyBankProgressBar, "progress",
-                0, percentage).apply {
+        ObjectAnimator.ofInt(piggyBankProgressBar, "progress", 0, percentage).apply {
             // 1000ms = 1s
             duration = 1000
             interpolator = AccelerateInterpolator()
@@ -133,15 +150,20 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId){
         R.id.menu_item_edit -> consume {
-            val bundle = bundleOf("piggyId" to piggyId, "piggyName" to name, "targetAmount" to targetAmount,
-                    "currentAmount" to currentAmount, "startDate" to dateStarted,"targetDate" to targetDate,
-                    "notes" to notes)
+            val bundle = bundleOf("piggyId" to piggyId)
             val addPiggy = Intent(requireContext(), AddPiggyActivity::class.java).apply{
                 putExtras(bundle)
             }
             startActivity(addPiggy)
         }
+        R.id.menu_item_delete -> consume {
+            deleteItem()
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+    }
 }

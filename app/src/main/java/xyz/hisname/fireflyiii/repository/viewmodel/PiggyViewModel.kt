@@ -49,6 +49,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.deletePiggyBankById(id)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
+                apiResponse.postValue(PiggyApiResponse(response.body()))
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
                     piggyDataBase?.deletePiggyById(id.toLong())
                 })
@@ -91,6 +92,26 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
 
     }
 
+    fun getPiggyBankById(id: Long, baseUrl: String, accessToken: String): PiggyResponse{
+        val apiResponse = MediatorLiveData<PiggyApiResponse>()
+        val piggyResponse: MutableLiveData<PiggyApiResponse> = MutableLiveData()
+        piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
+        piggyBankService?.getPiggyBankById(id.toString())?.enqueue(retrofitCallback({ response ->
+            if (!response.isSuccessful) {
+                var errorBody = ""
+                if (response.errorBody() != null) {
+                    errorBody = String(response.errorBody()?.bytes()!!)
+                }
+                piggyResponse.postValue(PiggyApiResponse(errorBody))
+            }
+        })
+        { throwable ->  piggyResponse.postValue(PiggyApiResponse(throwable))})
+        apiResponse.addSource(piggyResponse) {
+            apiResponse.value = it
+        }
+        return PiggyResponse(piggyDataBase?.getPiggyById(id), apiResponse)
+
+    }
 }
 
 data class PiggyResponse(val databaseData: LiveData<MutableList<PiggyData>>?, val apiResponse: MediatorLiveData<PiggyApiResponse>)

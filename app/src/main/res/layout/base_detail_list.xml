@@ -7,30 +7,30 @@
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/billImage"
+        android:id="@+id/detailImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/billTitle"
-        app:layout_constraintBottom_toBottomOf="@+id/billSubtext"/>
+        app:layout_constraintTop_toTopOf="@+id/detailTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/detailSubtext"/>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/billTitle"
+        android:id="@+id/detailTitle"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="36dp"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/billImage" />
+        app:layout_constraintStart_toEndOf="@+id/detailImage" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/billSubtext"
+        android:id="@+id/detailSubtext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/TextAppearance.MaterialComponents.Subtitle1"
-        app:layout_constraintTop_toBottomOf="@id/billTitle"
-        app:layout_constraintStart_toStartOf="@id/billTitle" />
+        app:layout_constraintTop_toBottomOf="@id/detailTitle"
+        app:layout_constraintStart_toStartOf="@id/detailTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

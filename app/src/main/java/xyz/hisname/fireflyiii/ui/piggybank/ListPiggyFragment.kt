@@ -73,12 +73,7 @@ class ListPiggyFragment: BaseFragment() {
 
     private fun itemClicked(piggyData: PiggyData){
         val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-                "percentage" to piggyData.piggyAttributes?.percentage, "currentAmount" to piggyData.piggyAttributes?.current_amount,
-                "piggyId" to piggyData.piggyId, "currencyCode" to piggyData.piggyAttributes?.currency_code,
-                "targetAmount" to piggyData.piggyAttributes?.target_amount,
-                "name" to piggyData.piggyAttributes?.name, "targetDate" to piggyData.piggyAttributes?.target_date,
-                "savePerMonth" to piggyData.piggyAttributes?.save_per_month, "notes" to piggyData.piggyAttributes?.notes,
-                "startDate" to piggyData.piggyAttributes?.start_date)
+                "piggyId" to piggyData.piggyId)
         requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
                 .addToBackStack(null)

@@ -41,18 +41,18 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
             }
             itemView.goal_save.text = piggyBankData?.currency_symbol + " " + piggyBankData?.target_amount
             itemView.currently_saved.text = piggyBankData?.currency_symbol + " " + piggyBankData?.current_amount.toString()
-            if(piggyBankData!!.percentage <= 15.toDouble()){
+            if(piggyBankData!!.percentage <= 15){
                 itemView.goal_progress_bar.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_red_700),
                         PorterDuff.Mode.SRC_IN)
-            } else if(piggyBankData.percentage <= 50.toDouble()){
+            } else if(piggyBankData.percentage <= 50){
                 itemView.goal_progress_bar.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_green_500),
                         PorterDuff.Mode.SRC_IN)
             }
-            itemView.goal_progress_bar.progress = piggyBankData.percentage.toInt()
+            itemView.goal_progress_bar.progress = piggyBankData.percentage
             val targetDate = piggyBankData.target_date
             itemView.timeLeft.let {
                 if(targetDate != null){
-                    if(piggyBankData.percentage.toInt() != 100){
+                    if(piggyBankData.percentage != 100){
                         val daysDiff = DateTimeUtil.getDaysDifference(targetDate).toInt()
                         when{
                             daysDiff == 0 -> it.text = context.getString(R.string.due_today)

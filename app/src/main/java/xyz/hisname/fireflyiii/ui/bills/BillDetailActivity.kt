@@ -20,17 +20,19 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_bill_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
+import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
 
 class BillDetailActivity: BaseActivity(){
 
-    private var billList: MutableList<BillDetailData> = ArrayList()
+    private var billList: MutableList<BaseDetailModel> = ArrayList()
     private val billVM by lazy { getViewModel(BillsViewModel::class.java) }
     private val billResponse by lazy { billVM.getBillById(intent.getLongExtra("billId", 0), baseUrl, accessToken) }
     private var billAttribute: BillAttributes? = null
@@ -53,38 +55,38 @@ class BillDetailActivity: BaseActivity(){
                 billAttribute = it[0].billAttributes
                 billName.text = billAttribute?.name
                 val billDataArray = arrayListOf(
-                        BillDetailData("Updated At", billAttribute?.updated_at,
+                        BaseDetailModel("Updated At", billAttribute?.updated_at,
                                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_update).sizeDp(24)),
-                        BillDetailData("Created At", billAttribute?.created_at,
+                        BaseDetailModel("Created At", billAttribute?.created_at,
                                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_create).sizeDp(24)),
-                        BillDetailData("Currency Code", billAttribute?.currency_code,
+                        BaseDetailModel("Currency Code", billAttribute?.currency_code,
                                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_local_atm).sizeDp(24)),
-                        BillDetailData("Currency ID", billAttribute?.currency_id.toString(),
+                        BaseDetailModel("Currency ID", billAttribute?.currency_id.toString(),
                                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_local_atm).sizeDp(24)),
-                        BillDetailData("Amount Min", billAttribute?.amount_min.toString(),
+                        BaseDetailModel("Amount Min", billAttribute?.amount_min.toString(),
                                 IconicsDrawable(this).icon(FontAwesome.Icon.faw_minus).sizeDp(24)),
-                        BillDetailData("Amount Max", billAttribute?.amount_max.toString(),
+                        BaseDetailModel("Amount Max", billAttribute?.amount_max.toString(),
                                 IconicsDrawable(this).icon(FontAwesome.Icon.faw_plus).sizeDp(24)),
-                        BillDetailData("Date", billAttribute?.date,
+                        BaseDetailModel("Date", billAttribute?.date,
                                 ContextCompat.getDrawable(this, R.drawable.ic_calendar_blank)),
-                        BillDetailData("Repeat Frequency", billAttribute?.repeat_freq,
+                        BaseDetailModel("Repeat Frequency", billAttribute?.repeat_freq,
                                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_repeat).sizeDp(24)),
-                        BillDetailData("Skip", billAttribute?.skip.toString(),
+                        BaseDetailModel("Skip", billAttribute?.skip.toString(),
                                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_skip_next).sizeDp(24)),
-                        BillDetailData("Automatch", billAttribute?.automatch.toString(),
+                        BaseDetailModel("Automatch", billAttribute?.automatch.toString(),
                                 IconicsDrawable(this).icon(FontAwesome.Icon.faw_magic).sizeDp(24)),
                         if (billAttribute?.pay_dates!!.isEmpty()) {
-                            BillDetailData("Pay Dates", "No dates found",
+                            BaseDetailModel("Pay Dates", "No dates found",
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         } else {
-                            BillDetailData("Pay Dates", billAttribute?.pay_dates.toString(),
+                            BaseDetailModel("Pay Dates", billAttribute?.pay_dates.toString(),
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         },
                         if (billAttribute?.paid_dates!!.isEmpty()) {
-                            BillDetailData("Paid Dates", "No dates found",
+                            BaseDetailModel("Paid Dates", "No dates found",
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         } else {
-                            BillDetailData("Paid Dates", billAttribute?.pay_dates.toString(),
+                            BaseDetailModel("Paid Dates", billAttribute?.pay_dates.toString(),
                                     IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                         }
                 )
@@ -92,7 +94,7 @@ class BillDetailActivity: BaseActivity(){
             }
             recycler_view.adapter?.notifyDataSetChanged()
         })
-        recycler_view.adapter = BillDetailRecyclerAdapter(billList)
+        recycler_view.adapter = BaseDetailRecyclerAdapter(billList)
         billResponse.apiResponse.observe(this, Observer {
             if(it.getError() != null){
                 toastError(it.getError()?.message)

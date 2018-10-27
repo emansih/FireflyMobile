@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 
 
@@ -20,5 +21,7 @@ abstract class PiggyDataDao{
     @Query("DELETE FROM piggy WHERE piggyId = :piggyId")
     abstract fun deletePiggyById(piggyId: Long): Int
 
+    @Query("SELECT * FROM piggy WHERE piggyId = :piggyId")
+    abstract fun getPiggyById(piggyId: Long): LiveData<MutableList<PiggyData>>
 
 }

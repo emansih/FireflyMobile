@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.repository.api
 import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.PIGGY_BANK_API_ENDPOINT
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
 import xyz.hisname.fireflyiii.repository.models.piggy.success.PiggySuccessModel
 
@@ -18,7 +19,7 @@ interface PiggybankService {
     fun deletePiggyBankById(@Path("id") id: String): Call<PiggyModel>
 
     @GET("$PIGGY_BANK_API_ENDPOINT/{id}")
-    fun getPiggyBankById(@Path("id") id: String): Call<PiggyModel>
+    fun getPiggyBankById(@Path("id") id: String): Call<PiggyData>
 
     @FormUrlEncoded
     @POST(PIGGY_BANK_API_ENDPOINT)

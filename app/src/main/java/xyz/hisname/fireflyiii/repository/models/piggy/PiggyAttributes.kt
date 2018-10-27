@@ -16,7 +16,7 @@ data class PiggyAttributes(
         val currency_symbol: String,
         val currency_dp: Int,
         val target_amount: BigDecimal,
-        val percentage: Double,
+        val percentage: Int,
         val current_amount: BigDecimal,
         val left_to_save: BigDecimal,
         val save_per_month: BigDecimal,
