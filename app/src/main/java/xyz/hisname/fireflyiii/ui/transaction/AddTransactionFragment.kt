@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_base.*
@@ -19,7 +18,7 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.transaction.ErrorModel
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment

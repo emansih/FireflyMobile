@@ -1,29 +1,48 @@
-package xyz.hisname.fireflyiii.repository.viewmodel.retrofit
+package xyz.hisname.fireflyiii.repository.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.TransactionService
+import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionApiResponse
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.util.retrofitCallback
+import java.util.*
 
-class TransactionViewModel:ViewModel() {
+class TransactionViewModel(application: Application) : AndroidViewModel(application){
+
+    private val transactionDatabase by lazy { AppDatabase.getInstance(application)?.transactionDataDao() }
 
     fun getTransactions(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
-            LiveData<TransactionApiResponse>{
+            BaseResponse<TransactionData, TransactionApiResponse> {
         val apiResponse: MediatorLiveData<TransactionApiResponse> = MediatorLiveData()
         val transaction: MutableLiveData<TransactionApiResponse> = MutableLiveData()
         val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
         transactionService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
+                response.body()?.data?.forEachIndexed { _, element ->
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                        transactionDatabase?.addTransaction(element)
+                    })
+                }
                 transaction.value = TransactionApiResponse(response.body())
             }
         })
         { throwable ->  transaction.value = TransactionApiResponse(throwable)})
         apiResponse.addSource(transaction) { apiResponse.value = it }
-        return apiResponse
+        return if(Objects.equals("all", type)){
+            BaseResponse(transactionDatabase?.getRecentTransactions(5), apiResponse)
+        } else if(start.isNullOrBlank() or end.isNullOrBlank()){
+            BaseResponse(transactionDatabase?.getTransaction(type), apiResponse)
+        } else {
+            BaseResponse(transactionDatabase?.getTransaction(start, end, type), apiResponse)
+        }
     }
 
     fun addTransaction(baseUrl: String?, accessToken: String?, type: String, description: String,

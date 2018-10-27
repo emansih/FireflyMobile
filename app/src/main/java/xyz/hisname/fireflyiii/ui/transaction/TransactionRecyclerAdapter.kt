@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
 import android.content.Context
-import android.graphics.Typeface
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -31,8 +30,8 @@ class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: RtAdapter, position: Int) {
-        val transactionData = items[position].attributes
-        if(transactionData.description.length >= 25){
+        val transactionData = items[position].transactionAttributes
+        if(transactionData?.description!!.length >= 25){
             holder.transactionNameText.text = transactionData.description.substring(0,25) + "..."
         } else {
             holder.transactionNameText.text = transactionData.description

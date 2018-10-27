@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_pat.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.TransactionViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -48,10 +48,10 @@ class PatFragment: Fragment() {
                 }
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 model.getTransactions(fireflyUrl,firefly_secret_edittext.getString(), DateTimeUtil.getTodayDate(),
-                        DateTimeUtil.getTodayDate(), "withdrawal").observe(this, Observer {
+                        DateTimeUtil.getTodayDate(), "withdrawal").apiResponse.observe(this, Observer {
                     apiResponse ->
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    if(apiResponse.getTransaction() != null){
+                    if(apiResponse.getError() == null){
                         sharedPref.edit{
                             putString("fireflyUrl", fireflyUrl)
                             putString("fireflySecretKey", firefly_secret_edittext.getString())

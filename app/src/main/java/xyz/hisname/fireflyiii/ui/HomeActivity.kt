@@ -133,7 +133,7 @@ class HomeActivity: BaseActivity(){
                 .withIdentifier(10)
                 .withSelectable(false)
                 .withSubItems(
-                        SecondaryDrawerItem().withName("Expenses")
+                        SecondaryDrawerItem().withName("Withdrawals")
                                 .withLevel(3)
                                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
                                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_blue_grey_500))
@@ -221,17 +221,17 @@ class HomeActivity: BaseActivity(){
                         }
                         drawerItem.identifier == 11L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "transactionType" to "expense")
+                                    "access_token" to accessToken, "transactionType" to "Withdrawal")
                             changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 12L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "transactionType" to "income")
+                                    "access_token" to accessToken, "transactionType" to "Deposit")
                             changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 13L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "transactionType" to "transfers")
+                                    "access_token" to accessToken, "transactionType" to "Transfer")
                             changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 15L -> {
