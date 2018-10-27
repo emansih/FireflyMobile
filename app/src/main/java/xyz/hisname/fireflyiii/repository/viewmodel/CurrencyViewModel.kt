@@ -12,6 +12,7 @@ import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyApiResponse
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.util.retrofitCallback
@@ -22,7 +23,7 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
     private var  currencyService: CurrencyService? = null
 
 
-    fun getCurrency(baseUrl: String, accessToken: String): CurrencyResponse{
+    fun getCurrency(baseUrl: String, accessToken: String): BaseResponse<CurrencyData, CurrencyApiResponse>{
         val apiResponse = MediatorLiveData<CurrencyApiResponse>()
         val billResponse: MutableLiveData<CurrencyApiResponse> = MutableLiveData()
         currencyService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(CurrencyService::class.java)
@@ -45,8 +46,6 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
         apiResponse.addSource(billResponse) {
             apiResponse.value = it
         }
-        return CurrencyResponse(currencyDatabase?.getAllCurrency(), apiResponse)
+        return BaseResponse(currencyDatabase?.getAllCurrency(), apiResponse)
     }
-
 }
-data class CurrencyResponse(val databaseData: LiveData<MutableList<CurrencyData>>?, val apiResponse: MediatorLiveData<CurrencyApiResponse>)

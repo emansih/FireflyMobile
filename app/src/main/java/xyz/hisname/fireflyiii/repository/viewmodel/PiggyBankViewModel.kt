@@ -10,6 +10,7 @@ import kotlinx.coroutines.experimental.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyApiResponse
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.util.retrofitCallback
@@ -21,7 +22,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
     private val apiLiveData: MutableLiveData<PiggyApiResponse> = MutableLiveData()
 
 
-    fun getPiggyBank(baseUrl: String?, accessToken: String?): PiggyResponse{
+    fun getPiggyBank(baseUrl: String?, accessToken: String?): BaseResponse<PiggyData, PiggyApiResponse>{
         val apiResponse: MediatorLiveData<PiggyApiResponse> =  MediatorLiveData()
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.getPiggyBanks()?.enqueue(retrofitCallback({ response ->
@@ -42,7 +43,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
         { throwable ->  apiLiveData.value = PiggyApiResponse(throwable)})
 
         apiResponse.addSource(apiLiveData) { apiResponse.value = it }
-        return PiggyResponse(piggyDataBase?.getPiggy(), apiResponse)
+        return BaseResponse(piggyDataBase?.getPiggy(), apiResponse)
     }
 
     fun deletePiggyBank(baseUrl: String?, accessToken: String?,id: String): LiveData<PiggyApiResponse>{
@@ -92,7 +93,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
 
     }
 
-    fun getPiggyBankById(id: Long, baseUrl: String, accessToken: String): PiggyResponse{
+    fun getPiggyBankById(id: Long, baseUrl: String, accessToken: String): BaseResponse<PiggyData, PiggyApiResponse>{
         val apiResponse = MediatorLiveData<PiggyApiResponse>()
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.getPiggyBankById(id.toString())?.enqueue(retrofitCallback({ response ->
@@ -108,8 +109,6 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
         apiResponse.addSource(apiLiveData) {
             apiResponse.value = it
         }
-        return PiggyResponse(piggyDataBase?.getPiggyById(id), apiResponse)
+        return BaseResponse(piggyDataBase?.getPiggyById(id), apiResponse)
     }
 }
-
-data class PiggyResponse(val databaseData: LiveData<MutableList<PiggyData>>?, val apiResponse: MediatorLiveData<PiggyApiResponse>)

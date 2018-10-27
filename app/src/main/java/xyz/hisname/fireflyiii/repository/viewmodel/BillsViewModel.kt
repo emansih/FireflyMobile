@@ -10,6 +10,7 @@ import okhttp3.ResponseBody
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.BillsService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.bills.BillApiResponse
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.util.retrofitCallback
@@ -19,7 +20,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
     private val billDatabase by lazy { AppDatabase.getInstance(application)?.billDataDao() }
     private var  billsService: BillsService? = null
 
-    fun getBill(baseUrl: String, accessToken: String): BillResponse{
+    fun getBill(baseUrl: String, accessToken: String): BaseResponse<BillData, BillApiResponse> {
         val apiResponse = MediatorLiveData<BillApiResponse>()
         val billResponse: MutableLiveData<BillApiResponse> = MutableLiveData()
         billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
@@ -42,7 +43,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         apiResponse.addSource(billResponse) {
             apiResponse.value = it
         }
-        return BillResponse(billDatabase?.getAllBill(), apiResponse)
+        return BaseResponse(billDatabase?.getAllBill(), apiResponse)
     }
 
     fun deleteBill(baseUrl: String?, accessToken: String?, id: String): LiveData<BillApiResponse>{
@@ -110,7 +111,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         return apiResponse
     }
 
-    fun getBillById(id: Long, baseUrl: String, accessToken: String): BillResponse{
+    fun getBillById(id: Long, baseUrl: String, accessToken: String): BaseResponse<BillData, BillApiResponse>{
         val apiResponse = MediatorLiveData<BillApiResponse>()
         val billResponse: MutableLiveData<BillApiResponse> = MutableLiveData()
         billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
@@ -127,8 +128,6 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         apiResponse.addSource(billResponse) {
             apiResponse.value = it
         }
-        return BillResponse(billDatabase?.getBillById(id), apiResponse)
+        return BaseResponse(billDatabase?.getBillById(id), apiResponse)
     }
 }
-
-data class BillResponse(val databaseData: LiveData<MutableList<BillData>>?, val apiResponse: MediatorLiveData<BillApiResponse>)

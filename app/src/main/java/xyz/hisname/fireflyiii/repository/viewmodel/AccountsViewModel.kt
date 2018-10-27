@@ -9,6 +9,7 @@ import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.AccountsService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountApiResponse
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.util.retrofitCallback
@@ -19,7 +20,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
     private val accountDatabase by lazy { AppDatabase.getInstance(application)?.accountDataDao() }
     private var  accountsService: AccountsService? = null
 
-    fun getAccounts(baseUrl: String, accessToken: String): AccountResponse{
+    fun getAccounts(baseUrl: String, accessToken: String): BaseResponse<AccountData, AccountApiResponse> {
         val apiResponse = MediatorLiveData<AccountApiResponse>()
         val accountResponse: MutableLiveData<AccountApiResponse> = MutableLiveData()
         accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
@@ -40,7 +41,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         })
         { throwable ->  accountResponse.postValue(AccountApiResponse(throwable))})
         apiResponse.addSource(accountResponse) { apiResponse.value = it }
-        return AccountResponse(accountDatabase?.getAllAccounts(), apiResponse)
+        return BaseResponse(accountDatabase?.getAllAccounts(), apiResponse)
     }
 
     fun getAccountType(baseUrl: String, accessToken: String, type: String): LiveData<AccountApiResponse>{
@@ -61,5 +62,3 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
 
 
 }
-
-data class AccountResponse(val databaseData: LiveData<MutableList<AccountData>>?, val apiResponse: MediatorLiveData<AccountApiResponse>)
