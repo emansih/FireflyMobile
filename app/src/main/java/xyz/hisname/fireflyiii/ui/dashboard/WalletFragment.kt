@@ -79,7 +79,7 @@ class WalletFragment: BaseFragment() {
                     assetsText.text = "0"
                 } else {
                     it.getAccounts()?.data?.forEachIndexed { _, element ->
-                        assets += Math.abs(element.accountAttributes?.current_balance!!.toInt())
+                        assets += element.accountAttributes?.current_balance!!.toInt()
                     }
                     assetsText.text = assets.toString()
                 }
