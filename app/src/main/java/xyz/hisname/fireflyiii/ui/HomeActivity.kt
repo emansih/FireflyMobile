@@ -51,18 +51,18 @@ class HomeActivity: BaseActivity(){
             when (transaction) {
                 "expense" -> {
                     val bundle = bundleOf("fireflyUrl" to baseUrl,
-                            "access_token" to accessToken, "transactionType" to "expenses")
+                            "access_token" to accessToken, "transactionType" to "Withdrawal")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
                 }
                 "income" -> {
                     val bundle = bundleOf("fireflyUrl" to baseUrl,
-                            "access_token" to accessToken, "transactionType" to "income")
+                            "access_token" to accessToken, "transactionType" to "Deposit")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
 
                 }
                 "transfer" -> {
                     val bundle = bundleOf("fireflyUrl" to baseUrl,
-                            "access_token" to accessToken, "transactionType" to "transfers")
+                            "access_token" to accessToken, "transactionType" to "Transfer")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
                 }
             }

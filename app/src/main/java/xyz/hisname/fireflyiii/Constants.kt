@@ -19,6 +19,7 @@ class Constants private constructor() {
         const val ACCOUNTS_API_ENDPOINT = "/api/v1/accounts"
         const val SETTINGS_API_ENDPOINT = "/api/v1/preferences"
         const val RULES_API_ENDPOINT = "/api/v1/rules"
+        const val CATEGORY_API_ENDPOINT = "/api/v1/categories"
         const val DB_NAME = "firefly.db"
     }
 }

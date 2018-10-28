@@ -30,5 +30,6 @@ interface TransactionService {
                        @Field("bill_name") billName: String?, @Field("transactions[0][amount]") amount: String,
                        @Field("transactions[0][source_name]") sourceName: String?,
                        @Field("transactions[0][destination_name]") destionationName: String?,
-                       @Field("transactions[0][currency_code]") currency: String): Call<TransactionSucessModel>
+                       @Field("transactions[0][currency_code]") currency: String,
+                       @Field("transactions[0][category_name]") category: String?): Call<TransactionSucessModel>
 }

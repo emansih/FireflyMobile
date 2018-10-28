@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.Relationships
+import xyz.hisname.fireflyiii.repository.models.category.CategoryAttributes
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import java.math.BigDecimal
@@ -48,6 +49,19 @@ object GsonConverterUtil{
     fun toList(value: String): List<String>{
         val type = object : TypeToken<List<String>>() {}.type
         return Gson().fromJson(value,type)
+    }
+
+
+    @TypeConverter
+    @JvmStatic
+    fun toCategoryAttribute(categoryAttributes: CategoryAttributes): String {
+        return Gson().toJson(categoryAttributes)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromCategoryAttributes(attributes: String): CategoryAttributes {
+        return Gson().fromJson(attributes, CategoryAttributes::class.java)
     }
 
     @TypeConverter

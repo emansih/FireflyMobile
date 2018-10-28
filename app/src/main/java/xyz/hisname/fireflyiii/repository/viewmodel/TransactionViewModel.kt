@@ -49,12 +49,13 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun addTransaction(baseUrl: String?, accessToken: String?, type: String, description: String,
                        date: String, piggyBankName: String?, billName: String?, amount: String,
-                       sourceName: String?, destinationName: String?, currencyName: String): LiveData<ApiResponses<TransactionSucessModel>>{
+                       sourceName: String?, destinationName: String?, currencyName: String,
+                       category: String?): LiveData<ApiResponses<TransactionSucessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSucessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSucessModel>> = MediatorLiveData()
         val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
-        transactionService?.addTransaction(type,description,date,piggyBankName,billName,
-                amount,sourceName,destinationName,currencyName)?.enqueue(retrofitCallback({ response ->
+        transactionService?.addTransaction(convertString(type),description,date,piggyBankName,billName,
+                amount,sourceName,destinationName,currencyName, category)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
             if(errorBody != null){
@@ -70,4 +71,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return apiResponse
     }
+
+    private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
+
 }

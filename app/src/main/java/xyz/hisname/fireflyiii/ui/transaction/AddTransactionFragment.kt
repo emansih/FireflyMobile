@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.transaction.ErrorModel
+import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -32,6 +33,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
 
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val accountDatabase by lazy { AppDatabase.getInstance(requireActivity())?.accountDataDao() }
     private var accounts = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
@@ -49,7 +51,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        if(Objects.equals(transactionType, "transfers")){
+        if(Objects.equals(transactionType, "Transfer")){
             zipLiveData(accountDatabase?.getAssetAccount()!!, piggyBankDatabase?.getPiggy()!!)
                     .observe(this, Observer {
                         it.first.forEachIndexed { _, accountData ->
@@ -70,7 +72,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         piggyBankName.threshold = 1
                         piggyBankName.setAdapter(adapter)
                     })
-        } else if(Objects.equals(transactionType, "income")){
+        } else if(Objects.equals(transactionType, "Deposit")){
             zipLiveData(accountDatabase?.getRevenueAccount()!!, accountDatabase?.getAssetAccount()!!)
                     .observe(this , Observer {
                         it.first.forEachIndexed { _, accountData ->
@@ -139,9 +141,9 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
-        if(Objects.equals(transactionType, "expense")){
+        if(Objects.equals(transactionType, "Withdrawal")){
             billEditText.isVisible = true
-        } else if(Objects.equals(transactionType, "transfers")){
+        } else if(Objects.equals(transactionType, "Transfer")){
             piggyBankName.isVisible = true
         }
         descriptionEditText.isFocusable = true
@@ -155,39 +157,27 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
             currencyListFragment.setCurrencyListener(this)
 
         }
-    }
-
-    // well...:(
-    private fun convertString(pleaseLowerCase: Boolean): String{
-        var convertedString = ""
-        when {
-            Objects.equals(transactionType, "expense") -> convertedString = if(pleaseLowerCase){
-                "withdrawal"
-            } else {
-                "Withdrawal"
+        categoryViewModel.getCategory(baseUrl, accessToken).databaseData?.observe(this, Observer {
+            if(it.isNotEmpty()){
+                val category = ArrayList<String>()
+                it.forEachIndexed { _,element ->
+                    category.add(element.categoryAttributes!!.name)
+                }
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, category)
+                categoryAutoComplete.threshold = 1
+                categoryAutoComplete.setAdapter(adapter)
             }
-            Objects.equals(transactionType, "income") -> convertedString = if(pleaseLowerCase) {
-                "deposit"
-            } else {
-                "Deposit"
-            }
-            Objects.equals(transactionType, "transfers") -> convertedString = if(pleaseLowerCase) {
-                "transfer"
-            } else {
-                "Transfer"
-            }
-        }
-        return convertedString
+        })
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        requireActivity().activity_toolbar.title = "Add " + convertString(false)
+        requireActivity().activity_toolbar.title = "Add $transactionType"
     }
 
     override fun onResume() {
         super.onResume()
-        requireActivity().activity_toolbar?.title = "Add " + convertString(false)
+        requireActivity().activity_toolbar?.title = "Add $transactionType"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -209,28 +199,34 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
             } else {
                 piggyBankName.getString()
             }
+            val categoryName: String? = if(categoryAutoComplete.isBlank()){
+                null
+            } else {
+                categoryAutoComplete.getString()
+            }
             var sourceAccount = ""
             var destinationAccount = ""
-            if(Objects.equals("expense", transactionType)){
+            if(Objects.equals("Withdrawal", transactionType)){
                 sourceAccount = sourceSpinner.selectedItem.toString()
                 destinationAccount = destinationAutoComplete.getString()
-            } else if(Objects.equals("transfers", transactionType)){
+            } else if(Objects.equals("Transfer", transactionType)){
                 sourceAccount = sourceSpinner.selectedItem.toString()
                 destinationAccount = destinationSpinner.selectedItem.toString()
-            } else if(Objects.equals("income", transactionType)){
+            } else if(Objects.equals("Deposit", transactionType)){
                 sourceAccount = sourceAutoComplete.getString()
                 destinationAccount = destinationSpinner.selectedItem.toString()
             }
             ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-                model.addTransaction(baseUrl, accessToken, convertString(true),
+                model.addTransaction(baseUrl, accessToken, transactionType,
                         descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
                         billName, transactionAmountEditText.getString(), sourceAccount,
-                        destinationAccount,
-                        currencyEditText.getString()).observe(this, Observer { transactionResponse ->
+                        destinationAccount, currencyEditText.getString(), categoryName
+                ).observe(this, Observer { transactionResponse ->
                     if (transactionResponse.getResponse() != null) {
                         toastSuccess("Transaction Added")
                         requireFragmentManager().popBackStack()
                     } else if(transactionResponse.getErrorMessage() != null){
+                        println("error: " + transactionResponse.getErrorMessage())
                         ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                         val errorMessage = transactionResponse.getErrorMessage()
                         val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
@@ -251,7 +247,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         }
                     } else if(transactionResponse.getError() != null){
                         if(transactionResponse.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
-                            if(Objects.equals("transfers", convertString(true))){
+                            if(Objects.equals("transfers", transactionType)){
                                 val transferBroadcast = Intent("firefly.hisname.ADD_TRANSFER")
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
@@ -260,24 +256,26 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                                         "currency" to currencyEditText.getString(),
                                         "sourceName" to sourceAccount,
                                         "destinationName" to destinationAccount,
-                                        "piggyBankName" to piggyBank
+                                        "piggyBankName" to piggyBank,
+                                        "category" to categoryName
                                 )
                                 transferBroadcast.putExtras(extras)
                                 requireActivity().sendBroadcast(transferBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Transfer"))
-                            } else if(Objects.equals("deposit", convertString(true))){
+                            } else if(Objects.equals("Deposit", transactionType)){
                                 val transferBroadcast = Intent("firefly.hisname.ADD_DEPOSIT")
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
-                                        "destinationName" to destinationAccount
+                                        "destinationName" to destinationAccount,
+                                        "category" to categoryName
                                 )
                                 transferBroadcast.putExtras(extras)
                                 requireActivity().sendBroadcast(transferBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Deposit"))
-                            } else if(Objects.equals("withdrawal", convertString(true))){
+                            } else if(Objects.equals("Withdrawal", transactionType)){
                                 val withdrawalBroadcast = Intent("firefly.hisname.ADD_WITHDRAW")
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
@@ -285,7 +283,8 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                                         "amount" to transactionAmountEditText.getString(),
                                         "currency" to currencyEditText.getString(),
                                         "sourceName" to sourceAccount,
-                                        "billName" to billName
+                                        "billName" to billName,
+                                        "category" to categoryName
                                 )
                                 withdrawalBroadcast.putExtras(extras)
                                 requireActivity().sendBroadcast(withdrawalBroadcast)

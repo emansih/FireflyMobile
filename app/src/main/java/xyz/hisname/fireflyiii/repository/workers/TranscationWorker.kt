@@ -23,10 +23,11 @@ class TranscationWorker(private val context: Context, workerParameters: WorkerPa
         val sourceName = inputData.getString("sourceName") ?: ""
         val piggyBank = inputData.getString("piggyBankName")
         val billName = inputData.getString("billName")
+        val category = inputData.getString("category")
         val transactionService = RetrofitBuilder.getClient(baseUrl, accessToken)?.
                 create(TransactionService::class.java)
-        transactionService?.addTransaction(transactionType, transactionDescription, transactionDate, piggyBank,
-                billName, transactionAmount,sourceName, destinationName, transactionCurrency)?.enqueue(
+        transactionService?.addTransaction(convertString(transactionType), transactionDescription, transactionDate, piggyBank,
+                billName, transactionAmount,sourceName, destinationName, transactionCurrency, category)?.enqueue(
                 retrofitCallback({ response ->
                     var errorBody = ""
                     if (response.errorBody() != null) {
@@ -71,4 +72,7 @@ class TranscationWorker(private val context: Context, workerParameters: WorkerPa
                 })
         return Result.SUCCESS
     }
+
+    private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
+
 }

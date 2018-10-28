@@ -47,7 +47,6 @@ class ListPiggyFragment: BaseFragment() {
 
     private fun displayView(){
         val viewModel = piggyBankViewModel.getPiggyBank(baseUrl, accessToken)
-        dataAdapter.clear()
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
         viewModel.apiResponse.observe(this, Observer {
@@ -83,6 +82,7 @@ class ListPiggyFragment: BaseFragment() {
 
     private fun pullToRefresh(){
         swipeContainer.setOnRefreshListener {
+            dataAdapter.clear()
             displayView()
         }
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
