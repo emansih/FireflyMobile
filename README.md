@@ -10,7 +10,9 @@ Other alternative include [this software](https://github.com/mconway/firefly-app
 ### Features
 
 ✔ Offline: View offline data(partial support)
+
 ✔ Automation: Add data non-interactively allowing powerful automation. Read the [wiki](https://github.com/emansih/FireflyMobile/wiki/Automation-via-Android-Intents) for more info.
+
 ✔ Reporting: Financial reports give you overview of your spending and income 
 
 
@@ -91,14 +93,13 @@ In order to start using this software, you have to create a new client in your F
 
 ### Screenshots
 
-| Dashboard | Piggy Bank | Adding Piggy Bank  | Showing Piggy Bank Details |
+| Dashboard | Piggy Bank | Adding Piggy Bank  | Piggy Bank Details |
 | :-: | :-: | :-: | :-: |
 | ![1](art/screenshot1.png) | ![3](art/screenshot3.png) | ![4](art/screenshot4.png) | ![5](art/screenshot5.png) |
 
-| Transactions | Bills |
-| :-: | :-: |
-| ![2](art/screenshot2.png) | ![6](art/screenshot6.png) |
-
+| Transactions | Bills | Login | Report | Bills Details
+| :-: | :-: | :-: | :-: | :-: |
+| ![2](art/screenshot2.png) | ![6](art/screenshot6.png) | ![7](art/screenshot7.png) | ![8](art/screenshot8.png) | ![9](art/screenshot9.png)
 
 
 Thanks to [Screener - Better Screenshots](https://play.google.com/store/apps/details?id=de.toastcode.screener&hl=en) for the device frame!
@@ -108,11 +109,11 @@ Icons in this app are taken from:
 2. [Material Design Icons](https://materialdesignicons.com)
 
 
-### Known Limitations
+### Known Limitations / bugs
 Heh... I left this to the last.
 
 1. When upgrading between Firefly III versions, your oAuth access token will be invalidated. It is a known bug in Firefly III. A workaround will be to clear app data and re-sign in again. (See [#1648](https://github.com/firefly-iii/firefly-iii/issues/1648) for more info)
-
+2. When viewing bill / piggy bank details, sometimes the data is either repeated or not showing correctly. (Quick workaround: view the details page offline)
 
 ### License
 ```
