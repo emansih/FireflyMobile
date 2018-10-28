@@ -1,31 +1,31 @@
-package xyz.hisname.fireflyiii.repository.models.currency
+package xyz.hisname.fireflyiii.repository.models
 
-class CurrencyApiResponse() {
+class ApiResponses<T>(){
 
     private var error: Throwable? = null
-    private var currencyList: CurrencyModel? = null
+    private var apiResponse: T? = null
     private var errorMessage: String? = null
 
-    constructor(currencyList: CurrencyModel?): this(){
-        this.currencyList = currencyList
+    constructor(apiResponse: T?): this(){
+        this.apiResponse = apiResponse
         this.error = null
         this.errorMessage = null
     }
 
     constructor(error: Throwable?): this(){
         this.error = error
-        this.currencyList = null
+        this.apiResponse = null
         this.errorMessage = null
     }
 
     constructor(errorMessage: String?): this(){
         this.errorMessage = errorMessage
-        this.currencyList = null
+        this.apiResponse = null
         this.error = null
     }
 
-    fun getCurrency(): CurrencyModel? {
-        return currencyList
+    fun getResponse(): T? {
+        return apiResponse
     }
 
     fun getError(): Throwable? {
@@ -35,5 +35,4 @@ class CurrencyApiResponse() {
     fun getErrorMessage(): String?{
         return errorMessage
     }
-
 }

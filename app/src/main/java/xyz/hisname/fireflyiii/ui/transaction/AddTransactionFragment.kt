@@ -227,7 +227,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         billName, transactionAmountEditText.getString(), sourceAccount,
                         destinationAccount,
                         currencyEditText.getString()).observe(this, Observer { transactionResponse ->
-                    if (transactionResponse.getSuccess() != null) {
+                    if (transactionResponse.getResponse() != null) {
                         toastSuccess("Transaction Added")
                         requireFragmentManager().popBackStack()
                     } else if(transactionResponse.getErrorMessage() != null){

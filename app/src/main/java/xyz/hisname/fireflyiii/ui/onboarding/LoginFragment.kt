@@ -103,12 +103,12 @@ class LoginFragment: Fragment() {
         model.getRefreshToken(baseUrl, sharedPref.getString("refresh_token", ""), fireflySecretKey)
                 .observe(this, Observer {
                     if(it.getError() == null) {
-                        val refreshtoken = it.getAuth()?.refresh_token ?: ""
+                        val refreshtoken = it.getResponse()?.refresh_token ?: ""
                         sharedPref.edit {
                             putString("refresh_token", refreshtoken)
-                            putString("access_token", it.getAuth()?.access_token)
+                            putString("access_token", it.getResponse()?.access_token)
                             putLong("expires_at", (System.currentTimeMillis() +
-                                    TimeUnit.MINUTES.toMillis(it.getAuth()?.expires_in!!.toLong())))
+                                    TimeUnit.MINUTES.toMillis(it.getResponse()?.expires_in!!.toLong())))
 
                         }
                         startHomeIntent()
@@ -147,19 +147,19 @@ class LoginFragment: Fragment() {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 model.getAccessToken(baseUrl, code,fireflyId,fireflySecretKey).observe(this, Observer {
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    if(it.getAuth() != null) {
+                    if(it.getResponse() != null) {
                         toastSuccess(resources.getString(R.string.welcome))
-                        val refreshtoken = it.getAuth()?.refresh_token ?: ""
+                        val refreshtoken = it.getResponse()?.refresh_token ?: ""
                         sharedPref.edit {
                             putString("refresh_token", refreshtoken)
-                            putString("access_token", it.getAuth()?.access_token)
+                            putString("access_token", it.getResponse()?.access_token)
                             putLong("expires_at", (System.currentTimeMillis() +
-                                    TimeUnit.MINUTES.toMillis(it.getAuth()!!.expires_in)))
+                                    TimeUnit.MINUTES.toMillis(it.getResponse()!!.expires_in)))
                             putString("auth_method", "oauth")
                         }
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
-                        val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to it.getAuth()?.access_token)
+                        val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to it.getResponse()?.access_token)
                         requireActivity().supportFragmentManager.beginTransaction()
                                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                                 .add(R.id.bigger_fragment_container, OnboardingFragment().apply { arguments = bundle })

@@ -158,7 +158,8 @@ class AddPiggyActivity: BaseActivity(){
                                         gson.errors.name != null -> toastError(gson.errors.name[0])
                                         gson.errors.account_id != null -> toastError(gson.errors.account_id[0])
                                         gson.errors.current_amount != null -> toastError(gson.errors.current_amount[0])
-                                        else -> toastError("Error occurred while saving bill")
+                                        gson.errors.targetDate != null -> toastError(gson.errors.targetDate[0])
+                                        else -> toastError("Error occurred while saving piggy bank")
                                     }
                                 } else if (it.getError() != null) {
                                     if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
@@ -179,7 +180,7 @@ class AddPiggyActivity: BaseActivity(){
                                     } else {
                                         toastError("Error saving piggy bank")
                                     }
-                                } else if (it.getSuccess() != null) {
+                                } else if (it.getResponse() != null) {
                                     toastSuccess("Piggy bank saved")
                                     finish()
                                 }

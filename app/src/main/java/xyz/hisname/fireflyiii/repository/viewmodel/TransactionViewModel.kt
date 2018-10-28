@@ -9,20 +9,22 @@ import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.TransactionService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionApiResponse
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
+import xyz.hisname.fireflyiii.repository.models.transaction.sucess.TransactionSucessModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import java.util.*
 
 class TransactionViewModel(application: Application) : AndroidViewModel(application){
 
     private val transactionDatabase by lazy { AppDatabase.getInstance(application)?.transactionDataDao() }
+    val apiResponse: MediatorLiveData<ApiResponses<TransactionModel>> = MediatorLiveData()
 
     fun getTransactions(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
-            BaseResponse<TransactionData, TransactionApiResponse> {
-        val apiResponse: MediatorLiveData<TransactionApiResponse> = MediatorLiveData()
-        val transaction: MutableLiveData<TransactionApiResponse> = MutableLiveData()
+            BaseResponse<TransactionData, ApiResponses<TransactionModel>> {
+        val transaction: MutableLiveData<ApiResponses<TransactionModel>> = MutableLiveData()
         val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
         transactionService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
@@ -31,10 +33,10 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
                         transactionDatabase?.addTransaction(element)
                     })
                 }
-                transaction.value = TransactionApiResponse(response.body())
+                transaction.value = ApiResponses(response.body())
             }
         })
-        { throwable ->  transaction.value = TransactionApiResponse(throwable)})
+        { throwable ->  transaction.value = ApiResponses(throwable)})
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return if(Objects.equals("all", type)){
             BaseResponse(transactionDatabase?.getRecentTransactions(5), apiResponse)
@@ -47,9 +49,9 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun addTransaction(baseUrl: String?, accessToken: String?, type: String, description: String,
                        date: String, piggyBankName: String?, billName: String?, amount: String,
-                       sourceName: String?, destinationName: String?, currencyName: String): LiveData<TransactionApiResponse>{
-        val apiResponse: MediatorLiveData<TransactionApiResponse> = MediatorLiveData()
-        val transaction: MutableLiveData<TransactionApiResponse> = MutableLiveData()
+                       sourceName: String?, destinationName: String?, currencyName: String): LiveData<ApiResponses<TransactionSucessModel>>{
+        val transaction: MutableLiveData<ApiResponses<TransactionSucessModel>> = MutableLiveData()
+        val apiResponse: MediatorLiveData<ApiResponses<TransactionSucessModel>> = MediatorLiveData()
         val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
         transactionService?.addTransaction(type,description,date,piggyBankName,billName,
                 amount,sourceName,destinationName,currencyName)?.enqueue(retrofitCallback({ response ->
@@ -59,12 +61,12 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
                 errorBodyMessage = String(errorBody.bytes())
             }
             if (response.isSuccessful) {
-                transaction.postValue(TransactionApiResponse(response.body()))
+                transaction.postValue(ApiResponses(response.body()))
             } else {
-                transaction.postValue(TransactionApiResponse(errorBodyMessage))
+                transaction.postValue(ApiResponses(errorBodyMessage))
             }
         })
-        { throwable ->  transaction.value = TransactionApiResponse(throwable)})
+        { throwable ->  transaction.value = ApiResponses(throwable)})
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return apiResponse
     }

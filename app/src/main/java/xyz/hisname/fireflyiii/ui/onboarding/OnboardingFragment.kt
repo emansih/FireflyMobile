@@ -45,11 +45,11 @@ class OnboardingFragment: Fragment() {
             if(it.first.getError() == null && it.second.getError() == null){
                 ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()
                 sharedPref.edit{
-                    putString("userEmail", it.first.getUserData()?.userData?.userAttributes?.email)
-                    putString("userRole", it.first.getUserData()?.userData?.userAttributes?.role)
-                    putString("server_version", it.second.getUserSystem()?.systemData?.version)
-                    putString("api_version", it.second.getUserSystem()?.systemData?.api_version)
-                    putString("user_os", it.second.getUserSystem()?.systemData?.os)
+                    putString("userEmail", it.first.getResponse()?.userData?.userAttributes?.email)
+                    putString("userRole", it.first.getResponse()?.userData?.userAttributes?.role)
+                    putString("server_version", it.second.getResponse()?.systemData?.version)
+                    putString("api_version", it.second.getResponse()?.systemData?.api_version)
+                    putString("user_os", it.second.getResponse()?.systemData?.os)
                 }
                 ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
                 startActivity(Intent(requireActivity(), HomeActivity::class.java))

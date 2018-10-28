@@ -19,7 +19,6 @@ import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_report.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionApiResponse
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment

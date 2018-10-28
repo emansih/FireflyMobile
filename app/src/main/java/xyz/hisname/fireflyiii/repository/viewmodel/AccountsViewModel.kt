@@ -9,20 +9,21 @@ import kotlinx.coroutines.experimental.launch
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.AccountsService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountApiResponse
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
-import java.util.*
 
 class AccountsViewModel(application: Application) : AndroidViewModel(application){
 
     private val accountDatabase by lazy { AppDatabase.getInstance(application)?.accountDataDao() }
     private var  accountsService: AccountsService? = null
+    private val apiLiveData: MutableLiveData<ApiResponses<AccountsModel>> = MutableLiveData()
 
-    fun getAccounts(baseUrl: String, accessToken: String): BaseResponse<AccountData, AccountApiResponse> {
-        val apiResponse = MediatorLiveData<AccountApiResponse>()
-        val accountResponse: MutableLiveData<AccountApiResponse> = MutableLiveData()
+
+    fun getAccounts(baseUrl: String, accessToken: String): BaseResponse<AccountData, ApiResponses<AccountsModel>> {
+        val apiResponse = MediatorLiveData<ApiResponses<AccountsModel>>()
         accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
         accountsService?.getAccountType("all")?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
@@ -36,25 +37,24 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
                 if (response.errorBody() != null) {
                     errorBody = String(response.errorBody()?.bytes()!!)
                 }
-                accountResponse.postValue(AccountApiResponse(errorBody))
+                apiLiveData.postValue(ApiResponses(errorBody))
             }
         })
-        { throwable ->  accountResponse.postValue(AccountApiResponse(throwable))})
-        apiResponse.addSource(accountResponse) { apiResponse.value = it }
+        { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
+        apiResponse.addSource(apiLiveData) { apiResponse.value = it }
         return BaseResponse(accountDatabase?.getAllAccounts(), apiResponse)
     }
 
-    fun getAccountType(baseUrl: String, accessToken: String, type: String): LiveData<AccountApiResponse>{
-        val apiResponse = MediatorLiveData<AccountApiResponse>()
-        val accountResponse: MutableLiveData<AccountApiResponse> = MutableLiveData()
+    fun getAccountType(baseUrl: String, accessToken: String, type: String): LiveData<ApiResponses<AccountsModel>>{
+        val apiResponse = MediatorLiveData<ApiResponses<AccountsModel>>()
         val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
         accountsService?.getAccountType(type)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
-                accountResponse.postValue(AccountApiResponse(response.body()))
+                apiLiveData.postValue(ApiResponses(response.body()))
             }
         })
-        { throwable ->  accountResponse.postValue(AccountApiResponse(throwable))})
-        apiResponse.addSource(accountResponse) {
+        { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
+        apiResponse.addSource(apiLiveData) {
             apiResponse.value = it
         }
         return apiResponse

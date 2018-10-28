@@ -205,7 +205,7 @@ class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
                         } else {
                             toastError("Error saving bill")
                         }
-                    } else if(it.getSuccess() != null){
+                    } else if(it.getResponse() != null){
                         toastSuccess("Bill saved")
                         finish()
                     }

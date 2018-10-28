@@ -39,11 +39,11 @@ class WalletFragment: BaseFragment() {
     private fun getCreditCard(){
         model.getAccountType(baseUrl,accessToken,"creditcard").observe(this, Observer {
             if(it.getError() == null){
-                dataAdapter = ArrayList(it.getAccounts()?.data)
+                dataAdapter = ArrayList(it.getResponse()?.data)
                 if(dataAdapter.size == 0){
                     creditText.text = "0"
                 } else {
-                    it.getAccounts()?.data?.forEachIndexed { _, element ->
+                    it.getResponse()?.data?.forEachIndexed { _, element ->
                         creditCard += Math.abs(element.accountAttributes?.current_balance!!.toInt())
 
                     }
@@ -56,11 +56,11 @@ class WalletFragment: BaseFragment() {
     private fun getCash(){
         model.getAccountType(baseUrl,accessToken,"cash").observe(this, Observer {
             if(it.getError() == null){
-                dataAdapter = ArrayList(it.getAccounts()?.data)
+                dataAdapter = ArrayList(it.getResponse()?.data)
                 if(dataAdapter.size == 0){
                     cashText.text = "0"
                 } else {
-                    it.getAccounts()?.data?.forEachIndexed { _, element ->
+                    it.getResponse()?.data?.forEachIndexed { _, element ->
                         cash += Math.abs(element.accountAttributes?.current_balance!!.toInt())
 
                     }
@@ -74,11 +74,11 @@ class WalletFragment: BaseFragment() {
     private fun getBankBalance(){
         model.getAccountType(baseUrl,accessToken,"asset").observe(this, Observer {
             if(it.getError() == null){
-                dataAdapter = ArrayList(it.getAccounts()?.data)
+                dataAdapter = ArrayList(it.getResponse()?.data)
                 if(dataAdapter.size == 0){
                     assetsText.text = "0"
                 } else {
-                    it.getAccounts()?.data?.forEachIndexed { _, element ->
+                    it.getResponse()?.data?.forEachIndexed { _, element ->
                         assets += element.accountAttributes?.current_balance!!.toInt()
                     }
                     assetsText.text = assets.toString()
