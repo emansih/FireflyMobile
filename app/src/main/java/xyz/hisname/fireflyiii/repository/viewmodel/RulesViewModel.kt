@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository.viewmodel.retrofit
+package xyz.hisname.fireflyiii.repository.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData

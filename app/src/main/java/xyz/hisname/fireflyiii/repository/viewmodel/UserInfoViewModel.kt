@@ -1,9 +1,9 @@
-package xyz.hisname.fireflyiii.repository.viewmodel.retrofit
+package xyz.hisname.fireflyiii.repository.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.preference.PreferenceManager
+import androidx.core.content.edit
+import androidx.lifecycle.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.SettingsService
 import xyz.hisname.fireflyiii.repository.api.SystemInfoService
@@ -13,7 +13,9 @@ import xyz.hisname.fireflyiii.repository.models.userinfo.system.SystemInfoModel
 import xyz.hisname.fireflyiii.repository.models.userinfo.user.UserDataModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
-class UserInfoViewModel: ViewModel(){
+class UserInfoViewModel(application: Application) : AndroidViewModel(application){
+
+    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(getApplication()) }
 
     fun getUser(baseUrl: String?, accessToken: String?):
             LiveData<ApiResponses<UserDataModel>> {
@@ -22,6 +24,10 @@ class UserInfoViewModel: ViewModel(){
         val systemService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(SystemInfoService::class.java)
         systemService?.getCurrentUserInfo()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
+                sharedPref.edit{
+                    putString("userEmail", response.body()?.userData?.userAttributes?.email)
+                    putString("userRole", response.body()?.userData?.userAttributes?.role)
+                }
                 user.value = ApiResponses(response.body())
             }
         })
@@ -37,6 +43,11 @@ class UserInfoViewModel: ViewModel(){
         val systemService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(SystemInfoService::class.java)
         systemService?.getSystemInfo()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
+                sharedPref.edit{
+                    putString("server_version", response.body()?.systemData?.version)
+                    putString("api_version", response.body()?.systemData?.api_version)
+                    putString("user_os", response.body()?.systemData?.os)
+                }
                 user.value = ApiResponses(response.body())
             }
         })

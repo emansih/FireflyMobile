@@ -226,7 +226,6 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         toastSuccess("Transaction Added")
                         requireFragmentManager().popBackStack()
                     } else if(transactionResponse.getErrorMessage() != null){
-                        println("error: " + transactionResponse.getErrorMessage())
                         ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                         val errorMessage = transactionResponse.getErrorMessage()
                         val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)

@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -20,7 +19,7 @@ import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.Main
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.viewmodel.retrofit.AuthViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.AuthViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
@@ -103,20 +102,12 @@ class LoginFragment: Fragment() {
         model.getRefreshToken(baseUrl, sharedPref.getString("refresh_token", ""), fireflySecretKey)
                 .observe(this, Observer {
                     if(it.getError() == null) {
-                        val refreshtoken = it.getResponse()?.refresh_token ?: ""
-                        sharedPref.edit {
-                            putString("refresh_token", refreshtoken)
-                            putString("access_token", it.getResponse()?.access_token)
-                            putLong("expires_at", (System.currentTimeMillis() +
-                                    TimeUnit.MINUTES.toMillis(it.getResponse()?.expires_in!!.toLong())))
-
-                        }
                         startHomeIntent()
                     } else {
                         ProgressBar.animateView(progressOverlay, View.GONE, 0.toFloat(), 200)
                         val error = it.getError()
-                        if(error!!.localizedMessage.startsWith("Unable to resolve host")){
-                            toastInfo(resources.getString(R.string.unable_ping_server))
+                        if(error != null){
+                            toastInfo(error.localizedMessage)
                         }
                     }
                 })
@@ -140,7 +131,6 @@ class LoginFragment: Fragment() {
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             val code = uri.getQueryParameter("code")
             if(code != null) {
-                val sharedPref= PreferenceManager.getDefaultSharedPreferences(requireContext())
                 val baseUrl= sharedPref.getString("fireflyUrl","") ?: ""
                 val fireflyId = sharedPref.getString("fireflyId","") ?: ""
                 val fireflySecretKey= sharedPref.getString("fireflySecretKey","") ?: ""
@@ -149,12 +139,7 @@ class LoginFragment: Fragment() {
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                     if(it.getResponse() != null) {
                         toastSuccess(resources.getString(R.string.welcome))
-                        val refreshtoken = it.getResponse()?.refresh_token ?: ""
                         sharedPref.edit {
-                            putString("refresh_token", refreshtoken)
-                            putString("access_token", it.getResponse()?.access_token)
-                            putLong("expires_at", (System.currentTimeMillis() +
-                                    TimeUnit.MINUTES.toMillis(it.getResponse()!!.expires_in)))
                             putString("auth_method", "oauth")
                         }
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
@@ -169,11 +154,7 @@ class LoginFragment: Fragment() {
                         if(error == null){
                             toastInfo("There was an error communicating with your server")
                         } else {
-                            if (error.localizedMessage.startsWith("Unable to resolve host")) {
-                                toastInfo(resources.getString(R.string.unable_ping_server))
-                            } else {
-                                toastInfo("There was an error communicating with your server")
-                            }
+                            toastError(error.localizedMessage)
                         }
                     }
                 })
