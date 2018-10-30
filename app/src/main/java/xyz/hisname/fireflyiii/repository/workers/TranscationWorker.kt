@@ -23,43 +23,41 @@ class TranscationWorker(private val context: Context, workerParameters: WorkerPa
         val sourceName = inputData.getString("sourceName") ?: ""
         val piggyBank = inputData.getString("piggyBankName")
         val billName = inputData.getString("billName")
-        val category = inputData.getString("category")
+        val category = inputData.getString("categoryName")
+        val tags = inputData.getString("tags")
+        val budget = inputData.getString("budgetName")
+        val interestDate  = inputData.getString("interestDate")
+        val bookDate = inputData.getString("bookDate")
+        val processDate = inputData.getString("processDate")
+        val dueDate = inputData.getString("dueDate")
+        val paymentDate = inputData.getString("paymentDate")
+        val invoiceDate = inputData.getString("invoiceDate")
         val transactionService = RetrofitBuilder.getClient(baseUrl, accessToken)?.
                 create(TransactionService::class.java)
         transactionService?.addTransaction(convertString(transactionType), transactionDescription, transactionDate, piggyBank,
-                billName, transactionAmount,sourceName, destinationName, transactionCurrency, category)?.enqueue(
+                billName, transactionAmount,sourceName, destinationName, transactionCurrency, category,
+                tags, budget, interestDate, bookDate, processDate, dueDate, paymentDate,
+                invoiceDate)?.enqueue(
                 retrofitCallback({ response ->
                     var errorBody = ""
                     if (response.errorBody() != null) {
                         errorBody = String(response.errorBody()?.bytes()!!)
                     }
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    var error = ""
                     if(response.isSuccessful){
                         notif.showTransactionNotification("Transaction added successfully!", "Transaction")
                         Result.SUCCESS
                     } else {
+                        var error = ""
                         when {
                             gson.errors.transactions_destination_name != null -> {
-                                error = if(gson.errors.transactions_destination_name.contains("is required")){
-                                    "Destination Account Required"
-                                } else {
-                                    "Invalid Destination Account"
-                                }
+                                error = gson.errors.transactions_destination_name[0]
                             }
                             gson.errors.transactions_currency != null -> {
-                                error = if(gson.errors.transactions_currency.contains("is required")){
-                                    "Currency Code Required"
-                                } else {
-                                    "Invalid Currency Code"
-                                }
+                                error = gson.errors.transactions_currency[0]
                             }
                             gson.errors.transactions_source_name != null  -> {
-                                error = if(gson.errors.transactions_source_name.contains("is required")){
-                                    "Source Account Required"
-                                } else {
-                                    "Invalid Source Account"
-                                }
+                                error = gson.errors.transactions_source_name[0]
                             }
                         }
                         notif.showTransactionNotification(error, "Error Adding $transactionType")
