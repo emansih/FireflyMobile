@@ -54,7 +54,7 @@ dependencies {
     ext.roomVersion = "2.0.0"
     ext.lifecycleVersion = "2.0.0"
     ext.retrofitVersion = "2.4.0"
-    ext.coroutineVersion = "0.26.0"
+    ext.coroutineVersion = "1.0.0"
     ext.work_version = "1.0.0-alpha10"
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')

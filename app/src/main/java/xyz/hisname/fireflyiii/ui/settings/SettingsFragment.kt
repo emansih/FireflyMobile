@@ -14,7 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils

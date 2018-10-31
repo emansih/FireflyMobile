@@ -15,8 +15,8 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_login.*
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.Main
+import kotlinx.coroutines.*
+import kotlinx.coroutines.android.Main
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.AuthViewModel
