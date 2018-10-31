@@ -95,22 +95,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
 
     }
 
-    fun getPiggyBankById(id: Long, baseUrl: String, accessToken: String): BaseResponse<PiggyData, ApiResponses<PiggyModel>>{
-        val apiResponse = MediatorLiveData<ApiResponses<PiggyModel>>()
-        piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
-        piggyBankService?.getPiggyBankById(id.toString())?.enqueue(retrofitCallback({ response ->
-            if (!response.isSuccessful) {
-                var errorBody = ""
-                if (response.errorBody() != null) {
-                    errorBody = String(response.errorBody()?.bytes()!!)
-                }
-                apiLiveData.postValue(ApiResponses(errorBody))
-            }
-        })
-        { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
-        apiResponse.addSource(apiLiveData) {
-            apiResponse.value = it
-        }
-        return BaseResponse(piggyDataBase?.getPiggyById(id), apiResponse)
-    }
+    fun getPiggyBankById(id: Long)=  piggyDataBase?.getPiggyById(id)
+
+
 }
