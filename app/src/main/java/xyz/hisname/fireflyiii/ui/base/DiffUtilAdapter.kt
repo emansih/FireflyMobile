@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.android.Main
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.launch
@@ -23,7 +22,7 @@ abstract class DiffUtilAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.A
     fun update (list: List<D>) = eventActor.offer(list)
 
     private suspend fun internalUpdate(list: List<D>) {
-        GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, null, {
+        GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
             dataSet = list
             DiffUtil.calculateDiff(diffCallback.apply { newList = list },false)
                     .dispatchUpdatesTo(this@DiffUtilAdapter)
@@ -32,7 +31,7 @@ abstract class DiffUtilAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.A
             `java.lang.IndexOutOfBoundsException: Inconsistency detected. Invalid item`
             */
             notifyDataSetChanged()
-        }).join()
+        }.join()
     }
 
     private inner class DiffCallback : DiffUtil.Callback() {

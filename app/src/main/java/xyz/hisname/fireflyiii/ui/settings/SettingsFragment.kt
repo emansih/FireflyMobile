@@ -70,10 +70,10 @@ class SettingsFragment: PreferenceFragmentCompat() {
         }
 
         logout.setOnPreferenceClickListener {
-            GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, null, {
+            GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
                 appDb?.clearAllTables()
                 sharedPref.edit().clear().apply()
-            })
+            }
             val loginActivity = Intent(requireActivity(), OnboardingActivity::class.java)
             startActivity(loginActivity)
             RetrofitBuilder.destroyInstance()

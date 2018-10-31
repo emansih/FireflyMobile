@@ -16,7 +16,6 @@ import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.android.Main
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.AuthViewModel
@@ -25,7 +24,6 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class LoginFragment: Fragment() {
 
@@ -117,12 +115,12 @@ class LoginFragment: Fragment() {
         if(sharedPref.getBoolean("persistent_notification",false)){
             NotificationUtils(requireContext()).showTransactionPersistentNotification()
         }
-        GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, null, {
+        GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
             delay(1234) //heh
             startActivity(Intent(requireContext(), HomeActivity::class.java))
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             requireActivity().finish()
-        })
+        }
     }
 
     override fun onResume() {

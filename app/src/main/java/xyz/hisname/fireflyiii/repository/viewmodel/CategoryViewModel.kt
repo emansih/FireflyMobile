@@ -30,9 +30,9 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
         categoryService?.getCategory()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                         categoryDatbase?.addCategory(element)
-                    })
+                    }
                 }
             }else {
                 var errorBody = ""

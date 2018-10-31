@@ -30,9 +30,9 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
         currencyService?.getCurrency()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                         currencyDatabase?.addCurrency(element)
-                    })
+                    }
                 }
             } else {
                 var errorBody = ""

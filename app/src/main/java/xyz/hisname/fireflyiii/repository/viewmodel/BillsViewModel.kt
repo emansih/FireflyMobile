@@ -29,9 +29,9 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         billsService?.getBills()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                         billDatabase?.addBill(element)
-                    })
+                    }
                 }
             } else {
                 var errorBody = ""
@@ -54,9 +54,9 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         billsService?.deleteBillById(id)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 billResponse.postValue(ApiResponses(response.body()))
-                GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                     billDatabase?.deleteBillById(id.toLong())
-                })
+                }
             }
         })
         { throwable -> billResponse.postValue(ApiResponses(throwable)) })

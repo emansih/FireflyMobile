@@ -29,9 +29,9 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
         piggyBankService?.getPiggyBanks()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                         piggyDataBase?.addPiggy(element)
-                    })
+                    }
                 }
             } else {
                 var errorBody = ""
@@ -53,9 +53,9 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
         piggyBankService?.deletePiggyBankById(id)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 apiResponse.postValue(ApiResponses(response.body()))
-                GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                     piggyDataBase?.deletePiggyById(id.toLong())
-                })
+                }
             } else {
                 var errorBody = ""
                 if (response.errorBody() != null) {

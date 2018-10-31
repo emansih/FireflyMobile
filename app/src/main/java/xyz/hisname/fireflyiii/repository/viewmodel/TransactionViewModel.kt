@@ -29,9 +29,9 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         transactionService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                         transactionDatabase?.addTransaction(element)
-                    })
+                    }
                 }
                 transaction.value = ApiResponses(response.body())
             }

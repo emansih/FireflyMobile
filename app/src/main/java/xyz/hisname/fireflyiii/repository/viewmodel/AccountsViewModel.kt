@@ -28,9 +28,9 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         accountsService?.getAccountType("all")?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT, null, {
+                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                         accountDatabase?.addAccounts(element)
-                    })
+                    }
                 }
             } else {
                 var errorBody = ""
