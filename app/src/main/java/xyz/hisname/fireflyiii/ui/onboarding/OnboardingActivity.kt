@@ -31,34 +31,43 @@ class OnboardingActivity: AppCompatActivity() {
                         .replace(R.id.fragment_container, AuthChooserFragment())
                         .commit()
             }
-            Objects.equals("oauth", authMethod) -> {
-                if(System.currentTimeMillis() > fireflyAccessTokenExpiry){
-                    val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
-                        .commit()
-                } else {
-                    if(sharedPref.getBoolean("persistent_notification",false)){
-                        NotificationUtils(this).showTransactionPersistentNotification()
+            authMethod.isNotEmpty() -> {
+                when {
+                    Objects.equals("oauth", authMethod) -> {
+                        if (System.currentTimeMillis() > fireflyAccessTokenExpiry) {
+                            val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
+                            supportFragmentManager.beginTransaction()
+                                    .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
+                                    .commit()
+                        } else {
+                            if (sharedPref.getBoolean("persistent_notification", false)) {
+                                NotificationUtils(this).showTransactionPersistentNotification()
+                            }
+                            GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
+                                delay(1234) //heh
+                                startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
+                                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                                finish()
+                            }
+                        }
                     }
-                    GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
-                        delay(1234) //heh
-                        startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
-                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                        finish()
-                    }
-
                 }
             }
             else -> {
                 if(sharedPref.getBoolean("persistent_notification",false)){
                     NotificationUtils(this).showTransactionPersistentNotification()
                 }
-                GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT){
-                    delay(1234) //heh
-                    startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                    finish()
+                if(fireflyUrl.isNotEmpty() and fireflySecretKey.isNotEmpty() and authMethod.isNotEmpty()) {
+                    GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
+                        delay(1234) //heh
+                        startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                        finish()
+                    }
+                } else {
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, AuthChooserFragment())
+                            .commit()
                 }
             }
         }
