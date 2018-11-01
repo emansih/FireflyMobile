@@ -111,8 +111,8 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun pullToRefresh(){
-        dataAdapter.clear()
         swipeContainer.setOnRefreshListener {
+            dataAdapter.clear()
             displayView()
         }
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -124,6 +124,7 @@ class ListBillFragment: BaseFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = "Bills"
+        fab.isVisible = true
     }
 
     override fun onResume() {

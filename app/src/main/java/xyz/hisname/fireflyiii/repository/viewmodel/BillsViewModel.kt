@@ -112,22 +112,5 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         return apiResponse
     }
 
-    fun getBillById(id: Long, baseUrl: String, accessToken: String): BaseResponse<BillData, ApiResponses<BillsModel>>{
-        val apiResponse = MediatorLiveData<ApiResponses<BillsModel>>()
-        billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
-        billsService?.getBillById(id.toString())?.enqueue(retrofitCallback({ response ->
-            if (!response.isSuccessful) {
-                var errorBody = ""
-                if (response.errorBody() != null) {
-                    errorBody = String(response.errorBody()?.bytes()!!)
-                }
-                billResponse.postValue(ApiResponses(errorBody))
-            }
-        })
-        { throwable ->  billResponse.postValue(ApiResponses(throwable))})
-        apiResponse.addSource(billResponse) {
-            apiResponse.value = it
-        }
-        return BaseResponse(billDatabase?.getBillById(id), apiResponse)
-    }
+    fun getBillById(id: Long) = billDatabase?.getBillById(id)
 }
