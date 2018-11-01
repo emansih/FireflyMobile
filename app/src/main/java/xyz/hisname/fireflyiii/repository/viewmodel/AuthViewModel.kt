@@ -25,14 +25,16 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         oAuthService = RetrofitBuilder.getClient(baseUrl, "")?.create(OAuthService::class.java)
         oAuthService?.getAccessToken(code, clientId, clientSecret, Constants.REDIRECT_URI,
                 "authorization_code")?.enqueue(retrofitCallback({ response ->
-            sharedPref.edit {
-                putString("refresh_token", response.body()?.refresh_token)
-                putString("access_token", response.body()?.access_token)
-                putLong("expires_at", (System.currentTimeMillis() +
-                        TimeUnit.MINUTES.toMillis(response.body()!!.expires_in)))
+            val expireTime = response.body()?.expires_in
+            if(expireTime != null) {
+                sharedPref.edit {
+                    putString("refresh_token", response.body()?.refresh_token)
+                    putString("access_token", response.body()?.access_token)
+                    putLong("expires_at", (System.currentTimeMillis() +
+                            TimeUnit.MINUTES.toMillis(expireTime)))
+                }
             }
-            auth.value = ApiResponses(response.body()
-            )})
+            auth.value = ApiResponses(response.body())})
         { throwable -> auth.value = ApiResponses(throwable)})
         return auth
     }

@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.viewmodel.AuthViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -58,6 +59,7 @@ class LoginFragment: Fragment() {
 
     private fun getAccessCode(){
         firefly_submit_button.setOnClickListener {
+            RetrofitBuilder.destroyInstance()
             hideKeyboard()
             fireflyUrl = firefly_url_edittext.getString()
             val fireflyId = firefly_id_edittext.getString()
@@ -72,6 +74,9 @@ class LoginFragment: Fragment() {
                 // Since user didn't bother to add http/https prefix, we will do it for them...
                 if(!fireflyUrl.startsWith("http")){
                     fireflyUrl = "https://$fireflyUrl"
+                }
+                if(!fireflyUrl.endsWith("/")){
+                    fireflyUrl = "$fireflyUrl/"
                 }
                 sharedPref.edit {
                     putString("fireflyUrl",fireflyUrl)
