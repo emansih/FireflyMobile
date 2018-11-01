@@ -17,6 +17,8 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
+import java.util.*
+
 
 class CurrencyListFragment: BottomSheetDialogFragment() {
 
@@ -42,6 +44,9 @@ class CurrencyListFragment: BottomSheetDialogFragment() {
         }
         viewModel.databaseData?.observe(this, Observer {
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+            it.sortWith(Comparator { initial, after ->
+                initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
+            })
             recycler_view.adapter = CurrencyRecyclerAdapter(it) { data: CurrencyData -> itemClicked(data) }
         })
 
