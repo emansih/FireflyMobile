@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
@@ -31,6 +34,7 @@ class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener{
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private val startDate: String? by lazy { arguments?.getString("startDate") }
     private val endDate: String? by lazy { arguments?.getString("endDate")  }
+    private lateinit var transactionData: MutableList<TransactionData>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -53,10 +57,11 @@ class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener{
         dataAdapter.clear()
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        val viewModel = model.getTransactions(baseUrl,accessToken, startDate, endDate,transactionType)
-        viewModel.databaseData?.observe(this, Observer {
-            dataAdapter = ArrayList(it)
-            if (dataAdapter.size == 0) {
+        launch(context = Dispatchers.Main) {
+            async(Dispatchers.IO) {
+                transactionData = model.getTransactions(baseUrl,accessToken, startDate, endDate,transactionType).databaseData!!
+            }.await()
+            if(transactionData.isEmpty()){
                 recycler_view.isGone = true
                 noTransactionText.isVisible = true
                 noTransactionImage.isVisible = true
@@ -72,17 +77,17 @@ class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener{
                 recycler_view.isVisible = true
                 noTransactionText.isGone = true
                 noTransactionImage.isGone = true
-                rtAdapter = TransactionRecyclerAdapter(it.toMutableList(), "no_type")
+                rtAdapter = TransactionRecyclerAdapter(transactionData, "no_type")
                 recycler_view.adapter = rtAdapter
                 rtAdapter.apply {
                     recycler_view.adapter as TransactionRecyclerAdapter
-                    update(it.toMutableList())
+                    update(transactionData)
                 }
                 rtAdapter.notifyDataSetChanged()
             }
             swipeContainer.isRefreshing = false
-        })
-        viewModel.apiResponse.observe(this, Observer {
+        }
+        model.getTransaction(baseUrl,accessToken, startDate, endDate,transactionType).observe(this, Observer {
             if(it.getError() != null){
                 toastError(it.getError()?.message)
             }

@@ -11,6 +11,7 @@ import xyz.hisname.fireflyiii.repository.api.TransactionService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
+import xyz.hisname.fireflyiii.repository.models.Response
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 import xyz.hisname.fireflyiii.repository.models.transaction.sucess.TransactionSucessModel
@@ -20,10 +21,10 @@ import java.util.*
 class TransactionViewModel(application: Application) : AndroidViewModel(application){
 
     private val transactionDatabase by lazy { AppDatabase.getInstance(application)?.transactionDataDao() }
-    val apiResponse: MediatorLiveData<ApiResponses<TransactionModel>> = MediatorLiveData()
+    private val apiResponse: MediatorLiveData<ApiResponses<TransactionModel>> = MediatorLiveData()
 
     fun getTransactions(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
-            BaseResponse<TransactionData, ApiResponses<TransactionModel>> {
+            Response<TransactionData, ApiResponses<TransactionModel>> {
         val transaction: MutableLiveData<ApiResponses<TransactionModel>> = MutableLiveData()
         val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
         transactionService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
@@ -38,13 +39,26 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         })
         { throwable ->  transaction.value = ApiResponses(throwable)})
         apiResponse.addSource(transaction) { apiResponse.value = it }
-        return if(Objects.equals("all", type)){
-            BaseResponse(transactionDatabase?.getRecentTransactions(5), apiResponse)
-        } else if(start.isNullOrBlank() or end.isNullOrBlank()){
-            BaseResponse(transactionDatabase?.getTransaction(type), apiResponse)
-        } else {
-            BaseResponse(transactionDatabase?.getTransaction(start, end, type), apiResponse)
+        return when {
+            Objects.equals("all", type) -> Response(transactionDatabase?.getRecentTransactions(5), apiResponse)
+            start.isNullOrBlank() or end.isNullOrBlank() -> Response(transactionDatabase?.getTransaction(type), apiResponse)
+            else -> Response(transactionDatabase?.getTransaction(start, end, type), apiResponse)
         }
+    }
+
+    fun getTransaction(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
+            LiveData<ApiResponses<TransactionModel>>{
+        val transaction: MutableLiveData<ApiResponses<TransactionModel>> = MutableLiveData()
+        val apiResponse: MediatorLiveData<ApiResponses<TransactionModel>> = MediatorLiveData()
+        val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
+        transactionService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                transaction.postValue(ApiResponses(response.body()))
+            }
+        })
+        { throwable ->  transaction.postValue(ApiResponses(throwable))})
+        apiResponse.addSource(transaction) { apiResponse.value = it }
+        return apiResponse
     }
 
     fun addTransaction(baseUrl: String?, accessToken: String?, type: String, description: String,

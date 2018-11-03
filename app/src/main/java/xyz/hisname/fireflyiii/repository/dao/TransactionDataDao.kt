@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.repository.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -14,12 +13,12 @@ abstract class TransactionDataDao {
     abstract fun addTransaction(vararg transactionData: TransactionData)
 
     @Query("SELECT * FROM transactions WHERE transactionType =:type")
-    abstract fun getTransaction(type: String): LiveData<MutableList<TransactionData>>
+    abstract fun getTransaction(type: String): MutableList<TransactionData>
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
-    abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<TransactionData>>
+    abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): MutableList<TransactionData>
 
     @Query("SELECT * FROM transactions order by transactionId desc limit :limit")
-    abstract fun getRecentTransactions(limit: Int): LiveData<MutableList<TransactionData>>
+    abstract fun getRecentTransactions(limit: Int): MutableList<TransactionData>
 
 }

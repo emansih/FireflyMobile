@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
@@ -21,6 +23,9 @@ import java.util.*
 class RecentTransactionFragment: BaseFragment() {
 
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val transactionList by lazy { model.getTransactions(baseUrl, accessToken,
+            null, null, "Withdrawal").databaseData }
+
     private var dataAdapter = ArrayList<TransactionData>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter
 
@@ -34,16 +39,19 @@ class RecentTransactionFragment: BaseFragment() {
         loadTransaction()
     }
 
-    private fun loadTransaction(){
+    private fun loadTransaction() {
         dataAdapter.clear()
         transactionLoader.bringToFront()
         transactionLoader.show()
         recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
         recentTransactionList.addItemDecoration(DividerItemDecoration(recentTransactionList.context,
                 DividerItemDecoration.VERTICAL))
-        model.getTransactions(baseUrl,accessToken, null, null ,"all").databaseData?.observe(this, Observer {
-            dataAdapter = ArrayList(it)
+        launch(context = Dispatchers.Main) {
+            async(Dispatchers.IO) {
+                transactionList
+            }.await()
             transactionLoader.hide()
+            dataAdapter = ArrayList(transactionList)
             if (dataAdapter.size == 0) {
                 recentTransactionList.isGone = true
                 noTransactionText.isVisible = true
@@ -51,7 +59,7 @@ class RecentTransactionFragment: BaseFragment() {
                 recentTransactionList.isVisible = true
                 noTransactionText.isGone = true
                 if (dataAdapter.size <= 5) {
-                    rtAdapter = TransactionRecyclerAdapter(it.toMutableList(), "recent")
+                    rtAdapter = TransactionRecyclerAdapter(dataAdapter, "recent")
                 } else {
                     // More than 5 index in json so we get first 5 only
                     dataAdapter.subList(5, dataAdapter.size).clear()
@@ -62,8 +70,9 @@ class RecentTransactionFragment: BaseFragment() {
                     recentTransactionList.adapter as TransactionRecyclerAdapter
                 }
                 rtAdapter.notifyDataSetChanged()
+
             }
-        })
+        }
     }
 
 }

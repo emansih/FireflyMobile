@@ -9,10 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import xyz.hisname.fireflyiii.R
 
-abstract class BaseFragment: Fragment(){
+abstract class BaseFragment: Fragment(), CoroutineScope {
 
+    override val coroutineContext = Job() + Dispatchers.Main
     val baseUrl: String by lazy { arguments?.getString("fireflyUrl") ?: "" }
     val accessToken: String by lazy { arguments?.getString("access_token") ?: "" }
 
