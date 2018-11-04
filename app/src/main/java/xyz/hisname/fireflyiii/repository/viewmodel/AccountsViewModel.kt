@@ -18,7 +18,7 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 class AccountsViewModel(application: Application) : AndroidViewModel(application){
 
     private val accountDatabase by lazy { AppDatabase.getInstance(application)?.accountDataDao() }
-    private var  accountsService: AccountsService? = null
+    private var accountsService: AccountsService? = null
     private val apiLiveData: MutableLiveData<ApiResponses<AccountsModel>> = MutableLiveData()
 
 

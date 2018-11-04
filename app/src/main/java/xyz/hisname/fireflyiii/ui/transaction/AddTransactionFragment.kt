@@ -52,7 +52,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         if(Objects.equals(transactionType, "Transfer")){
-            zipLiveData(accountDatabase?.getAssetAccount()!!, piggyBankDatabase?.getPiggy()!!)
+            zipLiveData(accountDatabase?.getAccountByType("Asset account")!!, piggyBankDatabase?.getPiggy()!!)
                     .observe(this, Observer {
                         it.first.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
@@ -73,7 +73,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         piggyBankName.setAdapter(adapter)
                     })
         } else if(Objects.equals(transactionType, "Deposit")){
-            zipLiveData(accountDatabase?.getRevenueAccount()!!, accountDatabase?.getAssetAccount()!!)
+            zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAccountByType("Revenue account")!!)
                     .observe(this , Observer {
                         it.first.forEachIndexed { _, accountData ->
                             sourceAccounts.add(accountData.accountAttributes?.name!!)
@@ -91,7 +91,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         sourceSpinner.isVisible = false
                     })
         } else {
-            zipLiveData(accountDatabase?.getAssetAccount()!!, accountDatabase?.getAllAccounts()!!)
+            zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAllAccounts()!!)
                     .observe(this, Observer {
                         // Spinner for source account
                         it.first.forEachIndexed { _, accountData ->

@@ -68,7 +68,7 @@ class AddPiggyActivity: BaseActivity(){
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
-        accountDatabase?.getAssetAccount()?.observe(this, Observer {
+        accountDatabase?.getAccountByType("Asset account")?.observe(this, Observer {
             if(it.isNotEmpty()) {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
