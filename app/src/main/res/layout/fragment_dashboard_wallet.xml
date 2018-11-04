@@ -46,7 +46,7 @@
                 android:layout_marginEnd="4dp"
                 android:background="@color/md_orange_500"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/creditLayout"
+                app:layout_constraintEnd_toStartOf="@+id/loanLayout"
                 app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -80,7 +80,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/creditLayout"
+                android:id="@+id/loanLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -91,32 +91,32 @@
                 app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/creditImageView"
+                    android:id="@+id/loanImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:srcCompat="@drawable/rectangle"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/creditTextView"
+                    android:id="@+id/loanTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
-                    android:text="Credit Card"
+                    android:text="Loan"
                     android:textColor="@color/white"
-                    app:layout_constraintStart_toStartOf="@+id/creditImageView"
-                    app:layout_constraintTop_toBottomOf="@+id/creditImageView" />
+                    app:layout_constraintStart_toStartOf="@+id/loanImageView"
+                    app:layout_constraintTop_toBottomOf="@+id/loanImageView" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/creditText"
+                    android:id="@+id/loanText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:text="--.--"
                     android:layout_marginBottom="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/creditTextView"
-                    app:layout_constraintStart_toStartOf="@+id/creditTextView" />
+                    app:layout_constraintTop_toBottomOf="@+id/loanTextView"
+                    app:layout_constraintStart_toStartOf="@+id/loanTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -127,7 +127,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="4dp"
                 android:background="@color/md_blue_500"
-                app:layout_constraintStart_toEndOf="@+id/creditLayout"
+                app:layout_constraintStart_toEndOf="@+id/loanLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/account_list_text">
 

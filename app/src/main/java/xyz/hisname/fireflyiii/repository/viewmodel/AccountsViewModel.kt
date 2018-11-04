@@ -45,20 +45,6 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         return BaseResponse(accountDatabase?.getAllAccounts(), apiResponse)
     }
 
-    fun getAccountType(baseUrl: String, accessToken: String, type: String): LiveData<ApiResponses<AccountsModel>>{
-        val apiResponse = MediatorLiveData<ApiResponses<AccountsModel>>()
-        val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
-        accountsService?.getAccountType(type)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                apiLiveData.postValue(ApiResponses(response.body()))
-            }
-        })
-        { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
-        apiResponse.addSource(apiLiveData) {
-            apiResponse.value = it
-        }
-        return apiResponse
-    }
-
+    fun getAccountType(type: String) = accountDatabase?.getAccountsByType(type)
 
 }
