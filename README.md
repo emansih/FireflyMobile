@@ -112,12 +112,7 @@ Icons in this app are taken from:
 ### Known Limitations / bugs
 Heh... I left this to the last.
 
-1. When upgrading between Firefly III versions, your oAuth access token will be invalidated. It is a known bug in Firefly III. A workaround will be to clear app data and re-sign in again. (See [#1648](https://github.com/firefly-iii/firefly-iii/issues/1648) for more info)
-2. When viewing bill / piggy bank details, sometimes the data is either repeated or not showing correctly. (Quick workaround: view the details page offline)
-3. Updating bill / piggy banks do not work yet, the actions are just placeholders.
-4. The amount in dashboard may be wrong at times
-5. "xxx will be added when you are back online" message is deceptive. It does not add yet...
-
+Please see [this](https://github.com/emansih/FireflyMobile/projects/1) for updates. 
 
 ### License
 ```
