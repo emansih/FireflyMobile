@@ -12,6 +12,7 @@ import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import xyz.hisname.fireflyiii.R
 
 abstract class BaseFragment: Fragment(), CoroutineScope {
@@ -34,5 +35,10 @@ abstract class BaseFragment: Fragment(), CoroutineScope {
             adapter?.notifyDataSetChanged()
             scheduleLayoutAnimation()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        coroutineContext.cancel()
     }
 }
