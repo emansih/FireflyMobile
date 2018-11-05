@@ -6,7 +6,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -19,6 +20,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
+import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
@@ -71,7 +73,6 @@ class HomeActivity: BaseActivity(){
                 val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, DashboardFragment().apply { arguments = bundle }, "dash")
-                        .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
                         .commit()
             }
         }
@@ -104,15 +105,31 @@ class HomeActivity: BaseActivity(){
                 .withIcon(R.drawable.ic_view_dashboard)
         val account = ExpandableDrawerItem().withName("Accounts")
                 .withIdentifier(2)
+                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_blue_A400))
+                .withIconTintingEnabled(true)
+                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_credit_card).sizeDp(24))
                 .withSelectable(false)
                 .withSubItems(
                         SecondaryDrawerItem().withName("Asset Accounts")
                                 .withLevel(3)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_cyan_A400))
+                                .withIconTintingEnabled(true)
+                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_money_bill).sizeDp(24))
                                 .withIdentifier(3),
-                        SecondaryDrawerItem().withName("Expanse Accounts")
+                        SecondaryDrawerItem().withName("Expense Accounts")
                                 .withLevel(3)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_yellow_400))
+                                .withIconTintingEnabled(true)
+                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_shopping_cart).sizeDp(24))
                                 .withIdentifier(4),
                         SecondaryDrawerItem().withName("Revenue Accounts")
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_black_1000))
+                                .withIconTintingEnabled(true)
+                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_download).sizeDp(24))
                                 .withLevel(3)
                                 .withIdentifier(5)
                 )
@@ -207,7 +224,7 @@ class HomeActivity: BaseActivity(){
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(dashboard, transactions,/*account, budgets, categories, tags, reports,
+                .addDrawerItems(dashboard, transactions,account,/* budgets, categories, tags, reports,
                         ,*/ moneyManagement,settings, about)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
@@ -216,8 +233,22 @@ class HomeActivity: BaseActivity(){
                             supportFragmentManager.beginTransaction()
                                     .replace(R.id.fragment_container,
                                             DashboardFragment().apply { arguments = bundle }, "dash")
-                                    .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
                                     .commit()
+                        }
+                        drawerItem.identifier == 3L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl,
+                                    "access_token" to accessToken, "accountType" to "asset")
+                            changeFragment(ListAccountFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 4L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl,
+                                    "access_token" to accessToken, "accountType" to "expense")
+                            changeFragment(ListAccountFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 5L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl,
+                                    "access_token" to accessToken, "accountType" to "revenue")
+                            changeFragment(ListAccountFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 11L -> {
                             val bundle = bundleOf("fireflyUrl" to baseUrl,
@@ -278,7 +309,6 @@ class HomeActivity: BaseActivity(){
     private fun changeFragment(fragment: Fragment){
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment)
-                .setTransition(FragmentTransaction.TRANSIT_ENTER_MASK)
                 .commit()
     }
 
@@ -309,6 +339,12 @@ class HomeActivity: BaseActivity(){
             if(supportFragmentManager.backStackEntryCount >= 1){
                 when {
                     supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment -> {
+                        val drawerLayout = result?.drawerLayout
+                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                        result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
+                        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                    }
+                    supportFragmentManager.findFragmentByTag("wallet") is ListAccountFragment -> {
                         val drawerLayout = result?.drawerLayout
                         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                         result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false

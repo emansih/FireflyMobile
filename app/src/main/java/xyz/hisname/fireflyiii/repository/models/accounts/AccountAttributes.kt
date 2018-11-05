@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Attributes(
+data class AccountAttributes(
         @PrimaryKey(autoGenerate = true)
         val accountIdPlaceHolder: Long,
         val updated_at: String,
