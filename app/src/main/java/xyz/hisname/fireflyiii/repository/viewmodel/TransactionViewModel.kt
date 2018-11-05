@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -12,6 +13,7 @@ import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.Response
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 import xyz.hisname.fireflyiii.repository.models.transaction.sucess.TransactionSucessModel
@@ -72,8 +74,24 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
                 amount,sourceName,destinationName,currencyName, category)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
-            if(errorBody != null){
+            if(errorBody != null) {
                 errorBodyMessage = String(errorBody.bytes())
+                val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                when {
+                    gson.errors.transactions_currency != null -> {
+                        if (gson.errors.transactions_currency.contains("is required")) {
+                            errorBodyMessage = "Currency Code Required"
+                        } else {
+                            errorBodyMessage = "Invalid Currency Code"
+                        }
+                    }
+                    gson.errors.bill_name != null -> errorBodyMessage = "Invalid Bill Name"
+                    gson.errors.piggy_bank_name != null -> errorBodyMessage = "Invalid Piggy Bank Name"
+                    gson.errors.transactions_destination_name != null -> errorBodyMessage = "Invalid Destination Account"
+                    gson.errors.transactions_source_name != null -> errorBodyMessage = "Invalid Source Account"
+                    gson.errors.transaction_destination_id != null -> errorBodyMessage = gson.errors.transaction_destination_id[0]
+                    else -> errorBodyMessage = "Error occurred while saving transaction"
+                }
             }
             if (response.isSuccessful) {
                 transaction.postValue(ApiResponses(response.body()))

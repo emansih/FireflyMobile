@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -14,6 +15,7 @@ import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
 import xyz.hisname.fireflyiii.repository.models.bills.success.BillSucessModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class BillsViewModel(application: Application) : AndroidViewModel(application) {
@@ -73,14 +75,25 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         billsService?.createBill(name, match, amountMin, amountMax, date,
                 repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
-                    var errorBody = ""
-                    if (response.errorBody() != null) {
-                        errorBody = String(response.errorBody()?.bytes()!!)
+                    var errorMessage = ""
+                    val responseErrorBody = response.errorBody()
+                    if (responseErrorBody != null) {
+                        errorMessage = String(responseErrorBody.bytes())
+                        val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                        errorMessage = when {
+                            gson.errors.name != null -> gson.errors.name[0]
+                            gson.errors.currency_code != null -> gson.errors.currency_code[0]
+                            gson.errors.amount_min != null -> gson.errors.amount_min[0]
+                            gson.errors.repeat_freq != null -> gson.errors.repeat_freq[0]
+                            gson.errors.automatch != null -> gson.errors.automatch[0]
+                            else -> "Error occurred while saving bill"
+                        }
                     }
+
                     if(response.isSuccessful){
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
-                        apiLiveData.postValue(ApiResponses(errorBody))
+                        apiLiveData.postValue(ApiResponses(errorMessage))
                     }
                 })
         { throwable -> apiLiveData.postValue(ApiResponses(throwable)) })

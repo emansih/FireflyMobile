@@ -5,12 +5,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
 import xyz.hisname.fireflyiii.repository.models.piggy.success.PiggySuccessModel
@@ -77,14 +79,23 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.createNewPiggyBank(piggyName, accountId, targetAmount, currentAmount, startDate,
                 targetDate, notes)?.enqueue(retrofitCallback({ response ->
-            var errorBody = ""
-            if (response.errorBody() != null) {
-                errorBody = String(response.errorBody()?.bytes()!!)
+            var errorMessage = ""
+            val responseErrorBody = response.errorBody()
+            if (responseErrorBody != null) {
+                errorMessage = String(responseErrorBody.bytes())
+                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                errorMessage = when {
+                    gson.errors.name != null -> gson.errors.name[0]
+                    gson.errors.account_id != null -> gson.errors.account_id[0]
+                    gson.errors.current_amount != null -> gson.errors.current_amount[0]
+                    gson.errors.targetDate != null -> gson.errors.targetDate[0]
+                    else -> "Error occurred while saving piggy bank"
+                }
             }
             if(response.isSuccessful){
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
-                apiLiveData.postValue(ApiResponses(errorBody))
+                apiLiveData.postValue(ApiResponses(errorMessage))
             }
         })
         { throwable ->

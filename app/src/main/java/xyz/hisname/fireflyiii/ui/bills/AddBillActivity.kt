@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
-import xyz.hisname.fireflyiii.repository.models.bills.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -174,17 +173,9 @@ class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
                 currency_code_edittext.getString(), notes)
                 .observe(this, Observer {
                     ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
-                    if(it.getErrorMessage() != null) {
-                        val errorMessage = it.getErrorMessage()
-                        val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
-                        when {
-                            gson.errors.name != null -> toastError(gson.errors.name[0])
-                            gson.errors.currency_code != null -> toastError(gson.errors.currency_code[0])
-                            gson.errors.amount_min != null -> toastError(gson.errors.amount_min[0])
-                            gson.errors.repeat_freq != null -> toastError(gson.errors.repeat_freq[0])
-                            gson.errors.automatch != null -> toastError(gson.errors.automatch[0])
-                            else -> toastError("Error occurred while saving bill")
-                        }
+                    val errorMessage = it.getErrorMessage()
+                    if(errorMessage != null) {
+                       toastError(errorMessage)
                     } else if(it.getError() != null){
                         if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
                             val billBroadcast = Intent("firefly.hisname.ADD_BILL")

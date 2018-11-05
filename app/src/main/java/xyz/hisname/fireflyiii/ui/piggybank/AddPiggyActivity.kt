@@ -10,12 +10,10 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_piggy_create.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
-import xyz.hisname.fireflyiii.repository.models.piggy.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -151,16 +149,9 @@ class AddPiggyActivity: BaseActivity(){
                             currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
                             .observe(this, Observer {
                                 ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
-                                if (it.getErrorMessage() != null) {
-                                    val errorMessage = it.getErrorMessage()
-                                    val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
-                                    when {
-                                        gson.errors.name != null -> toastError(gson.errors.name[0])
-                                        gson.errors.account_id != null -> toastError(gson.errors.account_id[0])
-                                        gson.errors.current_amount != null -> toastError(gson.errors.current_amount[0])
-                                        gson.errors.targetDate != null -> toastError(gson.errors.targetDate[0])
-                                        else -> toastError("Error occurred while saving piggy bank")
-                                    }
+                                val errorMessage = it.getErrorMessage()
+                                if (errorMessage != null) {
+                                    toastError(errorMessage)
                                 } else if (it.getError() != null) {
                                     if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
                                         val piggyBroadcast = Intent("firefly.hisname.ADD_PIGGY_BANK")
