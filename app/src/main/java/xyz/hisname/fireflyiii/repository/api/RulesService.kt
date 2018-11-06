@@ -7,6 +7,6 @@ import xyz.hisname.fireflyiii.repository.models.rules.Rulesmodel
 
 interface RulesService {
 
-    @GET(RULES_API_ENDPOINT)
+    @GET("$RULES_API_ENDPOINT/")
     fun getAllRules(): Call<Rulesmodel>
 }

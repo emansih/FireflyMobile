@@ -5,7 +5,7 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.TransactionService
-import xyz.hisname.fireflyiii.repository.models.transaction.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.retrofitCallback
 

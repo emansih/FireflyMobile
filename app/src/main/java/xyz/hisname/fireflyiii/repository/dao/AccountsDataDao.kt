@@ -25,4 +25,8 @@ abstract class AccountsDataDao {
     @Query("SELECT * FROM accounts WHERE type =:accountType")
     abstract fun getAccountsByType(accountType: String): MutableList<AccountData>
 
+    @Query("SELECT * FROM accounts WHERE accountId =:accountId")
+    abstract fun getAccountById(accountId: Long): MutableList<AccountData>
+
+
 }

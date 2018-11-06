@@ -7,7 +7,7 @@ import xyz.hisname.fireflyiii.repository.models.userinfo.settings.SettingsModel
 
 interface SettingsService {
 
-    @GET(SETTINGS_API_ENDPOINT)
+    @GET("$SETTINGS_API_ENDPOINT/")
     fun getSettings(): Call<SettingsModel>
 
 }

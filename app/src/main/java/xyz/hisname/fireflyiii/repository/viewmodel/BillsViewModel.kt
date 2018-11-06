@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -13,7 +14,8 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
-import xyz.hisname.fireflyiii.repository.models.bills.success.BillSucessModel
+import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class BillsViewModel(application: Application) : AndroidViewModel(application) {
@@ -66,21 +68,32 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addBill(baseUrl: String?, accessToken: String?, name: String, match: String,
                    amountMin: String, amountMax: String, date: String, repeatFreq: String,
-                   skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSucessModel>>{
-        val apiResponse = MediatorLiveData<ApiResponses<BillSucessModel>>()
-        val apiLiveData: MutableLiveData<ApiResponses<BillSucessModel>> = MutableLiveData()
+                   skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
+        val apiResponse = MediatorLiveData<ApiResponses<BillSuccessModel>>()
+        val apiLiveData: MutableLiveData<ApiResponses<BillSuccessModel>> = MutableLiveData()
         billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
         billsService?.createBill(name, match, amountMin, amountMax, date,
                 repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
-                    var errorBody = ""
-                    if (response.errorBody() != null) {
-                        errorBody = String(response.errorBody()?.bytes()!!)
+                    var errorMessage = ""
+                    val responseErrorBody = response.errorBody()
+                    if (responseErrorBody != null) {
+                        errorMessage = String(responseErrorBody.bytes())
+                        val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                        errorMessage = when {
+                            gson.errors.name != null -> gson.errors.name[0]
+                            gson.errors.currency_code != null -> gson.errors.currency_code[0]
+                            gson.errors.amount_min != null -> gson.errors.amount_min[0]
+                            gson.errors.repeat_freq != null -> gson.errors.repeat_freq[0]
+                            gson.errors.automatch != null -> gson.errors.automatch[0]
+                            else -> "Error occurred while saving bill"
+                        }
                     }
+
                     if(response.isSuccessful){
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
-                        apiLiveData.postValue(ApiResponses(errorBody))
+                        apiLiveData.postValue(ApiResponses(errorMessage))
                     }
                 })
         { throwable -> apiLiveData.postValue(ApiResponses(throwable)) })
@@ -90,9 +103,9 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateBill(baseUrl: String?, accessToken: String?, billId: String, name: String, match: String,
                    amountMin: String, amountMax: String, date: String, repeatFreq: String,
-                   skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSucessModel>>{
-        val apiResponse = MediatorLiveData<ApiResponses<BillSucessModel>>()
-        val apiLiveData: MutableLiveData<ApiResponses<BillSucessModel>> = MutableLiveData()
+                   skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
+        val apiResponse = MediatorLiveData<ApiResponses<BillSuccessModel>>()
+        val apiLiveData: MutableLiveData<ApiResponses<BillSuccessModel>> = MutableLiveData()
         billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
         billsService?.updateBill(billId, name, match, amountMin, amountMax, date,
                 repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(

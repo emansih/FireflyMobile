@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.TRANSACTION_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
-import xyz.hisname.fireflyiii.repository.models.transaction.sucess.TransactionSucessModel
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/transactions.html
 interface TransactionService {
@@ -12,7 +12,7 @@ interface TransactionService {
     /* Start date and end date is an optional query. Do not pass NULL into it, instead pass
     an empty string to it.
     */
-    @GET(TRANSACTION_API_ENDPOINT)
+    @GET("$TRANSACTION_API_ENDPOINT/")
     fun getAllTransactions(@Query("start") startDate: String?,
                            @Query("end") endDate: String?,
                            @Query("type") type: String): Call<TransactionModel>
@@ -31,7 +31,7 @@ interface TransactionService {
                        @Field("transactions[0][source_name]") sourceName: String?,
                        @Field("transactions[0][destination_name]") destionationName: String?,
                        @Field("transactions[0][currency_code]") currency: String,
-                       @Field("transactions[0][category_name]") category: String?): Call<TransactionSucessModel>
+                       @Field("transactions[0][category_name]") category: String?): Call<TransactionSuccessModel>
 
     @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)
@@ -45,7 +45,7 @@ interface TransactionService {
                        @Field("tags") tags: String?, @Field("transactions[0][budget_name]") budgetName: String?,
                        @Field("interest_date") interestDate: String?, @Field("book_date") bookDate: String?,
                        @Field("process_date") processDate: String?, @Field("due_date") dueDate: String?,
-                       @Field("payment_date") paymentDate: String?, @Field("invoice_date") invoiceDate: String?): Call<TransactionSucessModel>
+                       @Field("payment_date") paymentDate: String?, @Field("invoice_date") invoiceDate: String?): Call<TransactionSuccessModel>
 
 
 }

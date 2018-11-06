@@ -12,9 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import xyz.hisname.fireflyiii.GenericReceiver
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
-import xyz.hisname.fireflyiii.ui.piggybank.AddPiggyActivity
 import java.util.*
 
 
@@ -25,6 +23,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
     private val TRANSACTION_CHANNEL_ID = "xyz.hisname.fireflyiii.TRANSACTION"
     private val TRANSACTION_CHANNEL_NAME = "Transaction"
 
+    // TODO: Refactor this class
 
     fun showPiggyBankNotification(contextText: String, contextTitle: String) {
         val PIGGY_BANK_CHANNEL_ID = "xyz.hisname.fireflyiii.PIGGY_BANK"
@@ -155,6 +154,31 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
             setContentText(contextText)
             setGroup(GROUP_ID)
             setSmallIcon(R.drawable.ic_refresh)
+            setGroupSummary(true)
+            setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
+            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+        }
+        notificationManager.notify(createNotificationId(), groupBuilder.build())
+    }
+
+    fun showAccountNotification(contextText: String, contextTitle: String){
+        val ACCOUNT_CHANNEL_ID = "xyz.hisname.fireflyiii.ACCOUNT"
+        val ACCOUNT_CHANNEL_NAME = "Account"
+        val GROUP_ID = "xyz.hisname.fireflyiii.ACCOUNT"
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val accountChannel = NotificationChannel(ACCOUNT_CHANNEL_ID,
+                    ACCOUNT_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT).apply {
+                enableLights(true)
+                description = "Show Account Notifications"
+                enableVibration(false)
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
+            manager.createNotificationChannel(accountChannel)
+        }
+        val groupBuilder = NotificationCompat.Builder(this, ACCOUNT_CHANNEL_ID).apply {
+            setContentText(contextText)
+            setGroup(GROUP_ID)
+            setSmallIcon(R.drawable.ic_perm_identity_black_24dp)
             setGroupSummary(true)
             setStyle(NotificationCompat.InboxStyle().setBigContentTitle(contextTitle).addLine(contextText))
             setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)

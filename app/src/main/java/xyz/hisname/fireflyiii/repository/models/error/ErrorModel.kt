@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository.models.bills
+package xyz.hisname.fireflyiii.repository.models.error
 
 data class ErrorModel(
         val message: String,

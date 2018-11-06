@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import kotlinx.android.synthetic.main.fragment_dashboard_wallet.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
+import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -20,6 +22,8 @@ class WalletFragment: BaseFragment() {
     private var loan: Double = 0.toDouble()
     private var cash: Double = 0.toDouble()
     private var assets: Double = 0.toDouble()
+    private val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
+            "accountType" to "all") }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -30,6 +34,12 @@ class WalletFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         model.getAccounts(baseUrl,accessToken).databaseData
         displayData()
+        overviewCard.setOnClickListener {
+            requireFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, ListAccountFragment().apply { arguments = bundle }, "wallet")
+                    .addToBackStack(null)
+                    .commit()
+        }
     }
 
     private fun displayData() {

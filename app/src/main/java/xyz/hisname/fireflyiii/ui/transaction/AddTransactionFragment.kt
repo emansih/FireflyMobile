@@ -6,18 +6,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
-import xyz.hisname.fireflyiii.repository.models.transaction.ErrorModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -222,32 +220,19 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         billName, transactionAmountEditText.getString(), sourceAccount,
                         destinationAccount, currencyEditText.getString(), categoryName
                 ).observe(this, Observer { transactionResponse ->
+                    val errorMessage = transactionResponse.getErrorMessage()
                     if (transactionResponse.getResponse() != null) {
                         toastSuccess("Transaction Added")
                         requireFragmentManager().popBackStack()
-                    } else if(transactionResponse.getErrorMessage() != null){
+                    } else if(errorMessage != null){
                         ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-                        val errorMessage = transactionResponse.getErrorMessage()
-                        val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
-                        when {
-                            gson.errors.transactions_currency != null -> {
-                                if(gson.errors.transactions_currency.contains("is required")){
-                                    currencyEditText.error = "Currency Code Required"
-                                } else {
-                                    currencyEditText.error = "Invalid Currency Code"
-                                }
-                            }
-                            gson.errors.bill_name != null -> billEditText.error = "Invalid Bill Name"
-                            gson.errors.piggy_bank_name != null -> piggyBankName.error = "Invalid Piggy Bank Name"
-                            gson.errors.transactions_destination_name != null -> destinationAutoComplete.error = "Invalid Destination Account"
-                            gson.errors.transactions_source_name != null -> sourceAutoComplete.error = "Invalid Source Account"
-                            gson.errors.transaction_destination_id != null -> toastError(gson.errors.transaction_destination_id[0])
-                            else -> toastError("Error occurred while saving transaction", Toast.LENGTH_LONG)
-                        }
+                        toastError(errorMessage)
                     } else if(transactionResponse.getError() != null){
                         if(transactionResponse.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
                             if(Objects.equals("transfers", transactionType)){
-                                val transferBroadcast = Intent("firefly.hisname.ADD_TRANSFER")
+                                val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
+                                    action = "firefly.hisname.ADD_TRANSFER"
+                                }
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
@@ -262,7 +247,9 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                                 requireActivity().sendBroadcast(transferBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Transfer"))
                             } else if(Objects.equals("Deposit", transactionType)){
-                                val transferBroadcast = Intent("firefly.hisname.ADD_DEPOSIT")
+                                val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
+                                    action = "firefly.hisname.ADD_DEPOSIT"
+                                }
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
@@ -275,7 +262,9 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                                 requireActivity().sendBroadcast(transferBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Deposit"))
                             } else if(Objects.equals("Withdrawal", transactionType)){
-                                val withdrawalBroadcast = Intent("firefly.hisname.ADD_WITHDRAW")
+                                val withdrawalBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
+                                    action = "firefly.hisname.ADD_WITHDRAW"
+                                }
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
