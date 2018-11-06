@@ -15,7 +15,7 @@ import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
-import xyz.hisname.fireflyiii.repository.models.piggy.success.PiggySuccessModel
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class PiggyBankViewModel(application: Application) : AndroidViewModel(application) {

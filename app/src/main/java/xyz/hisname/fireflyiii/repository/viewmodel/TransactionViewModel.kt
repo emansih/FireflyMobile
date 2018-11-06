@@ -11,12 +11,11 @@ import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.TransactionService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
-import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.Response
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
-import xyz.hisname.fireflyiii.repository.models.transaction.sucess.TransactionSucessModel
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import java.util.*
 
@@ -66,9 +65,9 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     fun addTransaction(baseUrl: String?, accessToken: String?, type: String, description: String,
                        date: String, piggyBankName: String?, billName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?): LiveData<ApiResponses<TransactionSucessModel>>{
-        val transaction: MutableLiveData<ApiResponses<TransactionSucessModel>> = MutableLiveData()
-        val apiResponse: MediatorLiveData<ApiResponses<TransactionSucessModel>> = MediatorLiveData()
+                       category: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
+        val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
+        val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
         transactionService?.addTransaction(convertString(type),description,date,piggyBankName,billName,
                 amount,sourceName,destinationName,currencyName, category)?.enqueue(retrofitCallback({ response ->

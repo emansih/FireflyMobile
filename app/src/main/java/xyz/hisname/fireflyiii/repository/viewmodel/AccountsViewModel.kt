@@ -14,7 +14,7 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
-import xyz.hisname.fireflyiii.repository.models.accounts.success.AccountSuccessModel
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import java.util.*

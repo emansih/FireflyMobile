@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.ACCOUNTS_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
-import xyz.hisname.fireflyiii.repository.models.accounts.success.AccountSuccessModel
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/accounts.html
 interface AccountsService {

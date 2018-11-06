@@ -5,7 +5,7 @@ import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.PIGGY_BANK_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
-import xyz.hisname.fireflyiii.repository.models.piggy.success.PiggySuccessModel
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/piggy_banks.html
 interface PiggybankService {
