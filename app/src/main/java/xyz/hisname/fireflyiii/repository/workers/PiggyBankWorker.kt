@@ -5,7 +5,7 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.PiggybankService
-import xyz.hisname.fireflyiii.repository.models.piggy.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
