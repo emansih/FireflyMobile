@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/accountName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="24dp"
+                android:hint="Account Name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/accountType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="@+id/accountName"
+                app:layout_constraintStart_toStartOf="@+id/accountName"
+                app:layout_constraintTop_toBottomOf="@+id/accountName" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/currencyCode"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:layout_marginTop="16dp"
+                android:hint="Currency Code"
+                app:layout_constraintEnd_toEndOf="@+id/accountType"
+                app:layout_constraintStart_toStartOf="@+id/accountType"
+                app:layout_constraintTop_toBottomOf="@+id/accountType" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/netWorthText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Include Net Worth?"
+                android:layout_marginStart="12dp"
+                app:layout_constraintBottom_toBottomOf="@+id/netWorthCheckbox"
+                app:layout_constraintStart_toEndOf="@+id/netWorthCheckbox"
+                app:layout_constraintTop_toTopOf="@+id/netWorthCheckbox" />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/netWorthCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="@+id/currencyCode"
+                app:layout_constraintTop_toBottomOf="@+id/currencyCode" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/accountNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Account Number (Optional)"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@+id/currencyCode"
+                app:layout_constraintStart_toStartOf="@+id/netWorthCheckbox"
+                app:layout_constraintTop_toBottomOf="@+id/netWorthCheckbox" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/accountRole"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/accountNumber"
+                app:layout_constraintStart_toStartOf="@+id/accountNumber"
+                app:layout_constraintTop_toBottomOf="@+id/accountNumber" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/ccType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                android:hint="Credit Card Type"
+                app:layout_constraintEnd_toEndOf="@+id/accountRole"
+                app:layout_constraintStart_toStartOf="@+id/accountRole"
+                app:layout_constraintTop_toBottomOf="@+id/accountRole"/>
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/ccPaymentDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                android:focusable="false"
+                android:hint="Credit Card Payment Date"
+                app:layout_constraintEnd_toEndOf="@+id/ccType"
+                app:layout_constraintStart_toStartOf="@+id/ccType"
+                app:layout_constraintTop_toBottomOf="@+id/ccType"/>
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/liabilityType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/accountName"
+                app:layout_constraintStart_toStartOf="@+id/accountName"
+                app:layout_constraintTop_toBottomOf="@+id/accountNumber"/>
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/liabilityAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:inputType="numberDecimal"
+                android:hint="Liability Amount"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/accountName"
+                app:layout_constraintStart_toStartOf="@+id/accountName"
+                app:layout_constraintTop_toBottomOf="@+id/liabilityType"/>
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/liabilityStartDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:inputType="date"
+                android:hint="Liability Start Date"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/accountName"
+                app:layout_constraintStart_toStartOf="@+id/accountName"
+                app:layout_constraintTop_toBottomOf="@+id/liabilityAmount"/>
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/liabilityInterest"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:inputType="numberDecimal"
+                android:hint="Liability Interest"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/accountName"
+                app:layout_constraintStart_toStartOf="@+id/accountName"
+                app:layout_constraintTop_toBottomOf="@+id/liabilityStartDate"/>
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/interestPeriod"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/accountName"
+                app:layout_constraintStart_toStartOf="@+id/accountName"
+                app:layout_constraintTop_toBottomOf="@+id/liabilityInterest"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <include layout="@layout/progress_overlay"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

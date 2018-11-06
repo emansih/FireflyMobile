@@ -86,6 +86,9 @@ class AccountDetailFragment: BaseDetailFragment() {
         R.id.menu_item_delete -> consume {
             deleteItem()
         }
+        android.R.id.home -> consume {
+            requireFragmentManager().popBackStack()
+        }
         else -> super.onOptionsItemSelected(item)
     }
 }

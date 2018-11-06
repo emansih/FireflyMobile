@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -13,6 +14,8 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
+import xyz.hisname.fireflyiii.repository.models.accounts.success.AccountSuccessModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import java.util.*
 
@@ -77,6 +80,45 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
             Objects.equals(type, "revenue") -> accountDatabase?.getAccountByType("Revenue account")
             else -> accountDatabase?.getAllAccounts()
         }
+    }
+
+    fun addAccounts(baseUrl: String, accessToken: String, accountName: String, accountType: String,
+                    currencyCode: String, includeNetWorth: Int, accountRole: String?,
+                    ccType: String?, ccMonthlyPaymentDate: String?, liabilityType: String?,
+                    liabilityAmount: String?,liabilityStartDate: String?, interest: Int?,
+                    interestPeriod: String?,accountNumber: String?): LiveData<ApiResponses<AccountSuccessModel>>{
+        val apiResponse: MediatorLiveData<ApiResponses<AccountSuccessModel>> =  MediatorLiveData()
+        val apiLiveData: MutableLiveData<ApiResponses<AccountSuccessModel>> = MutableLiveData()
+        accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        accountsService?.addAccount(accountName, accountType, currencyCode,1, includeNetWorth,
+                accountRole, ccType, ccMonthlyPaymentDate, liabilityType, liabilityAmount, liabilityStartDate,
+                interest, interestPeriod, accountNumber)?.enqueue(retrofitCallback({ response ->
+            var errorMessage = ""
+            val responseErrorBody = response.errorBody()
+            if (responseErrorBody != null) {
+                errorMessage = String(responseErrorBody.bytes())
+                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                errorMessage = when {
+                    gson.errors.name != null -> gson.errors.name[0]
+                    gson.errors.account_number != null -> gson.errors.account_number[0]
+                    gson.errors.interest != null -> gson.errors.interest[0]
+                    gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
+                    else -> "Error occurred while saving Account"
+                }
+            }
+            if (response.isSuccessful) {
+                GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
+                    accountDatabase?.addAccounts(response.body()?.data!!)
+                }
+                apiLiveData.postValue(ApiResponses(response.body()))
+            } else {
+                apiLiveData.postValue(ApiResponses(errorMessage))
+            }
+
+        })
+        { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
+        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
+        return apiResponse
     }
 
     fun getAccountType(type: String) = accountDatabase?.getAccountsByType(type)

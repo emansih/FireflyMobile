@@ -88,12 +88,21 @@ class ListAccountFragment: BaseFragment() {
         fab.apply {
             isVisible = true
             translationY = (6 * 56).toFloat()
-            animate().translationY(0.toFloat())
-                    .setInterpolator(OvershootInterpolator(1.toFloat()))
+            animate().translationY(0f)
+                    .setInterpolator(OvershootInterpolator(1f))
                     .setStartDelay(300)
                     .setDuration(400)
                     .start()
-
+            setOnClickListener {
+                val bundle = bundleOf("fireflyUrl" to baseUrl,
+                        "access_token" to accessToken)
+                requireFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container,
+                                AddAccountFragment().apply { arguments = bundle })
+                        .addToBackStack(null)
+                        .commit()
+                requireActivity().globalFAB.isVisible = false
+            }
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

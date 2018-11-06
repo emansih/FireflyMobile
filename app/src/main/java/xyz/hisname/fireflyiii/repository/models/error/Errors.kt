@@ -20,5 +20,9 @@ data class Errors(
         @SerializedName("transactions.0.source_name")
         val transactions_source_name: List<String>?,
         val bill_name: List<String>?,
-        val piggy_bank_name: List<String>?
+        val piggy_bank_name: List<String>?,
+        val account_number: List<String>?,
+        val interest: List<String>?,
+        @SerializedName("liability_start_date")
+        val liabilityStartDate: List<String>?
 )
