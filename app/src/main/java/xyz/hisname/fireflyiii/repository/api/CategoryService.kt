@@ -9,6 +9,6 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryModel
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/categories.html
 interface CategoryService {
 
-    @GET(CATEGORY_API_ENDPOINT)
+    @GET("$CATEGORY_API_ENDPOINT/")
     fun getCategory(): Call<CategoryModel>
 }

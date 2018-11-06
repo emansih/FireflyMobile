@@ -8,8 +8,6 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/currency.html
 interface CurrencyService {
 
-    // TODO add callbacks
-
     @GET(CURRENCY_API_ENDPOINT)
     fun getCurrency(): Call<CurrencyModel>
 

@@ -10,7 +10,7 @@ interface RecurrenceService {
 
     // TODO: add callbacks
 
-    @GET(RECURRENCE_API_ENDPOINT)
+    @GET("$RECURRENCE_API_ENDPOINT/")
     fun getRecurrence()
 
     @DELETE("$RECURRENCE_API_ENDPOINT/{id}")
