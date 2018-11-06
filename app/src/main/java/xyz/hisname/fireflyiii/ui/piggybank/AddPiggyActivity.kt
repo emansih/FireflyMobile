@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_piggy_create.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -154,7 +155,9 @@ class AddPiggyActivity: BaseActivity(){
                                     toastError(errorMessage)
                                 } else if (it.getError() != null) {
                                     if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
-                                        val piggyBroadcast = Intent("firefly.hisname.ADD_PIGGY_BANK")
+                                        val piggyBroadcast = Intent(this, PiggyBankReceiver::class.java).apply {
+                                            action = "firefly.hisname.ADD_PIGGY_BANK"
+                                        }
                                         val extras = bundleOf(
                                                 "name" to piggy_name_edittext.getString(),
                                                 "accountId" to accountData[0].accountId.toString(),

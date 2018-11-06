@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
@@ -229,7 +230,9 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                     } else if(transactionResponse.getError() != null){
                         if(transactionResponse.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
                             if(Objects.equals("transfers", transactionType)){
-                                val transferBroadcast = Intent("firefly.hisname.ADD_TRANSFER")
+                                val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
+                                    action = "firefly.hisname.ADD_TRANSFER"
+                                }
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
@@ -244,7 +247,9 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                                 requireActivity().sendBroadcast(transferBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Transfer"))
                             } else if(Objects.equals("Deposit", transactionType)){
-                                val transferBroadcast = Intent("firefly.hisname.ADD_DEPOSIT")
+                                val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
+                                    action = "firefly.hisname.ADD_DEPOSIT"
+                                }
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
@@ -257,7 +262,9 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                                 requireActivity().sendBroadcast(transferBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Deposit"))
                             } else if(Objects.equals("Withdrawal", transactionType)){
-                                val withdrawalBroadcast = Intent("firefly.hisname.ADD_WITHDRAW")
+                                val withdrawalBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
+                                    action = "firefly.hisname.ADD_WITHDRAW"
+                                }
                                 val extras = bundleOf(
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),

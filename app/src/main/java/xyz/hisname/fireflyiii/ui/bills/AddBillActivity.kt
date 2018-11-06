@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_add_bill.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.receiver.BillReceiver
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -178,7 +179,9 @@ class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
                        toastError(errorMessage)
                     } else if(it.getError() != null){
                         if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
-                            val billBroadcast = Intent("firefly.hisname.ADD_BILL")
+                            val billBroadcast = Intent(this, BillReceiver::class.java).apply {
+                                action = "firefly.hisname.ADD_BILL"
+                            }
                             val extras = bundleOf(
                                     "name" to bill_name_edittext.getString(),
                                     "billMatch" to bill_match_edittext.getString(),
