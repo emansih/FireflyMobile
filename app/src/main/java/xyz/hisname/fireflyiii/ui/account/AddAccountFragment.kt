@@ -9,11 +9,13 @@ import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
+import androidx.work.*
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
+import xyz.hisname.fireflyiii.repository.workers.AccountWorker
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
@@ -152,7 +154,7 @@ class AddAccountFragment: BaseFragment(), CurrencyListFragment.OnCompleteListene
             null
         }
         val liability_interest = if(liabilityInterest.isVisible) {
-            liabilityInterest.getString().toInt()
+            liabilityInterest.getString()
         } else {
             null
         }
@@ -181,12 +183,42 @@ class AddAccountFragment: BaseFragment(), CurrencyListFragment.OnCompleteListene
                 liability_type, liability_amount, liability_start_date, liability_interest,
                 interest_period, accountNumber.getString())
                 .observe(this, Observer {
+                    val error = it.getError()
                     ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                     if(it.getResponse() != null){
                         toastSuccess("Account saved!")
                         requireFragmentManager().popBackStack()
                     } else if(it.getErrorMessage() != null){
                         toastError(it.getErrorMessage())
+                    } else if(error != null){
+                        if(error.localizedMessage.startsWith("Unable to resolve host")){
+                            val accountData = Data.Builder()
+                                    .putString("name", accountName.getString())
+                                    .putString("type", account_type)
+                                    .putString("currencyCode", currencyCode.getString())
+                                    .putInt("includeNetWorth", networth)
+                                    .putString("accountRole", role)
+                                    .putString("ccType", creditCardType)
+                                    .putString("ccMonthlyPaymentDate", creditCardDate)
+                                    .putString("liabilityType", liability_type)
+                                    .putString("liabilityAmount", liability_amount)
+                                    .putString("liabilityStartDate", liability_start_date)
+                                    .putString("interest", liability_interest)
+                                    .putString("interestPeriod", interest_period)
+                                    .putString("accountNumber", accountNumber.getString())
+                                    .build()
+                            val accountWork = OneTimeWorkRequest.Builder(AccountWorker::class.java)
+                                    .setInputData(accountData)
+                                    .setConstraints(Constraints.Builder()
+                                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                                            .build())
+                                    .build()
+                            WorkManager.getInstance().enqueue(accountWork)
+                            toastOffline(getString(R.string.data_added_when_user_online, "Account"))
+                            requireFragmentManager().popBackStack()
+                        } else {
+                            toastError("Error saving account")
+                        }
                     } else {
                         toastError("Error saving account")
                     }

@@ -85,7 +85,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
     fun addAccounts(baseUrl: String, accessToken: String, accountName: String, accountType: String,
                     currencyCode: String, includeNetWorth: Int, accountRole: String?,
                     ccType: String?, ccMonthlyPaymentDate: String?, liabilityType: String?,
-                    liabilityAmount: String?,liabilityStartDate: String?, interest: Int?,
+                    liabilityAmount: String?,liabilityStartDate: String?, interest: String?,
                     interestPeriod: String?,accountNumber: String?): LiveData<ApiResponses<AccountSuccessModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<AccountSuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<AccountSuccessModel>> = MutableLiveData()

@@ -25,7 +25,7 @@ interface AccountsService {
                    @Field("liability_type") liabilityType: String?,
                    @Field("liability_amount") liabilityAmount: String?,
                    @Field("liability_start_date") liabilityStartDate: String?,
-                   @Field("interest") interest: Int?,
+                   @Field("interest") interest: String?,
                    @Field("interest_period") interestPeriod: String?,
                    @Field("account_number") accountNumber: String?): Call<AccountSuccessModel>
 }
