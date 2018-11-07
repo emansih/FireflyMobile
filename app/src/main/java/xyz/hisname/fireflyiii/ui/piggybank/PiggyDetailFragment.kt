@@ -143,7 +143,7 @@ class PiggyDetailFragment: BaseDetailFragment(), CoroutineScope {
         }.start()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         R.id.menu_item_edit -> consume {
             val bundle = bundleOf("piggyId" to piggyId)
             val addPiggy = Intent(requireContext(), AddPiggyActivity::class.java).apply{

@@ -100,7 +100,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
         super.setDivider(ColorDrawable(Color.GRAY))
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().activity_toolbar.title = "Settings"
     }

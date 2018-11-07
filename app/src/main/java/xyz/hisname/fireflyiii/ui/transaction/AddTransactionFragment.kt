@@ -168,7 +168,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
         })
     }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().activity_toolbar.title = "Add $transactionType"
     }
@@ -178,8 +178,8 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
         requireActivity().activity_toolbar?.title = "Add $transactionType"
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.save_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.save_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 

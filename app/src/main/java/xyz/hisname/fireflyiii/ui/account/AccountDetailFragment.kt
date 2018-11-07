@@ -80,7 +80,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     override fun deleteItem() {
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId){
+    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         R.id.menu_item_edit -> consume {
         }
         R.id.menu_item_delete -> consume {
