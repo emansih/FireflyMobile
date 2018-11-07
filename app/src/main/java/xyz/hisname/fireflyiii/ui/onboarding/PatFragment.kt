@@ -46,6 +46,9 @@ class PatFragment: Fragment() {
                 } else {
                     firefly_url_edittext.getString()
                 }
+                if(!fireflyUrl.endsWith("/")){
+                    fireflyUrl = "$fireflyUrl/"
+                }
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 model.getTransactions(fireflyUrl,firefly_secret_edittext.getString(), DateTimeUtil.getTodayDate(),
                         DateTimeUtil.getTodayDate(), "withdrawal").apiResponse.observe(this, Observer {

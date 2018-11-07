@@ -6,6 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.repository.interceptors.RetrofitHeaderInterceptor
+import java.lang.StringBuilder
 import java.util.*
 
 class RetrofitBuilder {
@@ -15,6 +16,13 @@ class RetrofitBuilder {
         @Volatile private var INSTANCE: Retrofit? = null
 
         fun getClient(baseUrl: String?, accessToken: String?): Retrofit?{
+            var modifiedUrl = baseUrl?.substring(8)
+            val stringBuilder = StringBuilder(modifiedUrl).deleteCharAt(modifiedUrl!!.length - 1)
+            modifiedUrl = if(stringBuilder.contains("/")){
+                baseUrl
+            } else {
+                "https://"  + stringBuilder.toString()
+            }
             if(INSTANCE == null){
                 val client =  OkHttpClient().newBuilder()
                         .addInterceptor(RetrofitHeaderInterceptor(accessToken))
@@ -31,7 +39,7 @@ class RetrofitBuilder {
                 }
                 synchronized(RetrofitBuilder::class.java){
                     INSTANCE = Retrofit.Builder()
-                            .baseUrl(baseUrl)
+                            .baseUrl(modifiedUrl)
                             .client(client.build())
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()

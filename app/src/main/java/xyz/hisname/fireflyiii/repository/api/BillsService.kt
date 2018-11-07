@@ -10,7 +10,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/bills.html
 interface BillsService {
 
-    @GET("$BILL_API_ENDPONT/")
+    @GET(BILL_API_ENDPONT)
     fun getBills(): Call<BillsModel>
 
 
