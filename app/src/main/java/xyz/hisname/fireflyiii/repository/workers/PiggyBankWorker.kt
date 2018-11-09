@@ -3,16 +3,20 @@ package xyz.hisname.fireflyiii.repository.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
+import xyz.hisname.fireflyiii.Constants
+import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 
 class PiggyBankWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private lateinit var success: Result
+    private val channelName: String = "Piggy Bank"
+    private val channelDescription = "Show Piggy Bank Notifications"
+    private val channelIcon = R.drawable.ic_sort_descending
 
     override fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
@@ -23,15 +27,15 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val endDate = inputData.getString("endDate")
         val notes = inputData.getString("notes")
         val piggyBankService = RetrofitBuilder.getClient(baseUrl, accessToken)?.create(PiggybankService::class.java)
-        val notif = NotificationUtils(context)
         piggyBankService?.createNewPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)?.enqueue(retrofitCallback({ response ->
             var errorBody = ""
             if (response.errorBody() != null) {
                 errorBody = String(response.errorBody()?.bytes()!!)
             }
             val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-            success = if (response.isSuccessful) {
-                notif.showPiggyBankNotification("$name added successfully!", "Piggy Bank Added")
+            if (response.isSuccessful) {
+                context.displayNotification("$name was added successfully!", "Piggy Bank Added",
+                        Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
                 Result.SUCCESS
             } else {
                 var error = ""
@@ -40,13 +44,15 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                     gson.errors.account_id != null -> error = gson.errors.account_id[0]
                     gson.errors.current_amount != null -> error = gson.errors.current_amount[0]
                 }
-                notif.showPiggyBankNotification(error, "Error Adding $name")
+                context.displayNotification(error, "There was an issue adding $name",
+                        Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
                 Result.FAILURE
             }
         })
         { throwable ->
-            notif.showPiggyBankNotification(throwable.message.toString(), "Error adding Piggy Bank")
-            success = Result.FAILURE
+            context.displayNotification(throwable.message.toString(), "Error adding $name",
+                    Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
+            Result.FAILURE
         })
         return Result.SUCCESS
     }

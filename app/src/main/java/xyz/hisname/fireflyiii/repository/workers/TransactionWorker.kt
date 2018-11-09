@@ -3,17 +3,22 @@ package xyz.hisname.fireflyiii.repository.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
+import xyz.hisname.fireflyiii.Constants
+import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
-class TranscationWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
+class TransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
+    private val channelName = "Transactions"
+    private val channelDescription = "Show Transaction Notifications"
+    private val channelIcon = R.drawable.ic_refresh
 
     override fun doWork(): Result {
-        val notif = NotificationUtils(context)
+       // val notif = NotificationUtils(context)
         val transactionType = inputData.getString("transactionType") ?: ""
         val transactionDescription = inputData.getString("description") ?: ""
         val transactionDate = inputData.getString("date") ?: ""
@@ -45,7 +50,8 @@ class TranscationWorker(private val context: Context, workerParameters: WorkerPa
                     }
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if(response.isSuccessful){
-                        notif.showTransactionNotification("Transaction added successfully!", "Transaction")
+                        context.displayNotification("Transaction added successfully!",transactionType,
+                                Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
                         Result.SUCCESS
                     } else {
                         var error = ""
@@ -60,12 +66,15 @@ class TranscationWorker(private val context: Context, workerParameters: WorkerPa
                                 error = gson.errors.transactions_source_name[0]
                             }
                         }
-                        notif.showTransactionNotification(error, "Error Adding $transactionType")
+                        context.displayNotification(error,"Error Adding $transactionType",
+                                Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
                         Result.FAILURE
                     }
                 })
                 { throwable ->
-                    notif.showTransactionNotification(throwable.message.toString(), "Error adding Transaction")
+                    context.displayNotification(throwable.message.toString(),
+                            "Error Adding $transactionType",
+                            Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
                     Result.FAILURE
                 })
         return Result.SUCCESS

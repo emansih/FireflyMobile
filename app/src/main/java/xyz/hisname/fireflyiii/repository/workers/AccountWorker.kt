@@ -3,14 +3,19 @@ package xyz.hisname.fireflyiii.repository.workers
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
+import xyz.hisname.fireflyiii.Constants
+import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class AccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
+    private val channelName = "Account"
+    private val channelDescription = "Show Account Notifications"
+    private val channelIcon = R.drawable.ic_euro_sign
 
     override fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
@@ -26,7 +31,6 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val interest = inputData.getString("interest")
         val interestPeriod = inputData.getString("interestPeriod")
         val accountNumber = inputData.getString("accountNumber")
-        val notif = NotificationUtils(context)
         val accountService = RetrofitBuilder.getClient(baseUrl, accessToken)?.create(AccountsService::class.java)
         accountService?.addAccount(name,type,currencyCode,1,includeNetWorth,accountRole,ccType,
                 ccMonthlyPaymentDate,liabilityType,liabilityAmount,liabilityStartDate,interest,interestPeriod,accountNumber)?.enqueue(
@@ -38,7 +42,8 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     }
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if(response.isSuccessful) {
-                        notif.showAccountNotification("$name added successfully!", "Account Added")
+                        context.displayNotification("$name was added successfully!", "Account Added",
+                                Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
                         Result.SUCCESS
                     } else {
                         error = when {
@@ -48,7 +53,8 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                             gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
                             else -> "Error saving account"
                         }
-                        notif.showAccountNotification(error, "Error Adding $name")
+                        context.displayNotification(error, "There was an error adding $name",
+                                Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
                         Result.FAILURE
                     }
                 })

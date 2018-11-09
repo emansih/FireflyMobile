@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.work.*
-import xyz.hisname.fireflyiii.repository.workers.TranscationWorker
+import xyz.hisname.fireflyiii.repository.workers.TransactionWorker
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
 class TransactionReceiver: BroadcastReceiver()  {
@@ -61,7 +61,7 @@ class TransactionReceiver: BroadcastReceiver()  {
     }
 
     private fun transactionWork(data: Data.Builder, type: String){
-        val transactionWork = OneTimeWorkRequest.Builder(TranscationWorker::class.java)
+        val transactionWork = OneTimeWorkRequest.Builder(TransactionWorker::class.java)
                 .setInputData(data.putString("transactionType" ,type).build())
                 .setConstraints(Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
