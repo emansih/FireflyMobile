@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.ui.currency
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,8 +25,10 @@ import java.util.*
 class CurrencyListFragment: BottomSheetDialogFragment() {
 
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java)}
-    private val baseUrl: String by lazy { arguments?.getString("fireflyUrl") ?: "" }
-    private val accessToken: String by lazy { arguments?.getString("access_token") ?: "" }
+    // Note: For some really weird reason, we are not able to pass bundles to this fragment
+    private val sharedPref: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
+    private val baseUrl: String by lazy { sharedPref.getString("fireflyUrl","")}
+    private val accessToken: String by lazy { sharedPref.getString("access_token","") }
     private lateinit var listener: OnCompleteListener
 
 
