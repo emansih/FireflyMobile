@@ -28,4 +28,8 @@ interface AccountsService {
                    @Field("interest") interest: String?,
                    @Field("interest_period") interestPeriod: String?,
                    @Field("account_number") accountNumber: String?): Call<AccountSuccessModel>
+
+    @DELETE("$ACCOUNTS_API_ENDPOINT/{id}")
+    fun deleteAccountById(@Path("id") id: String): Call<AccountsModel>
+
 }

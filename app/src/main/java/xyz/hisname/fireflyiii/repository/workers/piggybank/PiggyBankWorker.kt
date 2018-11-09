@@ -1,13 +1,13 @@
-package xyz.hisname.fireflyiii.repository.workers
+package xyz.hisname.fireflyiii.repository.workers.piggybank
 
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
@@ -26,8 +26,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val startDate = inputData.getString("startDate")
         val endDate = inputData.getString("endDate")
         val notes = inputData.getString("notes")
-        val piggyBankService = RetrofitBuilder.getClient(baseUrl, accessToken)?.create(PiggybankService::class.java)
-        piggyBankService?.createNewPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)?.enqueue(retrofitCallback({ response ->
+        genericService?.create(PiggybankService::class.java)?.createNewPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)?.enqueue(retrofitCallback({ response ->
             var errorBody = ""
             if (response.errorBody() != null) {
                 errorBody = String(response.errorBody()?.bytes()!!)

@@ -5,10 +5,15 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_account_detail.*
+import kotlinx.android.synthetic.main.progress_overlay.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -16,11 +21,10 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
+import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
-import xyz.hisname.fireflyiii.util.extension.consume
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.extension.*
 
 class AccountDetailFragment: BaseDetailFragment() {
 
@@ -78,6 +82,35 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     override fun deleteItem() {
+        AlertDialog.Builder(requireContext())
+                .setTitle(R.string.get_confirmation)
+                .setMessage(R.string.irreversible_action)
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+                    accountViewModel.deleteAccountById(baseUrl,accessToken,id.toString()).observe(this, Observer {
+                        ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                        val error = it.getError()
+                        when {
+                            it.getResponse() != null -> {
+                                toastSuccess("Account deleted", Toast.LENGTH_LONG)
+                                requireFragmentManager().popBackStack()
+                            }
+                            error != null -> {
+                                toastInfo(it.getErrorMessage().toString())
+                            }
+                            else -> Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
+                                    R.string.generic_delete_error, Snackbar.LENGTH_LONG)
+                                    .setAction("Retry") { _ ->
+                                        deleteItem()
+                                    }
+                                    .show()
+                        }
+                    })
+                }
+                .setNegativeButton(android.R.string.no){dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){

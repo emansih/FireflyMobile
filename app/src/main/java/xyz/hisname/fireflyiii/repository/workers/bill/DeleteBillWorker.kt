@@ -1,0 +1,57 @@
+package xyz.hisname.fireflyiii.repository.workers.bill
+
+import android.content.Context
+import androidx.work.WorkerParameters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import xyz.hisname.fireflyiii.Constants
+import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.api.BillsService
+import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
+import xyz.hisname.fireflyiii.repository.workers.BaseWorker
+import xyz.hisname.fireflyiii.ui.notifications.displayNotification
+import xyz.hisname.fireflyiii.util.retrofitCallback
+
+class DeleteBillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
+
+    private val billDatabase by lazy { AppDatabase.getInstance(context)?.billDataDao() }
+    private val channelName = "Bill"
+    private val channelDescription = "Show Bill Notifications"
+    private val channelIcon = R.drawable.ic_calendar_blank
+
+    override fun doWork(): Result {
+        val billId = inputData.getLong("billId", 0)
+        var billAttribute: BillAttributes? = null
+        GlobalScope.launch(context = Dispatchers.Main) {
+            val result = async(Dispatchers.IO) {
+                billDatabase?.getBillById(billId)
+            }.await()
+            billAttribute  = result!![0].billAttributes
+        }
+        genericService?.create(BillsService::class.java)?.deleteBillById(id.toString())?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    async(Dispatchers.IO) {
+                        billDatabase?.deleteBillById(billId)
+                    }.await()
+                    context.displayNotification(billAttribute?.name + "successfully deleted", "Bill",
+                            Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+                }
+            } else {
+                context.displayNotification("There was an issue deleting " + billAttribute?.name , "Bill",
+                        Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+            }
+        })
+        { throwable ->
+            context.displayNotification(throwable.localizedMessage, "Bill",
+                    Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+        })
+
+        return Result.SUCCESS
+    }
+
+
+}

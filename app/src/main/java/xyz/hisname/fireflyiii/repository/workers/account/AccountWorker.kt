@@ -1,13 +1,13 @@
-package xyz.hisname.fireflyiii.repository.workers
+package xyz.hisname.fireflyiii.repository.workers.account
 
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
@@ -31,8 +31,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val interest = inputData.getString("interest")
         val interestPeriod = inputData.getString("interestPeriod")
         val accountNumber = inputData.getString("accountNumber")
-        val accountService = RetrofitBuilder.getClient(baseUrl, accessToken)?.create(AccountsService::class.java)
-        accountService?.addAccount(name,type,currencyCode,1,includeNetWorth,accountRole,ccType,
+        genericService?.create(AccountsService::class.java)?.addAccount(name,type,currencyCode,1,includeNetWorth,accountRole,ccType,
                 ccMonthlyPaymentDate,liabilityType,liabilityAmount,liabilityStartDate,interest,interestPeriod,accountNumber)?.enqueue(
                 retrofitCallback({ response ->
                     var errorBody = ""

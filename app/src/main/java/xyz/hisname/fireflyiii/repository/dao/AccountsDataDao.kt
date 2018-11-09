@@ -28,5 +28,9 @@ abstract class AccountsDataDao {
     @Query("SELECT * FROM accounts WHERE accountId =:accountId")
     abstract fun getAccountById(accountId: Long): MutableList<AccountData>
 
+    @Query("DELETE FROM accounts WHERE accountId = :accountId")
+    abstract fun deleteAccountById(accountId: Long): Int
+
+
 
 }

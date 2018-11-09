@@ -114,17 +114,21 @@ class PiggyDetailFragment: BaseDetailFragment(), CoroutineScope {
                     ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
                     piggyBankViewModel.deletePiggyBank(baseUrl,accessToken, piggyId.toString()).observe(this, Observer {
                         ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-                        if(it.getError() == null){
-                            toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
-                            requireFragmentManager().popBackStack()
-                        } else {
-                            Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
+                        val error = it.getError()
+                        when {
+                            it.getResponse() != null -> {
+                                toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
+                                requireFragmentManager().popBackStack()
+                            }
+                            error != null -> {
+                               toastInfo(it.getErrorMessage().toString())
+                            }
+                            else -> Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
                                     R.string.generic_delete_error, Snackbar.LENGTH_LONG)
                                     .setAction("Retry") { _ ->
                                         deleteItem()
                                     }
                                     .show()
-
                         }
                     })
                 }

@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.workers.bill.DeleteBillWorker
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class BillsViewModel(application: Application) : AndroidViewModel(application) {
@@ -58,6 +60,23 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
                 billResponse.postValue(ApiResponses(response.body()))
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                     billDatabase?.deleteBillById(id.toLong())
+                }
+            } else {
+                val billTag = WorkManager.getInstance().getStatusesByTag("delete_bill_$id").get()
+                if(billTag == null || billTag.size == 0){
+                    val billData = Data.Builder()
+                            .putString("id", id)
+                            .build()
+                    val deleteBillWork = OneTimeWorkRequest.Builder(DeleteBillWorker::class.java)
+                            .setInputData(billData)
+                            .addTag("delete_bill_$id")
+                            .setConstraints(Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED).build())
+                            .build()
+                    WorkManager.getInstance().enqueue(deleteBillWork)
+                    billResponse.postValue(ApiResponses("There is an error deleting your bill, we will do it again later."))
+                } else {
+                    billResponse.postValue(ApiResponses("This bill has already been queued to delete."))
                 }
             }
         })

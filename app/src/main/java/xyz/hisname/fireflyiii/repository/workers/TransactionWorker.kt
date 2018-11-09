@@ -5,7 +5,6 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
@@ -37,9 +36,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val dueDate = inputData.getString("dueDate")
         val paymentDate = inputData.getString("paymentDate")
         val invoiceDate = inputData.getString("invoiceDate")
-        val transactionService = RetrofitBuilder.getClient(baseUrl, accessToken)?.
-                create(TransactionService::class.java)
-        transactionService?.addTransaction(convertString(transactionType), transactionDescription, transactionDate, piggyBank,
+        genericService?.create(TransactionService::class.java)?.addTransaction(convertString(transactionType), transactionDescription, transactionDate, piggyBank,
                 billName, transactionAmount,sourceName, destinationName, transactionCurrency, category,
                 tags, budget, interestDate, bookDate, processDate, dueDate, paymentDate,
                 invoiceDate)?.enqueue(

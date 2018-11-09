@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_add_account.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.workers.AccountWorker
+import xyz.hisname.fireflyiii.repository.workers.account.AccountWorker
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment

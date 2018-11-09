@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
@@ -16,6 +17,7 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
+import xyz.hisname.fireflyiii.repository.workers.piggybank.DeletePiggyWorker
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class PiggyBankViewModel(application: Application) : AndroidViewModel(application) {
@@ -59,11 +61,23 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
                     piggyDataBase?.deletePiggyById(id.toLong())
                 }
             } else {
-                var errorBody = ""
-                if (response.errorBody() != null) {
-                    errorBody = String(response.errorBody()?.bytes()!!)
+                val piggyTag =
+                        WorkManager.getInstance().getStatusesByTag("delete_piggy_bank_$id").get()
+                if(piggyTag == null || piggyTag.size == 0) {
+                    apiLiveData.postValue(ApiResponses("There is an error deleting your piggy bank, we will do it again later."))
+                    val piggyData = Data.Builder()
+                            .putString("id", id)
+                            .build()
+                    val deletePiggyWork = OneTimeWorkRequest.Builder(DeletePiggyWorker::class.java)
+                            .setInputData(piggyData)
+                            .addTag("delete_piggy_bank_$id")
+                            .setConstraints(Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED).build())
+                            .build()
+                    WorkManager.getInstance().enqueue(deletePiggyWork)
+                } else {
+                    apiLiveData.postValue(ApiResponses("This Piggy Bank has already been queued to delete."))
                 }
-                apiLiveData.postValue(ApiResponses(errorBody))
             }
         })
         { throwable -> apiLiveData.value = ApiResponses(throwable)})

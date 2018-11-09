@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.workers.account.DeleteAccountWorker
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import java.util.*
 
@@ -125,4 +127,39 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
 
     fun getAccountById(id: Long) = accountDatabase?.getAccountById(id)
 
+    fun deleteAccountById(baseUrl: String, accessToken: String, id: String): LiveData<ApiResponses<AccountsModel>>{
+        val apiResponse = MediatorLiveData<ApiResponses<AccountsModel>>()
+        accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        accountsService?.deleteAccountById(id)?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
+                    accountDatabase?.deleteAccountById(id.toLong())
+                }
+                apiLiveData.postValue(ApiResponses(response.body()))
+            } else {
+                val accountTag =
+                        WorkManager.getInstance().getStatusesByTag("delete_account_$id").get()
+                if(accountTag == null || accountTag.size == 0) {
+                    apiLiveData.postValue(ApiResponses("There is an error deleting your account, we will do it again later."))
+                    val accountData = Data.Builder()
+                            .putString("id", id)
+                            .build()
+                    val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteAccountWorker::class.java)
+                            .setInputData(accountData)
+                            .addTag("delete_account_$id")
+                            .setConstraints(Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED).build())
+                            .build()
+                    WorkManager.getInstance().enqueue(deleteAccountWork)
+                } else {
+                    apiLiveData.postValue(ApiResponses("This account has already been queued to delete."))
+
+                }
+
+            }
+        })
+        { throwable ->  apiLiveData.value = ApiResponses(throwable)})
+        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
+        return apiResponse
+    }
 }

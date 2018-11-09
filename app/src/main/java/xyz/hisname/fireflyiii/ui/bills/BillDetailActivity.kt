@@ -29,6 +29,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
+import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
 
 class BillDetailActivity: BaseActivity(), CoroutineScope {
@@ -138,9 +139,11 @@ class BillDetailActivity: BaseActivity(), CoroutineScope {
                             deleteItem()
                         }
                         .show()
-            } else {
+            } else if(it.getResponse() != null){
                 toastSuccess(resources.getString(R.string.bill_deleted))
                 finish()
+            } else {
+                toastInfo(it.getErrorMessage().toString())
             }
         })
     }

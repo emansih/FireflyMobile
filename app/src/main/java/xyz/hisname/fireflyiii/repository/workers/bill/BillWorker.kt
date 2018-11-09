@@ -1,13 +1,13 @@
-package xyz.hisname.fireflyiii.repository.workers
+package xyz.hisname.fireflyiii.repository.workers.bill
 
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.BillsService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
@@ -27,9 +27,9 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val skip = inputData.getString("skip") ?: ""
         val currencyCode = inputData.getString("currencyCode") ?: ""
         val notes = inputData.getString("notes")
-        val billsService = RetrofitBuilder.getClient(baseUrl, accessToken)?.create(BillsService::class.java)
-        billsService?.createBill(name, billMatch, minAmount, maxAmount, billDate, repeatFreq, skip,
-                "1","1", currencyCode, notes)?.enqueue(retrofitCallback({ response ->
+        genericService?.create(BillsService::class.java)?.createBill(name, billMatch, minAmount,
+                maxAmount, billDate, repeatFreq, skip, "1","1", currencyCode, notes)?.enqueue(
+                retrofitCallback({ response ->
             var errorBody = ""
             var error = ""
             if (response.errorBody() != null) {

@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.work.*
-import xyz.hisname.fireflyiii.repository.workers.BillWorker
+import xyz.hisname.fireflyiii.repository.workers.bill.BillWorker
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
 class BillReceiver: BroadcastReceiver() {
