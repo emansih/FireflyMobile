@@ -107,7 +107,8 @@ Thanks to [Screener - Better Screenshots](https://play.google.com/store/apps/det
 Icons in this app are taken from:
 1. [Flaticon](https://www.flaticon.com/free-icon/piggy-bank-with-dollar-coin_21239)
 2. [Material Design Icons](https://materialdesignicons.com)
-
+3. [Android Iconics](https://github.com/mikepenz/Android-Iconics)
+4. App icon taken from Firefly III server(favicon). [Original source](https://www.kissclipart.com/dinero-no-png-clipart-service-751-05-jh4t51/download-clipart.html)
 
 ### Known Limitations / bugs
 Heh... I left this to the last.
