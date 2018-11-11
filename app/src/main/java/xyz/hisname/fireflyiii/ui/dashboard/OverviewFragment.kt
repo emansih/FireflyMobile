@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import kotlinx.android.synthetic.main.fragment_dashboard_overview.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
@@ -71,11 +70,9 @@ class OverviewFragment: BaseFragment(){
     }
 
     private fun viewReport(){
-        val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-                "expense" to withdrawSum.toString(), "income" to depositSum.toString()) }
         overviewCard.setOnClickListener{
             requireFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, ReportFragment().apply { arguments = bundle }, "report")
+                    .replace(R.id.fragment_container, ReportFragment(), "report")
                     .commit()
         }
     }

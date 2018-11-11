@@ -22,8 +22,7 @@ class WalletFragment: BaseFragment() {
     private var loan: Double = 0.toDouble()
     private var cash: Double = 0.toDouble()
     private var assets: Double = 0.toDouble()
-    private val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-            "accountType" to "all") }
+    private val bundle: Bundle by lazy { bundleOf("accountType" to "all") }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

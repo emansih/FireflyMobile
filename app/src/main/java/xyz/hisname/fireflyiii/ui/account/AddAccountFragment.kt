@@ -75,9 +75,7 @@ class AddAccountFragment: BaseFragment(){
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
         currencyCode.setOnClickListener{
-            val currencyListFragment = CurrencyListFragment().apply {
-                bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-            }
+            val currencyListFragment = CurrencyListFragment()
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
         }
         ccPaymentDate.setOnClickListener {

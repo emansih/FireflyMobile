@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.GlobalViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -25,10 +26,9 @@ import java.util.*
 class CurrencyListFragment: BottomSheetDialogFragment() {
 
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    // Note: For some really weird reason, we are not able to pass bundles to this fragment
-    private val sharedPref: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
-    private val baseUrl: String by lazy { sharedPref.getString("fireflyUrl","")}
-    private val accessToken: String by lazy { sharedPref.getString("access_token","") }
+    private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
+    private val baseUrl by lazy { globalViewModel.baseUrl.value ?: ""}
+    private val accessToken by lazy { globalViewModel.accessToken.value ?: "" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

@@ -65,8 +65,7 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun itemClicked(data: AccountData){
-        val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-                "accountId" to data.accountId)
+        val bundle = bundleOf("accountId" to data.accountId)
         requireFragmentManager().beginTransaction()
                 .addToBackStack(null)
                 .replace(R.id.fragment_container, AccountDetailFragment().apply { arguments = bundle })
@@ -94,11 +93,9 @@ class ListAccountFragment: BaseFragment() {
                     .setDuration(400)
                     .start()
             setOnClickListener {
-                val bundle = bundleOf("fireflyUrl" to baseUrl,
-                        "access_token" to accessToken)
                 requireFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container,
-                                AddAccountFragment().apply { arguments = bundle })
+                                AddAccountFragment())
                         .addToBackStack(null)
                         .commit()
                 requireActivity().globalFAB.isVisible = false

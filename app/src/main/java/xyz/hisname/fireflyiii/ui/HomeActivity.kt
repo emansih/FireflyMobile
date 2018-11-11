@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui
 
 import android.os.Bundle
-import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
@@ -37,7 +36,6 @@ class HomeActivity: BaseActivity(){
     private var result: Drawer? = null
     private lateinit var headerResult: AccountHeader
     private var profile: IProfile<*>? = null
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

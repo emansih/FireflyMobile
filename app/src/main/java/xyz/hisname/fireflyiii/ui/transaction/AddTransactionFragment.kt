@@ -291,8 +291,7 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     override fun onDestroyView() {
-        val bundle = bundleOf("fireflyUrl" to baseUrl,
-                "access_token" to accessToken, "transactionType" to transactionType)
+        val bundle = bundleOf("transactionType" to transactionType)
         requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, TransactionFragment().apply { arguments = bundle })
                 .commit()

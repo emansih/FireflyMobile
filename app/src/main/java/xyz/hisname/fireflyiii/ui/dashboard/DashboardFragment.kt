@@ -18,9 +18,6 @@ import xyz.hisname.fireflyiii.util.extension.create
 
 class DashboardFragment: BaseFragment() {
 
-    private val bundle: Bundle by lazy { bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-            "transactionType" to "all") }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_dashboard,container)
@@ -47,6 +44,7 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setUpCards(){
+        val bundle = bundleOf("transactionType" to "all")
         requireFragmentManager().beginTransaction()
                 .replace(R.id.overviewFrame, OverviewFragment().apply { arguments = bundle })
                 .commit()
