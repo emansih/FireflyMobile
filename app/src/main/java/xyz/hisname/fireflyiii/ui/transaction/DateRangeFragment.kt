@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
 import android.app.DatePickerDialog
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,15 +8,17 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_date_range.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.viewmodel.DateViewModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.isBlank
 import java.util.*
 
-open class DateRangeFragment: BottomSheetDialogFragment() {
+class DateRangeFragment: BottomSheetDialogFragment() {
 
     private lateinit var startDateText: String
     private lateinit var endDateText: String
-    private lateinit var listener: OnCompleteListener
+    private val dateViewModel by lazy { getViewModel(DateViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -66,17 +67,9 @@ open class DateRangeFragment: BottomSheetDialogFragment() {
             if(startDateEditText.isBlank() or endDateEditText.isBlank()){
                 onDestroy()
             } else {
-               this.listener.onComplete(startDateText, endDateText)
+                dateViewModel.setDateRange(startDateText, endDateText)
                 dismiss()
             }
         }
-    }
-
-    fun setDateListener(listener: OnCompleteListener){
-        this.listener = listener
-    }
-
-    interface OnCompleteListener {
-        fun onComplete(startDate: String, endDate: String)
     }
 }

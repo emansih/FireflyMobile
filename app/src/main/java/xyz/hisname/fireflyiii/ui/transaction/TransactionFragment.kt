@@ -18,17 +18,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.viewmodel.DateViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.extension.consume
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastError
+import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener{
+class TransactionFragment: BaseFragment(){
 
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val dateViewModel by lazy { getViewModel(DateViewModel::class.java) }
     private var dataAdapter = ArrayList<TransactionData>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
@@ -122,8 +121,7 @@ class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener{
                     .setDuration(400)
                     .start()
             setOnClickListener {
-                val bundle = bundleOf("fireflyUrl" to baseUrl,
-                        "access_token" to accessToken, "transactionType" to transactionType)
+                val bundle = bundleOf("transactionType" to transactionType)
                 requireFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container,
                                 AddTransactionFragment().apply { arguments = bundle } ,"addTrans")
@@ -168,13 +166,10 @@ class TransactionFragment: BaseFragment(), DateRangeFragment.OnCompleteListener{
         R.id.menu_item_filter -> consume {
             val bottomSheetFragment = DateRangeFragment()
             bottomSheetFragment.show(requireFragmentManager(), "daterangefrag" )
-            bottomSheetFragment.setDateListener(this)
+            zipLiveData(dateViewModel.startDate, dateViewModel.endDate).observe(this, Observer {
+                loadTransaction(it.first, it.second)
+            })
         }
         else -> super.onOptionsItemSelected(item)
     }
-
-    override fun onComplete(startDate: String, endDate: String) {
-        loadTransaction(startDate,endDate)
-    }
-
 }
