@@ -37,5 +37,6 @@
         app:srcCompat="@drawable/ic_plus"
         app:backgroundTint="@color/colorAccent"/>
 
+    <include layout="@layout/progress_overlay"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

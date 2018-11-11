@@ -111,9 +111,9 @@ class PiggyDetailFragment: BaseDetailFragment(), CoroutineScope {
                 .setTitle(R.string.get_confirmation)
                 .setMessage(R.string.irreversible_action)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+                    ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
                     piggyBankViewModel.deletePiggyBank(baseUrl,accessToken, piggyId.toString()).observe(this, Observer {
-                        ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         val error = it.getError()
                         when {
                             it.getResponse() != null -> {

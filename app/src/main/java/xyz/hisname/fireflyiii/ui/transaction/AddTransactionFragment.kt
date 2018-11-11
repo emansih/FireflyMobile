@@ -219,7 +219,7 @@ class AddTransactionFragment: BaseFragment() {
                 sourceAccount = sourceAutoComplete.getString()
                 destinationAccount = destinationSpinner.selectedItem.toString()
             }
-            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
                 model.addTransaction(baseUrl, accessToken, transactionType,
                         descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
                         billName, transactionAmountEditText.getString(), sourceAccount,
@@ -230,7 +230,7 @@ class AddTransactionFragment: BaseFragment() {
                         toastSuccess("Transaction Added")
                         requireFragmentManager().popBackStack()
                     } else if(errorMessage != null){
-                        ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         toastError(errorMessage)
                     } else if(transactionResponse.getError() != null){
                         if(transactionResponse.getError()!!.localizedMessage.startsWith("Unable to resolve host")){

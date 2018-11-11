@@ -71,5 +71,4 @@
         app:layout_constraintTop_toBottomOf="@+id/progressLayout"
         />
 
-    <include layout="@layout/progress_overlay"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

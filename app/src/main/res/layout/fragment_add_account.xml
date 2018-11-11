@@ -166,6 +166,4 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
-    <include layout="@layout/progress_overlay"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -112,7 +112,7 @@ class AddAccountFragment: BaseFragment(){
 
     private fun submitData(){
         hideKeyboard()
-        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         val networth = if(netWorthCheckbox.isChecked){
             1
         } else {
@@ -186,7 +186,7 @@ class AddAccountFragment: BaseFragment(){
                 interest_period, accountNumber.getString())
                 .observe(this, Observer {
                     val error = it.getError()
-                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     if(it.getResponse() != null){
                         toastSuccess("Account saved!")
                         requireFragmentManager().popBackStack()
