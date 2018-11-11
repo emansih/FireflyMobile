@@ -131,35 +131,37 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         val apiResponse = MediatorLiveData<ApiResponses<AccountsModel>>()
         accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
         accountsService?.deleteAccountById(id)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
+            if (response.code() == 204) {
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
                     accountDatabase?.deleteAccountById(id.toLong())
                 }
-                apiLiveData.postValue(ApiResponses(response.body()))
+                apiLiveData.postValue(ApiResponses("Delete Successful!"))
             } else {
-                val accountTag =
-                        WorkManager.getInstance().getStatusesByTag("delete_account_$id").get()
-                if(accountTag == null || accountTag.size == 0) {
-                    apiLiveData.postValue(ApiResponses("There is an error deleting your account, we will do it again later."))
-                    val accountData = Data.Builder()
-                            .putString("id", id)
-                            .build()
-                    val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteAccountWorker::class.java)
-                            .setInputData(accountData)
-                            .addTag("delete_account_$id")
-                            .setConstraints(Constraints.Builder()
-                                    .setRequiredNetworkType(NetworkType.CONNECTED).build())
-                            .build()
-                    WorkManager.getInstance().enqueue(deleteAccountWork)
-                } else {
-                    apiLiveData.postValue(ApiResponses("This account has already been queued to delete."))
-
-                }
-
+                deleteAccount(id)
             }
         })
-        { throwable ->  apiLiveData.value = ApiResponses(throwable)})
+        { throwable ->
+            deleteAccount(id)
+            apiLiveData.value = ApiResponses(throwable)
+        })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         return apiResponse
+    }
+
+    private fun deleteAccount(id: String){
+        val accountTag =
+                WorkManager.getInstance().getStatusesByTag("delete_account_$id").get()
+        if(accountTag == null || accountTag.size == 0) {
+            val accountData = Data.Builder()
+                    .putString("id", id)
+                    .build()
+            val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteAccountWorker::class.java)
+                    .setInputData(accountData)
+                    .addTag("delete_account_$id")
+                    .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED).build())
+                    .build()
+            WorkManager.getInstance().enqueue(deleteAccountWork)
+        }
     }
 }

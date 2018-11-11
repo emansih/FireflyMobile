@@ -87,23 +87,17 @@ class AccountDetailFragment: BaseDetailFragment() {
                 .setMessage(R.string.irreversible_action)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    accountViewModel.deleteAccountById(baseUrl,accessToken,id.toString()).observe(this, Observer {
+                    accountViewModel.deleteAccountById(baseUrl,accessToken,accountId.toString()).observe(this, Observer {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         val error = it.getError()
                         when {
-                            it.getResponse() != null -> {
+                            it.getErrorMessage() == "Delete Successful!" -> {
                                 toastSuccess("Account deleted", Toast.LENGTH_LONG)
                                 requireFragmentManager().popBackStack()
                             }
                             error != null -> {
-                                toastInfo(it.getErrorMessage().toString())
+                                toastInfo(error.localizedMessage)
                             }
-                            else -> Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
-                                    R.string.generic_delete_error, Snackbar.LENGTH_LONG)
-                                    .setAction("Retry") { _ ->
-                                        deleteItem()
-                                    }
-                                    .show()
                         }
                     })
                 }
