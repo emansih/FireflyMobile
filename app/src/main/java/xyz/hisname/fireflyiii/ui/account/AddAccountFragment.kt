@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.fragment_add_account.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.workers.account.AccountWorker
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -23,9 +24,10 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddAccountFragment: BaseFragment(), CurrencyListFragment.OnCompleteListener {
+class AddAccountFragment: BaseFragment(){
 
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -36,6 +38,9 @@ class AddAccountFragment: BaseFragment(), CurrencyListFragment.OnCompleteListene
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         setUpWidget()
+        currencyViewModel.currencyCode.observe(this, Observer {
+            currencyCode.setText(it)
+        })
     }
 
     private fun setUpWidget(){
@@ -74,7 +79,6 @@ class AddAccountFragment: BaseFragment(), CurrencyListFragment.OnCompleteListene
                 bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
             }
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
-            currencyListFragment.setCurrencyListener(this)
         }
         ccPaymentDate.setOnClickListener {
             val calendar = Calendar.getInstance()
@@ -246,9 +250,5 @@ class AddAccountFragment: BaseFragment(), CurrencyListFragment.OnCompleteListene
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = "Add Account"
-    }
-
-    override fun onCurrencyClickListener(currency: String) {
-        currencyCode.setText(currency)
     }
 }

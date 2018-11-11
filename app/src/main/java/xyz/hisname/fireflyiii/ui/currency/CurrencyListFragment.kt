@@ -24,13 +24,11 @@ import java.util.*
 
 class CurrencyListFragment: BottomSheetDialogFragment() {
 
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java)}
+    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     // Note: For some really weird reason, we are not able to pass bundles to this fragment
     private val sharedPref: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
     private val baseUrl: String by lazy { sharedPref.getString("fireflyUrl","")}
     private val accessToken: String by lazy { sharedPref.getString("access_token","") }
-    private lateinit var listener: OnCompleteListener
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -63,16 +61,7 @@ class CurrencyListFragment: BottomSheetDialogFragment() {
     }
 
     private fun itemClicked(currencyData: CurrencyData){
-        this.listener.onCurrencyClickListener(currencyData.currencyAttributes?.code!!)
+        currencyViewModel.setCurrencyCode(currencyData.currencyAttributes?.code!!)
         dismiss()
     }
-
-    fun setCurrencyListener(listener: OnCompleteListener){
-        this.listener = listener
-    }
-
-    interface OnCompleteListener {
-        fun onCurrencyClickListener(currency: String)
-    }
-
 }

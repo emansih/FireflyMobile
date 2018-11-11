@@ -17,6 +17,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -27,11 +28,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteListener {
+class AddTransactionFragment: BaseFragment() {
 
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val accountDatabase by lazy { AppDatabase.getInstance(requireActivity())?.accountDataDao() }
     private var accounts = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
@@ -49,8 +51,8 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        if(Objects.equals(transactionType, "Transfer")){
-            zipLiveData(accountDatabase?.getAccountByType("Asset account")!!, piggyBankDatabase?.getPiggy()!!)
+        when {
+            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountDatabase?.getAccountByType("Asset account")!!, piggyBankDatabase?.getPiggy()!!)
                     .observe(this, Observer {
                         it.first.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
@@ -70,8 +72,7 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         piggyBankName.threshold = 1
                         piggyBankName.setAdapter(adapter)
                     })
-        } else if(Objects.equals(transactionType, "Deposit")){
-            zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAccountByType("Revenue account")!!)
+            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAccountByType("Revenue account")!!)
                     .observe(this , Observer {
                         it.first.forEachIndexed { _, accountData ->
                             sourceAccounts.add(accountData.accountAttributes?.name!!)
@@ -88,36 +89,37 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                         sourceAutoComplete.setAdapter(autocompleteAdapter)
                         sourceSpinner.isVisible = false
                     })
-        } else {
-            zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAllAccounts()!!)
-                    .observe(this, Observer {
-                        // Spinner for source account
-                        it.first.forEachIndexed { _, accountData ->
-                            sourceAccounts.add(accountData.accountAttributes?.name!!)
+            else -> {
+                zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAllAccounts()!!)
+                        .observe(this, Observer {
+                            // Spinner for source account
+                            it.first.forEachIndexed { _, accountData ->
+                                sourceAccounts.add(accountData.accountAttributes?.name!!)
+                            }
+                            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sourceAccounts)
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            sourceAutoComplete.isVisible = false
+                            sourceSpinner.adapter = adapter
+                            // This is used for auto complete for destination account
+                            it.second.forEachIndexed { _, accountData ->
+                                destinationAccounts.add(accountData.accountAttributes?.name!!)
+                            }
+                            val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, destinationAccounts)
+                            destinationAutoComplete.threshold = 1
+                            destinationAutoComplete.setAdapter(autocompleteAdapter)
+                            destinationSpinner.isVisible = false
+                        })
+                billDatabase?.getAllBill()?.observe(this, Observer {
+                    if(it.isNotEmpty()){
+                        it.forEachIndexed { _,billData ->
+                            bill.add(billData.billAttributes?.name!!)
                         }
-                        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sourceAccounts)
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        sourceAutoComplete.isVisible = false
-                        sourceSpinner.adapter = adapter
-                        // This is used for auto complete for destination account
-                        it.second.forEachIndexed { _, accountData ->
-                            destinationAccounts.add(accountData.accountAttributes?.name!!)
-                        }
-                        val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, destinationAccounts)
-                        destinationAutoComplete.threshold = 1
-                        destinationAutoComplete.setAdapter(autocompleteAdapter)
-                        destinationSpinner.isVisible = false
-                    })
-            billDatabase?.getAllBill()?.observe(this, Observer {
-                if(it.isNotEmpty()){
-                    it.forEachIndexed { _,billData ->
-                        bill.add(billData.billAttributes?.name!!)
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
+                        billEditText.threshold = 1
+                        billEditText.setAdapter(adapter)
                     }
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
-                    billEditText.threshold = 1
-                    billEditText.setAdapter(adapter)
-                }
-            })
+                })
+            }
         }
         setupWidgets()
     }
@@ -152,7 +154,6 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                 bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
             }
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
-            currencyListFragment.setCurrencyListener(this)
 
         }
         categoryViewModel.getCategory(baseUrl, accessToken).databaseData?.observe(this, Observer {
@@ -166,6 +167,10 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                 categoryAutoComplete.setAdapter(adapter)
             }
         })
+        currencyViewModel.currencyCode.observe(this, Observer {
+            currencyEditText.setText(it)
+        })
+
     }
 
     override fun onAttach(context: Context) {
@@ -293,9 +298,4 @@ class AddTransactionFragment: BaseFragment(), CurrencyListFragment.OnCompleteLis
                 .commit()
         super.onDestroyView()
     }
-
-    override fun onCurrencyClickListener(currency: String) {
-        currencyEditText.setText(currency)
-    }
-
 }

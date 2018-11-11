@@ -18,6 +18,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.BillReceiver
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
+import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
@@ -25,9 +26,10 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
+class AddBillActivity: BaseActivity() {
 
     private val model: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private var billAttribute: BillAttributes? = null
     private var notes: String? = null
     private var repeatFreq: String = ""
@@ -40,6 +42,10 @@ class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
                     BillAttributes::class.java)
         }
         setupWidgets()
+        currencyViewModel.currencyCode.observe(this, Observer {
+            currency_code_edittext.setText(it)
+        })
+
     }
 
     private fun setupWidgets(){
@@ -85,7 +91,6 @@ class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
                 bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
             }
             currencyListFragment.show(supportFragmentManager, "currencyList" )
-            currencyListFragment.setCurrencyListener(this)
 
         }
     }
@@ -246,9 +251,5 @@ class AddBillActivity: BaseActivity(), CurrencyListFragment.OnCompleteListener {
 
     override fun onBackPressed() {
         checkEmptiness()
-    }
-
-    override fun onCurrencyClickListener(currency: String) {
-        currency_code_edittext.setText(currency)
     }
 }
