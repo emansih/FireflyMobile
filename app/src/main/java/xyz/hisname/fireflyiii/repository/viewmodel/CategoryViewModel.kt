@@ -31,7 +31,7 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        categoryDatbase?.addCategory(element)
+                        categoryDatbase?.insert(element)
                     }
                 }
             }else {

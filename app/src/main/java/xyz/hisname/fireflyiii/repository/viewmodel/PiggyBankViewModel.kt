@@ -34,7 +34,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        piggyDataBase?.addPiggy(element)
+                        piggyDataBase?.insert(element)
                     }
                 }
             } else {

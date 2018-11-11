@@ -34,7 +34,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        billDatabase?.addBill(element)
+                        billDatabase?.insert(element)
                     }
                 }
             } else {

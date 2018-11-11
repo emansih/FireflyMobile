@@ -1,16 +1,11 @@
 package xyz.hisname.fireflyiii.repository.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 
 @Dao
-abstract class TransactionDataDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun addTransaction(vararg transactionData: TransactionData)
+abstract class TransactionDataDao: BaseDao<TransactionData> {
 
     @Query("SELECT * FROM transactions WHERE transactionType =:type")
     abstract fun getTransaction(type: String): MutableList<TransactionData>

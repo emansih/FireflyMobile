@@ -31,7 +31,7 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        currencyDatabase?.addCurrency(element)
+                        currencyDatabase?.insert(element)
                     }
                 }
             } else {

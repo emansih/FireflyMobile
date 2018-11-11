@@ -32,7 +32,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        transactionDatabase?.addTransaction(element)
+                        transactionDatabase?.insert(element)
                     }
                 }
                 transaction.value = ApiResponses(response.body())

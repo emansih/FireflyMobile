@@ -35,7 +35,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        accountDatabase?.addAccounts(element)
+                        accountDatabase?.insert(element)
                     }
                 }
             } else {
@@ -59,7 +59,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        accountDatabase?.addAccounts(element)
+                        accountDatabase?.insert(element)
                     }
                 }
             } else {
@@ -110,7 +110,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
             }
             if (response.isSuccessful) {
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                    accountDatabase?.addAccounts(response.body()?.data!!)
+                    accountDatabase?.insert(response.body()?.data!!)
                 }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
