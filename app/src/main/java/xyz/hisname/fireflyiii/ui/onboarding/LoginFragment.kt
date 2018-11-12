@@ -71,19 +71,15 @@ class LoginFragment: Fragment() {
                     else -> firefly_secret_edittext.error = resources.getString(R.string.required_field)
                 }
             } else {
-                // Since user didn't bother to add http/https prefix, we will do it for them...
-                if(!fireflyUrl.startsWith("http")){
-                    fireflyUrl = "https://$fireflyUrl"
-                }
-                if(!fireflyUrl.endsWith("/")){
-                    fireflyUrl = "$fireflyUrl/"
-                }
                 sharedPref.edit {
                     putString("fireflyUrl",fireflyUrl)
                     putString("fireflyId",fireflyId)
                     putString("fireflySecretKey",fireflySecretKey)
                 }
                 try {
+                    if(!fireflyUrl.startsWith("http")){
+                        fireflyUrl = "https://$fireflyUrl"
+                    }
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.data = ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
                             "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri()

@@ -16,13 +16,6 @@ class RetrofitBuilder {
         @Volatile private var INSTANCE: Retrofit? = null
 
         fun getClient(baseUrl: String?, accessToken: String?): Retrofit?{
-            var modifiedUrl = baseUrl?.substring(8)
-            val stringBuilder = StringBuilder(modifiedUrl).deleteCharAt(modifiedUrl!!.length - 1)
-            modifiedUrl = if(stringBuilder.contains("/")){
-                baseUrl
-            } else {
-                "https://"  + stringBuilder.toString()
-            }
             if(INSTANCE == null){
                 val client =  OkHttpClient().newBuilder()
                         .addInterceptor(RetrofitHeaderInterceptor(accessToken))
@@ -39,7 +32,7 @@ class RetrofitBuilder {
                 }
                 synchronized(RetrofitBuilder::class.java){
                     INSTANCE = Retrofit.Builder()
-                            .baseUrl(modifiedUrl)
+                            .baseUrl(generateUrl(baseUrl))
                             .client(client.build())
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()
@@ -50,6 +43,27 @@ class RetrofitBuilder {
 
         fun destroyInstance() {
             RetrofitBuilder.INSTANCE = null
+        }
+
+        private fun generateUrl(url: String?): String{
+            var modifiedUrl = ""
+            if(url!!.startsWith("https")){
+                // if it contains https:// remove it
+                modifiedUrl = url.substring(8)
+            }
+            modifiedUrl = if(modifiedUrl.endsWith("/")) {
+                // if it contains / at the end of url, remove it
+                val stringBuilder = StringBuilder(modifiedUrl).deleteCharAt(modifiedUrl.length - 1)
+                // if url has / , just let it be
+                if(stringBuilder.contains("/")){
+                    url
+                } else {
+                    "https://"  + stringBuilder.toString()
+                }
+            } else {
+                "https://$url/"
+            }
+            return modifiedUrl
         }
 
     }
