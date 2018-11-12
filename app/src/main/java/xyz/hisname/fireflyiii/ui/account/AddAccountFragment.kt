@@ -28,6 +28,7 @@ class AddAccountFragment: BaseFragment(){
 
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
+    private lateinit var currency: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -39,6 +40,9 @@ class AddAccountFragment: BaseFragment(){
         setHasOptionsMenu(true)
         setUpWidget()
         currencyViewModel.currencyCode.observe(this, Observer {
+            currency = it
+        })
+        currencyViewModel.currencyDetails.observe(this, Observer {
             currencyCode.setText(it)
         })
     }
@@ -181,7 +185,7 @@ class AddAccountFragment: BaseFragment(){
         }
 
         accountViewModel.addAccounts(baseUrl, accessToken, accountName.getString(), account_type,
-                currencyCode.getString(), networth, role, creditCardType , creditCardDate,
+                currency, networth, role, creditCardType , creditCardDate,
                 liability_type, liability_amount, liability_start_date, liability_interest,
                 interest_period, accountNumber.getString())
                 .observe(this, Observer {
@@ -197,7 +201,7 @@ class AddAccountFragment: BaseFragment(){
                             val accountData = Data.Builder()
                                     .putString("name", accountName.getString())
                                     .putString("type", account_type)
-                                    .putString("currencyCode", currencyCode.getString())
+                                    .putString("currencyCode", currency)
                                     .putInt("includeNetWorth", networth)
                                     .putString("accountRole", role)
                                     .putString("ccType", creditCardType)

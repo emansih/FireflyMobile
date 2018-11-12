@@ -12,7 +12,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
@@ -42,6 +41,7 @@ class AddTransactionFragment: BaseFragment() {
     private var piggyBank = ArrayList<String>()
     private val billDatabase by lazy { AppDatabase.getInstance(requireActivity())?.billDataDao() }
     private val bill = ArrayList<String>()
+    private lateinit var currency: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -150,11 +150,8 @@ class AddTransactionFragment: BaseFragment() {
         descriptionEditText.isFocusableInTouchMode = true
         descriptionEditText.requestFocus()
         currencyEditText.setOnClickListener{
-            val currencyListFragment = CurrencyListFragment().apply {
-                bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-            }
+            val currencyListFragment = CurrencyListFragment()
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
-
         }
         categoryViewModel.getCategory(baseUrl, accessToken).databaseData?.observe(this, Observer {
             if(it.isNotEmpty()){
@@ -168,9 +165,11 @@ class AddTransactionFragment: BaseFragment() {
             }
         })
         currencyViewModel.currencyCode.observe(this, Observer {
+            currency = it
+        })
+        currencyViewModel.currencyDetails.observe(this, Observer {
             currencyEditText.setText(it)
         })
-
     }
 
     override fun onAttach(context: Context) {
@@ -223,7 +222,7 @@ class AddTransactionFragment: BaseFragment() {
                 model.addTransaction(baseUrl, accessToken, transactionType,
                         descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
                         billName, transactionAmountEditText.getString(), sourceAccount,
-                        destinationAccount, currencyEditText.getString(), categoryName
+                        destinationAccount, currency, categoryName
                 ).observe(this, Observer { transactionResponse ->
                     val errorMessage = transactionResponse.getErrorMessage()
                     if (transactionResponse.getResponse() != null) {
@@ -242,7 +241,7 @@ class AddTransactionFragment: BaseFragment() {
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
-                                        "currency" to currencyEditText.getString(),
+                                        "currency" to currency,
                                         "sourceName" to sourceAccount,
                                         "destinationName" to destinationAccount,
                                         "piggyBankName" to piggyBank,
@@ -259,7 +258,7 @@ class AddTransactionFragment: BaseFragment() {
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
-                                        "currency" to currencyEditText.getString(),
+                                        "currency" to currency,
                                         "destinationName" to destinationAccount,
                                         "category" to categoryName
                                 )
@@ -274,7 +273,7 @@ class AddTransactionFragment: BaseFragment() {
                                         "description" to descriptionEditText.getString(),
                                         "date" to transactionDateEditText.getString(),
                                         "amount" to transactionAmountEditText.getString(),
-                                        "currency" to currencyEditText.getString(),
+                                        "currency" to currency,
                                         "sourceName" to sourceAccount,
                                         "billName" to billName,
                                         "category" to categoryName

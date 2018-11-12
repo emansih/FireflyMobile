@@ -33,6 +33,7 @@ class AddBillActivity: BaseActivity() {
     private var billAttribute: BillAttributes? = null
     private var notes: String? = null
     private var repeatFreq: String = ""
+    private lateinit var currency: String
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -43,9 +44,12 @@ class AddBillActivity: BaseActivity() {
         }
         setupWidgets()
         currencyViewModel.currencyCode.observe(this, Observer {
-            currency_code_edittext.setText(it)
+            currency = it
         })
 
+        currencyViewModel.currencyDetails.observe(this, Observer {
+            currency_code_edittext.setText(it)
+        })
     }
 
     private fun setupWidgets(){
@@ -87,9 +91,7 @@ class AddBillActivity: BaseActivity() {
             note_edittext.setText(billAttribute?.markdown)
         }
         currency_code_edittext.setOnClickListener{
-            val currencyListFragment = CurrencyListFragment().apply {
-                bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-            }
+            val currencyListFragment = CurrencyListFragment()
             currencyListFragment.show(supportFragmentManager, "currencyList" )
 
         }
@@ -176,7 +178,7 @@ class AddBillActivity: BaseActivity() {
                 bill_match_edittext.getString(),amount_min_edittext.getString(),
                 amount_max_edittext.getString(), bill_date_edittext.getString(), repeatFreq,
                 skip_edittext.getString(), "1", "1",
-                currency_code_edittext.getString(), notes)
+                currency, notes)
                 .observe(this, Observer {
                     ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
                     val errorMessage = it.getErrorMessage()
@@ -195,7 +197,7 @@ class AddBillActivity: BaseActivity() {
                                     "billDate" to bill_date_edittext.getString(),
                                     "repeatFreq" to repeatFreq,
                                     "skip" to skip_edittext.getString(),
-                                    "currencyCode" to currency_code_edittext.getString(),
+                                    "currencyCode" to currency,
                                     "notes" to notes)
                             billBroadcast.putExtras(extras)
                             sendBroadcast(billBroadcast)
@@ -217,7 +219,7 @@ class AddBillActivity: BaseActivity() {
                 bill_name_edittext.getString(), bill_match_edittext.getString(),amount_min_edittext.getString(),
                 amount_max_edittext.getString(), bill_date_edittext.getString(), repeatFreq,
                 skip_edittext.getString(), "1", "1",
-                currency_code_edittext.getString(), notes).observe(this, Observer {
+                currency, notes).observe(this, Observer {
             ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
             if(it.getErrorMessage() != null) {
 

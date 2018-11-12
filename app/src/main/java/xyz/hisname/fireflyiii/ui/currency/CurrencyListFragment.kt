@@ -1,8 +1,6 @@
 package xyz.hisname.fireflyiii.ui.currency
 
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,7 +59,8 @@ class CurrencyListFragment: BottomSheetDialogFragment() {
     }
 
     private fun itemClicked(currencyData: CurrencyData){
-        currencyViewModel.setCurrencyCode(currencyData.currencyAttributes?.code!!)
+        currencyViewModel.setCurrencyCode(currencyData.currencyAttributes?.code)
+        currencyViewModel.setFullDetails(currencyData.currencyAttributes?.name + " (" + currencyData.currencyAttributes?.code + ")")
         dismiss()
     }
 }

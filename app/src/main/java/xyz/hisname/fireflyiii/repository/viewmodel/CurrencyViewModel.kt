@@ -23,6 +23,7 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
     private var currencyService: CurrencyService? = null
     private val apiLiveData: MutableLiveData<ApiResponses<CurrencyModel>> = MutableLiveData()
     val currencyCode =  MutableLiveData<String>()
+    val currencyDetails = MutableLiveData<String>()
 
     fun getCurrency(baseUrl: String, accessToken: String): BaseResponse<CurrencyData, ApiResponses<CurrencyModel>>{
         val apiResponse = MediatorLiveData<ApiResponses<CurrencyModel>>()
@@ -49,7 +50,11 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
         return BaseResponse(currencyDatabase?.getAllCurrency(), apiResponse)
     }
 
-    fun setCurrencyCode(code: String) {
+    fun setCurrencyCode(code: String?) {
         currencyCode.value = code
+    }
+
+    fun setFullDetails(details: String?){
+        currencyDetails.value = details
     }
 }
