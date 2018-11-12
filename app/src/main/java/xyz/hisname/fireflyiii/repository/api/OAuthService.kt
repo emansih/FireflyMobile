@@ -17,6 +17,7 @@ interface OAuthService {
     @FormUrlEncoded
     @POST("$OAUTH_API_ENDPOINT/token")
     fun getRefreshToken(@Field("grant_type") grantType: String?,
-                        @Field("refresh_token") refreshToken: String?): Call<AuthModel>
+                        @Field("refresh_token") refreshToken: String?,
+                        @Field("client_id") clientId: String?, @Field("client_secret") clientSecret: String?): Call<AuthModel>
 
 }

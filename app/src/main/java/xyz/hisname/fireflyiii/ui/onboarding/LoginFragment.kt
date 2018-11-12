@@ -102,7 +102,9 @@ class LoginFragment: Fragment() {
             Currently we only checked if the refresh token is `old`
         */
         ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
-        model.getRefreshToken(baseUrl, sharedPref.getString("refresh_token", ""), fireflySecretKey)
+        val refreshToken = sharedPref.getString("refresh_token", "")
+        val clientId = sharedPref.getString("fireflyId", "")
+        model.getRefreshToken(baseUrl, refreshToken, fireflySecretKey, clientId)
                 .observe(this, Observer {
                     if(it.getError() == null) {
                         startHomeIntent()
