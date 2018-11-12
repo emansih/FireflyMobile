@@ -80,6 +80,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
             Objects.equals(type, "asset") -> accountDatabase?.getAccountByType("Asset account")
             Objects.equals(type, "expense") -> accountDatabase?.getAccountByType("Expense account")
             Objects.equals(type, "revenue") -> accountDatabase?.getAccountByType("Revenue account")
+            Objects.equals(type, "liability") -> accountDatabase?.getAccountByType("Liability account")
             else -> accountDatabase?.getAllAccounts()
         }
     }

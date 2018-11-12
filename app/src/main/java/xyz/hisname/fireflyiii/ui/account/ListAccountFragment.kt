@@ -95,7 +95,9 @@ class ListAccountFragment: BaseFragment() {
             setOnClickListener {
                 requireFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container,
-                                AddAccountFragment())
+                                AddAccountFragment().apply {
+                                    arguments = bundleOf("accountType" to convertString())
+                                })
                         .addToBackStack(null)
                         .commit()
                 requireActivity().globalFAB.isVisible = false
@@ -118,14 +120,12 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun convertString(): String{
-        if(Objects.equals(accountType, "asset")){
-            return "Asset Account"
-        } else if(Objects.equals(accountType, "expense")){
-            return "Expense Account"
-        } else if(Objects.equals(accountType, "revenue")){
-            return "Revenue Account"
-        } else {
-            return "Accounts"
+        return when {
+            Objects.equals(accountType, "asset") -> "Asset Account"
+            Objects.equals(accountType, "expense") -> "Expense Account"
+            Objects.equals(accountType, "revenue") -> "Revenue Account"
+            Objects.equals(accountType, "liability") -> "Liability Account"
+            else -> "Accounts"
         }
     }
 

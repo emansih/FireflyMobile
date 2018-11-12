@@ -129,8 +129,15 @@ class HomeActivity: BaseActivity(){
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_download).sizeDp(24))
                                 .withLevel(3)
-                                .withIdentifier(5)
-                )
+                                .withIdentifier(5),
+                        SecondaryDrawerItem().withName("Liability Accounts")
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_deep_purple_500))
+                                .withIconTintingEnabled(true)
+                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_ticket_alt).sizeDp(24))
+                                .withLevel(3)
+                                .withIdentifier(21)
+                        )
         val budgets = PrimaryDrawerItem()
                 .withIdentifier(6)
                 .withName("Budgets")
@@ -280,6 +287,11 @@ class HomeActivity: BaseActivity(){
                         }
                         drawerItem.identifier == 20L -> {
                             changeFragment(AboutFragment())
+                        }
+                        drawerItem.identifier == 21L -> {
+                            val bundle = bundleOf("fireflyUrl" to baseUrl,
+                                    "access_token" to accessToken, "accountType" to "liability")
+                            changeFragment(ListAccountFragment().apply { arguments = bundle })
                         }
                         else -> {
 

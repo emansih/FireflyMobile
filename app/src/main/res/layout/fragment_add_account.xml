@@ -41,8 +41,8 @@
                 android:focusable="false"
                 android:layout_marginTop="16dp"
                 android:hint="Currency Code"
-                app:layout_constraintEnd_toEndOf="@+id/accountType"
-                app:layout_constraintStart_toStartOf="@+id/accountType"
+                app:layout_constraintEnd_toEndOf="@+id/accountName"
+                app:layout_constraintStart_toStartOf="@+id/accountName"
                 app:layout_constraintTop_toBottomOf="@+id/accountType" />
 
             <androidx.appcompat.widget.AppCompatTextView

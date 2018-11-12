@@ -29,6 +29,7 @@ class AddAccountFragment: BaseFragment(){
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private lateinit var currency: String
+    private val accountArgument: String by lazy { arguments?.getString("accountType") ?: "" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -48,6 +49,18 @@ class AddAccountFragment: BaseFragment(){
     }
 
     private fun setUpWidget(){
+        if(Objects.equals(accountArgument, "Asset Account")){
+            accountRole.isVisible = true
+            accountType.isVisible = false
+        } else if(Objects.equals(accountArgument,"Liability Account")) {
+            liabilityType.isVisible = true
+            liabilityAmount.isVisible = true
+            liabilityStartDate.isVisible = true
+            liabilityInterest.isVisible = true
+            interestPeriod.isVisible = true
+        } else if(!Objects.equals(accountArgument, "Accounts")){
+            accountType.isVisible = false
+        }
         val accountTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, arrayListOf(
                 "Asset" , "Expense", "Revenue", "Liability"
                 ))
@@ -114,6 +127,16 @@ class AddAccountFragment: BaseFragment(){
         }
     }
 
+    private fun convertString(): String{
+        return when {
+            Objects.equals(accountArgument, "Asset Account") -> "asset"
+            Objects.equals(accountArgument, "Expense Account") -> "expense"
+            Objects.equals(accountArgument, "Revenue Account") -> "revenue"
+            Objects.equals(accountArgument, "Liability Account") -> "liability"
+            else -> ""
+        }
+    }
+
     private fun submitData(){
         hideKeyboard()
         ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
@@ -122,12 +145,18 @@ class AddAccountFragment: BaseFragment(){
         } else {
             0
         }
-        val account_type = when {
-            accountType.selectedItemPosition == 0 -> "asset"
-            accountType.selectedItemPosition == 1 -> "expense"
-            accountType.selectedItemPosition == 2 -> "revenue "
-            else -> "liability"
+
+        val account_type = if(accountType.isVisible){
+            when {
+                accountType.selectedItemPosition == 0 -> "asset"
+                accountType.selectedItemPosition == 1 -> "expense"
+                accountType.selectedItemPosition == 2 -> "revenue "
+                else -> "liability"
+            }
+        } else {
+            convertString()
         }
+
         val role = if(accountRole.isVisible) {
             when {
                 accountRole.selectedItemPosition == 0 -> "defaultAsset"
@@ -246,11 +275,11 @@ class AddAccountFragment: BaseFragment(){
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Add Account"
+        activity?.activity_toolbar?.title = "Add $accountArgument"
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = "Add Account"
+        activity?.activity_toolbar?.title = "Add $accountArgument"
     }
 }
