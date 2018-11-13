@@ -15,7 +15,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.viewmodel.GlobalViewModel
-import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 abstract class BaseFragment: Fragment(), CoroutineScope {

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView

@@ -15,7 +15,7 @@ abstract class BaseDetailFragment: BaseFragment(){
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.piggy_detail_menu, menu)
+        inflater.inflate(R.menu.detail_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 

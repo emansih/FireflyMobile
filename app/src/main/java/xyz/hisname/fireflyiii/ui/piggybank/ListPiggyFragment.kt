@@ -17,8 +17,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_piggy.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -71,8 +69,7 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun itemClicked(piggyData: PiggyData){
-        val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken,
-                "piggyId" to piggyData.piggyId)
+        val bundle = bundleOf("piggyId" to piggyData.piggyId)
         requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
                 .addToBackStack(null)

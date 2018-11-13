@@ -234,53 +234,43 @@ class HomeActivity: BaseActivity(){
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
                         drawerItem.identifier == 1L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
                             supportFragmentManager.beginTransaction()
                                     .replace(R.id.fragment_container,
-                                            DashboardFragment().apply { arguments = bundle }, "dash")
+                                            DashboardFragment(), "dash")
                                     .commit()
                         }
                         drawerItem.identifier == 3L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "accountType" to "asset")
+                            val bundle = bundleOf("accountType" to "asset")
                             changeFragment(ListAccountFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 4L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "accountType" to "expense")
+                            val bundle = bundleOf("accountType" to "expense")
                             changeFragment(ListAccountFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 5L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "accountType" to "revenue")
+                            val bundle = bundleOf("accountType" to "revenue")
                             changeFragment(ListAccountFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 11L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "transactionType" to "Withdrawal")
+                            val bundle = bundleOf("transactionType" to "Withdrawal")
                             changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 12L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "transactionType" to "Deposit")
+                            val bundle = bundleOf("transactionType" to "Deposit")
                             changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 13L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "transactionType" to "Transfer")
+                            val bundle = bundleOf("transactionType" to "Transfer")
                             changeFragment(TransactionFragment().apply { arguments = bundle })
                         }
                         drawerItem.identifier == 15L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-                            changeFragment(ListPiggyFragment().apply { arguments = bundle })
+                            changeFragment(ListPiggyFragment())
                         }
                         drawerItem.identifier == 16L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-                            changeFragment(ListBillFragment().apply { arguments = bundle })
+                            changeFragment(ListBillFragment())
                         }
                         drawerItem.identifier == 17L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
-                            changeFragment(RulesFragment().apply { arguments = bundle })
+                            changeFragment(RulesFragment())
                         }
                         drawerItem.identifier == 19L -> {
                             changeFragment(SettingsFragment())
@@ -289,8 +279,7 @@ class HomeActivity: BaseActivity(){
                             changeFragment(AboutFragment())
                         }
                         drawerItem.identifier == 21L -> {
-                            val bundle = bundleOf("fireflyUrl" to baseUrl,
-                                    "access_token" to accessToken, "accountType" to "liability")
+                            val bundle = bundleOf("accountType" to "liability")
                             changeFragment(ListAccountFragment().apply { arguments = bundle })
                         }
                         else -> {
@@ -348,13 +337,8 @@ class HomeActivity: BaseActivity(){
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount >= 1){
                 when {
-                    supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment -> {
-                        val drawerLayout = result?.drawerLayout
-                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                        result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
-                        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                    }
-                    supportFragmentManager.findFragmentByTag("wallet") is ListAccountFragment -> {
+                    supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment /*||
+                            supportFragmentManager.findFragmentByTag("wallet") is ListAccountFragment*/ -> {
                         val drawerLayout = result?.drawerLayout
                         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                         result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
