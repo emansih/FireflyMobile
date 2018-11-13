@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.akaita.android.easylauncher'
 
 android {
     compileSdkVersion 28
@@ -33,12 +34,15 @@ android {
         buildConfigField("String", "CERTPIN", certPin)
         buildConfigField("String", "CERTHOST", certHost)
     }
+
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix "-debug"
             minifyEnabled false
         }
         compileOptions {
