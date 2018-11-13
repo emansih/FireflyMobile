@@ -59,12 +59,12 @@ dependencies {
     ext.lifecycleVersion = "2.0.0"
     ext.retrofitVersion = "2.4.0"
     ext.coroutineVersion = "1.0.0"
-    ext.work_version = "1.0.0-alpha10"
+    ext.work_version = "1.0.0-alpha11"
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     // Android support libs
-    implementation "androidx.appcompat:appcompat:1.0.1"
+    implementation "androidx.appcompat:appcompat:1.0.2"
     implementation "androidx.fragment:fragment-ktx:1.1.0-alpha01"
     implementation "androidx.annotation:annotation:$androidSupportLibs"
     implementation "androidx.recyclerview:recyclerview:$androidSupportLibs"
