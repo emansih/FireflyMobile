@@ -62,7 +62,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
                     billDatabase?.deleteBillById(id.toLong())
                 }
             } else {
-                val billTag = WorkManager.getInstance().getStatusesByTag("delete_bill_$id").get()
+                val billTag = WorkManager.getInstance().getWorkInfosByTag("delete_bill_$id").get()
                 if(billTag == null || billTag.size == 0){
                     val billData = Data.Builder()
                             .putString("id", id)

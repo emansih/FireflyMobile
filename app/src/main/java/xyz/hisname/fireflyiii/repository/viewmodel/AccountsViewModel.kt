@@ -155,7 +155,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
 
     private fun deleteAccount(id: String){
         val accountTag =
-                WorkManager.getInstance().getStatusesByTag("delete_account_$id").get()
+                WorkManager.getInstance().getWorkInfosByTag("delete_account_$id").get()
         if(accountTag == null || accountTag.size == 0) {
             val accountData = Data.Builder()
                     .putString("id", id)

@@ -62,7 +62,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
                 }
             } else {
                 val piggyTag =
-                        WorkManager.getInstance().getStatusesByTag("delete_piggy_bank_$id").get()
+                        WorkManager.getInstance().getWorkInfosByTag("delete_piggy_bank_$id").get()
                 if(piggyTag == null || piggyTag.size == 0) {
                     apiLiveData.postValue(ApiResponses("There is an error deleting your piggy bank, we will do it again later."))
                     val piggyData = Data.Builder()
