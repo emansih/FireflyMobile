@@ -25,16 +25,36 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
     private val piggyDataBase by lazy { AppDatabase.getInstance(application)?.piggyDataDao() }
     private var piggyBankService: PiggybankService? = null
     private val apiLiveData: MutableLiveData<ApiResponses<PiggyModel>> = MutableLiveData()
-
+    private lateinit var localData: MutableCollection<PiggyData>
 
     fun getPiggyBank(baseUrl: String?, accessToken: String?): BaseResponse<PiggyData, ApiResponses<PiggyModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<PiggyModel>> =  MediatorLiveData()
+        val localArray = arrayListOf<Long>()
+        val networkArray = arrayListOf<Long>()
         piggyBankService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(PiggybankService::class.java)
         piggyBankService?.getPiggyBanks()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
-                response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        piggyDataBase?.insert(element)
+                val networkData = response.body()?.data
+                networkData?.forEachIndexed { _, element ->
+                    runBlocking(Dispatchers.IO) {
+                        GlobalScope.async(Dispatchers.IO) {
+                            piggyDataBase?.insert(element)
+                            localData = piggyDataBase?.getAllPiggy()!!
+                        }.await()
+                        networkData.forEachIndexed { _, data ->
+                            networkArray.add(data.piggyId!!)
+                        }
+                        localData.forEachIndexed { _, piggyData ->
+                            localArray.add(piggyData.piggyId!!)
+                        }
+                        for (items in networkArray) {
+                            localArray.remove(items)
+                        }
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    localArray.forEachIndexed { _, piggyIndex ->
+                        piggyDataBase?.deletePiggyById(piggyIndex)
                     }
                 }
             } else {

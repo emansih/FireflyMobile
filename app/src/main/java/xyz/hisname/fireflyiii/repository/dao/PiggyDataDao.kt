@@ -12,6 +12,9 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
     @Query("SELECT * FROM piggy")
     abstract fun getPiggy(): LiveData<MutableList<PiggyData>>
 
+    @Query("SELECT * FROM piggy")
+    abstract fun getAllPiggy(): MutableList<PiggyData>
+
     @Query("DELETE FROM piggy WHERE piggyId = :piggyId")
     abstract fun deletePiggyById(piggyId: Long): Int
 
