@@ -11,6 +11,9 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("SELECT * FROM accounts")
     abstract fun getAllAccounts(): LiveData<MutableList<AccountData>>
 
+    @Query("SELECT * FROM accounts")
+    abstract fun getAccounts(): MutableList<AccountData>
+
     @Query("SELECT * FROM accounts WHERE name =:accountName")
     abstract fun getAssetAccount(accountName: String): LiveData<MutableList<AccountData>>
 

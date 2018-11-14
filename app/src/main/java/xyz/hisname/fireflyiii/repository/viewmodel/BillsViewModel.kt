@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import androidx.work.*
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.BillsService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
@@ -25,16 +22,37 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
     private val billDatabase by lazy { AppDatabase.getInstance(application)?.billDataDao() }
     private var billsService: BillsService? = null
     private val billResponse: MutableLiveData<ApiResponses<BillsModel>> = MutableLiveData()
+    private lateinit var localData: MutableCollection<BillData>
 
 
     fun getBill(baseUrl: String, accessToken: String): BaseResponse<BillData, ApiResponses<BillsModel>> {
         val apiResponse = MediatorLiveData<ApiResponses<BillsModel>>()
+        val localArray = arrayListOf<Long>()
+        val networkArray = arrayListOf<Long>()
         billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
         billsService?.getBills()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
-                response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        billDatabase?.insert(element)
+                val networkData = response.body()?.data
+                networkData?.forEachIndexed { _, element ->
+                    runBlocking(Dispatchers.IO) {
+                        async(Dispatchers.IO) {
+                            billDatabase?.insert(element)
+                            localData = billDatabase?.getBills()!!
+                        }.await()
+                        networkData.forEachIndexed { _, data ->
+                            networkArray.add(data.billId!!)
+                        }
+                        localData.forEachIndexed { _, billData ->
+                            localArray.add(billData.billId!!)
+                        }
+                        for (items in networkArray) {
+                            localArray.remove(items)
+                        }
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    localArray.forEachIndexed { _, accountIndex ->
+                        billDatabase?.deleteBillById(accountIndex)
                     }
                 }
             } else {

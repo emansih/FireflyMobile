@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import androidx.work.*
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.AccountsService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
@@ -26,16 +23,36 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
     private val accountDatabase by lazy { AppDatabase.getInstance(application)?.accountDataDao() }
     private var accountsService: AccountsService? = null
     private val apiLiveData: MutableLiveData<ApiResponses<AccountsModel>> = MutableLiveData()
-
+    private lateinit var localData: MutableCollection<AccountData>
 
     fun getAccounts(baseUrl: String, accessToken: String): BaseResponse<AccountData, ApiResponses<AccountsModel>> {
         val apiResponse = MediatorLiveData<ApiResponses<AccountsModel>>()
+        val localArray = arrayListOf<Long>()
+        val networkArray = arrayListOf<Long>()
         accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
         accountsService?.getAccountType("all")?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
-                response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        accountDatabase?.insert(element)
+                val networkData = response.body()?.data
+                networkData?.forEachIndexed { _, element ->
+                    runBlocking(Dispatchers.IO) {
+                        GlobalScope.async(Dispatchers.IO) {
+                            accountDatabase?.insert(element)
+                            localData = accountDatabase?.getAccounts()!!
+                        }.await()
+                        networkData.forEachIndexed { _, data ->
+                            networkArray.add(data.accountId!!)
+                        }
+                        localData.forEachIndexed { _, piggyData ->
+                            localArray.add(piggyData.accountId!!)
+                        }
+                        for (items in networkArray) {
+                            localArray.remove(items)
+                        }
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    localArray.forEachIndexed { _, accountIndex ->
+                        accountDatabase?.deleteAccountById(accountIndex)
                     }
                 }
             } else {
