@@ -1,7 +1,9 @@
 package xyz.hisname.fireflyiii.repository.models.category
 
+import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Entity
 data class CategoryAttributes(
         @PrimaryKey(autoGenerate = true)
         val categoryIdPlaceHolder: Long,
