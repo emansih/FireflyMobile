@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -109,6 +110,9 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         R.id.menu_item_edit -> consume {
+            val bundle = bundleOf("accountId" to accountId)
+            requireFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, UpdateAccountFragment().apply { arguments = bundle })
         }
         R.id.menu_item_delete -> consume {
             deleteItem()

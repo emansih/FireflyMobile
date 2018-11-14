@@ -29,6 +29,20 @@ interface AccountsService {
                    @Field("interest_period") interestPeriod: String?,
                    @Field("account_number") accountNumber: String?): Call<AccountSuccessModel>
 
+    @FormUrlEncoded
+    @PUT(ACCOUNTS_API_ENDPOINT)
+    fun updateAccount(@Field("name") name: String,
+                      @Field("currency_code") currencyCode: String,
+                      @Field("active") active: Int,
+                      @Field("cc_type") ccType: String?,
+                      @Field("cc_monthly_payment_date") ccMonthlyPaymentDate: String?,
+                      @Field("liability_type") liabilityType: String?,
+                      @Field("liability_amount") liabilityAmount: String?,
+                      @Field("liability_start_date") liabilityStartDate: String?,
+                      @Field("interest") interest: String?,
+                      @Field("interest_period") interestPeriod: String?,
+                      @Field("account_number") accountNumber: String?): Call<AccountSuccessModel>
+
     @DELETE("$ACCOUNTS_API_ENDPOINT/{id}")
     fun deleteAccountById(@Path("id") id: String): Call<AccountsModel>
 

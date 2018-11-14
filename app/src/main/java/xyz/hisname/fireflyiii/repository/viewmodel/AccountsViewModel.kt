@@ -124,6 +124,10 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         return apiResponse
     }
 
+    fun updateAccounts(){
+
+    }
+
     fun getAccountType(type: String) = accountDatabase?.getAccountsByType(type)
 
     fun getAccountById(id: Long) = accountDatabase?.getAccountById(id)

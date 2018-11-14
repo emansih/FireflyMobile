@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.account
 
-import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.*
@@ -12,38 +11,16 @@ import androidx.work.*
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.workers.account.AccountWorker
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
-import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddAccountFragment: BaseFragment(){
-
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private lateinit var currency: String
-    private val accountArgument: String by lazy { arguments?.getString("accountType") ?: "" }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_add_account, container)
-    }
+class AddAccountFragment: BaseAccountFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
         setUpWidget()
-        currencyViewModel.currencyCode.observe(this, Observer {
-            currency = it
-        })
-        currencyViewModel.currencyDetails.observe(this, Observer {
-            currencyCode.setText(it)
-        })
     }
 
     private fun setUpWidget(){
@@ -89,61 +66,14 @@ class AddAccountFragment: BaseFragment(){
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
-        currencyCode.setOnClickListener{
-            val currencyListFragment = CurrencyListFragment()
-            currencyListFragment.show(requireFragmentManager(), "currencyList" )
-        }
-        ccPaymentDate.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val date = DatePickerDialog.OnDateSetListener {
-                _, year, monthOfYear, dayOfMonth ->
-                run {
-                    calendar.set(Calendar.YEAR, year)
-                    calendar.set(Calendar.MONTH, monthOfYear)
-                    calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                    ccPaymentDate.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
-                }
-            }
-            ccPaymentDate.setOnClickListener {
-                DatePickerDialog(requireContext(), date, calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                        .show()
-            }
-        }
-        val liabilityAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, arrayListOf(
-                "Loan" , "Debt", "Mortgage", "Credit Card"
-        ))
-        liabilityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        liabilityType.adapter = liabilityAdapter
-        val interestAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, arrayListOf(
-                "Daily" , "Monthly", "Yearly"
-        ))
-        interestAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        interestPeriod.adapter = interestAdapter
-        netWorthText.setOnClickListener {
-            netWorthCheckbox.performClick()
-        }
     }
 
-    private fun convertString(): String{
-        return when {
-            Objects.equals(accountArgument, "Asset Account") -> "asset"
-            Objects.equals(accountArgument, "Expense Account") -> "expense"
-            Objects.equals(accountArgument, "Revenue Account") -> "revenue"
-            Objects.equals(accountArgument, "Liability Account") -> "liability"
-            else -> ""
-        }
-    }
-
-    private fun submitData(){
-        hideKeyboard()
-        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+    override fun submitData(){
         val networth = if(netWorthCheckbox.isChecked){
             1
         } else {
             0
         }
-
         val account_type = if(accountType.isVisible){
             when {
                 accountType.selectedItemPosition == 0 -> "asset"
@@ -210,74 +140,54 @@ class AddAccountFragment: BaseFragment(){
         } else {
             null
         }
-
         accountViewModel.addAccounts(baseUrl, accessToken, accountName.getString(), account_type,
-                currency, networth, role, creditCardType , creditCardDate,
+                currency, networth, role, creditCardType, creditCardDate,
                 liability_type, liability_amount, liability_start_date, liability_interest,
-                interest_period, accountNumber.getString())
-                .observe(this, Observer {
-                    val error = it.getError()
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                    if(it.getResponse() != null){
-                        toastSuccess("Account saved!")
-                        requireFragmentManager().popBackStack()
-                    } else if(it.getErrorMessage() != null){
-                        toastError(it.getErrorMessage())
-                    } else if(error != null){
-                        if(error.localizedMessage.startsWith("Unable to resolve host")){
-                            val accountData = Data.Builder()
-                                    .putString("name", accountName.getString())
-                                    .putString("type", account_type)
-                                    .putString("currencyCode", currency)
-                                    .putInt("includeNetWorth", networth)
-                                    .putString("accountRole", role)
-                                    .putString("ccType", creditCardType)
-                                    .putString("ccMonthlyPaymentDate", creditCardDate)
-                                    .putString("liabilityType", liability_type)
-                                    .putString("liabilityAmount", liability_amount)
-                                    .putString("liabilityStartDate", liability_start_date)
-                                    .putString("interest", liability_interest)
-                                    .putString("interestPeriod", interest_period)
-                                    .putString("accountNumber", accountNumber.getString())
-                                    .build()
-                            val accountWork = OneTimeWorkRequest.Builder(AccountWorker::class.java)
-                                    .setInputData(accountData)
-                                    .setConstraints(Constraints.Builder()
-                                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                                            .build())
-                                    .build()
-                            WorkManager.getInstance().enqueue(accountWork)
-                            toastOffline(getString(R.string.data_added_when_user_online, "Account"))
-                            requireFragmentManager().popBackStack()
-                        } else {
-                            toastError("Error saving account")
-                        }
-                    } else {
-                        toastError("Error saving account")
-                    }
-                })
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        super.onOptionsItemSelected(item)
-        if (item.itemId == R.id.menu_item_save) {
-            submitData()
-        }
-        return true
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.save_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+                interest_period, accountNumber.getString()).observe(this, Observer {
+            val error = it.getError()
+            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            if (it.getResponse() != null) {
+                toastSuccess("Account saved!")
+                requireFragmentManager().popBackStack()
+            } else if (it.getErrorMessage() != null) {
+                toastError(it.getErrorMessage())
+            } else if (error != null) {
+                if (error.localizedMessage.startsWith("Unable to resolve host")) {
+                    val accountData = Data.Builder()
+                            .putString("name", accountName.getString())
+                            .putString("type", account_type)
+                            .putString("currencyCode", currency)
+                            .putInt("includeNetWorth", networth)
+                            .putString("accountRole", role)
+                            .putString("ccType", creditCardType)
+                            .putString("ccMonthlyPaymentDate", creditCardDate)
+                            .putString("liabilityType", liability_type)
+                            .putString("liabilityAmount", liability_amount)
+                            .putString("liabilityStartDate", liability_start_date)
+                            .putString("interest", liability_interest)
+                            .putString("interestPeriod", interest_period)
+                            .putString("accountNumber", accountNumber.getString())
+                            .build()
+                    val accountWork = OneTimeWorkRequest.Builder(AccountWorker::class.java)
+                            .setInputData(accountData)
+                            .setConstraints(Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build())
+                            .build()
+                    WorkManager.getInstance().enqueue(accountWork)
+                    toastOffline(getString(R.string.data_added_when_user_online, "Account"))
+                    requireFragmentManager().popBackStack()
+                } else {
+                    toastError("Error saving account")
+                }
+            } else {
+                toastError("Error saving account")
+            }
+        })
     }
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Add $accountArgument"
-    }
-
-    override fun onResume() {
-        super.onResume()
         activity?.activity_toolbar?.title = "Add $accountArgument"
     }
 }
