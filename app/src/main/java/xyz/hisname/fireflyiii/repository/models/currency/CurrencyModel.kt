@@ -6,6 +6,6 @@ import androidx.room.Entity
 @Entity
 data class CurrencyModel(
         @Embedded
-        val data: List<CurrencyData>,
+        val data: MutableCollection<CurrencyData>,
         val meta: Meta
 )
