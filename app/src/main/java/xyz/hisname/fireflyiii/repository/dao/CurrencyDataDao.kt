@@ -11,4 +11,10 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("SELECT * FROM currency")
     abstract fun getAllCurrency(): LiveData<MutableList<CurrencyData>>
 
+    @Query("SELECT * FROM currency")
+    abstract fun getCurrency(): MutableList<CurrencyData>
+
+    @Query("DELETE FROM currency WHERE currencyId = :currencyId")
+    abstract fun deleteCurrencyById(currencyId: Long): Int
+
 }

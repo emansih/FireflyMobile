@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 data class CurrencyData(
         @PrimaryKey(autoGenerate = false)
         @SerializedName("id")
-        var id: String = "",
+        var currencyId: Long? = null,
         @Embedded
         @SerializedName("attributes")
         var currencyAttributes: CurrencyAttributes? = null,

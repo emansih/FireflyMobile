@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 data class CategoryData(
         @PrimaryKey(autoGenerate = false)
         @SerializedName("id")
-        var id: String = "",
+        var categoryId: Long? = null,
         @Embedded
         @SerializedName("attributes")
         var categoryAttributes: CategoryAttributes? = null,

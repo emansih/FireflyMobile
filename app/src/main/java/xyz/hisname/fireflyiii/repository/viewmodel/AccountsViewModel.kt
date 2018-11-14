@@ -42,8 +42,8 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
                         networkData.forEachIndexed { _, data ->
                             networkArray.add(data.accountId!!)
                         }
-                        localData.forEachIndexed { _, piggyData ->
-                            localArray.add(piggyData.accountId!!)
+                        localData.forEachIndexed { _, accountData ->
+                            localArray.add(accountData.accountId!!)
                         }
                         for (items in networkArray) {
                             localArray.remove(items)

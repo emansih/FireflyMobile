@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.dao.AppDatabase
@@ -24,15 +21,36 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
     private val apiLiveData: MutableLiveData<ApiResponses<CurrencyModel>> = MutableLiveData()
     val currencyCode =  MutableLiveData<String>()
     val currencyDetails = MutableLiveData<String>()
+    private lateinit var localData: MutableCollection<CurrencyData>
 
     fun getCurrency(baseUrl: String, accessToken: String): BaseResponse<CurrencyData, ApiResponses<CurrencyModel>>{
         val apiResponse = MediatorLiveData<ApiResponses<CurrencyModel>>()
+        val localArray = arrayListOf<Long>()
+        val networkArray = arrayListOf<Long>()
         currencyService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(CurrencyService::class.java)
         currencyService?.getCurrency()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
-                response.body()?.data?.forEachIndexed { _, element ->
-                    GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        currencyDatabase?.insert(element)
+                val networkData = response.body()?.data
+                networkData?.forEachIndexed { _, element ->
+                    runBlocking(Dispatchers.IO) {
+                        async(Dispatchers.IO) {
+                            currencyDatabase?.insert(element)
+                            localData = currencyDatabase?.getCurrency()!!
+                        }.await()
+                        networkData.forEachIndexed { _, data ->
+                            networkArray.add(data.currencyId!!)
+                        }
+                        localData.forEachIndexed { _, currencyData ->
+                            localArray.add(currencyData.currencyId!!)
+                        }
+                        for (items in networkArray) {
+                            localArray.remove(items)
+                        }
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) {
+                    localArray.forEachIndexed { _, currencyIndex ->
+                        currencyDatabase?.deleteCurrencyById(currencyIndex)
                     }
                 }
             } else {
