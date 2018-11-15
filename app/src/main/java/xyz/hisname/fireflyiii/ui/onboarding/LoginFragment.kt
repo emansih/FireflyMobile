@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -10,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
@@ -78,18 +78,12 @@ class LoginFragment: Fragment() {
                     putString("fireflyId",fireflyId)
                     putString("fireflySecretKey",fireflySecretKey)
                 }
-                try {
-                    if(!fireflyUrl.startsWith("http")){
-                        fireflyUrl = "https://$fireflyUrl"
-                    }
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
-                            "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri()
-                    startActivity(intent)
-                } catch (exception: ActivityNotFoundException){
-                    // this user doesn't have a browser installed on their device?!
-                    toastError(resources.getString(R.string.no_browser_installed))
+                if(!fireflyUrl.startsWith("http")){
+                    fireflyUrl = "https://$fireflyUrl"
                 }
+                val builder = CustomTabsIntent.Builder()
+                builder.build().launchUrl(requireContext(), ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
+                        "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri())
             }
         }
     }
