@@ -1,15 +1,20 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
+import android.animation.Animator
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.RetrofitBuilder
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.util.DeviceUtil
 import java.util.*
 
 
@@ -27,9 +32,28 @@ class OnboardingActivity: AppCompatActivity() {
         supportActionBar?.hide()
         when {
             fireflyUrl.isEmpty() or fireflySecretKey.isEmpty() -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, AuthChooserFragment())
-                        .commit()
+                piggyIcon.animate()
+                        .translationY(-DeviceUtil.getScreenHeight(this).toFloat() / 2 + 160F)
+                        .setDuration(900)
+                        .setInterpolator(AccelerateInterpolator())
+                        .setListener(object : Animator.AnimatorListener{
+                            override fun onAnimationRepeat(animation: Animator?) {
+                            }
+
+                            override fun onAnimationEnd(animation: Animator?) {
+                                app_name_textview.isVisible = true
+                                supportFragmentManager.beginTransaction()
+                                        .replace(R.id.fragment_container, AuthChooserFragment())
+                                        .commit()
+                            }
+
+                            override fun onAnimationCancel(animation: Animator?) {
+                            }
+
+                            override fun onAnimationStart(animation: Animator?) {
+                            }
+
+                        })
             }
             authMethod.isNotEmpty() -> {
                 when {
