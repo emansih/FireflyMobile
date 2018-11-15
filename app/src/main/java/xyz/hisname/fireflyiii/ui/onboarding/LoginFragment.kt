@@ -8,10 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -97,7 +99,8 @@ class LoginFragment: Fragment() {
             token again. Is it really a bug? Anyway, the client does not play well in this scenario.
             Currently we only checked if the refresh token is `old`
         */
-        ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
+        rootLayout.isVisible = false
+        toastInfo("Refreshing your access token...", Toast.LENGTH_LONG)
         val refreshToken = sharedPref.getString("refresh_token", "")
         val clientId = sharedPref.getString("fireflyId", "")
         model.getRefreshToken(baseUrl, refreshToken, fireflySecretKey, clientId)
