@@ -17,8 +17,8 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_bill.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -137,7 +137,6 @@ class ListBillFragment: BaseFragment() {
     }
 
     override fun onDetach() {
-        AppDatabase.destroyInstance()
         RetrofitBuilder.destroyInstance()
         fab.isGone = true
         super.onDetach()

@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel

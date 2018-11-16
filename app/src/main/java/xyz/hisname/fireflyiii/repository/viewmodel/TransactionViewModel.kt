@@ -7,9 +7,9 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.TransactionService
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.TransactionService
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.Response
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
@@ -21,7 +21,7 @@ import java.util.*
 
 class TransactionViewModel(application: Application) : AndroidViewModel(application){
 
-    private val transactionDatabase by lazy { AppDatabase.getInstance(application)?.transactionDataDao() }
+    private val transactionDatabase by lazy { AppDatabase.getInstance(application).transactionDataDao() }
     private val apiResponse: MediatorLiveData<ApiResponses<TransactionModel>> = MediatorLiveData()
 
     fun getTransactions(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
@@ -32,7 +32,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        transactionDatabase?.insert(element)
+                        transactionDatabase.insert(element)
                     }
                 }
                 transaction.value = ApiResponses(response.body())
@@ -41,9 +41,9 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         { throwable ->  transaction.value = ApiResponses(throwable)})
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return when {
-            Objects.equals("all", type) -> Response(transactionDatabase?.getRecentTransactions(5), apiResponse)
-            start.isNullOrBlank() or end.isNullOrBlank() -> Response(transactionDatabase?.getTransaction(type), apiResponse)
-            else -> Response(transactionDatabase?.getTransaction(start, end, type), apiResponse)
+            Objects.equals("all", type) -> Response(transactionDatabase.getRecentTransactions(5), apiResponse)
+            start.isNullOrBlank() or end.isNullOrBlank() -> Response(transactionDatabase.getTransaction(type), apiResponse)
+            else -> Response(transactionDatabase.getTransaction(start, end, type), apiResponse)
         }
     }
 

@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.ui.onboarding
 
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -20,7 +18,8 @@ import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.viewmodel.AuthViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -30,11 +29,10 @@ import java.util.*
 
 class LoginFragment: Fragment() {
 
-    private val baseUrl: String by lazy { sharedPref.getString("fireflyUrl","") ?: "" }
+    private val baseUrl by lazy { AppPref(requireContext()).getBaseUrl() }
     private lateinit var fireflyUrl: String
-    private val fireflyId: String by lazy { sharedPref.getString("fireflyId","") ?: "" }
-    private val fireflySecretKey: String by lazy { sharedPref.getString("fireflySecretKey","") ?: "" }
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
+    private val fireflyId: String by lazy { AppPref(requireContext()).getClientId() }
+    private val fireflySecretKey: String by lazy { AppPref(requireContext()).getSecretKey() }
     private val model by lazy { getViewModel(AuthViewModel::class.java) }
     private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
 
@@ -73,11 +71,9 @@ class LoginFragment: Fragment() {
                     else -> firefly_secret_edittext.error = resources.getString(R.string.required_field)
                 }
             } else {
-                sharedPref.edit {
-                    putString("fireflyUrl",fireflyUrl)
-                    putString("fireflyId",fireflyId)
-                    putString("fireflySecretKey",fireflySecretKey)
-                }
+                AppPref(requireContext()).setBaseUrl(fireflyUrl)
+                AppPref(requireContext()).setClientId(fireflyId)
+                AppPref(requireContext()).setSecretKey(fireflySecretKey)
                 if(!fireflyUrl.startsWith("http")){
                     fireflyUrl = "https://$fireflyUrl"
                 }
@@ -95,9 +91,8 @@ class LoginFragment: Fragment() {
         */
         rootLayout.isVisible = false
         toastInfo("Refreshing your access token...", Toast.LENGTH_LONG)
-        val refreshToken = sharedPref.getString("refresh_token", "")
-        val clientId = sharedPref.getString("fireflyId", "")
-        model.getRefreshToken(baseUrl, refreshToken, fireflySecretKey, clientId)
+        model.getRefreshToken(baseUrl, AppPref(requireContext()).getRefreshToken(),
+                fireflySecretKey, AppPref(requireContext()).getClientId())
                 .observe(this, Observer {
                     if(it.getError() == null) {
                         startHomeIntent()
@@ -112,7 +107,7 @@ class LoginFragment: Fragment() {
     }
 
     private fun startHomeIntent(){
-        if(sharedPref.getBoolean("persistent_notification",false)){
+        if(AppPref(requireContext()).isTransactionPersistent()){
             NotificationUtils(requireContext()).showTransactionPersistentNotification()
         }
         GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
@@ -129,17 +124,15 @@ class LoginFragment: Fragment() {
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             val code = uri.getQueryParameter("code")
             if(code != null) {
-                val baseUrl= sharedPref.getString("fireflyUrl","") ?: ""
-                val fireflyId = sharedPref.getString("fireflyId","") ?: ""
-                val fireflySecretKey= sharedPref.getString("fireflySecretKey","") ?: ""
+                val baseUrl= AppPref(requireContext()).getBaseUrl()
+                val fireflyId = AppPref(requireContext()).getClientId()
+                val fireflySecretKey= AppPref(requireContext()).getSecretKey()
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 model.getAccessToken(baseUrl, code,fireflyId,fireflySecretKey).observe(this, Observer {
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                     if(it.getResponse() != null) {
                         toastSuccess(resources.getString(R.string.welcome))
-                        sharedPref.edit {
-                            putString("auth_method", "oauth")
-                        }
+                        AppPref(requireContext()).setAuthMethod("oauth")
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
                         val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to it.getResponse()?.access_token)

@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.RulesService
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.RulesService
 import xyz.hisname.fireflyiii.repository.models.rules.RulesApiResponse
 import xyz.hisname.fireflyiii.util.retrofitCallback
 

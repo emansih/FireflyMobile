@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.viewmodel.UserInfoViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.util.extension.create

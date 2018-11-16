@@ -11,7 +11,7 @@ import androidx.work.*
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.workers.account.AccountWorker
+import xyz.hisname.fireflyiii.workers.account.AccountWorker
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*

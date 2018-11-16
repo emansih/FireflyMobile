@@ -11,7 +11,8 @@ import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.DeviceUtil
@@ -20,8 +21,8 @@ import java.util.*
 
 class OnboardingActivity: AppCompatActivity() {
 
-    private val fireflyUrl by lazy { sharedPref.getString("fireflyUrl","") ?: "" }
-    private val fireflySecretKey by lazy { sharedPref.getString("fireflySecretKey","") ?: "" }
+    private val fireflyUrl by lazy { AppPref(this).getBaseUrl() }
+    private val fireflySecretKey by lazy { AppPref(this).getSecretKey() }
     private val fireflyAccessTokenExpiry by lazy { sharedPref.getLong("expires_at",0) }
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
     private val authMethod  by lazy { sharedPref.getString("auth_method","") ?: "" }

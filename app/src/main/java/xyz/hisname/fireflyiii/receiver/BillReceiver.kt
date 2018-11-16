@@ -3,19 +3,15 @@ package xyz.hisname.fireflyiii.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import androidx.work.*
-import xyz.hisname.fireflyiii.repository.workers.bill.BillWorker
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.workers.bill.BillWorker
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
 class BillReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val sharedPref: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
-        val baseUrl: String by lazy { sharedPref.getString("fireflyUrl", "") }
-        val accessToken: String by lazy { sharedPref.getString("access_token","") }
-        if(baseUrl.isBlank() || accessToken.isBlank()){
+        if(AppPref(context).getBaseUrl().isBlank() || AppPref(context).getAccessToken().isBlank()){
             val notif = NotificationUtils(context)
             notif.showNotSignedIn()
         } else {

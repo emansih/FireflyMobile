@@ -5,9 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.CategoryService
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.CategoryService
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
@@ -16,7 +16,7 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class CategoryViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val categoryDatabase by lazy { AppDatabase.getInstance(application)?.categoryDataDao() }
+    private val categoryDatabase by lazy { AppDatabase.getInstance(application).categoryDataDao() }
     private var categoryService: CategoryService? = null
     private val apiLiveData: MutableLiveData<ApiResponses<CategoryModel>> = MutableLiveData()
     private lateinit var localData: MutableCollection<CategoryData>
@@ -33,8 +33,8 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
                 networkData?.forEachIndexed { _, element ->
                     runBlocking(Dispatchers.IO) {
                         async(Dispatchers.IO) {
-                            categoryDatabase?.insert(element)
-                            localData = categoryDatabase?.getCategories()!!
+                            categoryDatabase.insert(element)
+                            localData = categoryDatabase.getCategories()
                         }.await()
                         networkData.forEachIndexed { _, data ->
                             networkArray.add(data.categoryId!!)
@@ -49,7 +49,7 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     localArray.forEachIndexed { _, categoryIndex ->
-                        categoryDatabase?.deleteCategoryById(categoryIndex)
+                        categoryDatabase.deleteCategoryById(categoryIndex)
                     }
                 }
             }else {
@@ -64,7 +64,7 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
         apiResponse.addSource(apiLiveData) {
             apiResponse.value = it
         }
-        return BaseResponse(categoryDatabase?.getAllCategory(), apiResponse)
+        return BaseResponse(categoryDatabase.getAllCategory(), apiResponse)
     }
 
 

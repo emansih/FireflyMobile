@@ -5,21 +5,21 @@ import androidx.lifecycle.*
 import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.BillsService
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.BillsService
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.repository.workers.bill.DeleteBillWorker
+import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class BillsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val billDatabase by lazy { AppDatabase.getInstance(application)?.billDataDao() }
+    private val billDatabase by lazy { AppDatabase.getInstance(application).billDataDao() }
     private var billsService: BillsService? = null
     private val billResponse: MutableLiveData<ApiResponses<BillsModel>> = MutableLiveData()
     private lateinit var localData: MutableCollection<BillData>
@@ -36,8 +36,8 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
                 networkData?.forEachIndexed { _, element ->
                     runBlocking(Dispatchers.IO) {
                         async(Dispatchers.IO) {
-                            billDatabase?.insert(element)
-                            localData = billDatabase?.getBills()!!
+                            billDatabase.insert(element)
+                            localData = billDatabase.getBills()
                         }.await()
                         networkData.forEachIndexed { _, data ->
                             networkArray.add(data.billId!!)
@@ -52,7 +52,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     localArray.forEachIndexed { _, accountIndex ->
-                        billDatabase?.deleteBillById(accountIndex)
+                        billDatabase.deleteBillById(accountIndex)
                     }
                 }
             } else {
@@ -67,7 +67,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         apiResponse.addSource(billResponse) {
             apiResponse.value = it
         }
-        return BaseResponse(billDatabase?.getAllBill(), apiResponse)
+        return BaseResponse(billDatabase.getAllBill(), apiResponse)
     }
 
     fun deleteBill(baseUrl: String?, accessToken: String?, id: String): LiveData<ApiResponses<BillsModel>>{
@@ -77,7 +77,7 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
             if (response.isSuccessful) {
                 billResponse.postValue(ApiResponses(response.body()))
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                    billDatabase?.deleteBillById(id.toLong())
+                    billDatabase.deleteBillById(id.toLong())
                 }
             } else {
                 val billTag = WorkManager.getInstance().getWorkInfosByTag("delete_bill_$id").get()
@@ -162,5 +162,5 @@ class BillsViewModel(application: Application) : AndroidViewModel(application) {
         return apiResponse
     }
 
-    fun getBillById(id: Long) = billDatabase?.getBillById(id)
+    fun getBillById(id: Long) = billDatabase.getBillById(id)
 }

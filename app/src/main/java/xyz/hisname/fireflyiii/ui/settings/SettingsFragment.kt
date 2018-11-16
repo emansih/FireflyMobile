@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.preference.PreferenceManager
 import androidx.preference.PreferenceFragmentCompat
 import xyz.hisname.fireflyiii.R
 import android.graphics.drawable.ColorDrawable
@@ -15,8 +14,9 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import xyz.hisname.fireflyiii.util.extension.toastInfo
@@ -25,10 +25,9 @@ import java.util.*
 
 class SettingsFragment: PreferenceFragmentCompat() {
 
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
-    private val fireflyUrl by lazy { sharedPref.getString("fireflyUrl","") ?: "" }
-    private val fireflySecretKey by lazy { sharedPref.getString("fireflySecretKey","") ?: "" }
-    private val appDb by lazy { AppDatabase.getInstance(requireContext()) }
+    private val fireflyUrl by lazy { AppPref(requireContext()).getBaseUrl() }
+    private val fireflySecretKey by lazy { AppPref(requireContext()).getSecretKey() }
+    private val authMethodPref by lazy { AppPref(requireContext()).getAuthMethod() }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -51,7 +50,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
         val authMethod = findPreference("auth_method")
 
         val logout = findPreference("logout")
-        if(Objects.equals(sharedPref.getString("auth_method", ""), "oauth")){
+        if(Objects.equals(authMethodPref, "oauth")){
             authMethod.summary = "OAuth Authentication"
         } else {
             authMethod.summary = "Personal Access Authentication"
@@ -71,8 +70,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
         logout.setOnPreferenceClickListener {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
-                appDb?.clearAllTables()
-                sharedPref.edit().clear().apply()
+                AppDatabase.clearDb(requireContext())
+                AppPref(requireContext()).clearPref()
             }
             val loginActivity = Intent(requireActivity(), OnboardingActivity::class.java)
             startActivity(loginActivity)

@@ -5,9 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.CurrencyService
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.CurrencyService
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
@@ -16,7 +16,7 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class CurrencyViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val currencyDatabase by lazy { AppDatabase.getInstance(application)?.currencyDataDao() }
+    private val currencyDatabase by lazy { AppDatabase.getInstance(application).currencyDataDao() }
     private var currencyService: CurrencyService? = null
     private val apiLiveData: MutableLiveData<ApiResponses<CurrencyModel>> = MutableLiveData()
     val currencyCode =  MutableLiveData<String>()
@@ -34,8 +34,8 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
                 networkData?.forEachIndexed { _, element ->
                     runBlocking(Dispatchers.IO) {
                         async(Dispatchers.IO) {
-                            currencyDatabase?.insert(element)
-                            localData = currencyDatabase?.getCurrency()!!
+                            currencyDatabase.insert(element)
+                            localData = currencyDatabase.getCurrency()
                         }.await()
                         networkData.forEachIndexed { _, data ->
                             networkArray.add(data.currencyId!!)
@@ -50,7 +50,7 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     localArray.forEachIndexed { _, currencyIndex ->
-                        currencyDatabase?.deleteCurrencyById(currencyIndex)
+                        currencyDatabase.deleteCurrencyById(currencyIndex)
                     }
                 }
             } else {
@@ -65,7 +65,7 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
         apiResponse.addSource(apiLiveData) {
             apiResponse.value = it
         }
-        return BaseResponse(currencyDatabase?.getAllCurrency(), apiResponse)
+        return BaseResponse(currencyDatabase.getAllCurrency(), apiResponse)
     }
 
     fun setCurrencyCode(code: String?) {

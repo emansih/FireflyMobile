@@ -18,6 +18,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IProfile
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -77,11 +78,9 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
-        val role = sharedPref.getString("userRole", "")
-        val email = sharedPref.getString("userEmail","")
         profile = ProfileDrawerItem()
-                .withName(email)
-                .withEmail(role)
+                .withName(AppPref(this).getUserEmail())
+                .withEmail(AppPref(this).getUserRole())
                 .withIcon(R.drawable.ic_piggy_bank)
         headerResult = AccountHeaderBuilder()
                 .withActivity(this)

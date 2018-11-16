@@ -1,12 +1,11 @@
 package xyz.hisname.fireflyiii.repository.viewmodel
 
 import android.app.Application
-import android.preference.PreferenceManager
-import androidx.core.content.edit
 import androidx.lifecycle.*
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.SettingsService
-import xyz.hisname.fireflyiii.repository.api.SystemInfoService
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.SettingsService
+import xyz.hisname.fireflyiii.data.remote.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.userinfo.settings.SettingsApiResponse
 import xyz.hisname.fireflyiii.repository.models.userinfo.system.SystemInfoModel
@@ -15,19 +14,16 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class UserInfoViewModel(application: Application) : AndroidViewModel(application){
 
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(getApplication()) }
-
     fun getUser(baseUrl: String?, accessToken: String?):
             LiveData<ApiResponses<UserDataModel>> {
         val apiResponse: MediatorLiveData<ApiResponses<UserDataModel>> = MediatorLiveData()
         val user: MutableLiveData<ApiResponses<UserDataModel>> = MutableLiveData()
         val systemService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(SystemInfoService::class.java)
         systemService?.getCurrentUserInfo()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                sharedPref.edit{
-                    putString("userEmail", response.body()?.userData?.userAttributes?.email)
-                    putString("userRole", response.body()?.userData?.userAttributes?.role)
-                }
+            val userAttribute = response.body()?.userData?.userAttributes
+            if (userAttribute != null) {
+                AppPref(getApplication()).setUserEmail(userAttribute.email)
+                AppPref(getApplication()).setUserRole(userAttribute.role)
                 user.value = ApiResponses(response.body())
             }
         })
@@ -42,12 +38,11 @@ class UserInfoViewModel(application: Application) : AndroidViewModel(application
         val user: MutableLiveData<ApiResponses<SystemInfoModel>> = MutableLiveData()
         val systemService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(SystemInfoService::class.java)
         systemService?.getSystemInfo()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                sharedPref.edit{
-                    putString("server_version", response.body()?.systemData?.version)
-                    putString("api_version", response.body()?.systemData?.api_version)
-                    putString("user_os", response.body()?.systemData?.os)
-                }
+            val systemData = response.body()?.systemData
+            if (systemData != null) {
+                AppPref(getApplication()).setServerVersion(systemData.version)
+                AppPref(getApplication()).setRemoteApiVersion(systemData.api_version)
+                AppPref(getApplication()).setUserOS(systemData.os)
                 user.value = ApiResponses(response.body())
             }
         })

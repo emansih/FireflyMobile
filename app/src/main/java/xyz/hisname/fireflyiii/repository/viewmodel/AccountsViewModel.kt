@@ -5,16 +5,16 @@ import androidx.lifecycle.*
 import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.AccountsService
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.AccountsService
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.repository.workers.account.DeleteAccountWorker
+import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import java.util.*
 
@@ -36,8 +36,8 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
                 networkData?.forEachIndexed { _, element ->
                     runBlocking(Dispatchers.IO) {
                         GlobalScope.async(Dispatchers.IO) {
-                            accountDatabase?.insert(element)
-                            localData = accountDatabase?.getAccounts()!!
+                            accountDatabase.insert(element)
+                            localData = accountDatabase.getAccounts()
                         }.await()
                         networkData.forEachIndexed { _, data ->
                             networkArray.add(data.accountId!!)
@@ -52,7 +52,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     localArray.forEachIndexed { _, accountIndex ->
-                        accountDatabase?.deleteAccountById(accountIndex)
+                        accountDatabase.deleteAccountById(accountIndex)
                     }
                 }
             } else {
@@ -65,7 +65,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         })
         { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
         apiResponse.addSource(apiLiveData) { apiResponse.value = it }
-        return BaseResponse(accountDatabase?.getAllAccounts(), apiResponse)
+        return BaseResponse(accountDatabase.getAllAccounts(), apiResponse)
     }
 
     fun getAccountsByType(baseUrl: String, accessToken: String, type: String):
@@ -76,7 +76,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, element ->
                     GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                        accountDatabase?.insert(element)
+                        accountDatabase.insert(element)
                     }
                 }
             } else {
@@ -94,11 +94,11 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
 
     private fun getDbAccount(type: String): LiveData<MutableList<AccountData>>?{
         return when {
-            Objects.equals(type, "asset") -> accountDatabase?.getAccountByType("Asset account")
-            Objects.equals(type, "expense") -> accountDatabase?.getAccountByType("Expense account")
-            Objects.equals(type, "revenue") -> accountDatabase?.getAccountByType("Revenue account")
-            Objects.equals(type, "liability") -> accountDatabase?.getAccountByType("Liability account")
-            else -> accountDatabase?.getAllAccounts()
+            Objects.equals(type, "asset") -> accountDatabase.getAccountByType("Asset account")
+            Objects.equals(type, "expense") -> accountDatabase.getAccountByType("Expense account")
+            Objects.equals(type, "revenue") -> accountDatabase.getAccountByType("Revenue account")
+            Objects.equals(type, "liability") -> accountDatabase.getAccountByType("Liability account")
+            else -> accountDatabase.getAllAccounts()
         }
     }
 
@@ -128,7 +128,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
             }
             if (response.isSuccessful) {
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                    accountDatabase?.insert(response.body()?.data!!)
+                    accountDatabase.insert(response.body()?.data!!)
                 }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
@@ -141,13 +141,9 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         return apiResponse
     }
 
-    fun updateAccounts(){
+    fun getAccountType(type: String) = accountDatabase.getAccountsByType(type)
 
-    }
-
-    fun getAccountType(type: String) = accountDatabase?.getAccountsByType(type)
-
-    fun getAccountById(id: Long) = accountDatabase?.getAccountById(id)
+    fun getAccountById(id: Long) = accountDatabase.getAccountById(id)
 
     fun deleteAccountById(baseUrl: String, accessToken: String, id: String): LiveData<ApiResponses<AccountsModel>>{
         val apiResponse = MediatorLiveData<ApiResponses<AccountsModel>>()
@@ -155,7 +151,7 @@ class AccountsViewModel(application: Application) : AndroidViewModel(application
         accountsService?.deleteAccountById(id)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204) {
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                    accountDatabase?.deleteAccountById(id.toLong())
+                    accountDatabase.deleteAccountById(id.toLong())
                 }
                 apiLiveData.postValue(ApiResponses("Delete Successful!"))
             } else {

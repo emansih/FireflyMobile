@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_piggy_create.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity

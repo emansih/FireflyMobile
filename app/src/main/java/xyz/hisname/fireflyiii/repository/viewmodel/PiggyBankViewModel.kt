@@ -8,21 +8,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.repository.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.api.PiggybankService
-import xyz.hisname.fireflyiii.repository.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.BaseResponse
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
-import xyz.hisname.fireflyiii.repository.workers.piggybank.DeletePiggyWorker
+import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class PiggyBankViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val piggyDataBase by lazy { AppDatabase.getInstance(application)?.piggyDataDao() }
+    private val piggyDataBase by lazy { AppDatabase.getInstance(application).piggyDataDao() }
     private var piggyBankService: PiggybankService? = null
     private val apiLiveData: MutableLiveData<ApiResponses<PiggyModel>> = MutableLiveData()
     private lateinit var localData: MutableCollection<PiggyData>
@@ -38,8 +38,8 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
                 networkData?.forEachIndexed { _, element ->
                     runBlocking(Dispatchers.IO) {
                         GlobalScope.async(Dispatchers.IO) {
-                            piggyDataBase?.insert(element)
-                            localData = piggyDataBase?.getAllPiggy()!!
+                            piggyDataBase.insert(element)
+                            localData = piggyDataBase.getAllPiggy()
                         }.await()
                         networkData.forEachIndexed { _, data ->
                             networkArray.add(data.piggyId!!)
@@ -54,7 +54,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
                 }
                 GlobalScope.launch(Dispatchers.IO) {
                     localArray.forEachIndexed { _, piggyIndex ->
-                        piggyDataBase?.deletePiggyById(piggyIndex)
+                        piggyDataBase.deletePiggyById(piggyIndex)
                     }
                 }
             } else {
@@ -68,7 +68,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
         { throwable ->  apiLiveData.value = ApiResponses(throwable)})
 
         apiResponse.addSource(apiLiveData) { apiResponse.value = it }
-        return BaseResponse(piggyDataBase?.getPiggy(), apiResponse)
+        return BaseResponse(piggyDataBase.getPiggy(), apiResponse)
     }
 
     fun deletePiggyBank(baseUrl: String?, accessToken: String?,id: String): LiveData<ApiResponses<PiggyModel>>{
@@ -78,7 +78,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
             if (response.isSuccessful) {
                 apiResponse.postValue(ApiResponses(response.body()))
                 GlobalScope.launch(Dispatchers.Default, CoroutineStart.DEFAULT) {
-                    piggyDataBase?.deletePiggyById(id.toLong())
+                    piggyDataBase.deletePiggyById(id.toLong())
                 }
             } else {
                 val piggyTag =
@@ -140,7 +140,7 @@ class PiggyBankViewModel(application: Application) : AndroidViewModel(applicatio
 
     }
 
-    fun getPiggyBankById(id: Long)=  piggyDataBase?.getPiggyById(id)
+    fun getPiggyBankById(id: Long)=  piggyDataBase.getPiggyById(id)
 
 
 }
