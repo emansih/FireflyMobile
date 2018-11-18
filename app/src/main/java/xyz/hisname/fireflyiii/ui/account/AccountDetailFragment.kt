@@ -5,23 +5,17 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_account_detail.*
-import kotlinx.android.synthetic.main.progress_overlay.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
-import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
@@ -29,7 +23,7 @@ import xyz.hisname.fireflyiii.util.extension.*
 
 class AccountDetailFragment: BaseDetailFragment() {
 
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java)}
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val accountId: Long by lazy { arguments?.getLong("accountId") as Long  }
     private var accountAttributes: AccountAttributes? = null
     private var accountList: MutableList<BaseDetailModel> = ArrayList()
@@ -43,22 +37,20 @@ class AccountDetailFragment: BaseDetailFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        launch(context = Dispatchers.Main) {
-            val result = async(Dispatchers.IO) {
-                accountViewModel.getAccountById(accountId)
-            }.await()
-            accountAttributes = result!![0].accountAttributes
-            if(accountAttributes?.currency_symbol != null){
+        accountViewModel.getAccountById(accountId).observe(this, Observer {
+            accountAttributes = it[0].accountAttributes
+            if (accountAttributes?.currency_symbol != null) {
                 currencySymbol = accountAttributes?.currency_symbol!!
             }
             setupWidget()
-            recycler_view.adapter = BaseDetailRecyclerAdapter(accountList)
-        }
+
+        })
+        recycler_view.adapter = BaseDetailRecyclerAdapter(accountList)
     }
 
     private fun setupWidget(){
         accountName.text = accountAttributes?.name
-        accountAmount.text = currencySymbol  + " " + accountAttributes?.current_balance.toString()
+        accountAmount.text = currencySymbol  + " " + accountAttributes?.current_balance.toString().toBigDecimal().toPlainString()
         val data = arrayListOf(
                 BaseDetailModel("Created At", accountAttributes?.created_at,
                         IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_create).sizeDp(24)),
@@ -83,22 +75,23 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     override fun deleteItem() {
+        accountViewModel.isLoading.observe(this, Observer {
+            if(it == true){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        })
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.get_confirmation)
                 .setMessage(R.string.irreversible_action)
-                .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    accountViewModel.deleteAccountById(baseUrl,accessToken,accountId.toString()).observe(this, Observer {
-                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                        val error = it.getError()
-                        when {
-                            it.getErrorMessage() == "Delete Successful!" -> {
-                                toastSuccess("Account deleted", Toast.LENGTH_LONG)
-                                requireFragmentManager().popBackStack()
-                            }
-                            error != null -> {
-                                toastInfo(error.localizedMessage)
-                            }
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    accountViewModel.deleteAccountById(baseUrl,accessToken,accountId).observe(this, Observer {
+                        if(it == true){
+                            requireFragmentManager().popBackStack()
+                            toastSuccess("Account Deleted")
+                        } else {
+                            toastError("Account will be deleted later")
                         }
                     })
                 }

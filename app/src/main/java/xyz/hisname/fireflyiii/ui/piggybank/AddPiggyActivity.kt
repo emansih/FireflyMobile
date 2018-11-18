@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_piggy_create.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
-import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -25,7 +25,7 @@ import java.util.*
 class AddPiggyActivity: BaseActivity(){
 
     private val model by lazy { getViewModel(PiggyBankViewModel::class.java) }
-    private val accountDatabase by lazy { AppDatabase.getInstance(this)?.accountDataDao() }
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private var accounts = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +67,7 @@ class AddPiggyActivity: BaseActivity(){
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
-        accountDatabase?.getAccountByType("Asset account")?.observe(this, Observer {
+        accountViewModel.getAssetAccounts(baseUrl,accessToken).observe(this, Observer {
             if(it.isNotEmpty()) {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
@@ -145,7 +145,7 @@ class AddPiggyActivity: BaseActivity(){
                 } else {
                     note_edittext.getString()
                 }
-                accountDatabase?.getAssetAccount(account_id_edittext.selectedItem.toString())?.observe(this, Observer { accountData ->
+                accountViewModel.getAccountByName(account_id_edittext.selectedItem.toString()).observe(this, Observer { accountData ->
                     model.addPiggyBank(baseUrl, accessToken, piggy_name_edittext.getString(), accountData[0].accountId.toString(),
                             currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
                             .observe(this, Observer {

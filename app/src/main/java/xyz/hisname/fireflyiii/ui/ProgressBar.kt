@@ -16,8 +16,8 @@ class ProgressBar{
             view.isVisible = true
             view.bringToFront()
             view.animate()
-                    .setDuration(duration.toLong())
-                    .alpha(if (show) toAlpha else 0.toFloat())
+                    .setDuration(200)
+                    .alpha(if (show) toAlpha else 0F)
                     .setListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             view.visibility = toVisibility

@@ -17,26 +17,26 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class DeleteAccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val accountDatabase by lazy { AppDatabase.getInstance(context)?.accountDataDao() }
+    private val accountDatabase by lazy { AppDatabase.getInstance(context).accountDataDao() }
     private val channelName: String = "Account"
     private val channelDescription = "Show Account Notifications"
     private val channelIcon = R.drawable.ic_euro_sign
 
 
     override fun doWork(): Result {
-        val id = inputData.getString("accountId") ?: ""
+        val id = inputData.getLong("accountId", 0L)
         var accountAttributes: AccountAttributes? = null
         GlobalScope.launch(Dispatchers.Main) {
             val result = async(Dispatchers.IO) {
-                accountDatabase?.getAccountById(id.toLong())
+                accountDatabase.getAccountById(id)
             }.await()
-            accountAttributes = result!![0].accountAttributes
+            accountAttributes = result[0].accountAttributes
         }
         genericService?.create(AccountsService::class.java)?.deleteAccountById(id)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 GlobalScope.launch(Dispatchers.Main) {
                     async(Dispatchers.IO) {
-                        accountDatabase?.deleteAccountById(id.toLong())
+                        accountDatabase.deleteAccountById(id)
                     }.await()
                     context.displayNotification(accountAttributes?.name + "successfully deleted", "Account",
                             Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)

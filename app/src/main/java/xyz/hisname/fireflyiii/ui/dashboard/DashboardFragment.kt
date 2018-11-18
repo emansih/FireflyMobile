@@ -49,7 +49,7 @@ class DashboardFragment: BaseFragment() {
                 .replace(R.id.overviewFrame, OverviewFragment().apply { arguments = bundle })
                 .commit()
         requireFragmentManager().beginTransaction()
-                .replace(R.id.walletFrame, WalletFragment().apply { arguments = bundle })
+                .replace(R.id.walletFrame, WalletFragment())
                 .commit()
         requireFragmentManager().beginTransaction()
                 .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })

@@ -21,6 +21,13 @@ class AddAccountFragment: BaseAccountFragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpWidget()
+        accountViewModel.isLoading.observe(this, Observer {
+            if(it == true){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        })
     }
 
     private fun setUpWidget(){
@@ -145,7 +152,6 @@ class AddAccountFragment: BaseAccountFragment(){
                 liability_type, liability_amount, liability_start_date, liability_interest,
                 interest_period, accountNumber.getString()).observe(this, Observer {
             val error = it.getError()
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             if (it.getResponse() != null) {
                 toastSuccess("Account saved!")
                 requireFragmentManager().popBackStack()

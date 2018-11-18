@@ -44,6 +44,6 @@ interface AccountsService {
                       @Field("account_number") accountNumber: String?): Call<AccountSuccessModel>
 
     @DELETE("$ACCOUNTS_API_ENDPOINT/{id}")
-    fun deleteAccountById(@Path("id") id: String): Call<AccountsModel>
+    fun deleteAccountById(@Path("id") id: Long): Call<AccountsModel>
 
 }

@@ -11,11 +11,8 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("SELECT * FROM accounts")
     abstract fun getAllAccounts(): LiveData<MutableList<AccountData>>
 
-    @Query("SELECT * FROM accounts")
-    abstract fun getAccounts(): MutableList<AccountData>
-
     @Query("SELECT * FROM accounts WHERE name =:accountName")
-    abstract fun getAssetAccount(accountName: String): LiveData<MutableList<AccountData>>
+    abstract fun getAccountByName(accountName: String): MutableList<AccountData>
 
     @Query("SELECT * FROM accounts WHERE type =:accountType")
     abstract fun getAccountByType(accountType: String): LiveData<MutableList<AccountData>>
@@ -28,7 +25,5 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
 
     @Query("DELETE FROM accounts WHERE accountId = :accountId")
     abstract fun deleteAccountById(accountId: Long): Int
-
-
 
 }

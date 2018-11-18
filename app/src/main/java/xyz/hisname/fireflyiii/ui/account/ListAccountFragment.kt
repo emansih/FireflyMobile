@@ -16,8 +16,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
-import xyz.hisname.fireflyiii.repository.viewmodel.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -28,8 +28,7 @@ class ListAccountFragment: BaseFragment() {
 
     private var dataAdapter = ArrayList<AccountData>()
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
-    private val accountViewModel by lazy {
-        getViewModel(AccountsViewModel::class.java).getAccountsByType(baseUrl, accessToken, accountType)}
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val accountType by lazy { arguments?.getString("accountType") ?: "" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -45,22 +44,28 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun displayView(){
-        swipeContainer.isRefreshing = true
+        swipeContainer.isRefreshing = accountViewModel.isLoading.value == true
         runLayoutAnimation(recycler_view)
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        accountViewModel.databaseData?.observe(
-                this, Observer {
-            swipeContainer.isRefreshing = false
-            if(it.isNotEmpty()){
+        when (accountType) {
+            "all" -> accountViewModel.getAllAccounts(baseUrl, accessToken).observe(this, Observer {
                 recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-            }
-        })
-        accountViewModel.apiResponse
-                .observe(this, Observer {
-                    swipeContainer.isRefreshing = false
-                    if(it.getError() != null){
-                        toastError(it.getError()?.message)
-                    }
+            })
+            "asset" -> accountViewModel.getAssetAccounts(baseUrl, accessToken).observe(this, Observer {
+                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+            })
+            "expense" -> accountViewModel.getExpenseAccounts(baseUrl, accessToken).observe(this, Observer {
+                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+            })
+            "revenue" -> accountViewModel.getRevenueAccounts(baseUrl, accessToken).observe(this, Observer {
+                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+            })
+            "liability" -> accountViewModel.getLiabilityAccounts(baseUrl, accessToken).observe(this, Observer {
+                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+            })
+        }
+        accountViewModel.apiResponse.observe(this, Observer {
+            toastError(it)
         })
     }
 

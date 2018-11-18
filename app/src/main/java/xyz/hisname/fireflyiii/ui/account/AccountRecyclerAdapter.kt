@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.account
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.account_list_item.view.*
 import xyz.hisname.fireflyiii.R
@@ -33,7 +34,14 @@ class AccountRecyclerAdapter(private val items: MutableList<AccountData>, privat
                 currencySymbol = accountData.currency_symbol
             }
             itemView.accountNameText.text = accountData?.name
-            itemView.accountAmountText.text = currencySymbol + " " +accountData?.current_balance.toString()
+            val amount = accountData?.current_balance?.toBigDecimal()?.toPlainString()
+            if(amount != null){
+                if(amount.startsWith("-")){
+                    itemView.accountAmountText.setTextColor(ContextCompat.getColor(context, R.color.md_red_500))
+                }
+                itemView.accountAmountText.text = currencySymbol + " " + amount
+
+            }
             itemView.setOnClickListener { clickListener(data) }
         }
     }

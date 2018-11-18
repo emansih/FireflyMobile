@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
@@ -33,7 +34,7 @@ class AddTransactionFragment: BaseFragment() {
     private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private val accountDatabase by lazy { AppDatabase.getInstance(requireActivity())?.accountDataDao() }
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private var accounts = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
     private var destinationAccounts = ArrayList<String>()
@@ -52,7 +53,7 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         when {
-            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountDatabase?.getAccountByType("Asset account")!!, piggyBankDatabase?.getPiggy()!!)
+            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(baseUrl,accessToken), piggyBankDatabase.getPiggy())
                     .observe(this, Observer {
                         it.first.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
@@ -72,12 +73,10 @@ class AddTransactionFragment: BaseFragment() {
                         piggyBankName.threshold = 1
                         piggyBankName.setAdapter(adapter)
                     })
-            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAccountByType("Revenue account")!!)
+            Objects.equals(transactionType, "Deposit") -> accountViewModel.getRevenueAccounts(baseUrl, accessToken)
                     .observe(this , Observer {
-                        it.first.forEachIndexed { _, accountData ->
+                        it.forEachIndexed { _, accountData ->
                             sourceAccounts.add(accountData.accountAttributes?.name!!)
-                        }
-                        it.second.forEachIndexed { _, accountData ->
                             destinationAccounts.add(accountData.accountAttributes?.name!!)
                         }
                         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, destinationAccounts)
@@ -90,7 +89,7 @@ class AddTransactionFragment: BaseFragment() {
                         sourceSpinner.isVisible = false
                     })
             else -> {
-                zipLiveData(accountDatabase?.getAccountByType("Revenue account")!!, accountDatabase?.getAllAccounts()!!)
+                zipLiveData(accountViewModel.getRevenueAccounts(baseUrl, accessToken), accountViewModel.getAllAccounts(baseUrl, accessToken))
                         .observe(this, Observer {
                             // Spinner for source account
                             it.first.forEachIndexed { _, accountData ->
@@ -109,7 +108,7 @@ class AddTransactionFragment: BaseFragment() {
                             destinationAutoComplete.setAdapter(autocompleteAdapter)
                             destinationSpinner.isVisible = false
                         })
-                billDatabase?.getAllBill()?.observe(this, Observer {
+                billDatabase.getAllBill().observe(this, Observer {
                     if(it.isNotEmpty()){
                         it.forEachIndexed { _,billData ->
                             bill.add(billData.billAttributes?.name!!)

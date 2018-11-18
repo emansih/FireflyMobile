@@ -1,0 +1,233 @@
+package xyz.hisname.fireflyiii.repository.account
+
+import android.app.Application
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.work.*
+import com.google.gson.Gson
+import kotlinx.coroutines.*
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.api.AccountsService
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
+
+class AccountsViewModel(application: Application): BaseAccountViewModel(application) {
+
+    private var asset = 0.toDouble()
+    private var assetValue: MutableLiveData<String> = MutableLiveData()
+    private var cash = 0.toDouble()
+    private var cashValue: MutableLiveData<String> = MutableLiveData()
+    private var loan = 0.toDouble()
+    private var loanValue: MutableLiveData<String> = MutableLiveData()
+
+    fun getTotalAssetAccount(baseUrl: String, accessToken: String): LiveData<String> {
+        loadRemoteData(baseUrl,accessToken,"asset")
+        scope.async(Dispatchers.IO) {
+            accountData = repository.retrieveAccountByType("Asset account")
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            if (accountData.isNullOrEmpty()) {
+                asset = 0.toDouble()
+            } else {
+                accountData?.forEachIndexed { _, accountData ->
+                    asset += accountData.accountAttributes?.current_balance!!
+                }
+            }
+            assetValue.postValue(asset.toString())
+        }
+        return assetValue
+    }
+
+    fun getTotalCashAccount(baseUrl: String, accessToken: String): LiveData<String>{
+        loadRemoteData(baseUrl,accessToken,"cash")
+        scope.async(Dispatchers.IO) {
+            accountData = repository.retrieveAccountByType("Cash account")
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            if (accountData.isNullOrEmpty()) {
+                cash = 0.toDouble()
+            } else {
+                accountData?.forEachIndexed { _, accountData ->
+                    cash += accountData.accountAttributes?.current_balance!!
+                }
+            }
+            cashValue.postValue(cash.toString())
+        }
+        return cashValue
+    }
+
+    fun getTotalLoanAccount(baseUrl: String, accessToken: String): LiveData<String>{
+        loadRemoteData(baseUrl,accessToken,"loan")
+        scope.async(Dispatchers.IO) {
+            accountData = repository.retrieveAccountByType("Loan")
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            if (accountData.isNullOrEmpty()) {
+                loan = 0.toDouble()
+            } else {
+                accountData?.forEachIndexed { _, accountData ->
+                    loan += accountData.accountAttributes?.current_balance!!
+                }
+            }
+            loanValue.postValue(loan.toString())
+        }
+        return loanValue
+    }
+
+    fun getAllAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
+        loadRemoteData(baseUrl,accessToken,"all")
+        return repository.allAccounts
+    }
+
+    fun getAssetAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
+        loadRemoteData(baseUrl,accessToken,"asset")
+        return repository.assetAccount
+    }
+
+    fun getExpenseAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
+        loadRemoteData(baseUrl,accessToken,"expense")
+        return repository.expenseAccount
+    }
+
+    fun getRevenueAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
+        loadRemoteData(baseUrl,accessToken,"revenue")
+        return repository.revenueAccount
+    }
+
+    fun getLiabilityAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
+        loadRemoteData(baseUrl,accessToken,"liability")
+        return repository.liabilityAccount
+    }
+
+    fun getAccountById(id: Long): LiveData<MutableList<AccountData>>{
+        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
+        var data: MutableList<AccountData> = arrayListOf()
+        scope.async(Dispatchers.IO) {
+            data = repository.retrieveAccountById(id)
+        }.invokeOnCompletion {
+            accountData.postValue(data)
+        }
+        return accountData
+    }
+
+    fun deleteAccountById(baseUrl: String, accessToken: String, accountId: Long): LiveData<Boolean>{
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        isLoading.value = true
+        val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        accountsService?.deleteAccountById(accountId)?.enqueue(retrofitCallback({ response ->
+            if (response.code() == 204 || response.code() == 200) {
+                scope.async(Dispatchers.IO){
+                    repository.deleteAccountById(accountId)
+                }.invokeOnCompletion {
+                    isDeleted.postValue(true)
+                }
+            } else {
+                isDeleted.postValue(false)
+                deleteAccount(accountId)
+            }
+        })
+        { throwable ->
+            isDeleted.postValue(false)
+            deleteAccount(accountId)
+        })
+        isLoading.value = false
+        return isDeleted
+    }
+
+    fun getAccountByName(accountName: String): LiveData<MutableList<AccountData>>{
+        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
+        var data: MutableList<AccountData> = arrayListOf()
+        scope.async(Dispatchers.IO) {
+            data = repository.retrieveAccountByName(accountName)
+        }.invokeOnCompletion {
+            accountData.postValue(data)
+        }
+        return accountData
+    }
+
+    fun addAccounts(baseUrl: String, accessToken: String, accountName: String, accountType: String,
+                    currencyCode: String, includeNetWorth: Int, accountRole: String?,
+                    ccType: String?, ccMonthlyPaymentDate: String?, liabilityType: String?,
+                    liabilityAmount: String?,liabilityStartDate: String?, interest: String?,
+                    interestPeriod: String?,accountNumber: String?): LiveData<ApiResponses<AccountSuccessModel>>{
+        isLoading.value = true
+        val apiResponse: MediatorLiveData<ApiResponses<AccountSuccessModel>> =  MediatorLiveData()
+        val apiLiveData: MutableLiveData<ApiResponses<AccountSuccessModel>> = MutableLiveData()
+        val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        accountsService?.addAccount(accountName, accountType, currencyCode,1, includeNetWorth,
+                accountRole, ccType, ccMonthlyPaymentDate, liabilityType, liabilityAmount, liabilityStartDate,
+                interest, interestPeriod, accountNumber)?.enqueue(retrofitCallback({ response ->
+            var errorMessage = ""
+            val responseErrorBody = response.errorBody()
+            if (responseErrorBody != null) {
+                errorMessage = String(responseErrorBody.bytes())
+                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                errorMessage = when {
+                    gson.errors.name != null -> gson.errors.name[0]
+                    gson.errors.account_number != null -> gson.errors.account_number[0]
+                    gson.errors.interest != null -> gson.errors.interest[0]
+                    gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
+                    else -> "Error occurred while saving Account"
+                }
+            }
+            val networkResponse = response.body()?.data
+            if (networkResponse != null) {
+                scope.async(Dispatchers.IO) {
+                    repository.insertAccount(networkResponse)
+                }.invokeOnCompletion {
+                    apiLiveData.postValue(ApiResponses(response.body()))
+                }
+            } else {
+                apiLiveData.postValue(ApiResponses(errorMessage))
+            }
+
+        })
+        { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
+        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
+        isLoading.value = false
+        return apiResponse
+    }
+
+    private fun deleteAccount(id: Long){
+        val accountTag =
+                WorkManager.getInstance().getWorkInfosByTag("delete_account_$id").get()
+        if(accountTag == null || accountTag.size == 0) {
+            val accountData = Data.Builder()
+                    .putLong("id", id)
+                    .build()
+            val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteAccountWorker::class.java)
+                    .setInputData(accountData)
+                    .addTag("delete_account_$id")
+                    .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED).build())
+                    .build()
+            WorkManager.getInstance().enqueue(deleteAccountWork)
+        }
+    }
+
+    private fun loadRemoteData(baseUrl: String, accessToken: String, source: String){
+        isLoading.value = true
+        val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        accountsService?.getAccountType(source)?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful){
+                val networkData = response.body()?.data
+                networkData?.forEachIndexed { _, accountData ->
+                    scope.launch(Dispatchers.IO) { repository.insertAccount(accountData)}
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    apiResponse.postValue(errorBody)
+                }
+            }
+        })
+        { throwable -> apiResponse.postValue(throwable.localizedMessage) })
+        isLoading.value = false
+    }
+}

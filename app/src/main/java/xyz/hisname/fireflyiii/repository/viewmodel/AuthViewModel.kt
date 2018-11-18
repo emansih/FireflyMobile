@@ -18,7 +18,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private var oAuthService: OAuthService? = null
 
     fun getAccessToken(baseUrl: String, code: String, clientId: String, clientSecret: String): LiveData<ApiResponses<AuthModel>> {
-        oAuthService = RetrofitBuilder.getClient(baseUrl, "")?.create(OAuthService::class.java)
+        oAuthService = RetrofitBuilder.getClient(baseUrl)?.create(OAuthService::class.java)
         oAuthService?.getAccessToken(code, clientId, clientSecret, Constants.REDIRECT_URI,
                 "authorization_code")?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
