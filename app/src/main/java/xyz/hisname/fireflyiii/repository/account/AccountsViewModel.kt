@@ -27,6 +27,7 @@ class AccountsViewModel(application: Application): BaseAccountViewModel(applicat
 
     fun getTotalAssetAccount(baseUrl: String, accessToken: String): LiveData<String> {
         loadRemoteData(baseUrl,accessToken,"asset")
+        asset = 0.toDouble()
         scope.async(Dispatchers.IO) {
             accountData = repository.retrieveAccountByType("Asset account")
         }.invokeOnCompletion {
@@ -45,6 +46,7 @@ class AccountsViewModel(application: Application): BaseAccountViewModel(applicat
 
     fun getTotalCashAccount(baseUrl: String, accessToken: String): LiveData<String>{
         loadRemoteData(baseUrl,accessToken,"cash")
+        cash = 0.toDouble()
         scope.async(Dispatchers.IO) {
             accountData = repository.retrieveAccountByType("Cash account")
         }.invokeOnCompletion {
@@ -63,6 +65,7 @@ class AccountsViewModel(application: Application): BaseAccountViewModel(applicat
 
     fun getTotalLoanAccount(baseUrl: String, accessToken: String): LiveData<String>{
         loadRemoteData(baseUrl,accessToken,"loan")
+        loan = 0.toDouble()
         scope.async(Dispatchers.IO) {
             accountData = repository.retrieveAccountByType("Loan")
         }.invokeOnCompletion {
@@ -215,10 +218,18 @@ class AccountsViewModel(application: Application): BaseAccountViewModel(applicat
         val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
         accountsService?.getAccountType(source)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful){
-                val networkData = response.body()?.data
-                networkData?.forEachIndexed { _, accountData ->
-                    scope.launch(Dispatchers.IO) { repository.insertAccount(accountData)}
+                val networkData = response.body()
+                if(networkData != null){
+                    for(pagination in 1..networkData.meta.pagination.total_pages){
+                        accountsService.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({
+                            respond ->
+                            respond.body()?.data?.forEachIndexed{ _, accountPagination ->
+                                scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination)}
+                            }
+                        }))
+                    }
                 }
+
             } else {
                 val responseError = response.errorBody()
                 if (responseError != null) {
@@ -230,4 +241,5 @@ class AccountsViewModel(application: Application): BaseAccountViewModel(applicat
         { throwable -> apiResponse.postValue(throwable.localizedMessage) })
         isLoading.value = false
     }
+
 }

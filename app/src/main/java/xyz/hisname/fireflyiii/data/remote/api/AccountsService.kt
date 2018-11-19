@@ -12,6 +12,9 @@ interface AccountsService {
     @GET(ACCOUNTS_API_ENDPOINT)
     fun getAccountType(@Query("type") type: String): Call<AccountsModel>
 
+    @GET(ACCOUNTS_API_ENDPOINT)
+    fun getPaginatedAccountType(@Query("type") type: String, @Query("page") page: Int): Call<AccountsModel>
+
     @FormUrlEncoded
     @POST(ACCOUNTS_API_ENDPOINT)
     fun addAccount(@Field("name") name: String,
