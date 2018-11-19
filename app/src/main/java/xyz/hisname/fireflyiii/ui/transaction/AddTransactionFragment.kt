@@ -54,7 +54,7 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         when {
-            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(baseUrl,accessToken), piggyViewModel.getAllPiggyBanks(baseUrl, accessToken))
+            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(), piggyViewModel.getAllPiggyBanks())
                     .observe(this, Observer {
                         it.first.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
@@ -74,7 +74,7 @@ class AddTransactionFragment: BaseFragment() {
                         piggyBankName.threshold = 1
                         piggyBankName.setAdapter(adapter)
                     })
-            Objects.equals(transactionType, "Deposit") -> accountViewModel.getRevenueAccounts(baseUrl, accessToken)
+            Objects.equals(transactionType, "Deposit") -> accountViewModel.getRevenueAccounts()
                     .observe(this , Observer {
                         it.forEachIndexed { _, accountData ->
                             sourceAccounts.add(accountData.accountAttributes?.name!!)
@@ -90,7 +90,7 @@ class AddTransactionFragment: BaseFragment() {
                         sourceSpinner.isVisible = false
                     })
             else -> {
-                zipLiveData(accountViewModel.getRevenueAccounts(baseUrl, accessToken), accountViewModel.getAllAccounts(baseUrl, accessToken))
+                zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAllAccounts())
                         .observe(this, Observer {
                             // Spinner for source account
                             it.first.forEachIndexed { _, accountData ->
@@ -109,7 +109,7 @@ class AddTransactionFragment: BaseFragment() {
                             destinationAutoComplete.setAdapter(autocompleteAdapter)
                             destinationSpinner.isVisible = false
                         })
-                billViewModel.getAllBills(baseUrl, accessToken).observe(this, Observer {
+                billViewModel.getAllBills().observe(this, Observer {
                     if(it.isNotEmpty()){
                         it.forEachIndexed { _,billData ->
                             bill.add(billData.billAttributes?.name!!)
@@ -153,7 +153,7 @@ class AddTransactionFragment: BaseFragment() {
             val currencyListFragment = CurrencyListFragment()
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
         }
-        categoryViewModel.getAllCategory(baseUrl, accessToken).observe(this, Observer {
+        categoryViewModel.getAllCategory().observe(this, Observer {
             if(it.isNotEmpty()){
                 val category = ArrayList<String>()
                 it.forEachIndexed { _,element ->

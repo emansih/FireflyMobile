@@ -174,7 +174,7 @@ class AddBillActivity: BaseActivity() {
     }
 
     private fun addBill(){
-        model.addBill(baseUrl,accessToken,bill_name_edittext.getString(),
+        model.addBill(bill_name_edittext.getString(),
                 bill_match_edittext.getString(),amount_min_edittext.getString(),
                 amount_max_edittext.getString(), bill_date_edittext.getString(), repeatFreq,
                 skip_edittext.getString(), "1", "1",
@@ -215,7 +215,7 @@ class AddBillActivity: BaseActivity() {
     }
 
     private fun updateBill(){
-        model.updateBill(baseUrl,accessToken, intent.getLongExtra("billId", 0).toString(),
+        model.updateBill(intent.getLongExtra("billId", 0).toString(),
                 bill_name_edittext.getString(), bill_match_edittext.getString(),amount_min_edittext.getString(),
                 amount_max_edittext.getString(), bill_date_edittext.getString(), repeatFreq,
                 skip_edittext.getString(), "1", "1",

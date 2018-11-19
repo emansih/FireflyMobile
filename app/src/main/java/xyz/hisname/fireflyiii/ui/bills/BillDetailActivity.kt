@@ -126,7 +126,7 @@ class BillDetailActivity: BaseActivity() {
 
     private fun deleteItem(){
         ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-        billViewModel.deleteBillById(baseUrl, accessToken, intent.getLongExtra("billId", 0)).observe(this, Observer {
+        billViewModel.deleteBillById(intent.getLongExtra("billId", 0)).observe(this, Observer {
             if(it == true){
                 finish()
                 toastSuccess("Bill Deleted")

@@ -45,7 +45,7 @@ class ListPiggyFragment: BaseFragment() {
 
     private fun displayView(){
         runLayoutAnimation(recycler_view)
-        piggyViewModel.getAllPiggyBanks(baseUrl, accessToken).observe(this, Observer {
+        piggyViewModel.getAllPiggyBanks().observe(this, Observer {
             if(it.isNotEmpty()) {
                 piggybankText.isVisible = false
                 piggyImage.isVisible = false

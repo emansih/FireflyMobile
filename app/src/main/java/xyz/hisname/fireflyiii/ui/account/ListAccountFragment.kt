@@ -48,19 +48,19 @@ class ListAccountFragment: BaseFragment() {
         runLayoutAnimation(recycler_view)
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         when (accountType) {
-            "all" -> accountViewModel.getAllAccounts(baseUrl, accessToken).observe(this, Observer {
+            "all" -> accountViewModel.getAllAccounts().observe(this, Observer {
                 recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
             })
-            "asset" -> accountViewModel.getAssetAccounts(baseUrl, accessToken).observe(this, Observer {
+            "asset" -> accountViewModel.getAssetAccounts().observe(this, Observer {
                 recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
             })
-            "expense" -> accountViewModel.getExpenseAccounts(baseUrl, accessToken).observe(this, Observer {
+            "expense" -> accountViewModel.getExpenseAccounts().observe(this, Observer {
                 recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
             })
-            "revenue" -> accountViewModel.getRevenueAccounts(baseUrl, accessToken).observe(this, Observer {
+            "revenue" -> accountViewModel.getRevenueAccounts().observe(this, Observer {
                 recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
             })
-            "liability" -> accountViewModel.getLiabilityAccounts(baseUrl, accessToken).observe(this, Observer {
+            "liability" -> accountViewModel.getLiabilityAccounts().observe(this, Observer {
                 recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
             })
         }

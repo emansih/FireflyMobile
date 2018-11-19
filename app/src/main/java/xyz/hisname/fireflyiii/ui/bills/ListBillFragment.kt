@@ -49,7 +49,7 @@ class ListBillFragment: BaseFragment() {
 
     private fun displayView(){
         runLayoutAnimation(recycler_view)
-        billViewModel.getAllBills(baseUrl,accessToken).observe(this, Observer {
+        billViewModel.getAllBills().observe(this, Observer {
             if (it.isNotEmpty()) {
                 happyFaceText.isVisible = false
                 happyFace.isVisible = false

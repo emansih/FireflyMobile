@@ -106,7 +106,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 .setMessage(R.string.irreversible_action)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    piggyViewModel.deletePiggyById(baseUrl,accessToken, piggyId).observe(this, Observer {
+                    piggyViewModel.deletePiggyById(piggyId).observe(this, Observer {
                         ProgressBar.animateView(requireActivity().findViewById<View>(R.id.progress_overlay),
                                 View.GONE, 0f, 200)
                         if(it == true){

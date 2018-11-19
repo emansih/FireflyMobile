@@ -67,7 +67,7 @@ class AddPiggyActivity: BaseActivity(){
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
-        accountViewModel.getAssetAccounts(baseUrl,accessToken).observe(this, Observer {
+        accountViewModel.getAssetAccounts().observe(this, Observer {
             if(it.isNotEmpty()) {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
@@ -146,7 +146,7 @@ class AddPiggyActivity: BaseActivity(){
                     note_edittext.getString()
                 }
                 accountViewModel.getAccountByName(account_id_edittext.selectedItem.toString()).observe(this, Observer { accountData ->
-                    model.addPiggyBank(baseUrl, accessToken, piggy_name_edittext.getString(), accountData[0].accountId.toString(),
+                    model.addPiggyBank(piggy_name_edittext.getString(), accountData[0].accountId.toString(),
                             currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
                             .observe(this, Observer {
                                 ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)

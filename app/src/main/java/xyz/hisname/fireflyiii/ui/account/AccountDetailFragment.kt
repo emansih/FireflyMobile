@@ -86,7 +86,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 .setTitle(R.string.get_confirmation)
                 .setMessage(R.string.irreversible_action)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    accountViewModel.deleteAccountById(baseUrl,accessToken,accountId).observe(this, Observer {
+                    accountViewModel.deleteAccountById(accountId).observe(this, Observer {
                         if(it == true){
                             requireFragmentManager().popBackStack()
                             toastSuccess("Account Deleted")

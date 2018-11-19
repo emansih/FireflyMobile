@@ -147,7 +147,7 @@ class AddAccountFragment: BaseAccountFragment(){
         } else {
             null
         }
-        accountViewModel.addAccounts(baseUrl, accessToken, accountName.getString(), account_type,
+        accountViewModel.addAccounts(accountName.getString(), account_type,
                 currency, networth, role, creditCardType, creditCardDate,
                 liability_type, liability_amount, liability_start_date, liability_interest,
                 interest_period, accountNumber.getString()).observe(this, Observer {

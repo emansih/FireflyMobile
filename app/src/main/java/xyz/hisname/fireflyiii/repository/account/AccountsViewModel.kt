@@ -8,9 +8,11 @@ import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.AccountsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.UserRepository
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
@@ -27,16 +29,18 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     private var loan = 0.toDouble()
     private var loanValue: MutableLiveData<String> = MutableLiveData()
     val repository: AccountRepository
+    val userRepo: UserRepository
     var accountData: MutableList<AccountData>? = null
 
     init {
         val accountDao = AppDatabase.getInstance(application).accountDataDao()
         repository = AccountRepository(accountDao)
+        userRepo = UserRepository(AppPref(application))
     }
 
 
-    fun getTotalAssetAccount(baseUrl: String, accessToken: String): LiveData<String> {
-        loadRemoteData(baseUrl,accessToken,"asset")
+    fun getTotalAssetAccount(): LiveData<String> {
+        loadRemoteData("asset")
         asset = 0.toDouble()
         scope.async(Dispatchers.IO) {
             accountData = repository.retrieveAccountByType("Asset account")
@@ -54,8 +58,8 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return assetValue
     }
 
-    fun getTotalCashAccount(baseUrl: String, accessToken: String): LiveData<String>{
-        loadRemoteData(baseUrl,accessToken,"cash")
+    fun getTotalCashAccount(): LiveData<String>{
+        loadRemoteData("cash")
         cash = 0.toDouble()
         scope.async(Dispatchers.IO) {
             accountData = repository.retrieveAccountByType("Cash account")
@@ -73,8 +77,8 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return cashValue
     }
 
-    fun getTotalLoanAccount(baseUrl: String, accessToken: String): LiveData<String>{
-        loadRemoteData(baseUrl,accessToken,"loan")
+    fun getTotalLoanAccount(): LiveData<String>{
+        loadRemoteData("loan")
         loan = 0.toDouble()
         scope.async(Dispatchers.IO) {
             accountData = repository.retrieveAccountByType("Loan")
@@ -92,28 +96,28 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return loanValue
     }
 
-    fun getAllAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
-        loadRemoteData(baseUrl,accessToken,"all")
+    fun getAllAccounts(): LiveData<MutableList<AccountData>> {
+        loadRemoteData("all")
         return repository.allAccounts
     }
 
-    fun getAssetAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
-        loadRemoteData(baseUrl,accessToken,"asset")
+    fun getAssetAccounts(): LiveData<MutableList<AccountData>> {
+        loadRemoteData("asset")
         return repository.assetAccount
     }
 
-    fun getExpenseAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
-        loadRemoteData(baseUrl,accessToken,"expense")
+    fun getExpenseAccounts(): LiveData<MutableList<AccountData>> {
+        loadRemoteData("expense")
         return repository.expenseAccount
     }
 
-    fun getRevenueAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
-        loadRemoteData(baseUrl,accessToken,"revenue")
+    fun getRevenueAccounts(): LiveData<MutableList<AccountData>> {
+        loadRemoteData("revenue")
         return repository.revenueAccount
     }
 
-    fun getLiabilityAccounts(baseUrl: String, accessToken: String): LiveData<MutableList<AccountData>> {
-        loadRemoteData(baseUrl,accessToken,"liability")
+    fun getLiabilityAccounts(): LiveData<MutableList<AccountData>> {
+        loadRemoteData("liability")
         return repository.liabilityAccount
     }
 
@@ -128,10 +132,10 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return accountData
     }
 
-    fun deleteAccountById(baseUrl: String, accessToken: String, accountId: Long): LiveData<Boolean>{
+    fun deleteAccountById(accountId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
-        val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        val accountsService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.accessToken)?.create(AccountsService::class.java)
         accountsService?.deleteAccountById(accountId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
                 scope.async(Dispatchers.IO){
@@ -163,7 +167,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return accountData
     }
 
-    fun addAccounts(baseUrl: String, accessToken: String, accountName: String, accountType: String,
+    fun addAccounts(accountName: String, accountType: String,
                     currencyCode: String, includeNetWorth: Int, accountRole: String?,
                     ccType: String?, ccMonthlyPaymentDate: String?, liabilityType: String?,
                     liabilityAmount: String?,liabilityStartDate: String?, interest: String?,
@@ -171,7 +175,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         isLoading.value = true
         val apiResponse: MediatorLiveData<ApiResponses<AccountSuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<AccountSuccessModel>> = MutableLiveData()
-        val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        val accountsService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.accessToken)?.create(AccountsService::class.java)
         accountsService?.addAccount(accountName, accountType, currencyCode,1, includeNetWorth,
                 accountRole, ccType, ccMonthlyPaymentDate, liabilityType, liabilityAmount, liabilityStartDate,
                 interest, interestPeriod, accountNumber)?.enqueue(retrofitCallback({ response ->
@@ -223,9 +227,9 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         }
     }
 
-    private fun loadRemoteData(baseUrl: String, accessToken: String, source: String){
+    private fun loadRemoteData(source: String){
         isLoading.value = true
-        val accountsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(AccountsService::class.java)
+        val accountsService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.accessToken)?.create(AccountsService::class.java)
         accountsService?.getAccountType(source)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful){
                 val networkData = response.body()

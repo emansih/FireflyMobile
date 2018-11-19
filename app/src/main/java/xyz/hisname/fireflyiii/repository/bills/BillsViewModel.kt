@@ -10,9 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.BillsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.UserRepository
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
@@ -23,17 +25,19 @@ import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 class BillsViewModel(application: Application): BaseViewModel(application) {
 
     val repository: BillRepository
-    var billData: MutableList<BillData> = arrayListOf()
+    private var billData: MutableList<BillData> = arrayListOf()
+    val userRepo: UserRepository
 
     init {
         val billDataDao = AppDatabase.getInstance(application).billDataDao()
         repository = BillRepository(billDataDao)
+        userRepo = UserRepository(AppPref(application))
     }
 
 
-    fun getAllBills(baseUrl: String, accessToken: String): LiveData<MutableList<BillData>>{
+    fun getAllBills(): LiveData<MutableList<BillData>>{
         isLoading.value = true
-        val billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
+        val billsService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.accessToken)?.create(BillsService::class.java)
         billsService?.getBills()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()?.data
@@ -63,10 +67,10 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         return billLiveData
     }
 
-    fun deleteBillById(baseUrl: String, accessToken: String, billId: Long): LiveData<Boolean>{
+    fun deleteBillById(billId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
-        val billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
+        val billsService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.accessToken)?.create(BillsService::class.java)
         billsService?.deleteBillById(billId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
                 scope.async(Dispatchers.IO){
@@ -88,12 +92,12 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
     }
 
-    fun addBill(baseUrl: String?, accessToken: String?, name: String, match: String,
+    fun addBill(name: String, match: String,
                 amountMin: String, amountMax: String, date: String, repeatFreq: String,
                 skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
         val apiResponse = MediatorLiveData<ApiResponses<BillSuccessModel>>()
         val apiLiveData: MutableLiveData<ApiResponses<BillSuccessModel>> = MutableLiveData()
-        val billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
+        val billsService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.accessToken)?.create(BillsService::class.java)
         billsService?.createBill(name, match, amountMin, amountMax, date,
                 repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
@@ -123,12 +127,12 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
-    fun updateBill(baseUrl: String?, accessToken: String?, billId: String, name: String, match: String,
+    fun updateBill(billId: String, name: String, match: String,
                    amountMin: String, amountMax: String, date: String, repeatFreq: String,
                    skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
         val apiResponse = MediatorLiveData<ApiResponses<BillSuccessModel>>()
         val apiLiveData: MutableLiveData<ApiResponses<BillSuccessModel>> = MutableLiveData()
-        val billsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(BillsService::class.java)
+        val billsService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.accessToken)?.create(BillsService::class.java)
         billsService?.updateBill(billId, name, match, amountMin, amountMax, date,
                 repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->

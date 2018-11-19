@@ -36,13 +36,13 @@ class WalletFragment: BaseFragment() {
     }
 
     private fun displayData() {
-        accountsRepo.getTotalCashAccount(baseUrl, accessToken).observe(this, Observer {
+        accountsRepo.getTotalCashAccount().observe(this, Observer {
             cashText.text = it
         })
-        accountsRepo.getTotalAssetAccount(baseUrl, accessToken).observe(this, Observer {
+        accountsRepo.getTotalAssetAccount().observe(this, Observer {
             assetsText.text = it
         })
-        accountsRepo.getTotalLoanAccount(baseUrl, accessToken).observe(this, Observer {
+        accountsRepo.getTotalLoanAccount().observe(this, Observer {
             loanText.text = it
         })
 
