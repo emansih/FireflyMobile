@@ -28,7 +28,7 @@ interface BillsService {
     ): Call<BillSuccessModel>
 
     @DELETE("$BILL_API_ENDPONT/{id}")
-    fun deleteBillById(@Path("id") id: String): Call<BillsModel>
+    fun deleteBillById(@Path("id") id: Long): Call<BillsModel>
 
     @FormUrlEncoded
     @PUT("$BILL_API_ENDPONT/{id}")

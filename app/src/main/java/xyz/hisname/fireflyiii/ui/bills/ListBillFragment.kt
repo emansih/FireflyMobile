@@ -20,7 +20,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
+import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -48,18 +48,9 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun displayView(){
-        val viewModel = billViewModel.getBill(baseUrl,accessToken)
-        swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        viewModel.apiResponse.observe(this, Observer {
-            if(it.getError() != null){
-                toastError(it.getError()?.message)
-            }
-        })
-
-        viewModel.databaseData?.observe(this, Observer {
-            swipeContainer.isRefreshing = false
-            if(it.isNotEmpty()) {
+        billViewModel.getAllBills(baseUrl,accessToken).observe(this, Observer {
+            if (it.isNotEmpty()) {
                 happyFaceText.isVisible = false
                 happyFace.isVisible = false
                 recycler_view.isVisible = true
@@ -69,6 +60,12 @@ class ListBillFragment: BaseFragment() {
                 happyFace.isVisible = true
                 recycler_view.isVisible = false
             }
+        })
+        billViewModel.isLoading.observe(this, Observer {
+            swipeContainer.isRefreshing = it == true
+        })
+        billViewModel.apiResponse.observe(this, Observer {
+           toastError(it)
         })
     }
 
@@ -83,7 +80,7 @@ class ListBillFragment: BaseFragment() {
         fab.apply {
             translationY = (6 * 56).toFloat()
             animate().translationY(0.toFloat())
-                    .setInterpolator(OvershootInterpolator(1.toFloat()))
+                    .setInterpolator(OvershootInterpolator(1f))
                     .setStartDelay(300)
                     .setDuration(400)
                     .start()

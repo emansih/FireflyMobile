@@ -16,6 +16,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
+import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
@@ -35,12 +36,12 @@ class AddTransactionFragment: BaseFragment() {
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
+    private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private var accounts = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
     private var destinationAccounts = ArrayList<String>()
     private val piggyBankDatabase by lazy { AppDatabase.getInstance(requireActivity())?.piggyDataDao() }
     private var piggyBank = ArrayList<String>()
-    private val billDatabase by lazy { AppDatabase.getInstance(requireActivity())?.billDataDao() }
     private val bill = ArrayList<String>()
     private lateinit var currency: String
 
@@ -108,7 +109,7 @@ class AddTransactionFragment: BaseFragment() {
                             destinationAutoComplete.setAdapter(autocompleteAdapter)
                             destinationSpinner.isVisible = false
                         })
-                billDatabase.getAllBill().observe(this, Observer {
+                billViewModel.getAllBills(baseUrl, accessToken).observe(this, Observer {
                     if(it.isNotEmpty()){
                         it.forEachIndexed { _,billData ->
                             bill.add(billData.billAttributes?.name!!)

@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,21 +24,19 @@ import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
-import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
+import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
 
-class BillDetailActivity: BaseActivity(), CoroutineScope {
+class BillDetailActivity: BaseActivity() {
 
     private var billList: MutableList<BaseDetailModel> = ArrayList()
-    private val billVM by lazy { getViewModel(BillsViewModel::class.java) }
+    private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private var billAttribute: BillAttributes? = null
-    override val coroutineContext = Job() + Dispatchers.Main
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +51,8 @@ class BillDetailActivity: BaseActivity(), CoroutineScope {
 
 
     private fun showData(){
-        launch(context = Dispatchers.Main) {
-            val result = async(Dispatchers.IO) {
-                billVM.getBillById(intent.getLongExtra("billId", 0))
-            }.await()
-            billAttribute = result!![0].billAttributes
+        billViewModel.getBillById(intent.getLongExtra("billId", 0)).observe(this, Observer {
+            billAttribute = it[0].billAttributes
             billName.text = billAttribute?.name
             val billDataArray = arrayListOf(
                     BaseDetailModel("Updated At", billAttribute?.updated_at,
@@ -97,8 +93,8 @@ class BillDetailActivity: BaseActivity(), CoroutineScope {
                             IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_note).sizeDp(24))
             )
             billList.addAll(billDataArray)
-            recycler_view.adapter = BaseDetailRecyclerAdapter(billList)
-        }
+        })
+        recycler_view.adapter = BaseDetailRecyclerAdapter(billList)
     }
 
     private fun editBill(){
@@ -130,8 +126,11 @@ class BillDetailActivity: BaseActivity(), CoroutineScope {
 
     private fun deleteItem(){
         ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-        billVM.deleteBill(baseUrl, accessToken, intent.getLongExtra("billId", 0).toString()).observe(this, Observer {
-            if (it.getError() != null) {
+        billViewModel.deleteBillById(baseUrl, accessToken, intent.getLongExtra("billId", 0)).observe(this, Observer {
+            if(it == true){
+                finish()
+                toastSuccess("Bill Deleted")
+            } else {
                 ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                 val parentLayout: View = findViewById(R.id.coordinatorlayout)
                 Snackbar.make(parentLayout, R.string.generic_delete_error, Snackbar.LENGTH_LONG)
@@ -139,11 +138,6 @@ class BillDetailActivity: BaseActivity(), CoroutineScope {
                             deleteItem()
                         }
                         .show()
-            } else if(it.getResponse() != null){
-                toastSuccess(resources.getString(R.string.bill_deleted))
-                finish()
-            } else {
-                toastInfo(it.getErrorMessage().toString())
             }
         })
     }

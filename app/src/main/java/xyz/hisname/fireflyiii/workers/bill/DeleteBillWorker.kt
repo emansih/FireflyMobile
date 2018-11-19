@@ -31,7 +31,7 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
             }.await()
             billAttribute  = result!![0].billAttributes
         }
-        genericService?.create(BillsService::class.java)?.deleteBillById(id.toString())?.enqueue(retrofitCallback({ response ->
+        genericService?.create(BillsService::class.java)?.deleteBillById(billId)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 GlobalScope.launch(Dispatchers.Main) {
                     async(Dispatchers.IO) {

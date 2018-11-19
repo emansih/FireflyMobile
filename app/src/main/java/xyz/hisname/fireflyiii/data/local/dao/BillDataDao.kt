@@ -10,9 +10,6 @@ abstract class BillDataDao: BaseDao<BillData>{
     @Query("SELECT * FROM bills")
     abstract fun getAllBill(): LiveData<MutableList<BillData>>
 
-    @Query("SELECT * FROM bills")
-    abstract fun getBills(): MutableList<BillData>
-
     @Query("DELETE FROM bills WHERE billId = :billId")
     abstract fun deleteBillById(billId: Long): Int
 

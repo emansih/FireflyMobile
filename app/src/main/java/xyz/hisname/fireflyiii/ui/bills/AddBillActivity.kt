@@ -17,7 +17,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.BillReceiver
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
-import xyz.hisname.fireflyiii.repository.viewmodel.BillsViewModel
+import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
