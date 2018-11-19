@@ -20,7 +20,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.viewmodel.AuthViewModel
+import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
@@ -30,10 +30,10 @@ import java.util.*
 class LoginFragment: Fragment() {
 
     private val baseUrl by lazy { AppPref(requireContext()).getBaseUrl() }
-    private lateinit var fireflyUrl: String
     private val fireflyId: String by lazy { AppPref(requireContext()).getClientId() }
     private val fireflySecretKey: String by lazy { AppPref(requireContext()).getSecretKey() }
-    private val model by lazy { getViewModel(AuthViewModel::class.java) }
+    private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
+    private lateinit var fireflyUrl: String
     private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,6 +55,13 @@ class LoginFragment: Fragment() {
                 refreshToken()
             }
         }
+        authViewModel.isLoading.observe(this, Observer {
+            if(it == true){
+                ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressOverlay, View.GONE, 0.toFloat(), 200)
+            }
+        })
     }
 
     private fun getAccessCode(){
@@ -91,19 +98,13 @@ class LoginFragment: Fragment() {
         */
         rootLayout.isVisible = false
         toastInfo("Refreshing your access token...", Toast.LENGTH_LONG)
-        model.getRefreshToken(baseUrl, AppPref(requireContext()).getRefreshToken(),
-                fireflySecretKey, AppPref(requireContext()).getClientId())
-                .observe(this, Observer {
-                    if(it.getError() == null) {
-                        startHomeIntent()
-                    } else {
-                        ProgressBar.animateView(progressOverlay, View.GONE, 0.toFloat(), 200)
-                        val error = it.getError()
-                        if(error != null){
-                            toastInfo(error.localizedMessage)
-                        }
-                    }
-                })
+        authViewModel.getRefreshToken().observe(this, Observer {
+            if(it == true){
+                startHomeIntent()
+            } else {
+                toastError("There was an issue refreshing your token")
+            }
+        })
     }
 
     private fun startHomeIntent(){
@@ -111,7 +112,7 @@ class LoginFragment: Fragment() {
             NotificationUtils(requireContext()).showTransactionPersistentNotification()
         }
         GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
-            delay(1234) //heh
+            delay(500) //heh
             startActivity(Intent(requireContext(), HomeActivity::class.java))
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             requireActivity().finish()
@@ -125,28 +126,19 @@ class LoginFragment: Fragment() {
             val code = uri.getQueryParameter("code")
             if(code != null) {
                 val baseUrl= AppPref(requireContext()).getBaseUrl()
-                val fireflyId = AppPref(requireContext()).getClientId()
-                val fireflySecretKey= AppPref(requireContext()).getSecretKey()
-                ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
-                model.getAccessToken(baseUrl, code,fireflyId,fireflySecretKey).observe(this, Observer {
-                    ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    if(it.getResponse() != null) {
+                authViewModel.getAccessToken(code).observe(this, Observer {
+                    if(it == true){
                         toastSuccess(resources.getString(R.string.welcome))
                         AppPref(requireContext()).setAuthMethod("oauth")
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
-                        val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to it.getResponse()?.access_token)
+                        val bundle = bundleOf("fireflyUrl" to baseUrl)
                         requireActivity().supportFragmentManager.beginTransaction()
                                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                                 .add(R.id.bigger_fragment_container, OnboardingFragment().apply { arguments = bundle })
                                 .commit()
                     } else {
-                        val error = it.getError()
-                        if(error == null){
-                            toastInfo("There was an error communicating with your server")
-                        } else {
-                            toastError(error.localizedMessage)
-                        }
+                        toastInfo("Authentication Failed")
                     }
                 })
             } else {
@@ -156,7 +148,7 @@ class LoginFragment: Fragment() {
     }
 
     private fun showDialog(){
-        ProgressBar.animateView(progressOverlay, View.GONE, 0.toFloat(), 200)
+        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.authentication_failed))
                 .setMessage(resources.getString(R.string.authentication_failed_message, Constants.REDIRECT_URI))
