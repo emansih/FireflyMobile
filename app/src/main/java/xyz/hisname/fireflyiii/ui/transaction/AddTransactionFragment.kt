@@ -17,7 +17,7 @@ import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.CategoryViewModel
+import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -153,7 +153,7 @@ class AddTransactionFragment: BaseFragment() {
             val currencyListFragment = CurrencyListFragment()
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
         }
-        categoryViewModel.getCategory(baseUrl, accessToken).databaseData?.observe(this, Observer {
+        categoryViewModel.getAllCategory(baseUrl, accessToken).observe(this, Observer {
             if(it.isNotEmpty()){
                 val category = ArrayList<String>()
                 it.forEachIndexed { _,element ->
