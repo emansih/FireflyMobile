@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import kotlin.coroutines.CoroutineContext
 
 open class BaseViewModel(application: Application) : AndroidViewModel(application){

@@ -9,8 +9,10 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.BillsService
+import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
@@ -18,7 +20,16 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 
-class BillsViewModel(application: Application): BaseBillViewModel(application) {
+class BillsViewModel(application: Application): BaseViewModel(application) {
+
+    val repository: BillRepository
+    var billData: MutableList<BillData> = arrayListOf()
+
+    init {
+        val billDataDao = AppDatabase.getInstance(application).billDataDao()
+        repository = BillRepository(billDataDao)
+    }
+
 
     fun getAllBills(baseUrl: String, accessToken: String): LiveData<MutableList<BillData>>{
         isLoading.value = true
@@ -43,14 +54,13 @@ class BillsViewModel(application: Application): BaseBillViewModel(application) {
     }
 
     fun getBillById(billId: Long): LiveData<MutableList<BillData>>{
-        val billData: MutableLiveData<MutableList<BillData>> = MutableLiveData()
-        var data: MutableList<BillData> = arrayListOf()
+        val billLiveData: MutableLiveData<MutableList<BillData>> = MutableLiveData()
         scope.async(Dispatchers.IO){
-            data = repository.retrieveBillById(billId)
+            billData = repository.retrieveBillById(billId)
         }.invokeOnCompletion {
-            billData.postValue(data)
+            billLiveData.postValue(billData)
         }
-        return billData
+        return billLiveData
     }
 
     fun deleteBillById(baseUrl: String, accessToken: String, billId: Long): LiveData<Boolean>{

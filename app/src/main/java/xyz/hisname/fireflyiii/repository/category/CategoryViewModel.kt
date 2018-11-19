@@ -4,12 +4,21 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.CategoryService
+import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
-class CategoryViewModel(application: Application): BaseCategoryViewModel(application){
+class CategoryViewModel(application: Application): BaseViewModel(application) {
+
+    val repository: CategoryRepository
+
+    init {
+        val categoryDataDao = AppDatabase.getInstance(application).categoryDataDao()
+        repository = CategoryRepository(categoryDataDao)
+    }
 
     fun getAllCategory(baseUrl: String, accessToken: String): LiveData<MutableList<CategoryData>> {
         isLoading.value = true

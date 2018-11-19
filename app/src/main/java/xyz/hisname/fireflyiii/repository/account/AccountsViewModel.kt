@@ -7,8 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.AccountsService
+import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
@@ -16,7 +18,7 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 
-class AccountsViewModel(application: Application): BaseAccountViewModel(application) {
+class AccountsViewModel(application: Application): BaseViewModel(application){
 
     private var asset = 0.toDouble()
     private var assetValue: MutableLiveData<String> = MutableLiveData()
@@ -24,6 +26,14 @@ class AccountsViewModel(application: Application): BaseAccountViewModel(applicat
     private var cashValue: MutableLiveData<String> = MutableLiveData()
     private var loan = 0.toDouble()
     private var loanValue: MutableLiveData<String> = MutableLiveData()
+    val repository: AccountRepository
+    var accountData: MutableList<AccountData>? = null
+
+    init {
+        val accountDao = AppDatabase.getInstance(application).accountDataDao()
+        repository = AccountRepository(accountDao)
+    }
+
 
     fun getTotalAssetAccount(baseUrl: String, accessToken: String): LiveData<String> {
         loadRemoteData(baseUrl,accessToken,"asset")
