@@ -14,10 +14,10 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
-import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -37,10 +37,10 @@ class AddTransactionFragment: BaseFragment() {
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
+    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private var accounts = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
     private var destinationAccounts = ArrayList<String>()
-    private val piggyBankDatabase by lazy { AppDatabase.getInstance(requireActivity())?.piggyDataDao() }
     private var piggyBank = ArrayList<String>()
     private val bill = ArrayList<String>()
     private lateinit var currency: String
@@ -54,7 +54,7 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         when {
-            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(baseUrl,accessToken), piggyBankDatabase.getPiggy())
+            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(baseUrl,accessToken), piggyViewModel.getAllPiggyBanks(baseUrl, accessToken))
                     .observe(this, Observer {
                         it.first.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)

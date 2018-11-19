@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -24,7 +24,7 @@ import java.util.*
 
 class AddPiggyActivity: BaseActivity(){
 
-    private val model by lazy { getViewModel(PiggyBankViewModel::class.java) }
+    private val model by lazy { getViewModel(PiggyViewModel::class.java) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private var accounts = ArrayList<String>()
 

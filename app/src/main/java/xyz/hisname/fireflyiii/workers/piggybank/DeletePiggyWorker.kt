@@ -14,25 +14,25 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class DeletePiggyWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val piggyDataBase by lazy { AppDatabase.getInstance(context)?.piggyDataDao() }
+    private val piggyDataBase by lazy { AppDatabase.getInstance(context).piggyDataDao() }
     private val channelName: String = "Piggy Bank"
     private val channelDescription = "Show Piggy Bank Notifications"
     private val channelIcon = R.drawable.ic_sort_descending
 
     override fun doWork(): Result {
-        val id = inputData.getString("piggyId") ?: ""
+        val piggyId = inputData.getLong("piggyId", 0)
         var piggyAttribute: PiggyAttributes? = null
         GlobalScope.launch(Dispatchers.Main) {
             val result = async(Dispatchers.IO) {
-                piggyDataBase?.getPiggyById(id.toLong())
+                piggyDataBase.getPiggyById(piggyId)
             }.await()
-            piggyAttribute = result!![0].piggyAttributes
+            piggyAttribute = result[0].piggyAttributes
         }
-        genericService?.create(PiggybankService::class.java)?.deletePiggyBankById(id)?.enqueue(retrofitCallback({ response ->
+        genericService?.create(PiggybankService::class.java)?.deletePiggyBankById(piggyId)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 GlobalScope.launch(Dispatchers.Main) {
                     async(Dispatchers.IO) {
-                        piggyDataBase?.deletePiggyById(id.toLong())
+                        piggyDataBase.deletePiggyById(piggyId)
                     }.await()
                 }
                 context.displayNotification(piggyAttribute?.name + "successfully deleted", "Piggy Bank",

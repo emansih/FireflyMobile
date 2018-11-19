@@ -14,7 +14,7 @@ interface PiggybankService {
     fun getPiggyBanks(): Call<PiggyModel>
 
     @DELETE("$PIGGY_BANK_API_ENDPOINT/{id}")
-    fun deletePiggyBankById(@Path("id") id: String): Call<PiggyModel>
+    fun deletePiggyBankById(@Path("id") id: Long): Call<PiggyModel>
 
     @GET("$PIGGY_BANK_API_ENDPOINT/{id}")
     fun getPiggyBankById(@Path("id") id: String): Call<PiggyData>

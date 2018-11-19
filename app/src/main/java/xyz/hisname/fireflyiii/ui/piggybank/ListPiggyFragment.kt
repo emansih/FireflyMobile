@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_piggy.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
-import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -27,7 +27,7 @@ import xyz.hisname.fireflyiii.util.extension.toastError
 class ListPiggyFragment: BaseFragment() {
 
     private var dataAdapter = ArrayList<PiggyData>()
-    private val piggyBankViewModel by lazy { getViewModel(PiggyBankViewModel::class.java)}
+    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
 
 
@@ -44,17 +44,8 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun displayView(){
-        val viewModel = piggyBankViewModel.getPiggyBank(baseUrl, accessToken)
-        swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        viewModel.apiResponse.observe(this, Observer {
-            if(it.getError() != null){
-                toastError(it.getError()?.message)
-            }
-        })
-
-        viewModel.databaseData?.observe(this, Observer {
-            swipeContainer.isRefreshing = false
+        piggyViewModel.getAllPiggyBanks(baseUrl, accessToken).observe(this, Observer {
             if(it.isNotEmpty()) {
                 piggybankText.isVisible = false
                 piggyImage.isVisible = false
@@ -65,6 +56,13 @@ class ListPiggyFragment: BaseFragment() {
                 piggyImage.isVisible = true
                 recycler_view.isVisible = false
             }
+        })
+        piggyViewModel.isLoading.observe(this, Observer {
+            swipeContainer.isRefreshing = it == true
+        })
+
+        piggyViewModel.apiResponse.observe(this, Observer {
+            toastError(it)
         })
     }
 

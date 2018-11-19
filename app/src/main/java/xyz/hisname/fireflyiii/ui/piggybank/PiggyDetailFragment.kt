@@ -6,7 +6,6 @@ import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
 import android.view.animation.AccelerateInterpolator
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -17,11 +16,10 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
-import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
-import xyz.hisname.fireflyiii.repository.viewmodel.PiggyBankViewModel
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
@@ -29,10 +27,9 @@ import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
 import kotlin.collections.ArrayList
 
-class PiggyDetailFragment: BaseDetailFragment(), CoroutineScope {
+class PiggyDetailFragment: BaseDetailFragment() {
 
-    override val coroutineContext = Job() + Dispatchers.Main
-    private val piggyBankViewModel by lazy { getViewModel(PiggyBankViewModel::class.java)}
+    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val piggyId: Long by lazy { arguments?.getLong("piggyId") as Long  }
     private var piggyAttribute: PiggyAttributes? = null
     private var currentAmount: BigDecimal? = 0.toBigDecimal()
@@ -49,11 +46,8 @@ class PiggyDetailFragment: BaseDetailFragment(), CoroutineScope {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        launch(context = Dispatchers.Main){
-            val result = async(Dispatchers.IO) {
-                piggyBankViewModel.getPiggyBankById(piggyId)
-            }.await()
-            piggyAttribute = result!![0].piggyAttributes
+        piggyViewModel.getPiggyById(piggyId).observe(this, Observer {
+            piggyAttribute = it[0].piggyAttributes
             piggyName = piggyAttribute?.name
             currentAmount = piggyAttribute?.current_amount
             percentage = piggyAttribute!!.percentage
@@ -61,7 +55,7 @@ class PiggyDetailFragment: BaseDetailFragment(), CoroutineScope {
             setupWidgets()
             recycler_view.adapter = BaseDetailRecyclerAdapter(piggyList)
             setupProgressBar()
-        }
+        })
     }
 
 
@@ -112,19 +106,15 @@ class PiggyDetailFragment: BaseDetailFragment(), CoroutineScope {
                 .setMessage(R.string.irreversible_action)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    piggyBankViewModel.deletePiggyBank(baseUrl,accessToken, piggyId.toString()).observe(this, Observer {
-                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                        val error = it.getError()
-                        when {
-                            it.getResponse() != null -> {
-                                toastSuccess(resources.getString(R.string.piggy_bank_deleted), Toast.LENGTH_LONG)
-                                requireFragmentManager().popBackStack()
-                            }
-                            error != null -> {
-                               toastInfo(it.getErrorMessage().toString())
-                            }
-                            else -> Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
-                                    R.string.generic_delete_error, Snackbar.LENGTH_LONG)
+                    piggyViewModel.deletePiggyById(baseUrl,accessToken, piggyId).observe(this, Observer {
+                        ProgressBar.animateView(requireActivity().findViewById<View>(R.id.progress_overlay),
+                                View.GONE, 0f, 200)
+                        if(it == true){
+                            requireFragmentManager().popBackStack()
+                            toastSuccess("Piggy Bank Deleted")
+                        } else {
+                            val parentLayout: View = requireActivity().findViewById(R.id.coordinatorlayout)
+                            Snackbar.make(parentLayout, R.string.generic_delete_error, Snackbar.LENGTH_LONG)
                                     .setAction("Retry") { _ ->
                                         deleteItem()
                                     }
