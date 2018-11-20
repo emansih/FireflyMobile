@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository.viewmodel
+package xyz.hisname.fireflyiii.repository.userinfo
 
 import android.app.Application
 import androidx.lifecycle.*
@@ -14,16 +14,17 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class UserInfoViewModel(application: Application) : AndroidViewModel(application){
 
-    fun getUser(baseUrl: String?, accessToken: String?):
+    fun getUser():
             LiveData<ApiResponses<UserDataModel>> {
         val apiResponse: MediatorLiveData<ApiResponses<UserDataModel>> = MediatorLiveData()
         val user: MutableLiveData<ApiResponses<UserDataModel>> = MutableLiveData()
-        val systemService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(SystemInfoService::class.java)
+        val systemService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
+                 AppPref(getApplication()).accessToken)?.create(SystemInfoService::class.java)
         systemService?.getCurrentUserInfo()?.enqueue(retrofitCallback({ response ->
             val userAttribute = response.body()?.userData?.userAttributes
             if (userAttribute != null) {
-                AppPref(getApplication()).setUserEmail(userAttribute.email)
-                AppPref(getApplication()).setUserRole(userAttribute.role)
+                AppPref(getApplication()).userEmail = userAttribute.email
+                AppPref(getApplication()).userRole = userAttribute.role
                 user.value = ApiResponses(response.body())
             }
         })
@@ -32,17 +33,18 @@ class UserInfoViewModel(application: Application) : AndroidViewModel(application
         return apiResponse
     }
 
-    fun userSystem(baseUrl: String?, accessToken: String?):
+    fun userSystem():
             LiveData<ApiResponses<SystemInfoModel>> {
         val apiResponse: MediatorLiveData<ApiResponses<SystemInfoModel>> = MediatorLiveData()
         val user: MutableLiveData<ApiResponses<SystemInfoModel>> = MutableLiveData()
-        val systemService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(SystemInfoService::class.java)
+        val systemService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
+                AppPref(getApplication()).accessToken)?.create(SystemInfoService::class.java)
         systemService?.getSystemInfo()?.enqueue(retrofitCallback({ response ->
             val systemData = response.body()?.systemData
             if (systemData != null) {
-                AppPref(getApplication()).setServerVersion(systemData.version)
-                AppPref(getApplication()).setRemoteApiVersion(systemData.api_version)
-                AppPref(getApplication()).setUserOS(systemData.os)
+                AppPref(getApplication()).serverVersion = systemData.version
+                AppPref(getApplication()).remoteApiVersion = systemData.api_version
+                AppPref(getApplication()).userOs = systemData.os
                 user.value = ApiResponses(response.body())
             }
         })
@@ -51,11 +53,12 @@ class UserInfoViewModel(application: Application) : AndroidViewModel(application
         return apiResponse
     }
 
-    fun getUserSettings(baseUrl: String?, accessToken: String?):
+    fun getUserSettings():
             LiveData<SettingsApiResponse> {
         val apiResponse: MediatorLiveData<SettingsApiResponse> = MediatorLiveData()
         val user: MutableLiveData<SettingsApiResponse> = MutableLiveData()
-        val settingsService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(SettingsService::class.java)
+        val settingsService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
+                AppPref(getApplication()).accessToken)?.create(SettingsService::class.java)
         settingsService?.getSettings()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 user.value = SettingsApiResponse(response.body())

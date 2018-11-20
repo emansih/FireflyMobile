@@ -51,27 +51,23 @@ class HomeActivity: BaseActivity(){
             val transaction = intent.getStringExtra("transaction")
             when (transaction) {
                 "expense" -> {
-                    val bundle = bundleOf("fireflyUrl" to baseUrl,
-                            "access_token" to accessToken, "transactionType" to "Withdrawal")
+                    val bundle = bundleOf("transactionType" to "Withdrawal")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
                 }
                 "income" -> {
-                    val bundle = bundleOf("fireflyUrl" to baseUrl,
-                            "access_token" to accessToken, "transactionType" to "Deposit")
+                    val bundle = bundleOf("transactionType" to "Deposit")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
 
                 }
                 "transfer" -> {
-                    val bundle = bundleOf("fireflyUrl" to baseUrl,
-                            "access_token" to accessToken, "transactionType" to "Transfer")
+                    val bundle = bundleOf("transactionType" to "Transfer")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
                 }
             }
         } else {
             if (savedInstanceState == null) {
-                val bundle = bundleOf("fireflyUrl" to baseUrl, "access_token" to accessToken)
                 supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, DashboardFragment().apply { arguments = bundle }, "dash")
+                        .replace(R.id.fragment_container, DashboardFragment(), "dash")
                         .commit()
             }
         }
@@ -79,8 +75,8 @@ class HomeActivity: BaseActivity(){
 
     private fun setUpHeader(savedInstanceState: Bundle?){
         profile = ProfileDrawerItem()
-                .withName(AppPref(this).getUserEmail())
-                .withEmail(AppPref(this).getUserRole())
+                .withName(AppPref(this).userEmail)
+                .withEmail(AppPref(this).userRole)
                 .withIcon(R.drawable.ic_piggy_bank)
         headerResult = AccountHeaderBuilder()
                 .withActivity(this)

@@ -17,6 +17,11 @@ interface TransactionService {
                            @Query("end") endDate: String?,
                            @Query("type") type: String): Call<TransactionModel>
 
+    @GET(TRANSACTION_API_ENDPOINT)
+    fun getPaginatedTransactions(@Query("start") startDate: String?,
+                           @Query("end") endDate: String?,
+                           @Query("type") type: String,@Query("page") page: Int): Call<TransactionModel>
+
     @GET("$TRANSACTION_API_ENDPOINT/{id}")
     fun getTransactionById(@Path("id") id: String)
 

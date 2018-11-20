@@ -53,10 +53,12 @@ class ReportFragment: BaseFragment() {
     private var month6 = 0
     private var month6With = 0
     private var month6Depot = 0
+/*
     private val withdrawal by lazy { model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(),
             DateTimeUtil.getEndOfMonth(), "Withdrawal")}
     private val deposit by lazy { model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(),
             DateTimeUtil.getEndOfMonth(), "Deposit") }
+*/
 
 
 
@@ -68,11 +70,11 @@ class ReportFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setToolbar()
-        getThisMonthData()
+    //    getThisMonthData()
         getHistoricalData()
     }
 
-    private fun getThisMonthData(){
+   /* private fun getThisMonthData(){
         launch(context = Dispatchers.Main) {
             async(Dispatchers.IO) {
                 withdrawal.databaseData
@@ -103,7 +105,7 @@ class ReportFragment: BaseFragment() {
             }
         }
     }
-
+*/
     private fun setPieChartData(){
         val dataset = PieDataSet(arrayListOf(PieEntry(depositSum.toFloat(), "Deposit"),
                 PieEntry(withdrawSum.toFloat(), "Withdraw")), "")
@@ -136,12 +138,12 @@ class ReportFragment: BaseFragment() {
         lateinit var sixMonthAgo : ReportPair
         launch(context = Dispatchers.Main) {
             async(Dispatchers.IO) {
-                oneMonthAgo = getMonthData(1)
+                /*oneMonthAgo = getMonthData(1)
                 twoMonthAgo = getMonthData(2)
                 threeMonthAgo = getMonthData(3)
                 fourMonthAgo = getMonthData(4)
                 fiveMonthAgo = getMonthData(5)
-                sixMonthAgo = getMonthData(6)
+                sixMonthAgo = getMonthData(6)*/
             }.await()
             dataAdapter = ArrayList(oneMonthAgo.first)
             if(dataAdapter.isNotEmpty()){
@@ -255,12 +257,12 @@ class ReportFragment: BaseFragment() {
         }
     }
 
-    private fun getMonthData(duration: Long): ReportPair{
+   /* private fun getMonthData(duration: Long): ReportPair{
         return ReportPair(model.getTransactions(baseUrl, accessToken, DateTimeUtil.getStartOfMonth(duration),
                 DateTimeUtil.getEndOfMonth(duration), "Withdrawal").databaseData,
                 model.getTransactions(baseUrl,accessToken, DateTimeUtil.getStartOfMonth(duration),
                         DateTimeUtil.getEndOfMonth(duration), "Deposit").databaseData)
-    }
+    }*/
 
     private fun setUpBarChart(){
         val withDrawalHistory = arrayListOf(

@@ -13,20 +13,17 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.repository.viewmodel.DateViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
 class TransactionFragment: BaseFragment(){
 
-    private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     private val dateViewModel by lazy { getViewModel(DateViewModel::class.java) }
     private var dataAdapter = ArrayList<TransactionData>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter
@@ -56,40 +53,73 @@ class TransactionFragment: BaseFragment(){
         dataAdapter.clear()
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        launch(context = Dispatchers.Main) {
-            async(Dispatchers.IO) {
-                transactionData = model.getTransactions(baseUrl,accessToken, startDate, endDate,transactionType).databaseData!!
-            }.await()
-            if(transactionData.isEmpty()){
-                recycler_view.isGone = true
-                noTransactionText.isVisible = true
-                noTransactionImage.isVisible = true
-                when {
-                    Objects.equals("Withdrawal", transactionType) ->
-                        noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_left))
-                    Objects.equals("Deposit", transactionType) ->
-                        noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bank_transfer))
-                    Objects.equals("Transfer", transactionType) ->
-                        noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_right))
+        when (transactionType) {
+            "Withdrawal" -> transactionViewModel.getWithdrawalList(startDate, endDate).observe(this, Observer {
+                transactionData = it
+                if(transactionData.isEmpty()) {
+                    recycler_view.isGone = true
+                    noTransactionText.isVisible = true
+                    noTransactionImage.isVisible = true
+                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_left))
+                } else {
+                    recycler_view.isVisible = true
+                    noTransactionText.isGone = true
+                    noTransactionImage.isGone = true
+                    rtAdapter = TransactionRecyclerAdapter(transactionData, "no_type")
+                    recycler_view.adapter = rtAdapter
+                    rtAdapter.apply {
+                        recycler_view.adapter as TransactionRecyclerAdapter
+                        update(transactionData)
+                    }
+                    rtAdapter.notifyDataSetChanged()
                 }
-            } else {
-                recycler_view.isVisible = true
-                noTransactionText.isGone = true
-                noTransactionImage.isGone = true
-                rtAdapter = TransactionRecyclerAdapter(transactionData, "no_type")
-                recycler_view.adapter = rtAdapter
-                rtAdapter.apply {
-                    recycler_view.adapter as TransactionRecyclerAdapter
-                    update(transactionData)
+            })
+            "Transfer" -> transactionViewModel.getTransferList(startDate, endDate).observe(this, Observer {
+                transactionData = it
+                if(transactionData.isEmpty()) {
+                    recycler_view.isGone = true
+                    noTransactionText.isVisible = true
+                    noTransactionImage.isVisible = true
+                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_right))
+                } else {
+                    recycler_view.isVisible = true
+                    noTransactionText.isGone = true
+                    noTransactionImage.isGone = true
+                    rtAdapter = TransactionRecyclerAdapter(transactionData, "no_type")
+                    recycler_view.adapter = rtAdapter
+                    rtAdapter.apply {
+                        recycler_view.adapter as TransactionRecyclerAdapter
+                        update(transactionData)
+                    }
+                    rtAdapter.notifyDataSetChanged()
                 }
-                rtAdapter.notifyDataSetChanged()
-            }
-            swipeContainer.isRefreshing = false
+            })
+            "Deposit" -> transactionViewModel.getDepositList(startDate, endDate).observe(this, Observer {
+                transactionData = it
+                if(transactionData.isEmpty()) {
+                    recycler_view.isGone = true
+                    noTransactionText.isVisible = true
+                    noTransactionImage.isVisible = true
+                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bank_transfer))
+                } else {
+                    recycler_view.isVisible = true
+                    noTransactionText.isGone = true
+                    noTransactionImage.isGone = true
+                    rtAdapter = TransactionRecyclerAdapter(transactionData, "no_type")
+                    recycler_view.adapter = rtAdapter
+                    rtAdapter.apply {
+                        recycler_view.adapter as TransactionRecyclerAdapter
+                        update(transactionData)
+                    }
+                    rtAdapter.notifyDataSetChanged()
+                }
+            })
         }
-        model.getTransaction(baseUrl,accessToken, startDate, endDate,transactionType).observe(this, Observer {
-            if(it.getError() != null){
-                toastError(it.getError()?.message)
-            }
+        transactionViewModel.isLoading.observe(this, Observer {
+            swipeContainer.isRefreshing = it == true
+        })
+        transactionViewModel.apiResponse.observe(this, Observer {
+            toastInfo(it)
         })
     }
 

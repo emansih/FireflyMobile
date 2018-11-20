@@ -8,24 +8,22 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.OAuthService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.UserRepository
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class AuthViewModel(application: Application): BaseViewModel(application){
 
-    private val userRepo: UserRepository = UserRepository(AppPref(application))
     private val isAuthenticated: MutableLiveData<Boolean> = MutableLiveData()
 
     fun getAccessToken(code: String): LiveData<Boolean> {
         isLoading.value = true
-        val oAuthService = RetrofitBuilder.getClient(userRepo.baseUrl)?.create(OAuthService::class.java)
-        oAuthService?.getAccessToken(code, userRepo.clientId, userRepo.clientSecret, Constants.REDIRECT_URI,
-                "authorization_code")?.enqueue(retrofitCallback({ response ->
+        val oAuthService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl)?.create(OAuthService::class.java)
+        oAuthService?.getAccessToken(code, AppPref(getApplication()).clientId, AppPref(getApplication()).secretKey,
+                Constants.REDIRECT_URI, "authorization_code")?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
             if(authResponse != null) {
-                userRepo.insertAccessToken(authResponse.access_token)
-                userRepo.insertRefreshToken(authResponse.refresh_token)
-                userRepo.insertTokenExpiry(authResponse.expires_in)
+                AppPref(getApplication()).accessToken = authResponse.access_token
+                AppPref(getApplication()).refreshToken = authResponse.refresh_token
+                AppPref(getApplication()).tokenExpiry = authResponse.expires_in
                 isAuthenticated.value = true
             } else {
                 isAuthenticated.value = false
@@ -37,14 +35,14 @@ class AuthViewModel(application: Application): BaseViewModel(application){
     }
 
     fun getRefreshToken(): LiveData<Boolean>{
-        val oAuthService = RetrofitBuilder.getClient(userRepo.baseUrl, userRepo.clientSecret)?.create(OAuthService::class.java)
-        oAuthService?.getRefreshToken("refresh_token", userRepo.refreshToken,
-                userRepo.clientId, userRepo.clientSecret)?.enqueue(retrofitCallback({ response ->
+        val oAuthService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl, AppPref(getApplication()).secretKey)?.create(OAuthService::class.java)
+        oAuthService?.getRefreshToken("refresh_token", AppPref(getApplication()).refreshToken,
+                AppPref(getApplication()).clientId, AppPref(getApplication()).secretKey)?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
             if(authResponse != null) {
-                userRepo.insertAccessToken(authResponse.access_token)
-                userRepo.insertRefreshToken(authResponse.refresh_token)
-                userRepo.insertTokenExpiry(authResponse.expires_in)
+                AppPref(getApplication()).accessToken = authResponse.access_token
+                AppPref(getApplication()).refreshToken = authResponse.refresh_token
+                AppPref(getApplication()).tokenExpiry = authResponse.expires_in
                 isAuthenticated.value = true
             } else {
                 isAuthenticated.value = false

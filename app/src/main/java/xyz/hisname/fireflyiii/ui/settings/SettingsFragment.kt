@@ -25,9 +25,7 @@ import java.util.*
 
 class SettingsFragment: PreferenceFragmentCompat() {
 
-    private val fireflyUrl by lazy { AppPref(requireContext()).getBaseUrl() }
-    private val fireflySecretKey by lazy { AppPref(requireContext()).getSecretKey() }
-    private val authMethodPref by lazy { AppPref(requireContext()).getAuthMethod() }
+    private val authMethodPref by lazy { AppPref(requireContext()).authMethod }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -39,13 +37,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
         val fireflyUrlPref = findPreference("fireflyUrl") as EditTextPreference
         fireflyUrlPref.apply {
             title = "Firefly URL"
-            summary = fireflyUrl
+            summary = AppPref(requireContext()).baseUrl
         }
 
         val accessTokenPref = findPreference("access_token") as EditTextPreference
         accessTokenPref.apply {
             title = "Access Token"
-            summary = fireflySecretKey
+            summary = AppPref(requireContext()).secretKey
         }
         val authMethod = findPreference("auth_method")
 

@@ -24,7 +24,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     private val transactionDatabase by lazy { AppDatabase.getInstance(application).transactionDataDao() }
     private val apiResponse: MediatorLiveData<ApiResponses<TransactionModel>> = MediatorLiveData()
 
-    fun getTransactions(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
+   /* fun getTransactions(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
             Response<TransactionData, ApiResponses<TransactionModel>> {
         val transaction: MutableLiveData<ApiResponses<TransactionModel>> = MutableLiveData()
         val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
@@ -40,28 +40,14 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         })
         { throwable ->  transaction.value = ApiResponses(throwable)})
         apiResponse.addSource(transaction) { apiResponse.value = it }
+        return Response(transactionDatabase.getTransaction(start, end, type), apiResponse)
         return when {
             Objects.equals("all", type) -> Response(transactionDatabase.getRecentTransactions(5), apiResponse)
             start.isNullOrBlank() or end.isNullOrBlank() -> Response(transactionDatabase.getTransaction(type), apiResponse)
             else -> Response(transactionDatabase.getTransaction(start, end, type), apiResponse)
         }
     }
-
-    fun getTransaction(baseUrl: String?, accessToken: String?, start: String?, end: String?, type: String):
-            LiveData<ApiResponses<TransactionModel>>{
-        val transaction: MutableLiveData<ApiResponses<TransactionModel>> = MutableLiveData()
-        val apiResponse: MediatorLiveData<ApiResponses<TransactionModel>> = MediatorLiveData()
-        val transactionService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(TransactionService::class.java)
-        transactionService?.getAllTransactions(start, end, type)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                transaction.postValue(ApiResponses(response.body()))
-            }
-        })
-        { throwable ->  transaction.postValue(ApiResponses(throwable))})
-        apiResponse.addSource(transaction) { apiResponse.value = it }
-        return apiResponse
-    }
-
+*/
     fun addTransaction(baseUrl: String?, accessToken: String?, type: String, description: String,
                        date: String, piggyBankName: String?, billName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,

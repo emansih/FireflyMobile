@@ -43,7 +43,7 @@ class PatFragment: Fragment() {
             }  else {
                 fireflyUrl = firefly_url_edittext.getString()
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
-                model.getTransactions(fireflyUrl,firefly_secret_edittext.getString(), DateTimeUtil.getTodayDate(),
+                /*model.getTransactions(fireflyUrl,firefly_secret_edittext.getString(), DateTimeUtil.getTodayDate(),
                         DateTimeUtil.getTodayDate(), "withdrawal").apiResponse.observe(this, Observer {
                     apiResponse ->
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
@@ -65,7 +65,7 @@ class PatFragment: Fragment() {
                     } else {
                         toastError(resources.getString(R.string.authentication_failed))
                     }
-                })
+                })*/
             }
 
         }

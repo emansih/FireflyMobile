@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
-import xyz.hisname.fireflyiii.repository.viewmodel.UserInfoViewModel
+import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -21,8 +21,6 @@ import xyz.hisname.fireflyiii.util.extension.zipLiveData
 class OnboardingFragment: Fragment() {
 
     private val model by lazy { getViewModel(UserInfoViewModel::class.java) }
-    private val baseUrl: String by lazy { arguments?.getString("fireflyUrl") ?: "" }
-    private val accessToken: String by lazy { arguments?.getString("access_token") ?: "" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -37,7 +35,7 @@ class OnboardingFragment: Fragment() {
     private fun getUser(){
         RetrofitBuilder.destroyInstance()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
-        zipLiveData(model.getUser(baseUrl,accessToken), model.userSystem(baseUrl, accessToken))
+        zipLiveData(model.getUser(), model.userSystem())
                 .observe(this, Observer {
             if(it.first.getError() == null && it.second.getError() == null){
                 ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()

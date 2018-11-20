@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
@@ -29,11 +28,7 @@ import java.util.*
 
 class LoginFragment: Fragment() {
 
-    private val baseUrl by lazy { AppPref(requireContext()).getBaseUrl() }
-    private val fireflyId: String by lazy { AppPref(requireContext()).getClientId() }
-    private val fireflySecretKey: String by lazy { AppPref(requireContext()).getSecretKey() }
     private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
-    private lateinit var fireflyUrl: String
     private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,9 +41,9 @@ class LoginFragment: Fragment() {
         val argument = arguments?.getString("ACTION")
         when {
             Objects.equals(argument, "LOGIN") -> {
-                firefly_url_edittext.setText(baseUrl)
-                firefly_id_edittext.setText(fireflyId)
-                firefly_secret_edittext.setText(fireflySecretKey)
+                firefly_url_edittext.setText( AppPref(requireContext()).baseUrl)
+                firefly_id_edittext.setText(AppPref(requireContext()).clientId)
+                firefly_secret_edittext.setText(AppPref(requireContext()).secretKey)
                 getAccessCode()
             }
             Objects.equals(argument, "REFRESH_TOKEN") -> {
@@ -68,7 +63,7 @@ class LoginFragment: Fragment() {
         firefly_submit_button.setOnClickListener {
             RetrofitBuilder.destroyInstance()
             hideKeyboard()
-            fireflyUrl = firefly_url_edittext.getString()
+            var fireflyUrl = firefly_url_edittext.getString()
             val fireflyId = firefly_id_edittext.getString()
             val fireflySecretKey =  firefly_secret_edittext.getString()
             if(fireflyUrl.isEmpty() or fireflyId.isEmpty() or fireflySecretKey.isEmpty()){
@@ -78,9 +73,9 @@ class LoginFragment: Fragment() {
                     else -> firefly_secret_edittext.error = resources.getString(R.string.required_field)
                 }
             } else {
-                AppPref(requireContext()).setBaseUrl(fireflyUrl)
-                AppPref(requireContext()).setClientId(fireflyId)
-                AppPref(requireContext()).setSecretKey(fireflySecretKey)
+                AppPref(requireContext()).baseUrl = fireflyUrl
+                AppPref(requireContext()).clientId = fireflyId
+                AppPref(requireContext()).secretKey = fireflySecretKey
                 if(!fireflyUrl.startsWith("http")){
                     fireflyUrl = "https://$fireflyUrl"
                 }
@@ -108,7 +103,7 @@ class LoginFragment: Fragment() {
     }
 
     private fun startHomeIntent(){
-        if(AppPref(requireContext()).isTransactionPersistent()){
+        if(AppPref(requireContext()).isTransactionPersistent){
             NotificationUtils(requireContext()).showTransactionPersistentNotification()
         }
         GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
@@ -125,17 +120,15 @@ class LoginFragment: Fragment() {
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             val code = uri.getQueryParameter("code")
             if(code != null) {
-                val baseUrl= AppPref(requireContext()).getBaseUrl()
                 authViewModel.getAccessToken(code).observe(this, Observer {
                     if(it == true){
                         toastSuccess(resources.getString(R.string.welcome))
-                        AppPref(requireContext()).setAuthMethod("oauth")
+                        AppPref(requireContext()).authMethod = "oauth"
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
-                        val bundle = bundleOf("fireflyUrl" to baseUrl)
                         requireActivity().supportFragmentManager.beginTransaction()
                                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                                .add(R.id.bigger_fragment_container, OnboardingFragment().apply { arguments = bundle })
+                                .add(R.id.bigger_fragment_container, OnboardingFragment())
                                 .commit()
                     } else {
                         toastInfo("Authentication Failed")

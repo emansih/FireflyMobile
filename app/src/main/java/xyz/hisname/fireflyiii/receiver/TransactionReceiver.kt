@@ -11,7 +11,7 @@ import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 class TransactionReceiver: BroadcastReceiver()  {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if(AppPref(context).getBaseUrl().isBlank() || AppPref(context).getAccessToken().isBlank()){
+        if(AppPref(context).baseUrl.isBlank() || AppPref(context).accessToken.isBlank()){
             val notif = NotificationUtils(context)
             notif.showNotSignedIn()
         } else {

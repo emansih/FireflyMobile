@@ -10,60 +10,64 @@ class AppPref(context: Context): PreferenceHelper {
 
     private val sharedPref: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
 
-    override fun getBaseUrl() = sharedPref.getString("fireflyUrl", "") ?: ""
+    override var baseUrl
+        get() = sharedPref.getString("fireflyUrl", "") ?: ""
+        set(value) = sharedPref.edit { putString("fireflyUrl", value) }
 
-    override fun setBaseUrl(url: String) = sharedPref.edit{ putString("fireflyUrl", url) }
 
-    override fun getSecretKey() = sharedPref.getString("fireflySecretKey", "") ?: ""
+    override var secretKey
+        get() = sharedPref.getString("fireflySecretKey", "") ?: ""
+        set(value) = sharedPref.edit { putString("fireflySecretKey", value) }
 
-    override fun setSecretKey(key: String) = sharedPref.edit { putString("fireflySecretKey", key) }
+    override var accessToken
+        get() = sharedPref.getString("access_token", "") ?: ""
+        set(value) = sharedPref.edit { putString("access_token", value) }
 
-    override fun getClientId() = sharedPref.getString("fireflyId", "") ?: ""
+    override var clientId
+        get() = sharedPref.getString("fireflyId", "") ?: ""
+        set(value) = sharedPref.edit { putString("fireflyId", value) }
 
-    override fun setClientId(id: String) = sharedPref.edit{ putString("fireflyId", id)}
+    override var refreshToken
+        get() = sharedPref.getString("refresh_token", "") ?: ""
+        set(value) = sharedPref.edit { putString("refresh_token", value) }
 
-    override fun getAccessToken() = sharedPref.getString("access_token", "") ?: ""
+    override var authMethod
+        get() = sharedPref.getString("auth_method", "") ?: ""
+        set(value) = sharedPref.edit { putString("auth_method", value) }
 
-    override fun setAccessToken(token: String) =  sharedPref.edit { putString("access_token", token) }
+    override var isTransactionPersistent
+        get() = sharedPref.getBoolean("persistent_notification", false)
+        set(value) = sharedPref.edit { putBoolean("persistent_notification", value) }
 
-    override fun getRefreshToken() = sharedPref.getString("refresh_token", "") ?: ""
+    override var tokenExpiry
+        get() = sharedPref.getLong("expires_at", 0L)
+        set(value) {
+            sharedPref.edit {
+                putLong("expires_at", (System.currentTimeMillis() +
+                        TimeUnit.MINUTES.toMillis(value)))
+            }
+        }
 
-    override fun setRefreshToken(refreshToken: String) = sharedPref.edit{ putString("refresh_token", refreshToken)}
+    override var userEmail
+        get() = sharedPref.getString("userEmail", "") ?: ""
+        set(value) = sharedPref.edit { putString("userEmail", value) }
 
-    override fun getAuthMethod() = sharedPref.getString("auth_method", "") ?: ""
 
-    override fun setAuthMethod(method: String) = sharedPref.edit { putString("auth_method", method) }
+    override var userRole
+        get() = sharedPref.getString("userRole", "") ?: ""
+        set(value) = sharedPref.edit { putString("userRole", value) }
 
-    override fun isTransactionPersistent(): Boolean = sharedPref.getBoolean("persistent_notification", false)
+    override var remoteApiVersion
+        get() = sharedPref.getString("api_version", "") ?: ""
+        set(value) = sharedPref.edit { putString("api_version", value) }
 
-    override fun setTransactionPersistent(yesno: Boolean) = sharedPref.edit { putBoolean("persistent_notification", yesno) }
+    override var serverVersion
+        get() = sharedPref.getString("server_version", "") ?: ""
+        set(value) = sharedPref.edit { putString("server_version", value) }
 
-    override fun getTokenExpiry(): Long = sharedPref.getLong("expires_at", 0L)
-
-    override fun setTokenExpiry(time: Long) = sharedPref.edit {
-        putLong("expires_at", (System.currentTimeMillis() +
-                    TimeUnit.MINUTES.toMillis(time)))
-    }
-
-    override fun getUserEmail() = sharedPref.getString("userEmail", "") ?: ""
-
-    override fun setUserEmail(email: String) = sharedPref.edit { putString("userEmail", email) }
-
-    override fun getUserRole() = sharedPref.getString("userRole", "") ?: ""
-
-    override fun setUserRole(role: String) = sharedPref.edit { putString("userRole", role) }
-
-    override fun getRemoteApiVersion() = sharedPref.getString("api_version", "") ?: ""
-
-    override fun setRemoteApiVersion(apiVersion: String) = sharedPref.edit{ putString("api_version", apiVersion) }
-
-    override fun getServerVersion() = sharedPref.getString("server_version", "") ?: ""
-
-    override fun setServerVersion(version: String) = sharedPref.edit { putString("server_version", version) }
-
-    override fun getUserOS() = sharedPref.getString("user_os", "") ?: ""
-
-    override fun setUserOS(os: String) = sharedPref.edit { putString("user_os", os) }
+    override var userOs: String
+        get() = sharedPref.getString("user_os", "") ?: ""
+        set(value) = sharedPref.edit { putString("user_os", value) }
 
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

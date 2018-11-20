@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.ui.onboarding
 import android.animation.Animator
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -21,11 +20,10 @@ import java.util.*
 
 class OnboardingActivity: AppCompatActivity() {
 
-    private val fireflyUrl by lazy { AppPref(this).getBaseUrl() }
-    private val fireflySecretKey by lazy { AppPref(this).getSecretKey() }
-    private val fireflyAccessTokenExpiry by lazy { sharedPref.getLong("expires_at",0) }
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
-    private val authMethod  by lazy { sharedPref.getString("auth_method","") ?: "" }
+    private val fireflyUrl by lazy { AppPref(this).baseUrl }
+    private val fireflySecretKey by lazy { AppPref(this).secretKey }
+    private val fireflyAccessTokenExpiry by lazy { AppPref(this).tokenExpiry }
+    private val authMethod  by lazy { AppPref(this).authMethod ?: "" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +63,7 @@ class OnboardingActivity: AppCompatActivity() {
                                     .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
                                     .commit()
                         } else {
-                            if (sharedPref.getBoolean("persistent_notification", false)) {
+                            if (AppPref(this).isTransactionPersistent) {
                                 NotificationUtils(this).showTransactionPersistentNotification()
                             }
                             GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
@@ -79,7 +77,7 @@ class OnboardingActivity: AppCompatActivity() {
                 }
             }
             else -> {
-                if(sharedPref.getBoolean("persistent_notification",false)){
+                if(AppPref(this).isTransactionPersistent){
                     NotificationUtils(this).showTransactionPersistentNotification()
                 }
                 if(fireflyUrl.isNotEmpty() and fireflySecretKey.isNotEmpty() and authMethod.isNotEmpty()) {

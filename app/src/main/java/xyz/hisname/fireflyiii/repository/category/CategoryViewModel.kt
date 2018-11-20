@@ -9,25 +9,22 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.CategoryService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.UserRepository
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class CategoryViewModel(application: Application): BaseViewModel(application) {
 
     val repository: CategoryRepository
-    val userRepo: UserRepository
 
     init {
         val categoryDataDao = AppDatabase.getInstance(application).categoryDataDao()
         repository = CategoryRepository(categoryDataDao)
-        userRepo = UserRepository(AppPref(application))
     }
 
     fun getAllCategory(): LiveData<MutableList<CategoryData>> {
         isLoading.value = true
-        val categoryService = RetrofitBuilder.getClient(userRepo.baseUrl,
-                userRepo.accessToken)?.create(CategoryService::class.java)
+        val categoryService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
+                AppPref(getApplication()).accessToken)?.create(CategoryService::class.java)
         categoryService?.getCategory()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()?.data
