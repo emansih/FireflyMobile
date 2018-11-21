@@ -12,8 +12,9 @@
         android:hint="URL"
         android:letterSpacing="0.1"
         android:textSize="16sp"
-        android:layout_marginStart="15dp"
-        android:padding="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -34,8 +35,9 @@
         android:layout_height="240dp"
         android:hint="Personal Access Token"
         android:textSize="16sp"
-        android:layout_marginStart="15dp"
-        android:padding="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/firefly_url_layout"
         app:layout_constraintEnd_toEndOf="parent">
@@ -51,16 +53,14 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/fireflySignIn"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:layout_weight="1"
-        android:gravity="center"
         android:textStyle="bold"
         android:text="Sign In"
-        android:background="@drawable/rectangle"
+        android:textColor="@color/white"
+        android:background="@color/md_black_1000"
         app:layout_constraintTop_toBottomOf="@+id/firefly_secret_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/firefly_secret_layout"
+        app:layout_constraintEnd_toEndOf="@+id/firefly_secret_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

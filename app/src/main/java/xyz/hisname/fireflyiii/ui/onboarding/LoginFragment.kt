@@ -54,7 +54,7 @@ class LoginFragment: Fragment() {
             if(it == true){
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
-                ProgressBar.animateView(progressOverlay, View.GONE, 0.toFloat(), 200)
+                ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
             }
         })
     }
@@ -73,6 +73,7 @@ class LoginFragment: Fragment() {
                     else -> firefly_secret_edittext.error = resources.getString(R.string.required_field)
                 }
             } else {
+                ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 AppPref(requireContext()).baseUrl = fireflyUrl
                 AppPref(requireContext()).clientId = fireflyId
                 AppPref(requireContext()).secretKey = fireflySecretKey
@@ -107,7 +108,7 @@ class LoginFragment: Fragment() {
             NotificationUtils(requireContext()).showTransactionPersistentNotification()
         }
         GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
-            delay(500) //heh
+            delay(500)
             startActivity(Intent(requireContext(), HomeActivity::class.java))
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             requireActivity().finish()
@@ -122,10 +123,11 @@ class LoginFragment: Fragment() {
             if(code != null) {
                 authViewModel.getAccessToken(code).observe(this, Observer {
                     if(it == true){
-                        toastSuccess(resources.getString(R.string.welcome))
                         AppPref(requireContext()).authMethod = "oauth"
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
+                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+                        toastSuccess(resources.getString(R.string.welcome))
                         requireActivity().supportFragmentManager.beginTransaction()
                                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                                 .add(R.id.bigger_fragment_container, OnboardingFragment())

@@ -82,7 +82,7 @@ class OnboardingActivity: AppCompatActivity() {
                 }
                 if(fireflyUrl.isNotEmpty() and fireflySecretKey.isNotEmpty() and authMethod.isNotEmpty()) {
                     GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
-                        delay(1234) //heh
+                        delay(500)
                         startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
                         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                         finish()
