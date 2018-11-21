@@ -46,7 +46,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
     @WorkerThread
     suspend fun allDeposit(startDate: String?, endDate: String?) =
             transactionDao.getTransactionsByTypeWithDate(startDate, endDate, "Deposit")
-    
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun recentTransactions(limit: Int) = transactionDao.getRecentTransactions(limit)

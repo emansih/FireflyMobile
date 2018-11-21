@@ -1,27 +1,23 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.content.edit
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_pat.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 
 class PatFragment: Fragment() {
 
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
     private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
-    private val model by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val model by lazy { getViewModel(AccountsViewModel::class.java) }
     private lateinit var fireflyUrl: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -42,30 +38,31 @@ class PatFragment: Fragment() {
                 }
             }  else {
                 fireflyUrl = firefly_url_edittext.getString()
-                ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
-                /*model.getTransactions(fireflyUrl,firefly_secret_edittext.getString(), DateTimeUtil.getTodayDate(),
-                        DateTimeUtil.getTodayDate(), "withdrawal").apiResponse.observe(this, Observer {
-                    apiResponse ->
-                    ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    if(apiResponse.getError() == null){
-                        sharedPref.edit{
-                            putString("fireflyUrl", fireflyUrl)
-                            putString("fireflySecretKey", firefly_secret_edittext.getString())
-                            putString("auth_method", "pat")
+                model.getAllAccounts().observe(this, Observer { accountData ->
+                    if(accountData != null){
+                        AppPref(requireContext()).apply {
+                            baseUrl = fireflyUrl
+                            secretKey = firefly_secret_edittext.getString()
+                            authMethod = "pat"
                         }
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
-                        val bundle = bundleOf("fireflyUrl" to fireflyUrl, "access_token"
-                                to firefly_secret_edittext.getString())
                         requireActivity().supportFragmentManager.beginTransaction()
                                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                                .add(R.id.bigger_fragment_container, OnboardingFragment().apply { arguments = bundle })
+                                .add(R.id.bigger_fragment_container, OnboardingFragment())
                                 .commit()
                         toastSuccess(resources.getString(R.string.welcome))
                     } else {
                         toastError(resources.getString(R.string.authentication_failed))
                     }
-                })*/
+                })
+                model.isLoading.observe(this, Observer {  loading ->
+                    if(loading == true) {
+                        ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
+                    } else {
+                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+                    }
+                })
             }
 
         }

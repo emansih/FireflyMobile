@@ -19,7 +19,7 @@ import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
-import xyz.hisname.fireflyiii.repository.viewmodel.TransactionViewModel
+import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
@@ -32,7 +32,7 @@ import kotlin.collections.ArrayList
 class AddTransactionFragment: BaseFragment() {
 
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
-    private val model: TransactionViewModel by lazy { getViewModel(TransactionViewModel::class.java) }
+    private val model by lazy { getViewModel(TransactionsViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
@@ -219,8 +219,8 @@ class AddTransactionFragment: BaseFragment() {
                 destinationAccount = destinationSpinner.selectedItem.toString()
             }
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                model.addTransaction(baseUrl, accessToken, transactionType,
-                        descriptionEditText.getString(), transactionDateEditText.getString(), piggyBank,
+                model.addTransaction(transactionType, descriptionEditText.getString(),
+                        transactionDateEditText.getString(), piggyBank,
                         billName, transactionAmountEditText.getString(), sourceAccount,
                         destinationAccount, currency, categoryName
                 ).observe(this, Observer { transactionResponse ->

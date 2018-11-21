@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.rules.RulesData
 import xyz.hisname.fireflyiii.repository.viewmodel.RulesViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -35,7 +36,8 @@ class RulesFragment: BaseFragment() {
     private fun showRules(){
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        model.getAllRules(baseUrl, accessToken).observe(this, Observer {
+        model.getAllRules(AppPref(requireContext()).baseUrl,
+                AppPref(requireContext()).accessToken).observe(this, Observer {
             if(it.getError() == null){
                 recycler_view.adapter = RulesRecyclerAdapter(it.getRules()?.data!!.toMutableList())
             }
