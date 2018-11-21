@@ -11,16 +11,26 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
+import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
+import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
+import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastError
-import xyz.hisname.fireflyiii.util.extension.zipLiveData
+import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.*
 
 class OnboardingFragment: Fragment() {
 
-    private val model by lazy { getViewModel(UserInfoViewModel::class.java) }
+    private val userInfoViewModel by lazy { getViewModel(UserInfoViewModel::class.java) }
+    private val transaction by lazy { getViewModel(TransactionsViewModel::class.java) }
+    private val currency by lazy { getViewModel(CurrencyViewModel::class.java) }
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
+    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
+    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
+    private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -33,23 +43,29 @@ class OnboardingFragment: Fragment() {
     }
 
     private fun getUser(){
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
         RetrofitBuilder.destroyInstance()
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
-        zipLiveData(model.getUser(), model.userSystem())
-                .observe(this, Observer {
-            if(it.first.getError() == null && it.second.getError() == null){
-                ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()
-                ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
-                startActivity(Intent(requireActivity(), HomeActivity::class.java))
-                requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                requireActivity().finish()
-            }else {
-                if(it.first.getError()!!.localizedMessage.startsWith("Unable to resolve host")){
-                    toastError(resources.getString(R.string.unable_ping_server))
-                } else {
-                    toastError("There was some issue retrieving your data")
-                }
-            }
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 20).start()
+        transaction.getAllData(DateTimeUtil.getStartOfMonth(6), DateTimeUtil.getEndOfMonth()).observe(this, Observer {
+            ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
+        })
+        piggyViewModel.getAllPiggyBanks().observe(this, Observer {
+            ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
+        })
+        billViewModel.getAllBills()
+        categoryViewModel.getAllCategory()
+        accountViewModel.getAllAccounts().observe(this, Observer {
+            onboarding_text.text = "Almost there!"
+            ObjectAnimator.ofInt(onboarding_progress,"progress", 80).start()
+        })
+        currency.getCurrency()
+        userInfoViewModel.getUser().observe(this, Observer {
+            ObjectAnimator.ofInt(onboarding_progress,"progress", 95).start()
+        })
+        userInfoViewModel.userSystem().observe(this, Observer {
+            startActivity(Intent(requireActivity(), HomeActivity::class.java))
+            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            requireActivity().finish()
         })
     }
 

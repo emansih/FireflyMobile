@@ -65,7 +65,7 @@ class AppPref(context: Context): PreferenceHelper {
         get() = sharedPref.getString("server_version", "") ?: ""
         set(value) = sharedPref.edit { putString("server_version", value) }
 
-    override var userOs: String
+    override var userOs
         get() = sharedPref.getString("user_os", "") ?: ""
         set(value) = sharedPref.edit { putString("user_os", value) }
 

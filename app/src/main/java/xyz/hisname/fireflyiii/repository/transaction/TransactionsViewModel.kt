@@ -28,6 +28,15 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         repository = TransactionRepository(transactionDataDao)
     }
 
+    // PLACE HOLDER. DO NOT CALL THIS FUNCTION FROM ANYWHERE EXCEPT ONBOARDING!!!
+    fun getAllData(startDate: String?, endDate: String?): LiveData<Boolean> {
+        val isLoaded: MutableLiveData<Boolean> = MutableLiveData()
+        isLoaded.value = false
+        loadRemoteData(startDate, endDate, "all")
+        isLoaded.value = true
+        return isLoaded
+    }
+
     fun getWithdrawalList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
         loadRemoteData(startDate, endDate, "withdrawal")
         return repository.withdrawalList(startDate, endDate)
