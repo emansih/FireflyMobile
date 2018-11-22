@@ -23,9 +23,7 @@ Other alternative include [this software](https://github.com/mconway/firefly-app
 **Change the default oAuth callback URL**
 
 1. Change `config.hostname` value in [`config.properties`](app/config.properties) to your desired value.
-2. Change  the host value for `manifestPlaceholders = [host: "empty"]` in [`build.gradle`](app/build.gradle) to your desired value.
 
-Ensure *both* values **are the same**.
 
 **Certificate pinning**
 
@@ -53,18 +51,7 @@ f8NnEFZxQ4ExFOhSN7EiFWtiudZQVD2oY60uauV/n78=
 ```
 ###### Script requires bash and openssl to run.
 
-2. Copy the lower-case host name or wildcard pattern to `config.host` in
-[`config.properties`](app/config.properties)
-
-3. Copy the sha256 value hash of the certificate's Subject Public Key Info to `config.certpinnervalue` in 
-[`config.properties`](app/config.properties)
-
-If you have been following correctly and by using the output from above, your config will be as follows
-
-```
-config.host="www.google.com"
-config.certpinnervalue="47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
-```
+2. Copy the sha256 value hash of the certificate's Subject Public Key Info to the app settings. 
 
 
 ### Running the Software
