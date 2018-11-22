@@ -9,7 +9,9 @@ Other alternative include [this software](https://github.com/mconway/firefly-app
 
 ### Features
 
-✔ Offline: View offline data(partial support)
+✔ Support Kitkat and up!
+
+✔ Offline: View offline data
 
 ✔ Automation: Add data non-interactively allowing powerful automation. Read the [wiki](https://github.com/emansih/FireflyMobile/wiki/Automation-via-Android-Intents) for more info.
 
@@ -65,7 +67,10 @@ config.certpinnervalue="47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU="
 ```
 
 
-### Building APK
+### Running the Software
+
+#### Building
+
 With your device plugged into your PC and ADB enabled
 ```bash
 git clone https://github.com/emansih/FireflyMobile.git
@@ -73,8 +78,16 @@ cd FireflyMobile
 ./gradlew clean installDebug
 ```
 
-Note: An APK is provided in the [release page](https://github.com/emansih/FireflyMobile/releases) for convienent purposes. All APKs
+
+#### Pre-built APK
+
+An APK is provided in the [release page](https://github.com/emansih/FireflyMobile/releases) for convienent purposes. All APKs
 are signed with the same release key, this ensure that the APK comes from me and your financial data will not be exposed to nefarious actors. The APK SHA256 public key is `40:F2:02:B8:CC:D1:68:87:56:8A:F7:9E:27:44:5B:E1:82:51:CC:B9:1E:89:08:8B:04:3D:2F:35:A2:0D:C3:8F`. All commits in this repo are signed with my GPG key and the public key can be found on [keybase](https://keybase.io/hisname/pgp_keys.asc) and [Github](https://api.github.com/users/emansih/gpg_keys)
+
+
+To get latest update notifications, add [this RSS feed](https://github.com/emansih/FireflyMobile/releases.atom). 
+
+An attempt has been made to [include this software on Fdroid](https://gitlab.com/fdroid/fdroiddata/merge_requests/3910). If there is enough interest, I might upload it to Google Play Store.
 
 ### Authentication
 In order to start using this software, you have to create a new client in your Firefly Instance. 
