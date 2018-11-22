@@ -21,9 +21,9 @@ data class AccountAttributes(
         val monthly_payment_date: String?,
         val credit_card_type: String?,
         val account_number: String?,
-        val iban: String,
+        val iban: String?,
         val bic: String?,
-        val virtual_balance: Int,
+        val virtual_balance: Int?,
         val opening_balance: String?,
         val opening_balance_date: String?,
         val role: String?
