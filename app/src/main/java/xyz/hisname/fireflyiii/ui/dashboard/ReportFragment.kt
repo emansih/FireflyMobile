@@ -33,7 +33,6 @@ class ReportFragment: BaseFragment() {
     private val model by lazy { getViewModel(TransactionsViewModel::class.java) }
     private var depositSum = 0
     private var withdrawSum = 0
-    private var dataAdapter = ArrayList<TransactionData>()
     private var month1 = 0
     private var month1With = 0
     private var month1Depot = 0
@@ -70,16 +69,14 @@ class ReportFragment: BaseFragment() {
         zipLiveData(model.getWithdrawalList(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth()),
                 model.getDepositList(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())).observe(this, Observer {
             if(it.first.isNotEmpty() && it.second.isNotEmpty()){
-                dataAdapter = ArrayList(it.first)
-                if(dataAdapter.isEmpty()){
+                if(it.first.isEmpty()){
                     withdrawSum = 0
                 } else {
                     it.first.forEachIndexed { _, element ->
                         withdrawSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
                     }
                 }
-                dataAdapter = ArrayList(it.second)
-                if(dataAdapter.isEmpty()){
+                if(it.second.isEmpty()){
                     depositSum = 0
                 } else {
                     it.second.forEachIndexed { _, element ->
@@ -119,78 +116,66 @@ class ReportFragment: BaseFragment() {
     }
 
     private fun getHistoricalData() {
-        getMonthData(1).observe(this, Observer {
-            dataAdapter = ArrayList(it.first)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+        zipLiveData(getMonthData(1), getMonthData(2), getMonthData(3),
+                getMonthData(4), getMonthData(5), getMonthData(6)).observe(this, Observer {
+
+            if(it.first.first.isNotEmpty()){
+                ArrayList(it.first.first).forEachIndexed { _, element ->
                     month1With += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month1With = 0
             }
-            dataAdapter = ArrayList(it.second)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if(it.first.second.isNotEmpty()){
+                ArrayList(it.first.second).forEachIndexed { _, element ->
                     month1Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month1Depot = 0
             }
             month1 = month1Depot - month1With
-        })
 
-        getMonthData(2).observe(this, Observer {
-            dataAdapter = ArrayList(it.first)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.second.first.isNotEmpty()) {
+                it.second.first.forEachIndexed { _, element ->
                     month2With += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month2With = 0
             }
-            dataAdapter = ArrayList(it.second)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.second.second.isNotEmpty()) {
+                it.second.second.forEachIndexed { _, element ->
                     month2Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month2Depot = 0
             }
             month2 = month2Depot - month2With
-        })
 
-        getMonthData(3).observe(this, Observer {
-            dataAdapter = ArrayList(it.first)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.third.first.isNotEmpty()) {
+                it.third.first.forEachIndexed { _, element ->
                     month3With += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month3With = 0
             }
-            dataAdapter = ArrayList(it.second)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.third.second.isNotEmpty()) {
+                it.third.second.forEachIndexed { _, element ->
                     month3Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month3Depot = 0
             }
             month3 = month3Depot - month3With
-        })
 
-        getMonthData(4).observe(this, Observer {
-            dataAdapter = ArrayList(it.first)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.fourth.first.isNotEmpty()) {
+                it.fourth.first.forEachIndexed { _, element ->
                     month4With += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month4With = 0
             }
-            dataAdapter = ArrayList(it.second)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.fourth.second.isNotEmpty()) {
+                it.fourth.second.forEachIndexed { _, element ->
                     month4Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
@@ -198,49 +183,40 @@ class ReportFragment: BaseFragment() {
             }
             month4 = month4Depot - month4With
 
-        })
-
-        getMonthData(5).observe(this, Observer {
-            dataAdapter = ArrayList(it.first)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.fifth.first.isNotEmpty()) {
+                it.fifth.first.forEachIndexed { _, element ->
                     month5With += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month5With = 0
             }
-            dataAdapter = ArrayList(it.second)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.fifth.second.isNotEmpty()) {
+                it.fifth.second.forEachIndexed { _, element ->
                     month5Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month5Depot = 0
             }
             month5 = month5Depot - month5With
-        })
 
-        getMonthData(6).observe(this, Observer {
-            dataAdapter = ArrayList(it.first)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.sixth.first.isNotEmpty()) {
+                it.sixth.first.forEachIndexed { _, element ->
                     month6With += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month6With = 0
             }
-            dataAdapter = ArrayList(it.second)
-            if (dataAdapter.isNotEmpty()) {
-                dataAdapter.forEachIndexed { _, element ->
+            if (it.sixth.second.isNotEmpty()) {
+                it.sixth.second.forEachIndexed { _, element ->
                     month6Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
                 }
             } else {
                 month6Depot = 0
             }
             month6 = month6Depot - month6With
+            setUpBarChart()
+            setBalanceHistory()
         })
-        setUpBarChart()
-        setBalanceHistory()
     }
 
     private fun getMonthData(duration: Long): LiveData<Pair<MutableList<TransactionData>,MutableList<TransactionData>>>{
