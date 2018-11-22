@@ -9,8 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
@@ -22,6 +20,7 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
     val repository: TransactionRepository
+    private val transactionService by lazy { genericService()?.create(TransactionService::class.java) }
 
     init {
         val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
@@ -56,8 +55,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         isLoading.value = true
         var recentData: MutableList<TransactionData> = arrayListOf()
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        val transactionService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(TransactionService::class.java)
         transactionService?.getAllTransactions("","", "all")?.enqueue(retrofitCallback({
             response ->
             if (response.isSuccessful) {
@@ -109,8 +106,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                        category: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        val transactionService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(TransactionService::class.java)
         transactionService?.addTransaction(convertString(type),description,date,piggyBankName,billName,
                 amount,sourceName,destinationName,currencyName, category)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
@@ -149,14 +144,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     private fun loadRemoteData(startDate: String?, endDate: String?, source: String){
         isLoading.value = true
-        val transactionService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(TransactionService::class.java)
         transactionService?.getAllTransactions(startDate, endDate, source)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful){
                 val networkData = response.body()
                 if(networkData != null){
                     for(pagination in 1..networkData.meta.pagination.total_pages){
-                        transactionService.getPaginatedTransactions(startDate,endDate, source, pagination).enqueue(retrofitCallback({
+                        transactionService!!.getPaginatedTransactions(startDate,endDate, source, pagination).enqueue(retrofitCallback({
                             respond ->
                             respond.body()?.data?.forEachIndexed{ _, transactionPagination ->
                                 scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionPagination)}

@@ -10,8 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
@@ -24,6 +22,7 @@ import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
 class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
     val repository: PiggyRepository
+    private val piggyService by lazy { genericService()?.create(PiggybankService::class.java) }
 
     init {
         val piggyDataDao = AppDatabase.getInstance(application).piggyDataDao()
@@ -32,8 +31,6 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
     fun getAllPiggyBanks(): LiveData<MutableList<PiggyData>> {
         isLoading.value = true
-        val piggyService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(PiggybankService::class.java)
         piggyService?.getPiggyBanks()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()?.data
@@ -67,8 +64,6 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
     fun deletePiggyById(piggyId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
-        val piggyService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(PiggybankService::class.java)
         piggyService?.deletePiggyBankById(piggyId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
                 scope.async(Dispatchers.IO){
@@ -93,9 +88,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                      targetDate: String?): LiveData<ApiResponses<PiggySuccessModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<PiggySuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<PiggySuccessModel>> = MutableLiveData()
-        val piggyBankService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(PiggybankService::class.java)
-        piggyBankService?.createNewPiggyBank(piggyName, accountId, targetAmount, currentAmount, startDate,
+        piggyService?.createNewPiggyBank(piggyName, accountId, targetAmount, currentAmount, startDate,
                 targetDate, notes)?.enqueue(retrofitCallback({ response ->
             var errorMessage = ""
             val responseErrorBody = response.errorBody()

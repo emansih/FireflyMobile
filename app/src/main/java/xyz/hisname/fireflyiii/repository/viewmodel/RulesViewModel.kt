@@ -1,21 +1,20 @@
 package xyz.hisname.fireflyiii.repository.viewmodel
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.RulesService
+import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.rules.RulesApiResponse
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
-class RulesViewModel: ViewModel() {
+class RulesViewModel(application: Application): BaseViewModel(application) {
 
-    fun getAllRules(baseUrl: String?, accessToken: String?): LiveData<RulesApiResponse>{
+    fun getAllRules(): LiveData<RulesApiResponse>{
         val apiResponse: MediatorLiveData<RulesApiResponse> =  MediatorLiveData()
         val rules: MutableLiveData<RulesApiResponse> = MutableLiveData()
-        val rulesService = RetrofitBuilder.getClient(baseUrl,accessToken)?.create(RulesService::class.java)
-        rulesService?.getAllRules()?.enqueue(retrofitCallback({ response ->
+        genericService()?.create(RulesService::class.java)?.getAllRules()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 rules.value = RulesApiResponse(response.body())
             }

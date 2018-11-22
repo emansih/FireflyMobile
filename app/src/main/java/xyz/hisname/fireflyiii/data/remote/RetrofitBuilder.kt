@@ -15,18 +15,13 @@ class RetrofitBuilder {
 
         @Volatile private var INSTANCE: Retrofit? = null
 
-        fun getClient(baseUrl: String?, accessToken: String?): Retrofit?{
+        fun getClient(baseUrl: String?, accessToken: String?, certPinValue: String): Retrofit?{
             if(INSTANCE == null){
-                val client =  OkHttpClient().newBuilder()
+                val client = OkHttpClient().newBuilder()
                         .addInterceptor(HeaderInterceptor(accessToken))
-                val certPinValue = BuildConfig.CERTPIN
-                val certHost = BuildConfig.CERTHOST
-                if(!certPinValue.isBlank() and !Objects.equals(certPinValue, "CHANGE THIS VALUE") and
-                        certPinValue.endsWith("=") and !certHost.isBlank() and
-                        !Objects.equals(certHost, "CHANGE THIS VALUE")){
-                    // User enabled cert pinning
-                        val certPinner = CertificatePinner.Builder()
-                            .add(certHost, "sha256/$certPinValue")
+                if(!certPinValue.isBlank()){
+                    val certPinner = CertificatePinner.Builder()
+                            .add(baseUrl, "sha256/$certPinValue")
                             .build()
                     client.certificatePinner(certPinner)
                 }
@@ -40,6 +35,7 @@ class RetrofitBuilder {
             }
             return INSTANCE
         }
+
 
 
         fun getClient(baseUrl: String?): Retrofit?{

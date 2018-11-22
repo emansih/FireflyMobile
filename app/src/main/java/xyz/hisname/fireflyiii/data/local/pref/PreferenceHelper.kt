@@ -15,5 +15,7 @@ interface PreferenceHelper {
     var remoteApiVersion: String
     var serverVersion: String
     var userOs: String
+    var enableCertPinning: Boolean
+    var certValue: String
     fun clearPref()
 }

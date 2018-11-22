@@ -95,6 +95,20 @@ class SettingsFragment: PreferenceFragmentCompat() {
             })
             true
         }
+        val certBolean = findPreference("enable_cert_pinning")
+        certBolean.setOnPreferenceChangeListener { _, _ ->
+            RetrofitBuilder.destroyInstance()
+            true
+        }
+        val certValue = findPreference("cert_value")
+        certValue.setOnPreferenceClickListener {
+            RetrofitBuilder.destroyInstance()
+            true
+        }
+        certValue.setOnPreferenceChangeListener{ _,_ ->
+            RetrofitBuilder.destroyInstance()
+            true
+        }
     }
 
     private fun setTransactionSection(){
@@ -108,7 +122,6 @@ class SettingsFragment: PreferenceFragmentCompat() {
            }
             true
         }
-
     }
 
     override fun setDivider(divider: Drawable) {

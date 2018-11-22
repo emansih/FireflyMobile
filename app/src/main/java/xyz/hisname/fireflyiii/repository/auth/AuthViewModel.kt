@@ -35,9 +35,9 @@ class AuthViewModel(application: Application): BaseViewModel(application){
     }
 
     fun getRefreshToken(): LiveData<Boolean>{
-        val oAuthService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl, AppPref(getApplication()).secretKey)?.create(OAuthService::class.java)
-        oAuthService?.getRefreshToken("refresh_token", AppPref(getApplication()).refreshToken,
-                AppPref(getApplication()).clientId, AppPref(getApplication()).secretKey)?.enqueue(retrofitCallback({ response ->
+        genericService()?.create(OAuthService::class.java)?.getRefreshToken("refresh_token",
+                AppPref(getApplication()).refreshToken, AppPref(getApplication()).clientId,
+                AppPref(getApplication()).secretKey)?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
             if(authResponse != null) {
                 AppPref(getApplication()).accessToken = authResponse.access_token

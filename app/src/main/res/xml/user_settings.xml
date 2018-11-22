@@ -1,44 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
         android:title="Account">
 
         <EditTextPreference
-            android:key="fireflyUrl"
-            android:title="Firefly URL">
+            app:key="fireflyUrl"
+            app:title="Firefly URL">
         </EditTextPreference>
 
         <EditTextPreference
-            android:key="access_token"
-            android:title="Access Token">
+            app:key="access_token"
+            app:title="Access Token">
+        </EditTextPreference>
+
+        <SwitchPreference
+            app:key="enable_cert_pinning"
+            app:title="Enable Certificate Pinning">
+        </SwitchPreference>
+
+        <EditTextPreference
+            app:key="cert_value"
+            app:title="Certificate Pinning Hash Value"
+            app:useSimpleSummaryProvider="true"
+            app:dependency="enable_cert_pinning">
+
         </EditTextPreference>
 
         <Preference
-            android:key="auth_method"
-            android:title="Authentication Method">
+            app:key="auth_method"
+            app:title="Authentication Method">
         </Preference>
 
         <Preference
-            android:key="refresh_token"
-            android:title="Refresh Token"
-            android:summary="Click here to refresh your token">
+            app:key="refresh_token"
+            app:title="Refresh Token"
+            app:summary="Click here to refresh your token">
         </Preference>
 
         <Preference
-            android:key="logout"
-            android:title="Logout">
+            app:key="logout"
+            app:title="Logout">
         </Preference>
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Transaction"
-        android:summary="Add Transaction anytime anywhere">
+        app:title="Transaction"
+        app:summary="Add Transaction anytime anywhere">
 
         <CheckBoxPreference
-            android:key="persistent_notification"
-            android:title="Show Notification Shortcut">
+            app:key="persistent_notification"
+            app:title="Show Notification Shortcut">
         </CheckBoxPreference>
 
     </PreferenceCategory>

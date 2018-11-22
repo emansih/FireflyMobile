@@ -8,8 +8,6 @@ import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.AccountsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
@@ -29,6 +27,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     private var loanValue: MutableLiveData<String> = MutableLiveData()
     val repository: AccountRepository
     var accountData: MutableList<AccountData>? = null
+    private val accountsService by lazy { genericService()?.create(AccountsService::class.java) }
 
     init {
         val accountDao = AppDatabase.getInstance(application).accountDataDao()
@@ -132,8 +131,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     fun deleteAccountById(accountId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
-        val accountsService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(AccountsService::class.java)
         accountsService?.deleteAccountById(accountId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
                 scope.async(Dispatchers.IO){
@@ -173,8 +170,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         isLoading.value = true
         val apiResponse: MediatorLiveData<ApiResponses<AccountSuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<AccountSuccessModel>> = MutableLiveData()
-        val accountsService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(AccountsService::class.java)
         accountsService?.addAccount(accountName, accountType, currencyCode,1, includeNetWorth,
                 accountRole, ccType, ccMonthlyPaymentDate, liabilityType, liabilityAmount, liabilityStartDate,
                 interest, interestPeriod, accountNumber)?.enqueue(retrofitCallback({ response ->
@@ -228,14 +223,12 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     private fun loadRemoteData(source: String){
         isLoading.value = true
-        val accountsService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl,
-                AppPref(getApplication()).accessToken)?.create(AccountsService::class.java)
         accountsService?.getAccountType(source)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful){
                 val networkData = response.body()
                 if(networkData != null){
                     for(pagination in 1..networkData.meta.pagination.total_pages){
-                        accountsService.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({
+                        accountsService!!.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({
                             respond ->
                             respond.body()?.data?.forEachIndexed{ _, accountPagination ->
                                 scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination)}

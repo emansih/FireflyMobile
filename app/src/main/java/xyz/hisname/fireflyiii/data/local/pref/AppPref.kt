@@ -69,5 +69,13 @@ class AppPref(context: Context): PreferenceHelper {
         get() = sharedPref.getString("user_os", "") ?: ""
         set(value) = sharedPref.edit { putString("user_os", value) }
 
+    override var certValue
+        get() = sharedPref.getString("cert_value", "") ?: ""
+        set(value) = sharedPref.edit { putString("cert_value", value) }
+
+    override var enableCertPinning
+        get() = sharedPref.getBoolean("enable_cert_pinning", false)
+        set(value) = sharedPref.edit{ putBoolean("enable_cert_pinning", value)}
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }
