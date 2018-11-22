@@ -65,19 +65,19 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
         setUpOreo(Constants.TRANSACTION_CHANNEL, "Transaction", "Shows Persistent Transaction Notifications")
         val expenseIntent = Intent(this, GenericReceiver::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("transaction_notif", "expense")
+            putExtra("transaction_notif", "Withdrawal")
         }
         val expensePendingIntent: PendingIntent =
                 PendingIntent.getBroadcast(this, 0, expenseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         val incomeIntent = Intent(this, GenericReceiver::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("transaction_notif", "income")
+            putExtra("transaction_notif", "Deposit")
         }
         val incomePendingIntent: PendingIntent =
                 PendingIntent.getBroadcast(this, 1, incomeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         val transferIntent = Intent(this, GenericReceiver::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("transaction_notif", "transfer")
+            putExtra("transaction_notif", "Transfer")
         }
         val transferPendingIntent: PendingIntent =
                 PendingIntent.getBroadcast(this, 2, transferIntent, PendingIntent.FLAG_UPDATE_CURRENT)

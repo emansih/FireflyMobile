@@ -16,9 +16,9 @@ class GenericReceiver: BroadcastReceiver(){
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             when (action) {
-                "expense" -> trans.putExtra("transaction", "expense")
-                "income" -> trans.putExtra("transaction", "income")
-                "transfer" -> trans.putExtra("transaction", "transfer")
+                "Deposit" -> trans.putExtra("transaction", "Deposit")
+                "Withdrawal" -> trans.putExtra("transaction", "Withdrawal")
+                "Transfer" -> trans.putExtra("transaction", "Transfer")
             }
             context.startActivity(trans)
         }

@@ -50,16 +50,16 @@ class HomeActivity: BaseActivity(){
         if(intent.getStringExtra("transaction") != null) {
             val transaction = intent.getStringExtra("transaction")
             when (transaction) {
-                "expense" -> {
+                "Withdrawal" -> {
                     val bundle = bundleOf("transactionType" to "Withdrawal")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
                 }
-                "income" -> {
+                "Deposit" -> {
                     val bundle = bundleOf("transactionType" to "Deposit")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
 
                 }
-                "transfer" -> {
+                "Transfer" -> {
                     val bundle = bundleOf("transactionType" to "Transfer")
                     changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
                 }
@@ -332,8 +332,7 @@ class HomeActivity: BaseActivity(){
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount >= 1){
                 when {
-                    supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment /*||
-                            supportFragmentManager.findFragmentByTag("wallet") is ListAccountFragment*/ -> {
+                    supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment -> {
                         val drawerLayout = result?.drawerLayout
                         drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                         result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false

@@ -61,6 +61,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".GenericReceiver">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+    </receiver>
+
     </application>
 
 

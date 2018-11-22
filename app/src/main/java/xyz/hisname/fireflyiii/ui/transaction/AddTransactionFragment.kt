@@ -293,7 +293,7 @@ class AddTransactionFragment: BaseFragment() {
         val bundle = bundleOf("transactionType" to transactionType)
         requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, TransactionFragment().apply { arguments = bundle })
-                .commit()
+                .commitAllowingStateLoss()
         super.onDestroyView()
     }
 }
