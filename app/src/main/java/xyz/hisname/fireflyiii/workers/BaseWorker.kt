@@ -1,8 +1,6 @@
 package xyz.hisname.fireflyiii.workers
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import xyz.hisname.fireflyiii.data.local.pref.AppPref

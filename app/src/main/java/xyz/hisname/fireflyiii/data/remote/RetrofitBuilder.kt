@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.data.remote
 
+import android.util.Base64
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -20,10 +21,14 @@ class RetrofitBuilder {
                 val client = OkHttpClient().newBuilder()
                         .addInterceptor(HeaderInterceptor(accessToken))
                 if(!certPinValue.isBlank()){
-                    val certPinner = CertificatePinner.Builder()
-                            .add(baseUrl, "sha256/$certPinValue")
-                            .build()
-                    client.certificatePinner(certPinner)
+                    try {
+                        val certPinner = CertificatePinner.Builder()
+                                .add(baseUrl, "sha256/" +
+                                        Base64.decode(certPinValue, Base64.DEFAULT)
+                                                .toString(Charsets.UTF_8))
+                                .build()
+                        client.certificatePinner(certPinner)
+                    } catch (exception: IllegalArgumentException){ }
                 }
                 synchronized(RetrofitBuilder::class.java){
                     INSTANCE = Retrofit.Builder()

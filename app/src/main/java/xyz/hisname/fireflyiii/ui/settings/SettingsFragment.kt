@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.ui.settings
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -8,6 +9,7 @@ import androidx.preference.PreferenceFragmentCompat
 import xyz.hisname.fireflyiii.R
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.util.Base64
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Observer
@@ -105,7 +107,17 @@ class SettingsFragment: PreferenceFragmentCompat() {
             RetrofitBuilder.destroyInstance()
             true
         }
-        certValue.setOnPreferenceChangeListener{ _,_ ->
+        certValue.setOnPreferenceChangeListener{ _, newValue ->
+            try {
+                Base64.decode(newValue.toString(), Base64.DEFAULT).toString(Charsets.UTF_8)
+            }catch (exception: IllegalArgumentException){
+                AlertDialog.Builder(requireContext())
+                        .setTitle("Error parsing Certificate pin value")
+                        .setMessage("Your certificate pin is not a valid base64 value. The app will continue" +
+                                " to work but you should note that certificate pinning is now useless.")
+                        .setPositiveButton("OK") { _, _ -> }
+                        .show()
+            }
             RetrofitBuilder.destroyInstance()
             true
         }
