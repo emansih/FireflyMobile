@@ -20,6 +20,12 @@
         </Preference>
 
         <Preference
+            android:key="refresh_token"
+            android:title="Refresh Token"
+            android:summary="Click here to refresh your token">
+        </Preference>
+
+        <Preference
             android:key="logout"
             android:title="Logout">
         </Preference>

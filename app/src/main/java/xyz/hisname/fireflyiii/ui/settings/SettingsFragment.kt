@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.Observer
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import kotlinx.android.synthetic.main.activity_base.*
@@ -17,15 +18,20 @@ import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
+import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.toastInfo
+import xyz.hisname.fireflyiii.util.extension.toastSuccess
 import java.util.*
 
 
 class SettingsFragment: PreferenceFragmentCompat() {
 
     private val authMethodPref by lazy { AppPref(requireContext()).authMethod }
+    private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -75,6 +81,18 @@ class SettingsFragment: PreferenceFragmentCompat() {
             startActivity(loginActivity)
             RetrofitBuilder.destroyInstance()
             requireActivity().finish()
+            true
+        }
+        val refreshToken = findPreference("refresh_token")
+        refreshToken.setOnPreferenceClickListener {
+            toastInfo("Refreshing your token...")
+            authViewModel.getRefreshToken().observe(this, Observer { success ->
+                if(success){
+                    toastSuccess("Token refresh success!")
+                } else {
+                    toastError("There was an error refreshing your token")
+                }
+            })
             true
         }
     }
