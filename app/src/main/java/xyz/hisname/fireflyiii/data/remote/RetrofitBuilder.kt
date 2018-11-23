@@ -45,22 +45,9 @@ class RetrofitBuilder {
 
         fun getClient(baseUrl: String?): Retrofit?{
             if(INSTANCE == null){
-                val client =  OkHttpClient().newBuilder()
-                val certPinValue = BuildConfig.CERTPIN
-                val certHost = BuildConfig.CERTHOST
-                if(!certPinValue.isBlank() and !Objects.equals(certPinValue, "CHANGE THIS VALUE") and
-                        certPinValue.endsWith("=") and !certHost.isBlank() and
-                        !Objects.equals(certHost, "CHANGE THIS VALUE")){
-                    // User enabled cert pinning
-                    val certPinner = CertificatePinner.Builder()
-                            .add(certHost, "sha256/$certPinValue")
-                            .build()
-                    client.certificatePinner(certPinner)
-                }
                 synchronized(RetrofitBuilder::class.java){
                     INSTANCE = Retrofit.Builder()
                             .baseUrl(generateUrl(baseUrl))
-                            .client(client.build())
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()
                 }
