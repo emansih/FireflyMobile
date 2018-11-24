@@ -13,6 +13,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
+import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
@@ -31,6 +32,7 @@ class OnboardingFragment: Fragment() {
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
+    private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -53,13 +55,17 @@ class OnboardingFragment: Fragment() {
             ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
         })
         billViewModel.getAllBills()
+        budgetViewModel.retrieveAllBudgetLimits().observe(this, Observer {
+            onboarding_text.text = "Just hang in there..."
+            ObjectAnimator.ofInt(onboarding_progress,"progress", 70).start()
+        })
         categoryViewModel.getAllCategory()
         accountViewModel.getAllAccounts().observe(this, Observer {
-            onboarding_text.text = "Almost there!"
             ObjectAnimator.ofInt(onboarding_progress,"progress", 80).start()
         })
         currency.getCurrency()
         userInfoViewModel.getUser().observe(this, Observer {
+            onboarding_text.text = "Almost there!"
             ObjectAnimator.ofInt(onboarding_progress,"progress", 95).start()
         })
         userInfoViewModel.userSystem().observe(this, Observer {

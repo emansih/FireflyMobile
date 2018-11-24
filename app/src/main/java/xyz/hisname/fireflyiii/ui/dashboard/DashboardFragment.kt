@@ -26,7 +26,7 @@ class DashboardFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         swipeContainer.isRefreshing = true
-        animateCard(overviewFrame,walletFrame,recentTransactionFrame)
+        animateCard(overviewFrame,walletFrame,budgetFrame, recentTransactionFrame)
         swipeContainer.isRefreshing = false
         setRefreshing()
     }
@@ -35,8 +35,8 @@ class DashboardFragment: BaseFragment() {
         for(frames in frameLayout){
             frames.translationY = DeviceUtil.getScreenHeight(requireContext()).toFloat()
             frames.animate()
-                    .translationY(0.toFloat())
-                    .setInterpolator(DecelerateInterpolator(5.toFloat()))
+                    .translationY(0f)
+                    .setInterpolator(DecelerateInterpolator(5f))
                     .setDuration(3000)
                     .start()
         }
@@ -52,6 +52,9 @@ class DashboardFragment: BaseFragment() {
                 .replace(R.id.walletFrame, WalletFragment())
                 .commit()
         requireFragmentManager().beginTransaction()
+                .replace(R.id.budgetFrame, BudgetFragment())
+                .commit()
+        requireFragmentManager().beginTransaction()
                 .replace(R.id.recentTransactionFrame, RecentTransactionFragment().apply { arguments = bundle })
                 .commit()
     }
@@ -61,8 +64,9 @@ class DashboardFragment: BaseFragment() {
             swipeContainer.isRefreshing = true
             requireFragmentManager().beginTransaction().remove(OverviewFragment()).commit()
             requireFragmentManager().beginTransaction().remove(WalletFragment()).commit()
+            requireFragmentManager().beginTransaction().remove(BudgetFragment()).commit()
             requireFragmentManager().beginTransaction().remove(RecentTransactionFragment()).commit()
-            animateCard(overviewFrame,walletFrame,recentTransactionFrame)
+            animateCard(overviewFrame,walletFrame,budgetFrame,recentTransactionFrame)
             swipeContainer.isRefreshing = false
         }
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
