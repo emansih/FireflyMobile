@@ -48,31 +48,31 @@ class OnboardingFragment: Fragment() {
         ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
         RetrofitBuilder.destroyInstance()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 20).start()
-        transaction.getAllData(DateTimeUtil.getStartOfMonth(6), DateTimeUtil.getEndOfMonth()).observe(this, Observer {
-            ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
-        })
-        piggyViewModel.getAllPiggyBanks().observe(this, Observer {
+        zipLiveData(transaction.getAllData(DateTimeUtil.getStartOfMonth(6),
+                DateTimeUtil.getTodayDate()), piggyViewModel.getAllPiggyBanks(), billViewModel.getAllBills(),
+                currency.getCurrency(), categoryViewModel.getAllCategory(),
+                accountViewModel.getAllAccounts())
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()
+        accountViewModel.getAllAccounts().observe(this, Observer {
             ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
-        })
-        billViewModel.getAllBills()
-        budgetViewModel.retrieveAllBudgetLimits().observe(this, Observer {
             onboarding_text.text = "Just hang in there..."
+        })
+        accountViewModel.getAllAccounts().observe(this, Observer {
             ObjectAnimator.ofInt(onboarding_progress,"progress", 70).start()
         })
-        categoryViewModel.getAllCategory()
-        accountViewModel.getAllAccounts().observe(this, Observer {
+        budgetViewModel.retrieveAllBudgetLimits().observe(this, Observer {
             ObjectAnimator.ofInt(onboarding_progress,"progress", 80).start()
-        })
-        currency.getCurrency()
-        userInfoViewModel.getUser().observe(this, Observer {
             onboarding_text.text = "Almost there!"
-            ObjectAnimator.ofInt(onboarding_progress,"progress", 95).start()
         })
-        userInfoViewModel.userSystem().observe(this, Observer {
+        budgetViewModel.retrieveAllBudget().observe(this, Observer {
+            ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
+        })
+        zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem()).observe(this, Observer {
             startActivity(Intent(requireActivity(), HomeActivity::class.java))
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             requireActivity().finish()
         })
+
     }
 
 

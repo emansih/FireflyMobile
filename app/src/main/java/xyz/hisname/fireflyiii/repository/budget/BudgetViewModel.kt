@@ -8,7 +8,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.BudgetLimitService
+import xyz.hisname.fireflyiii.data.remote.api.BudgetService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.models.budget.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.limit.BudgetLimitData
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.retrofitCallback
@@ -17,22 +19,29 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
 
     val repository: BudgetRepository
     private val budgetLimitService by lazy { genericService()?.create(BudgetLimitService::class.java) }
+    private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
     private var currentMonthBudgetLimit = 0.toDouble()
     private var currentMonthBudgetValue: MutableLiveData<String> = MutableLiveData()
 
     init {
-        val accountDao = AppDatabase.getInstance(application).budgetDataDao()
-        repository = BudgetRepository(accountDao)
+        val budgetLimitDao = AppDatabase.getInstance(application).budgetLimitDataDao()
+        val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
+        repository = BudgetRepository(budgetLimitDao, budgetDao)
     }
 
     fun retrieveAllBudgetLimits(): LiveData<MutableList<BudgetLimitData>> {
-        loadRemoteData()
+        loadRemoteLimit()
         return repository.allBudgetLimits
+    }
+
+    fun retrieveAllBudget(): LiveData<MutableList<BudgetData>>{
+        loadRemoteBudget()
+        return repository.allBudget
     }
 
     fun retrieveCurrentMonthBudget(): LiveData<String>{
         var budgetLimitData: MutableList<BudgetLimitData>? = null
-        loadRemoteData()
+        loadRemoteLimit()
         currentMonthBudgetLimit = 0.toDouble()
         scope.async(Dispatchers.IO){
             budgetLimitData = repository.retrieveConstraintBudget(DateTimeUtil.getStartOfMonth(),
@@ -50,7 +59,35 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         return currentMonthBudgetValue
     }
 
-    private fun loadRemoteData(){
+    private fun loadRemoteBudget(){
+        isLoading.value = true
+        budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful){
+                val networkData = response.body()
+                if(networkData != null){
+                    for(pagination in 1..networkData.meta.pagination.total_pages){
+                        budgetService!!.getPaginatedBudget(pagination).enqueue(retrofitCallback({
+                            respond ->
+                            respond.body()?.budgetData?.forEachIndexed{ _, budgetList ->
+                                scope.launch(Dispatchers.IO) { repository.insertBudget(budgetList)}
+                            }
+                        }))
+                    }
+                }
+
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    apiResponse.postValue(errorBody)
+                }
+            }
+        })
+        { throwable -> apiResponse.postValue(throwable.localizedMessage) })
+        isLoading.value = false
+    }
+
+    private fun loadRemoteLimit(){
         isLoading.value = true
         budgetLimitService?.getAllBudgetLimits()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful){
@@ -59,7 +96,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     for(pagination in 1..networkData.meta.pagination.total_pages){
                         budgetLimitService!!.getPaginatedBudgetLimits(pagination).enqueue(retrofitCallback({
                             respond ->
-                            respond.body()?.budgetData?.forEachIndexed{ _, budgetList ->
+                            respond.body()?.budgetLimitData?.forEachIndexed{ _, budgetList ->
                                 scope.launch(Dispatchers.IO) { repository.insertBudgetLimit(budgetList)}
                             }
                         }))

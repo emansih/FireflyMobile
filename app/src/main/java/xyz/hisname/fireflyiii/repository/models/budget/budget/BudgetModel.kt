@@ -1,11 +1,11 @@
-package xyz.hisname.fireflyiii.repository.models.budget.limit
+package xyz.hisname.fireflyiii.repository.models.budget.budget
 
 import androidx.room.Embedded
 import com.google.gson.annotations.SerializedName
 
-data class BudgetLimitModel(
+data class BudgetModel(
         @Embedded
         @SerializedName("data")
-        val budgetLimitData: List<BudgetLimitData>,
+        val budgetData: List<BudgetData>,
         val meta: Meta
 )
