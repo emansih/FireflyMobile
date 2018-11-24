@@ -18,5 +18,7 @@ data class BudgetLimitData(
         @Ignore
         var links: Links? = null,
         @Ignore
-        var type: String = ""
+        var type: String = "",
+        @Embedded
+        var relationships: Relationships? = null
 )

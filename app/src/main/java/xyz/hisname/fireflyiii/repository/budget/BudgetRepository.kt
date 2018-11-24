@@ -23,7 +23,7 @@ class BudgetRepository(private val budgetLimitDao: BudgetLimitDataDao, private v
         budget.insert(budgetData)
     }
 
-            @Suppress("RedundantSuspendModifier")
+    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun retrieveConstraintBudget(startDate: String, endDate: String): MutableList<BudgetLimitData>{
         return budgetLimitDao.getConstraintBudget(startDate, endDate)
