@@ -1,5 +1,7 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
+import android.accounts.Account
+import android.accounts.AccountManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,9 +12,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants
@@ -30,6 +34,9 @@ class LoginFragment: Fragment() {
 
     private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
     private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
+    private var baseUrlLiveData: MutableLiveData<String> = MutableLiveData()
+    private var clientIdLiveData: MutableLiveData<String> = MutableLiveData()
+    private var secretKeyLiveData: MutableLiveData<String> = MutableLiveData()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -41,9 +48,15 @@ class LoginFragment: Fragment() {
         val argument = arguments?.getString("ACTION")
         when {
             Objects.equals(argument, "LOGIN") -> {
-                firefly_url_edittext.setText( AppPref(requireContext()).baseUrl)
-                firefly_id_edittext.setText(AppPref(requireContext()).clientId)
-                firefly_secret_edittext.setText(AppPref(requireContext()).secretKey)
+                baseUrlLiveData.observe(this, Observer {
+                    firefly_url_edittext.setText(it)
+                })
+                clientIdLiveData.observe(this, Observer {
+                    firefly_id_edittext.setText(it)
+                })
+                secretKeyLiveData.observe(this, Observer {
+                    firefly_secret_edittext.setText(it)
+                })
                 getAccessCode()
             }
             Objects.equals(argument, "REFRESH_TOKEN") -> {
@@ -74,12 +87,12 @@ class LoginFragment: Fragment() {
                 }
             } else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
-                AppPref(requireContext()).baseUrl = fireflyUrl
-                AppPref(requireContext()).clientId = fireflyId
-                AppPref(requireContext()).secretKey = fireflySecretKey
+                baseUrlLiveData.value = fireflyUrl
                 if(!fireflyUrl.startsWith("http")){
                     fireflyUrl = "https://$fireflyUrl"
                 }
+                clientIdLiveData.value = fireflyId
+                secretKeyLiveData.value = fireflySecretKey
                 val builder = CustomTabsIntent.Builder()
                 builder.build().launchUrl(requireContext(), ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
                         "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri())
@@ -121,6 +134,13 @@ class LoginFragment: Fragment() {
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             val code = uri.getQueryParameter("code")
             if(code != null) {
+                AccountManager.get(context).addAccountExplicitly(Account("Firefly III Mobile", "OAUTH"),
+                        "", bundleOf())
+                AppPref(requireContext()).apply {
+                    baseUrl = baseUrlLiveData.value ?: ""
+                    secretKey = secretKeyLiveData.value ?: ""
+                    clientId = clientIdLiveData.value ?: ""
+                }
                 authViewModel.getAccessToken(code).observe(this, Observer {
                     if(it == true){
                         AppPref(requireContext()).authMethod = "oauth"

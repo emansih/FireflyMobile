@@ -1,35 +1,48 @@
 package xyz.hisname.fireflyiii.data.local.pref
 
+import android.accounts.Account
+import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.core.content.edit
+import androidx.core.os.bundleOf
 import java.util.concurrent.TimeUnit
 
 class AppPref(context: Context): PreferenceHelper {
 
     private val sharedPref: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
+    private val account by lazy { Account("Firefly III Mobile", "OAUTH") }
+    private val accountManager by lazy { AccountManager.get(context) }
 
     override var baseUrl
         get() = sharedPref.getString("fireflyUrl", "") ?: ""
         set(value) = sharedPref.edit { putString("fireflyUrl", value) }
 
-
     override var secretKey
-        get() = sharedPref.getString("fireflySecretKey", "") ?: ""
-        set(value) = sharedPref.edit { putString("fireflySecretKey", value) }
+        get() = accountManager.getUserData(account, "SECRET_KEY") ?: ""
+        set(value) {
+            accountManager.setUserData(account, "SECRET_KEY", value)
+        }
 
     override var accessToken
-        get() = sharedPref.getString("access_token", "") ?: ""
-        set(value) = sharedPref.edit { putString("access_token", value) }
+        get() = accountManager.getUserData(account, "ACCESS_TOKEN") ?: ""
+        set(value) {
+            accountManager.setUserData(account, "ACCESS_TOKEN", value)
+        }
 
     override var clientId
-        get() = sharedPref.getString("fireflyId", "") ?: ""
-        set(value) = sharedPref.edit { putString("fireflyId", value) }
+        get() = accountManager.getUserData(account, "CLIENT_ID") ?: ""
+        set(value) {
+            accountManager.setUserData(account, "CLIENT_ID", value)
+        }
+
 
     override var refreshToken
-        get() = sharedPref.getString("refresh_token", "") ?: ""
-        set(value) = sharedPref.edit { putString("refresh_token", value) }
+        get() = accountManager.getUserData(account, "REFRESH_TOKEN") ?: ""
+        set(value) {
+            accountManager.setUserData(account, "REFRESH_TOKEN", value)
+        }
 
     override var authMethod
         get() = sharedPref.getString("auth_method", "") ?: ""
@@ -40,17 +53,19 @@ class AppPref(context: Context): PreferenceHelper {
         set(value) = sharedPref.edit { putBoolean("persistent_notification", value) }
 
     override var tokenExpiry
-        get() = sharedPref.getLong("expires_at", 0L)
+        get() = sharedPref.getLong("token_expires_in", 0L)
         set(value) {
             sharedPref.edit {
-                putLong("expires_at", (System.currentTimeMillis() +
+                putLong("token_expires_in", (System.currentTimeMillis() +
                         TimeUnit.MINUTES.toMillis(value)))
             }
         }
 
     override var userEmail
-        get() = sharedPref.getString("userEmail", "") ?: ""
-        set(value) = sharedPref.edit { putString("userEmail", value) }
+        get() = accountManager.getUserData(account, "USER_EMAIL") ?: ""
+        set(value) {
+            accountManager.setUserData(account, "USER_EMAIL", value)
+        }
 
 
     override var userRole

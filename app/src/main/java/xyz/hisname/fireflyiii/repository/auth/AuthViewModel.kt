@@ -10,7 +10,7 @@ import xyz.hisname.fireflyiii.data.remote.api.OAuthService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
-class AuthViewModel(application: Application): BaseViewModel(application){
+class AuthViewModel(application: Application): BaseViewModel(application) {
 
     private val isAuthenticated: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -20,7 +20,7 @@ class AuthViewModel(application: Application): BaseViewModel(application){
         oAuthService?.getAccessToken(code, AppPref(getApplication()).clientId, AppPref(getApplication()).secretKey,
                 Constants.REDIRECT_URI, "authorization_code")?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
-            if(authResponse != null) {
+            if (authResponse != null) {
                 AppPref(getApplication()).accessToken = authResponse.access_token
                 AppPref(getApplication()).refreshToken = authResponse.refresh_token
                 AppPref(getApplication()).tokenExpiry = authResponse.expires_in
@@ -34,12 +34,12 @@ class AuthViewModel(application: Application): BaseViewModel(application){
         return isAuthenticated
     }
 
-    fun getRefreshToken(): LiveData<Boolean>{
+    fun getRefreshToken(): LiveData<Boolean> {
         genericService()?.create(OAuthService::class.java)?.getRefreshToken("refresh_token",
                 AppPref(getApplication()).refreshToken, AppPref(getApplication()).clientId,
                 AppPref(getApplication()).secretKey)?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
-            if(authResponse != null) {
+            if (authResponse != null) {
                 AppPref(getApplication()).accessToken = authResponse.access_token
                 AppPref(getApplication()).refreshToken = authResponse.refresh_token
                 AppPref(getApplication()).tokenExpiry = authResponse.expires_in

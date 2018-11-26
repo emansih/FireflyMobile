@@ -38,13 +38,11 @@ class PatFragment: Fragment() {
                 }
             }  else {
                 fireflyUrl = firefly_url_edittext.getString()
+                AppPref(requireContext()).baseUrl = fireflyUrl
+                AppPref(requireContext()).secretKey = firefly_secret_edittext.getString()
                 model.getAllAccounts().observe(this, Observer { accountData ->
                     if(accountData != null){
-                        AppPref(requireContext()).apply {
-                            baseUrl = fireflyUrl
-                            secretKey = firefly_secret_edittext.getString()
-                            authMethod = "pat"
-                        }
+                        AppPref(requireContext()).authMethod = "pat"
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
                         requireActivity().supportFragmentManager.beginTransaction()
