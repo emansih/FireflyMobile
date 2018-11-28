@@ -87,7 +87,9 @@ are signed with the same release key, this ensure that the APK comes from me and
 
 To get latest update notifications, add [this RSS feed](https://github.com/emansih/FireflyMobile/releases.atom). 
 
-An attempt has been made to [include this software on Fdroid](https://gitlab.com/fdroid/fdroiddata/merge_requests/3910). If there is enough interest, I might upload it to Google Play Store.
+It's also available via F-Droid [here](https://f-droid.org/packages/xyz.hisname.fireflyiii/).
+
+If there is enough interest, I might upload it to Google Play Store.
 
 ### Authentication
 In order to start using this software, you have to create a new client in your Firefly Instance. 
