@@ -1,5 +1,9 @@
 ### Firefly III(Android)
 
+[<img src="https://f-droid.org/badge/get-it-on.png"
+      alt="Get it on F-Droid"
+      height="80">](https://f-droid.org/packages/xyz.hisname.fireflyiii/)
+
 An unofficial Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 
 ### Disclaimer
