@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -88,14 +87,18 @@ class LoginFragment: Fragment() {
             } else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 baseUrlLiveData.value = fireflyUrl
-                if(!fireflyUrl.startsWith("http")){
+                if (!fireflyUrl.startsWith("http")) {
                     fireflyUrl = "https://$fireflyUrl"
                 }
                 clientIdLiveData.value = fireflyId
                 secretKeyLiveData.value = fireflySecretKey
-                val builder = CustomTabsIntent.Builder()
-                builder.build().launchUrl(requireContext(), ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
-                        "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri())
+                val intent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
+                "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri())
+                if (intent.resolveActivity(requireActivity().packageManager) != null){
+                    startActivity(intent)
+                } else {
+                    toastError("No apps on your device can handle OAuth")
+                }
             }
         }
     }
