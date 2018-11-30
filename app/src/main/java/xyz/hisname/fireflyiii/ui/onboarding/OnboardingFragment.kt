@@ -47,6 +47,7 @@ class OnboardingFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+//        setRefreshWorker()
         getUser()
     }
 
@@ -54,7 +55,6 @@ class OnboardingFragment: Fragment() {
         ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
         RetrofitBuilder.destroyInstance()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 20).start()
-        setRefreshWorker()
         zipLiveData(transaction.getAllData(DateTimeUtil.getStartOfMonth(6),
                 DateTimeUtil.getTodayDate()), piggyViewModel.getAllPiggyBanks(), billViewModel.getAllBills(),
                 currency.getCurrency(), categoryViewModel.getAllCategory(),
