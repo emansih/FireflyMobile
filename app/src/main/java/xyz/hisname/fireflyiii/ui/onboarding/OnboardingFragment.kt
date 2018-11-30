@@ -60,13 +60,6 @@ class OnboardingFragment: Fragment() {
                 currency.getCurrency(), categoryViewModel.getAllCategory(),
                 accountViewModel.getAllAccounts())
         ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()
-        accountViewModel.getAllAccounts().observe(this, Observer {
-            ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
-            onboarding_text.text = "Just hang in there..."
-        })
-        accountViewModel.getAllAccounts().observe(this, Observer {
-            ObjectAnimator.ofInt(onboarding_progress,"progress", 70).start()
-        })
         budgetViewModel.retrieveAllBudgetLimits().observe(this, Observer {
             ObjectAnimator.ofInt(onboarding_progress,"progress", 80).start()
             onboarding_text.text = "Almost there!"
