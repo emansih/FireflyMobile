@@ -58,7 +58,7 @@ class AuthenticatorManager(private val accountManager: AccountManager): AccountH
     }
 
     override fun isTokenValid(): Boolean{
-        return System.currentTimeMillis() <= tokenExpiry
+        return System.currentTimeMillis() >= tokenExpiry
     }
 
 }
