@@ -27,6 +27,7 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 
 class AddTransactionFragment: BaseFragment() {
@@ -53,13 +54,15 @@ class AddTransactionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+        // TODO: Code clean up!
         when {
             Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(), piggyViewModel.getAllPiggyBanks())
                     .observe(this, Observer {
                         it.first.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
                         }
-                        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
+                        val uniqueValues = HashSet(accounts).toArray()
+                        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueValues)
                         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         sourceSpinner.isVisible = true
                         sourceAutoComplete.isGone = true
@@ -70,33 +73,41 @@ class AddTransactionFragment: BaseFragment() {
                         it.second.forEachIndexed { _,piggyData ->
                             piggyBank.add(piggyData.piggyAttributes?.name!!)
                         }
-                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, piggyBank)
+                        val uniquePiggy = HashSet(piggyBank).toArray()
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniquePiggy)
                         piggyBankName.threshold = 1
                         piggyBankName.setAdapter(adapter)
                     })
-            Objects.equals(transactionType, "Deposit") -> accountViewModel.getRevenueAccounts()
+            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAssetAccounts())
                     .observe(this , Observer {
-                        it.forEachIndexed { _, accountData ->
+                        // Revenue account, autocomplete
+                        it.first.forEachIndexed { _, accountData ->
                             sourceAccounts.add(accountData.accountAttributes?.name!!)
+                        }
+                        // Asset account, spinner
+                        it.second.forEachIndexed { _, accountData ->
                             destinationAccounts.add(accountData.accountAttributes?.name!!)
                         }
-                        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, destinationAccounts)
+                        val uniqueSource = HashSet(sourceAccounts).toArray()
+                        val uniqueDestination = HashSet(destinationAccounts).toArray()
+                        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueDestination)
                         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         destinationSpinner.adapter = spinnerAdapter
                         destinationAutoComplete.isVisible = false
-                        val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, sourceAccounts)
+                        val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueSource)
                         sourceAutoComplete.threshold = 1
                         sourceAutoComplete.setAdapter(autocompleteAdapter)
                         sourceSpinner.isVisible = false
                     })
             else -> {
-                zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAllAccounts())
+                zipLiveData(accountViewModel.getAssetAccounts(), accountViewModel.getExpenseAccounts())
                         .observe(this, Observer {
                             // Spinner for source account
                             it.first.forEachIndexed { _, accountData ->
                                 sourceAccounts.add(accountData.accountAttributes?.name!!)
                             }
-                            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sourceAccounts)
+                            val uniqueSource = HashSet(sourceAccounts).toArray()
+                            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueSource)
                             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                             sourceAutoComplete.isVisible = false
                             sourceSpinner.adapter = adapter
@@ -104,7 +115,8 @@ class AddTransactionFragment: BaseFragment() {
                             it.second.forEachIndexed { _, accountData ->
                                 destinationAccounts.add(accountData.accountAttributes?.name!!)
                             }
-                            val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, destinationAccounts)
+                            val uniqueDestination = HashSet(destinationAccounts).toArray()
+                            val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueDestination)
                             destinationAutoComplete.threshold = 1
                             destinationAutoComplete.setAdapter(autocompleteAdapter)
                             destinationSpinner.isVisible = false
@@ -114,7 +126,8 @@ class AddTransactionFragment: BaseFragment() {
                         it.forEachIndexed { _,billData ->
                             bill.add(billData.billAttributes?.name!!)
                         }
-                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
+                        val uniqueBill = HashSet(bill).toArray()
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueBill)
                         billEditText.threshold = 1
                         billEditText.setAdapter(adapter)
                     }
@@ -226,6 +239,7 @@ class AddTransactionFragment: BaseFragment() {
                 ).observe(this, Observer { transactionResponse ->
                     val errorMessage = transactionResponse.getErrorMessage()
                     if (transactionResponse.getResponse() != null) {
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         toastSuccess("Transaction Added")
                         requireFragmentManager().popBackStack()
                     } else if(errorMessage != null){
