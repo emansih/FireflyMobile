@@ -1,9 +1,9 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
-import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +11,6 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
@@ -20,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
@@ -36,6 +36,8 @@ class LoginFragment: Fragment() {
     private var baseUrlLiveData: MutableLiveData<String> = MutableLiveData()
     private var clientIdLiveData: MutableLiveData<String> = MutableLiveData()
     private var secretKeyLiveData: MutableLiveData<String> = MutableLiveData()
+    private val accManager by lazy { AuthenticatorManager(AccountManager.get(requireContext())) }
+    private val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -120,7 +122,7 @@ class LoginFragment: Fragment() {
     }
 
     private fun startHomeIntent(){
-        if(AppPref(requireContext()).isTransactionPersistent){
+        if(AppPref(sharedPref).isTransactionPersistent){
             NotificationUtils(requireContext()).showTransactionPersistentNotification()
         }
         GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
@@ -137,16 +139,15 @@ class LoginFragment: Fragment() {
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             val code = uri.getQueryParameter("code")
             if(code != null) {
-                AccountManager.get(context).addAccountExplicitly(Account("Firefly III Mobile", "OAUTH"),
-                        "", bundleOf())
-                AppPref(requireContext()).apply {
-                    baseUrl = baseUrlLiveData.value ?: ""
+                AppPref(sharedPref).baseUrl = baseUrlLiveData.value ?: ""
+                accManager.initializeAccount()
+                accManager.apply {
                     secretKey = secretKeyLiveData.value ?: ""
                     clientId = clientIdLiveData.value ?: ""
                 }
                 authViewModel.getAccessToken(code).observe(this, Observer {
                     if(it == true){
-                        AppPref(requireContext()).authMethod = "oauth"
+                        accManager.authMethod = "oauth"
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)

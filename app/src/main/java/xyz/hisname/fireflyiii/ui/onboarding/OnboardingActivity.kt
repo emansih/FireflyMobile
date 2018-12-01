@@ -1,14 +1,17 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
+import android.accounts.AccountManager
 import android.animation.Animator
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.animation.AccelerateInterpolator
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.ui.HomeActivity
@@ -20,21 +23,21 @@ import java.util.*
 
 class OnboardingActivity: AccountAuthenticatorActivity() {
 
-    private val fireflyAccessTokenExpiry by lazy { AppPref(this).tokenExpiry }
-    private val authMethod  by lazy { AppPref(this).authMethod }
+    private val accManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
+    private val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
-        if(Objects.equals("oauth", authMethod)){
-            if (System.currentTimeMillis() > fireflyAccessTokenExpiry) {
+        if(Objects.equals("oauth", accManager.authMethod)){
+            if (accManager.isTokenValid()) {
                 val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
                         .commit()
             } else {
-                if (AppPref(this).isTransactionPersistent) {
+                if (AppPref(sharedPref).isTransactionPersistent) {
                     NotificationUtils(this).showTransactionPersistentNotification()
                 }
                 GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
@@ -44,8 +47,8 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                     finish()
                 }
             }
-        } else if(Objects.equals("pat", authMethod)){
-            if(AppPref(this).isTransactionPersistent){
+        } else if(Objects.equals("pat", accManager.authMethod)){
+            if(AppPref(sharedPref).isTransactionPersistent){
                 NotificationUtils(this).showTransactionPersistentNotification()
             }
             GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {

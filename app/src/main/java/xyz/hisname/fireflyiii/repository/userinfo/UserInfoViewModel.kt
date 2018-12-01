@@ -17,8 +17,8 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
         systemService?.getCurrentUserInfo()?.enqueue(retrofitCallback({ response ->
             val userAttribute = response.body()?.userData?.userAttributes
             if (userAttribute != null) {
-                AppPref(getApplication()).userEmail = userAttribute.email
-                AppPref(getApplication()).userRole = userAttribute.role
+                accManager.userEmail = userAttribute.email
+                AppPref(sharedPref).userRole = userAttribute.role
                 apiOk.value = true
             } else {
                 apiOk.value = false
@@ -35,9 +35,9 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
         systemService?.getSystemInfo()?.enqueue(retrofitCallback({ response ->
             val systemData = response.body()?.systemData
             if (systemData != null) {
-                AppPref(getApplication()).serverVersion = systemData.version
-                AppPref(getApplication()).remoteApiVersion = systemData.api_version
-                AppPref(getApplication()).userOs = systemData.os
+                AppPref(sharedPref).serverVersion = systemData.version
+                AppPref(sharedPref).remoteApiVersion = systemData.api_version
+                AppPref(sharedPref).userOs = systemData.os
                 apiOk.value = true
             } else {
                 apiOk.value = false

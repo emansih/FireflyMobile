@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
+import android.accounts.AccountManager
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_pat.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -38,11 +41,12 @@ class PatFragment: Fragment() {
                 }
             }  else {
                 fireflyUrl = firefly_url_edittext.getString()
-                AppPref(requireContext()).baseUrl = fireflyUrl
-                AppPref(requireContext()).secretKey = firefly_secret_edittext.getString()
+                AuthenticatorManager(AccountManager.get(requireContext())).initializeAccount()
+                AppPref(PreferenceManager.getDefaultSharedPreferences(context)).baseUrl = fireflyUrl
+                AuthenticatorManager(AccountManager.get(requireContext())).secretKey = firefly_secret_edittext.getString()
                 model.getAllAccounts().observe(this, Observer { accountData ->
                     if(accountData != null){
-                        AppPref(requireContext()).authMethod = "pat"
+                        AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
                         val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
                         frameLayout.removeAllViews()
                         requireActivity().supportFragmentManager.beginTransaction()

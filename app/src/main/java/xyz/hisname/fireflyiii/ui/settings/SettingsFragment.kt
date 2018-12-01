@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.ui.settings
 
+import android.accounts.AccountManager
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -9,6 +10,7 @@ import androidx.preference.PreferenceFragmentCompat
 import xyz.hisname.fireflyiii.R
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.preference.PreferenceManager
 import android.util.Base64
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
@@ -17,6 +19,7 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.coroutines.*
+import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
@@ -32,8 +35,10 @@ import java.util.*
 
 class SettingsFragment: PreferenceFragmentCompat() {
 
-    private val authMethodPref by lazy { AppPref(requireContext()).authMethod }
+    private val authMethodPref by lazy { accManager.authMethod }
     private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
+    private val accManager by lazy { AuthenticatorManager(AccountManager.get(requireContext())) }
+    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -45,13 +50,13 @@ class SettingsFragment: PreferenceFragmentCompat() {
         val fireflyUrlPref = findPreference("fireflyUrl") as EditTextPreference
         fireflyUrlPref.apply {
             title = "Firefly URL"
-            summary = AppPref(requireContext()).baseUrl
+            summary = AppPref(sharedPref).baseUrl
         }
 
         val accessTokenPref = findPreference("access_token") as EditTextPreference
         accessTokenPref.apply {
             title = "Access Token"
-            summary = AppPref(requireContext()).secretKey
+            summary = accManager.secretKey
         }
         val authMethod = findPreference("auth_method")
 
@@ -77,7 +82,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
         logout.setOnPreferenceClickListener {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
                 AppDatabase.clearDb(requireContext())
-                AppPref(requireContext()).clearPref()
+                AppPref(sharedPref).clearPref()
+                accManager.destroyAccount()
             }
             val loginActivity = Intent(requireActivity(), OnboardingActivity::class.java)
             startActivity(loginActivity)

@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.ui
 
+import android.accounts.AccountManager
 import android.os.Bundle
+import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
@@ -18,6 +20,7 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IProfile
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
@@ -37,6 +40,7 @@ class HomeActivity: BaseActivity(){
     private var result: Drawer? = null
     private lateinit var headerResult: AccountHeader
     private var profile: IProfile<*>? = null
+    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,8 +79,8 @@ class HomeActivity: BaseActivity(){
 
     private fun setUpHeader(savedInstanceState: Bundle?){
         profile = ProfileDrawerItem()
-                .withName(AppPref(this).userEmail)
-                .withEmail(AppPref(this).userRole)
+                .withName(AuthenticatorManager(AccountManager.get(this)).userEmail)
+                .withEmail(AppPref(sharedPref).userRole)
                 .withIcon(R.drawable.ic_piggy_bank)
         headerResult = AccountHeaderBuilder()
                 .withActivity(this)

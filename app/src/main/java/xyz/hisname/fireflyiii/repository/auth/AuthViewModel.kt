@@ -16,14 +16,14 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
 
     fun getAccessToken(code: String): LiveData<Boolean> {
         isLoading.value = true
-        val oAuthService = RetrofitBuilder.getClient(AppPref(getApplication()).baseUrl)?.create(OAuthService::class.java)
-        oAuthService?.getAccessToken(code, AppPref(getApplication()).clientId, AppPref(getApplication()).secretKey,
-                Constants.REDIRECT_URI, "authorization_code")?.enqueue(retrofitCallback({ response ->
+        val oAuthService = RetrofitBuilder.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
+        oAuthService?.getAccessToken(code, accManager.clientId, accManager.secretKey, Constants.REDIRECT_URI,
+                "authorization_code")?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
             if (authResponse != null) {
-                AppPref(getApplication()).accessToken = authResponse.access_token
-                AppPref(getApplication()).refreshToken = authResponse.refresh_token
-                AppPref(getApplication()).tokenExpiry = authResponse.expires_in
+                accManager.accessToken = authResponse.access_token
+                accManager.refreshToken = authResponse.refresh_token
+                accManager.tokenExpiry = authResponse.expires_in
                 isAuthenticated.value = true
             } else {
                 isAuthenticated.value = false
@@ -36,13 +36,13 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
 
     fun getRefreshToken(): LiveData<Boolean> {
         genericService()?.create(OAuthService::class.java)?.getRefreshToken("refresh_token",
-                AppPref(getApplication()).refreshToken, AppPref(getApplication()).clientId,
-                AppPref(getApplication()).secretKey)?.enqueue(retrofitCallback({ response ->
+                accManager.refreshToken, accManager.clientId,
+                accManager.secretKey)?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
             if (authResponse != null) {
-                AppPref(getApplication()).accessToken = authResponse.access_token
-                AppPref(getApplication()).refreshToken = authResponse.refresh_token
-                AppPref(getApplication()).tokenExpiry = authResponse.expires_in
+                accManager.accessToken = authResponse.access_token
+                accManager.refreshToken = authResponse.refresh_token
+                accManager.tokenExpiry = authResponse.expires_in
                 isAuthenticated.value = true
             } else {
                 isAuthenticated.value = false
