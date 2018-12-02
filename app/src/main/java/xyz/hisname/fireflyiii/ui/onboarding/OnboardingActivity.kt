@@ -2,12 +2,14 @@ package xyz.hisname.fireflyiii.ui.onboarding
 
 import android.accounts.AccountManager
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.view.animation.AccelerateInterpolator
+import android.view.ViewPropertyAnimator
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
@@ -60,26 +62,14 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         } else {
             piggyIcon.animate().apply {
                 translationY(-DeviceUtil.getScreenHeight(this@OnboardingActivity).toFloat() / 2 + 160F)
+                interpolator = FastOutSlowInInterpolator()
                 duration = 900
-                interpolator = AccelerateInterpolator()
-                setListener(object : Animator.AnimatorListener {
-                    override fun onAnimationRepeat(animation: Animator?) {
-                    }
-
-                    override fun onAnimationEnd(animation: Animator?) {
-                        app_name_textview.isVisible = true
-                        supportFragmentManager.beginTransaction()
-                                .replace(R.id.fragment_container, AuthChooserFragment())
-                                .commit()
-                    }
-
-                    override fun onAnimationCancel(animation: Animator?) {
-                    }
-
-                    override fun onAnimationStart(animation: Animator?) {
-                    }
-
-                })
+                onAnimationEnd {
+                    app_name_textview.isVisible = true
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, AuthChooserFragment())
+                            .commit()
+                }
             }
         }
     }
@@ -104,5 +94,12 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 
+    inline fun ViewPropertyAnimator.onAnimationEnd(crossinline continuation: (Animator) -> Unit) {
+        setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                continuation(animation)
+            }
+        })
+    }
 }
 
