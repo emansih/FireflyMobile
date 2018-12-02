@@ -32,7 +32,8 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
-        if(Objects.equals("oauth", accManager.authMethod)){
+        if(Objects.equals("oauth", accManager.authMethod) &&
+                AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isNotEmpty()){
             if (accManager.isTokenValid()) {
                 val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
                 supportFragmentManager.beginTransaction()
@@ -49,7 +50,8 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                     finish()
                 }
             }
-        } else if(Objects.equals("pat", accManager.authMethod)){
+        } else if(Objects.equals("pat", accManager.authMethod) &&
+                AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isNotEmpty()){
             if(AppPref(sharedPref).isTransactionPersistent){
                 NotificationUtils(this).showTransactionPersistentNotification()
             }
@@ -64,6 +66,9 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                 translationY(-DeviceUtil.getScreenHeight(this@OnboardingActivity).toFloat() / 2 + 160F)
                 interpolator = FastOutSlowInInterpolator()
                 duration = 900
+                onAnimationStart {
+                    AuthenticatorManager(AccountManager.get(this@OnboardingActivity)).destroyAccount()
+                }
                 onAnimationEnd {
                     app_name_textview.isVisible = true
                     supportFragmentManager.beginTransaction()
@@ -94,9 +99,17 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 
-    inline fun ViewPropertyAnimator.onAnimationEnd(crossinline continuation: (Animator) -> Unit) {
+    private inline fun ViewPropertyAnimator.onAnimationEnd(crossinline continuation: (Animator) -> Unit) {
         setListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
+                continuation(animation)
+            }
+        })
+    }
+
+    private inline fun ViewPropertyAnimator.onAnimationStart(crossinline continuation: (Animator) -> Unit) {
+        setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationStart(animation: Animator) {
                 continuation(animation)
             }
         })

@@ -38,7 +38,9 @@ class AuthenticatorManager(private val accountManager: AccountManager): AccountH
         get() = accountManager.getUserData(account, "AUTH_METHOD") ?: ""
         set(value) = accountManager.setUserData(account, "AUTH_METHOD", value)
 
-    override fun destroyAccount() {}
+    override fun destroyAccount() {
+        accountManager.addAccountExplicitly(account, null, bundleOf())
+    }
 
     override var tokenExpiry
         get() = accountManager.getUserData(account, "token_expires_in").toLong()
