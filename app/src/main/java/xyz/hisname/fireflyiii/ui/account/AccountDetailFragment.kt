@@ -102,11 +102,11 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
-        R.id.menu_item_edit -> consume {
+        /*R.id.menu_item_edit -> consume {
             val bundle = bundleOf("accountId" to accountId)
             requireFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, UpdateAccountFragment().apply { arguments = bundle })
-        }
+        }*/
         R.id.menu_item_delete -> consume {
             deleteItem()
         }
