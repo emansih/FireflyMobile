@@ -20,12 +20,13 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# kotlin coroutines
--keepclassmembernames class kotlinx.** {
-    volatile <fields>;
-}
--keepattributes Signature, InnerClasses,*Annotation*
 -keep class xyz.hisname.fireflyiii.repository.models.** { *; }
+
+# kotlin coroutines
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+
+-keepattributes Signature, InnerClasses,*Annotation*
 -dontwarn sun.misc.**
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
