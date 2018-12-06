@@ -27,5 +27,7 @@ data class Errors(
         val liabilityStartDate: List<String>?,
         @SerializedName("transactions.0.amount")
         val transaction_amount: List<String>?,
-        val description: List<String>?
+        val description: List<String>?,
+        val date: List<String>?,
+        val skip: List<String>?
 )

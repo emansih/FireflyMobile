@@ -36,7 +36,7 @@ class AddBillDialog: DialogFragment() {
     private var billAttribute: BillAttributes? = null
     private var notes: String? = null
     private var repeatFreq: String = ""
-    private lateinit var currency: String
+    private var currency = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

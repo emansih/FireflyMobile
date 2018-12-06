@@ -105,6 +105,8 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                             gson.errors.amount_min != null -> gson.errors.amount_min[0]
                             gson.errors.repeat_freq != null -> gson.errors.repeat_freq[0]
                             gson.errors.automatch != null -> gson.errors.automatch[0]
+                            gson.errors.date != null -> gson.errors.date[0]
+                            gson.errors.skip != null -> gson.errors.skip[0]
                             else -> "Error occurred while saving bill"
                         }
                     }
