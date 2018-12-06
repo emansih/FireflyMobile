@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             app:elevation="0dp"
             app:expandedTitleTextAppearance="@style/Widget.AppCompat.ActionBar.TabText"
-            app:layout_scrollFlags="scroll|enterAlways"
+            app:layout_scrollFlags="enterAlways"
             app:statusBarScrim="?attr/colorAccent">
 
             <androidx.appcompat.widget.Toolbar
