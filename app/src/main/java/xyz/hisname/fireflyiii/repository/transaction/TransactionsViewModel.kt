@@ -15,6 +15,8 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
+import xyz.hisname.fireflyiii.util.extension.getString
+import xyz.hisname.fireflyiii.util.extension.isBlank
 import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
@@ -114,18 +116,14 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 errorBodyMessage = String(errorBody.bytes())
                 val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
                 when {
-                    gson.errors.transactions_currency != null -> {
-                        if (gson.errors.transactions_currency.contains("is required")) {
-                            errorBodyMessage = "Currency Code Required"
-                        } else {
-                            errorBodyMessage = "Invalid Currency Code"
-                        }
-                    }
+                    gson.errors.transactions_currency != null -> errorBodyMessage = "Currency Code Required"
                     gson.errors.bill_name != null -> errorBodyMessage = "Invalid Bill Name"
                     gson.errors.piggy_bank_name != null -> errorBodyMessage = "Invalid Piggy Bank Name"
                     gson.errors.transactions_destination_name != null -> errorBodyMessage = "Invalid Destination Account"
                     gson.errors.transactions_source_name != null -> errorBodyMessage = "Invalid Source Account"
                     gson.errors.transaction_destination_id != null -> errorBodyMessage = gson.errors.transaction_destination_id[0]
+                    gson.errors.transaction_amount != null -> errorBodyMessage = "Amount field is required"
+                    gson.errors.description != null -> errorBodyMessage = "Description is required"
                     else -> errorBodyMessage = "Error occurred while saving transaction"
                 }
             }

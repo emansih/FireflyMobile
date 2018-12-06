@@ -42,7 +42,7 @@ class AddTransactionDialog: DialogFragment() {
     private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
-    private lateinit var currency: String
+    private var currency = ""
     private var accounts = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
     private var destinationAccounts = ArrayList<String>()
@@ -266,10 +266,9 @@ class AddTransactionDialog: DialogFragment() {
             }
         }
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
-                transaction_date_edittext.getString(), piggyBank,
-                billName, transaction_amount_edittext.getString(), sourceAccount,
-                destinationAccount, currency, categoryName
-        ).observe(this, Observer { transactionResponse ->
+                transaction_date_edittext.getString(), piggyBank, billName,
+                transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
+                currency, categoryName).observe(this, Observer { transactionResponse ->
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
