@@ -9,7 +9,7 @@ class GenericReceiver: BroadcastReceiver(){
 
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.getStringExtra("transaction_notif")
-        if(action != null){
+        if(action != null) {
             // close the notification tray
             context.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
             val trans = Intent(context, HomeActivity::class.java).apply {
@@ -22,6 +22,5 @@ class GenericReceiver: BroadcastReceiver(){
             }
             context.startActivity(trans)
         }
-
     }
 }

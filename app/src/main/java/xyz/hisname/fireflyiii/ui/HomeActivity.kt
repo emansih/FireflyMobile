@@ -31,7 +31,7 @@ import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
-import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.AddTransactionDialog
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
 
@@ -53,28 +53,28 @@ class HomeActivity: BaseActivity(){
         setNavIcon()
         if(intent.getStringExtra("transaction") != null) {
             val transaction = intent.getStringExtra("transaction")
+            val addTransactionDialog = AddTransactionDialog()
             when (transaction) {
                 "Withdrawal" -> {
-                    val bundle = bundleOf("transactionType" to "Withdrawal")
-                    changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
+                    addTransactionDialog.show(supportFragmentManager.beginTransaction(),"addTrans").apply {
+                        addTransactionDialog.arguments = bundleOf("transactionType" to "Withdrawal")
+                    }
                 }
                 "Deposit" -> {
-                    val bundle = bundleOf("transactionType" to "Deposit")
-                    changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
-
+                    addTransactionDialog.show(supportFragmentManager.beginTransaction(),"addTrans").apply {
+                        addTransactionDialog.arguments = bundleOf("transactionType" to "Deposit")
+                    }
                 }
                 "Transfer" -> {
-                    val bundle = bundleOf("transactionType" to "Transfer")
-                    changeFragment(AddTransactionFragment().apply { arguments = bundle }, "addTrans")
+                    addTransactionDialog.show(supportFragmentManager.beginTransaction(),"addTrans").apply {
+                        addTransactionDialog.arguments = bundleOf("transactionType" to "Transfer")
+                    }
                 }
             }
-        } else {
-            if (savedInstanceState == null) {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, DashboardFragment(), "dash")
-                        .commit()
-            }
         }
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, DashboardFragment(), "dash")
+                .commit()
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
@@ -310,13 +310,6 @@ class HomeActivity: BaseActivity(){
                 .commit()
     }
 
-    private fun changeFragment(fragment: Fragment, tag: String){
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment, tag)
-                .addToBackStack(null)
-                .commit()
-    }
-
     override fun onBackPressed() {
         when {
             result?.isDrawerOpen!! -> result?.closeDrawer()
@@ -335,21 +328,11 @@ class HomeActivity: BaseActivity(){
     private fun setNavIcon(){
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount >= 1){
-                when {
-                    supportFragmentManager.findFragmentByTag("addTrans") is AddTransactionFragment -> {
-                        val drawerLayout = result?.drawerLayout
-                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                        result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
-                        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                    }
-                    else -> {
-                        // show back icon and lock nav drawer
-                        val drawerLayout = result?.drawerLayout
-                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                        result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
-                        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                    }
-                }
+                // show back icon and lock nav drawer
+                val drawerLayout = result?.drawerLayout
+                drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
             } else {
                 val drawerLayout = result?.drawerLayout
                 drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)

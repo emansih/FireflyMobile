@@ -14,7 +14,6 @@ import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_add_bill.*
-import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R

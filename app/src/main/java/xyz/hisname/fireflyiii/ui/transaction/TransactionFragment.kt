@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
+import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.view.animation.OvershootInterpolator
@@ -151,13 +153,9 @@ class TransactionFragment: BaseFragment(){
                     .setDuration(400)
                     .start()
             setOnClickListener {
-                val bundle = bundleOf("transactionType" to transactionType)
-                requireFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container,
-                                AddTransactionFragment().apply { arguments = bundle } ,"addTrans")
-                        .addToBackStack(null)
-                        .commit()
-                requireActivity().globalFAB.isVisible = false
+                AddTransactionDialog().show(requireFragmentManager().beginTransaction(),"add_transaction_dialog").apply {
+                    arguments = bundleOf("transactionType" to transactionType)
+                }
             }
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
