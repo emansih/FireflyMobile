@@ -99,12 +99,12 @@ class BillDetailActivity: BaseActivity() {
 
     private fun editBill(){
         editBillFab.setOnClickListener {
-            val data = Gson()
+           /* val data = Gson()
             val billDetail = Intent(this, AddBillActivity::class.java).apply {
                 putExtras(bundleOf("billId" to intent.getLongExtra("billId", 0),
                         "status" to "UPDATE", "billData" to data.toJson(billAttribute)))
             }
-            startActivity(billDetail)
+            startActivity(billDetail)*/
         }
 
     }

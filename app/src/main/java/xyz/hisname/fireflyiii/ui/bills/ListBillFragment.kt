@@ -86,8 +86,7 @@ class ListBillFragment: BaseFragment() {
                     .start()
 
             setOnClickListener{
-                val addBillActivity = Intent(requireContext(), AddBillActivity::class.java)
-                startActivity(addBillActivity)
+                AddBillDialog().show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
             }
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
