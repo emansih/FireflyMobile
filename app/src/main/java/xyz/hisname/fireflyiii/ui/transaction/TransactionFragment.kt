@@ -9,7 +9,8 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.RecyclerView
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
@@ -19,12 +20,12 @@ import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import java.util.*
+import kotlin.collections.ArrayList
 
 class TransactionFragment: BaseFragment(){
 
     private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
-    private var dataAdapter = ArrayList<TransactionData>()
+    private var dataAdapter = arrayListOf<TransactionData>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private var currentDate = DateTimeUtil.getTodayDate()
@@ -37,7 +38,6 @@ class TransactionFragment: BaseFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().globalFAB.isVisible = true
         runLayoutAnimation(recycler_view)
         setupFab()
         getDate()
@@ -48,7 +48,8 @@ class TransactionFragment: BaseFragment(){
         dataAdapter.clear()
         when (transactionType) {
             "Withdrawal" -> transactionViewModel.getWithdrawalList(currentDate, currentDate).observe(this, Observer{
-                if(it.isEmpty()) {
+                dataAdapter = ArrayList(it)
+                if(dataAdapter.isEmpty()) {
                     recycler_view.isGone = true
                     noTransactionText.isVisible = true
                     noTransactionImage.isVisible = true
@@ -57,16 +58,16 @@ class TransactionFragment: BaseFragment(){
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(it, "no_type")
+                    rtAdapter = TransactionRecyclerAdapter(dataAdapter, "no_type")
                     recycler_view.adapter = rtAdapter
                     rtAdapter.apply {
                         recycler_view.adapter as TransactionRecyclerAdapter
-                        update(it)
+                        update(dataAdapter)
                     }
-                    rtAdapter.notifyDataSetChanged()
                 }
             })
             "Transfer" -> transactionViewModel.getTransferList(currentDate, currentDate).observe(this, Observer {
+                dataAdapter = ArrayList(it)
                 if(it.isEmpty()) {
                     recycler_view.isGone = true
                     noTransactionText.isVisible = true
@@ -76,16 +77,16 @@ class TransactionFragment: BaseFragment(){
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(it, "no_type")
+                    rtAdapter = TransactionRecyclerAdapter(dataAdapter, "no_type")
                     recycler_view.adapter = rtAdapter
                     rtAdapter.apply {
                         recycler_view.adapter as TransactionRecyclerAdapter
-                        update(it)
+                        update(dataAdapter)
                     }
-                    rtAdapter.notifyDataSetChanged()
                 }
             })
             "Deposit" -> transactionViewModel.getDepositList(currentDate, currentDate).observe(this, Observer {
+                dataAdapter = ArrayList(it)
                 if(it.isEmpty()) {
                     recycler_view.isGone = true
                     noTransactionText.isVisible = true
@@ -95,13 +96,12 @@ class TransactionFragment: BaseFragment(){
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(it, "no_type")
+                    rtAdapter = TransactionRecyclerAdapter(dataAdapter, "no_type")
                     recycler_view.adapter = rtAdapter
                     rtAdapter.apply {
                         recycler_view.adapter as TransactionRecyclerAdapter
-                        update(it)
+                        update(dataAdapter)
                     }
-                    rtAdapter.notifyDataSetChanged()
                 }
             })
         }
@@ -133,11 +133,11 @@ class TransactionFragment: BaseFragment(){
     }
 
     private fun setupFab(){
-        requireActivity().globalFAB.apply {
-            translationY = (6 * 56).toFloat()
+        transactionFab.apply {
+            translationX = (6 * 56).toFloat()
             animate().apply {
-                translationY(0f)
-                interpolator = OvershootInterpolator(1f)
+                translationX(0f)
+                interpolator = OvershootInterpolator(3f)
                 startDelay = 300
                 duration = 400
                 start()
@@ -147,25 +147,14 @@ class TransactionFragment: BaseFragment(){
                     arguments = bundleOf("transactionType" to transactionType)
                 }
             }
+            setImageDrawable(IconicsDrawable(requireContext())
+                    .icon(GoogleMaterial.Icon.gmd_add)
+                    .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
+                    .sizeDp(16))
         }
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(dy > 0 && requireActivity().globalFAB.isShown){
-                    requireActivity().globalFAB.hide()
-                }
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if(newState == RecyclerView.SCROLL_STATE_IDLE){
-                    requireActivity().globalFAB.show()
-                }
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-        })
     }
 
     private fun pullToRefresh(){
-        dataAdapter.clear()
         swipeContainer.setOnRefreshListener {
             loadTransaction()
         }
@@ -179,7 +168,7 @@ class TransactionFragment: BaseFragment(){
         loadTransaction()
         transaction_calendar.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val correctDate = if(dayOfMonth in 1..9){
-            "0$dayOfMonth"
+                "0$dayOfMonth"
             } else {
                 dayOfMonth.toString()
             }
