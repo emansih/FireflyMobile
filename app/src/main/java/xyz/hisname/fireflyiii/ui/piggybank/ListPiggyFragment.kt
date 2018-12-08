@@ -10,6 +10,7 @@ import android.view.animation.OvershootInterpolator
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -68,11 +69,10 @@ class ListPiggyFragment: BaseFragment() {
 
     private fun itemClicked(piggyData: PiggyData){
         val bundle = bundleOf("piggyId" to piggyData.piggyId)
-        requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
-                .addToBackStack(null)
-                .commit()
-
+        requireFragmentManager().commit {
+            replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
+            addToBackStack(null)
+        }
     }
 
     private fun pullToRefresh(){

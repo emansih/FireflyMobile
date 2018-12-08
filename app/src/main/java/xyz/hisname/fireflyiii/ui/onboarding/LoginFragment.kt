@@ -14,6 +14,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.lifecycle.MutableLiveData
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
@@ -152,10 +153,10 @@ class LoginFragment: Fragment() {
                         frameLayout.removeAllViews()
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         toastSuccess(resources.getString(R.string.welcome))
-                        requireActivity().supportFragmentManager.beginTransaction()
-                                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                                .add(R.id.bigger_fragment_container, OnboardingFragment())
-                                .commit()
+                        requireFragmentManager().commit {
+                            setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                            add(R.id.bigger_fragment_container, OnboardingFragment())
+                        }
                     } else {
                         toastInfo("Authentication Failed")
                     }

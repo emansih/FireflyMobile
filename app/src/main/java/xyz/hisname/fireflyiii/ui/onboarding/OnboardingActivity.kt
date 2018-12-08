@@ -9,6 +9,7 @@ import android.preference.PreferenceManager
 import android.view.ViewPropertyAnimator
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
@@ -36,9 +37,10 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                 AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isNotEmpty()){
             if (accManager.isTokenValid()) {
                 val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
-                        .commit()
+                supportFragmentManager.commit{
+                    replace(R.id.fragment_container, LoginFragment().apply { arguments = bundle })
+                }
+
             } else {
                 if (AppPref(sharedPref).isTransactionPersistent) {
                     NotificationUtils(this).showTransactionPersistentNotification()

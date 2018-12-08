@@ -6,7 +6,7 @@ import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.*
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.materialdrawer.AccountHeader
@@ -72,9 +72,9 @@ class HomeActivity: BaseActivity(){
                 }
             }
         }
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, DashboardFragment(), "dash")
-                .commit()
+        supportFragmentManager.commit{
+            replace(R.id.fragment_container, DashboardFragment(), "dash")
+        }
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
@@ -305,9 +305,9 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun changeFragment(fragment: Fragment){
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit()
+        supportFragmentManager.commit {
+            replace(R.id.fragment_container, fragment)
+        }
     }
 
     override fun onBackPressed() {
