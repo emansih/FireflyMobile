@@ -1,14 +1,18 @@
 package xyz.hisname.fireflyiii.ui.bills
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color.rgb
+import android.graphics.Outline
+import android.graphics.Point
+import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
@@ -41,6 +45,55 @@ class AddBillDialog: DialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.inflate(R.layout.dialog_add_bill, container, false)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogStyle)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val windowView = requireActivity().window.decorView
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            windowView.outlineProvider = object: ViewOutlineProvider(){
+                override fun getOutline(view: View?, outline: Outline?) {
+                    outline?.setOval(-1, -1, 0, 0)
+                }
+            }
+            windowView.clipToOutline = true
+            windowView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener{
+                override fun onPreDraw(): Boolean {
+                    val vto = windowView.viewTreeObserver
+                    if(vto.isAlive){
+                        vto.removeOnPreDrawListener(this)
+                    }
+                    val animator = getRevealAnimator()
+                    animator.addListener(object: AnimatorListenerAdapter(){
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            windowView.clipToOutline = false
+
+                        }
+                    })
+                    animator.start()
+                    return false
+                }
+
+            })
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun getRevealAnimator(): Animator {
+        val point = Point()
+        requireActivity().windowManager.defaultDisplay.getSize(point)
+        val startX = point.x / 2
+        val startY = point.y / 2
+        val valueAnimator = ViewAnimationUtils.createCircularReveal(requireActivity().window.decorView,
+                startX, startY, 0f, Math.max(point.x.toFloat(), point.y.toFloat()))
+        valueAnimator.duration = 700
+        return valueAnimator
     }
 
     override fun onStart() {
