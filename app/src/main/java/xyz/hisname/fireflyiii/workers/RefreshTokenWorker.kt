@@ -20,12 +20,12 @@ class RefreshTokenWorker(private val context: Context, workerParameters: WorkerP
                     refreshToken = responseBody.refresh_token
                     tokenExpiry = responseBody.expires_in
                 }
-                Result.SUCCESS
+                Result.success()
             } else {
-                Result.FAILURE
+                Result.failure()
             }
         } else {
-            Result.RETRY
+            Result.retry()
         }
     }
 

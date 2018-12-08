@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.workers
 
 import android.content.Context
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -49,7 +49,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     if(response.isSuccessful){
                         context.displayNotification("Transaction added successfully!",transactionType,
                                 Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
-                        Result.SUCCESS
+                        Result.success()
                     } else {
                         var error = ""
                         when {
@@ -65,16 +65,16 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                         }
                         context.displayNotification(error,"Error Adding $transactionType",
                                 Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
-                        Result.FAILURE
+                        Result.failure()
                     }
                 })
                 { throwable ->
                     context.displayNotification(throwable.message.toString(),
                             "Error Adding $transactionType",
                             Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
-                    Result.FAILURE
+                    Result.failure()
                 })
-        return Result.SUCCESS
+        return Result.success()
     }
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()

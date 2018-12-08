@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.workers.bill
 
 import android.content.Context
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -39,7 +39,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
             if(response.isSuccessful){
                 context.displayNotification("$name added successfully!", "Bill Added",
                         Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
-                Result.SUCCESS
+                Result.success()
             } else {
                 when {
                     gson.errors.name != null -> error = gson.errors.name[0]
@@ -50,14 +50,14 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                 }
                 context.displayNotification(error, "Error Adding $name",
                         Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
-                Result.FAILURE
+                Result.failure()
             }
         })
         { throwable ->
             context.displayNotification(throwable.message.toString(), "Error Adding $name",
                     Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
-            Result.FAILURE
+            Result.failure()
         })
-        return Result.SUCCESS
+        return Result.success()
     }
 }

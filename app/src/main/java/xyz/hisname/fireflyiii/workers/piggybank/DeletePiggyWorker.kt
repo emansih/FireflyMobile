@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.workers.piggybank
 
 import android.content.Context
-import androidx.work.WorkerParameters
+import androidx.work.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -38,15 +38,17 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
                 context.displayNotification(piggyAttribute?.name + "successfully deleted", "Piggy Bank",
                         Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
             } else {
+                Result.failure()
                 context.displayNotification("There was an issue deleting ${piggyAttribute?.name}. " +
                         "Please try again later", "Error deleting Piggy Bank",
                         Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
             }
         })
         { throwable ->
+            Result.failure()
             context.displayNotification(throwable.localizedMessage, "Error deleting Piggy Bank",
                     Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
         })
-        return Result.SUCCESS
+        return Result.success()
     }
 }

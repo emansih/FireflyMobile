@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
-import androidx.work.WorkerParameters
+import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -38,20 +38,23 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                     async(Dispatchers.IO) {
                         accountDatabase.deleteAccountById(id)
                     }.await()
+                    Result.success()
                     context.displayNotification(accountAttributes?.name + "successfully deleted", "Account",
                             Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
                 }
             } else {
+                Result.failure()
                 context.displayNotification("There was an issue deleting " + accountAttributes?.name , "Account",
                         Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
             }
         })
         { throwable ->
+            Result.failure()
             context.displayNotification(throwable.localizedMessage, "Account",
                     Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
         })
 
-        return Result.SUCCESS
+        return Result.success()
     }
 
 

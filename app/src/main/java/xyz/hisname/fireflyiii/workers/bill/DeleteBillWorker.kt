@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.workers.bill
 
 import android.content.Context
-import androidx.work.WorkerParameters
+import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -17,7 +17,7 @@ import xyz.hisname.fireflyiii.util.retrofitCallback
 
 class DeleteBillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val billDatabase by lazy { AppDatabase.getInstance(context)?.billDataDao() }
+    private val billDatabase by lazy { AppDatabase.getInstance(context).billDataDao() }
     private val channelName = "Bill"
     private val channelDescription = "Show Bill Notifications"
     private val channelIcon = R.drawable.ic_calendar_blank
@@ -27,30 +27,33 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
         var billAttribute: BillAttributes? = null
         GlobalScope.launch(context = Dispatchers.Main) {
             val result = async(Dispatchers.IO) {
-                billDatabase?.getBillById(billId)
+                billDatabase.getBillById(billId)
             }.await()
-            billAttribute  = result!![0].billAttributes
+            billAttribute  = result[0].billAttributes
         }
         genericService?.create(BillsService::class.java)?.deleteBillById(billId)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 GlobalScope.launch(Dispatchers.Main) {
                     async(Dispatchers.IO) {
-                        billDatabase?.deleteBillById(billId)
+                        billDatabase.deleteBillById(billId)
                     }.await()
+                    Result.success()
                     context.displayNotification(billAttribute?.name + "successfully deleted", "Bill",
                             Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
                 }
             } else {
+                Result.failure()
                 context.displayNotification("There was an issue deleting " + billAttribute?.name , "Bill",
                         Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
             }
         })
         { throwable ->
+            Result.failure()
             context.displayNotification(throwable.localizedMessage, "Bill",
                     Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
         })
 
-        return Result.SUCCESS
+        return Result.success()
     }
 
 

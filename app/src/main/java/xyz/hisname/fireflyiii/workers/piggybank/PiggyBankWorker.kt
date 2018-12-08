@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.workers.piggybank
 
 import android.content.Context
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -35,7 +35,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             if (response.isSuccessful) {
                 context.displayNotification("$name was added successfully!", "Piggy Bank Added",
                         Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
-                Result.SUCCESS
+                Result.success()
             } else {
                 var error = ""
                 when {
@@ -45,15 +45,15 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                 }
                 context.displayNotification(error, "There was an issue adding $name",
                         Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
-                Result.FAILURE
+                Result.failure()
             }
         })
         { throwable ->
             context.displayNotification(throwable.message.toString(), "Error adding $name",
                     Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
-            Result.FAILURE
+            Result.failure()
         })
-        return Result.SUCCESS
+        return Result.success()
     }
 
 }

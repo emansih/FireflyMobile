@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -43,7 +43,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     if(response.isSuccessful) {
                         context.displayNotification("$name was added successfully!", "Account Added",
                                 Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
-                        Result.SUCCESS
+                        Result.success()
                     } else {
                         error = when {
                             gson.errors.name != null -> gson.errors.name[0]
@@ -54,11 +54,11 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                         }
                         context.displayNotification(error, "There was an error adding $name",
                                 Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
-                        Result.FAILURE
+                        Result.failure()
                     }
                 })
         )
 
-        return Result.SUCCESS
+        return Result.success()
     }
 }
