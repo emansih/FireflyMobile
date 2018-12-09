@@ -14,13 +14,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="FullScreenDialogStyle" parent="Theme.AppCompat.Dialog">
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="android:windowBackground">@color/white</item>
+    <style name="FullScreenDialogStyle" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:textColor">@color/md_black_1000</item>
-        <item name="android:textColorHint">@color/md_grey_400</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowIsFloating">false</item>
     </style>
