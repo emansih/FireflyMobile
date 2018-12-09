@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -13,6 +15,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
@@ -30,10 +34,12 @@ class ListAccountFragment: BaseFragment() {
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val accountType by lazy { arguments?.getString("accountType") ?: "" }
+    private val noAccountImage by lazy { requireActivity().findViewById<ImageView>(R.id.listImage) }
+    private val noAccountText by lazy { requireActivity().findViewById<TextView>(R.id.listText) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.base_swipe_layout, container)
+        return inflater.create(R.layout.fragment_base_list, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,19 +55,76 @@ class ListAccountFragment: BaseFragment() {
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         when (accountType) {
             "all" -> accountViewModel.getAllAccounts().observe(this, Observer {
-                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+                if(it.isEmpty()){
+                    recycler_view.isGone = true
+                    noAccountImage.isVisible = true
+                    noAccountText.isVisible = true
+                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                            .icon(FontAwesome.Icon.faw_credit_card))
+                    noAccountText.text = resources.getString(R.string.no_account_found, "Accounts")
+                } else {
+                    noAccountText.isGone = true
+                    noAccountImage.isGone = true
+                    recycler_view.isVisible = true
+                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+                }
             })
             "asset" -> accountViewModel.getAssetAccounts().observe(this, Observer {
-                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-            })
+                if(it.isEmpty()){
+                    recycler_view.isGone = true
+                    noAccountImage.isVisible = true
+                    noAccountText.isVisible = true
+                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                            .icon(FontAwesome.Icon.faw_money_bill))
+                    noAccountText.text = resources.getString(R.string.no_account_found, "Asset Accounts")
+                } else {
+                    noAccountText.isGone = true
+                    noAccountImage.isGone = true
+                    recycler_view.isVisible = true
+                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+                }            })
             "expense" -> accountViewModel.getExpenseAccounts().observe(this, Observer {
-                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-            })
+                if(it.isEmpty()){
+                    recycler_view.isGone = true
+                    noAccountImage.isVisible = true
+                    noAccountText.isVisible = true
+                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                            .icon(FontAwesome.Icon.faw_shopping_cart))
+                    noAccountText.text = resources.getString(R.string.no_account_found, "Expense Accounts")
+                } else {
+                    noAccountText.isGone = true
+                    noAccountImage.isGone = true
+                    recycler_view.isVisible = true
+                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+                }            })
             "revenue" -> accountViewModel.getRevenueAccounts().observe(this, Observer {
-                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-            })
+                if(it.isEmpty()){
+                    recycler_view.isGone = true
+                    noAccountImage.isVisible = true
+                    noAccountText.isVisible = true
+                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                            .icon(FontAwesome.Icon.faw_download))
+                    noAccountText.text = resources.getString(R.string.no_account_found, "Revenue Accounts")
+                } else {
+                    noAccountText.isGone = true
+                    noAccountImage.isGone = true
+                    recycler_view.isVisible = true
+                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+                }            })
             "liability" -> accountViewModel.getLiabilityAccounts().observe(this, Observer {
-                recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+                if(it.isEmpty()){
+                    recycler_view.isGone = true
+                    noAccountImage.isVisible = true
+                    noAccountText.isVisible = true
+                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                            .icon(FontAwesome.Icon.faw_ticket_alt))
+                    noAccountText.text = resources.getString(R.string.no_account_found, "Liability Accounts")
+                } else {
+                    noAccountText.isGone = true
+                    noAccountImage.isGone = true
+                    recycler_view.isVisible = true
+                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+                }
             })
         }
         accountViewModel.apiResponse.observe(this, Observer {

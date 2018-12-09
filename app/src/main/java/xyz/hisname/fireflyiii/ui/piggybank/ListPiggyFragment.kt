@@ -1,12 +1,12 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.fragment_piggy.*
+import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
@@ -34,7 +34,7 @@ class ListPiggyFragment: BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_piggy, container)
+        return inflater.create(R.layout.fragment_base_list, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,13 +48,15 @@ class ListPiggyFragment: BaseFragment() {
         runLayoutAnimation(recycler_view)
         piggyViewModel.getAllPiggyBanks().observe(this, Observer {
             if(it.isNotEmpty()) {
-                piggybankText.isVisible = false
-                piggyImage.isVisible = false
+                listText.isVisible = false
+                listImage.isVisible = false
                 recycler_view.isVisible = true
                 recycler_view.adapter = PiggyRecyclerAdapter(it) { data: PiggyData -> itemClicked(data) }
             } else {
-                piggybankText.isVisible = true
-                piggyImage.isVisible = true
+                listText.text = resources.getString(R.string.no_piggy_bank)
+                listText.isVisible = true
+                listImage.isVisible = true
+                listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank))
                 recycler_view.isVisible = false
             }
         })

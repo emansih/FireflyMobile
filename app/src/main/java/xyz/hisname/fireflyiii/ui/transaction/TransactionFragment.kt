@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.view.animation.OvershootInterpolator
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -29,6 +31,8 @@ class TransactionFragment: BaseFragment(){
     private lateinit var rtAdapter: TransactionRecyclerAdapter
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private var currentDate = DateTimeUtil.getTodayDate()
+    private val noTransactionText by lazy { requireActivity().findViewById<TextView>(R.id.listText) }
+    private val noTransactionImage by lazy { requireActivity().findViewById<ImageView>(R.id.listImage) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -52,6 +56,7 @@ class TransactionFragment: BaseFragment(){
                 if(dataAdapter.isEmpty()) {
                     recycler_view.isGone = true
                     noTransactionText.isVisible = true
+                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
                     noTransactionImage.isVisible = true
                     noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_left))
                 } else {
@@ -71,6 +76,7 @@ class TransactionFragment: BaseFragment(){
                 if(it.isEmpty()) {
                     recycler_view.isGone = true
                     noTransactionText.isVisible = true
+                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
                     noTransactionImage.isVisible = true
                     noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_right))
                 } else {
@@ -90,6 +96,7 @@ class TransactionFragment: BaseFragment(){
                 if(it.isEmpty()) {
                     recycler_view.isGone = true
                     noTransactionText.isVisible = true
+                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
                     noTransactionImage.isVisible = true
                     noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bank_transfer))
                 } else {

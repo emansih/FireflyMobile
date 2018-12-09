@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -15,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.fragment_bill.*
+import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -36,7 +37,7 @@ class ListBillFragment: BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_bill, container)
+        return inflater.create(R.layout.fragment_base_list, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,13 +52,15 @@ class ListBillFragment: BaseFragment() {
         runLayoutAnimation(recycler_view)
         billViewModel.getAllBills().observe(this, Observer {
             if (it.isNotEmpty()) {
-                happyFaceText.isVisible = false
-                happyFace.isVisible = false
+                listText.isVisible = false
+                listImage.isVisible = false
                 recycler_view.isVisible = true
                 recycler_view.adapter = BillsRecyclerAdapter(it) { data: BillData -> itemClicked(data) }
             } else {
-                happyFaceText.isVisible = true
-                happyFace.isVisible = true
+                listText.text = resources.getString(R.string.no_bills)
+                listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_emoticon_happy))
+                listText.isVisible = true
+                listImage.isVisible = true
                 recycler_view.isVisible = false
             }
         })
