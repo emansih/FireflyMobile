@@ -96,7 +96,11 @@ class ListPiggyFragment: BaseFragment() {
                     .setDuration(400)
                     .start()
             setOnClickListener{
-                startActivity(Intent(requireContext(), AddPiggyActivity::class.java))
+                fab.isClickable = false
+                val addPiggy = AddPiggyDialog()
+                addPiggy.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                addPiggy.show(requireFragmentManager().beginTransaction(), "add_piggy_dialog")
+                fab.isClickable = true
             }
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){

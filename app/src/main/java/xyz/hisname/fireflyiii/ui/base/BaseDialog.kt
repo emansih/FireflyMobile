@@ -4,14 +4,14 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.util.animation.BakedBezierInterpolator
+
+
 
 open class BaseDialog: DialogFragment() {
 
