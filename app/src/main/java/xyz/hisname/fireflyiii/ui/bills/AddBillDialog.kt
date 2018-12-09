@@ -1,21 +1,14 @@
 package xyz.hisname.fireflyiii.ui.bills
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color.rgb
-import android.graphics.Outline
-import android.graphics.Point
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -28,12 +21,14 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.BaseDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
+import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddBillDialog: DialogFragment() {
+class AddBillDialog: BaseDialog() {
 
     private val model: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
@@ -47,58 +42,13 @@ class AddBillDialog: DialogFragment() {
         return inflater.inflate(R.layout.dialog_add_bill, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogStyle)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val windowView = requireActivity().window.decorView
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            windowView.outlineProvider = object: ViewOutlineProvider(){
-                override fun getOutline(view: View?, outline: Outline?) {
-                    outline?.setOval(-1, -1, 0, 0)
-                }
-            }
-            windowView.clipToOutline = true
-            windowView.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener{
-                override fun onPreDraw(): Boolean {
-                    val vto = windowView.viewTreeObserver
-                    if(vto.isAlive){
-                        vto.removeOnPreDrawListener(this)
-                    }
-                    val animator = getRevealAnimator()
-                    animator.addListener(object: AnimatorListenerAdapter(){
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
-                            windowView.clipToOutline = false
-
-                        }
-                    })
-                    animator.start()
-                    return false
-                }
-
-            })
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun getRevealAnimator(): Animator {
-        val point = Point()
-        requireActivity().windowManager.defaultDisplay.getSize(point)
-        val startX = point.x / 2
-        val startY = point.y / 2
-        val valueAnimator = ViewAnimationUtils.createCircularReveal(requireActivity().window.decorView,
-                startX, startY, 0f, Math.max(point.x.toFloat(), point.y.toFloat()))
-        valueAnimator.duration = 700
-        return valueAnimator
+        CircularReveal(dialog_add_bill_layout).showReveal(revealX, revealY)
     }
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         setIcons()
         setWidgets()
         addBillFab.setOnClickListener { addBill() }
@@ -139,7 +89,7 @@ class AddBillDialog: DialogFragment() {
         addBillFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
                 .sizeDp(24))
-        placeHolderToolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material)
+        placeHolderToolbar.navigationIcon = navIcon
     }
 
     private fun setWidgets(){
@@ -174,7 +124,7 @@ class AddBillDialog: DialogFragment() {
         currencyViewModel.currencyDetails.observe(this, Observer {
             currency_edittext.setText(it)
         })
-        placeHolderToolbar.setNavigationOnClickListener { dialog?.dismiss() }
+        placeHolderToolbar.setNavigationOnClickListener{ unReveal(dialog_add_bill_layout) }
     }
 
     private fun addBill(){

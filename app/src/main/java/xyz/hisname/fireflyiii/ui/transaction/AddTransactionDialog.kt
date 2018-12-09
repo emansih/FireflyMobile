@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
@@ -29,12 +28,14 @@ import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.BaseDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
+import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddTransactionDialog: DialogFragment() {
+class AddTransactionDialog: BaseDialog() {
 
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
@@ -58,13 +59,15 @@ class AddTransactionDialog: DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         setIcons()
         setWidgets()
         contextSwitch()
-        addTransactionFab.setOnClickListener {
-            submitData()
-        }
+        addTransactionFab.setOnClickListener { submitData() }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        CircularReveal(dialog_add_transaction_layout).showReveal(revealX, revealY)
     }
 
     private fun setIcons(){
@@ -96,7 +99,7 @@ class AddTransactionDialog: DialogFragment() {
                  IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
                          .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
                          .sizeDp(24),null, null, null)
-        placeHolderToolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material)
+        placeHolderToolbar.navigationIcon = navIcon
         addTransactionFab.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_add)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
@@ -137,7 +140,7 @@ class AddTransactionDialog: DialogFragment() {
          currencyViewModel.currencyDetails.observe(this, Observer {
              currency_edittext.setText(it)
          })
-         placeHolderToolbar.setNavigationOnClickListener { dialog?.dismiss() }
+         placeHolderToolbar.setNavigationOnClickListener { unReveal(dialog_add_transaction_layout) }
          currency_edittext.setOnClickListener{
              CurrencyListFragment().show(requireFragmentManager(), "currencyList" )
          }

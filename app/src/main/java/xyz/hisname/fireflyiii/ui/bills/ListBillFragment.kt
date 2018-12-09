@@ -86,7 +86,11 @@ class ListBillFragment: BaseFragment() {
                     .start()
 
             setOnClickListener{
-                AddBillDialog().show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
+                fab.isClickable = false
+                val addBill = AddBillDialog()
+                addBill.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                addBill.show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
+                fab.isClickable = true
             }
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){

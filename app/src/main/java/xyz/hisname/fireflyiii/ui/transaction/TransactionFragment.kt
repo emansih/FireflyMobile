@@ -133,7 +133,7 @@ class TransactionFragment: BaseFragment(){
     }
 
     private fun setupFab(){
-        transactionFab.apply {
+        addTransactionFab.apply {
             translationX = (6 * 56).toFloat()
             animate().apply {
                 translationX(0f)
@@ -143,9 +143,12 @@ class TransactionFragment: BaseFragment(){
                 start()
             }
             setOnClickListener {
-                AddTransactionDialog().show(requireFragmentManager().beginTransaction(),"add_transaction_dialog").apply {
-                    arguments = bundleOf("transactionType" to transactionType)
-                }
+                addTransactionFab.isClickable = false
+                val addTransaction = AddTransactionDialog()
+                addTransaction.arguments = bundleOf("revealX" to addTransactionFab.width / 2,
+                        "revealY" to addTransactionFab.height / 2, "transactionType" to transactionType)
+                addTransaction.show(requireFragmentManager().beginTransaction(), "add_transaction_dialog")
+                addTransactionFab.isClickable = true
             }
             setImageDrawable(IconicsDrawable(requireContext())
                     .icon(GoogleMaterial.Icon.gmd_add)
