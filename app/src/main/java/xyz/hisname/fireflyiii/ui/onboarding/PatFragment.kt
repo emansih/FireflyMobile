@@ -6,7 +6,8 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_pat.*
@@ -47,8 +48,8 @@ class PatFragment: Fragment() {
                 model.getAllAccounts().observe(this, Observer { accountData ->
                     if(accountData != null){
                         AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
-                        val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
-                        frameLayout.removeAllViews()
+                        val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
+                        layout.isVisible = false
                         requireActivity().supportFragmentManager.beginTransaction()
                                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                                 .add(R.id.bigger_fragment_container, OnboardingFragment())

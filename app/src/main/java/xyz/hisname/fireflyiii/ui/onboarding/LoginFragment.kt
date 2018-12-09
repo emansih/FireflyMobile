@@ -7,9 +7,9 @@ import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
@@ -137,6 +137,7 @@ class LoginFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         val uri = requireActivity().intent.data
+        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             val code = uri.getQueryParameter("code")
             if(code != null) {
@@ -147,15 +148,15 @@ class LoginFragment: Fragment() {
                     clientId = clientIdLiveData.value ?: ""
                 }
                 authViewModel.getAccessToken(code).observe(this, Observer {
+                    ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                     if(it == true){
                         accManager.authMethod = "oauth"
-                        val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
-                        frameLayout.removeAllViews()
-                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+                        val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
+                        layout.isVisible = false
                         toastSuccess(resources.getString(R.string.welcome))
                         requireFragmentManager().commit {
                             setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                            add(R.id.bigger_fragment_container, OnboardingFragment())
+                            replace(R.id.bigger_fragment_container, OnboardingFragment())
                         }
                     } else {
                         toastInfo("Authentication Failed")
