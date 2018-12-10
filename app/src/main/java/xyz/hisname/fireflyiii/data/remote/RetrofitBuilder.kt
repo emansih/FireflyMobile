@@ -5,10 +5,8 @@ import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.util.interceptors.HeaderInterceptor
 import java.lang.StringBuilder
-import java.util.*
 
 class RetrofitBuilder {
 
@@ -16,7 +14,7 @@ class RetrofitBuilder {
 
         @Volatile private var INSTANCE: Retrofit? = null
 
-        fun getClient(baseUrl: String?, accessToken: String?, certPinValue: String): Retrofit?{
+        fun getClient(baseUrl: String, accessToken: String, certPinValue: String): Retrofit?{
             if(INSTANCE == null){
                 val client = OkHttpClient().newBuilder()
                         .addInterceptor(HeaderInterceptor(accessToken))
@@ -43,7 +41,7 @@ class RetrofitBuilder {
 
 
 
-        fun getClient(baseUrl: String?): Retrofit?{
+        fun getClient(baseUrl: String): Retrofit?{
             if(INSTANCE == null){
                 synchronized(RetrofitBuilder::class.java){
                     INSTANCE = Retrofit.Builder()
@@ -59,9 +57,9 @@ class RetrofitBuilder {
             INSTANCE = null
         }
 
-        private fun generateUrl(url: String?): String{
+        private fun generateUrl(url: String): String{
             var modifiedUrl = ""
-            if(url!!.startsWith("https")){
+            if(url.startsWith("https")){
                 // if it contains https:// remove it
                 modifiedUrl = url.substring(8)
             }

@@ -107,10 +107,6 @@ class LoginFragment: Fragment() {
     }
 
     private fun refreshToken(){
-        /* Bug: Currently there is a bug where if a user upgrades Firefly III, we have to request
-            token again. Is it really a bug? Anyway, the client does not play well in this scenario.
-            Currently we only checked if the refresh token is `old`
-        */
         rootLayout.isVisible = false
         toastInfo("Refreshing your access token...", Toast.LENGTH_LONG)
         authViewModel.getRefreshToken().observe(this, Observer {
