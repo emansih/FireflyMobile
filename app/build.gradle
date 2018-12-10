@@ -5,11 +5,11 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.akaita.android.easylauncher'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion(Dependencies.compileSdk)
     defaultConfig {
         applicationId "xyz.hisname.fireflyiii"
-        minSdkVersion 19
-        targetSdkVersion 28
+        minSdkVersion(Dependencies.minSdk)
+        targetSdkVersion(Dependencies.targetSdk)
         versionCode 16
         versionName "1.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -50,42 +50,42 @@ android {
 dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$Deps.kotlinVersion"
+    implementation Dependencies.kotlinLib
     // Android support libs
-    implementation Deps.appCompat
-    implementation Deps.androidxFragment
-    implementation Deps.androidxAnnotation
-    implementation Deps.androidxRecyclerView
-    implementation Deps.materialDesign
-    implementation Deps.androidxCore
-    implementation Deps.androidxConstraintLayout
-    implementation Deps.androidxPref
-    implementation Deps.androidxWork
+    implementation Dependencies.appCompat
+    implementation Dependencies.androidxFragment
+    implementation Dependencies.androidxAnnotation
+    implementation Dependencies.androidxRecyclerView
+    implementation Dependencies.materialDesign
+    implementation Dependencies.androidxCore
+    implementation Dependencies.androidxConstraintLayout
+    implementation Dependencies.androidxPref
+    implementation Dependencies.androidxWork
 
     // Lifecycle component
-    implementation Deps.lifecycleLibs
-    kapt Deps.lifecycleCompiler
+    implementation Dependencies.lifecycleLibs
+    kapt Dependencies.lifecycleCompiler
 
     // Room
-    implementation Deps.roomLibs
-    kapt Deps.roomCompiler
+    implementation Dependencies.roomLibs
+    kapt Dependencies.roomCompiler
     // Retrofit
-    implementation Deps.retrofitLibs
-    implementation Deps.retrofitGson
+    implementation Dependencies.retrofitLibs
+    implementation Dependencies.retrofitGson
 
     // Coroutine
-    implementation Deps.coroutineCore
-    implementation Deps.coroutineAndroid
+    implementation Dependencies.coroutineCore
+    implementation Dependencies.coroutineAndroid
 
-    implementation Deps.materialDrawer
-    implementation Deps.iconics
-    implementation Deps.googleMaterialIcons
-    implementation Deps.fontAwesome
+    implementation Dependencies.materialDrawer
+    implementation Dependencies.iconics
+    implementation Dependencies.googleMaterialIcons
+    implementation Dependencies.fontAwesome
 
-    implementation Deps.toasty
-    implementation Deps.threeTenBp
-    implementation Deps.chart
-    implementation Deps.aboutLib
+    implementation Dependencies.toasty
+    implementation Dependencies.threeTenBp
+    implementation Dependencies.chart
+    implementation Dependencies.aboutLib
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
