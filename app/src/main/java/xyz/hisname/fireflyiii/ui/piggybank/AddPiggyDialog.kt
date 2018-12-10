@@ -115,8 +115,7 @@ class AddPiggyDialog: BaseDialog() {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
                 }
-                val uniqueAccounts = HashSet(accounts).toArray()
-                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccounts)
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 account_spinner.adapter = adapter
             }
