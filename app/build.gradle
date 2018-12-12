@@ -44,6 +44,9 @@ android {
             targetCompatibility JavaVersion.VERSION_1_8
         }
     }
+    aaptOptions {
+        ignoreAssetsPattern "NOTICE.txt"
+    }
     configurations {all*.exclude group: 'com.android.support'}
 }
 

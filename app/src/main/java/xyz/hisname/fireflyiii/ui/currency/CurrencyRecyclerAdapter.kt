@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.currency_list.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
+import xyz.hisname.fireflyiii.util.Flags
 import xyz.hisname.fireflyiii.util.extension.inflate
 
 class CurrencyRecyclerAdapter(private val items: MutableList<CurrencyData>, private val clickListener:(CurrencyData) -> Unit):
@@ -30,6 +31,7 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
             val currency = currencyData.currencyAttributes
             itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             itemView.currencySymbol.text = currency?.symbol.toString()
+            itemView.flagImage.setImageDrawable(Flags(context).getCurrencyFlagsByIso(currency?.code!!))
             itemView.setOnClickListener {
                 clickListener(currencyData)
             }
