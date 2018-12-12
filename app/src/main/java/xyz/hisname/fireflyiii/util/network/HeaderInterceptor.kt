@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.util.interceptors
+package xyz.hisname.fireflyiii.util.network
 
 import okhttp3.Interceptor
 import xyz.hisname.fireflyiii.BuildConfig

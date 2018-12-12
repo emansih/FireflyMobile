@@ -3,12 +3,15 @@ package xyz.hisname.fireflyiii.repository.currency
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.data.remote.api.CurrencyService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.network.NetworkErrors
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
@@ -25,7 +28,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun getCurrency(): LiveData<MutableList<CurrencyData>> {
         isLoading.value = true
         genericService()?.create(CurrencyService::class.java)?.getCurrency()?.enqueue(retrofitCallback({ response ->
-            if(response.isSuccessful){
+            if (response.isSuccessful) {
                 val networkData = response.body()?.data
                 networkData?.forEachIndexed { _, element ->
                     scope.launch(Dispatchers.IO) { repository.insertCurrency(element) }
@@ -34,11 +37,12 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                 val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
-                    apiResponse.postValue(errorBody)
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
                 }
             }
         })
-        { throwable ->  apiResponse.postValue(throwable.localizedMessage)})
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
         isLoading.value = false
         return repository.allCurrency
     }

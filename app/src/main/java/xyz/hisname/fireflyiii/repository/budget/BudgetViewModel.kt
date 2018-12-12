@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.repository.budget
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -12,8 +13,10 @@ import xyz.hisname.fireflyiii.data.remote.api.BudgetService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.budget.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.limit.BudgetLimitData
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.NetworkErrors
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class BudgetViewModel(application: Application): BaseViewModel(application) {
 
@@ -62,14 +65,13 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     private fun loadRemoteBudget(){
         isLoading.value = true
         budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 val networkData = response.body()
-                if(networkData != null){
-                    for(pagination in 1..networkData.meta.pagination.total_pages){
-                        budgetService!!.getPaginatedBudget(pagination).enqueue(retrofitCallback({
-                            respond ->
-                            respond.body()?.budgetData?.forEachIndexed{ _, budgetList ->
-                                scope.launch(Dispatchers.IO) { repository.insertBudget(budgetList)}
+                if (networkData != null) {
+                    for (pagination in 1..networkData.meta.pagination.total_pages) {
+                        budgetService!!.getPaginatedBudget(pagination).enqueue(retrofitCallback({ respond ->
+                            respond.body()?.budgetData?.forEachIndexed { _, budgetList ->
+                                scope.launch(Dispatchers.IO) { repository.insertBudget(budgetList) }
                             }
                         }))
                     }
@@ -79,25 +81,25 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
-                    apiResponse.postValue(errorBody)
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
                 }
             }
         })
-        { throwable -> apiResponse.postValue(throwable.localizedMessage) })
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
         isLoading.value = false
     }
 
     private fun loadRemoteLimit(){
         isLoading.value = true
         budgetLimitService?.getAllBudgetLimits()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 val networkData = response.body()
-                if(networkData != null){
-                    for(pagination in 1..networkData.meta.pagination.total_pages){
-                        budgetLimitService!!.getPaginatedBudgetLimits(pagination).enqueue(retrofitCallback({
-                            respond ->
-                            respond.body()?.budgetLimitData?.forEachIndexed{ _, budgetList ->
-                                scope.launch(Dispatchers.IO) { repository.insertBudgetLimit(budgetList)}
+                if (networkData != null) {
+                    for (pagination in 1..networkData.meta.pagination.total_pages) {
+                        budgetLimitService!!.getPaginatedBudgetLimits(pagination).enqueue(retrofitCallback({ respond ->
+                            respond.body()?.budgetLimitData?.forEachIndexed { _, budgetList ->
+                                scope.launch(Dispatchers.IO) { repository.insertBudgetLimit(budgetList) }
                             }
                         }))
                     }
@@ -107,11 +109,12 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
-                    apiResponse.postValue(errorBody)
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
                 }
             }
         })
-        { throwable -> apiResponse.postValue(throwable.localizedMessage) })
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
         isLoading.value = false
 
     }

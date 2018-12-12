@@ -5,7 +5,7 @@ import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import xyz.hisname.fireflyiii.util.interceptors.HeaderInterceptor
+import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.lang.StringBuilder
 
 class RetrofitBuilder {

@@ -9,7 +9,7 @@ import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 
 class PiggyBankWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {

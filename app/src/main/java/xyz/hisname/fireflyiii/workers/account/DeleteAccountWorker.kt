@@ -13,7 +13,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class DeleteAccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
@@ -44,7 +44,7 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                 }
             } else {
                 Result.failure()
-                context.displayNotification("There was an issue deleting " + accountAttributes?.name , "Account",
+                context.displayNotification("There was an issue deleting " + accountAttributes?.name, "Account",
                         Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
             }
         })

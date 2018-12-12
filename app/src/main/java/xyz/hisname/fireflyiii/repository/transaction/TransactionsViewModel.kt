@@ -15,9 +15,8 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
-import xyz.hisname.fireflyiii.util.extension.getString
-import xyz.hisname.fireflyiii.util.extension.isBlank
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.NetworkErrors
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
@@ -57,16 +56,15 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         isLoading.value = true
         var recentData: MutableList<TransactionData> = arrayListOf()
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        transactionService?.getAllTransactions("","", "all")?.enqueue(retrofitCallback({
-            response ->
+        transactionService?.getAllTransactions("","", "all")?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
-                networkData?.data?.forEachIndexed{ _, data ->
-                    scope.launch(Dispatchers.IO) { repository.insertTransaction(data)}
+                networkData?.data?.forEachIndexed { _, data ->
+                    scope.launch(Dispatchers.IO) { repository.insertTransaction(data) }
                 }
             }
         })
-        { throwable ->  })
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
         scope.async(Dispatchers.IO){
             recentData = repository.recentTransactions(limit)
         }.invokeOnCompletion {
@@ -112,7 +110,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 amount,sourceName,destinationName,currencyName, category)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
-            if(errorBody != null) {
+            if (errorBody != null) {
                 errorBodyMessage = String(errorBody.bytes())
                 val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
                 when {
@@ -133,7 +131,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 transaction.postValue(ApiResponses(errorBodyMessage))
             }
         })
-        { throwable ->  transaction.value = ApiResponses(throwable) })
+        { throwable -> transaction.value = ApiResponses(throwable) })
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return apiResponse
     }
@@ -143,14 +141,13 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     private fun loadRemoteData(startDate: String?, endDate: String?, source: String){
         isLoading.value = true
         transactionService?.getAllTransactions(startDate, endDate, source)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 val networkData = response.body()
-                if(networkData != null){
-                    for(pagination in 1..networkData.meta.pagination.total_pages){
-                        transactionService!!.getPaginatedTransactions(startDate,endDate, source, pagination).enqueue(retrofitCallback({
-                            respond ->
-                            respond.body()?.data?.forEachIndexed{ _, transactionPagination ->
-                                scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionPagination)}
+                if (networkData != null) {
+                    for (pagination in 1..networkData.meta.pagination.total_pages) {
+                        transactionService!!.getPaginatedTransactions(startDate, endDate, source, pagination).enqueue(retrofitCallback({ respond ->
+                            respond.body()?.data?.forEachIndexed { _, transactionPagination ->
+                                scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionPagination) }
                             }
                         }))
                     }
@@ -160,11 +157,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
-                    apiResponse.postValue(errorBody)
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
                 }
             }
         })
-        { throwable -> apiResponse.postValue(throwable.localizedMessage) })
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
         isLoading.value = false
     }
 

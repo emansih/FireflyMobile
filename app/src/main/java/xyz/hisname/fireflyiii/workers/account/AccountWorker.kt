@@ -9,7 +9,7 @@ import xyz.hisname.fireflyiii.data.remote.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class AccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
@@ -40,7 +40,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                         errorBody = String(response.errorBody()?.bytes()!!)
                     }
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(response.isSuccessful) {
+                    if (response.isSuccessful) {
                         context.displayNotification("$name was added successfully!", "Account Added",
                                 Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
                         Result.success()

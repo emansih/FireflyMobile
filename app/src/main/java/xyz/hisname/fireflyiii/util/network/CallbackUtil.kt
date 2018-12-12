@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.util
+package xyz.hisname.fireflyiii.util.network
 
 import retrofit2.Call
 import retrofit2.Callback

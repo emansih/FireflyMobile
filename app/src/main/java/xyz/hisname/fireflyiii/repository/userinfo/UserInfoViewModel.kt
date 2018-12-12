@@ -5,7 +5,7 @@ import androidx.lifecycle.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class UserInfoViewModel(application: Application) : BaseViewModel(application){
 
@@ -24,7 +24,7 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
                 apiOk.value = false
             }
         })
-        { throwable -> apiOk.value = false})
+        { throwable -> apiOk.value = false })
         isLoading.value = false
         return apiOk
     }
@@ -43,7 +43,7 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
                 apiOk.value = false
             }
         })
-        { throwable ->  apiOk.value = false })
+        { throwable -> apiOk.value = false })
         isLoading.value = false
         return apiOk
     }

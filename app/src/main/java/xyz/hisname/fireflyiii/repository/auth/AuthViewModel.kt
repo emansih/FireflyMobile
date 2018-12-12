@@ -8,7 +8,7 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.OAuthService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class AuthViewModel(application: Application): BaseViewModel(application) {
 

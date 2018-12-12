@@ -14,7 +14,8 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.NetworkErrors
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
@@ -133,7 +134,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         isLoading.value = true
         accountsService?.deleteAccountById(accountId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
-                scope.async(Dispatchers.IO){
+                scope.async(Dispatchers.IO) {
                     repository.deleteAccountById(accountId)
                 }.invokeOnCompletion {
                     isDeleted.postValue(true)
@@ -198,7 +199,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             }
 
         })
-        { throwable ->  apiLiveData.postValue(ApiResponses(throwable))})
+        { throwable -> apiLiveData.postValue(ApiResponses(throwable)) })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         isLoading.value = false
         return apiResponse
@@ -224,14 +225,13 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     private fun loadRemoteData(source: String){
         isLoading.value = true
         accountsService?.getAccountType(source)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 val networkData = response.body()
-                if(networkData != null){
-                    for(pagination in 1..networkData.meta.pagination.total_pages){
-                        accountsService!!.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({
-                            respond ->
-                            respond.body()?.data?.forEachIndexed{ _, accountPagination ->
-                                scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination)}
+                if (networkData != null) {
+                    for (pagination in 1..networkData.meta.pagination.total_pages) {
+                        accountsService!!.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({ respond ->
+                            respond.body()?.data?.forEachIndexed { _, accountPagination ->
+                                scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
                             }
                         }))
                     }
@@ -241,11 +241,12 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                 val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
-                    apiResponse.postValue(errorBody)
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
                 }
             }
         })
-        { throwable -> apiResponse.postValue(throwable.localizedMessage) })
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
         isLoading.value = false
     }
 

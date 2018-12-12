@@ -10,7 +10,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class DeletePiggyWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 

@@ -13,7 +13,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class DeleteBillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
@@ -43,7 +43,7 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
                 }
             } else {
                 Result.failure()
-                context.displayNotification("There was an issue deleting " + billAttribute?.name , "Bill",
+                context.displayNotification("There was an issue deleting " + billAttribute?.name, "Bill",
                         Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
             }
         })

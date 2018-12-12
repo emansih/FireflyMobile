@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import xyz.hisname.fireflyiii.data.remote.api.RulesService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.rules.RulesApiResponse
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class RulesViewModel(application: Application): BaseViewModel(application) {
 
@@ -19,7 +19,7 @@ class RulesViewModel(application: Application): BaseViewModel(application) {
                 rules.value = RulesApiResponse(response.body())
             }
         })
-        { throwable ->  rules.value = RulesApiResponse(throwable)})
+        { throwable -> rules.value = RulesApiResponse(throwable) })
         apiResponse.addSource(rules) { apiResponse.value = it }
         return apiResponse
     }

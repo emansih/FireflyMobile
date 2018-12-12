@@ -16,7 +16,8 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
-import xyz.hisname.fireflyiii.util.retrofitCallback
+import xyz.hisname.fireflyiii.util.network.NetworkErrors
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
 
 class PiggyViewModel(application: Application): BaseViewModel(application)  {
@@ -41,11 +42,12 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                 val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
-                    apiResponse.postValue(errorBody)
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
                 }
             }
         })
-        { throwable ->  apiResponse.postValue(throwable.localizedMessage)})
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
         isLoading.value = false
         return repository.allPiggyBanks
     }
@@ -66,7 +68,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         isLoading.value = true
         piggyService?.deletePiggyBankById(piggyId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
-                scope.async(Dispatchers.IO){
+                scope.async(Dispatchers.IO) {
                     repository.deletePiggyById(piggyId)
                 }.invokeOnCompletion {
                     isDeleted.postValue(true)
@@ -104,7 +106,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                 }
             }
             val networkData = response.body()
-            if(networkData != null){
+            if (networkData != null) {
                 scope.launch(Dispatchers.IO) { repository.insertPiggy(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
