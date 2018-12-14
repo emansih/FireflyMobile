@@ -31,7 +31,7 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
             val currency = currencyData.currencyAttributes
             itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             itemView.currencySymbol.text = currency?.symbol.toString()
-            itemView.flagImage.setImageDrawable(Flags(context).getCurrencyFlagsByIso(currency?.code!!))
+            itemView.flagImage.setImageDrawable(Flags.getCurrencyFlagsByIso(context.assets, currency?.code!!))
             itemView.setOnClickListener {
                 clickListener(currencyData)
             }
