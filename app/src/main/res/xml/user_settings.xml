@@ -4,46 +4,21 @@
 
     <PreferenceCategory
         android:title="Account">
-
-        <EditTextPreference
-            app:key="fireflyUrl"
-            app:title="Firefly URL">
-        </EditTextPreference>
-
-        <EditTextPreference
-            app:key="access_token"
-            app:title="Access Token">
-        </EditTextPreference>
-
-        <SwitchPreference
-            app:key="enable_cert_pinning"
-            app:title="Enable Certificate Pinning">
-        </SwitchPreference>
-
-        <EditTextPreference
-            app:key="cert_value"
-            app:title="Certificate Pinning Hash Value"
-            app:useSimpleSummaryProvider="true"
-            app:dependency="enable_cert_pinning">
-
-        </EditTextPreference>
-
-        <Preference
-            app:key="auth_method"
-            app:title="Authentication Method">
-        </Preference>
-
-        <Preference
-            app:key="refresh_token"
-            app:title="Refresh Token"
-            app:summary="Click here to refresh your token">
-        </Preference>
-
         <Preference
             app:key="logout"
-            app:title="Logout">
-        </Preference>
+            app:title="Logout" />
 
+        <Preference
+            app:key="account_more_options"
+            app:title="More Options" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Themes">
+        <Preference
+            app:key="themes_settings"
+            app:title="Configure App Theming" />
     </PreferenceCategory>
 
     <PreferenceCategory

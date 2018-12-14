@@ -8,10 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
@@ -26,8 +22,6 @@ import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
-import java.util.concurrent.TimeUnit
 
 class OnboardingFragment: Fragment() {
 
@@ -47,7 +41,6 @@ class OnboardingFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        setRefreshWorker()
         getUser()
     }
 
@@ -72,19 +65,6 @@ class OnboardingFragment: Fragment() {
             requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             requireActivity().finish()
         })
-    }
-
-    private fun setRefreshWorker(){
-        val workBuilder = PeriodicWorkRequest
-                .Builder(RefreshTokenWorker::class.java, 24, TimeUnit.HOURS)
-                .addTag("refresh_worker")
-                .setConstraints(Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .setRequiresBatteryNotLow(true)
-                        .build())
-                .build()
-        WorkManager.getInstance().enqueue(workBuilder)
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 40).start()
     }
 
 }

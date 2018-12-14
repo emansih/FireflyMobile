@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="refresh_token_timing_names">
+        <item>1 hour(Not Recommended)</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>12 hours</item>
+        <item>24 hours(Recommended)</item>
+        <item>36 hours</item>
+        <item>48 hours</item>
+        <item>60 hours</item>
+    </string-array>
+
+    <string-array name="refresh_token_timing_values">
+        <item>1</item>
+        <item>3</item>
+        <item>6</item>
+        <item>12</item>
+        <item>24</item>
+        <item>36</item>
+        <item>48</item>
+        <item>60</item>
+    </string-array>
+
+    <string-array name="dark_themes_names">
+        <item>Always</item>
+        <item>Automatically(at night and batter saver)</item>
+        <item>Battery saver only</item>
+        <item>Never</item>
+    </string-array>
+
+    <string-array name="dark_themes_values">
+        <item>always</item>
+        <item>automatically</item>
+        <item>battery_saver</item>
+        <item>never</item>
+    </string-array>
+
+
+</resources>
