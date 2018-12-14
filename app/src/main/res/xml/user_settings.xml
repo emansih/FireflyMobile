@@ -19,6 +19,9 @@
         <Preference
             app:key="themes_settings"
             app:title="Configure App Theming" />
+        <Preference
+            app:key="themes_reset"
+            app:title="Reset app theme" />
     </PreferenceCategory>
 
     <PreferenceCategory
