@@ -23,6 +23,7 @@ object Dependencies{
     private const val threeTenVersion = "1.1.1"
     private const val chartVersion = "v3.0.3"
     private const val aboutLibVersion = "2.3.0"
+    private const val glideVersion = "4.8.0"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
@@ -51,4 +52,6 @@ object Dependencies{
     val aboutLib = "com.github.daniel-stoneuk:material-about-library:$aboutLibVersion"
     val kotlinLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     val cyanea = "com.jaredrummler:cyanea:1.0.1"
+    val glideLib = "com.github.bumptech.glide:glide:$glideVersion"
+    val glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
 }

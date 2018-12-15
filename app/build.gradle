@@ -80,6 +80,10 @@ dependencies {
     implementation Dependencies.coroutineCore
     implementation Dependencies.coroutineAndroid
 
+    // Glide
+    implementation Dependencies.glideLib
+    kapt Dependencies.glideCompiler
+
     implementation Dependencies.materialDrawer
     implementation Dependencies.iconics
     implementation Dependencies.googleMaterialIcons

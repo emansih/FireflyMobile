@@ -28,5 +28,6 @@ class Constants private constructor() {
         const val TRANSACTION_CHANNEL = "xyz.hisname.fireflyiii.TRANSACTION"
         const val ACCOUNT_CHANNEL = "xyz.hisname.fireflyiii.ACCOUNT"
         const val GENERAL_NOTIFICATION = "xyz.hisname.fireflyiii.GENERAL"
+        const val PROFILE_URL = "https://images.unsplash.com/photo-1531987428847-95ad50737a07?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&w=1001&q=80"
     }
 }

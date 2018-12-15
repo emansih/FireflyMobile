@@ -1,12 +1,20 @@
 package xyz.hisname.fireflyiii.ui
 
 import android.accounts.AccountManager
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.materialdrawer.AccountHeader
@@ -18,7 +26,11 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IProfile
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader
+import com.mikepenz.materialdrawer.util.DrawerImageLoader
+import com.mikepenz.materialdrawer.util.DrawerUIUtils
 import kotlinx.android.synthetic.main.activity_base.*
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
@@ -46,6 +58,7 @@ class HomeActivity: BaseActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
         animateToolbar()
+        setProfileImage()
         setUpHeader(savedInstanceState)
         setSupportActionBar(activity_toolbar)
         setUpDrawer(savedInstanceState)
@@ -81,15 +94,47 @@ class HomeActivity: BaseActivity(){
         profile = ProfileDrawerItem()
                 .withName(AuthenticatorManager(AccountManager.get(this)).userEmail)
                 .withEmail(AppPref(sharedPref).userRole)
-                .withIcon(R.drawable.ic_piggy_bank)
+                .withIcon(Constants.PROFILE_URL)
         headerResult = AccountHeaderBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
                 .withSelectionListEnabledForSingleProfile(false)
                 .withCompactStyle(true)
+                .withHeightDp(100)
                 .addProfiles(profile)
                 .withSavedInstance(savedInstanceState)
                 .build()
+        val headerView = headerResult.headerBackgroundView
+        headerView.setBackgroundColor(ContextCompat.getColor(this, R.color.cyanea_accent_light_reference))
+    }
+
+    private fun setProfileImage(){
+        DrawerImageLoader.init(object : AbstractDrawerImageLoader(){
+            override fun set(imageView: ImageView, uri: Uri?, placeholder: Drawable?, tag: String?) {
+                super.set(imageView, uri, placeholder, tag)
+                Glide.with(imageView.context)
+                        .load(Constants.PROFILE_URL)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop())
+                        .into(imageView)
+            }
+            override fun cancel(imageView: ImageView) {
+                Glide.with(imageView.context).clear(imageView)
+                super.cancel(imageView)
+            }
+            override fun placeholder(ctx: Context?, tag: String): Drawable {
+                return when (tag) {
+                    DrawerImageLoader.Tags.PROFILE.name -> DrawerUIUtils.getPlaceHolder(ctx)
+                    DrawerImageLoader.Tags.ACCOUNT_HEADER.name -> IconicsDrawable(ctx).iconText(" ")
+                            .backgroundColorRes(R.color.md_orange_500)
+                            .sizeDp(56)
+                    "customUrlItem" -> IconicsDrawable(ctx).iconText(" ")
+                            .backgroundColorRes(R.color.md_orange_500)
+                            .sizeDp(56)
+                    else -> super.placeholder(ctx)
+                }
+            }
+        })
     }
 
     private fun setUpDrawer(savedInstanceState: Bundle?){
@@ -222,7 +267,6 @@ class HomeActivity: BaseActivity(){
                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_pink_500))
                 .withIconTintingEnabled(true)
                 .withIcon(R.drawable.ic_perm_identity_black_24dp)
-
         result = DrawerBuilder()
                 .withActivity(this)
                 .withFullscreen(true)
