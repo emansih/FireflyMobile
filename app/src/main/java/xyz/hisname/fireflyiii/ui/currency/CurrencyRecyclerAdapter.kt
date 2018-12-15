@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.currency_list.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
@@ -31,7 +32,9 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
             val currency = currencyData.currencyAttributes
             itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             itemView.currencySymbol.text = currency?.symbol.toString()
-            itemView.flagImage.setImageDrawable(Flags.getCurrencyFlagsByIso(context.assets, currency?.code!!))
+            Glide.with(context)
+                    .load(Flags.getCurrencyFlagsByIso(context.assets, currency?.code!!))
+                    .into(itemView.flagImage)
             itemView.setOnClickListener {
                 clickListener(currencyData)
             }
