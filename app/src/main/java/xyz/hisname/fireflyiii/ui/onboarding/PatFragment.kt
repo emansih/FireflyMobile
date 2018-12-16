@@ -33,18 +33,18 @@ class PatFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         fireflySignIn.setOnClickListener {
             hideKeyboard()
-            if(firefly_url_edittext.isBlank() or firefly_secret_edittext.isBlank()){
+            if(firefly_url_edittext.isBlank() or firefly_access_edittext.isBlank()){
                 if(firefly_url_edittext.isBlank()) {
-                    firefly_url_edittext.showRequiredError()
+                    firefly_url_layout.showRequiredError()
                 }
-                if(firefly_secret_edittext.isBlank()){
-                    firefly_secret_edittext.showRequiredError()
+                if(firefly_access_edittext.isBlank()){
+                    firefly_access_layout.showRequiredError()
                 }
             }  else {
                 fireflyUrl = firefly_url_edittext.getString()
                 AuthenticatorManager(AccountManager.get(requireContext())).initializeAccount()
                 AppPref(PreferenceManager.getDefaultSharedPreferences(context)).baseUrl = fireflyUrl
-                AuthenticatorManager(AccountManager.get(requireContext())).secretKey = firefly_secret_edittext.getString()
+                AuthenticatorManager(AccountManager.get(requireContext())).accessToken = firefly_access_edittext.getString()
                 model.getAllAccounts().observe(this, Observer { accountData ->
                     if(accountData != null){
                         AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"

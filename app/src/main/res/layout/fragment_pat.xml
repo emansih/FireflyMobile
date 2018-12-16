@@ -30,7 +30,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/firefly_secret_layout"
+        android:id="@+id/firefly_access_layout"
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:hint="Personal Access Token"
@@ -43,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/firefly_secret_edittext"
+            android:id="@+id/firefly_access_edittext"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="text|textMultiLine"
@@ -58,9 +58,10 @@
         android:textStyle="bold"
         android:text="Sign In"
         android:textColor="@color/white"
+        android:layout_marginTop="8dp"
         android:background="@color/md_black_1000"
-        app:layout_constraintTop_toBottomOf="@+id/firefly_secret_layout"
-        app:layout_constraintStart_toStartOf="@+id/firefly_secret_layout"
-        app:layout_constraintEnd_toEndOf="@+id/firefly_secret_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/firefly_access_layout"
+        app:layout_constraintStart_toStartOf="@+id/firefly_access_layout"
+        app:layout_constraintEnd_toEndOf="@+id/firefly_access_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

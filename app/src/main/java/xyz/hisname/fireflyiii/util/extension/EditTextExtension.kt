@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.util.extension
 
 import android.widget.EditText
 import androidx.core.text.isDigitsOnly
+import com.google.android.material.textfield.TextInputLayout
 import xyz.hisname.fireflyiii.R
 
 fun EditText.getString(): String {
@@ -21,5 +22,9 @@ fun EditText.isDigitsOnly(): Boolean {
 }
 
 fun EditText.showRequiredError(){
+    this.error = resources.getText(R.string.required_field)
+}
+
+fun TextInputLayout.showRequiredError(){
     this.error = resources.getText(R.string.required_field)
 }
