@@ -100,10 +100,13 @@ class AddTransactionDialog: BaseDialog() {
                          .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
                          .sizeDp(24),null, null, null)
         placeHolderToolbar.navigationIcon = navIcon
-        addTransactionFab.setImageDrawable(IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_add)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
-                .sizeDp(16))
+        addTransactionFab.apply{
+            setImageDrawable(IconicsDrawable(requireContext())
+                    .icon(FontAwesome.Icon.faw_save)
+                    .color(ContextCompat.getColor(requireContext(), R.color.cyanea_accent_light_reference))
+                    .sizeDp(16))
+            setBackgroundColor(ContextCompat.getColor(requireContext(),R.color.cyanea_accent_dark_reference))
+        }
     }
 
      private fun setWidgets(){
