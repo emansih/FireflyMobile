@@ -41,6 +41,7 @@
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/accessTokenButton"
                         style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        android:textColor="@color/md_light_blue_300"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Access Token"
