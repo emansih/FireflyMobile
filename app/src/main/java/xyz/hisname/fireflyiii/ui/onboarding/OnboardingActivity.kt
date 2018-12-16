@@ -68,10 +68,8 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                 translationY(-DeviceUtil.getScreenHeight(this@OnboardingActivity).toFloat() / 2 + 160F)
                 interpolator = FastOutSlowInInterpolator()
                 duration = 900
-                onAnimationStart {
-                    AuthenticatorManager(AccountManager.get(this@OnboardingActivity)).destroyAccount()
-                }
                 onAnimationEnd {
+                    AuthenticatorManager(AccountManager.get(this@OnboardingActivity)).destroyAccount()
                     app_name_textview.isVisible = true
                     supportFragmentManager.beginTransaction()
                             .replace(R.id.fragment_container, AuthChooserFragment())
@@ -109,12 +107,5 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         })
     }
 
-    private inline fun ViewPropertyAnimator.onAnimationStart(crossinline continuation: (Animator) -> Unit) {
-        setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationStart(animation: Animator) {
-                continuation(animation)
-            }
-        })
-    }
 }
 

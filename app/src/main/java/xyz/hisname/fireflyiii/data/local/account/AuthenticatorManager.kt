@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.data.local.account
 
 import android.accounts.Account
 import android.accounts.AccountManager
+import android.os.Build
 import androidx.core.os.bundleOf
 import java.util.concurrent.TimeUnit
 
@@ -39,7 +40,14 @@ class AuthenticatorManager(private val accountManager: AccountManager): AccountH
         set(value) = accountManager.setUserData(account, "AUTH_METHOD", value)
 
     override fun destroyAccount() {
-        accountManager.addAccountExplicitly(account, null, bundleOf())
+        val accountList = accountManager.getAccountsByType("OAUTH")
+        for(items in accountList){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                accountManager.removeAccount(items, null, null, null)
+            } else {
+                accountManager.removeAccount(items, null, null)
+            }
+        }
     }
 
     override var tokenExpiry
