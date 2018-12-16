@@ -98,5 +98,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    debugImplementation Dependencies.debugDb
 }
