@@ -13,6 +13,8 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutCard
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class AboutFragment: MaterialAboutFragment() {
 
@@ -20,6 +22,11 @@ class AboutFragment: MaterialAboutFragment() {
     private val serverVersion by lazy { sharedPref.getString("server_version","") ?: ""}
     private val apiVersion by lazy { sharedPref.getString("api_version","") ?: ""}
     private val userOs by lazy { sharedPref.getString("user_os","") ?: ""}
+
+    override fun onStart() {
+        super.onStart()
+        getViewModel(UserInfoViewModel::class.java).userSystem()
+    }
 
     override fun getMaterialAboutList(context: Context): MaterialAboutList{
         return createMaterialAboutList()
@@ -33,8 +40,7 @@ class AboutFragment: MaterialAboutFragment() {
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank)))
                 .addItem(ConvenienceBuilder.createVersionActionItem(requireContext(),
                 ContextCompat.getDrawable(requireContext(),R.drawable.ic_cellphone),
-                "Mobile Version",false))
-                .addItem(MaterialAboutActionItem.Builder()
+                "Mobile Version",false)).addItem(MaterialAboutActionItem.Builder()
                         .text("Server Version")
                         .subText(serverVersion)
                         .icon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_server))
@@ -50,7 +56,6 @@ class AboutFragment: MaterialAboutFragment() {
                         .icon(setUserOsIcon())
                         .build())
                 .build()
-
         val authorCardBuilder = MaterialAboutCard.Builder()
         authorCardBuilder.title("Author")
         authorCardBuilder.addItem(MaterialAboutActionItem.Builder()
@@ -66,7 +71,6 @@ class AboutFragment: MaterialAboutFragment() {
                         .setOnClickAction {
                             requireContext().startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/emansih/FireflyMobile".toUri()))
                         }.build())
-
         return MaterialAboutList(appCardBuilder.build(), authorCardBuilder.build())
     }
 
