@@ -95,10 +95,11 @@ class LoginFragment: Fragment() {
                 }
                 clientIdLiveData.value = fireflyId
                 secretKeyLiveData.value = fireflySecretKey
-                val intent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
+                val browserIntent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
                 "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri())
-                if (intent.resolveActivity(requireActivity().packageManager) != null){
-                    startActivity(intent)
+                browserIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                if (browserIntent.resolveActivity(requireActivity().packageManager) != null){
+                    startActivity(browserIntent)
                 } else {
                     toastError("No apps on your device can handle OAuth")
                 }

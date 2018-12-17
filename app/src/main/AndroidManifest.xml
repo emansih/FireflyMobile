@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".ui.onboarding.OnboardingActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

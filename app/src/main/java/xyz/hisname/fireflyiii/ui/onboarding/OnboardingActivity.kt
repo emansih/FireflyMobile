@@ -71,9 +71,9 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                 onAnimationEnd {
                     AuthenticatorManager(AccountManager.get(this@OnboardingActivity)).destroyAccount()
                     app_name_textview.isVisible = true
-                    supportFragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container, AuthChooserFragment())
-                            .commit()
+                    supportFragmentManager.commit(allowStateLoss = true){
+                        replace(R.id.fragment_container, AuthChooserFragment())
+                    }
                 }
             }
         }
