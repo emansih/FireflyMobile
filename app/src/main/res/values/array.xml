@@ -22,19 +22,4 @@
         <item>60</item>
     </string-array>
 
-    <string-array name="dark_themes_names">
-        <item>Always</item>
-        <item>Automatically(at night and batter saver)</item>
-        <item>Battery saver only</item>
-        <item>Never</item>
-    </string-array>
-
-    <string-array name="dark_themes_values">
-        <item>always</item>
-        <item>automatically</item>
-        <item>battery_saver</item>
-        <item>never</item>
-    </string-array>
-
-
 </resources>

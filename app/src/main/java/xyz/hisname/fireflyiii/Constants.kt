@@ -4,11 +4,6 @@ class Constants private constructor() {
 
     companion object {
         const val REDIRECT_URI = "http://${BuildConfig.HOSTNAME}"
-        const val WEEKLY = "Weekly"
-        const val MONTHLY = "Monthly"
-        const val QUARTERLY = "Quarterly"
-        const val HALF_YEARLY = "Half-yearly"
-        const val YEARLY = "Yearly"
         const val OAUTH_API_ENDPOINT = "oauth"
         const val SYSTEM_INFO_ENDPOINT = "api/v1/about"
         const val BILL_API_ENDPONT = "api/v1/bills"

@@ -93,9 +93,7 @@ class AddBillDialog: BaseDialog() {
     }
 
     private fun setWidgets(){
-        val spinnerValue = arrayOf(Constants.WEEKLY, Constants.MONTHLY,
-                Constants.QUARTERLY, Constants.HALF_YEARLY, Constants.YEARLY)
-        val dataAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, spinnerValue)
+        val dataAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, resources.getStringArray(R.array.repeat_frequency))
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         frequency_spinner.adapter = dataAdapter
         val calendar = Calendar.getInstance()
