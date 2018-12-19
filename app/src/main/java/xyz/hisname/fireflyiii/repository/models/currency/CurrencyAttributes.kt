@@ -10,6 +10,7 @@ data class CurrencyAttributes(
         val currencyIdPlaceHolder: Long,
         val updated_at: String,
         val created_at: String,
+        val enabled: Boolean,
         val name: String,
         val code: String,
         val symbol: String,

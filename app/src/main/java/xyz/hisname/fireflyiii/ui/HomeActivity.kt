@@ -16,6 +16,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -38,6 +39,7 @@ import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
+import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
@@ -253,13 +255,26 @@ class HomeActivity: BaseActivity(){
                                 .withIdentifier(18)*/
 
                 )
-        val settings = PrimaryDrawerItem()
-                .withIdentifier(19)
-                .withName("Settings")
-                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_teal_500))
-                .withIconTintingEnabled(true)
-                .withIcon(R.drawable.ic_settings)
+        val options = ExpandableDrawerItem().withName("Options")
+                .withIdentifier(14)
+                .withIcon(FontAwesome.Icon.faw_cog)
+                .withSelectable(false)
+                .withSubItems(
+                        SecondaryDrawerItem().withName("Settings")
+                                .withLevel(4)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_teal_500))
+                                .withIconTintingEnabled(true)
+                                .withIdentifier(19)
+                                .withIcon(R.drawable.ic_settings),
+                        SecondaryDrawerItem().withName("Currencies")
+                                .withLevel(4)
+                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_pink_800))
+                                .withIconTintingEnabled(true)
+                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_money_bill).sizeDp(24))
+                                .withIdentifier(22)
+                )
         val about = PrimaryDrawerItem()
                 .withIdentifier(20)
                 .withName("About")
@@ -273,7 +288,7 @@ class HomeActivity: BaseActivity(){
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(dashboard, transactions,account,/* budgets, categories, tags, reports,
-                        ,*/ moneyManagement,settings, about)
+                        ,*/ moneyManagement, options, about)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
                         drawerItem.identifier == 1L -> {
@@ -324,6 +339,9 @@ class HomeActivity: BaseActivity(){
                         drawerItem.identifier == 21L -> {
                             val bundle = bundleOf("accountType" to "liability")
                             changeFragment(ListAccountFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 22L -> {
+                            changeFragment(CurrencyListFragment())
                         }
                         else -> {
 

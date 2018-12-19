@@ -4,6 +4,7 @@ import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.CURRENCY_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
+import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/currency.html
 interface CurrencyService {
@@ -18,7 +19,7 @@ interface CurrencyService {
     @POST(CURRENCY_API_ENDPOINT)
     fun createCurrency(@Field("name") name: String, @Field("code") code: String,
                        @Field("symbol") symbol: String, @Field("decimal_places") decimalPlaces: String,
-                       @Field("default") default: Boolean)
+                       @Field("enabled") default: Boolean): Call<CurrencySuccessModel>
 
     @DELETE("$CURRENCY_API_ENDPOINT/{id}")
     fun deleteCurrencyById(@Path("id") id: String)

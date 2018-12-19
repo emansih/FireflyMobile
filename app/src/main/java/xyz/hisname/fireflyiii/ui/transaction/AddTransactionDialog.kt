@@ -15,7 +15,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
@@ -29,7 +28,7 @@ import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
-import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
+import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -145,7 +144,7 @@ class AddTransactionDialog: BaseDialog() {
          })
          placeHolderToolbar.setNavigationOnClickListener { unReveal(dialog_add_transaction_layout) }
          currency_edittext.setOnClickListener{
-             CurrencyListFragment().show(requireFragmentManager(), "currencyList" )
+             CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )
          }
      }
 

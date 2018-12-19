@@ -14,7 +14,6 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_bill.*
 import kotlinx.android.synthetic.main.progress_overlay.*
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.BillReceiver
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
@@ -22,7 +21,7 @@ import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
-import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
+import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -113,7 +112,7 @@ class AddBillDialog: BaseDialog() {
                     .show()
         }
         currency_edittext.setOnClickListener{
-            CurrencyListFragment().show(requireFragmentManager(), "currencyList" )
+            CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )
         }
         currencyViewModel.currencyCode.observe(this, Observer {
             currency = it

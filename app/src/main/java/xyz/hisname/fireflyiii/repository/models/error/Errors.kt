@@ -29,5 +29,9 @@ data class Errors(
         val transaction_amount: List<String>?,
         val description: List<String>?,
         val date: List<String>?,
-        val skip: List<String>?
+        val skip: List<String>?,
+        val code: List<String>?,
+        val symbol: List<String>?,
+        @SerializedName("decimal_places")
+        val decimalPlaces: List<String>?
 )

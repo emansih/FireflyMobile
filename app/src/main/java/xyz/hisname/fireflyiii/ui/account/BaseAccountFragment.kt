@@ -11,7 +11,7 @@ import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
+import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -45,7 +45,7 @@ abstract class BaseAccountFragment: BaseFragment() {
             currencyCode.setText(it)
         })
         currencyCode.setOnClickListener{
-            val currencyListFragment = CurrencyListFragment()
+            val currencyListFragment = CurrencyListBottomSheet()
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
         }
         ccPaymentDate.setOnClickListener {
