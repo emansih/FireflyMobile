@@ -2,20 +2,11 @@ package xyz.hisname.fireflyiii.repository.budget
 
 import androidx.annotation.WorkerThread
 import xyz.hisname.fireflyiii.data.local.dao.BudgetDataDao
-import xyz.hisname.fireflyiii.data.local.dao.BudgetLimitDataDao
-import xyz.hisname.fireflyiii.repository.models.budget.budget.BudgetData
-import xyz.hisname.fireflyiii.repository.models.budget.limit.BudgetLimitData
+import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 
-class BudgetRepository(private val budgetLimitDao: BudgetLimitDataDao, private val budget: BudgetDataDao) {
+class BudgetRepository(private val budget: BudgetDataDao) {
 
-    val allBudgetLimits = budgetLimitDao.getAllBudgetLimits()
     val allBudget = budget.getAllBudget()
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun insertBudgetLimit(budgetLimit: BudgetLimitData){
-        budgetLimitDao.insert(budgetLimit)
-    }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -25,7 +16,8 @@ class BudgetRepository(private val budgetLimitDao: BudgetLimitDataDao, private v
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun retrieveConstraintBudget(startDate: String, endDate: String): MutableList<BudgetLimitData>{
-        return budgetLimitDao.getConstraintBudget(startDate, endDate)
+    suspend fun retrieveConstraintBudget(startDate: String, endDate: String): MutableList<BudgetData>{
+        return budget.getConstraintBudget(startDate, endDate)
     }
+
 }

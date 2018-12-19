@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository.models.budget.budget
+package xyz.hisname.fireflyiii.repository.models.budget
 
 import androidx.room.Embedded
 import androidx.room.Entity

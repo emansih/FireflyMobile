@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository.models.budget.limit
+package xyz.hisname.fireflyiii.repository.models.budget
 
 data class Pagination(
         val count: Int,

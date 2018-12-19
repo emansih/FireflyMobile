@@ -4,7 +4,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 import xyz.hisname.fireflyiii.Constants.Companion.BUDGET_API_ENDPOINT
-import xyz.hisname.fireflyiii.repository.models.budget.budget.BudgetModel
+import xyz.hisname.fireflyiii.repository.models.budget.BudgetModel
 
 interface BudgetService {
 
