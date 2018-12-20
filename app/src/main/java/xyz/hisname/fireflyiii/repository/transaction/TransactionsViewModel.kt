@@ -126,6 +126,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 }
             }
             if (response.isSuccessful) {
+                response.body()?.data?.forEachIndexed { _, transaction ->
+                    scope.launch(Dispatchers.IO) { repository.insertTransaction(transaction) }
+                }
                 transaction.postValue(ApiResponses(response.body()))
             } else {
                 transaction.postValue(ApiResponses(errorBodyMessage))
