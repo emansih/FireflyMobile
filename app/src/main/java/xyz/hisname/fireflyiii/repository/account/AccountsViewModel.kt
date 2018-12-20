@@ -40,7 +40,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         loadRemoteData("asset")
         asset = 0.toDouble()
         scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByType("Asset account")
+            accountData = repository.retrieveAccountByType("asset")
         }.invokeOnCompletion {
             isLoading.postValue(false)
             if (accountData.isNullOrEmpty()) {
@@ -78,7 +78,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         loadRemoteData("loan")
         loan = 0.toDouble()
         scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByType("Loan")
+            accountData = repository.retrieveAccountByType("loan")
         }.invokeOnCompletion {
             isLoading.postValue(false)
             if (accountData.isNullOrEmpty()) {

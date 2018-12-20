@@ -7,10 +7,10 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 class AccountRepository(private val accountDao: AccountsDataDao){
 
     val allAccounts = accountDao.getAllAccounts()
-    val assetAccount = accountDao.getAccountByType("Asset account")
-    val expenseAccount = accountDao.getAccountByType("Expense account")
-    val revenueAccount = accountDao.getAccountByType("Revenue account")
-    val liabilityAccount = accountDao.getAccountByType("Liability account")
+    val assetAccount = accountDao.getAccountByType("asset")
+    val expenseAccount = accountDao.getAccountByType("expense")
+    val revenueAccount = accountDao.getAccountByType("revenue")
+    val liabilityAccount = accountDao.getAccountByType("liabilities")
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
