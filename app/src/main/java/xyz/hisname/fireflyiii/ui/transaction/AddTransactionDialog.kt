@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
 import android.app.DatePickerDialog
-import android.content.Intent
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -10,10 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
+import com.hootsuite.nachos.ChipConfiguration
+import com.hootsuite.nachos.chip.ChipSpan
+import com.hootsuite.nachos.terminator.ChipTerminatorHandler
+import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_transaction.*
@@ -33,6 +36,10 @@ import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
+import android.content.Intent
+import androidx.core.os.bundleOf
+import com.hootsuite.nachos.chip.ChipCreator
+
 
 class AddTransactionDialog: BaseDialog() {
 
@@ -98,6 +105,22 @@ class AddTransactionDialog: BaseDialog() {
                  IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
                          .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
                          .sizeDp(24),null, null, null)
+
+        tags_chip.chipTokenizer = SpanChipTokenizer(requireContext(), object : ChipCreator<ChipSpan> {
+            override fun configureChip(chip: ChipSpan, chipConfiguration: ChipConfiguration) {
+            }
+
+            override fun createChip(context: Context, text: CharSequence, data: Any?): ChipSpan {
+                return ChipSpan(requireContext(), text,
+                        IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag).sizeDp(12), data)
+            }
+
+            override fun createChip(context: Context, existingChip: ChipSpan): ChipSpan {
+                return ChipSpan(requireContext(), existingChip)
+            }
+        }, ChipSpan::class.java)
+
+
         placeHolderToolbar.navigationIcon = navIcon
         addTransactionFab.apply{
             setImageDrawable(IconicsDrawable(requireContext())
@@ -146,6 +169,8 @@ class AddTransactionDialog: BaseDialog() {
          currency_edittext.setOnClickListener{
              CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )
          }
+         tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
+         tags_chip.enableEditChipOnTouch(false, true)
      }
 
      private fun contextSwitch(){
@@ -263,10 +288,18 @@ class AddTransactionDialog: BaseDialog() {
                 destinationAccount = destination_spinner.selectedItem.toString()
             }
         }
+        val transactionTags = if(tags_chip.allChips.isNullOrEmpty()){
+            null
+        } else {
+            // Remove [ and ] from beginning and end of string
+            val beforeTags = tags_chip.allChips.toString().substring(1)
+            beforeTags.substring(0, beforeTags.length - 1)
+        }
+
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transaction_date_edittext.getString(), piggyBank, billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
-                currency, categoryName).observe(this, Observer { transactionResponse ->
+                currency, categoryName, transactionTags).observe(this, Observer { transactionResponse ->
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {

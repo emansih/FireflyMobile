@@ -36,7 +36,8 @@ interface TransactionService {
                        @Field("transactions[0][source_name]") sourceName: String?,
                        @Field("transactions[0][destination_name]") destionationName: String?,
                        @Field("transactions[0][currency_code]") currency: String,
-                       @Field("transactions[0][category_name]") category: String?): Call<TransactionSuccessModel>
+                       @Field("transactions[0][category_name]") category: String?,
+                       @Field("tags") tags: String?): Call<TransactionSuccessModel>
 
     @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)

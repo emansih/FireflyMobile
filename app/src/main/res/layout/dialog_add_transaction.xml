@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:id="@+id/dialog_add_transaction_layout"
     android:layout_width="match_parent"
@@ -272,6 +273,25 @@
                     style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
             </com.google.android.material.textfield.TextInputLayout>
 
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tags_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:layout_constraintEnd_toEndOf="@+id/transaction_amount_layout"
+                app:layout_constraintStart_toStartOf="@+id/transaction_amount_layout"
+                app:layout_constraintTop_toBottomOf="@+id/category_layout">
+
+                <com.hootsuite.nachos.NachoTextView
+                    android:id="@+id/tags_chip"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Tags(optional), Comma separated"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

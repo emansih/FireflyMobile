@@ -25,6 +25,7 @@ object Dependencies{
     private const val aboutLibVersion = "2.4.2"
     private const val glideVersion = "4.8.0"
     private const val debugDbVersion = "1.0.4"
+    private const val nachosVersion = "1.1.1"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
@@ -56,4 +57,5 @@ object Dependencies{
     val glideLib = "com.github.bumptech.glide:glide:$glideVersion"
     val glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
     val debugDb = "com.amitshekhar.android:debug-db:$debugDbVersion"
+    val nachos = "com.hootsuite.android:nachos:$nachosVersion"
 }
