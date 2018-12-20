@@ -39,6 +39,8 @@ import java.util.*
 import android.content.Intent
 import androidx.core.os.bundleOf
 import com.hootsuite.nachos.chip.ChipCreator
+import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
+import kotlin.collections.ArrayList
 
 
 class AddTransactionDialog: BaseDialog() {
@@ -48,9 +50,11 @@ class AddTransactionDialog: BaseDialog() {
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
+    private val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     private var currency = ""
     private var accounts = ArrayList<String>()
+    private var tags = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
     private var destinationAccounts = ArrayList<String>()
     private var piggyBank = ArrayList<String>()
@@ -119,8 +123,6 @@ class AddTransactionDialog: BaseDialog() {
                 return ChipSpan(requireContext(), existingChip)
             }
         }, ChipSpan::class.java)
-
-
         placeHolderToolbar.navigationIcon = navIcon
         addTransactionFab.apply{
             setImageDrawable(IconicsDrawable(requireContext())
@@ -171,6 +173,14 @@ class AddTransactionDialog: BaseDialog() {
          }
          tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
          tags_chip.enableEditChipOnTouch(false, true)
+         tagsViewModel.getAllTags().observe(this, Observer {
+             it.forEachIndexed{ _, tagsData ->
+                 tags.add(tagsData.tagsAttributes?.tag!!)
+             }
+             val tagsAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, tags)
+             tags_chip.threshold = 1
+             tags_chip.setAdapter(tagsAdapter)
+         })
      }
 
      private fun contextSwitch(){
