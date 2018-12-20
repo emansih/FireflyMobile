@@ -45,6 +45,7 @@ import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
+import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
 import xyz.hisname.fireflyiii.ui.transaction.AddTransactionDialog
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
@@ -193,6 +194,10 @@ class HomeActivity: BaseActivity(){
         val tags = PrimaryDrawerItem()
                 .withIdentifier(8)
                 .withName("Tags")
+                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_green_400))
+                .withIconTintingEnabled(true)
+                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_tag).sizeDp(24))
         val reports = PrimaryDrawerItem()
                 .withIdentifier(9)
                 .withName("Reports")
@@ -287,7 +292,7 @@ class HomeActivity: BaseActivity(){
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(dashboard, transactions,account,/* budgets, categories, tags, reports,
+                .addDrawerItems(dashboard, transactions,account, tags, /* budgets, categories, tags, reports,
                         ,*/ moneyManagement, options, about)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
@@ -308,6 +313,9 @@ class HomeActivity: BaseActivity(){
                         drawerItem.identifier == 5L -> {
                             val bundle = bundleOf("accountType" to "revenue")
                             changeFragment(ListAccountFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 8L -> {
+                            changeFragment(ListTagsFragment())
                         }
                         drawerItem.identifier == 11L -> {
                             val bundle = bundleOf("transactionType" to "Withdrawal")
