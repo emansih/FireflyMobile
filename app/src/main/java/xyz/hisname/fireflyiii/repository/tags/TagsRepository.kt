@@ -14,5 +14,11 @@ class TagsRepository(private val tagsDataDao: TagsDataDao) {
         tagsDataDao.insert(tags)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteTagByName(tagName: String): Int{
+        return tagsDataDao.deleteTagByName(tagName)
+    }
+
 
 }

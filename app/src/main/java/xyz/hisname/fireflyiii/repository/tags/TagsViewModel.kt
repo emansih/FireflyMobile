@@ -2,8 +2,10 @@ package xyz.hisname.fireflyiii.repository.tags
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.TagsService
@@ -46,5 +48,23 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
         return repository.allTags
     }
 
-
+    fun deleteTagByName(tagName: String): LiveData<Boolean>{
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        isLoading.value = true
+        tagsService?.deleteTagByName(tagName)?.enqueue(retrofitCallback({ response ->
+            if (response.code() == 204 || response.code() == 200) {
+                scope.async(Dispatchers.IO) {
+                    repository.deleteTagByName(tagName)
+                }.invokeOnCompletion {
+                    isDeleted.postValue(true)
+                }
+            } else {
+                isDeleted.postValue(false)
+            }
+        })
+        { throwable ->
+            isDeleted.postValue(false)
+        })
+        return isDeleted
+    }
 }

@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.google.android.material.chip.Chip
@@ -17,6 +19,8 @@ import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.extension.toastError
+import xyz.hisname.fireflyiii.util.extension.toastSuccess
 
 class ListTagsFragment: BaseFragment() {
 
@@ -30,18 +34,31 @@ class ListTagsFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        all_tags.setChipSpacing(16)
         tagsViewModel.getAllTags().observe(this, Observer {
             it.forEachIndexed { _, tagsData ->
-                chipTags = Chip(requireContext()).apply {
+                chipTags = Chip(requireContext())
+                chipTags.apply {
                     text = tagsData.tagsAttributes?.tag
                     chipIcon = IconicsDrawable(requireContext()).
-                            icon(FontAwesome.Icon.faw_tag).sizeDp(8)
+                            icon(FontAwesome.Icon.faw_tag)
                             .color(ContextCompat.getColor(requireContext(),R.color.md_green_400))
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener { close ->
+                        val tagName = (close as TextView).text.toString()
+                        tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
+                            if (status) {
+                                all_tags.removeAllViews()
+                                toastSuccess("$tagName Deleted")
+                            } else {
+                                toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
+                            }
+                        })
+                    }
                 }
                 all_tags.addView(chipTags)
             }
         })
-
     }
 
     override fun onAttach(context: Context){
