@@ -46,7 +46,7 @@ class PatFragment: Fragment() {
                 AppPref(PreferenceManager.getDefaultSharedPreferences(context)).baseUrl = fireflyUrl
                 AuthenticatorManager(AccountManager.get(requireContext())).accessToken = firefly_access_edittext.getString()
                 model.getAllAccounts().observe(this, Observer { accountData ->
-                    if(accountData != null){
+                    if(accountData.isNotEmpty()){
                         AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
