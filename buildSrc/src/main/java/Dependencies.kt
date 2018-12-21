@@ -53,7 +53,6 @@ object Dependencies{
     val chart = "com.github.PhilJay:MPAndroidChart:$chartVersion"
     val aboutLib = "com.github.daniel-stoneuk:material-about-library:$aboutLibVersion"
     val kotlinLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    val cyanea = "com.jaredrummler:cyanea:1.0.1"
     val glideLib = "com.github.bumptech.glide:glide:$glideVersion"
     val glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
     val debugDb = "com.amitshekhar.android:debug-db:$debugDbVersion"

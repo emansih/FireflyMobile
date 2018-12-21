@@ -3,15 +3,11 @@ package xyz.hisname.fireflyiii.ui.settings
 import android.accounts.AccountManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import xyz.hisname.fireflyiii.R
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
-import com.jaredrummler.cyanea.Cyanea
-import com.jaredrummler.cyanea.prefs.CyaneaSettingsActivity
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +29,6 @@ class SettingsFragment: BaseSettings() {
         addPreferencesFromResource(R.xml.user_settings)
         setAccountSection()
         setTransactionSection()
-        setThemesSection()
     }
 
    private fun setAccountSection(){
@@ -59,24 +54,6 @@ class SettingsFragment: BaseSettings() {
            }
            true
        }
-    }
-
-    private fun setThemesSection(){
-        findPreference("themes_settings").setOnPreferenceClickListener {
-            val themePicker = Intent(requireContext(), CyaneaSettingsActivity::class.java)
-            startActivity(themePicker)
-            true
-        }
-        findPreference("themes_reset").setOnPreferenceClickListener {
-            Cyanea.instance.edit {
-                primary(ContextCompat.getColor(requireContext(),R.color.primary))
-                primaryDark(ContextCompat.getColor(requireContext(),R.color.colorPrimaryDark))
-                accent(ContextCompat.getColor(requireContext(),R.color.accent))
-                shouldTintNavBar(false)
-                shouldTintStatusBar(false)
-            }.recreate(requireActivity(), smooth = true)
-            true
-        }
     }
 
     private fun setTransactionSection(){

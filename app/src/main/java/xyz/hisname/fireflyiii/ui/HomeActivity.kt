@@ -108,7 +108,7 @@ class HomeActivity: BaseActivity(){
                 .withSavedInstance(savedInstanceState)
                 .build()
         val headerView = headerResult.headerBackgroundView
-        headerView.setBackgroundColor(ContextCompat.getColor(this, R.color.cyanea_accent_light_reference))
+        headerView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
     }
 
     private fun setProfileImage(){

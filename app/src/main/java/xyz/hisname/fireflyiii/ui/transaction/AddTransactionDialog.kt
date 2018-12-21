@@ -127,9 +127,9 @@ class AddTransactionDialog: BaseDialog() {
         addTransactionFab.apply{
             setImageDrawable(IconicsDrawable(requireContext())
                     .icon(FontAwesome.Icon.faw_save)
-                    .color(ContextCompat.getColor(requireContext(), R.color.cyanea_accent_light_reference))
+                    .color(ContextCompat.getColor(requireContext(), R.color.colorPrimaryLight))
                     .sizeDp(16))
-            setBackgroundColor(ContextCompat.getColor(requireContext(),R.color.cyanea_accent_dark_reference))
+            setBackgroundColor(ContextCompat.getColor(requireContext(),R.color.colorPrimaryDark))
         }
     }
 

@@ -93,7 +93,6 @@ dependencies {
     implementation Dependencies.threeTenBp
     implementation Dependencies.chart
     implementation Dependencies.aboutLib
-    implementation Dependencies.cyanea
     implementation Dependencies.nachos
 
     testImplementation 'junit:junit:4.12'
