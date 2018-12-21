@@ -22,7 +22,6 @@ class BillReceiver: BroadcastReceiver() {
             if(intent.action == "firefly.hisname.ADD_BILL"){
                 val billData = Data.Builder()
                         .putString("name", intent.getStringExtra("name"))
-                        .putString("billMatch", intent.getStringExtra("billMatch"))
                         .putString("minAmount", intent.getStringExtra("minAmount"))
                         .putString("maxAmount", intent.getStringExtra("maxAmount"))
                         .putString("billDate", intent.getStringExtra("billDate"))

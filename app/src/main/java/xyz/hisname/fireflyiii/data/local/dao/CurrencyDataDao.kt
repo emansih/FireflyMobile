@@ -14,4 +14,8 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("DELETE FROM currency WHERE currencyId = :currencyId")
     abstract fun deleteCurrencyById(currencyId: Long): Int
 
+    @Query("SELECT * FROM currency WHERE code = :currencyCode")
+    abstract fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData>
+
+
 }

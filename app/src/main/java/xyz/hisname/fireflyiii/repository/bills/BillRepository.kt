@@ -16,6 +16,12 @@ class BillRepository(private val billDao: BillDataDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
+    suspend fun updateBill(bill: BillData){
+        billDao.update(bill)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun retrieveBillById(billId: Long): MutableList<BillData>{
         return billDao.getBillById(billId)
     }

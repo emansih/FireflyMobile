@@ -29,12 +29,14 @@ import java.util.*
 
 class AddBillDialog: BaseDialog() {
 
-    private val model: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
+    private val billViewModel: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private var billAttribute: BillAttributes? = null
     private var notes: String? = null
     private var repeatFreq: String = ""
     private var currency = ""
+    private val billId by lazy { arguments?.getLong("billId") ?: 0 }
+    private lateinit var freqAdapter: ArrayAdapter<String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -44,19 +46,48 @@ class AddBillDialog: BaseDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         CircularReveal(dialog_add_bill_layout).showReveal(revealX, revealY)
+        if(billId != 0L){
+            billViewModel.getBillById(billId).observe(this, Observer {
+                billAttribute = it[0].billAttributes
+                description_edittext.setText(billAttribute?.name)
+                min_amount_edittext.setText(billAttribute?.amount_min.toString())
+                max_amount_edittext.setText(billAttribute?.amount_max.toString())
+                currency = billAttribute?.currency_code ?: ""
+                currencyViewModel.getCurrencyByCode(currency).observe(this, Observer { currencyList ->
+                    val currencyData = currencyList[0].currencyAttributes
+                    currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+                })
+                bill_date_edittext.setText(billAttribute?.date)
+                skip_edittext.setText(billAttribute?.skip.toString())
+                notes_edittext.setText(billAttribute?.notes)
+                val spinnerPosition = freqAdapter.getPosition(
+                        billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase() +
+                                billAttribute?.repeat_freq?.substring(1))
+                frequency_spinner.setSelection(spinnerPosition)
+            })
+        }
     }
 
     override fun onStart() {
         super.onStart()
         setIcons()
         setWidgets()
-        addBillFab.setOnClickListener { addBill() }
-        /*
-         if(intent.getStringExtra("status") != null) {
-            billAttribute = Gson().fromJson(intent.getSerializableExtra("billData").toString(),
-                    BillAttributes::class.java)
+        addBillFab.setOnClickListener {
+            hideKeyboard()
+            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+            notes = if(notes_edittext.isBlank()){
+                null
+            } else {
+                notes_edittext.getString()
+            }
+            repeatFreq = frequency_spinner.selectedItem.toString().substring(0,1).toLowerCase() +
+                    frequency_spinner.selectedItem.toString().substring(1)
+            if(billId == 0L){
+                addBill()
+            } else {
+                updateBill()
+            }
         }
-         */
     }
 
     private fun setIcons(){
@@ -76,10 +107,6 @@ class AddBillDialog: BaseDialog() {
                 .icon(FontAwesome.Icon.faw_calendar)
                 .color(ColorStateList.valueOf(rgb(18, 122, 190)))
                 .sizeDp(24),null, null, null)
-        rules_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_ruler)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_brown_500))
-                        .sizeDp(24),null, null, null)
         skip_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_sort_numeric_up)
                         .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
@@ -92,9 +119,9 @@ class AddBillDialog: BaseDialog() {
     }
 
     private fun setWidgets(){
-        val dataAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, resources.getStringArray(R.array.repeat_frequency))
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        frequency_spinner.adapter = dataAdapter
+        freqAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, resources.getStringArray(R.array.repeat_frequency))
+        freqAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        frequency_spinner.adapter = freqAdapter
         val calendar = Calendar.getInstance()
         val startDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
@@ -125,21 +152,12 @@ class AddBillDialog: BaseDialog() {
     }
 
     private fun addBill(){
-        hideKeyboard()
-        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-        notes = if(notes_edittext.isBlank()){
-            null
-        } else {
-            notes_edittext.getString()
-        }
-        repeatFreq = frequency_spinner.selectedItem.toString().substring(0,1).toLowerCase() +
-                frequency_spinner.selectedItem.toString().substring(1)
-        model.addBill(description_edittext.getString(), rules_edittext.getString(),
+        billViewModel.addBill(description_edittext.getString(),
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
-                bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1", "1",
+                bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
                     currency, notes)
                 .observe(this, Observer { response ->
-                    ProgressBar.animateView(progress_overlay, View.GONE, 0.toFloat(), 200)
+                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                     val errorMessage = response.getErrorMessage()
                     if (errorMessage != null) {
                         toastError(errorMessage)
@@ -149,7 +167,6 @@ class AddBillDialog: BaseDialog() {
                         }
                         val extras = bundleOf(
                                 "name" to description_edittext.getString(),
-                                "billMatch" to rules_edittext.getString(),
                                 "minAmount" to min_amount_edittext.getString(),
                                 "maxAmount" to max_amount_edittext.getString(),
                                 "billDate" to bill_date_edittext.getString(),
@@ -166,5 +183,22 @@ class AddBillDialog: BaseDialog() {
                         dismiss()
                     }
                 })
+    }
+
+    private fun updateBill(){
+        billViewModel.updateBill(billId, description_edittext.getString(),
+                min_amount_edittext.getString(), max_amount_edittext.getString(),
+                bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
+                currency, notes).observe(this, Observer { response ->
+            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+            if (response.getErrorMessage() != null) {
+                toastError(response.getErrorMessage())
+            } else if (response.getError() != null) {
+                toastError(response.getError()?.localizedMessage)
+            } else if (response.getResponse() != null) {
+                toastSuccess("Bill updated")
+                dismiss()
+            }
+        })
     }
 }

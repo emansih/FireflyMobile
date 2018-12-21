@@ -146,7 +146,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/rules_layout"
+                android:id="@+id/bill_date_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -154,25 +154,6 @@
                 app:layout_constraintEnd_toEndOf="@+id/currency_layout"
                 app:layout_constraintStart_toStartOf="@+id/currency_layout"
                 app:layout_constraintTop_toBottomOf="@+id/currency_layout">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/rules_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="Rules to Match On"
-                    android:drawablePadding="12dp"
-                    android:textSize="16sp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/bill_date_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:layout_constraintEnd_toEndOf="@+id/rules_layout"
-                app:layout_constraintStart_toStartOf="@+id/rules_layout"
-                app:layout_constraintTop_toBottomOf="@+id/rules_layout">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/bill_date_edittext"

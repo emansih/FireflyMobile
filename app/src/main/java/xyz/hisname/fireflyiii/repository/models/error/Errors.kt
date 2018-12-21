@@ -10,7 +10,6 @@ data class Errors(
         val currency_code: List<String>?,
         val amount_min: List<String>?,
         val repeat_freq: List<String>?,
-        val automatch: List<String>?,
         @SerializedName("transactions.0.destination_name")
         val transactions_destination_name: List<String>?,
         @SerializedName("transactions.0.destination_id")

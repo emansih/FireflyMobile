@@ -73,23 +73,21 @@ class BillDetailActivity: BaseActivity() {
                             IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_repeat).sizeDp(24)),
                     BaseDetailModel("Skip", billAttribute?.skip.toString(),
                             IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_skip_next).sizeDp(24)),
-                    BaseDetailModel("Automatch", billAttribute?.automatch.toString(),
-                            IconicsDrawable(this@BillDetailActivity).icon(FontAwesome.Icon.faw_magic).sizeDp(24)),
-                    if (billAttribute?.pay_dates!!.isEmpty()) {
+                    if (billAttribute?.pay_dates.isNullOrEmpty()) {
                         BaseDetailModel("Pay Dates", "No dates found",
                                 IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                     } else {
                         BaseDetailModel("Pay Dates", billAttribute?.pay_dates.toString(),
                                 IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                     },
-                    if (billAttribute?.paid_dates!!.isEmpty()) {
+                    if (billAttribute?.paid_dates.isNullOrEmpty()) {
                         BaseDetailModel("Paid Dates", "No dates found",
                                 IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                     } else {
                         BaseDetailModel("Paid Dates", billAttribute?.pay_dates.toString(),
                                 IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_credit_card).sizeDp(24))
                     },
-                    BaseDetailModel("Notes", billAttribute?.markdown,
+                    BaseDetailModel("Notes", billAttribute?.notes,
                             IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_note).sizeDp(24))
             )
             billList.addAll(billDataArray)
@@ -99,16 +97,15 @@ class BillDetailActivity: BaseActivity() {
 
     private fun editBill(){
         editBillFab.setOnClickListener {
-           /* val data = Gson()
-            val billDetail = Intent(this, AddBillActivity::class.java).apply {
-                putExtras(bundleOf("billId" to intent.getLongExtra("billId", 0),
-                        "status" to "UPDATE", "billData" to data.toJson(billAttribute)))
-            }
-            startActivity(billDetail)*/
+            editBillFab.isClickable = false
+            val addBill = AddBillDialog()
+            addBill.arguments = bundleOf("revealX" to editBillFab.width / 2,
+                    "revealY" to editBillFab.height / 2, "billId" to intent.getLongExtra("billId", 0))
+            addBill.show(supportFragmentManager.beginTransaction(), "add_bill_dialog")
+            editBillFab.isClickable = true
         }
-
     }
-    
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.delete_menu, menu)
         return true

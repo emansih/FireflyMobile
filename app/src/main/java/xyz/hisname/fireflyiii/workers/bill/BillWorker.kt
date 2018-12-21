@@ -19,7 +19,6 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
 
     override fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
-        val billMatch = inputData.getString("billMatch") ?: ""
         val minAmount = inputData.getString("minAmount") ?: ""
         val maxAmount = inputData.getString("maxAmount") ?: ""
         val billDate = inputData.getString("billDate") ?: ""
@@ -27,8 +26,8 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val skip = inputData.getString("skip") ?: ""
         val currencyCode = inputData.getString("currencyCode") ?: ""
         val notes = inputData.getString("notes")
-        genericService?.create(BillsService::class.java)?.createBill(name, billMatch, minAmount,
-                maxAmount, billDate, repeatFreq, skip, "1","1", currencyCode, notes)?.enqueue(
+        genericService?.create(BillsService::class.java)?.createBill(name, minAmount,
+                maxAmount, billDate, repeatFreq, skip,"1", currencyCode, notes)?.enqueue(
                 retrofitCallback({ response ->
                     var errorBody = ""
                     var error = ""
@@ -46,7 +45,6 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                             gson.errors.currency_code != null -> error = gson.errors.currency_code[0]
                             gson.errors.amount_min != null -> error = gson.errors.amount_min[0]
                             gson.errors.repeat_freq != null -> error = gson.errors.repeat_freq[0]
-                            gson.errors.automatch != null -> error = gson.errors.automatch[0]
                         }
                         context.displayNotification(error, "Error Adding $name",
                                 Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)

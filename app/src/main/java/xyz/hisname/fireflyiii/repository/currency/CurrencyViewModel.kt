@@ -21,6 +21,8 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     val currencyCode =  MutableLiveData<String>()
     val currencyDetails = MutableLiveData<String>()
     val repository: CurrencyRepository
+    private var currencyData: MutableList<CurrencyData> = arrayListOf()
+
     private val currencyService by lazy { genericService()?.create(CurrencyService::class.java) }
 
     init {
@@ -82,6 +84,16 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         { throwable -> apiResponse.postValue(ApiResponses(throwable)) })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         return apiResponse
+    }
+
+    fun getCurrencyByCode(currencyCode: String): LiveData<MutableList<CurrencyData>>{
+        val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
+        scope.async(Dispatchers.IO){
+            currencyData = repository.getCurrencyByCode(currencyCode)
+        }.invokeOnCompletion {
+            currencyLiveData.postValue(currencyData)
+        }
+        return currencyLiveData
     }
 
     fun setCurrencyCode(code: String?) {

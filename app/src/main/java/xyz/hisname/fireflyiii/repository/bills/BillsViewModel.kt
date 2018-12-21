@@ -88,13 +88,12 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
     }
 
-    fun addBill(name: String, match: String,
-                amountMin: String, amountMax: String, date: String, repeatFreq: String,
-                skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
+    fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,
+                skip: String, active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
         val apiResponse = MediatorLiveData<ApiResponses<BillSuccessModel>>()
         val apiLiveData: MutableLiveData<ApiResponses<BillSuccessModel>> = MutableLiveData()
-        billsService?.createBill(name, match, amountMin, amountMax, date,
-                repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
+        billsService?.createBill(name, amountMin, amountMax, date,
+                repeatFreq, skip, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
                     var errorMessage = ""
                     val responseErrorBody = response.errorBody()
@@ -106,14 +105,14 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                             gson.errors.currency_code != null -> gson.errors.currency_code[0]
                             gson.errors.amount_min != null -> gson.errors.amount_min[0]
                             gson.errors.repeat_freq != null -> gson.errors.repeat_freq[0]
-                            gson.errors.automatch != null -> gson.errors.automatch[0]
                             gson.errors.date != null -> gson.errors.date[0]
                             gson.errors.skip != null -> gson.errors.skip[0]
                             else -> "Error occurred while saving bill"
                         }
                     }
-
-                    if (response.isSuccessful) {
+                    val networkData = response.body()
+                    if (networkData != null) {
+                        scope.launch(Dispatchers.IO) { repository.insertBill(networkData.data) }
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
                         apiLiveData.postValue(ApiResponses(errorMessage))
@@ -124,19 +123,21 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
-    fun updateBill(billId: String, name: String, match: String,
-                   amountMin: String, amountMax: String, date: String, repeatFreq: String,
-                   skip: String,automatch: String,active: String,currencyId: String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
+    fun updateBill(billId: Long, name: String, amountMin: String, amountMax: String, date: String,
+                   repeatFreq: String, skip: String,active: String,currencyId:
+                   String,notes: String?): LiveData<ApiResponses<BillSuccessModel>>{
         val apiResponse = MediatorLiveData<ApiResponses<BillSuccessModel>>()
         val apiLiveData: MutableLiveData<ApiResponses<BillSuccessModel>> = MutableLiveData()
-        billsService?.updateBill(billId, name, match, amountMin, amountMax, date,
-                repeatFreq, skip, automatch, active, currencyId, notes)?.enqueue(retrofitCallback(
+        billsService?.updateBill(billId, name, amountMin, amountMax, date,
+                repeatFreq, skip, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
                     var errorBody = ""
                     if (response.errorBody() != null) {
                         errorBody = String(response.errorBody()?.bytes()!!)
                     }
-                    if (response.isSuccessful) {
+                    val networkData = response.body()
+                    if (networkData != null) {
+                        scope.launch(Dispatchers.IO) { repository.updateBill(networkData.data) }
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
                         apiLiveData.postValue(ApiResponses(errorBody))

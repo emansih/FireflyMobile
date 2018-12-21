@@ -13,15 +13,16 @@ data class BillAttributes(
         var name: String,
         val currency_id: Int,
         val currency_code: String,
+        val currency_symbol: String,
+        val currency_decimal_places: Int,
         val amount_min: BigDecimal,
         val amount_max: BigDecimal,
         val date: String,
         val repeat_freq: String,
-        val skip: Int = 0,
-        val automatch: Boolean,
+        val skip: Int,
         val active: Boolean,
         val attachments_count: Int,
         val pay_dates: List<String>,
         val paid_dates: List<String>,
-        val markdown: String?
+        val notes: String?
 )
