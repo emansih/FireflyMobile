@@ -42,7 +42,7 @@ class BillDetailActivity: BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bill_detail)
         setSupportActionBar(toolbar)
-        runLayoutAnimation(recycler_view)
+        recycler_view.layoutManager = LinearLayoutManager(this)
         toolbar.navigationIcon = ContextCompat.getDrawable(this, R.drawable.ic_arrow_left)
         toolbar.setNavigationOnClickListener { finish() }
         showData()
@@ -93,8 +93,8 @@ class BillDetailActivity: BaseActivity() {
                             IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_note).sizeDp(24))
             )
             billList.addAll(billDataArray)
+            recycler_view.adapter = BaseDetailRecyclerAdapter(billList)
         })
-        recycler_view.adapter = BaseDetailRecyclerAdapter(billList)
     }
 
     private fun editBill(){
@@ -108,17 +108,7 @@ class BillDetailActivity: BaseActivity() {
         }
 
     }
-
-    private fun runLayoutAnimation(recyclerView: RecyclerView){
-        val controller = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down)
-        recyclerView.apply {
-            layoutManager = LinearLayoutManager(this@BillDetailActivity)
-            layoutAnimation = controller
-            adapter?.notifyDataSetChanged()
-            scheduleLayoutAnimation()
-        }
-    }
-
+    
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.delete_menu, menu)
         return true
