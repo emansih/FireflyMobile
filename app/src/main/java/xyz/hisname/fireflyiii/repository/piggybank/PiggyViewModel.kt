@@ -120,6 +120,41 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         return apiResponse
     }
 
+    fun updatePiggyBank(piggyId: Long, piggyName: String, accountId: String,
+                        currentAmount: String?, notes: String?, startDate: String?, targetAmount: String,
+                        targetDate: String?): LiveData<ApiResponses<PiggySuccessModel>> {
+        val apiResponse: MediatorLiveData<ApiResponses<PiggySuccessModel>> = MediatorLiveData()
+        val apiLiveData: MutableLiveData<ApiResponses<PiggySuccessModel>> = MutableLiveData()
+        piggyService?.updatePiggyBank(piggyId, piggyName, accountId, targetAmount, currentAmount, startDate,
+                targetDate, notes)?.enqueue(retrofitCallback({ response ->
+            var errorMessage = ""
+            val responseErrorBody = response.errorBody()
+            if (responseErrorBody != null) {
+                errorMessage = String(responseErrorBody.bytes())
+                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                errorMessage = when {
+                    gson.errors.name != null -> gson.errors.name[0]
+                    gson.errors.account_id != null -> gson.errors.account_id[0]
+                    gson.errors.current_amount != null -> gson.errors.current_amount[0]
+                    gson.errors.targetDate != null -> gson.errors.targetDate[0]
+                    else -> "Error occurred while updating piggy bank"
+                }
+            }
+            val networkData = response.body()
+            if (networkData != null) {
+                scope.launch(Dispatchers.IO) { repository.updatePiggy(networkData.data) }
+                apiLiveData.postValue(ApiResponses(response.body()))
+            } else {
+                apiLiveData.postValue(ApiResponses(errorMessage))
+            }
+        })
+        { throwable ->
+            apiResponse.postValue(ApiResponses(throwable))
+        })
+        apiResponse.addSource(apiLiveData) { apiResponse.value = it }
+        return apiResponse
+    }
+
     private fun deletePiggy(piggyId: Long){
         val accountTag =
                 WorkManager.getInstance().getWorkInfosByTag("delete_piggy_$piggyId").get()

@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -32,6 +33,12 @@ class AddPiggyDialog: BaseDialog() {
     private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private var accounts = ArrayList<String>()
+    private var piggyId: Long = 0
+    private lateinit var accountAdapter: ArrayAdapter<String>
+    private var currentAmount: String? = null
+    private var startDate: String? = null
+    private var targetDate: String? = null
+    private var notes: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -41,14 +48,57 @@ class AddPiggyDialog: BaseDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         CircularReveal(dialog_add_piggy_layout).showReveal(revealX, revealY)
+        setWidgets()
+        piggyId = arguments?.getLong("piggyId") ?: 0
+        if(piggyId != 0L){
+            piggyViewModel.getPiggyById(piggyId).observe(this, Observer { piggyData ->
+                val piggyAttributes = piggyData[0].piggyAttributes
+                description_edittext.setText(piggyAttributes?.name)
+                target_amount_edittext.setText(piggyAttributes?.target_amount.toString())
+                current_amount_edittext.setText(piggyAttributes?.current_amount.toString())
+                date_started_edittext.setText(piggyAttributes?.start_date)
+                date_target_edittext.setText(piggyAttributes?.target_date)
+                note_edittext.setText(piggyAttributes?.notes)
+                accountViewModel.getAccountById(piggyAttributes?.account_id!!).observe(this, Observer { accountData ->
+                    val accountName = accountData[0].accountAttributes?.name
+                    val spinnerPosition = accountAdapter.getPosition(accountName)
+                    account_spinner.setSelection(spinnerPosition)
+                })
+            })
+        }
     }
 
     override fun onStart() {
         super.onStart()
         setIcons()
-        setWidgets()
         addPiggyFab.setOnClickListener {
-            submitData()
+            hideKeyboard()
+            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+            currentAmount = if (current_amount_edittext.isBlank()) {
+                null
+            } else {
+                current_amount_edittext.getString()
+            }
+            startDate = if (date_started_edittext.isBlank()) {
+                null
+            } else {
+                date_started_edittext.getString()
+            }
+            targetDate = if (date_target_edittext.isBlank()) {
+                null
+            } else {
+                date_target_edittext.getString()
+            }
+            notes = if (note_edittext.isBlank()) {
+                null
+            } else {
+                note_edittext.getString()
+            }
+            if(piggyId == 0L) {
+                submitData()
+            } else {
+                updatePiggyBank()
+            }
         }
         placeHolderToolbar.setOnClickListener {
             unReveal(dialog_add_piggy_layout)
@@ -115,36 +165,14 @@ class AddPiggyDialog: BaseDialog() {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
                 }
-                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                account_spinner.adapter = adapter
+                accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
+                accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                account_spinner.adapter = accountAdapter
             }
         })
     }
 
     private fun submitData(){
-        hideKeyboard()
-        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-        val currentAmount: String? = if (current_amount_edittext.isBlank()) {
-            null
-        } else {
-            current_amount_edittext.getString()
-        }
-        val startDate = if (date_started_edittext.isBlank()) {
-            null
-        } else {
-            date_started_edittext.getString()
-        }
-        val targetDate = if (date_target_edittext.isBlank()) {
-            null
-        } else {
-            date_target_edittext.getString()
-        }
-        val notes = if (note_edittext.isBlank()) {
-            null
-        } else {
-            note_edittext.getString()
-        }
         accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
             piggyViewModel.addPiggyBank(description_edittext.getString(), accountData[0].accountId.toString(),
                     currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
@@ -181,4 +209,28 @@ class AddPiggyDialog: BaseDialog() {
                     })
         })
     }
+
+    private fun updatePiggyBank(){
+        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
+            piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), accountData[0].accountId.toString(),
+                    currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(this, Observer {
+                ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                if (it.getErrorMessage() != null) {
+                    toastError(it.getErrorMessage())
+                } else if (it.getError() != null) {
+                    toastError(it.getError()?.localizedMessage)
+                } else if (it.getResponse() != null) {
+                    toastSuccess("Piggy bank updated")
+                    requireFragmentManager().popBackStack()
+                    val bundle = bundleOf("piggyId" to piggyId)
+                    requireFragmentManager().commit {
+                        replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
+                        addToBackStack(null)
+                    }
+                    dialog?.dismiss()
+                }
+            })
+        })
+    }
+
 }

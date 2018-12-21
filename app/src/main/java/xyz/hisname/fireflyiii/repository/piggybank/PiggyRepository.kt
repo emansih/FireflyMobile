@@ -16,6 +16,12 @@ class PiggyRepository(private val piggyDao: PiggyDataDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
+    suspend fun updatePiggy(piggy: PiggyData){
+        piggyDao.update(piggy)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun retrievePiggyById(piggyId: Long): MutableList<PiggyData>{
         return piggyDao.getPiggyById(piggyId)
     }

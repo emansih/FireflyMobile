@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
@@ -138,13 +139,11 @@ class PiggyDetailFragment: BaseDetailFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
-        /*R.id.menu_item_edit -> consume {
-            val bundle = bundleOf("piggyId" to piggyId)
-            val addPiggy = Intent(requireContext(), AddPiggyActivity::class.java).apply{
-                putExtras(bundle)
-            }
-            startActivity(addPiggy)
-        }*/
+        R.id.menu_item_edit -> consume {
+            val addPiggy = AddPiggyDialog()
+            addPiggy.arguments = bundleOf("piggyId" to piggyId)
+            addPiggy.show(requireFragmentManager().beginTransaction(), "add_piggy_dialog")
+        }
         R.id.menu_item_delete -> consume {
             deleteItem()
         }
