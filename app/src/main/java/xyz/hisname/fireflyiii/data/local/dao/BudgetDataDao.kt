@@ -11,7 +11,9 @@ abstract class BudgetDataDao: BaseDao<BudgetData> {
     @Query("SELECT * FROM budget")
     abstract fun getAllBudget(): LiveData<MutableList<BudgetData>>
 
-    @Query("SELECT * FROM budget WHERE (start_date =:startDate AND end_date =:endDate)")
-    abstract fun getConstraintBudget(startDate: String, endDate: String): MutableList<BudgetData>
+    @Query("SELECT * FROM budget WHERE (start_date =:startDate AND end_date =:endDate) AND " +
+            "currency_code =:currencyCode")
+    abstract fun getConstraintBudgetWithCurrency(startDate: String, endDate: String,
+                                                 currencyCode: String): MutableList<BudgetData>
 
 }

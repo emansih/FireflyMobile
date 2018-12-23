@@ -16,8 +16,9 @@ class BudgetRepository(private val budget: BudgetDataDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun retrieveConstraintBudget(startDate: String, endDate: String): MutableList<BudgetData>{
-        return budget.getConstraintBudget(startDate, endDate)
+    suspend fun retrieveConstraintBudgetWithCurrency(startDate: String, endDate: String,
+                                                     currencyCode: String): MutableList<BudgetData>{
+        return budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
     }
 
 }
