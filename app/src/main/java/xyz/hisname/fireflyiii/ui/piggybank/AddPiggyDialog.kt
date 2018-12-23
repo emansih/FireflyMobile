@@ -34,7 +34,7 @@ class AddPiggyDialog: BaseDialog() {
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private var accounts = ArrayList<String>()
     private var piggyId: Long = 0
-    private lateinit var accountAdapter: ArrayAdapter<String>
+    private lateinit var accountAdapter: ArrayAdapter<Any>
     private var currentAmount: String? = null
     private var startDate: String? = null
     private var targetDate: String? = null
@@ -165,7 +165,8 @@ class AddPiggyDialog: BaseDialog() {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
                 }
-                accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
+                val uniqueAccount = HashSet(accounts).toArray()
+                accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
                 accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 account_spinner.adapter = accountAdapter
             }

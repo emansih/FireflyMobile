@@ -190,11 +190,12 @@ class AddTransactionDialog: BaseDialog() {
      private fun contextSwitch(){
          when {
              Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(), piggyViewModel.getAllPiggyBanks())
-                     .observe(this, Observer {
-                         it.first.forEachIndexed { _, accountData ->
+                     .observe(this, Observer { transferData ->
+                         transferData.first.forEachIndexed { _, accountData ->
                              accounts.add(accountData.accountAttributes?.name!!)
                          }
-                         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
+                         val uniqueAccount = HashSet(accounts).toArray()
+                         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
                          spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                          source_spinner.isVisible = true
                          source_textview.isVisible = true
@@ -204,10 +205,11 @@ class AddTransactionDialog: BaseDialog() {
                          destination_spinner.isVisible = true
                          destination_textview.isVisible = true
                          destination_spinner.adapter = spinnerAdapter
-                         it.second.forEachIndexed { _,piggyData ->
+                         transferData.second.forEachIndexed { _,piggyData ->
                              piggyBank.add(piggyData.piggyAttributes?.name!!)
                          }
-                         val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, piggyBank)
+                         val uniquePiggy = HashSet(piggyBank).toArray()
+                         val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniquePiggy)
                          piggy_edittext.threshold = 1
                          piggy_edittext.setAdapter(adapter)
                      })
@@ -217,16 +219,18 @@ class AddTransactionDialog: BaseDialog() {
                          it.first.forEachIndexed { _, accountData ->
                              sourceAccounts.add(accountData.accountAttributes?.name!!)
                          }
+                         val uniqueSource = HashSet(sourceAccounts).toArray()
                          // Asset account, spinner
                          it.second.forEachIndexed { _, accountData ->
                              destinationAccounts.add(accountData.accountAttributes?.name!!)
                          }
-                         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, destinationAccounts)
+                         val uniqueDestination = HashSet(destinationAccounts).toArray()
+                         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueDestination)
                          spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                          destination_spinner.adapter = spinnerAdapter
                          destination_textview.isVisible = true
                          destination_layout.isVisible = false
-                         val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, sourceAccounts)
+                         val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueSource)
                          source_edittext.threshold = 1
                          source_edittext.setAdapter(autocompleteAdapter)
                          source_spinner.isVisible = false
@@ -239,7 +243,8 @@ class AddTransactionDialog: BaseDialog() {
                              it.first.forEachIndexed { _, accountData ->
                                  sourceAccounts.add(accountData.accountAttributes?.name!!)
                              }
-                             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sourceAccounts)
+                             val uniqueSource = HashSet(sourceAccounts).toArray()
+                             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueSource)
                              adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                              source_layout.isVisible = false
                              source_spinner.adapter = adapter
@@ -248,7 +253,8 @@ class AddTransactionDialog: BaseDialog() {
                              it.second.forEachIndexed { _, accountData ->
                                  destinationAccounts.add(accountData.accountAttributes?.name!!)
                              }
-                             val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, destinationAccounts)
+                             val uniqueDestination = HashSet(destinationAccounts).toArray()
+                             val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueDestination)
                              destination_edittext.threshold = 1
                              destination_edittext.setAdapter(autocompleteAdapter)
                              destination_spinner.isVisible = false
@@ -259,7 +265,9 @@ class AddTransactionDialog: BaseDialog() {
                          it.forEachIndexed { _,billData ->
                              bill.add(billData.billAttributes?.name!!)
                          }
-                         val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
+                         bill_layout.isVisible = true
+                         val uniqueBill = HashSet(bill).toArray()
+                         val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueBill)
                          bill_edittext.threshold = 1
                          bill_edittext.setAdapter(adapter)
                      }
