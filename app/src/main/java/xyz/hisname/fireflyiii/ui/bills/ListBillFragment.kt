@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -20,8 +19,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
-import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -33,7 +30,6 @@ class ListBillFragment: BaseFragment() {
 
     private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private var dataAdapter = ArrayList<BillData>()
-    private var billDatabase: AppDatabase? = null
     private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
 
 
@@ -44,7 +40,6 @@ class ListBillFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        billDatabase = AppDatabase.getInstance(requireContext())
         displayView()
         pullToRefresh()
         initFab()
@@ -143,7 +138,6 @@ class ListBillFragment: BaseFragment() {
     }
 
     override fun onDetach() {
-        RetrofitBuilder.destroyInstance()
         fab.isGone = true
         super.onDetach()
     }
