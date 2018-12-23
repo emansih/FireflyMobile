@@ -18,6 +18,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
     suspend fun allWithdrawal(startDate: String?, endDate: String?) =
             transactionDao.getTransactionsByTypeWithDate(startDate, endDate, "Withdrawal")
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun allWithdrawalWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String) =
+            transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(startDate, endDate, "Withdrawal", currencyCode)
+
     fun withdrawalList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>>{
         return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
             transactionDao.getTransaction("Withdrawal")
