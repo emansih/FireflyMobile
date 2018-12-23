@@ -28,10 +28,12 @@ class BudgetFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         budget_list_text.text = DateTimeUtil.getCurrentMonth() + " Budget"
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
-            val currencyData = defaultCurrency[0].currencyAttributes
-            budgetLimit.retrieveCurrentMonthBudget(currencyData?.code!!).observe(this, Observer { budget ->
-                budget_text.text = currencyData.symbol + " " +budget
-            })
+            if(defaultCurrency.isNotEmpty()) {
+                val currencyData = defaultCurrency[0].currencyAttributes
+                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code!!).observe(this, Observer { budget ->
+                    budget_text.text = currencyData.symbol + " " + budget
+                })
+            }
         })
     }
 }

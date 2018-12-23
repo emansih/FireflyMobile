@@ -39,16 +39,18 @@ class WalletFragment: BaseFragment() {
 
     private fun displayData() {
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
-            val currencyData = defaultCurrency[0].currencyAttributes
-            accountViewModel.getTotalCashAccount(currencyData!!.code).observe(this, Observer { cash ->
-                cashText.text = currencyData.symbol + " " + cash
-            })
-            accountViewModel.getTotalAssetAccount(currencyData.code).observe(this, Observer { asset ->
-                assetsText.text = currencyData.symbol + " " + asset
-            })
-            accountViewModel.getTotalExpenseAccount(currencyData.code).observe(this, Observer { expense ->
-                expenseText.text = currencyData.symbol + " " + expense
-            })
+            if(defaultCurrency.isNotEmpty()) {
+                val currencyData = defaultCurrency[0].currencyAttributes
+                accountViewModel.getTotalCashAccount(currencyData!!.code).observe(this, Observer { cash ->
+                    cashText.text = currencyData.symbol + " " + cash
+                })
+                accountViewModel.getTotalAssetAccount(currencyData.code).observe(this, Observer { asset ->
+                    assetsText.text = currencyData.symbol + " " + asset
+                })
+                accountViewModel.getTotalExpenseAccount(currencyData.code).observe(this, Observer { expense ->
+                    expenseText.text = currencyData.symbol + " " + expense
+                })
+            }
         })
 
 

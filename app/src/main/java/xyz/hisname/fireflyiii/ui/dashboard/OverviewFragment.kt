@@ -36,39 +36,38 @@ class OverviewFragment: BaseFragment(){
 
     private fun loadTransaction(){
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
-            val currencyData = defaultCurrency[0].currencyAttributes
-            val currencyCode = if(currencyData?.code == null){
-                ""
-            } else {
-                currencyData.code
+            if(defaultCurrency.isNotEmpty()) {
+                val currencyData = defaultCurrency[0].currencyAttributes
+                val currencyCode = currencyData?.code!!
+                zipLiveData(transactionViewModel.getWithdrawalWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+                        DateTimeUtil.getEndOfMonth(), currencyCode),
+                        transactionViewModel.getDepositWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+                                DateTimeUtil.getEndOfMonth(), currencyCode)).observe(this, Observer {
+                    if (it.first.isNotEmpty()) {
+                        it.first.forEachIndexed { _, element ->
+                            withdrawSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
+                        }
+                        withdrawText.text = currencyData?.symbol + " " + withdrawSum.toString()
+                    } else {
+                        // no withdrawal
+                        withdrawSum = 0
+                        withdrawText.text = currencyData?.symbol + " " + "0"
+                    }
+                    if (it.second.isNotEmpty()) {
+                        it.second.forEachIndexed { _, element ->
+                            depositSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
+                        }
+                        incomeDigit.text = currencyData?.symbol + " " + depositSum.toString()
+                    } else {
+                        // no deposit
+                        depositSum = 0
+                        incomeDigit.text = currencyData?.symbol + " " + "0"
+                    }
+                    transaction = depositSum - withdrawSum
+                    sumText.text = currencyData?.symbol + " " + transaction.toString()
+                })
             }
-            zipLiveData(transactionViewModel.getWithdrawalWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
-                    DateTimeUtil.getEndOfMonth(), currencyCode),
-                    transactionViewModel.getDepositWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), currencyCode)).observe(this, Observer {
-                if(it.first.isNotEmpty()){
-                    it.first.forEachIndexed{ _, element ->
-                        withdrawSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                    }
-                    withdrawText.text = currencyData?.symbol + " " + withdrawSum.toString()
-                } else {
-                    // no withdrawal
-                    withdrawSum = 0
-                    withdrawText.text = currencyData?.symbol + " " + "0"
-                }
-                if(it.second.isNotEmpty()){
-                    it.second.forEachIndexed{ _, element ->
-                        depositSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                    }
-                    incomeDigit.text = currencyData?.symbol + " " + depositSum.toString()
-                } else {
-                    // no deposit
-                    depositSum = 0
-                    incomeDigit.text = currencyData?.symbol + " " + "0"
-                }
-                transaction = depositSum - withdrawSum
-                sumText.text = currencyData?.symbol + " " + transaction.toString()
-            })
         })
+
     }
 }
