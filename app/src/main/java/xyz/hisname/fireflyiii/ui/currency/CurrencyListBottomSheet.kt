@@ -8,7 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.base_swipe_layout.*
+import kotlinx.android.synthetic.main.currency_bottom_sheet.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
@@ -24,7 +24,7 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.base_swipe_layout, container)
+        return inflater.create(R.layout.currency_bottom_sheet, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,10 +40,6 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
                 initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
             })
             recycler_view.adapter = CurrencyRecyclerAdapter(currencyData) { data: CurrencyData -> itemClicked(data) }
-        })
-
-        currencyViewModel.isLoading.observe(this, Observer {
-            swipeContainer.isRefreshing = it == true
         })
     }
 
