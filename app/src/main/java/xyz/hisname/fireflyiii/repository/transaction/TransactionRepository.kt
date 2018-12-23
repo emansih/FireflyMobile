@@ -7,6 +7,8 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 
 class TransactionRepository(private val transactionDao: TransactionDataDao) {
 
+    val allTransaction = transactionDao.getTransaction()
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertTransaction(transaction: TransactionData){

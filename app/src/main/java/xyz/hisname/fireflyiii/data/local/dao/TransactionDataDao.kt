@@ -8,6 +8,9 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 @Dao
 abstract class TransactionDataDao: BaseDao<TransactionData> {
 
+    @Query("SELECT * FROM transactions")
+    abstract fun getTransaction(): LiveData<MutableList<TransactionData>>
+
     @Query("SELECT * FROM transactions WHERE transactionType =:type")
     abstract fun getTransaction(type: String): LiveData<MutableList<TransactionData>>
 

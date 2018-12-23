@@ -27,7 +27,7 @@ class OnboardingFragment: Fragment() {
 
     private val userInfoViewModel by lazy { getViewModel(UserInfoViewModel::class.java) }
     private val transaction by lazy { getViewModel(TransactionsViewModel::class.java) }
-    private val currency by lazy { getViewModel(CurrencyViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
@@ -41,29 +41,30 @@ class OnboardingFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        RetrofitBuilder.destroyInstance()
         getUser()
     }
 
     private fun getUser(){
         ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
-        RetrofitBuilder.destroyInstance()
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 20).start()
         zipLiveData(transaction.getAllData(DateTimeUtil.getStartOfMonth(6),
-                DateTimeUtil.getTodayDate()), piggyViewModel.getAllPiggyBanks(), billViewModel.getAllBills(),
-                currency.getCurrency(), categoryViewModel.getAllCategory(),
-                accountViewModel.getAllAccounts())
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 50).start()
-        budgetViewModel.retrieveAllBudgetLimits().observe(this, Observer {
-            ObjectAnimator.ofInt(onboarding_progress,"progress", 80).start()
-            onboarding_text.text = "Almost there!"
-        })
-        budgetViewModel.retrieveAllBudget().observe(this, Observer {
+                DateTimeUtil.getTodayDate()), categoryViewModel.getAllCategory())
+        onboarding_text.text = "Retrieving your data..."
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
+        budgetViewModel.retrieveAllBudgetLimits()
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
+        onboarding_text.text = "Hang on..."
+        zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem(),piggyViewModel.getAllPiggyBanks(),
+                billViewModel.getAllBills(), currencyViewModel.getCurrency(),
+                accountViewModel.getAllAccounts()).observe(this, Observer { multipleLiveData ->
             ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
-        })
-        zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem()).observe(this, Observer {
-            startActivity(Intent(requireActivity(), HomeActivity::class.java))
-            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            requireActivity().finish()
+            onboarding_text.text = "Almost there!"
+            if(multipleLiveData.fifth.isNotEmpty() && multipleLiveData.first && multipleLiveData.second &&
+                    multipleLiveData.sixth.isNotEmpty()){
+                startActivity(Intent(requireActivity(), HomeActivity::class.java))
+                requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                requireActivity().finish()
+            }
         })
     }
 
