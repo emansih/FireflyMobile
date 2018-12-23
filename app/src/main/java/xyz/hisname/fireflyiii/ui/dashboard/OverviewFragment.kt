@@ -52,24 +52,24 @@ class OverviewFragment: BaseFragment(){
                     it.first.forEachIndexed{ _, element ->
                         withdrawSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
                     }
-                    withdrawText.text = currencyData?.symbol + "" + withdrawSum.toString()
+                    withdrawText.text = currencyData?.symbol + " " + withdrawSum.toString()
                 } else {
                     // no withdrawal
                     withdrawSum = 0
-                    withdrawText.text = currencyData?.symbol + "" + "0"
+                    withdrawText.text = currencyData?.symbol + " " + "0"
                 }
                 if(it.second.isNotEmpty()){
                     it.second.forEachIndexed{ _, element ->
                         depositSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
                     }
-                    incomeDigit.text = currencyData?.symbol + "" + depositSum.toString()
+                    incomeDigit.text = currencyData?.symbol + " " + depositSum.toString()
                 } else {
                     // no deposit
                     depositSum = 0
-                    incomeDigit.text = currencyData?.symbol + "" + "0"
+                    incomeDigit.text = currencyData?.symbol + " " + "0"
                 }
                 transaction = depositSum - withdrawSum
-                sumText.text = currencyData?.symbol + "" + transaction.toString()
+                sumText.text = currencyData?.symbol + " " + transaction.toString()
             })
         })
     }
