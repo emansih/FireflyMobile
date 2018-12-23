@@ -31,9 +31,7 @@ class OverviewFragment: BaseFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fullreport.text = resources.getString(R.string.view_report, DateTimeUtil.getCurrentMonth())
         loadTransaction()
-        viewReport()
     }
 
     private fun loadTransaction(){
@@ -72,13 +70,5 @@ class OverviewFragment: BaseFragment(){
                 sumText.text = currencyData?.symbol + " " + transaction.toString()
             })
         })
-    }
-
-    private fun viewReport(){
-        overviewCard.setOnClickListener{
-            requireFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, ReportFragment(), "report")
-                    .commit()
-        }
     }
 }
