@@ -79,7 +79,8 @@ class TransactionFragment: BaseFragment(){
                     noTransactionText.isVisible = true
                     noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
                     noTransactionImage.isVisible = true
-                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_right))
+                    noTransactionImage.setImageDrawable(IconicsDrawable(requireContext())
+                            .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
                 } else {
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
@@ -99,8 +100,7 @@ class TransactionFragment: BaseFragment(){
                     noTransactionText.isVisible = true
                     noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
                     noTransactionImage.isVisible = true
-                    noTransactionImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
+                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_right))
                 } else {
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
