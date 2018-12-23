@@ -32,5 +32,10 @@ data class Errors(
         val code: List<String>?,
         val symbol: List<String>?,
         @SerializedName("decimal_places")
-        val decimalPlaces: List<String>?
+        val decimalPlaces: List<String>?,
+        val tag: List<String>?,
+        val latitude: List<String>?,
+        val longitude: List<String>?,
+        @SerializedName("zoom_level")
+        val zoomLevel: List<String>?
 )

@@ -5,11 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.google.android.material.chip.Chip
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -26,6 +31,7 @@ class ListTagsFragment: BaseFragment() {
 
     private val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     private lateinit var chipTags: Chip
+    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -35,31 +41,65 @@ class ListTagsFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         all_tags.setChipSpacing(16)
-        tagsViewModel.getAllTags().observe(this, Observer {
-            it.forEachIndexed { _, tagsData ->
-                chipTags = Chip(requireContext())
-                chipTags.apply {
-                    text = tagsData.tagsAttributes?.tag
-                    chipIcon = IconicsDrawable(requireContext()).
-                            icon(FontAwesome.Icon.faw_tag)
-                            .color(ContextCompat.getColor(requireContext(),R.color.md_green_400))
-                    isCloseIconVisible = true
-                    setOnCloseIconClickListener { close ->
-                        val tagName = (close as TextView).text.toString()
-                        tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
-                            if (status) {
-                                all_tags.removeAllViews()
-                                toastSuccess("$tagName Deleted")
-                            } else {
-                                toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
+        displayView()
+        tagsViewModel.apiResponse.observe(this, Observer {
+            toastError(it)
+        })
+        setFab()
+    }
+
+    private fun displayView(){
+        tagsViewModel.getAllTags().observe(this, Observer { tags ->
+            tagsViewModel.isLoading.observe(this, Observer { isLoading ->
+                if(isLoading == false){
+                    tags.forEachIndexed { _, tagsData ->
+                        chipTags = Chip(requireContext())
+                        chipTags.apply {
+                            text = tagsData.tagsAttributes?.tag
+                            chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
+                                    .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                            isCloseIconVisible = true
+                            setOnCloseIconClickListener { close ->
+                                val tagName = (close as TextView).text.toString()
+                                tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
+                                    if (status) {
+                                        all_tags.removeAllViews()
+                                        toastSuccess("$tagName Deleted")
+                                    } else {
+                                        toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
+                                    }
+                                })
                             }
-                        })
+                        }
+                        swipe_tags.isRefreshing = false
+                        all_tags.addView(chipTags)
                     }
+                } else {
+                    swipe_tags.isRefreshing = true
                 }
-                all_tags.addView(chipTags)
-            }
+            })
         })
     }
+
+    private fun setFab(){
+        fab.apply {
+            isVisible = true
+            translationY = (6 * 56).toFloat()
+            animate().translationY(0.toFloat())
+                    .setInterpolator(OvershootInterpolator(1f))
+                    .setStartDelay(300)
+                    .setDuration(400)
+                    .start()
+            setOnClickListener{
+                fab.isClickable = false
+                val addTags = AddTagsDialog()
+                addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
+                fab.isClickable = true
+            }
+        }
+    }
+
 
     override fun onAttach(context: Context){
         super.onAttach(context)
@@ -70,5 +110,16 @@ class ListTagsFragment: BaseFragment() {
         super.onResume()
         activity?.activity_toolbar?.title = "Tags"
     }
+
+    override fun onStop() {
+        super.onStop()
+        fab.isGone = true
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        fab.isGone = true
+    }
+
 
 }
