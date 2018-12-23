@@ -263,7 +263,7 @@ class HomeActivity: BaseActivity(){
                 )
         val options = ExpandableDrawerItem().withName("Options")
                 .withIdentifier(14)
-                .withIcon(FontAwesome.Icon.faw_cog)
+                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_settings).sizeDp(24))
                 .withSelectable(false)
                 .withSubItems(
                         SecondaryDrawerItem().withName("Settings")
