@@ -96,6 +96,9 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return currencyLiveData
     }
 
+    fun getDefaultCurrency() = repository.defaultCurrency
+
+
     fun setCurrencyCode(code: String?) {
         currencyCode.value = code
     }

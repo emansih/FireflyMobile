@@ -93,6 +93,10 @@ abstract class BaseAccountFragment: BaseFragment() {
         netWorthText.setOnClickListener {
             netWorthCheckbox.performClick()
         }
+        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+            val currencyData = defaultCurrency[0].currencyAttributes
+            currencyCode.setText(currencyData?.name + " (" + currencyData?.code + ")")
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

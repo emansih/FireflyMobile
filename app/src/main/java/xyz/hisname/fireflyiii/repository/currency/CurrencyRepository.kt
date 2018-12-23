@@ -7,6 +7,7 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 class CurrencyRepository(private val currencyDao: CurrencyDataDao) {
 
     val allCurrency = currencyDao.getAllCurrency()
+    val defaultCurrency = currencyDao.getDefaultCurrency()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

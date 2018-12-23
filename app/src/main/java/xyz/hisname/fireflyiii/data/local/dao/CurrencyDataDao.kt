@@ -17,5 +17,8 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("SELECT * FROM currency WHERE code = :currencyCode")
     abstract fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData>
 
+    @Suppress("AndroidUnresolvedRoomSqlReference")
+    @Query("SELECT * FROM currency WHERE currencyDefault = :default")
+    abstract fun getDefaultCurrency(default: Boolean = true): LiveData<MutableList<CurrencyData>>
 
 }

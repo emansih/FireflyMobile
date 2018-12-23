@@ -119,7 +119,7 @@ class AddBillDialog: BaseDialog() {
     }
 
     private fun setWidgets(){
-        freqAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_item, resources.getStringArray(R.array.repeat_frequency))
+        freqAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_item, resources.getStringArray(R.array.repeat_frequency))
         freqAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         frequency_spinner.adapter = freqAdapter
         val calendar = Calendar.getInstance()
@@ -149,6 +149,10 @@ class AddBillDialog: BaseDialog() {
             currency_edittext.setText(it)
         })
         placeHolderToolbar.setNavigationOnClickListener{ unReveal(dialog_add_bill_layout) }
+        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+            val currencyData = defaultCurrency[0].currencyAttributes
+            currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+        })
     }
 
     private fun addBill(){

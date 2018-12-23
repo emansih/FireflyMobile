@@ -181,6 +181,10 @@ class AddTransactionDialog: BaseDialog() {
              tags_chip.threshold = 1
              tags_chip.setAdapter(tagsAdapter)
          })
+         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+             val currencyData = defaultCurrency[0].currencyAttributes
+             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+         })
      }
 
      private fun contextSwitch(){
