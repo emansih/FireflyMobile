@@ -35,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:backgroundTint="@color/md_pink_500"
-        app:srcCompat="@drawable/ic_pencil"
         app:layout_anchor="@id/toolbar"
         app:layout_anchorGravity="bottom|right|end" />
 

@@ -14,6 +14,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
@@ -58,7 +60,8 @@ class ListBillFragment: BaseFragment() {
                 recycler_view.adapter = BillsRecyclerAdapter(it) { data: BillData -> itemClicked(data) }
             } else {
                 listText.text = resources.getString(R.string.no_bills)
-                listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_emoticon_happy))
+                listImage.setImageDrawable(IconicsDrawable(requireContext())
+                        .icon(GoogleMaterial.Icon.gmd_insert_emoticon).sizeDp(24))
                 listText.isVisible = true
                 listImage.isVisible = true
                 recycler_view.isVisible = false

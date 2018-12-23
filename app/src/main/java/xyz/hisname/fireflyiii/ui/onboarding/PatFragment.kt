@@ -10,6 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_pat.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
@@ -31,6 +33,12 @@ class PatFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        firefly_url_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_link)
+                        .sizeDp(24),null, null, null)
+        firefly_access_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_lock)
+                        .sizeDp(24),null, null, null)
         fireflySignIn.setOnClickListener {
             hideKeyboard()
             if(firefly_url_edittext.isBlank() or firefly_access_edittext.isBlank()){

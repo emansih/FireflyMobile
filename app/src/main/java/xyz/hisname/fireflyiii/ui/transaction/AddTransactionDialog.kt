@@ -93,8 +93,8 @@ class AddTransactionDialog: BaseDialog() {
                  .icon(FontAwesome.Icon.faw_calendar)
                  .color(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
                  .sizeDp(24),null, null, null)
-         source_edittext.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(requireContext(),
-                 R.drawable.ic_bank_transfer),null, null, null)
+         source_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
+                 .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24),null, null, null)
          destination_edittext.setCompoundDrawablesWithIntrinsicBounds(
                  ContextCompat.getDrawable(requireContext(), R.drawable.ic_bank_transfer),null, null, null)
          bill_edittext.setCompoundDrawablesWithIntrinsicBounds(

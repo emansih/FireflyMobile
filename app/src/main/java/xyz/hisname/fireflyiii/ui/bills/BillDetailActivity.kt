@@ -1,26 +1,20 @@
 package xyz.hisname.fireflyiii.ui.bills
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_bill_detail.*
 import kotlinx.android.synthetic.main.progress_overlay.*
-import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
@@ -29,7 +23,6 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
 
 class BillDetailActivity: BaseActivity() {
@@ -45,6 +38,7 @@ class BillDetailActivity: BaseActivity() {
         recycler_view.layoutManager = LinearLayoutManager(this)
         toolbar.navigationIcon = ContextCompat.getDrawable(this, R.drawable.ic_arrow_left)
         toolbar.setNavigationOnClickListener { finish() }
+        editBillFab.setImageDrawable(IconicsDrawable(this).icon(FontAwesome.Icon.faw_pencil_alt).sizeDp(24))
         showData()
         editBill()
     }

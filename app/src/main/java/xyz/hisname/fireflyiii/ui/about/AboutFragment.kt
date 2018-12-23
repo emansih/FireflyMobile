@@ -11,6 +11,9 @@ import com.danielstone.materialaboutlibrary.MaterialAboutFragment
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
@@ -39,16 +42,16 @@ class AboutFragment: MaterialAboutFragment() {
         appCardBuilder.addItem(ConvenienceBuilder.createAppTitleItem(getString(R.string.app_name),
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank)))
                 .addItem(ConvenienceBuilder.createVersionActionItem(requireContext(),
-                ContextCompat.getDrawable(requireContext(),R.drawable.ic_cellphone),
+                        IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_phone).sizeDp(24),
                 "Mobile Version",false)).addItem(MaterialAboutActionItem.Builder()
                         .text("Server Version")
                         .subText(serverVersion)
-                        .icon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_server))
+                        .icon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_server).sizeDp(24))
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text("API Version")
                         .subText(apiVersion)
-                        .icon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_web))
+                        .icon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_globe).sizeDp(24))
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text("Operating System")
@@ -61,13 +64,13 @@ class AboutFragment: MaterialAboutFragment() {
         authorCardBuilder.addItem(MaterialAboutActionItem.Builder()
                 .text("Daniel Quah")
                 .subText("emansih")
-                .icon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_perm_identity_black_24dp))
+                .icon(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_perm_identity).sizeDp(24))
                 .setOnClickAction {
                     requireContext().startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/emansih".toUri()))
                 }.build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text("View on Github")
-                        .icon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_github_circle))
+                        .icon(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_link).sizeDp(24))
                         .setOnClickAction {
                             requireContext().startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/emansih/FireflyMobile".toUri()))
                         }.build())
@@ -77,11 +80,11 @@ class AboutFragment: MaterialAboutFragment() {
     // Because why not?
     private fun setUserOsIcon(): Drawable?{
         return when {
-            userOs.toLowerCase().contains("windows") -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_windows)
-            userOs.toLowerCase().contains("linux") -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_linux)
+            userOs.toLowerCase().contains("windows") -> IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_windows)
+            userOs.toLowerCase().contains("linux") -> IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_linux)
             userOs.toLowerCase().contains("bsd") -> // yea... this is freebsd icon. sorry other BSDs
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_freebsd)
-            else -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_server)
+                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_freebsd)
+            else -> IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_server)
         }
     }
 

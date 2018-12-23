@@ -26,8 +26,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="1"
-                android:drawablePadding="4dp"
-                android:drawableStart="@drawable/ic_link_black_24dp"/>
+                android:drawablePadding="4dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -77,8 +76,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="1"
-                android:drawablePadding="4dp"
-                android:drawableStart="@drawable/ic_lock_outline_black_24dp"/>
+                android:drawablePadding="4dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.AppCompatButton

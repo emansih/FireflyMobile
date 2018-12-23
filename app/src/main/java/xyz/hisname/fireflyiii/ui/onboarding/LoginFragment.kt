@@ -16,6 +16,8 @@ import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.MutableLiveData
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants
@@ -48,6 +50,12 @@ class LoginFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val argument = arguments?.getString("ACTION")
+        firefly_url_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_link)
+                        .sizeDp(24),null, null, null)
+        firefly_secret_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_lock)
+                        .sizeDp(24),null, null, null)
         when {
             Objects.equals(argument, "LOGIN") -> {
                 baseUrlLiveData.observe(this, Observer {

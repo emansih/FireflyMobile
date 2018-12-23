@@ -15,11 +15,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun allWithdrawal(startDate: String?, endDate: String?) =
-            transactionDao.getTransactionsByTypeWithDate(startDate, endDate, "Withdrawal")
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
     suspend fun allWithdrawalWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String) =
             transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(startDate, endDate, "Withdrawal", currencyCode)
 
@@ -46,11 +41,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
             transactionDao.getTransaction(startDate, endDate, "Transfer")
         }
     }
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun allDeposit(startDate: String?, endDate: String?) =
-            transactionDao.getTransactionsByTypeWithDate(startDate, endDate, "Deposit")
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

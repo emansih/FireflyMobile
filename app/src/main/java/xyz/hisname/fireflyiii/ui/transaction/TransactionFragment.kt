@@ -11,6 +11,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -98,7 +99,8 @@ class TransactionFragment: BaseFragment(){
                     noTransactionText.isVisible = true
                     noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
                     noTransactionImage.isVisible = true
-                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bank_transfer))
+                    noTransactionImage.setImageDrawable(IconicsDrawable(requireContext())
+                            .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
                 } else {
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true

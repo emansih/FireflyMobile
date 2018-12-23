@@ -74,19 +74,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getWithdrawal(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
-        var withdrawData: MutableList<TransactionData> = arrayListOf()
-        val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        loadRemoteData(startDate, endDate, "withdrawal")
-        scope.async(Dispatchers.IO) {
-            withdrawData = repository.allWithdrawal(startDate, endDate)
-        }.invokeOnCompletion {
-            data.postValue(withdrawData)
-        }
-        isLoading.value = false
-        return data
-    }
-
     fun getWithdrawalWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<MutableList<TransactionData>> {
         var withdrawData: MutableList<TransactionData> = arrayListOf()
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
@@ -108,19 +95,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
         }.invokeOnCompletion {
             data.postValue(withdrawData)
-        }
-        isLoading.value = false
-        return data
-    }
-
-    fun getDeposit(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
-        var depositData: MutableList<TransactionData> = arrayListOf()
-        val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        loadRemoteData(startDate, endDate, "deposit")
-        scope.async(Dispatchers.IO) {
-            depositData = repository.allDeposit(startDate, endDate)
-        }.invokeOnCompletion {
-            data.postValue(depositData)
         }
         isLoading.value = false
         return data

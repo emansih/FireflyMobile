@@ -34,7 +34,6 @@
         android:visibility="gone"
         android:layout_margin="16dp"
         android:layout_gravity="end|bottom"
-        app:srcCompat="@drawable/ic_plus"
         app:backgroundTint="@color/colorAccent"/>
 
     <include layout="@layout/progress_overlay"/>

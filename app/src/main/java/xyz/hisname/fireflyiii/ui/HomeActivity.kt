@@ -17,6 +17,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.Iconics
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -91,6 +92,7 @@ class HomeActivity: BaseActivity(){
         supportFragmentManager.commit{
             replace(R.id.fragment_container, DashboardFragment(), "dash")
         }
+        globalFAB.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_add).sizeDp(24))
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
@@ -147,7 +149,7 @@ class HomeActivity: BaseActivity(){
                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_deep_orange_500))
                 .withIconTintingEnabled(true)
-                .withIcon(R.drawable.ic_view_dashboard)
+                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_dashboard).sizeDp(24))
         val account = ExpandableDrawerItem().withName("Accounts")
                 .withIdentifier(2)
                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
@@ -202,7 +204,7 @@ class HomeActivity: BaseActivity(){
                 .withIdentifier(9)
                 .withName("Reports")
         val transactions = ExpandableDrawerItem().withName("Transactions")
-                .withIcon(R.drawable.ic_refresh)
+                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_refresh).sizeDp(24))
                 .withIdentifier(10)
                 .withSelectable(false)
                 .withSubItems(
@@ -224,13 +226,13 @@ class HomeActivity: BaseActivity(){
                                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
                                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_green_500))
                                 .withIconTintingEnabled(true)
-                                .withIcon(R.drawable.ic_bank_transfer)
+                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
                                 .withLevel(3)
                                 .withIdentifier(13)
                 )
         val moneyManagement = ExpandableDrawerItem().withName("Money Management")
                 .withIdentifier(14)
-                .withIcon(R.drawable.ic_euro_sign)
+                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_euro_symbol).sizeDp(24))
                 .withSelectable(false)
                 .withSubItems(
                         SecondaryDrawerItem().withName("Piggy Banks")
@@ -252,8 +254,7 @@ class HomeActivity: BaseActivity(){
                                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
                                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_brown_500))
                                 .withIconTintingEnabled(true)
-                                // Rules -> ruler icon, get it?
-                                .withIcon(R.drawable.ic_ruler)
+                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_random).sizeDp(24))
                                 .withIdentifier(17)/*,
                         SecondaryDrawerItem().withName("Recurring Transactions")
                                 .withLevel(4)
@@ -271,7 +272,7 @@ class HomeActivity: BaseActivity(){
                                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_teal_500))
                                 .withIconTintingEnabled(true)
                                 .withIdentifier(19)
-                                .withIcon(R.drawable.ic_settings),
+                                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_settings).sizeDp(24)),
                         SecondaryDrawerItem().withName("Currencies")
                                 .withLevel(4)
                                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
@@ -286,7 +287,7 @@ class HomeActivity: BaseActivity(){
                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_pink_500))
                 .withIconTintingEnabled(true)
-                .withIcon(R.drawable.ic_perm_identity_black_24dp)
+                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_perm_identity).sizeDp(24))
         result = DrawerBuilder()
                 .withActivity(this)
                 .withFullscreen(true)
