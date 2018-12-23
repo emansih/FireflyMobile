@@ -44,6 +44,7 @@ class OverviewFragment: BaseFragment(){
                         transactionViewModel.getDepositWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
                                 DateTimeUtil.getEndOfMonth(), currencyCode)).observe(this, Observer {
                     if (it.first.isNotEmpty()) {
+                        withdrawSum = 0
                         it.first.forEachIndexed { _, element ->
                             withdrawSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
                         }
@@ -54,6 +55,7 @@ class OverviewFragment: BaseFragment(){
                         withdrawText.text = currencyData?.symbol + " " + "0"
                     }
                     if (it.second.isNotEmpty()) {
+                        depositSum = 0
                         it.second.forEachIndexed { _, element ->
                             depositSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
                         }

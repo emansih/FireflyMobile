@@ -84,13 +84,13 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun getDepositWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<MutableList<TransactionData>> {
-        var withdrawData: MutableList<TransactionData> = arrayListOf()
+        var depositData: MutableList<TransactionData> = arrayListOf()
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
         loadRemoteData(startDate, endDate, "deposit")
         scope.async(Dispatchers.IO) {
-            withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
+            depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
         }.invokeOnCompletion {
-            data.postValue(withdrawData)
+            data.postValue(depositData)
         }
         isLoading.value = false
         return data

@@ -28,7 +28,12 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
         }
     }
 
-   fun depositList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun allDepositWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String) =
+            transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(startDate, endDate, "Deposit", currencyCode)
+
+    fun depositList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
            transactionDao.getTransaction("Deposit")
        } else {
