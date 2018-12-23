@@ -32,24 +32,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun getCurrency(): LiveData<MutableList<CurrencyData>> {
-        isLoading.value = true
-        currencyService?.getCurrency()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()?.data
-                networkData?.forEachIndexed { _, element ->
-                    scope.launch(Dispatchers.IO) { repository.insertCurrency(element) }
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-            }
-        })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
+        loadRemoteData()
         return repository.allCurrency
     }
 
@@ -105,5 +88,33 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
     fun setFullDetails(details: String?){
         currencyDetails.value = details
+    }
+
+    private fun loadRemoteData(){
+        isLoading.value = true
+        currencyService?.getCurrency()?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                val networkData = response.body()
+                if (networkData != null) {
+                    for (pagination in 1..networkData.meta.pagination.total_pages) {
+                        currencyService?.getPaginatedCurrency(pagination)?.enqueue(retrofitCallback({ respond ->
+                            respond.body()?.data?.forEachIndexed { _, currencyPagination ->
+                                scope.launch(Dispatchers.IO) { repository.insertCurrency(currencyPagination) }
+                            }
+                        }))
+                    }
+                }
+
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+            }
+        })
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
+        isLoading.value = false
     }
 }

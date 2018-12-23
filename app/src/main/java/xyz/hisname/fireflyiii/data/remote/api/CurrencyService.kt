@@ -12,6 +12,9 @@ interface CurrencyService {
     @GET(CURRENCY_API_ENDPOINT)
     fun getCurrency(): Call<CurrencyModel>
 
+    @GET(CURRENCY_API_ENDPOINT)
+    fun getPaginatedCurrency(@Query("page") page: Int): Call<CurrencyModel>
+
     @GET("$CURRENCY_API_ENDPOINT/{id}")
     fun getCurrencyById(@Path("id") id: String)
 
