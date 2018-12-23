@@ -17,7 +17,7 @@ class BillRepository(private val billDao: BillDataDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun updateBill(bill: BillData){
-        billDao.update(bill)
+        billDao.insert(bill)
     }
 
     @Suppress("RedundantSuspendModifier")

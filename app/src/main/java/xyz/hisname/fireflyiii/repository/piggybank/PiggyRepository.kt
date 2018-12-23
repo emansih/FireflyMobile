@@ -17,7 +17,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun updatePiggy(piggy: PiggyData){
-        piggyDao.update(piggy)
+        piggyDao.insert(piggy)
     }
 
     @Suppress("RedundantSuspendModifier")
