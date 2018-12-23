@@ -79,7 +79,10 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return currencyLiveData
     }
 
-    fun getDefaultCurrency() = repository.defaultCurrency
+    fun getDefaultCurrency(): LiveData<MutableList<CurrencyData>>{
+        loadRemoteData()
+        return repository.defaultCurrency
+    }
 
 
     fun setCurrencyCode(code: String?) {

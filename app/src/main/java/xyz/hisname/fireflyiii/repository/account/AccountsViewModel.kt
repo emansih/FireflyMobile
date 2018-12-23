@@ -17,6 +17,7 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
+import kotlin.math.round
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
 
@@ -24,8 +25,8 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     private var assetValue: MutableLiveData<String> = MutableLiveData()
     private var cash = 0.toDouble()
     private var cashValue: MutableLiveData<String> = MutableLiveData()
-    private var loan = 0.toDouble()
-    private var loanValue: MutableLiveData<String> = MutableLiveData()
+    private var expense = 0.toDouble()
+    private var expenseValue: MutableLiveData<String> = MutableLiveData()
     val repository: AccountRepository
     var accountData: MutableList<AccountData>? = null
     private val accountsService by lazy { genericService()?.create(AccountsService::class.java) }
@@ -36,11 +37,11 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     }
 
 
-    fun getTotalAssetAccount(): LiveData<String> {
+    fun getTotalAssetAccount(currencyCode: String): LiveData<String> {
         loadRemoteData("asset")
         asset = 0.toDouble()
         scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByType("asset")
+            accountData = repository.retrieveAccountByTypeWithCurrency("asset", currencyCode)
         }.invokeOnCompletion {
             isLoading.postValue(false)
             if (accountData.isNullOrEmpty()) {
@@ -50,16 +51,17 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     asset += accountData.accountAttributes?.current_balance!!
                 }
             }
+            asset = round(asset)
             assetValue.postValue(asset.toString())
         }
         return assetValue
     }
 
-    fun getTotalCashAccount(): LiveData<String>{
+    fun getTotalCashAccount(currencyCode: String): LiveData<String>{
         loadRemoteData("cash")
         cash = 0.toDouble()
         scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByType("Cash account")
+            accountData = repository.retrieveAccountByTypeWithCurrency("cash", currencyCode)
         }.invokeOnCompletion {
             isLoading.postValue(false)
             if (accountData.isNullOrEmpty()) {
@@ -69,28 +71,30 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     cash += accountData.accountAttributes?.current_balance!!
                 }
             }
+            cash = round(cash)
             cashValue.postValue(cash.toString())
         }
         return cashValue
     }
 
-    fun getTotalLoanAccount(): LiveData<String>{
-        loadRemoteData("loan")
-        loan = 0.toDouble()
+    fun getTotalExpenseAccount(currencyCode: String): LiveData<String>{
+        loadRemoteData("expense")
+        expense = 0.toDouble()
         scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByType("loan")
+            accountData = repository.retrieveAccountByTypeWithCurrency("expense", currencyCode)
         }.invokeOnCompletion {
             isLoading.postValue(false)
             if (accountData.isNullOrEmpty()) {
-                loan = 0.toDouble()
+                expense = 0.toDouble()
             } else {
                 accountData?.forEachIndexed { _, accountData ->
-                    loan += accountData.accountAttributes?.current_balance!!
+                    expense += accountData.accountAttributes?.current_balance!!
                 }
             }
-            loanValue.postValue(loan.toString())
+            expense = round(expense)
+            expenseValue.postValue(expense.toString())
         }
-        return loanValue
+        return expenseValue
     }
 
     fun getAllAccounts(): LiveData<MutableList<AccountData>> {

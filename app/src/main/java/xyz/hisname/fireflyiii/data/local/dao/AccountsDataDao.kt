@@ -20,6 +20,9 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("SELECT * FROM accounts WHERE type =:accountType")
     abstract fun getAccountsByType(accountType: String): MutableList<AccountData>
 
+    @Query("SELECT * FROM accounts WHERE type =:accountType AND currency_code =:currencyCode")
+    abstract fun getAccountsByTypeWithCurrency(accountType: String, currencyCode: String): MutableList<AccountData>
+
     @Query("SELECT * FROM accounts WHERE accountId =:accountId")
     abstract fun getAccountById(accountId: Long): MutableList<AccountData>
 

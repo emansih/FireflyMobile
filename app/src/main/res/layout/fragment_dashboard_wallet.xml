@@ -96,26 +96,26 @@
                     app:srcCompat="@drawable/rectangle"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/loanTextView"
+                    android:id="@+id/expenseTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="8dp"
-                    android:text="Loan"
+                    android:text="Expense"
                     android:textColor="@color/white"
                     app:layout_constraintStart_toStartOf="@+id/loanImageView"
                     app:layout_constraintTop_toBottomOf="@+id/loanImageView" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/loanText"
+                    android:id="@+id/expenseText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:text="--.--"
                     android:layout_marginBottom="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/loanTextView"
-                    app:layout_constraintStart_toStartOf="@+id/loanTextView" />
+                    app:layout_constraintTop_toBottomOf="@+id/expenseTextView"
+                    app:layout_constraintStart_toStartOf="@+id/expenseTextView" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

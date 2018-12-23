@@ -26,6 +26,12 @@ class AccountRepository(private val accountDao: AccountsDataDao){
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
+    suspend fun retrieveAccountByTypeWithCurrency(accountType: String, currencyCode: String): MutableList<AccountData>{
+        return accountDao.getAccountsByTypeWithCurrency(accountType,currencyCode)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun retrieveAccountById(accountId: Long): MutableList<AccountData>{
         return accountDao.getAccountById(accountId)
     }

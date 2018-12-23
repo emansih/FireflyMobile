@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.fragment_dashboard_wallet.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
@@ -17,7 +18,8 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 class WalletFragment: BaseFragment() {
 
     private val bundle: Bundle by lazy { bundleOf("accountType" to "all") }
-    private val accountsRepo by lazy { getViewModel(AccountsViewModel::class.java) }
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -36,15 +38,19 @@ class WalletFragment: BaseFragment() {
     }
 
     private fun displayData() {
-        accountsRepo.getTotalCashAccount().observe(this, Observer {
-            cashText.text = it
+        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+            val currencyData = defaultCurrency[0].currencyAttributes
+            accountViewModel.getTotalCashAccount(currencyData!!.code).observe(this, Observer { cash ->
+                cashText.text = currencyData.symbol + " " + cash
+            })
+            accountViewModel.getTotalAssetAccount(currencyData.code).observe(this, Observer { asset ->
+                assetsText.text = currencyData.symbol + " " + asset
+            })
+            accountViewModel.getTotalExpenseAccount(currencyData.code).observe(this, Observer { expense ->
+                expenseText.text = currencyData.symbol + " " + expense
+            })
         })
-        accountsRepo.getTotalAssetAccount().observe(this, Observer {
-            assetsText.text = it
-        })
-        accountsRepo.getTotalLoanAccount().observe(this, Observer {
-            loanText.text = it
-        })
+
 
     }
 }
