@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -46,6 +47,7 @@ class ListTagsFragment: BaseFragment() {
             toastError(it)
         })
         setFab()
+        pullToRefresh()
     }
 
     private fun displayView(){
@@ -98,6 +100,19 @@ class ListTagsFragment: BaseFragment() {
                 fab.isClickable = true
             }
         }
+    }
+
+    private fun pullToRefresh(){
+        swipe_tags.setOnRefreshListener {
+            requireFragmentManager().commit {
+                // This hack is so nasty!
+                replace(R.id.fragment_container, ListTagsFragment())
+            }
+        }
+        swipe_tags.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light)
     }
 
 
