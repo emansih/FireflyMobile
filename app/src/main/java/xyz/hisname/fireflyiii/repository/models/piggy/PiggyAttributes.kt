@@ -1,13 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.piggy
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import java.math.BigDecimal
 
 @Entity
 data class PiggyAttributes(
-        @PrimaryKey(autoGenerate = true)
-        val piggyPlaceHolder: Long,
         val updated_at: String,
         val created_at: String,
         val name: String,

@@ -1,13 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.transaction
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 @Entity
 data class TransactionAttributes(
-        @PrimaryKey(autoGenerate = true)
-        val transactionPlaceHolder: Long,
         val updated_at: String,
         val created_at: String,
         val description: String,

@@ -1,13 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.bills
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import java.math.BigDecimal
 
 @Entity
 data class BillAttributes(
-        @PrimaryKey(autoGenerate = true)
-        val billIdPlaceHolder: Long,
         val updated_at: String,
         val created_at: String,
         var name: String,
