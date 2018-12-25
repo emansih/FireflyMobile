@@ -14,6 +14,7 @@ data class TransactionAttributes(
         val transactionType: String,
         val identifier: Int,
         val journal_id: Int,
+        val journal_description: String,
         val reconciled: Boolean,
         val amount: Double,
         val currency_id: Int,
@@ -39,5 +40,15 @@ data class TransactionAttributes(
         val destination_id: Int,
         val destination_name: String?,
         val destination_iban: String?,
-        val destination_type: String?
+        val destination_type: String?,
+        val sepa_ct_op: String?,
+        val sepa_ct_id: String?,
+        val sepa_country: String?,
+        val sepa_ep: String?,
+        val sepa_ci: String?,
+        val sepa_batch_id: String?,
+        val tags: String?,
+        val internal_reference: String?,
+        val bunq_payment_id: String?,
+        val recurrence_id: Int?
 )

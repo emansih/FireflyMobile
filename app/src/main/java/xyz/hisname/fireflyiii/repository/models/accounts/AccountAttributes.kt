@@ -9,6 +9,7 @@ data class AccountAttributes(
         val name: String,
         val active: Boolean,
         val type: String,
+        val account_role: String,
         val currency_id: Int?,
         val currency_code: String?,
         val current_balance: Double,
@@ -23,5 +24,10 @@ data class AccountAttributes(
         val virtual_balance: Int?,
         val opening_balance: String?,
         val opening_balance_date: String?,
-        val role: String?
+        val liability_type: String?,
+        val liability_amount: String?,
+        val liability_start_date: String?,
+        val interest: String?,
+        val interest_period: String?,
+        val include_net_worth: Boolean
 )
