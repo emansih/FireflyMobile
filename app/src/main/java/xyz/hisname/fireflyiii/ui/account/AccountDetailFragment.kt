@@ -66,7 +66,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                         IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_attach_money).sizeDp(24)),
                 BaseDetailModel("Account Number", accountAttributes?.account_number,
                         IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_account_balance).sizeDp(24)),
-                BaseDetailModel("Role", accountAttributes?.role,
+                BaseDetailModel("Role", accountAttributes?.account_role,
                         IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_supervisor_account).sizeDp(24)),
                 BaseDetailModel("Notes", accountAttributes?.notes,
                         IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_note).sizeDp(24))

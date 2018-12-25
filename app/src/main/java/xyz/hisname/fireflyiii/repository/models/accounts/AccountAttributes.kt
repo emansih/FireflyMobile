@@ -9,7 +9,7 @@ data class AccountAttributes(
         val name: String,
         val active: Boolean,
         val type: String,
-        val account_role: String,
+        val account_role: String?,
         val currency_id: Int?,
         val currency_code: String?,
         val current_balance: Double,
