@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
@@ -47,7 +48,7 @@ class RecentTransactionFragment: BaseFragment() {
             } else {
                 recentTransactionList.isVisible = true
                 noTransactionText.isGone = true
-                rtAdapter = TransactionRecyclerAdapter(dataAdapter, "recent")
+                rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
                 recentTransactionList.adapter = rtAdapter
                 rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
                 rtAdapter.notifyDataSetChanged()
@@ -63,4 +64,10 @@ class RecentTransactionFragment: BaseFragment() {
         })
     }
 
+    private fun itemClicked(data: TransactionData){
+        val addTransaction = AddTransactionDialog()
+        addTransaction.arguments = bundleOf("transactionId" to data.transactionId,
+                "transactionType" to data.transactionAttributes?.transactionType)
+        addTransaction.show(requireFragmentManager().beginTransaction(), "add_transaction_dialog")
+    }
 }

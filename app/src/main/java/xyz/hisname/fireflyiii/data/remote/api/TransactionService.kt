@@ -40,6 +40,18 @@ interface TransactionService {
                        @Field("tags") tags: String?): Call<TransactionSuccessModel>
 
     @FormUrlEncoded
+    @PUT("$TRANSACTION_API_ENDPOINT/{transactionId}")
+    fun updateTransaction(@Path("transactionId") transactionId: Long, @Field("type") type: String,
+                          @Field("description") description: String,
+                          @Field("date") date: String, @Field("piggy_bank_name") piggyBankName: String?,
+                          @Field("bill_name") billName: String?, @Field("transactions[0][amount]") amount: String,
+                          @Field("transactions[0][source_name]") sourceName: String?,
+                          @Field("transactions[0][destination_name]") destionationName: String?,
+                          @Field("transactions[0][currency_code]") currency: String,
+                          @Field("transactions[0][category_name]") category: String?,
+                          @Field("tags") tags: String?): Call<TransactionSuccessModel>
+
+    @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)
     fun addTransaction(@Field("type") type: String, @Field("description") description: String,
                        @Field("date") date: String, @Field("piggy_bank_name") piggyBankName: String?,

@@ -52,32 +52,119 @@ class AddTransactionDialog: BaseDialog() {
     private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
+    private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
+    private val transactionId by lazy { arguments?.getLong("transactionId") ?: 0 }
     private var currency = ""
     private var accounts = ArrayList<String>()
     private var tags = ArrayList<String>()
     private var sourceAccounts = ArrayList<String>()
     private var destinationAccounts = ArrayList<String>()
-    private var piggyBank = ArrayList<String>()
+    private var piggyBankList = ArrayList<String>()
     private val bill = ArrayList<String>()
-    private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
-
+    private var billName: String? = ""
+    private var piggyBank: String? = ""
+    private var categoryName: String? = ""
+    private var transactionTags: String? = ""
+    private var sourceAccount = ""
+    private var destinationAccount = ""
+    private lateinit var spinnerAdapter: ArrayAdapter<Any>
+    private var sourceName: String? = ""
+    private var destinationName: String? = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.inflate(R.layout.dialog_add_transaction, container, false)
     }
 
-    override fun onStart() {
-        super.onStart()
-        setIcons()
-        setWidgets()
-        contextSwitch()
-        addTransactionFab.setOnClickListener { submitData() }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         CircularReveal(dialog_add_transaction_layout).showReveal(revealX, revealY)
+        contextSwitch()
+        setIcons()
+        setWidgets()
+        if(transactionId != 0L){
+            updateTransactionSetup()
+        }
+        addTransactionFab.setOnClickListener {
+            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+            hideKeyboard()
+            billName = if(bill_edittext.isBlank()){
+                null
+            } else {
+                bill_edittext.getString()
+            }
+            piggyBank = if(piggy_edittext.isBlank()){
+                null
+            } else {
+                piggy_edittext.getString()
+            }
+            categoryName = if(category_edittext.isBlank()){
+                null
+            } else {
+                category_edittext.getString()
+            }
+            transactionTags = if(tags_chip.allChips.isNullOrEmpty()){
+                null
+            } else {
+                // Remove [ and ] from beginning and end of string
+                val beforeTags = tags_chip.allChips.toString().substring(1)
+                beforeTags.substring(0, beforeTags.length - 1)
+            }
+            when {
+                Objects.equals("Withdrawal", transactionType) -> {
+                    sourceAccount = source_spinner.selectedItem.toString()
+                    destinationAccount = destination_edittext.getString()
+                }
+                Objects.equals("Transfer", transactionType) -> {
+                    sourceAccount = source_spinner.selectedItem.toString()
+                    destinationAccount = destination_spinner.selectedItem.toString()
+                }
+                Objects.equals("Deposit", transactionType) -> {
+                    sourceAccount = source_edittext.getString()
+                    destinationAccount = destination_spinner.selectedItem.toString()
+                }
+            }
+            if(transactionId != 0L){
+                updateData()
+            } else {
+                submitData()
+            }
+        }
+    }
+
+    private fun updateTransactionSetup(){
+        transactionViewModel.getTransactionById(transactionId).observe(this, Observer {
+            val transactionAttributes = it[0].transactionAttributes
+            description_edittext.setText(transactionAttributes?.description)
+            transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount
+                    ?: 0.toDouble()).toString())
+            currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this, Observer { currencyData ->
+                val currencyAttributes = currencyData[0].currencyAttributes
+                currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
+            })
+            currency = transactionAttributes?.currency_code.toString()
+            transaction_date_edittext.setText(transactionAttributes?.date)
+            bill_edittext.setText(transactionAttributes?.bill_name)
+            piggy_edittext.setText(transactionAttributes?.piggy_bank_name)
+            category_edittext.setText(transactionAttributes?.category_name)
+            if(transactionAttributes?.tags != null){
+                tags_chip.setText(transactionAttributes.tags + ",")
+            }
+            when {
+                Objects.equals("Withdrawal", transactionType) -> {
+                    destination_edittext.setText(transactionAttributes?.destination_name)
+                    sourceName = transactionAttributes?.source_name
+                }
+                Objects.equals("Transfer", transactionType) -> {
+                    sourceName = transactionAttributes?.source_name
+                    destinationName = transactionAttributes?.destination_name
+                }
+                Objects.equals("Deposit", transactionType) -> {
+                    source_edittext.setText(transactionAttributes?.source_name)
+                    destinationName = transactionAttributes?.destination_name
+                }
+            }
+        })
     }
 
     private fun setIcons(){
@@ -185,6 +272,13 @@ class AddTransactionDialog: BaseDialog() {
              val currencyData = defaultCurrency[0].currencyAttributes
              currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
          })
+         accountViewModel.isLoading.observe(this, Observer {
+             if(it == true){
+                 ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+             } else {
+                 ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+             }
+         })
      }
 
      private fun contextSwitch(){
@@ -195,7 +289,7 @@ class AddTransactionDialog: BaseDialog() {
                              accounts.add(accountData.accountAttributes?.name!!)
                          }
                          val uniqueAccount = HashSet(accounts).toArray()
-                         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
+                         spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
                          spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                          source_spinner.isVisible = true
                          source_textview.isVisible = true
@@ -206,12 +300,17 @@ class AddTransactionDialog: BaseDialog() {
                          destination_textview.isVisible = true
                          destination_spinner.adapter = spinnerAdapter
                          transferData.second.forEachIndexed { _,piggyData ->
-                             piggyBank.add(piggyData.piggyAttributes?.name!!)
+                             piggyBankList.add(piggyData.piggyAttributes?.name!!)
                          }
-                         val uniquePiggy = HashSet(piggyBank).toArray()
+                         piggy_layout.isVisible = true
+                         val uniquePiggy = HashSet(piggyBankList).toArray()
                          val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniquePiggy)
                          piggy_edittext.threshold = 1
                          piggy_edittext.setAdapter(adapter)
+                         val sourcePosition = spinnerAdapter.getPosition(sourceName)
+                         source_spinner.setSelection(sourcePosition)
+                         val destinationPosition = spinnerAdapter.getPosition(destinationName)
+                         destination_spinner.setSelection(destinationPosition)
                      })
              Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAssetAccounts())
                      .observe(this , Observer {
@@ -225,7 +324,7 @@ class AddTransactionDialog: BaseDialog() {
                              destinationAccounts.add(accountData.accountAttributes?.name!!)
                          }
                          val uniqueDestination = HashSet(destinationAccounts).toArray()
-                         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueDestination)
+                         spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueDestination)
                          spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                          destination_spinner.adapter = spinnerAdapter
                          destination_textview.isVisible = true
@@ -235,6 +334,8 @@ class AddTransactionDialog: BaseDialog() {
                          source_edittext.setAdapter(autocompleteAdapter)
                          source_spinner.isVisible = false
                          source_textview.isVisible = false
+                         val destinationPosition = spinnerAdapter.getPosition(destinationName)
+                         destination_spinner.setSelection(destinationPosition)
                      })
              else -> {
                  zipLiveData(accountViewModel.getAssetAccounts(), accountViewModel.getExpenseAccounts())
@@ -244,10 +345,10 @@ class AddTransactionDialog: BaseDialog() {
                                  sourceAccounts.add(accountData.accountAttributes?.name!!)
                              }
                              val uniqueSource = HashSet(sourceAccounts).toArray()
-                             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueSource)
-                             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                             spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueSource)
+                             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                              source_layout.isVisible = false
-                             source_spinner.adapter = adapter
+                             source_spinner.adapter = spinnerAdapter
                              source_textview.isVisible = true
                              // This is used for auto complete for destination account
                              it.second.forEachIndexed { _, accountData ->
@@ -259,6 +360,10 @@ class AddTransactionDialog: BaseDialog() {
                              destination_edittext.setAdapter(autocompleteAdapter)
                              destination_spinner.isVisible = false
                              destination_textview.isVisible = false
+                             val spinnerPosition = spinnerAdapter.getPosition(sourceName)
+                             source_spinner.setSelection(spinnerPosition)
+                             val destinationPosition = spinnerAdapter.getPosition(destinationName)
+                             destination_spinner.setSelection(destinationPosition)
                          })
                  billViewModel.getAllBills().observe(this, Observer {
                      if(it.isNotEmpty()){
@@ -277,47 +382,6 @@ class AddTransactionDialog: BaseDialog() {
      }
 
     private fun submitData(){
-        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-        hideKeyboard()
-        val billName: String? = if(bill_edittext.isBlank()){
-            null
-        } else {
-            bill_edittext.getString()
-        }
-        val piggyBank: String? = if(piggy_edittext.isBlank()){
-            null
-        } else {
-            piggy_edittext.getString()
-        }
-        val categoryName: String? = if(category_edittext.isBlank()){
-            null
-        } else {
-            category_edittext.getString()
-        }
-        var sourceAccount = ""
-        var destinationAccount = ""
-        when {
-            Objects.equals("Withdrawal", transactionType) -> {
-                sourceAccount = source_spinner.selectedItem.toString()
-                destinationAccount = destination_edittext.getString()
-            }
-            Objects.equals("Transfer", transactionType) -> {
-                sourceAccount = source_spinner.selectedItem.toString()
-                destinationAccount = destination_spinner.selectedItem.toString()
-            }
-            Objects.equals("Deposit", transactionType) -> {
-                sourceAccount = source_edittext.getString()
-                destinationAccount = destination_spinner.selectedItem.toString()
-            }
-        }
-        val transactionTags = if(tags_chip.allChips.isNullOrEmpty()){
-            null
-        } else {
-            // Remove [ and ] from beginning and end of string
-            val beforeTags = tags_chip.allChips.toString().substring(1)
-            beforeTags.substring(0, beforeTags.length - 1)
-        }
-
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transaction_date_edittext.getString(), piggyBank, billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
@@ -342,8 +406,9 @@ class AddTransactionDialog: BaseDialog() {
                                 "currency" to currency,
                                 "sourceName" to sourceAccount,
                                 "destinationName" to destinationAccount,
-                                "piggyBankName" to piggyBank,
-                                "category" to categoryName
+                                "piggyBankName" to piggyBankList,
+                                "category" to categoryName,
+                                "tags" to transactionTags
                         )
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
@@ -358,7 +423,8 @@ class AddTransactionDialog: BaseDialog() {
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "destinationName" to destinationAccount,
-                                "category" to categoryName
+                                "category" to categoryName,
+                                "tags" to transactionTags
                         )
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
@@ -374,7 +440,8 @@ class AddTransactionDialog: BaseDialog() {
                                 "currency" to currency,
                                 "sourceName" to sourceAccount,
                                 "billName" to billName,
-                                "category" to categoryName
+                                "category" to categoryName,
+                                "tags" to transactionTags
                         )
                         withdrawalBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(withdrawalBroadcast)
@@ -382,6 +449,24 @@ class AddTransactionDialog: BaseDialog() {
                 }
                 toastOffline(getString(R.string.data_added_when_user_online, transactionType))
                 dialog?.dismiss()
+            }
+        })
+    }
+
+    private fun updateData(){
+        transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
+                transaction_date_edittext.getString(), piggyBank, billName,
+                transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
+                currency, categoryName, transactionTags).observe(this, Observer { transactionResponse->
+            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+            val errorMessage = transactionResponse.getErrorMessage()
+            if (transactionResponse.getResponse() != null) {
+                toastSuccess("Transaction Updated")
+                dialog?.dismiss()
+            } else if(errorMessage != null) {
+                toastError(errorMessage)
+            } else if(transactionResponse.getError() != null) {
+                toastError(transactionResponse.getError()?.localizedMessage)
             }
         })
     }

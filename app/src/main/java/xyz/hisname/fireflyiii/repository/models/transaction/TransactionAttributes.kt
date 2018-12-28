@@ -50,5 +50,6 @@ data class TransactionAttributes(
         val tags: String?,
         val internal_reference: String?,
         val bunq_payment_id: String?,
-        val recurrence_id: Int?
+        val recurrence_id: Int?,
+        val piggy_bank_name: String?
 )

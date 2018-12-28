@@ -11,6 +11,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -64,8 +65,10 @@ class TransactionFragment: BaseFragment(){
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(dataAdapter, "no_type")
+                    rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
                     recycler_view.adapter = rtAdapter
+                    recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
+                            DividerItemDecoration.VERTICAL))
                     rtAdapter.apply {
                         recycler_view.adapter as TransactionRecyclerAdapter
                         update(dataAdapter)
@@ -85,8 +88,10 @@ class TransactionFragment: BaseFragment(){
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(dataAdapter, "no_type")
+                    rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
                     recycler_view.adapter = rtAdapter
+                    recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
+                            DividerItemDecoration.VERTICAL))
                     rtAdapter.apply {
                         recycler_view.adapter as TransactionRecyclerAdapter
                         update(dataAdapter)
@@ -105,8 +110,10 @@ class TransactionFragment: BaseFragment(){
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(dataAdapter, "no_type")
+                    rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
                     recycler_view.adapter = rtAdapter
+                    recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
+                            DividerItemDecoration.VERTICAL))
                     rtAdapter.apply {
                         recycler_view.adapter as TransactionRecyclerAdapter
                         update(dataAdapter)
@@ -122,11 +129,17 @@ class TransactionFragment: BaseFragment(){
         })
     }
 
+    private fun itemClicked(data: TransactionData){
+        val addTransaction = AddTransactionDialog()
+        addTransaction.arguments = bundleOf("transactionId" to data.transactionId,
+                "transactionType" to data.transactionAttributes?.transactionType)
+        addTransaction.show(requireFragmentManager().beginTransaction(), "add_transaction_dialog")
+    }
+
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = transactionType.substring(0,1).toUpperCase() +
                 transactionType.substring(1)
-
     }
 
     override fun onResume() {

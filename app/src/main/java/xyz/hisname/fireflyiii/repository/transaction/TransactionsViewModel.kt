@@ -109,16 +109,16 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             if (errorBody != null) {
                 errorBodyMessage = String(errorBody.bytes())
                 val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
-                when {
-                    gson.errors.transactions_currency != null -> errorBodyMessage = "Currency Code Required"
-                    gson.errors.bill_name != null -> errorBodyMessage = "Invalid Bill Name"
-                    gson.errors.piggy_bank_name != null -> errorBodyMessage = "Invalid Piggy Bank Name"
-                    gson.errors.transactions_destination_name != null -> errorBodyMessage = "Invalid Destination Account"
-                    gson.errors.transactions_source_name != null -> errorBodyMessage = "Invalid Source Account"
-                    gson.errors.transaction_destination_id != null -> errorBodyMessage = gson.errors.transaction_destination_id[0]
-                    gson.errors.transaction_amount != null -> errorBodyMessage = "Amount field is required"
-                    gson.errors.description != null -> errorBodyMessage = "Description is required"
-                    else -> errorBodyMessage = "Error occurred while saving transaction"
+                errorBodyMessage = when {
+                    gson.errors.transactions_currency != null -> "Currency Code Required"
+                    gson.errors.bill_name != null -> "Invalid Bill Name"
+                    gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
+                    gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
+                    gson.errors.transactions_source_name != null -> "Invalid Source Account"
+                    gson.errors.transaction_destination_id != null -> gson.errors.transaction_destination_id[0]
+                    gson.errors.transaction_amount != null -> "Amount field is required"
+                    gson.errors.description != null -> "Description is required"
+                    else -> "Error occurred while saving transaction"
                 }
             }
             if (response.isSuccessful) {
@@ -133,6 +133,56 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         { throwable -> transaction.value = ApiResponses(throwable) })
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return apiResponse
+    }
+
+    fun updateTransaction(transactionId: Long, type: String, description: String,
+                       date: String, piggyBankName: String?, billName: String?, amount: String,
+                       sourceName: String?, destinationName: String?, currencyName: String,
+                       category: String?, tags: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
+        val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
+        val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
+        transactionService?.updateTransaction(transactionId, convertString(type),description,date,piggyBankName,billName,
+                amount,sourceName,destinationName,currencyName, category, tags)?.enqueue(retrofitCallback({ response ->
+            val errorBody = response.errorBody()
+            var errorBodyMessage = ""
+            if (errorBody != null) {
+                errorBodyMessage = String(errorBody.bytes())
+                val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                errorBodyMessage = when {
+                    gson.errors.transactions_currency != null -> "Currency Code Required"
+                    gson.errors.bill_name != null -> "Invalid Bill Name"
+                    gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
+                    gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
+                    gson.errors.transactions_source_name != null -> "Invalid Source Account"
+                    gson.errors.transaction_destination_id != null -> gson.errors.transaction_destination_id[0]
+                    gson.errors.transaction_amount != null -> "Amount field is required"
+                    gson.errors.description != null -> "Description is required"
+                    else -> "Error occurred while saving transaction"
+                }
+            }
+            if (response.isSuccessful) {
+                response.body()?.data?.forEachIndexed { _, transaction ->
+                    scope.launch(Dispatchers.IO) { repository.insertTransaction(transaction) }
+                }
+                transaction.postValue(ApiResponses(response.body()))
+            } else {
+                transaction.postValue(ApiResponses(errorBodyMessage))
+            }
+        })
+        { throwable -> transaction.value = ApiResponses(throwable) })
+        apiResponse.addSource(transaction) { apiResponse.value = it }
+        return apiResponse
+    }
+
+    fun getTransactionById(transactionId: Long): LiveData<MutableList<TransactionData>>{
+        val transactionData: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
+        var data: MutableList<TransactionData> = arrayListOf()
+        scope.async(Dispatchers.IO) {
+            data = repository.getTransactionById(transactionId)
+        }.invokeOnCompletion {
+            transactionData.postValue(data)
+        }
+        return transactionData
     }
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
