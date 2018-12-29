@@ -94,4 +94,23 @@
     <string name="options">Options</string>
     <string name="transaction">Transactions</string>
     <string name="account">Accounts</string>
+    <string name="asset_account">Asset Accounts</string>
+    <string name="expense_account">Expense Accounts</string>
+    <string name="revenue_account">Revenue Accounts</string>
+    <string name="liability_account">Liability Accounts</string>
+    <string name="money_management">Money Management</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="revenue_income_menu">Revenue / Income</string>
+    <string-array name="account_type">
+        <item>Asset</item>
+        <item>Expense</item>
+        <item>Revenue</item>
+        <item>Liability</item>
+    </string-array>
+    <string-array name="account_role">
+        <item>Default Asset</item>
+        <item>Shared Asset</item>
+        <item>Saving Asset</item>
+        <item>Credit Card Asset</item>
+    </string-array>
 </resources>

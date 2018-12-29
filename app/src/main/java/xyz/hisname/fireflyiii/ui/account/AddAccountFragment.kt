@@ -43,9 +43,7 @@ class AddAccountFragment: BaseAccountFragment(){
         } else if(!Objects.equals(accountArgument, "Accounts")){
             accountType.isVisible = false
         }
-        val accountTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, arrayListOf(
-                "Asset" , "Expense", "Revenue", "Liability"
-                ))
+        val accountTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, resources.getStringArray(R.array.account_type))
         accountTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         accountType.adapter = accountTypeAdapter
         accountType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
@@ -60,9 +58,7 @@ class AddAccountFragment: BaseAccountFragment(){
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
-        val accountRoleAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, arrayListOf(
-                "Default Asset", "Shared Asset", "Saving Asset", "Credit Card Asset"
-        ))
+        val accountRoleAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, resources.getStringArray(R.array.account_role))
         accountRoleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         accountRole.adapter = accountRoleAdapter
         accountRole.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{

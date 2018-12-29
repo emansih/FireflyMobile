@@ -22,5 +22,30 @@
     <string name="options">選項</string>
     <string name="transaction">交易</string>
     <string name="account">帳戶</string>
-
+    <string name="asset_account">資產帳戶</string>
+    <string name="expense_account">支出帳戶</string>
+    <string name="revenue_account">收入帳戶</string>
+    <string name="liability_account">債務</string>
+    <string name="money_management">金錢管理</string>
+    <string name="dashboard">監控面板</string>
+    <string name="revenue_income_menu">收入 / 所得</string>
+    <string-array name="account_type">
+        <item>資產</item>
+        <item>支出</item>
+        <item>收入</item>
+        <item>債務</item>
+    </string-array>
+    <string-array name="account_role">
+        <item>預設資產帳戶</item>
+        <item>共用資產帳戶</item>
+        <item>儲蓄帳戶</item>
+        <item>信用卡</item>
+    </string-array>
+    <string-array name="repeat_frequency">
+        <item>每週</item>
+        <item>每月</item>
+        <item>每季</item>
+        <item>每半年</item>
+        <item>每年</item>
+    </string-array>
 </resources>
