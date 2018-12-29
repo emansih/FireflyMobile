@@ -77,6 +77,9 @@ class RetrofitBuilder {
             } else {
                 "$url/"
             }
+            if(!modifiedUrl.startsWith("https://")){
+                modifiedUrl = "https://$modifiedUrl"
+            }
             return modifiedUrl
         }
 
