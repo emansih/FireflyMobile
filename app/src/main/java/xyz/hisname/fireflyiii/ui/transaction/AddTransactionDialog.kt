@@ -299,14 +299,16 @@ class AddTransactionDialog: BaseDialog() {
                          destination_spinner.isVisible = true
                          destination_textview.isVisible = true
                          destination_spinner.adapter = spinnerAdapter
-                         transferData.second.forEachIndexed { _,piggyData ->
-                             piggyBankList.add(piggyData.piggyAttributes?.name!!)
+                         if(transactionId == 0L) {
+                             transferData.second.forEachIndexed { _, piggyData ->
+                                 piggyBankList.add(piggyData.piggyAttributes?.name!!)
+                             }
+                             piggy_layout.isVisible = true
+                             val uniquePiggy = HashSet(piggyBankList).toArray()
+                             val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniquePiggy)
+                             piggy_edittext.threshold = 1
+                             piggy_edittext.setAdapter(adapter)
                          }
-                         piggy_layout.isVisible = true
-                         val uniquePiggy = HashSet(piggyBankList).toArray()
-                         val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniquePiggy)
-                         piggy_edittext.threshold = 1
-                         piggy_edittext.setAdapter(adapter)
                          val sourcePosition = spinnerAdapter.getPosition(sourceName)
                          source_spinner.setSelection(sourcePosition)
                          val destinationPosition = spinnerAdapter.getPosition(destinationName)
@@ -455,7 +457,7 @@ class AddTransactionDialog: BaseDialog() {
 
     private fun updateData(){
         transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
-                transaction_date_edittext.getString(), piggyBank, billName,
+                transaction_date_edittext.getString(), billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
                 currency, categoryName, transactionTags).observe(this, Observer { transactionResponse->
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)

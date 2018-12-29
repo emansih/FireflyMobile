@@ -136,12 +136,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun updateTransaction(transactionId: Long, type: String, description: String,
-                       date: String, piggyBankName: String?, billName: String?, amount: String,
+                       date: String, billName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
                        category: String?, tags: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        transactionService?.updateTransaction(transactionId, convertString(type),description,date,piggyBankName,billName,
+        transactionService?.updateTransaction(transactionId, convertString(type),description,date,billName,
                 amount,sourceName,destinationName,currencyName, category, tags)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
