@@ -5,9 +5,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
@@ -37,6 +34,9 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 import android.content.Intent
+import android.view.*
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import com.hootsuite.nachos.chip.ChipCreator
 import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
@@ -218,6 +218,33 @@ class AddTransactionDialog: BaseDialog() {
                     .sizeDp(16))
             setBackgroundColor(ContextCompat.getColor(requireContext(),R.color.colorPrimaryDark))
         }
+        placeHolderToolbar.inflateMenu(R.menu.delete_menu)
+        placeHolderToolbar.setOnMenuItemClickListener { item ->
+            if(item.itemId == R.id.menu_item_delete){
+                AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.get_confirmation)
+                        .setMessage(R.string.delete_transaction_message)
+                        .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
+                                .sizeDp(24)
+                                .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
+                        .setPositiveButton("Yes"){ _,_ ->
+                            transactionViewModel.deleteTransaction(transactionId).observe(this, Observer {
+                                if(it == true){
+                                    toastSuccess(resources.getString(R.string.transaction_deleted))
+                                    dialog?.dismiss()
+                                } else {
+                                    toastError(resources.getString(R.string.issue_deleting_transaction),
+                                            Toast.LENGTH_LONG)
+                                }
+                            })
+                        }
+                        .setNegativeButton("No"){ _, _ ->
+                            toastInfo("Transaction not deleted")
+                        }
+                        .show()
+            }
+            true
+        }
     }
 
      private fun setWidgets(){
@@ -279,6 +306,9 @@ class AddTransactionDialog: BaseDialog() {
                  ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
              }
          })
+         if(transactionId != 0L){
+             setHasOptionsMenu(true)
+         }
      }
 
      private fun contextSwitch(){
@@ -391,7 +421,7 @@ class AddTransactionDialog: BaseDialog() {
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
-                toastSuccess("Transaction Added")
+                toastSuccess(resources.getString(R.string.transaction_added))
                 dialog?.dismiss()
             } else if(errorMessage != null){
                 toastError(errorMessage)
@@ -463,7 +493,7 @@ class AddTransactionDialog: BaseDialog() {
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
-                toastSuccess("Transaction Updated")
+                toastSuccess(resources.getString(R.string.transaction_updated))
                 dialog?.dismiss()
             } else if(errorMessage != null) {
                 toastError(errorMessage)
@@ -472,5 +502,4 @@ class AddTransactionDialog: BaseDialog() {
             }
         })
     }
-
 }

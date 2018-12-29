@@ -185,6 +185,27 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return transactionData
     }
 
+    fun deleteTransaction(transactionId: Long): LiveData<Boolean>{
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        isLoading.value = true
+        transactionService?.deleteTransactionById(transactionId)?.enqueue(retrofitCallback({ response ->
+            if (response.code() == 204 || response.code() == 200) {
+                scope.async(Dispatchers.IO) {
+                    repository.deleteTransactionById(transactionId)
+                }.invokeOnCompletion {
+                    isDeleted.postValue(true)
+                }
+            }else {
+                isDeleted.postValue(false)
+            }
+        })
+        { throwable ->
+            isDeleted.postValue(false)
+        })
+        isLoading.value = false
+        return isDeleted
+    }
+
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
 
     private fun loadRemoteData(startDate: String?, endDate: String?, source: String){

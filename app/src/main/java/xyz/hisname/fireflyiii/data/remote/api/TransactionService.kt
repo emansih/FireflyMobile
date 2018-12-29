@@ -25,8 +25,8 @@ interface TransactionService {
     @GET("$TRANSACTION_API_ENDPOINT/{id}")
     fun getTransactionById(@Path("id") id: String)
 
-    @DELETE("$TRANSACTION_API_ENDPOINT/{id}")
-    fun deleteTransactionById(@Path("id") id: String)
+    @DELETE("$TRANSACTION_API_ENDPOINT/{transactionId}")
+    fun deleteTransactionById(@Path("transactionId") id: Long): Call<TransactionSuccessModel>
 
     @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)

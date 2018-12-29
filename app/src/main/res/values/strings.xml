@@ -52,4 +52,9 @@
         <item>Half-yearly</item>
         <item>Yearly</item>
     </string-array>
+    <string name="delete_transaction_message">You are about to delete this transaction from your account. This action is irreversible.</string>
+    <string name="transaction_deleted">Transaction deleted</string>
+    <string name="issue_deleting_transaction">There was an issue deleting your transactions. Please try again later</string>
+    <string name="transaction_updated">Transaction Updated</string>
+    <string name="transaction_added">Transaction Added</string>
 </resources>

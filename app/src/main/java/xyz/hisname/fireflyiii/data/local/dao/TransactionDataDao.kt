@@ -30,4 +30,8 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
 
     @Query("SELECT * FROM transactions WHERE transactionId = :transactionId")
     abstract fun getTransactionById(transactionId: Long): MutableList<TransactionData>
+
+    @Query("DELETE FROM transactions WHERE transactionId = :transactionId")
+    abstract fun deleteTransactionById(transactionId: Long): Int
+
 }

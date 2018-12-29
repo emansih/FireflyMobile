@@ -57,4 +57,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
     @WorkerThread
     suspend fun getTransactionById(transactionId: Long) = transactionDao.getTransactionById(transactionId)
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteTransactionById(transactionId: Long) = transactionDao.deleteTransactionById(transactionId)
+
+
 }
