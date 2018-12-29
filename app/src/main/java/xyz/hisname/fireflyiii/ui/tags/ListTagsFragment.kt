@@ -118,17 +118,7 @@ class ListTagsFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Tags"
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity?.activity_toolbar?.title = "Tags"
-    }
-
-    override fun onStop() {
-        super.onStop()
-        fab.isGone = true
+        activity?.activity_toolbar?.title = resources.getString(R.string.tags)
     }
 
     override fun onDetach() {

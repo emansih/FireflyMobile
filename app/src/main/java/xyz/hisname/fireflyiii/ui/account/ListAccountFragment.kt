@@ -193,23 +193,13 @@ class ListAccountFragment: BaseFragment() {
             Objects.equals(accountType, "expense") -> "Expense Account"
             Objects.equals(accountType, "revenue") -> "Revenue Account"
             Objects.equals(accountType, "liability") -> "Liability Account"
-            else -> "Accounts"
+            else -> resources.getString(R.string.account)
         }
     }
 
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = convertString()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity?.activity_toolbar?.title = convertString()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        fab.isGone = true
     }
 
     override fun onDetach() {

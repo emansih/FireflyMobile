@@ -109,7 +109,7 @@ class LoginFragment: Fragment() {
                 if (browserIntent.resolveActivity(requireActivity().packageManager) != null){
                     startActivity(browserIntent)
                 } else {
-                    toastError("No apps on your device can handle OAuth")
+                    toastError(resources.getString(R.string.no_browser_installed))
                 }
             }
         }
@@ -117,12 +117,12 @@ class LoginFragment: Fragment() {
 
     private fun refreshToken(){
         rootLayout.isVisible = false
-        toastInfo("Refreshing your access token...", Toast.LENGTH_LONG)
+        toastInfo(resources.getString(R.string.refreshing_token), Toast.LENGTH_LONG)
         authViewModel.getRefreshToken().observe(this, Observer {
             if(it == true){
                 startHomeIntent()
             } else {
-                toastError("There was an issue refreshing your token")
+                toastError(resources.getString(R.string.issue_refreshing_token))
             }
         })
     }
@@ -164,7 +164,7 @@ class LoginFragment: Fragment() {
                             replace(R.id.bigger_fragment_container, OnboardingFragment())
                         }
                     } else {
-                        toastInfo("Authentication Failed")
+                        toastInfo(resources.getString(R.string.authentication_failed))
                     }
                 })
             } else {

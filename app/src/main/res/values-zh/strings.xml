@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tags">標籤</string>
+    <string name="bill">帳單</string>
+    <string name="description">描述</string>
+    <string name="amount">金額</string>
+    <string name="piggy_bank">小豬撲滿</string>
+    <string name="withdrawal">提款</string>
+    <string name="deposit">存款</string>
+    <string name="transfer">轉帳</string>
+    <string name="source_account">來源帳戶</string>
+    <string name="destination_account">目標帳戶</string>
+    <string name="min_amount">最小金額</string>
+    <string name="max_amount">最大金額</string>
+    <string name="currency">貨幣</string>
+    <string name="skip">略過</string>
+    <string name="client_secret">客戶端金鑰</string>
+    <string name="get_confirmation">你確定吗?</string>
+    <string name="delete_piggy_bank">你確定你想要刪除名為 %1$s 的小豬撲滿?</string>
+    <string name="delete_bill">你確定你想要刪除名為 %1$s 的帳單?</string>
+    <string name="delete_transaction">你真的要刪除這個描述為 %1$s 的交易嗎</string>
+    <string name="options">選項</string>
+    <string name="transaction">交易</string>
+    <string name="account">帳戶</string>
+
+</resources>

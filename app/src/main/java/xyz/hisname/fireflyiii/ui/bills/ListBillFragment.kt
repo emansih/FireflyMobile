@@ -123,18 +123,8 @@ class ListBillFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Bills"
+        activity?.activity_toolbar?.title = resources.getString(R.string.bill)
         fab.isVisible = true
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity?.activity_toolbar?.title = "Bills"
-    }
-
-    override fun onStop() {
-        super.onStop()
-        fab.isGone = true
     }
 
     override fun onDetach() {

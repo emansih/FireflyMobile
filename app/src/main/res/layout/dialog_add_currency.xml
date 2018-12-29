@@ -52,7 +52,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
-                android:hint="Currency Name"
+                android:hint="@string/currency"
                 android:textColor="@color/md_black_1000"
                 android:textSize="28sp" />
 
@@ -88,7 +88,7 @@
                     android:layout_height="match_parent"
                     android:digits="0123456789"
                     android:drawablePadding="12dp"
-                    android:hint="Decimal Places"
+                    android:hint="@string/decimal_places"
                     android:inputType="number"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -110,7 +110,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:drawablePadding="12dp"
-                    android:hint="Symbol"
+                    android:hint="@string/currency_symbol"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -131,7 +131,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:drawablePadding="12dp"
-                    android:hint="Currency Code"
+                    android:hint="@string/currency_code"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 

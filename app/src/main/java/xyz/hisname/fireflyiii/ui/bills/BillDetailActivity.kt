@@ -30,6 +30,7 @@ class BillDetailActivity: BaseActivity() {
     private var billList: MutableList<BaseDetailModel> = ArrayList()
     private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private var billAttribute: BillAttributes? = null
+    private var nameOfBill: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,7 @@ class BillDetailActivity: BaseActivity() {
         billViewModel.getBillById(intent.getLongExtra("billId", 0)).observe(this, Observer {
             billAttribute = it[0].billAttributes
             billName.text = billAttribute?.name
+            nameOfBill = billAttribute?.name
             val billDataArray = arrayListOf(
                     BaseDetailModel("Updated At", billAttribute?.updated_at,
                             IconicsDrawable(this@BillDetailActivity).icon(GoogleMaterial.Icon.gmd_update).sizeDp(24)),
@@ -126,8 +128,8 @@ class BillDetailActivity: BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if(item?.itemId == R.id.menu_item_delete) {
             AlertDialog.Builder(this)
-                    .setTitle("Are you sure?")
-                    .setMessage(R.string.irreversible_action)
+                    .setTitle(resources.getString(R.string.get_confirmation))
+                    .setMessage(resources.getString(R.string.delete_bill, nameOfBill))
                     .setPositiveButton("Yes") { _, _ ->
                         deleteItem()
                     }

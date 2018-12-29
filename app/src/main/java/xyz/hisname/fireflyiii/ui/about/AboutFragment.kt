@@ -43,24 +43,24 @@ class AboutFragment: MaterialAboutFragment() {
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank)))
                 .addItem(ConvenienceBuilder.createVersionActionItem(requireContext(),
                         IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_phone).sizeDp(24),
-                "Mobile Version",false)).addItem(MaterialAboutActionItem.Builder()
-                        .text("Server Version")
+                resources.getString(R.string.mobile_version),false)).addItem(MaterialAboutActionItem.Builder()
+                        .text(resources.getString(R.string.server_version))
                         .subText(serverVersion)
                         .icon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_server).sizeDp(24))
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
-                        .text("API Version")
+                        .text(resources.getString(R.string.api_version))
                         .subText(apiVersion)
                         .icon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_globe).sizeDp(24))
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
-                        .text("Operating System")
+                        .text(resources.getString(R.string.operating_system))
                         .subText(userOs)
                         .icon(setUserOsIcon())
                         .build())
                 .build()
         val authorCardBuilder = MaterialAboutCard.Builder()
-        authorCardBuilder.title("Author")
+        authorCardBuilder.title(resources.getString(R.string.author))
         authorCardBuilder.addItem(MaterialAboutActionItem.Builder()
                 .text("Daniel Quah")
                 .subText("emansih")
@@ -69,7 +69,7 @@ class AboutFragment: MaterialAboutFragment() {
                     requireContext().startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/emansih".toUri()))
                 }.build())
                 .addItem(MaterialAboutActionItem.Builder()
-                        .text("View on Github")
+                        .text(resources.getString(R.string.view_on_github))
                         .icon(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_link).sizeDp(24))
                         .setOnClickAction {
                             requireContext().startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/emansih/FireflyMobile".toUri()))
@@ -90,11 +90,6 @@ class AboutFragment: MaterialAboutFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "About"
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity?.activity_toolbar?.title = "About"
+        activity?.activity_toolbar?.title = resources.getString(R.string.about)
     }
 }

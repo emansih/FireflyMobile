@@ -138,15 +138,13 @@ class TransactionFragment: BaseFragment(){
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = transactionType.substring(0,1).toUpperCase() +
-                transactionType.substring(1)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity?.activity_toolbar?.title = transactionType.substring(0,1).toUpperCase() +
-                transactionType.substring(1)
-
+        val toolBarTitle = when {
+            transactionType.contains("Withdrawal") -> resources.getString(R.string.withdrawal)
+            transactionType.contains("Deposit") -> resources.getString(R.string.deposit)
+            transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
+            else -> ""
+        }
+        activity?.activity_toolbar?.title = toolBarTitle
     }
 
     override fun onDetach() {

@@ -70,6 +70,7 @@ class AddTransactionDialog: BaseDialog() {
     private lateinit var spinnerAdapter: ArrayAdapter<Any>
     private var sourceName: String? = ""
     private var destinationName: String? = ""
+    private var transactionDescription: String? = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -136,6 +137,7 @@ class AddTransactionDialog: BaseDialog() {
         transactionViewModel.getTransactionById(transactionId).observe(this, Observer {
             val transactionAttributes = it[0].transactionAttributes
             description_edittext.setText(transactionAttributes?.description)
+            transactionDescription = transactionAttributes?.description
             transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount
                     ?: 0.toDouble()).toString())
             currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this, Observer { currencyData ->
@@ -223,7 +225,7 @@ class AddTransactionDialog: BaseDialog() {
             if(item.itemId == R.id.menu_item_delete){
                 AlertDialog.Builder(requireContext())
                         .setTitle(R.string.get_confirmation)
-                        .setMessage(R.string.delete_transaction_message)
+                        .setMessage(resources.getString(R.string.delete_transaction, transactionDescription))
                         .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
                                 .sizeDp(24)
                                 .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))

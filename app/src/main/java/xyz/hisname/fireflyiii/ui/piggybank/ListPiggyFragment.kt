@@ -123,17 +123,7 @@ class ListPiggyFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Piggy Bank"
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity?.activity_toolbar?.title = "Piggy Bank"
-    }
-
-    override fun onStop() {
-        super.onStop()
-        fab.isGone = true
+        activity?.activity_toolbar?.title = resources.getString(R.string.piggy_bank)
     }
 
     override fun onDetach() {

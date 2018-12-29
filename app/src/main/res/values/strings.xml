@@ -1,4 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
     <string name="app_name">Firefly III Mobile</string>
     <string name="required_field">Required Field</string>
     <string name="bill_due_today">Your bill is due today!</string>
@@ -19,7 +20,6 @@
     <string name="no_target_date">No date set</string>
     <string name="min_amount_save_per_month">Minimum amount to save per month: %1$s %2$s</string>
     <string name="user_did_it">You did it!</string>
-    <string name="amount">%1$s / %2$s</string>
     <string name="edit">Edit</string>
     <string name="due_today">Due today</string>
     <string name="one_more_day_to_target">1 more day to your target!</string>
@@ -28,8 +28,6 @@
     <string name="days_to_go">%1$d days to go</string>
     <string name="get_confirmation">Are you sure?</string>
     <string name="irreversible_action">This action is irreversible.</string>
-    <string name="delete_bill">Delete Bill</string>
-    <string name="delete_piggy">Delete Piggy Bank</string>
     <string name="piggy_bank_deleted">Piggy bank deleted</string>
     <string name="bill_deleted">Bill deleted</string>
     <string name="generic_delete_error">An error occurred while deleting</string>
@@ -52,9 +50,48 @@
         <item>Half-yearly</item>
         <item>Yearly</item>
     </string-array>
-    <string name="delete_transaction_message">You are about to delete this transaction from your account. This action is irreversible.</string>
     <string name="transaction_deleted">Transaction deleted</string>
     <string name="issue_deleting_transaction">There was an issue deleting your transactions. Please try again later</string>
     <string name="transaction_updated">Transaction Updated</string>
     <string name="transaction_added">Transaction Added</string>
+    <string name="issue_refreshing_token">There was an issue refreshing your token</string>
+    <string name="refreshing_token">Refreshing your access token…</string>
+    <string name="description">Description</string>
+    <string name="currency">Currency</string>
+    <string name="source_account">Source Account</string>
+    <string name="amount">Amount</string>
+    <string name="destination_account">Destination Account</string>
+    <string name="bill_name_optional">Bill Name(Optional)</string>
+    <string name="piggy_bank_name_optional">Piggy Bank Name(Optional)</string>
+    <string name="category_optional">Category(Optional)</string>
+    <string name="tags_optional">Tags(optional), Comma separated</string>
+    <string name="url">URL</string>
+    <string name="client_id">Client ID</string>
+    <string name="client_secret">Client Secret</string>
+    <string name="sign_in">Sign In</string>
+    <string name="server_version">Server Version</string>
+    <string name="mobile_version">Mobile Version</string>
+    <string name="api_version">API Version</string>
+    <string name="operating_system">Operating System</string>
+    <string name="author">Author</string>
+    <string name="view_on_github">View on Github</string>
+    <string name="about">About</string>
+    <string name="decimal_places">Decimal Places</string>
+    <string name="currency_symbol">Currency Symbol</string>
+    <string name="currency_code">Currency Code</string>
+    <string name="tags">Tags</string>
+    <string name="bill">Bill</string>
+    <string name="piggy_bank">Piggy Bank</string>
+    <string name="withdrawal">Withdrawal</string>
+    <string name="deposit">Deposit</string>
+    <string name="transfer">Transfer</string>
+    <string name="min_amount">Min Amount</string>
+    <string name="max_amount">Max Amount</string>
+    <string name="skip">Skip</string>
+    <string name="delete_piggy_bank">Are you sure you want to delete the piggy bank named %1$s ?</string>
+    <string name="delete_bill">Are you sure you want to delete the bill named %1$s ?</string>
+    <string name="delete_transaction">Are you sure you want to delete the transaction described %1$s ?</string>
+    <string name="options">Options</string>
+    <string name="transaction">Transactions</string>
+    <string name="account">Accounts</string>
 </resources>

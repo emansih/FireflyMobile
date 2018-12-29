@@ -53,7 +53,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
-                android:hint="Description"
+                android:hint="@string/description"
                 android:textColor="@color/md_black_1000"
                 android:textSize="28sp" />
 
@@ -85,7 +85,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:drawablePadding="12dp"
-                    android:hint="Min Amount"
+                    android:hint="@string/min_amount"
                     android:inputType="numberDecimal"
                     android:digits="0123456789.,"
                     android:textSize="16sp" />
@@ -120,7 +120,7 @@
                     android:layout_height="match_parent"
                     android:digits="0123456789.,"
                     android:drawablePadding="12dp"
-                    android:hint="Max Amount"
+                    android:hint="@string/max_amount"
                     android:inputType="numberDecimal"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -139,7 +139,7 @@
                     android:id="@+id/currency_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="Currency"
+                    android:hint="@string/currency"
                     android:drawablePadding="12dp"
                     android:focusable="false"
                     android:textSize="16sp" />
@@ -179,7 +179,7 @@
                     android:id="@+id/skip_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:hint="Skip"
+                    android:hint="@string/skip"
                     android:inputType="number"
                     android:drawablePadding="12dp"
                     android:textSize="16sp" />

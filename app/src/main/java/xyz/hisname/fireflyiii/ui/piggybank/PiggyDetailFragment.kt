@@ -104,7 +104,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     override fun deleteItem() {
         AlertDialog.Builder(requireContext())
                 .setTitle(R.string.get_confirmation)
-                .setMessage(R.string.irreversible_action)
+                .setMessage(resources.getString(R.string.delete_piggy_bank, piggyName))
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
                     piggyViewModel.deletePiggyById(piggyId).observe(this, Observer {
