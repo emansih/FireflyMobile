@@ -51,7 +51,7 @@
         <item>Yearly</item>
     </string-array>
     <string name="transaction_deleted">Transaction deleted</string>
-    <string name="issue_deleting_transaction">There was an issue deleting your transactions. Please try again later</string>
+    <string name="issue_deleting">There was an issue deleting your %1$s. Please try again later</string>
     <string name="transaction_updated">Transaction Updated</string>
     <string name="transaction_added">Transaction Added</string>
     <string name="issue_refreshing_token">There was an issue refreshing your token</string>
@@ -113,4 +113,5 @@
         <item>Saving Asset</item>
         <item>Credit Card Asset</item>
     </string-array>
+
 </resources>

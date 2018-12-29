@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.bills
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -71,10 +70,9 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun itemClicked(billData: BillData){
-        val billDetail = Intent(requireActivity(), BillDetailActivity::class.java).apply {
-            putExtras(bundleOf("billId" to billData.billId))
-        }
-        startActivity(billDetail)
+        val addBill = AddBillDialog()
+        addBill.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "billId" to billData.billId)
+        addBill.show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
     }
 
     private fun initFab(){

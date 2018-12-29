@@ -7,6 +7,8 @@ import android.graphics.Color.rgb
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
@@ -37,6 +39,7 @@ class AddBillDialog: BaseDialog() {
     private var currency = ""
     private val billId by lazy { arguments?.getLong("billId") ?: 0 }
     private lateinit var freqAdapter: ArrayAdapter<String>
+    private var billDescription: String? = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -50,6 +53,7 @@ class AddBillDialog: BaseDialog() {
             billViewModel.getBillById(billId).observe(this, Observer {
                 billAttribute = it[0].billAttributes
                 description_edittext.setText(billAttribute?.name)
+                billDescription = billAttribute?.name
                 min_amount_edittext.setText(billAttribute?.amount_min.toString())
                 max_amount_edittext.setText(billAttribute?.amount_max.toString())
                 currency = billAttribute?.currency_code ?: ""
@@ -116,6 +120,37 @@ class AddBillDialog: BaseDialog() {
                 .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
                 .sizeDp(24))
         placeHolderToolbar.navigationIcon = navIcon
+        if(billId != 0L) {
+            placeHolderToolbar.inflateMenu(R.menu.delete_menu)
+            placeHolderToolbar.setOnMenuItemClickListener { item ->
+                if (item.itemId == R.id.menu_item_delete) {
+                    AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.get_confirmation)
+                            .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
+                                    .sizeDp(24)
+                                    .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
+                            .setMessage(resources.getString(R.string.delete_bill, billDescription))
+                            .setPositiveButton("Yes"){ _,_ ->
+                                ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+                                billViewModel.deleteBillById(billId).observe(this, Observer {
+                                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                                    if(it == true){
+                                        toastSuccess(resources.getString(R.string.bill_deleted))
+                                        dialog?.dismiss()
+                                    } else {
+                                        toastError(resources.getString(R.string.issue_deleting, "bill"),
+                                                Toast.LENGTH_LONG)
+                                    }
+                                })
+                            }
+                            .setNegativeButton("No") { _, _ ->
+                                toastInfo("Bill not deleted")
+                            }
+                            .show()
+                }
+                true
+            }
+        }
     }
 
     private fun setWidgets(){

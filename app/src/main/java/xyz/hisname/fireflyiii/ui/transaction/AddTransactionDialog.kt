@@ -220,32 +220,36 @@ class AddTransactionDialog: BaseDialog() {
                     .sizeDp(16))
             setBackgroundColor(ContextCompat.getColor(requireContext(),R.color.colorPrimaryDark))
         }
-        placeHolderToolbar.inflateMenu(R.menu.delete_menu)
-        placeHolderToolbar.setOnMenuItemClickListener { item ->
-            if(item.itemId == R.id.menu_item_delete){
-                AlertDialog.Builder(requireContext())
-                        .setTitle(R.string.get_confirmation)
-                        .setMessage(resources.getString(R.string.delete_transaction, transactionDescription))
-                        .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
-                                .sizeDp(24)
-                                .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
-                        .setPositiveButton("Yes"){ _,_ ->
-                            transactionViewModel.deleteTransaction(transactionId).observe(this, Observer {
-                                if(it == true){
-                                    toastSuccess(resources.getString(R.string.transaction_deleted))
-                                    dialog?.dismiss()
-                                } else {
-                                    toastError(resources.getString(R.string.issue_deleting_transaction),
-                                            Toast.LENGTH_LONG)
-                                }
-                            })
-                        }
-                        .setNegativeButton("No"){ _, _ ->
-                            toastInfo("Transaction not deleted")
-                        }
-                        .show()
+        if (transactionId != 0L) {
+            placeHolderToolbar.inflateMenu(R.menu.delete_menu)
+            placeHolderToolbar.setOnMenuItemClickListener { item ->
+                if (item.itemId == R.id.menu_item_delete) {
+                    AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.get_confirmation)
+                            .setMessage(resources.getString(R.string.delete_transaction, transactionDescription))
+                            .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
+                                    .sizeDp(24)
+                                    .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
+                            .setPositiveButton("Yes") { _, _ ->
+                                ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+                                transactionViewModel.deleteTransaction(transactionId).observe(this, Observer {
+                                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                                    if (it == true) {
+                                        toastSuccess(resources.getString(R.string.transaction_deleted))
+                                        dialog?.dismiss()
+                                    } else {
+                                        toastError(resources.getString(R.string.issue_deleting, "transaction"),
+                                                Toast.LENGTH_LONG)
+                                    }
+                                })
+                            }
+                            .setNegativeButton("No") { _, _ ->
+                                toastInfo("Transaction not deleted")
+                            }
+                            .show()
+                }
+                true
             }
-            true
         }
     }
 
@@ -308,9 +312,6 @@ class AddTransactionDialog: BaseDialog() {
                  ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
              }
          })
-         if(transactionId != 0L){
-             setHasOptionsMenu(true)
-         }
      }
 
      private fun contextSwitch(){

@@ -38,7 +38,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.HomeActivity" />
-        <activity android:name=".ui.bills.BillDetailActivity" />
 
         <receiver android:name=".receiver.TransactionReceiver"
             tools:ignore="ExportedReceiver">
