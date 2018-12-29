@@ -4,10 +4,10 @@ class NetworkErrors(){
 
     companion object {
         fun getThrowableMessage(message: String): String{
-            if(message.startsWith("Certificate Pinning failure")){
-                return "Certificate pinning failure!"
+            return if(message.startsWith("Certificate Pinning failure")){
+                "Certificate pinning failure!"
             } else {
-                return "Exception occurred"
+                message
             }
         }
     }
