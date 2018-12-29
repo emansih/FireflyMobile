@@ -62,6 +62,8 @@ class RetrofitBuilder {
             if(url.startsWith("https")){
                 // if it contains https:// remove it
                 modifiedUrl = url.substring(8)
+            } else if(url.startsWith("http://")){
+                modifiedUrl = url.substring(7)
             }
             modifiedUrl = if(modifiedUrl.endsWith("/")) {
                 // if it contains / at the end of url, remove it
@@ -73,7 +75,7 @@ class RetrofitBuilder {
                     "https://"  + stringBuilder.toString()
                 }
             } else {
-                "https://$url/"
+                "$url/"
             }
             return modifiedUrl
         }
