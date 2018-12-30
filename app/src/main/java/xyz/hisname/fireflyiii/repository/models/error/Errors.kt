@@ -37,5 +37,6 @@ data class Errors(
         val latitude: List<String>?,
         val longitude: List<String>?,
         @SerializedName("zoom_level")
-        val zoomLevel: List<String>?
+        val zoomLevel: List<String>?,
+        val iban: List<String>?
 )

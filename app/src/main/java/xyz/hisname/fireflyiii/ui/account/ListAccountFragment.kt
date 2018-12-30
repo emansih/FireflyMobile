@@ -161,13 +161,9 @@ class ListAccountFragment: BaseFragment() {
                     .setDuration(400)
                     .start()
             setOnClickListener {
-                requireFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container,
-                                AddAccountFragment().apply {
-                                    arguments = bundleOf("accountType" to convertString())
-                                })
-                        .addToBackStack(null)
-                        .commit()
+                val addAccount = AddAccountDialog()
+                addAccount.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to convertString())
+                addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
                 requireActivity().globalFAB.isVisible = false
             }
         }
@@ -193,7 +189,7 @@ class ListAccountFragment: BaseFragment() {
             Objects.equals(accountType, "expense") -> "Expense Account"
             Objects.equals(accountType, "revenue") -> "Revenue Account"
             Objects.equals(accountType, "liability") -> "Liability Account"
-            else -> ""
+            else -> "Accounts"
         }
     }
 

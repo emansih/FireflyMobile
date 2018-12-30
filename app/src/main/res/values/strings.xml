@@ -113,5 +113,16 @@
         <item>Saving Asset</item>
         <item>Credit Card Asset</item>
     </string-array>
+    <string-array name="interest_freq">
+        <item>Daily</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+    </string-array>
+    <string-array name="liability">
+        <item>Loan</item>
+        <item>Debt</item>
+        <item>Mortgage</item>
+        <item>Credit Card</item>
+    </string-array>
     <string name="personal_access_token">Personal Access Token</string>
 </resources>

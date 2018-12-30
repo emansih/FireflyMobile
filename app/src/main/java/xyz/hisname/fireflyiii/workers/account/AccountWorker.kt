@@ -31,8 +31,9 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val interest = inputData.getString("interest")
         val interestPeriod = inputData.getString("interestPeriod")
         val accountNumber = inputData.getString("accountNumber")
+        val iban = inputData.getString("iban")
         genericService?.create(AccountsService::class.java)?.addAccount(name,type,currencyCode,1,includeNetWorth,accountRole,ccType,
-                ccMonthlyPaymentDate,liabilityType,liabilityAmount,liabilityStartDate,interest,interestPeriod,accountNumber)?.enqueue(
+                ccMonthlyPaymentDate,liabilityType,liabilityAmount,liabilityStartDate,interest,interestPeriod,accountNumber, iban)?.enqueue(
                 retrofitCallback({ response ->
                     var errorBody = ""
                     var error = ""

@@ -198,13 +198,13 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     currencyCode: String, includeNetWorth: Int, accountRole: String?,
                     ccType: String?, ccMonthlyPaymentDate: String?, liabilityType: String?,
                     liabilityAmount: String?,liabilityStartDate: String?, interest: String?,
-                    interestPeriod: String?,accountNumber: String?): LiveData<ApiResponses<AccountSuccessModel>>{
+                    interestPeriod: String?,accountNumber: String?, iban: String?): LiveData<ApiResponses<AccountSuccessModel>>{
         isLoading.value = true
         val apiResponse: MediatorLiveData<ApiResponses<AccountSuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<AccountSuccessModel>> = MutableLiveData()
         accountsService?.addAccount(accountName, accountType, currencyCode,1, includeNetWorth,
                 accountRole, ccType, ccMonthlyPaymentDate, liabilityType, liabilityAmount, liabilityStartDate,
-                interest, interestPeriod, accountNumber)?.enqueue(retrofitCallback({ response ->
+                interest, interestPeriod, accountNumber, iban)?.enqueue(retrofitCallback({ response ->
             var errorMessage = ""
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
@@ -215,6 +215,8 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     gson.errors.account_number != null -> gson.errors.account_number[0]
                     gson.errors.interest != null -> gson.errors.interest[0]
                     gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
+                    gson.errors.currency_code != null -> gson.errors.currency_code[0]
+                    gson.errors.iban != null -> gson.errors.iban[0]
                     else -> "Error occurred while saving Account"
                 }
             }
