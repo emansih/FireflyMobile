@@ -30,6 +30,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     val repository: AccountRepository
     var accountData: MutableList<AccountData>? = null
     private val accountsService by lazy { genericService()?.create(AccountsService::class.java) }
+    val emptyAccount: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
         val accountDao = AppDatabase.getInstance(application).accountDataDao()
@@ -103,7 +104,33 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     }
 
     fun getAssetAccounts(): LiveData<MutableList<AccountData>> {
-        loadRemoteData("asset")
+        isLoading.value = true
+        accountsService?.getAccountType("asset")?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                val networkData = response.body()
+                if (networkData != null) {
+                    for (pagination in 1..networkData.meta.pagination.total_pages) {
+                        accountsService!!.getPaginatedAccountType("asset", pagination).enqueue(retrofitCallback({ respond ->
+                            respond.body()?.data?.forEachIndexed { _, accountPagination ->
+                                scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
+                            }
+                        }))
+                    }
+                    if(networkData.data.isEmpty()){
+                        emptyAccount.value = true
+                    }
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+            }
+        })
+        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
+        isLoading.value = false
         return repository.assetAccount
     }
 
@@ -240,7 +267,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                         }))
                     }
                 }
-
             } else {
                 val responseError = response.errorBody()
                 if (responseError != null) {

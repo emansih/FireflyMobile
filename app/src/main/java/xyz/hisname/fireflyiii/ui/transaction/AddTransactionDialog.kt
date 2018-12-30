@@ -31,7 +31,9 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.fragment.app.commit
 import com.hootsuite.nachos.chip.ChipCreator
+import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import kotlin.collections.ArrayList
 
 
@@ -293,6 +295,28 @@ class AddTransactionDialog: BaseDialog() {
                  ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
              } else {
                  ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+             }
+         })
+         accountViewModel.emptyAccount.observe(this, Observer {
+             if(it == true){
+                 AlertDialog.Builder(requireContext())
+                         .setTitle("No asset accounts found!")
+                         .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
+                                 "to add an asset account first? ")
+                         .setPositiveButton("OK"){ _,_ ->
+                             requireFragmentManager().commit {
+                                 replace(R.id.fragment_container,
+                                         AddAccountFragment().apply {
+                                             arguments = bundleOf("accountType" to "Asset Account")
+                                         })
+                                 addToBackStack(null)
+                             }
+                             dialog?.dismiss()
+                         }
+                         .setNegativeButton("No"){ _,_ ->
+                             dialog?.dismiss()
+                         }
+                         .show()
              }
          })
      }
