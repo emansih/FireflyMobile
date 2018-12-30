@@ -214,12 +214,21 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
-                    for (pagination in 1..networkData.meta.pagination.total_pages) {
-                        transactionService!!.getPaginatedTransactions(startDate, endDate, source, pagination).enqueue(retrofitCallback({ respond ->
-                            respond.body()?.data?.forEachIndexed { _, transactionPagination ->
-                                scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionPagination) }
-                            }
-                        }))
+                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
+                        networkData.data.forEachIndexed{ _, transactionData ->
+                            scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionData) }
+                        }
+                    } else {
+                        networkData.data.forEachIndexed { _, transactionData ->
+                            scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionData) }
+                        }
+                        for (pagination in 2..networkData.meta.pagination.total_pages) {
+                            transactionService?.getPaginatedTransactions(startDate, endDate, source, pagination)?.enqueue(retrofitCallback({ respond ->
+                                respond.body()?.data?.forEachIndexed { _, transactionPagination ->
+                                    scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionPagination) }
+                                }
+                            }))
+                        }
                     }
                 }
 

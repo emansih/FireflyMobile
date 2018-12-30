@@ -99,12 +99,21 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
-                    for (pagination in 1..networkData.meta.pagination.total_pages) {
-                        currencyService?.getPaginatedCurrency(pagination)?.enqueue(retrofitCallback({ respond ->
-                            respond.body()?.data?.forEachIndexed { _, currencyPagination ->
-                                scope.launch(Dispatchers.IO) { repository.insertCurrency(currencyPagination) }
-                            }
-                        }))
+                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
+                        networkData.data.forEachIndexed { _, currencyData ->
+                            scope.launch(Dispatchers.IO) { repository.insertCurrency(currencyData) }
+                        }
+                    } else {
+                        networkData.data.forEachIndexed { _, currencyData ->
+                            scope.launch(Dispatchers.IO) { repository.insertCurrency(currencyData) }
+                        }
+                        for (pagination in 2..networkData.meta.pagination.total_pages) {
+                            currencyService?.getPaginatedCurrency(pagination)?.enqueue(retrofitCallback({ respond ->
+                                respond.body()?.data?.forEachIndexed { _, currencyPagination ->
+                                    scope.launch(Dispatchers.IO) { repository.insertCurrency(currencyPagination) }
+                                }
+                            }))
+                        }
                     }
                 }
 

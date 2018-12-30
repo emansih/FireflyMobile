@@ -93,12 +93,21 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
-                    for (pagination in 1..networkData.meta.pagination.total_pages) {
-                        availableBudgets!!.getPaginatedBudget(pagination).enqueue(retrofitCallback({ respond ->
-                            respond.body()?.budgetData?.forEachIndexed { _, budgetList ->
-                                scope.launch(Dispatchers.IO) { repository.insertBudget(budgetList) }
-                            }
-                        }))
+                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
+                        networkData.budgetData.forEachIndexed { _, budgetData ->
+                            scope.launch(Dispatchers.IO) { repository.insertBudget(budgetData) }
+                        }
+                    } else {
+                        networkData.budgetData.forEachIndexed { _, budgetData ->
+                            scope.launch(Dispatchers.IO) { repository.insertBudget(budgetData) }
+                        }
+                        for (pagination in 2..networkData.meta.pagination.total_pages) {
+                            availableBudgets!!.getPaginatedBudget(pagination).enqueue(retrofitCallback({ respond ->
+                                respond.body()?.budgetData?.forEachIndexed { _, budgetList ->
+                                    scope.launch(Dispatchers.IO) { repository.insertBudget(budgetList) }
+                                }
+                            }))
+                        }
                     }
                 }
 

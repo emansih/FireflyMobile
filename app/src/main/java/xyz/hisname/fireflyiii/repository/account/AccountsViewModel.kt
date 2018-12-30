@@ -259,12 +259,21 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
-                    for (pagination in 1..networkData.meta.pagination.total_pages) {
-                        accountsService!!.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({ respond ->
-                            respond.body()?.data?.forEachIndexed { _, accountPagination ->
-                                scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
-                            }
-                        }))
+                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages) {
+                        networkData.data.forEachIndexed { _, accountData ->
+                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
+                        }
+                    } else {
+                        networkData.data.forEachIndexed { _, accountData ->
+                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
+                        }
+                        for (pagination in 2..networkData.meta.pagination.total_pages) {
+                            accountsService!!.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({ respond ->
+                                respond.body()?.data?.forEachIndexed { _, accountPagination ->
+                                    scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
+                                }
+                            }))
+                        }
                     }
                 }
             } else {
