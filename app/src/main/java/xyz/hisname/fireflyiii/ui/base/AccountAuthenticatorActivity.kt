@@ -41,7 +41,7 @@ import androidx.core.os.bundleOf
 
 //https://android.googlesource.com/platform/frameworks/base.git/+/master/core/java/android/accounts/AccountAuthenticatorActivity.java
 @SuppressLint("Registered")
-open class AccountAuthenticatorActivity: AppCompatActivity() {
+open class AccountAuthenticatorActivity: BaseActivity() {
 
     private var accountAuthenticatorResponse: AccountAuthenticatorResponse? = null
     private var resultBundle: Bundle? = null
