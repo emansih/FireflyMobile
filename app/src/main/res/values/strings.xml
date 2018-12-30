@@ -113,5 +113,5 @@
         <item>Saving Asset</item>
         <item>Credit Card Asset</item>
     </string-array>
-
+    <string name="personal_access_token">Personal Access Token</string>
 </resources>

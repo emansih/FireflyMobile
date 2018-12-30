@@ -44,7 +44,7 @@
                         android:textColor="@color/md_light_blue_300"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Access Token"
+                        android:text="@string/personal_access_token"
                         android:layout_marginTop="28dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"

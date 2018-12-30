@@ -189,16 +189,21 @@ class ListAccountFragment: BaseFragment() {
 
     private fun convertString(): String{
         return when {
-            Objects.equals(accountType, "asset") -> resources.getString(R.string.asset_account)
-            Objects.equals(accountType, "expense") -> resources.getString(R.string.expense_account)
-            Objects.equals(accountType, "revenue") -> resources.getString(R.string.revenue_account)
-            Objects.equals(accountType, "liability") -> resources.getString(R.string.liability_account)
-            else -> resources.getString(R.string.account)
+            Objects.equals(accountType, "asset") -> "Asset Account"
+            Objects.equals(accountType, "expense") -> "Expense Account"
+            Objects.equals(accountType, "revenue") -> "Revenue Account"
+            Objects.equals(accountType, "liability") -> "Liability Account"
+            else -> ""
         }
     }
 
     override fun onAttach(context: Context){
         super.onAttach(context)
+        activity?.activity_toolbar?.title = convertString()
+    }
+
+    override fun onResume() {
+        super.onResume()
         activity?.activity_toolbar?.title = convertString()
     }
 

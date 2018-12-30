@@ -83,7 +83,7 @@ class ListBillFragment: BaseFragment() {
                     .setStartDelay(300)
                     .setDuration(400)
                     .start()
-
+            isVisible = true
             setOnClickListener{
                 fab.isClickable = false
                 val addBill = AddBillDialog()
@@ -122,11 +122,15 @@ class ListBillFragment: BaseFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = resources.getString(R.string.bill)
-        fab.isVisible = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity?.activity_toolbar?.title = resources.getString(R.string.bill)
     }
 
     override fun onDetach() {
-        fab.isGone = true
         super.onDetach()
+        fab.isGone = true
     }
 }

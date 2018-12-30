@@ -126,6 +126,11 @@ class ListPiggyFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.piggy_bank)
     }
 
+    override fun onResume() {
+        super.onResume()
+        activity?.activity_toolbar?.title = resources.getString(R.string.piggy_bank)
+    }
+
     override fun onDetach() {
         super.onDetach()
         fab.isGone = true

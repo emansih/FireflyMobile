@@ -121,6 +121,12 @@ class ListTagsFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.tags)
     }
 
+    override fun onStop() {
+        super.onStop()
+        fab.isGone = true
+        activity?.activity_toolbar?.title = resources.getString(R.string.tags)
+    }
+
     override fun onDetach() {
         super.onDetach()
         fab.isGone = true

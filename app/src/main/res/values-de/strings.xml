@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard">Übersicht</string>
+    <string name="transfer">Umbuchungen</string>
+    <string name="tags">Schlagwörter</string>
+    <string name="account">Konten</string>
+    <string name="bill">Rechnungen</string>
+    <string name="withdrawal">Ausgaben</string>
+    <string name="revenue_income_menu">Einnahmen / Einkommen</string>
+    <string name="currency">Währungen</string>
+    <string name="description">Beschreibung</string>
+    <string name="piggy_bank">Sparschweine</string>
+    <string name="liability_account">Verbindlichkeiten</string>
+    <string name="money_management">Geldverwaltung</string>
+    <string name="min_amount">Mindestbetrag</string>
+    <string name="max_amount">Höchstbetrag</string>
+    <string name="min_amount_save_per_month">Monatlich empfohlen</string>
+    <string name="amount">Betrag</string>
+    <string name="decimal_places">Nachkommastellen</string>
+    <string name="skip">Überspringen</string>
+    <string name="client_secret">Kundengeheimnis</string>
+    <string name="options">Einstellungen</string>
+    <string name="delete_bill">Möchten Sie die Rechnung %1$s wirklich löschen?</string>
+    <string name="delete_piggy_bank">Möchten Sie das Sparschwein %1$s wirklich löschen?</string>
+    <string name="delete_transaction">Sind Sie sicher, dass Sie die Überweisung mit dem Namen %1$s löschen möchten?</string>
+    <string name="destination_account">Zielkonto</string>
+    <string name="expense_account">Debitor (Ausgabe)</string>
+    <string name="source_account">Quellkonto</string>
+    <string name="asset_account">Bestandskonto</string>
+    <string name="revenue_account">Kreditor (Einnahme)</string>
+    <string name="personal_access_token">Persönliche Zugangs-Authentifizierungsschlüssel</string>
+    <string name="currency_symbol">Zeichen</string>
+    <string name="currency_code">Schlüssel</string>
+
+</resources>

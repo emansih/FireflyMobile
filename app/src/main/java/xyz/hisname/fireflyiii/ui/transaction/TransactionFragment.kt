@@ -147,6 +147,17 @@ class TransactionFragment: BaseFragment(){
         activity?.activity_toolbar?.title = toolBarTitle
     }
 
+    override fun onResume() {
+        super.onResume()
+        val toolBarTitle = when {
+            transactionType.contains("Withdrawal") -> resources.getString(R.string.withdrawal)
+            transactionType.contains("Deposit") -> resources.getString(R.string.deposit)
+            transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
+            else -> ""
+        }
+        activity?.activity_toolbar?.title = toolBarTitle
+    }
+
     override fun onDetach() {
         super.onDetach()
         requireActivity().globalFAB.isGone = true

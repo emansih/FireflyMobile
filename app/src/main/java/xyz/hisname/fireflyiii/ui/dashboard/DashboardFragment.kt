@@ -80,4 +80,9 @@ class DashboardFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
     }
 
+    override fun onResume() {
+        super.onResume()
+        activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
+    }
+
 }
