@@ -20,16 +20,9 @@ import kotlinx.android.synthetic.main.dialog_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
-import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
-import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
-import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
-import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
@@ -39,19 +32,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import com.hootsuite.nachos.chip.ChipCreator
-import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import kotlin.collections.ArrayList
 
 
 class AddTransactionDialog: BaseDialog() {
 
-    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
-    private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
-    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
-    private val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
-    private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private val transactionId by lazy { arguments?.getLong("transactionId") ?: 0 }
     private var currency = ""
@@ -79,10 +64,8 @@ class AddTransactionDialog: BaseDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        CircularReveal(dialog_add_transaction_layout).showReveal(revealX, revealY)
+        showReveal(dialog_add_transaction_layout)
         contextSwitch()
-        setIcons()
-        setWidgets()
         if(transactionId != 0L){
             updateTransactionSetup()
         }
@@ -169,7 +152,7 @@ class AddTransactionDialog: BaseDialog() {
         })
     }
 
-    private fun setIcons(){
+    override fun setIcons(){
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
                      .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
@@ -253,7 +236,7 @@ class AddTransactionDialog: BaseDialog() {
         }
     }
 
-     private fun setWidgets(){
+     override fun setWidgets(){
          transaction_date_edittext.setText(DateTimeUtil.getTodayDate())
          val calendar = Calendar.getInstance()
          val transactionDate = DatePickerDialog.OnDateSetListener {
@@ -416,7 +399,7 @@ class AddTransactionDialog: BaseDialog() {
          }
      }
 
-    private fun submitData(){
+    override fun submitData(){
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transaction_date_edittext.getString(), piggyBank, billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,

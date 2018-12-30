@@ -9,19 +9,40 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
+import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
+import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
+import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
+import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.util.animation.BakedBezierInterpolator
+import xyz.hisname.fireflyiii.util.animation.CircularReveal
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 
+abstract class BaseDialog: DialogFragment() {
 
-open class BaseDialog: DialogFragment() {
-
+    private val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
+    private val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
     protected val navIcon by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material) }
-    protected val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
-    protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
+    protected val billViewModel: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
+    protected val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
+    protected val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
+    protected val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
+    protected val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
+    protected val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
+    protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogStyle)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setIcons()
+        setWidgets()
     }
 
     override fun onStart() {
@@ -50,4 +71,11 @@ open class BaseDialog: DialogFragment() {
             dialog?.dismiss()
         }
     }
+
+    fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
+
+
+    abstract fun setIcons()
+    abstract fun setWidgets()
+    abstract fun submitData()
 }

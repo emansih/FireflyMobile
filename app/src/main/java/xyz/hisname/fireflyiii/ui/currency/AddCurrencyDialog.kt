@@ -12,15 +12,11 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_currency.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
-import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.*
 
 class AddCurrencyDialog: BaseDialog() {
-
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -29,7 +25,7 @@ class AddCurrencyDialog: BaseDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        CircularReveal(dialog_add_currency_layout).showReveal(revealX, revealY)
+        showReveal(dialog_add_currency_layout)
         addCurrencyFab.setOnClickListener {
             submitData()
         }
@@ -37,14 +33,12 @@ class AddCurrencyDialog: BaseDialog() {
 
     override fun onStart() {
         super.onStart()
-        setIcons()
-        setWidgets()
         placeHolderToolbar.setOnClickListener {
             unReveal(dialog_add_currency_layout)
         }
     }
 
-    private fun setIcons(){
+    override fun setIcons(){
         decimal_places_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_dot_circle)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_amber_500))
@@ -64,13 +58,13 @@ class AddCurrencyDialog: BaseDialog() {
                 .sizeDp(24))
     }
 
-    private fun setWidgets(){
+    override fun setWidgets(){
         enabled_textview.setOnClickListener {
             enabled_checkbox.performClick()
         }
     }
 
-    private fun submitData(){
+    override fun submitData(){
         hideKeyboard()
         ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
         currencyViewModel.addCurrency(name_edittext.getString(), code_edittext.getString(),

@@ -19,19 +19,14 @@ import kotlinx.android.synthetic.main.dialog_add_piggy.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
-import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
 class AddPiggyDialog: BaseDialog() {
 
-    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private var accounts = ArrayList<String>()
     private var piggyId: Long = 0
     private lateinit var accountAdapter: ArrayAdapter<Any>
@@ -47,8 +42,7 @@ class AddPiggyDialog: BaseDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        CircularReveal(dialog_add_piggy_layout).showReveal(revealX, revealY)
-        setWidgets()
+        showReveal(dialog_add_piggy_layout)
         piggyId = arguments?.getLong("piggyId") ?: 0
         if(piggyId != 0L){
             piggyViewModel.getPiggyById(piggyId).observe(this, Observer { piggyData ->
@@ -70,7 +64,6 @@ class AddPiggyDialog: BaseDialog() {
 
     override fun onStart() {
         super.onStart()
-        setIcons()
         addPiggyFab.setOnClickListener {
             hideKeyboard()
             ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
@@ -105,7 +98,7 @@ class AddPiggyDialog: BaseDialog() {
         }
     }
 
-    private fun setIcons(){
+    override fun setIcons(){
         target_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
                         .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
@@ -129,7 +122,7 @@ class AddPiggyDialog: BaseDialog() {
         placeHolderToolbar.navigationIcon = navIcon
     }
 
-    private fun setWidgets(){
+    override fun setWidgets(){
         val calendar = Calendar.getInstance()
         val startDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
@@ -173,7 +166,7 @@ class AddPiggyDialog: BaseDialog() {
         })
     }
 
-    private fun submitData(){
+    override fun submitData(){
         accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
             piggyViewModel.addPiggyBank(description_edittext.getString(), accountData[0].accountId.toString(),
                     currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)

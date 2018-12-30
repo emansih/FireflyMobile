@@ -14,17 +14,14 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_tags.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
 class AddTagsDialog: BaseDialog() {
 
-    private val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     private var date: String? = null
     private var description: String? = null
     private var latitude: String? = null
@@ -45,7 +42,7 @@ class AddTagsDialog: BaseDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        CircularReveal(dialog_add_tags_layout).showReveal(revealX, revealY)
+        showReveal(dialog_add_tags_layout)
         addTagFab.setOnClickListener {
             hideKeyboard()
             ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
@@ -76,11 +73,9 @@ class AddTagsDialog: BaseDialog() {
             }
             submitData()
         }
-        setWidgets()
-        setIcons()
     }
 
-    private fun setWidgets(){
+    override fun setWidgets(){
         val calendar = Calendar.getInstance()
         val calendarDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
@@ -98,7 +93,7 @@ class AddTagsDialog: BaseDialog() {
         }
     }
 
-    private fun setIcons(){
+    override fun setIcons(){
         date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
                 .color(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
@@ -125,7 +120,7 @@ class AddTagsDialog: BaseDialog() {
         placeHolderToolbar.navigationIcon = navIcon
     }
 
-    private fun submitData(){
+    override fun submitData(){
         tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(this, androidx.lifecycle.Observer {
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = it.getErrorMessage()
