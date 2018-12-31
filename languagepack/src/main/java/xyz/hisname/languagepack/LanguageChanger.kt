@@ -1,18 +1,17 @@
-package xyz.hisname.fireflyiii.util
+package xyz.hisname.languagepack
 
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
-import java.util.*
 import androidx.core.os.ConfigurationCompat
+import java.util.*
 
-
-class LangContextWrapper(base: Context): ContextWrapper(base) {
+class LanguageChanger(baseContext: Context): ContextWrapper(baseContext){
 
     companion object {
-        fun wrap(context: Context): ContextWrapper{
+        fun init(context: Context): ContextWrapper{
             val config = context.resources.configuration
             val locale = Locale(ConfigurationCompat.getLocales(context.resources.configuration)[0].language)
             Locale.setDefault(locale)
@@ -21,7 +20,19 @@ class LangContextWrapper(base: Context): ContextWrapper(base) {
             } else {
                 setSystemLocaleLegacy(config, locale)
             }
-            return LangContextWrapper(context.createConfigurationContext(config))
+            return LanguageChanger(context.createConfigurationContext(config))
+        }
+
+        fun init(context: Context, language: String): ContextWrapper{
+            val config = context.resources.configuration
+            val locale = Locale(language)
+            Locale.setDefault(locale)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                setSystemLocale(config, locale)
+            } else {
+                setSystemLocaleLegacy(config, locale)
+            }
+            return LanguageChanger(context.createConfigurationContext(config))
         }
 
         @Suppress("DEPRECATION")
@@ -33,7 +44,5 @@ class LangContextWrapper(base: Context): ContextWrapper(base) {
         private fun setSystemLocale(config: Configuration, locale: Locale) {
             config.setLocale(locale)
         }
-
     }
-
 }
