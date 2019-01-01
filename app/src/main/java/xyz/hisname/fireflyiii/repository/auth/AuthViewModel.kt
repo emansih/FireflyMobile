@@ -13,6 +13,7 @@ import xyz.hisname.fireflyiii.util.network.retrofitCallback
 class AuthViewModel(application: Application): BaseViewModel(application) {
 
     private val isAuthenticated: MutableLiveData<Boolean> = MutableLiveData()
+    val authFailedReason: MutableLiveData<String> = MutableLiveData()
 
     fun getAccessToken(code: String): LiveData<Boolean> {
         isLoading.value = true
@@ -26,10 +27,19 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
                 accManager.tokenExpiry = authResponse.expires_in
                 isAuthenticated.value = true
             } else {
+                val errorBody = response.errorBody()
+                if(errorBody != null) {
+                    authFailedReason.value = String(errorBody.bytes())
+                } else {
+                    authFailedReason.value = "Authentication Failed"
+                }
                 isAuthenticated.value = false
             }
         })
-        { throwable -> isAuthenticated.value = false })
+        { throwable ->
+            authFailedReason.value = throwable.localizedMessage
+            isAuthenticated.value = false
+        })
         isLoading.value = false
         return isAuthenticated
     }
