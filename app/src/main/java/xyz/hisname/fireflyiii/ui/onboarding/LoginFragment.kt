@@ -170,9 +170,9 @@ class LoginFragment: Fragment() {
                             replace(R.id.bigger_fragment_container, OnboardingFragment())
                         }
                     } else {
-                        authViewModel.authFailedReason.observe(this, Observer { reason ->
-                            toastInfo(reason)
-                        })
+                        if(!authViewModel.authFailedReason.value.toString().isBlank()){
+                            toastInfo( authViewModel.authFailedReason.value.toString())
+                        }
                     }
                 })
             } else {

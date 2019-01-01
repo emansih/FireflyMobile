@@ -3,11 +3,13 @@ package xyz.hisname.fireflyiii.repository.auth
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.data.remote.api.OAuthService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class AuthViewModel(application: Application): BaseViewModel(application) {
@@ -17,19 +19,22 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
 
     fun getAccessToken(code: String): LiveData<Boolean> {
         isLoading.value = true
-        val oAuthService = RetrofitBuilder.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
+        authFailedReason.value = ""
+        val oAuthService= RetrofitBuilder.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
         oAuthService?.getAccessToken(code, accManager.clientId, accManager.secretKey, Constants.REDIRECT_URI,
                 "authorization_code")?.enqueue(retrofitCallback({ response ->
             val authResponse = response.body()
+            val errorBody = response.errorBody()
             if (authResponse != null) {
                 accManager.accessToken = authResponse.access_token
                 accManager.refreshToken = authResponse.refresh_token
                 accManager.tokenExpiry = authResponse.expires_in
                 isAuthenticated.value = true
             } else {
-                val errorBody = response.errorBody()
                 if(errorBody != null) {
-                    authFailedReason.value = String(errorBody.bytes())
+                    val errorBodyMessage = String(errorBody.bytes())
+                    val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                    authFailedReason.value = gson.message
                 } else {
                     authFailedReason.value = "Authentication Failed"
                 }
