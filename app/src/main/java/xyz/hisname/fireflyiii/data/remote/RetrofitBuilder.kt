@@ -58,10 +58,16 @@ class RetrofitBuilder {
         }
 
         private fun generateUrl(url: String): String{
+            val initialUrl = if(url.endsWith("/")){
+                // Remove / if user has it
+                StringBuilder(url).deleteCharAt(url.length - 1).toString()
+            } else {
+                url
+            }
             baseUrl = try {
-                URL(url)
+                URL(initialUrl)
             } catch (malformed: MalformedURLException){
-                URL("https://$url")
+                URL("https://$initialUrl")
             }
             val baseProtocol = baseUrl.protocol
             // Remove protocol. Example: https://demo.firefly-iii.org becomes demo.firefly-iii.org

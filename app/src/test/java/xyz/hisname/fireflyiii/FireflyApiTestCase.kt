@@ -25,6 +25,14 @@ class FireflyApiTestCase {
     }
 
     @Test
+    fun testOAuthWithSlash() {
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/")?.create(OAuthService::class.java)?.getAccessToken(
+                "", "", "", "", "")
+        assertEquals(auth?.request()?.url().toString(),
+                "https://$FIREFLY_BASEURL${Constants.OAUTH_API_ENDPOINT}/token")
+    }
+
+    @Test
     fun testOAuthWithHttps() {
         val auth = RetrofitBuilder.getClient("https://$FIREFLY_BASEURL")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
@@ -35,6 +43,14 @@ class FireflyApiTestCase {
     @Test
     fun testOAuthWithPathInBaseUrl() {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login")?.create(OAuthService::class.java)?.getAccessToken(
+                "", "", "", "", "")
+        assertEquals(auth?.request()?.url().toString(),
+                "https://$FIREFLY_BASEURL/login${Constants.OAUTH_API_ENDPOINT}/token")
+    }
+
+    @Test
+    fun testOAuthWithPathInBaseUrlAndSlash() {
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login/")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login${Constants.OAUTH_API_ENDPOINT}/token")
@@ -65,6 +81,14 @@ class FireflyApiTestCase {
     }
 
     @Test
+    fun testAccountWithSlash(){
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/")?.create(AccountsService::class.java)?.getAccountType(
+                "asset")
+        assertEquals(auth?.request()?.url().toString(),
+                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+    }
+
+    @Test
     fun testAccountWithHttps(){
         val auth = RetrofitBuilder.getClient("https://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getAccountType(
                 "asset")
@@ -83,6 +107,14 @@ class FireflyApiTestCase {
     @Test
     fun testAccountWithPathInBaseUrl() {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login")?.create(AccountsService::class.java)?.getAccountType(
+                "asset")
+        assertEquals(auth?.request()?.url().toString(),
+                "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+    }
+
+    @Test
+    fun testAccountWithPathInBaseUrlAndSlash() {
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login/")?.create(AccountsService::class.java)?.getAccountType(
                 "asset")
         assertEquals(auth?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
