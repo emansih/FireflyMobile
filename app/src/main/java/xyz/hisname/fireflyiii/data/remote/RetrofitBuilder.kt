@@ -6,13 +6,15 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
-import java.lang.StringBuilder
+import java.net.MalformedURLException
+import java.net.URL
 
 class RetrofitBuilder {
 
     companion object {
 
         @Volatile private var INSTANCE: Retrofit? = null
+        private lateinit var baseUrl: URL
 
         fun getClient(baseUrl: String, accessToken: String, certPinValue: String): Retrofit?{
             if(INSTANCE == null){
@@ -39,8 +41,6 @@ class RetrofitBuilder {
             return INSTANCE
         }
 
-
-
         fun getClient(baseUrl: String): Retrofit?{
             if(INSTANCE == null){
                 synchronized(RetrofitBuilder::class.java){
@@ -58,29 +58,22 @@ class RetrofitBuilder {
         }
 
         private fun generateUrl(url: String): String{
-            var modifiedUrl = ""
-            if(url.startsWith("https")){
-                // if it contains https:// remove it
-                modifiedUrl = url.substring(8)
-            } else if(url.startsWith("http://")){
-                modifiedUrl = url.substring(7)
+            baseUrl = try {
+                URL(url)
+            } catch (malformed: MalformedURLException){
+                URL("https://$url")
             }
-            modifiedUrl = if(modifiedUrl.endsWith("/")) {
-                // if it contains / at the end of url, remove it
-                val stringBuilder = StringBuilder(modifiedUrl).deleteCharAt(modifiedUrl.length - 1)
-                // if url has / , just let it be
-                if(stringBuilder.contains("/")){
-                    url
-                } else {
-                    "https://"  + stringBuilder.toString()
-                }
+            val baseProtocol = baseUrl.protocol
+            // Remove protocol. Example: https://demo.firefly-iii.org becomes demo.firefly-iii.org
+            val baseUrlHost = baseUrl.host
+            val apiUrl = if(baseUrl.path.isEmpty()){
+                // User has no path in url(demo.firefly-iii.org)
+                baseUrlHost
             } else {
-                "$url/"
+                // User has path in url(demo.firefly-iii.org/login)
+                baseUrlHost + baseUrl.path
             }
-            if(!modifiedUrl.startsWith("https://")){
-                modifiedUrl = "https://$modifiedUrl"
-            }
-            return modifiedUrl
+            return "$baseProtocol://$apiUrl/"
         }
 
     }

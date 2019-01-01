@@ -103,8 +103,14 @@ class LoginFragment: Fragment() {
                 }
                 clientIdLiveData.value = fireflyId
                 secretKeyLiveData.value = fireflySecretKey
-                val browserIntent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl/oauth/authorize?client_id=$fireflyId" +
-                "&redirect_uri=${Constants.REDIRECT_URI}&scope=&response_type=code&state=").toUri())
+                fireflyUrl = if(fireflyUrl.endsWith("/")){
+                    StringBuilder(fireflyUrl).deleteCharAt(fireflyUrl.length - 1).toString()
+                } else {
+                    fireflyUrl
+                }
+                val browserIntent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl${Constants.OAUTH_API_ENDPOINT}" +
+                        "/authorize?client_id=$fireflyId&redirect_uri=${Constants.REDIRECT_URI}" +
+                        "&scope=&response_type=code&state=").toUri())
                 browserIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                 if (browserIntent.resolveActivity(requireActivity().packageManager) != null){
                     startActivity(browserIntent)
