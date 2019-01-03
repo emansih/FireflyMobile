@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -22,6 +21,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 
@@ -76,21 +76,12 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.apply {
-            translationY = (6 * 56).toFloat()
-            animate().translationY(0.toFloat())
-                    .setInterpolator(OvershootInterpolator(1f))
-                    .setStartDelay(300)
-                    .setDuration(400)
-                    .start()
-            isVisible = true
-            setOnClickListener{
-                fab.isClickable = false
-                val addBill = AddBillDialog()
-                addBill.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-                addBill.show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
-                fab.isClickable = true
-            }
+        fab.display {
+            fab.isClickable = false
+            val addBill = AddBillDialog()
+            addBill.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+            addBill.show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
+            fab.isClickable = true
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.os.bundleOf
@@ -24,6 +23,7 @@ import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import java.util.*
@@ -152,20 +152,11 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.apply {
-            isVisible = true
-            translationY = (6 * 56).toFloat()
-            animate().translationY(0f)
-                    .setInterpolator(OvershootInterpolator(1f))
-                    .setStartDelay(300)
-                    .setDuration(400)
-                    .start()
-            setOnClickListener {
-                val addAccount = AddAccountDialog()
-                addAccount.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to convertString())
-                addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
-                requireActivity().globalFAB.isVisible = false
-            }
+        fab.display {
+            val addAccount = AddAccountDialog()
+            addAccount.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to convertString())
+            addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
+            requireActivity().globalFAB.isVisible = false
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

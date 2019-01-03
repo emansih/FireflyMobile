@@ -5,10 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -19,6 +17,7 @@ import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 
@@ -57,21 +56,12 @@ class CurrencyListFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.apply {
-            isVisible = true
-            translationY = (6 * 56).toFloat()
-            animate().translationY(0f)
-                    .setInterpolator(OvershootInterpolator(1f))
-                    .setStartDelay(300)
-                    .setDuration(400)
-                    .start()
-            setOnClickListener {
-                fab.isClickable = false
-                val addCurrency = AddCurrencyDialog()
-                addCurrency.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-                addCurrency.show(requireFragmentManager().beginTransaction(), "add_currency_dialog")
-                fab.isClickable = true
-            }
+        fab.display {
+            fab.isClickable = false
+            val addCurrency = AddCurrencyDialog()
+            addCurrency.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+            addCurrency.show(requireFragmentManager().beginTransaction(), "add_currency_dialog")
+            fab.isClickable = true
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

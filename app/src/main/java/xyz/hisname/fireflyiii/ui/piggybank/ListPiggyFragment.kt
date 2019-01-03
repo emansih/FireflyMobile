@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -22,6 +21,7 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 
@@ -89,21 +89,13 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.apply {
-            isVisible = true
-            translationY = (6 * 56).toFloat()
-            animate().translationY(0.toFloat())
-                    .setInterpolator(OvershootInterpolator(1.toFloat()))
-                    .setStartDelay(300)
-                    .setDuration(400)
-                    .start()
-            setOnClickListener{
-                fab.isClickable = false
-                val addPiggy = AddPiggyDialog()
-                addPiggy.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-                addPiggy.show(requireFragmentManager().beginTransaction(), "add_piggy_dialog")
-                fab.isClickable = true
-            }
+        fab.display {
+            fab.isClickable = false
+            val addPiggy = AddPiggyDialog()
+            addPiggy.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+            addPiggy.show(requireFragmentManager().beginTransaction(), "add_piggy_dialog")
+            fab.isClickable = true
+
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

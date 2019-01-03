@@ -5,14 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.google.android.material.chip.Chip
@@ -97,21 +95,12 @@ class ListTagsFragment: BaseFragment() {
     }
 
     private fun setFab(){
-        fab.apply {
-            isVisible = true
-            translationY = (6 * 56).toFloat()
-            animate().translationY(0.toFloat())
-                    .setInterpolator(OvershootInterpolator(1f))
-                    .setStartDelay(300)
-                    .setDuration(400)
-                    .start()
-            setOnClickListener{
-                fab.isClickable = false
-                val addTags = AddTagsDialog()
-                addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-                addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
-                fab.isClickable = true
-            }
+        fab.display {
+            fab.isClickable = false
+            val addTags = AddTagsDialog()
+            addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+            addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
+            fab.isClickable = true
         }
     }
 
