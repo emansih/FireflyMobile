@@ -153,10 +153,11 @@ class ListAccountFragment: BaseFragment() {
 
     private fun initFab(){
         fab.display {
+            fab.isClickable = false
             val addAccount = AddAccountDialog()
             addAccount.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to convertString())
             addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
-            requireActivity().globalFAB.isVisible = false
+            fab.isClickable = true
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
