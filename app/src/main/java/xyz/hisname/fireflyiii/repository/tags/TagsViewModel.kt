@@ -100,6 +100,40 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
+    fun updateTag(tagId: Long, tagName: String, date: String?, description: String?, latitude: String?, longitude: String?,
+               zoomLevel: String?): LiveData<ApiResponses<TagsSuccessModel>>{
+        val apiResponse: MediatorLiveData<ApiResponses<TagsSuccessModel>> =  MediatorLiveData()
+        val apiLiveData: MutableLiveData<ApiResponses<TagsSuccessModel>> = MutableLiveData()
+        tagsService?.updateTag(tagId, tagName, date, description, latitude, longitude, zoomLevel)?.enqueue(retrofitCallback({
+            response ->
+            var errorMessage = ""
+            val responseErrorBody = response.errorBody()
+            if (responseErrorBody != null) {
+                errorMessage = String(responseErrorBody.bytes())
+                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                errorMessage = when {
+                    gson.errors.longitude != null -> gson.errors.longitude[0]
+                    gson.errors.tag != null -> gson.errors.tag[0]
+                    gson.errors.latitude != null -> gson.errors.latitude[0]
+                    gson.errors.zoomLevel != null -> gson.errors.zoomLevel[0]
+                    else -> "Error occurred while updating tag"
+                }
+            }
+            val networkData = response.body()
+            if (networkData != null) {
+                scope.launch(Dispatchers.IO) { repository.insertTags(networkData.data) }
+                apiLiveData.postValue(ApiResponses(response.body()))
+            } else {
+                apiLiveData.postValue(ApiResponses(errorMessage))
+            }
+        })
+        { throwable ->
+            apiResponse.postValue(ApiResponses(throwable))
+        })
+        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
+        return apiResponse
+    }
+
     fun deleteTagByName(tagName: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
@@ -118,5 +152,16 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
             isDeleted.postValue(false)
         })
         return isDeleted
+    }
+
+    fun getTagById(tagId: Long): LiveData<MutableList<TagsData>>{
+        val tagData: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
+        var data: MutableList<TagsData> = arrayListOf()
+        scope.async(Dispatchers.IO){
+            data = repository.retrieveTagById(tagId)
+        }.invokeOnCompletion {
+            tagData.postValue(data)
+        }
+        return tagData
     }
 }

@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.commit
+import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -27,6 +29,7 @@ class AddTagsDialog: BaseDialog() {
     private var latitude: String? = null
     private var longitude: String? = null
     private var zoomLevel: String? = null
+    private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -43,6 +46,9 @@ class AddTagsDialog: BaseDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_tags_layout)
+        if(tagId != 0L){
+            updateData()
+        }
         addTagFab.setOnClickListener {
             hideKeyboard()
             ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
@@ -71,8 +77,38 @@ class AddTagsDialog: BaseDialog() {
             } else {
                 zoom_edittext.getString()
             }
-            submitData()
+            if(tagId == 0L){
+                submitData()
+            } else {
+                tagsViewModel.updateTag(tagId, tag_edittext.getString(), date, description, latitude,
+                        longitude, zoomLevel).observe(this, Observer { apiResponse ->
+                    val errorMessage = apiResponse.getErrorMessage()
+                    when {
+                        errorMessage != null -> toastError(errorMessage)
+                        apiResponse.getError() != null -> toastError("Error updating " + tag_edittext.getString())
+                        apiResponse.getResponse() != null -> {
+                            requireFragmentManager().commit {
+                                replace(R.id.fragment_container, ListTagsFragment())
+                            }
+                            toastSuccess(tag_edittext.getString() + " updated!")
+                            unReveal(dialog_add_tags_layout)
+                        }
+                    }
+                })
+            }
         }
+    }
+
+    private fun updateData(){
+        tagsViewModel.getTagById(tagId).observe(this, Observer {
+            val tagData = it[0].tagsAttributes
+            tag_edittext.setText(tagData?.tag)
+            date_edittext.setText(tagData?.date)
+            description_edittext.setText(tagData?.description)
+            latitude_edittext.setText(tagData?.latitude)
+            longitude_edittext.setText(tagData?.longitude)
+            zoom_edittext.setText(tagData?.zoom_level)
+        })
     }
 
     override fun setWidgets(){
@@ -121,16 +157,19 @@ class AddTagsDialog: BaseDialog() {
     }
 
     override fun submitData(){
-        tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(this, androidx.lifecycle.Observer {
+        tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(this, Observer {
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = it.getErrorMessage()
-            if(errorMessage != null){
-                toastError(errorMessage)
-            } else if (it.getError() != null) {
-                toastError("Error saving tag")
-            } else if(it.getResponse() != null){
-                toastSuccess("Tags saved!")
-                unReveal(dialog_add_tags_layout)
+            when {
+                errorMessage != null -> toastError(errorMessage)
+                it.getError() != null -> toastError("Error saving " + tag_edittext.getString())
+                it.getResponse() != null -> {
+                    requireFragmentManager().commit {
+                        replace(R.id.fragment_container, ListTagsFragment())
+                    }
+                    toastSuccess(tag_edittext.getString()+ " saved!")
+                    unReveal(dialog_add_tags_layout)
+                }
             }
         })
     }

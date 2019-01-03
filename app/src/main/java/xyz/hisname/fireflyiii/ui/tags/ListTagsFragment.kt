@@ -61,6 +61,11 @@ class ListTagsFragment: BaseFragment() {
                                 val tagName = (close as TextView).text.toString()
                                 deleteTag(tagName)
                             }
+                            setOnClickListener {
+                                val addTags = AddTagsDialog()
+                                addTags.arguments = bundleOf("tagId" to tagsData.tagsId)
+                                addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
+                            }
                         }
                         swipe_tags.isRefreshing = false
                         all_tags.addView(chipTags)

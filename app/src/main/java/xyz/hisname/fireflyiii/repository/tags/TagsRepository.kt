@@ -22,4 +22,8 @@ class TagsRepository(private val tagsDataDao: TagsDataDao) {
     @WorkerThread
     suspend fun allTags() = tagsDataDao.getAllTags()
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun retrieveTagById(tagId: Long) = tagsDataDao.getTagById(tagId)
+
 }

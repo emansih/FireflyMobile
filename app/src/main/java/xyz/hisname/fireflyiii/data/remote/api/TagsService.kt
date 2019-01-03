@@ -22,4 +22,13 @@ interface TagsService {
                      @Field("latitude") latitude: String?, @Field("longitude") longitude: String?,
                      @Field("zoom_level") zoomLevel: String?): Call<TagsSuccessModel>
 
+    @FormUrlEncoded
+    @PUT("$TAGS_API_ENDPOINT/{tagId}")
+    fun updateTag(@Path("tagId") tagId: Long,
+                  @Field("tag") tagName: String, @Field("date") date: String?,
+                  @Field("description") description: String?,
+                  @Field("latitude") latitude: String?, @Field("longitude") longitude: String?,
+                  @Field("zoom_level") zoomLevel: String?): Call<TagsSuccessModel>
+
+
 }
