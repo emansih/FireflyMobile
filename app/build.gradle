@@ -94,6 +94,8 @@ dependencies {
     implementation Dependencies.chart
     implementation Dependencies.aboutLib
     implementation Dependencies.nachos
+    implementation Dependencies.acraMail
+    implementation Dependencies.acraDialog
 
     // Project Lib
     api project(path: ":languagepack")
