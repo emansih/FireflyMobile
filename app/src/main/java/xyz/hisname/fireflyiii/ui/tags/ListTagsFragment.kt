@@ -81,7 +81,9 @@ class ListTagsFragment: BaseFragment() {
                 .setPositiveButton("Yes"){_, _ ->
                     tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
                         if (status) {
-                            all_tags.removeAllViews()
+                            requireFragmentManager().commit {
+                                replace(R.id.fragment_container, ListTagsFragment())
+                            }
                             toastSuccess("$tagName Deleted")
                         } else {
                             toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
