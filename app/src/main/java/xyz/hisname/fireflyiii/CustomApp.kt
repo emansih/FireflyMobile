@@ -11,7 +11,8 @@ import xyz.hisname.languagepack.LanguageChanger
 
 @AcraCore(reportFormat = StringFormat.KEY_VALUE_LIST,
         reportSenderFactoryClasses = [EmailIntentSenderFactory::class], buildConfigClass = BuildConfig::class)
-@AcraMailSender(reportAsFile = true, mailTo = "", resSubject = R.string.app_name)
+@AcraMailSender(reportAsFile = true, mailTo = "", resSubject = R.string.app_name,
+        reportFileName = "Fireflyiii-mobile.txt")
 class CustomApp: Application() {
 
     override fun onCreate() {
