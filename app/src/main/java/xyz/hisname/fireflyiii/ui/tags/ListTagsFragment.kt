@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -23,10 +24,7 @@ import kotlinx.android.synthetic.main.fragment_lists_tags.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastError
-import xyz.hisname.fireflyiii.util.extension.toastSuccess
+import xyz.hisname.fireflyiii.util.extension.*
 
 class ListTagsFragment: BaseFragment() {
 
@@ -63,14 +61,7 @@ class ListTagsFragment: BaseFragment() {
                             isCloseIconVisible = true
                             setOnCloseIconClickListener { close ->
                                 val tagName = (close as TextView).text.toString()
-                                tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
-                                    if (status) {
-                                        all_tags.removeAllViews()
-                                        toastSuccess("$tagName Deleted")
-                                    } else {
-                                        toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
-                                    }
-                                })
+                                deleteTag(tagName)
                             }
                         }
                         swipe_tags.isRefreshing = false
@@ -81,6 +72,26 @@ class ListTagsFragment: BaseFragment() {
                 }
             })
         })
+    }
+
+    private fun deleteTag(tagName: String){
+        AlertDialog.Builder(requireContext())
+                .setTitle(R.string.get_confirmation)
+                .setMessage(resources.getString(R.string.delete_tag, tagName))
+                .setPositiveButton("Yes"){_, _ ->
+                    tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
+                        if (status) {
+                            all_tags.removeAllViews()
+                            toastSuccess("$tagName Deleted")
+                        } else {
+                            toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
+                        }
+                    })
+                }
+                .setNegativeButton("No"){ _, _ ->
+                    toastInfo("Tag not deleted")
+                }
+                .show()
     }
 
     private fun setFab(){

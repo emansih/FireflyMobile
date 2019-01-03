@@ -54,4 +54,5 @@
     <string name="currency_symbol">符號</string>
     <string name="currency_code">代碼</string>
     <string name="decimal_places">小數位數</string>
+    <string name="delete_tag">你真的要要刪除標籤 %1$s 嗎？</string>
 </resources>

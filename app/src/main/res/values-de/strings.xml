@@ -31,5 +31,6 @@
     <string name="personal_access_token">Persönliche Zugangs-Authentifizierungsschlüssel</string>
     <string name="currency_symbol">Zeichen</string>
     <string name="currency_code">Schlüssel</string>
+    <string name="delete_tag">Möchten Sie das Schlagwort %1$s wirklich löschen?</string>
 
 </resources>

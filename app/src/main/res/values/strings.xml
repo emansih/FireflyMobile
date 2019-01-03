@@ -125,4 +125,5 @@
         <item>Credit Card</item>
     </string-array>
     <string name="personal_access_token">Personal Access Token</string>
+    <string name="delete_tag">Are you sure you want to delete the tag named %1$s ?</string>
 </resources>
