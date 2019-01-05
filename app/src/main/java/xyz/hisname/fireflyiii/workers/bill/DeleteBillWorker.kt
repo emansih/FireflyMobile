@@ -19,7 +19,6 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
 
     private val billDatabase by lazy { AppDatabase.getInstance(context).billDataDao() }
     private val channelName = "Bill"
-    private val channelDescription = "Show Bill Notifications"
     private val channelIcon = R.drawable.ic_calendar_blank
 
     override fun doWork(): Result {
@@ -38,19 +37,19 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
                         billDatabase.deleteBillById(billId)
                     }.await()
                     Result.success()
-                    context.displayNotification(billAttribute?.name + "successfully deleted", "Bill",
-                            Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+                    context.displayNotification(billAttribute?.name + "successfully deleted", context.getString(R.string.bill),
+                            Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
                 }
             } else {
                 Result.failure()
-                context.displayNotification("There was an issue deleting " + billAttribute?.name, "Bill",
-                        Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+                context.displayNotification("There was an issue deleting " + billAttribute?.name, context.getString(R.string.bill),
+                        Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
             }
         })
         { throwable ->
             Result.failure()
-            context.displayNotification(throwable.localizedMessage, "Bill",
-                    Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+            context.displayNotification(throwable.localizedMessage, "Error deleting $channelName",
+                    Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
         })
 
         return Result.success()

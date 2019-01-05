@@ -19,7 +19,6 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
 
     private val accountDatabase by lazy { AppDatabase.getInstance(context).accountDataDao() }
     private val channelName: String = "Account"
-    private val channelDescription = "Show Account Notifications"
     private val channelIcon = R.drawable.ic_euro_sign
 
 
@@ -39,19 +38,19 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                         accountDatabase.deleteAccountById(id)
                     }.await()
                     Result.success()
-                    context.displayNotification(accountAttributes?.name + "successfully deleted", "Account",
-                            Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
+                    context.displayNotification(accountAttributes?.name + "successfully deleted", context.getString(R.string.account),
+                            Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
                 }
             } else {
                 Result.failure()
-                context.displayNotification("There was an issue deleting " + accountAttributes?.name, "Account",
-                        Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
+                context.displayNotification("There was an issue deleting " + accountAttributes?.name, context.getString(R.string.account),
+                        Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
             }
         })
         { throwable ->
             Result.failure()
-            context.displayNotification(throwable.localizedMessage, "Account",
-                    Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
+            context.displayNotification(throwable.localizedMessage, context.getString(R.string.account),
+                    Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
         })
 
         return Result.success()

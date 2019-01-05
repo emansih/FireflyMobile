@@ -14,7 +14,6 @@ import xyz.hisname.fireflyiii.util.network.retrofitCallback
 class BillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
     private val channelName = "Bill"
-    private val channelDescription = "Show Bill Notifications"
     private val channelIcon = R.drawable.ic_calendar_blank
 
     override fun doWork(): Result {
@@ -37,7 +36,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if (response.isSuccessful) {
                         context.displayNotification("$name added successfully!", "Bill Added",
-                                Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+                                Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
                         Result.success()
                     } else {
                         when {
@@ -47,13 +46,13 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                             gson.errors.repeat_freq != null -> error = gson.errors.repeat_freq[0]
                         }
                         context.displayNotification(error, "Error Adding $name",
-                                Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+                                Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
                         Result.failure()
                     }
                 })
                 { throwable ->
                     context.displayNotification(throwable.message.toString(), "Error Adding $name",
-                            Constants.BILL_CHANNEL, channelName, channelDescription, channelIcon)
+                            Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
                     Result.failure()
                 })
         return Result.success()

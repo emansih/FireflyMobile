@@ -20,6 +20,7 @@ import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
+import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 
@@ -41,19 +42,21 @@ class OnboardingFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        onboarding_text.text = "Hang on..."
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
         RetrofitBuilder.destroyInstance()
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
+        NotificationUtils(requireContext()).setupChannels()
         getUser()
     }
 
     private fun getUser(){
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
         zipLiveData(transaction.getAllData(DateTimeUtil.getStartOfMonth(6),
                 DateTimeUtil.getTodayDate()), categoryViewModel.getAllCategory())
         onboarding_text.text = "Retrieving your data..."
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
+        ObjectAnimator.ofInt(onboarding_progress,"progress", 45).start()
         budgetViewModel.retrieveAllBudgetLimits()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
-        onboarding_text.text = "Hang on..."
         zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem(),piggyViewModel.getAllPiggyBanks(),
                 billViewModel.getAllBills(), currencyViewModel.getCurrency(),
                 accountViewModel.getAllAccounts()).observe(this, Observer { multipleLiveData ->

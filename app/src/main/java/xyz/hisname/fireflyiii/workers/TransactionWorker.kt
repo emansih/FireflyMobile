@@ -13,7 +13,6 @@ import xyz.hisname.fireflyiii.util.network.retrofitCallback
 class TransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
     private val channelName = "Transactions"
-    private val channelDescription = "Show Transaction Notifications"
     private val channelIcon = R.drawable.ic_refresh
 
     override fun doWork(): Result {
@@ -48,7 +47,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if (response.isSuccessful) {
                         context.displayNotification("Transaction added successfully!", transactionType,
-                                Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
+                                Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION, channelIcon)
                         Result.success()
                     } else {
                         var error = ""
@@ -64,14 +63,16 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                             }
                         }
                         context.displayNotification(error, "Error Adding $transactionType",
-                                Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
+                                Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION,
+                                channelIcon)
                         Result.failure()
                     }
                 })
                 { throwable ->
                     context.displayNotification(throwable.message.toString(),
                             "Error Adding $transactionType",
-                            Constants.TRANSACTION_CHANNEL, channelName, channelDescription, channelIcon)
+                            Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION,
+                            channelIcon)
                     Result.failure()
                 })
         return Result.success()

@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.ui.notifications
 
+import android.annotation.TargetApi
 import android.app.Notification
 import android.content.Context
 import android.content.ContextWrapper
@@ -25,8 +26,42 @@ fun Context.displayNotification(contextText: String, contextTitle: String, chann
 class NotificationUtils(base: Context) : ContextWrapper(base) {
 
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
-    private inline val Context.manager: NotificationManager? get() =
-    getSystemService(NOTIFICATION_SERVICE) as? NotificationManager
+    private inline val Context.manager: NotificationManager get() =
+    getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
+    @TargetApi(Build.VERSION_CODES.O)
+    fun setupChannels(){
+        manager.createNotificationChannels(arrayListOf(
+                NotificationChannel(Constants.ACCOUNT_CHANNEL,
+                        "Accounts", NotificationManager.IMPORTANCE_HIGH).apply {
+                    enableLights(true)
+                    description = Constants.ACCOUNT_CHANNEL_DESCRIPTION
+                    enableVibration(false)
+                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                },
+                NotificationChannel(Constants.TRANSACTION_CHANNEL,
+                        "Transactions", NotificationManager.IMPORTANCE_HIGH).apply {
+                    enableLights(true)
+                    description = Constants.TRANSACTION_CHANNEL_DESCRIPTION
+                    enableVibration(false)
+                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                },
+                NotificationChannel(Constants.BILL_CHANNEL,
+                        "Bill", NotificationManager.IMPORTANCE_HIGH).apply {
+                    enableLights(true)
+                    description = Constants.BILL_CHANNEL_DESCRIPTION
+                    enableVibration(false)
+                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                },
+                NotificationChannel(Constants.PIGGY_BANK_CHANNEL,
+                        "Piggy Bank", NotificationManager.IMPORTANCE_HIGH).apply {
+                    enableLights(true)
+                    description = Constants.PIGGY_BANK_CHANNEL_DESCRIPTION
+                    enableVibration(false)
+                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                }
+        ))
+    }
 
     fun showNotification(contextText: String, contextTitle: String, channelId: String, channelName:String,
                          channelDescription: String, icon: Int){
@@ -105,7 +140,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
                 enableVibration(false)
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             }
-            manager?.createNotificationChannel(notificationChannel)
+            manager.createNotificationChannel(notificationChannel)
         }
     }
 

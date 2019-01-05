@@ -14,7 +14,6 @@ import xyz.hisname.fireflyiii.util.network.retrofitCallback
 class AccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
     private val channelName = "Account"
-    private val channelDescription = "Show Account Notifications"
     private val channelIcon = R.drawable.ic_euro_sign
 
     override fun doWork(): Result {
@@ -43,7 +42,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if (response.isSuccessful) {
                         context.displayNotification("$name was added successfully!", "Account Added",
-                                Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
+                                Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
                         Result.success()
                     } else {
                         error = when {
@@ -54,7 +53,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                             else -> "Error saving account"
                         }
                         context.displayNotification(error, "There was an error adding $name",
-                                Constants.ACCOUNT_CHANNEL, channelName, channelDescription, channelIcon)
+                                Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
                         Result.failure()
                     }
                 })

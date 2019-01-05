@@ -16,7 +16,6 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
 
     private val piggyDataBase by lazy { AppDatabase.getInstance(context).piggyDataDao() }
     private val channelName: String = "Piggy Bank"
-    private val channelDescription = "Show Piggy Bank Notifications"
     private val channelIcon = R.drawable.ic_sort_descending
 
     override fun doWork(): Result {
@@ -35,19 +34,19 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
                         piggyDataBase.deletePiggyById(piggyId)
                     }.await()
                 }
-                context.displayNotification(piggyAttribute?.name + "successfully deleted", "Piggy Bank",
-                        Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
+                context.displayNotification(piggyAttribute?.name + "successfully deleted", channelName,
+                        Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
             } else {
                 Result.failure()
                 context.displayNotification("There was an issue deleting ${piggyAttribute?.name}. " +
                         "Please try again later", "Error deleting Piggy Bank",
-                        Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
+                        Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
             }
         })
         { throwable ->
             Result.failure()
             context.displayNotification(throwable.localizedMessage, "Error deleting Piggy Bank",
-                    Constants.PIGGY_BANK_CHANNEL, channelName, channelDescription, channelIcon)
+                    Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
         })
         return Result.success()
     }
