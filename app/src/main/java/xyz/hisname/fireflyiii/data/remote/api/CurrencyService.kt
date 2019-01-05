@@ -10,9 +10,6 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 interface CurrencyService {
 
     @GET(CURRENCY_API_ENDPOINT)
-    fun getCurrency(): Call<CurrencyModel>
-
-    @GET(CURRENCY_API_ENDPOINT)
     fun getPaginatedCurrency(@Query("page") page: Int): Call<CurrencyModel>
 
     @GET("$CURRENCY_API_ENDPOINT/{id}")

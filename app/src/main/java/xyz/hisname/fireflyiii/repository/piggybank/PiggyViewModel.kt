@@ -34,7 +34,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         isLoading.value = true
         var piggyData: MutableList<PiggyData> = arrayListOf()
         val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
-        piggyService?.getPiggyBanks()?.enqueue(retrofitCallback({ response ->
+        piggyService?.getPaginatedPiggyBank(1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if(responseBody != null){
@@ -58,7 +58,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                             }
                         }
                         data.postValue(piggyData.toMutableList())
-                    } 
+                    }
                 }
             } else {
                 val responseError = response.errorBody()

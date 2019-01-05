@@ -95,7 +95,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
     private fun loadRemoteData(){
         isLoading.value = true
-        currencyService?.getCurrency()?.enqueue(retrofitCallback({ response ->
+        currencyService?.getPaginatedCurrency(1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {

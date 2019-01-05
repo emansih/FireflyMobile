@@ -105,7 +105,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     fun getAssetAccounts(): LiveData<MutableList<AccountData>> {
         isLoading.value = true
-        accountsService?.getAccountType("asset")?.enqueue(retrofitCallback({ response ->
+        accountsService?.getPaginatedAccountType("asset", 1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
@@ -257,7 +257,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     private fun loadRemoteData(source: String){
         isLoading.value = true
-        accountsService?.getAccountType(source)?.enqueue(retrofitCallback({ response ->
+        accountsService?.getPaginatedAccountType(source, 1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
