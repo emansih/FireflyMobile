@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.google.android.material.chip.Chip
@@ -18,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
+import kotlinx.android.synthetic.main.fragment_base_list.*
 import kotlinx.android.synthetic.main.fragment_lists_tags.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
@@ -37,6 +39,7 @@ class ListTagsFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        baseSwipeLayout.isGone = true
         all_tags.setChipSpacing(16)
         displayView()
         tagsViewModel.apiResponse.observe(this, Observer {
@@ -47,31 +50,42 @@ class ListTagsFragment: BaseFragment() {
     }
 
     private fun displayView(){
+        swipe_tags.isRefreshing = true
         tagsViewModel.getAllTags().observe(this, Observer { tags ->
             tagsViewModel.isLoading.observe(this, Observer { isLoading ->
                 if(isLoading == false){
-                    tags.forEachIndexed { _, tagsData ->
-                        chipTags = Chip(requireContext())
-                        chipTags.apply {
-                            text = tagsData.tagsAttributes?.tag
-                            chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                                    .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
-                            isCloseIconVisible = true
-                            setOnCloseIconClickListener { close ->
-                                val tagName = (close as TextView).text.toString()
-                                deleteTag(tagName)
-                            }
-                            setOnClickListener {
-                                val addTags = AddTagsDialog()
-                                addTags.arguments = bundleOf("tagId" to tagsData.tagsId)
-                                addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
-                            }
-                        }
+                    if(tags.isEmpty()){
+                        listImage.isVisible = true
+                        listText.isVisible = true
+                        listImage.setImageDrawable(IconicsDrawable(requireContext())
+                                .icon(FontAwesome.Icon.faw_tag)
+                                .sizeDp(24))
+                        listText.text = "No Tags Found! Start tagging now?"
                         swipe_tags.isRefreshing = false
-                        all_tags.addView(chipTags)
+                    } else {
+                        listImage.isGone = true
+                        listText.isGone = true
+                        tags.forEachIndexed { _, tagsData ->
+                            chipTags = Chip(requireContext())
+                            chipTags.apply {
+                                text = tagsData.tagsAttributes?.tag
+                                chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
+                                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                                isCloseIconVisible = true
+                                setOnCloseIconClickListener { close ->
+                                    val tagName = (close as TextView).text.toString()
+                                    deleteTag(tagName)
+                                }
+                                setOnClickListener {
+                                    val addTags = AddTagsDialog()
+                                    addTags.arguments = bundleOf("tagId" to tagsData.tagsId)
+                                    addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
+                                }
+                            }
+                            swipe_tags.isRefreshing = false
+                            all_tags.addView(chipTags)
+                        }
                     }
-                } else {
-                    swipe_tags.isRefreshing = true
                 }
             })
         })

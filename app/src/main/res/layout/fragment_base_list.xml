@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/base_swipe_layout"/>
+    <include
+        android:id="@+id/baseSwipeLayout"
+        layout="@layout/base_swipe_layout"/>
 
     <ImageView
         android:id="@+id/listImage"

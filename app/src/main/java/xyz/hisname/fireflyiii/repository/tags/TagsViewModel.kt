@@ -53,6 +53,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
                     data.postValue(tagsData)
                 }
             }
+            isLoading.value = false
         })
         { throwable ->
             scope.async(Dispatchers.IO) {
@@ -60,9 +61,9 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
             }.invokeOnCompletion {
                 data.postValue(tagsData)
             }
+            isLoading.value = false
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
-        isLoading.value = false
         return data
     }
 

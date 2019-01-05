@@ -21,5 +21,6 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <include layout="@layout/fragment_base_list"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
