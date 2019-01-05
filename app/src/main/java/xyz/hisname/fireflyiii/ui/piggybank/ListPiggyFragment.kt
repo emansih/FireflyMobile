@@ -46,22 +46,25 @@ class ListPiggyFragment: BaseFragment() {
 
     private fun displayView(){
         runLayoutAnimation(recycler_view)
-        piggyViewModel.getAllPiggyBanks().observe(this, Observer {
-            if(it.isNotEmpty()) {
-                listText.isVisible = false
-                listImage.isVisible = false
-                recycler_view.isVisible = true
-                recycler_view.adapter = PiggyRecyclerAdapter(it) { data: PiggyData -> itemClicked(data) }
-            } else {
-                listText.text = resources.getString(R.string.no_piggy_bank)
-                listText.isVisible = true
-                listImage.isVisible = true
-                listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank))
-                recycler_view.isVisible = false
-            }
-        })
-        piggyViewModel.isLoading.observe(this, Observer {
-            swipeContainer.isRefreshing = it == true
+        swipeContainer.isRefreshing = true
+        piggyViewModel.getAllPiggyBanks().observe(this, Observer { piggyBankData ->
+            piggyViewModel.isLoading.observe(this, Observer { loading ->
+                if (loading == false) {
+                    swipeContainer.isRefreshing = false
+                    if (piggyBankData.isNotEmpty()) {
+                        listText.isVisible = false
+                        listImage.isVisible = false
+                        recycler_view.isVisible = true
+                        recycler_view.adapter = PiggyRecyclerAdapter(piggyBankData) { data: PiggyData -> itemClicked(data) }
+                    } else {
+                        listText.text = resources.getString(R.string.no_piggy_bank)
+                        listText.isVisible = true
+                        listImage.isVisible = true
+                        listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank))
+                        recycler_view.isVisible = false
+                    }
+                }
+            })
         })
 
         piggyViewModel.apiResponse.observe(this, Observer {

@@ -10,7 +10,7 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 abstract class PiggyDataDao: BaseDao<PiggyData>{
 
     @Query("SELECT * FROM piggy")
-    abstract fun getAllPiggy(): LiveData<MutableList<PiggyData>>
+    abstract fun getAllPiggy(): MutableList<PiggyData>
 
     @Query("DELETE FROM piggy WHERE piggyId = :piggyId")
     abstract fun deletePiggyById(piggyId: Long): Int
@@ -18,4 +18,6 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
     @Query("SELECT * FROM piggy WHERE piggyId = :piggyId")
     abstract fun getPiggyById(piggyId: Long): MutableList<PiggyData>
 
+    @Query("DELETE FROM piggy")
+    abstract fun deleteAllPiggyBank(): Int
 }

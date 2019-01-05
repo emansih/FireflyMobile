@@ -6,8 +6,6 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 
 class PiggyRepository(private val piggyDao: PiggyDataDao) {
 
-    val allPiggyBanks = piggyDao.getAllPiggy()
-
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun insertPiggy(piggy: PiggyData){
@@ -31,5 +29,14 @@ class PiggyRepository(private val piggyDao: PiggyDataDao) {
     suspend fun deletePiggyById(piggyId: Long): Int{
         return piggyDao.deletePiggyById(piggyId)
     }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteAllPiggyBank() = piggyDao.deleteAllPiggyBank()
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun allPiggyBanks() = piggyDao.getAllPiggy()
+
 
 }

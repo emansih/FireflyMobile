@@ -32,11 +32,33 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
     fun getAllPiggyBanks(): LiveData<MutableList<PiggyData>> {
         isLoading.value = true
+        var piggyData: MutableList<PiggyData> = arrayListOf()
+        val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
         piggyService?.getPiggyBanks()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
-                val networkData = response.body()?.data
-                networkData?.forEachIndexed { _, element ->
-                    scope.launch(Dispatchers.IO) { repository.insertPiggy(element) }
+                val responseBody = response.body()
+                if(responseBody != null){
+                    val networkData = responseBody.data
+                    scope.launch(Dispatchers.IO){
+                        repository.deleteAllPiggyBank()
+                    }.invokeOnCompletion {
+                        piggyData.addAll(networkData)
+                        if(responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
+                            for(items in 2..responseBody.meta.pagination.total_pages){
+                                piggyService?.getPaginatedPiggyBank(items)?.enqueue(retrofitCallback({ pagination ->
+                                    pagination.body()?.data?.forEachIndexed{ _, pigData ->
+                                        piggyData.add(pigData)
+                                    }
+                                }))
+                            }
+                        }
+                        piggyData.forEachIndexed{ _, pigData ->
+                            scope.launch(Dispatchers.IO) {
+                                repository.insertPiggy(pigData)
+                            }
+                        }
+                        data.postValue(piggyData.toMutableList())
+                    } 
                 }
             } else {
                 val responseError = response.errorBody()
@@ -45,11 +67,23 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
+                scope.async(Dispatchers.IO) {
+                    piggyData = repository.allPiggyBanks()
+                }.invokeOnCompletion {
+                    data.postValue(piggyData)
+                }
             }
+            isLoading.value = false
         })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
-        return repository.allPiggyBanks
+        { throwable ->
+            scope.async(Dispatchers.IO) {
+                piggyData = repository.allPiggyBanks()
+            }.invokeOnCompletion {
+                data.postValue(piggyData)
+            }
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
+        return data
     }
 
     fun getPiggyById(piggyId: Long): LiveData<MutableList<PiggyData>>{
