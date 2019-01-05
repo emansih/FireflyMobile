@@ -74,49 +74,49 @@ class FireflyApiTestCase {
 
     @Test
     fun testAccount(){
-        val auth = RetrofitBuilder.getClient(FIREFLY_BASEURL)?.create(AccountsService::class.java)?.getAccountType(
-                "asset")
+        val auth = RetrofitBuilder.getClient(FIREFLY_BASEURL)?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithSlash(){
-        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/")?.create(AccountsService::class.java)?.getAccountType(
-                "asset")
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithHttps(){
-        val auth = RetrofitBuilder.getClient("https://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getAccountType(
-                "asset")
+        val auth = RetrofitBuilder.getClient("https://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithHttp(){
-        val auth = RetrofitBuilder.getClient("http://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getAccountType(
-                "asset")
+        val auth = RetrofitBuilder.getClient("http://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "http://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+                "http://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithPathInBaseUrl() {
-        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login")?.create(AccountsService::class.java)?.getAccountType(
-                "asset")
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+                "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithPathInBaseUrlAndSlash() {
-        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login/")?.create(AccountsService::class.java)?.getAccountType(
-                "asset")
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset")
+                "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 }
