@@ -32,8 +32,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import androidx.work.Data
 import com.hootsuite.nachos.chip.ChipCreator
 import xyz.hisname.fireflyiii.ui.account.AddAccountDialog
+import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 import kotlin.collections.ArrayList
 
 
@@ -223,7 +225,9 @@ class AddTransactionDialog: BaseDialog() {
                                         toastSuccess(resources.getString(R.string.transaction_deleted))
                                         dialog?.dismiss()
                                     } else {
-                                        toastError(resources.getString(R.string.issue_deleting, "transaction"),
+                                        DeleteTransactionWorker.setupWorker(Data.Builder(), transactionId)
+                                        toastInfo("There was an issue deleting your transaction. It will be " +
+                                                "deleted in the background.",
                                                 Toast.LENGTH_LONG)
                                     }
                                 })

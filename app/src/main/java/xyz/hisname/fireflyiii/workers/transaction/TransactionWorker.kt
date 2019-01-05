@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.workers
+package xyz.hisname.fireflyiii.workers.transaction
 
 import android.content.Context
 import androidx.work.*
@@ -9,6 +9,7 @@ import xyz.hisname.fireflyiii.data.remote.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import xyz.hisname.fireflyiii.workers.BaseWorker
 
 class TransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 

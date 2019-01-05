@@ -8,7 +8,7 @@ import android.preference.PreferenceManager
 import androidx.work.*
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.workers.TransactionWorker
+import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
 class TransactionReceiver: BroadcastReceiver()  {
