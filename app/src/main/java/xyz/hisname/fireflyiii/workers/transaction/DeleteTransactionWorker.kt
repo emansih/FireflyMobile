@@ -37,12 +37,12 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
                 }
             }
             context.displayNotification(transactionAttributes?.description + " successfully deleted", channelName,
-                    Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION, channelIcon)
+                    Constants.TRANSACTION_CHANNEL, channelIcon)
             Result.success()
         } else {
             context.displayNotification("There was issue deleting ${transactionAttributes?.description}",
                     "Failed to delete transaction",
-                Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION, channelIcon)
+                Constants.TRANSACTION_CHANNEL, channelIcon)
             Result.failure()
         }
         return Result.success()

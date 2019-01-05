@@ -18,7 +18,6 @@ import xyz.hisname.fireflyiii.util.network.retrofitCallback
 class DeleteAccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
     private val accountDatabase by lazy { AppDatabase.getInstance(context).accountDataDao() }
-    private val channelName: String = "Account"
     private val channelIcon = R.drawable.ic_euro_sign
 
 
@@ -39,18 +38,18 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                     }.await()
                     Result.success()
                     context.displayNotification(accountAttributes?.name + "successfully deleted", context.getString(R.string.account),
-                            Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
+                            Constants.ACCOUNT_CHANNEL, channelIcon)
                 }
             } else {
                 Result.failure()
                 context.displayNotification("There was an issue deleting " + accountAttributes?.name, context.getString(R.string.account),
-                        Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
+                        Constants.ACCOUNT_CHANNEL, channelIcon)
             }
         })
         { throwable ->
             Result.failure()
             context.displayNotification(throwable.localizedMessage, context.getString(R.string.account),
-                    Constants.ACCOUNT_CHANNEL, channelName, Constants.ACCOUNT_CHANNEL_DESCRIPTION, channelIcon)
+                    Constants.ACCOUNT_CHANNEL, channelIcon)
         })
 
         return Result.success()

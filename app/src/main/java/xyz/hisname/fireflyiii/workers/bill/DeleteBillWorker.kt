@@ -38,18 +38,18 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
                     }.await()
                     Result.success()
                     context.displayNotification(billAttribute?.name + "successfully deleted", context.getString(R.string.bill),
-                            Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
+                            Constants.BILL_CHANNEL, channelIcon)
                 }
             } else {
                 Result.failure()
                 context.displayNotification("There was an issue deleting " + billAttribute?.name, context.getString(R.string.bill),
-                        Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
+                        Constants.BILL_CHANNEL, channelIcon)
             }
         })
         { throwable ->
             Result.failure()
             context.displayNotification(throwable.localizedMessage, "Error deleting $channelName",
-                    Constants.BILL_CHANNEL, channelName, Constants.BILL_CHANNEL_DESCRIPTION, channelIcon)
+                    Constants.BILL_CHANNEL, channelIcon)
         })
 
         return Result.success()

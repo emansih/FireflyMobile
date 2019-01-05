@@ -18,9 +18,8 @@ import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import java.util.*
 
 
-fun Context.displayNotification(contextText: String, contextTitle: String, channelId: String, channelName:String,
-                                channelDescription: String, icon: Int) {
-    NotificationUtils(this).showNotification(contextText, contextTitle, channelId, channelName, channelDescription, icon)
+fun Context.displayNotification(contextText: String, contextTitle: String, channelId: String, icon: Int) {
+    NotificationUtils(this).showNotification(contextText, contextTitle, channelId, icon)
 }
 
 class NotificationUtils(base: Context) : ContextWrapper(base) {
@@ -63,9 +62,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
         ))
     }
 
-    fun showNotification(contextText: String, contextTitle: String, channelId: String, channelName:String,
-                         channelDescription: String, icon: Int){
-        setUpOreo(channelId,channelName,channelDescription)
+    fun showNotification(contextText: String, contextTitle: String, channelId: String, icon: Int){
         val groupBuilder = NotificationCompat.Builder(this, channelId).apply {
             setContentText(contextText)
             setGroup(channelId)

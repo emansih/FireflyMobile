@@ -14,7 +14,6 @@ import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class PiggyBankWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val channelName: String = "Piggy Bank"
     private val channelIcon = R.drawable.ic_sort_descending
 
     override fun doWork(): Result {
@@ -33,7 +32,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
             if (response.isSuccessful) {
                 context.displayNotification("$name was added successfully!", "Piggy Bank Added",
-                        Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
+                        Constants.PIGGY_BANK_CHANNEL, channelIcon)
                 Result.success()
             } else {
                 var error = ""
@@ -43,13 +42,13 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                     gson.errors.current_amount != null -> error = gson.errors.current_amount[0]
                 }
                 context.displayNotification(error, "There was an issue adding $name",
-                        Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
+                        Constants.PIGGY_BANK_CHANNEL, channelIcon)
                 Result.failure()
             }
         })
         { throwable ->
             context.displayNotification(throwable.message.toString(), "Error adding $name",
-                    Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
+                    Constants.PIGGY_BANK_CHANNEL, channelIcon)
             Result.failure()
         })
         return Result.success()

@@ -48,7 +48,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if (response.isSuccessful) {
                         context.displayNotification("Transaction added successfully!", transactionType,
-                                Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION, channelIcon)
+                                Constants.TRANSACTION_CHANNEL, channelIcon)
                         Result.success()
                     } else {
                         var error = ""
@@ -64,16 +64,13 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                             }
                         }
                         context.displayNotification(error, "Error Adding $transactionType",
-                                Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION,
-                                channelIcon)
+                                Constants.TRANSACTION_CHANNEL, channelIcon)
                         Result.failure()
                     }
                 })
                 { throwable ->
                     context.displayNotification(throwable.message.toString(),
-                            "Error Adding $transactionType",
-                            Constants.TRANSACTION_CHANNEL, channelName, Constants.TRANSACTION_CHANNEL_DESCRIPTION,
-                            channelIcon)
+                            "Error Adding $transactionType", Constants.TRANSACTION_CHANNEL, channelIcon)
                     Result.failure()
                 })
         return Result.success()

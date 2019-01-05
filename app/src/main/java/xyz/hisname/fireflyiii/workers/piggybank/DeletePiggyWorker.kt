@@ -35,18 +35,18 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
                     }.await()
                 }
                 context.displayNotification(piggyAttribute?.name + "successfully deleted", channelName,
-                        Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
+                        Constants.PIGGY_BANK_CHANNEL, channelIcon)
             } else {
                 Result.failure()
                 context.displayNotification("There was an issue deleting ${piggyAttribute?.name}. " +
                         "Please try again later", "Error deleting Piggy Bank",
-                        Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
+                        Constants.PIGGY_BANK_CHANNEL, channelIcon)
             }
         })
         { throwable ->
             Result.failure()
             context.displayNotification(throwable.localizedMessage, "Error deleting Piggy Bank",
-                    Constants.PIGGY_BANK_CHANNEL, channelName, Constants.PIGGY_BANK_CHANNEL_DESCRIPTION, channelIcon)
+                    Constants.PIGGY_BANK_CHANNEL, channelIcon)
         })
         return Result.success()
     }
