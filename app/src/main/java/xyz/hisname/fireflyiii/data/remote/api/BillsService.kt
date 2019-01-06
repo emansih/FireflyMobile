@@ -13,6 +13,8 @@ interface BillsService {
     @GET(BILL_API_ENDPONT)
     fun getBills(): Call<BillsModel>
 
+    @GET(BILL_API_ENDPONT)
+    fun getPaginatedBills(@Query("page") type: Int): Call<BillsModel>
 
     @GET("$BILL_API_ENDPONT/{id}")
     fun getBillById(@Path("id") id: String): Call<BillData>

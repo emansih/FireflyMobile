@@ -34,11 +34,31 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
     fun getAllBills(): LiveData<MutableList<BillData>>{
         isLoading.value = true
-        billsService?.getBills()?.enqueue(retrofitCallback({ response ->
+        var billData: MutableList<BillData> = arrayListOf()
+        val data: MutableLiveData<MutableList<BillData>> = MutableLiveData()
+        billsService?.getPaginatedBills(1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
-                val networkData = response.body()?.data
-                networkData?.forEachIndexed { _, element ->
-                    scope.launch(Dispatchers.IO) { repository.insertBill(element) }
+                val responseBody = response.body()
+                if(responseBody != null && responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
+                    billData.addAll(responseBody.data)
+                    for(items in 2..responseBody.meta.pagination.total_pages){
+                        billsService?.getPaginatedBills(items)?.enqueue(retrofitCallback({ pagination ->
+                            pagination.body()?.data?.forEachIndexed{ _, dataResponse ->
+                                billData.add(dataResponse)
+                            }
+
+                        }))
+                    }
+                }
+                data.postValue(billData.toMutableList())
+                scope.launch(Dispatchers.IO){
+                    repository.deleteAllBills()
+                }.invokeOnCompletion {
+                    billData.forEachIndexed { _, billData ->
+                        scope.launch(Dispatchers.IO){
+                            repository.insertBill(billData)
+                        }
+                    }
                 }
             } else {
                 val responseError = response.errorBody()
@@ -47,11 +67,24 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
+                scope.async(Dispatchers.IO) {
+                    billData = repository.allBills()
+                }.invokeOnCompletion {
+                    data.postValue(billData)
+                }
             }
+            isLoading.value = false
         })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
-        return repository.allBills
+        { throwable ->
+            scope.async(Dispatchers.IO) {
+                billData = repository.allBills()
+            }.invokeOnCompletion {
+                data.postValue(billData)
+            }
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
+        return data
     }
 
     fun getBillById(billId: Long): LiveData<MutableList<BillData>>{

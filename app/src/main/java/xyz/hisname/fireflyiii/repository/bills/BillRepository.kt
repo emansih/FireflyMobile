@@ -6,7 +6,9 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 
 class BillRepository(private val billDao: BillDataDao) {
 
-    val allBills = billDao.getAllBill()
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun allBills() = billDao.getAllBill()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -31,5 +33,9 @@ class BillRepository(private val billDao: BillDataDao) {
     suspend fun deleteBillById(billId: Long): Int{
         return billDao.deleteBillById(billId)
     }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteAllBills() = billDao.deleteAllBills()
 
 }

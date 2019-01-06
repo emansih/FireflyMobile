@@ -46,20 +46,25 @@ class ListBillFragment: BaseFragment() {
 
     private fun displayView(){
         runLayoutAnimation(recycler_view)
-        billViewModel.getAllBills().observe(this, Observer {
-            if (it.isNotEmpty()) {
-                listText.isVisible = false
-                listImage.isVisible = false
-                recycler_view.isVisible = true
-                recycler_view.adapter = BillsRecyclerAdapter(it) { data: BillData -> itemClicked(data) }
-            } else {
-                listText.text = resources.getString(R.string.no_bills)
-                listImage.setImageDrawable(IconicsDrawable(requireContext())
-                        .icon(GoogleMaterial.Icon.gmd_insert_emoticon).sizeDp(24))
-                listText.isVisible = true
-                listImage.isVisible = true
-                recycler_view.isVisible = false
-            }
+        billViewModel.getAllBills().observe(this, Observer { billList ->
+            billViewModel.isLoading.observe(this, Observer { loader ->
+                if(loader == false){
+                    if (billList.isNotEmpty()) {
+                        listText.isVisible = false
+                        listImage.isVisible = false
+                        recycler_view.isVisible = true
+                        recycler_view.adapter = BillsRecyclerAdapter(billList) { data: BillData -> itemClicked(data) }
+                    } else {
+                        listText.text = resources.getString(R.string.no_bills)
+                        listImage.setImageDrawable(IconicsDrawable(requireContext())
+                                .icon(GoogleMaterial.Icon.gmd_insert_emoticon).sizeDp(24))
+                        listText.isVisible = true
+                        listImage.isVisible = true
+                        recycler_view.isVisible = false
+                    }
+                }
+            })
+
         })
         billViewModel.isLoading.observe(this, Observer {
             swipeContainer.isRefreshing = it == true
