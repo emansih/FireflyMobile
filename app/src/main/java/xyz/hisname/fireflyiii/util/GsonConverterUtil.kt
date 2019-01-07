@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.Relationships
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.Spent
 import xyz.hisname.fireflyiii.repository.models.category.CategoryAttributes
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
@@ -51,6 +52,19 @@ object GsonConverterUtil{
         return Gson().fromJson(value,type)
     }
 
+    @TypeConverter
+    @JvmStatic
+    fun fromBudgetSpent(spent: List<Spent>): String{
+        val type = object : TypeToken<List<Spent>>(){}.type
+        return Gson().toJson(spent,type)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toBudgetSpent(spent: String): List<Spent>{
+        val type = object : TypeToken<List<Spent>>() {}.type
+        return Gson().fromJson(spent,type)
+    }
 
     @TypeConverter
     @JvmStatic

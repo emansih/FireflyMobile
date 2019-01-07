@@ -9,6 +9,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
@@ -19,8 +20,8 @@ import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 
 @Database(entities = [PiggyData::class, BillData::class, AccountData::class, CurrencyData::class,
-    TransactionData::class, CategoryData::class, BudgetData::class, TagsData::class],
-        version = 3,exportSchema = false)
+    TransactionData::class, CategoryData::class, BudgetData::class, BudgetListData::class, TagsData::class],
+        version = 4,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
@@ -31,6 +32,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun transactionDataDao(): TransactionDataDao
     abstract fun categoryDataDao(): CategoryDataDao
     abstract fun budgetDataDao(): BudgetDataDao
+    abstract fun budgetListDataDao(): BudgetListDataDao
     abstract fun tagsDataDao(): TagsDataDao
 
     companion object {

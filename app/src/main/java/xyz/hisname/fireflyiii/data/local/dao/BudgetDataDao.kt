@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 
 @Dao
 abstract class BudgetDataDao: BaseDao<BudgetData> {

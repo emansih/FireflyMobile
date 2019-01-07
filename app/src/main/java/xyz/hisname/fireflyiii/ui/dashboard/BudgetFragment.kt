@@ -30,9 +30,9 @@ class BudgetFragment: BaseFragment() {
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
             if(defaultCurrency.isNotEmpty()) {
                 val currencyData = defaultCurrency[0].currencyAttributes
-                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code!!).observe(this, Observer { budget ->
+                /*budgetLimit.retrieveCurrentMonthBudget(currencyData?.code!!).observe(this, Observer { budget ->
                     budget_text.text = currencyData.symbol + " " + budget
-                })
+                })*/
             }
         })
     }
