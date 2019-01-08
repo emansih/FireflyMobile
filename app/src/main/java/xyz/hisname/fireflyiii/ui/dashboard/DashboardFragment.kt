@@ -30,7 +30,6 @@ import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
 import kotlin.math.roundToInt
-import kotlin.math.sign
 
 
 // TODO: Refactor this god class (7 Jan 2019)
@@ -39,15 +38,15 @@ class DashboardFragment: BaseFragment() {
     private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
-    private var depositSum = 0
-    private var withdrawSum = 0
-    private var transaction = 0
+    private var depositSum = 0.toBigDecimal()
+    private var withdrawSum = 0.toBigDecimal()
+    private var transaction = 0.toBigDecimal()
     private var budgetSpent = 0f
     private var budgeted = 0f
-    private var month2Depot = 0
-    private var month3Depot = 0
-    private var month2With = 0
-    private var month3With = 0
+    private var month2Depot = 0.toBigDecimal()
+    private var month3Depot = 0.toBigDecimal()
+    private var month2With = 0.toBigDecimal()
+    private var month3With = 0.toBigDecimal()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -70,78 +69,37 @@ class DashboardFragment: BaseFragment() {
             if(defaultCurrency.isNotEmpty()) {
                 val currencyData = defaultCurrency[0].currencyAttributes
                 val currencyCode = currencyData?.code!!
-                zipLiveData(transactionViewModel.getWithdrawalWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+                zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), currencyCode),
-                        transactionViewModel.getDepositWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+                        transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
                                 DateTimeUtil.getEndOfMonth(), currencyCode)).observe(this, Observer { transactionData ->
                     transactionViewModel.isLoading.observe(this, Observer { loader ->
                         if(loader == false){
-                            if (transactionData.first.isNotEmpty()) {
-                                withdrawSum = 0
-                                transactionData.first.forEachIndexed { _, element ->
-                                    withdrawSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                                }
-                                withdrawText.text = currencyData.symbol + " " + withdrawSum.toString()
-                                currentExpense.text = currencyData.symbol + " " + withdrawSum.toString()
-                            } else {
-                                // no withdrawal
-                                withdrawSum = 0
-                                withdrawText.text = currencyData.symbol + " " + "0"
-                                currentExpense.text = currencyData.symbol + " " + "0"
-                            }
-                            if (transactionData.second.isNotEmpty()) {
-                                depositSum = 0
-                                transactionData.second.forEachIndexed { _, element ->
-                                    depositSum += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                                }
-                                incomeDigit.text = currencyData.symbol + " " + depositSum.toString()
-                                currentMonthIncome.text = currencyData.symbol + " " + depositSum.toString()
-                            } else {
-                                // no deposit
-                                depositSum = 0
-                                incomeDigit.text = currencyData.symbol + " " + "0"
-                                currentMonthIncome.text = currencyData.symbol + " " + "0"
-                            }
+                            depositSum = transactionData.second
+                            withdrawSum = transactionData.first
                             transaction = depositSum - withdrawSum
-                            if(transaction.sign == -1){
-                                sumText.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+                            currentExpense.text = currencyData.symbol + " " + withdrawSum.toString()
+                            currentMonthIncome.text = currencyData.symbol + " " + depositSum.toString()
+                            if(transaction.signum() == -1){
                                 currentNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
                             }
-                            sumText.text = currencyData.symbol + " " + transaction.toString()
+                            balanceText.text = currencyData.symbol + " " + transaction.toString()
                             currentNetIncome.text = currencyData.symbol + " " + transaction.toString()
                         }
                     })
                 })
-                zipLiveData(transactionViewModel.getWithdrawalWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
+                zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
                         DateTimeUtil.getEndOfMonth(1), currencyCode),
-                        transactionViewModel.getDepositWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
+                        transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
                                 DateTimeUtil.getEndOfMonth(1), currencyCode)).observe(this, Observer { transactionData ->
                     transactionViewModel.isLoading.observe(this, Observer { loader ->
                         if(loader == false){
-                            if (transactionData.first.isNotEmpty()) {
-                                month2With = 0
-                                transactionData.first.forEachIndexed { _, element ->
-                                    month2With += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                                }
-                                oneMonthBeforeExpense.text = currencyData.symbol + " " + month2With.toString()
-                            } else {
-                                // no withdrawal
-                                month2With = 0
-                                oneMonthBeforeExpense.text = currencyData.symbol + " " + "0"
-                            }
-                            if (transactionData.second.isNotEmpty()) {
-                                month2Depot = 0
-                                transactionData.second.forEachIndexed { _, element ->
-                                    month2Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                                }
-                                oneMonthBeforeIncome.text = currencyData.symbol + " " + month2Depot.toString()
-                            } else {
-                                // no deposit
-                                month2Depot = 0
-                                oneMonthBeforeIncome.text = currencyData.symbol + " " + "0"
-                            }
+                            month2Depot = transactionData.second
+                            month2With = transactionData.first
                             transaction = month2Depot - month2With
-                            if(transaction.sign == -1){
+                            oneMonthBeforeExpense.text = currencyData.symbol + " " + month2With.toString()
+                            oneMonthBeforeIncome.text = currencyData.symbol + " " + month2Depot.toString()
+                            if(transaction.signum() == -1){
                                 oneMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
                             }
                             oneMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
@@ -149,36 +107,18 @@ class DashboardFragment: BaseFragment() {
                     })
                 })
 
-                zipLiveData(transactionViewModel.getWithdrawalWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
+                zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
                         DateTimeUtil.getEndOfMonth(2), currencyCode),
-                        transactionViewModel.getDepositWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
+                        transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
                                 DateTimeUtil.getEndOfMonth(2), currencyCode)).observe(this, Observer { transactionData ->
                     transactionViewModel.isLoading.observe(this, Observer { loader ->
                         if(loader == false){
-                            if (transactionData.first.isNotEmpty()) {
-                                month3With = 0
-                                transactionData.first.forEachIndexed { _, element ->
-                                    month3With += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                                }
-                                twoMonthBeforeExpense.text = currencyData.symbol + " " + month3With.toString()
-                            } else {
-                                // no withdrawal
-                                month3With = 0
-                                twoMonthBeforeExpense.text = currencyData.symbol + " " + "0"
-                            }
-                            if (transactionData.second.isNotEmpty()) {
-                                month3Depot = 0
-                                transactionData.second.forEachIndexed { _, element ->
-                                    month3Depot += Math.abs(element.transactionAttributes?.amount!!.toInt())
-                                }
-                                twoMonthBeforeIncome.text = currencyData.symbol + " " + month3Depot.toString()
-                            } else {
-                                // no deposit
-                                month3Depot = 0
-                                twoMonthBeforeIncome.text = currencyData.symbol + " " + "0"
-                            }
+                            month3Depot = transactionData.second
+                            month3With = transactionData.first
                             transaction = month3Depot - month3With
-                            if(transaction.sign == -1){
+                            twoMonthBeforeExpense.text = currencyData.symbol + " " + month3With.toString()
+                            twoMonthBeforeIncome.text = currencyData.symbol + " " + month3Depot.toString()
+                            if(transaction.signum() == -1){
                                 twoMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
                             }
                             twoMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
@@ -268,16 +208,21 @@ class DashboardFragment: BaseFragment() {
                                 invalidate()
                             }
                             val progressDrawable = budgetProgress.progressDrawable.mutate()
-                            if (budgetLeftPercentage.roundToInt() >= 80) {
-                                progressDrawable.setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN)
-                                budgetProgress.progressDrawable = progressDrawable
-                            } else if (budgetLeftPercentage.roundToInt() in 50..80) {
-                                progressDrawable.setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN)
-                                budgetProgress.progressDrawable = progressDrawable
-                            } else {
-                                progressDrawable.setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN)
-                                budgetProgress.progressDrawable = progressDrawable
+                            when {
+                                budgetLeftPercentage.roundToInt() >= 80 -> {
+                                    progressDrawable.setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN)
+                                    budgetProgress.progressDrawable = progressDrawable
+                                }
+                                budgetLeftPercentage.roundToInt() in 50..80 -> {
+                                    progressDrawable.setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN)
+                                    budgetProgress.progressDrawable = progressDrawable
+                                }
+                                else -> {
+                                    progressDrawable.setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN)
+                                    budgetProgress.progressDrawable = progressDrawable
+                                }
                             }
+                            leftToSpentText.text = currencyData.symbol + " " + String.format("%.2f",(budgeted - budgetSpent))
                             ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
                         }
                     })

@@ -17,6 +17,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import java.math.BigDecimal
 
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
@@ -79,6 +80,42 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
         }.invokeOnCompletion {
             data.postValue(withdrawData)
+            isLoading.postValue(false)
+        }
+        return data
+    }
+
+    fun getWithdrawalAmountWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<BigDecimal>{
+        isLoading.value = true
+        var withdrawData: MutableList<TransactionData> = arrayListOf()
+        var withdrawAmount: BigDecimal = 0.toBigDecimal()
+        val data: MutableLiveData<BigDecimal> = MutableLiveData()
+        loadRemoteData(startDate, endDate, "withdrawal")
+        scope.async(Dispatchers.IO) {
+            withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
+        }.invokeOnCompletion {
+            withdrawData.forEachIndexed { _, transactionData ->
+                withdrawAmount = withdrawAmount.add(transactionData.transactionAttributes?.amount?.toBigDecimal()?.abs())
+            }
+            data.postValue(withdrawAmount)
+            isLoading.postValue(false)
+        }
+        return data
+    }
+
+    fun getDepositAmountWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<BigDecimal>{
+        isLoading.value = true
+        var depositData: MutableList<TransactionData> = arrayListOf()
+        var depositAmount: BigDecimal = 0.toBigDecimal()
+        val data: MutableLiveData<BigDecimal> = MutableLiveData()
+        loadRemoteData(startDate, endDate, "deposit")
+        scope.async(Dispatchers.IO) {
+            depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
+        }.invokeOnCompletion {
+            depositData.forEachIndexed { _, transactionData ->
+                depositAmount = depositAmount.add(transactionData.transactionAttributes?.amount?.toBigDecimal()?.abs())
+            }
+            data.postValue(depositAmount)
             isLoading.postValue(false)
         }
         return data

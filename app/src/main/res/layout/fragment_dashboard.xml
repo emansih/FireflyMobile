@@ -17,9 +17,9 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/overviewCard"
+                android:id="@+id/statsCard"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="80dp"
                 android:stateListAnimator="@animator/lift_on_touch"
                 card_view:targetApi="lollipop"
                 android:clickable="true"
@@ -42,88 +42,131 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/overviewText"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/balanceLayout"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:textSize="30sp"
-                        android:textStyle="bold"
-                        android:text="Monthly Overview"
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/md_orange_500"
+                        android:layout_marginTop="12dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        app:layout_constraintEnd_toStartOf="@+id/leftToSpentLayout"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <View
-                        android:id="@+id/linedivider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#E1E1E1"
-                        android:layout_marginTop="5dp"
-                        app:layout_constraintStart_toStartOf="@id/overviewText"
-                        app:layout_constraintTop_toBottomOf="@id/overviewText"
-                        app:layout_constraintEnd_toEndOf="parent"/>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/balanceImageView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/rectangle"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/incomeText"
-                        android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/balanceTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="8dp"
+                            android:text="Balance"
+                            android:textColor="@color/white"
+                            app:layout_constraintStart_toStartOf="@+id/balanceImageView"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceImageView" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/balanceText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:layout_marginBottom="4dp"
+                            android:text="--.--"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceTextView"
+                            app:layout_constraintStart_toStartOf="@+id/balanceTextView" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/leftToSpentLayout"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/income"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
                         android:layout_marginTop="12dp"
-                        app:layout_constraintStart_toStartOf="@id/overviewText"
-                        app:layout_constraintTop_toBottomOf="@id/linedivider" />
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/md_purple_500"
+                        app:layout_constraintStart_toEndOf="@+id/balanceLayout"
+                        app:layout_constraintEnd_toStartOf="@+id/netWorthLayout"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/expenseText"
-                        android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/leftToSpentImageView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/rectangle"/>
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/leftToSpentTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="8dp"
+                            android:text="Left To Spend"
+                            android:textColor="@color/white"
+                            app:layout_constraintStart_toStartOf="@+id/leftToSpentImageView"
+                            app:layout_constraintTop_toBottomOf="@+id/leftToSpentImageView" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/leftToSpentText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:text="--.--"
+                            android:layout_marginBottom="4dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/leftToSpentTextView"
+                            app:layout_constraintStart_toStartOf="@+id/leftToSpentTextView" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/netWorthLayout"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/expense"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
                         android:layout_marginTop="12dp"
-                        app:layout_constraintStart_toStartOf="@id/incomeText"
-                        app:layout_constraintTop_toBottomOf="@id/incomeText" />
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/incomeDigit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="--.--"
-                        app:layout_constraintTop_toTopOf="@+id/incomeText"
-                        app:layout_constraintEnd_toEndOf="parent"/>
+                        android:layout_marginEnd="4dp"
+                        android:background="@color/md_blue_500"
+                        app:layout_constraintStart_toEndOf="@+id/leftToSpentLayout"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/netWorthImageView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/rectangle"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/withdrawText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="20sp"
-                        android:text="--.--"
-                        android:textColor="@color/md_red_500"
-                        app:layout_constraintTop_toBottomOf="@+id/incomeDigit"
-                        app:layout_constraintTop_toTopOf="@+id/expenseText"
-                        app:layout_constraintEnd_toEndOf="parent"/>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/netWorthTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="8dp"
+                            android:text="Net Worth"
+                            android:textColor="@color/white"
+                            app:layout_constraintStart_toStartOf="@+id/netWorthImageView"
+                            app:layout_constraintTop_toBottomOf="@+id/netWorthImageView" />
 
-                    <View
-                        android:id="@+id/sumDivider"
-                        android:layout_width="150dp"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#E1E1E1"
-                        app:layout_constraintTop_toBottomOf="@+id/withdrawText"
-                        app:layout_constraintEnd_toEndOf="parent"/>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/netWorthText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:layout_marginBottom="4dp"
+                            android:text="--.--"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/netWorthTextView"
+                            app:layout_constraintStart_toStartOf="@+id/netWorthTextView" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/sumText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="--.--"
-                        android:textSize="20sp"
-                        app:layout_constraintTop_toBottomOf="@+id/sumDivider"
-                        app:layout_constraintEnd_toEndOf="parent"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -141,9 +184,9 @@
                 app:cardPreventCornerOverlap="false"
                 app:cardCornerRadius="2dp"
                 app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/overviewCard"
-                app:layout_constraintStart_toStartOf="@+id/overviewCard"
-                app:layout_constraintEnd_toEndOf="@+id/overviewCard">
+                app:layout_constraintTop_toBottomOf="@+id/statsCard"
+                app:layout_constraintStart_toStartOf="@+id/statsCard"
+                app:layout_constraintEnd_toEndOf="@+id/statsCard">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -181,7 +224,7 @@
                            android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
                            android:layout_marginTop="4dp"
-                           android:layout_marginEnd="28dp"
+                           android:layout_marginEnd="48dp"
                            app:layout_constraintTop_toTopOf="parent"
                            app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -226,7 +269,7 @@
                             android:id="@+id/twoMonthBefore"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="36dp"
+                            android:layout_marginStart="20dp"
                             app:layout_constraintStart_toEndOf="@+id/netEarningsTextView"
                             app:layout_constraintTop_toTopOf="@+id/currentMonthTextView"/>
 
