@@ -20,6 +20,7 @@ import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
@@ -37,6 +38,7 @@ class DashboardFragment: BaseFragment() {
 
     private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
     private var depositSum = 0.toBigDecimal()
     private var withdrawSum = 0.toBigDecimal()
@@ -58,10 +60,26 @@ class DashboardFragment: BaseFragment() {
         twoMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(2)
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
-        setBarChart()
         setNetIncome()
+        setBarChart()
+        setNetWorth()
     }
 
+    private fun setNetWorth(){
+        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+            if(defaultCurrency.isNotEmpty()) {
+                val currencyData = defaultCurrency[0].currencyAttributes
+                val currencyCode = currencyData?.code!!
+                accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
+                    accountViewModel.isLoading.observe(this, Observer { load ->
+                        if(load == false){
+                            netWorthText.text = money
+                        }
+                    })
+                })
+            }
+        })
+    }
 
     @SuppressLint("SetTextI18n")
     private fun setNetIncome(){

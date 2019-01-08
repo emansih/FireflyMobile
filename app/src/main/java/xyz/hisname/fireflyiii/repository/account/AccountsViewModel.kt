@@ -103,6 +103,73 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return repository.allAccounts
     }
 
+    fun getAllAccountWithNetworthAndCurrency(currencyCode: String): LiveData<String>{
+        isLoading.value = true
+        val accountValue: MutableLiveData<String> = MutableLiveData()
+        var currentBalance = 0.toDouble()
+        accountsService?.getPaginatedAccountType("all", 1)?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                val networkData = response.body()
+                if (networkData != null) {
+                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages) {
+                        networkData.data.forEachIndexed { _, accountData ->
+                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
+                        }
+                    } else {
+                        networkData.data.forEachIndexed { _, accountData ->
+                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
+                        }
+                        for (pagination in 2..networkData.meta.pagination.total_pages) {
+                            accountsService?.getPaginatedAccountType("all", pagination)?.enqueue(retrofitCallback({ respond ->
+                                respond.body()?.data?.forEachIndexed { _, accountPagination ->
+                                    scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
+                                }
+                            }))
+                        }
+                    }
+                    scope.launch(Dispatchers.IO){
+                        accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
+                    }.invokeOnCompletion {
+                        accountData?.forEachIndexed { _, accountData ->
+                            currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
+                        }
+                        accountValue.postValue(currentBalance.toString())
+                    }
+                    isLoading.value = false
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+                scope.launch(Dispatchers.IO){
+                    accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
+                }.invokeOnCompletion {
+                    accountData?.forEachIndexed { _, accountData ->
+                        currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
+                    }
+                    accountValue.postValue(currentBalance.toString())
+                }
+                isLoading.value = false
+            }
+        })
+        { throwable ->
+            scope.launch(Dispatchers.IO){
+                accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
+            }.invokeOnCompletion {
+                accountData?.forEachIndexed { _, accountData ->
+                    currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
+                }
+                accountValue.postValue(currentBalance.toString())
+            }
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
+        return accountValue
+    }
+
     fun getAssetAccounts(): LiveData<MutableList<AccountData>> {
         isLoading.value = true
         accountsService?.getPaginatedAccountType("asset", 1)?.enqueue(retrofitCallback({ response ->

@@ -29,4 +29,6 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("DELETE FROM accounts WHERE accountId = :accountId")
     abstract fun deleteAccountById(accountId: Long): Int
 
+    @Query("SELECT * FROM accounts WHERE currency_code =:currencyCode AND include_net_worth =:networth")
+    abstract fun getAccountsWithNetworthAndCurrency(networth: Boolean, currencyCode: String): MutableList<AccountData>
 }
