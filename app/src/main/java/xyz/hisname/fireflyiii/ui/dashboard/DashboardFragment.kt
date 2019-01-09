@@ -77,7 +77,7 @@ class DashboardFragment: BaseFragment() {
                 accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
                     accountViewModel.isLoading.observe(this, Observer { load ->
                         if(load == false){
-                            netWorthText.text = money
+                            netWorthText.text = currencyData.symbol + " " + money
                         }
                     })
                 })
