@@ -29,6 +29,7 @@ import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
 import kotlin.math.roundToInt
 
@@ -63,6 +64,9 @@ class DashboardFragment: BaseFragment() {
         setNetIncome()
         setBarChart()
         setNetWorth()
+        currencyViewModel.apiResponse.observe(this, Observer {
+            toastInfo(it)
+        })
     }
 
     private fun setNetWorth(){
