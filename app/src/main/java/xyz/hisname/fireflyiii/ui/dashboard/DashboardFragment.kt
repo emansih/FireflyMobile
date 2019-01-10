@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.components.Description
@@ -17,6 +19,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
@@ -25,12 +28,10 @@ import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastInfo
-import xyz.hisname.fireflyiii.util.extension.zipLiveData
+import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.roundToInt
 
 
@@ -41,6 +42,7 @@ class DashboardFragment: BaseFragment() {
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
+    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
     private var depositSum = 0.toBigDecimal()
     private var withdrawSum = 0.toBigDecimal()
     private var transaction = 0.toBigDecimal()
@@ -67,6 +69,17 @@ class DashboardFragment: BaseFragment() {
         currencyViewModel.apiResponse.observe(this, Observer {
             toastInfo(it)
         })
+        fab.display {
+            fab.isClickable = false
+            requireFragmentManager().commit {
+                val addTransactionFragment = AddTransactionFragment()
+                addTransactionFragment.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                replace(R.id.bigger_fragment_container, addTransactionFragment)
+                addToBackStack(null)
+            }
+            fab.isClickable = true
+
+        }
     }
 
     private fun setNetWorth(){
@@ -230,22 +243,24 @@ class DashboardFragment: BaseFragment() {
                                 invalidate()
                             }
                             val progressDrawable = budgetProgress.progressDrawable.mutate()
-                            when {
-                                budgetLeftPercentage.roundToInt() >= 80 -> {
-                                    progressDrawable.setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN)
-                                    budgetProgress.progressDrawable = progressDrawable
-                                }
-                                budgetLeftPercentage.roundToInt() in 50..80 -> {
-                                    progressDrawable.setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN)
-                                    budgetProgress.progressDrawable = progressDrawable
-                                }
-                                else -> {
-                                    progressDrawable.setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN)
-                                    budgetProgress.progressDrawable = progressDrawable
-                                }
-                            }
                             leftToSpentText.text = currencyData.symbol + " " + String.format("%.2f",(budgeted - budgetSpent))
-                            ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
+                            if(!budgetLeftPercentage.isNaN()) {
+                                when {
+                                    budgetLeftPercentage.roundToInt() >= 80 -> {
+                                        progressDrawable.setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN)
+                                        budgetProgress.progressDrawable = progressDrawable
+                                    }
+                                    budgetLeftPercentage.roundToInt() in 50..80 -> {
+                                        progressDrawable.setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN)
+                                        budgetProgress.progressDrawable = progressDrawable
+                                    }
+                                    else -> {
+                                        progressDrawable.setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN)
+                                        budgetProgress.progressDrawable = progressDrawable
+                                    }
+                                }
+                                ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
+                            }
                         }
                     })
                 })
@@ -263,4 +278,8 @@ class DashboardFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        fab.isGone = true
+    }
 }

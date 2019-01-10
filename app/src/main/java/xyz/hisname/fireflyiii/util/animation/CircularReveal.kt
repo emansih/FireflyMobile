@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 class CircularReveal(private val revealView: View) {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    fun showReveal(revealX: Int, revealY: Int) {
+    fun showReveal(revealX: Int, revealY: Int, animation: BakedBezierInterpolator = BakedBezierInterpolator.FADE_IN_CURVE) {
         revealView.isInvisible = true
         val viewTreeObserver = revealView.viewTreeObserver
         if(viewTreeObserver.isAlive){
@@ -22,7 +22,7 @@ class CircularReveal(private val revealView: View) {
                     val circularReveal= ViewAnimationUtils.createCircularReveal(
                             revealView, revealX, revealY,0f, finalRadius)
                     circularReveal.duration = 800
-                    circularReveal.interpolator = BakedBezierInterpolator.FADE_IN_CURVE
+                    circularReveal.interpolator = animation
                     revealView.isVisible = true
                     circularReveal.start()
                     revealView.viewTreeObserver.removeOnGlobalLayoutListener(this)
