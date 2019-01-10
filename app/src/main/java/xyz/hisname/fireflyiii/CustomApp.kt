@@ -23,7 +23,9 @@ class CustomApp: Application() {
         super.onCreate()
         AndroidThreeTen.init(this)
         LanguageChanger.init(this)
-        ACRA.init(this)
+        if(!BuildConfig.DEBUG) {
+            ACRA.init(this)
+        }
     }
 
 }
