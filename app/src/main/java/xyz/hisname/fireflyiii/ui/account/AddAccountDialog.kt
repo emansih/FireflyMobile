@@ -90,8 +90,6 @@ class AddAccountDialog: BaseDialog() {
             liabilityStartDate_layout.isVisible = true
             liabilityInterest_layout.isVisible = true
             interestPeriod.isVisible = true
-        } else if(!Objects.equals(accountType, "Accounts")){
-            accountTypeSpinner.isVisible = false
         }
         accountTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {

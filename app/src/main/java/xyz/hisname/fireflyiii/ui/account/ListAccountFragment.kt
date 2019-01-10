@@ -54,21 +54,6 @@ class ListAccountFragment: BaseFragment() {
         runLayoutAnimation(recycler_view)
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         when (accountType) {
-            "all" -> accountViewModel.getAllAccounts().observe(this, Observer {
-                if(it.isEmpty()){
-                    recycler_view.isGone = true
-                    noAccountImage.isVisible = true
-                    noAccountText.isVisible = true
-                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_credit_card))
-                    noAccountText.text = resources.getString(R.string.no_account_found, "Accounts")
-                } else {
-                    noAccountText.isGone = true
-                    noAccountImage.isGone = true
-                    recycler_view.isVisible = true
-                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-                }
-            })
             "asset" -> accountViewModel.getAssetAccounts().observe(this, Observer {
                 if(it.isEmpty()){
                     recycler_view.isGone = true
@@ -76,7 +61,7 @@ class ListAccountFragment: BaseFragment() {
                     noAccountText.isVisible = true
                     noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
                             .icon(FontAwesome.Icon.faw_money_bill))
-                    noAccountText.text = resources.getString(R.string.no_account_found, "Asset Accounts")
+                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
                 } else {
                     noAccountText.isGone = true
                     noAccountImage.isGone = true
@@ -90,7 +75,7 @@ class ListAccountFragment: BaseFragment() {
                     noAccountText.isVisible = true
                     noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
                             .icon(FontAwesome.Icon.faw_shopping_cart))
-                    noAccountText.text = resources.getString(R.string.no_account_found, "Expense Accounts")
+                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
                 } else {
                     noAccountText.isGone = true
                     noAccountImage.isGone = true
@@ -104,7 +89,7 @@ class ListAccountFragment: BaseFragment() {
                     noAccountText.isVisible = true
                     noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
                             .icon(FontAwesome.Icon.faw_download))
-                    noAccountText.text = resources.getString(R.string.no_account_found, "Revenue Accounts")
+                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
                 } else {
                     noAccountText.isGone = true
                     noAccountImage.isGone = true
@@ -118,7 +103,7 @@ class ListAccountFragment: BaseFragment() {
                     noAccountText.isVisible = true
                     noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
                             .icon(FontAwesome.Icon.faw_ticket_alt))
-                    noAccountText.text = resources.getString(R.string.no_account_found, "Liability Accounts")
+                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
                 } else {
                     noAccountText.isGone = true
                     noAccountImage.isGone = true
