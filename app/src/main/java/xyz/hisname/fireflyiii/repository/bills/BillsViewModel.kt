@@ -39,15 +39,17 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         billsService?.getPaginatedBills(1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val responseBody = response.body()
-                if(responseBody != null && responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
+                if(responseBody != null){
                     billData.addAll(responseBody.data)
-                    for(items in 2..responseBody.meta.pagination.total_pages){
-                        billsService?.getPaginatedBills(items)?.enqueue(retrofitCallback({ pagination ->
-                            pagination.body()?.data?.forEachIndexed{ _, dataResponse ->
-                                billData.add(dataResponse)
-                            }
+                    if(responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
+                        for(items in 2..responseBody.meta.pagination.total_pages){
+                            billsService?.getPaginatedBills(items)?.enqueue(retrofitCallback({ pagination ->
+                                pagination.body()?.data?.forEachIndexed{ _, dataResponse ->
+                                    billData.add(dataResponse)
+                                }
 
-                        }))
+                            }))
+                        }
                     }
                 }
                 data.postValue(billData.toMutableList())
