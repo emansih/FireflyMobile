@@ -81,10 +81,10 @@ class AddAccountDialog: BaseDialog() {
     }
 
     override fun setWidgets() {
-        if(Objects.equals(accountType, "Asset Account")){
+        if(Objects.equals(accountType, "asset")){
             accountRoleSpinner.isVisible = true
             accountTypeSpinner.isVisible = false
-        } else if(Objects.equals(accountType,"Liability Account")) {
+        } else if(Objects.equals(accountType,"liability")) {
             liabilityTypeSpinner.isVisible = true
             liabilityAmount_layout.isVisible = true
             liabilityStartDate_layout.isVisible = true
@@ -167,23 +167,13 @@ class AddAccountDialog: BaseDialog() {
 
     }
 
-    private fun convertString(): String{
-        return when {
-            Objects.equals(accountType, "Asset Account") -> "asset"
-            Objects.equals(accountType, "Expense Account") -> "expense"
-            Objects.equals(accountType, "Revenue Account") -> "revenue"
-            Objects.equals(accountType, "Liability Account") -> "liability"
-            else -> "Account"
-        }
-    }
-
     override fun submitData() {
         val networth = if(netWorthCheckbox.isChecked){
             1
         } else {
             0
         }
-        val accountType = if(accountTypeSpinner.isVisible){
+        val accountTypeSpinner = if(accountTypeSpinner.isVisible){
             when {
                 accountTypeSpinner.selectedItemPosition == 0 -> "asset"
                 accountTypeSpinner.selectedItemPosition == 1 -> "expense"
@@ -191,7 +181,7 @@ class AddAccountDialog: BaseDialog() {
                 else -> "liability"
             }
         } else {
-            convertString()
+            accountType
         }
 
         val accountRole = if(accountRoleSpinner.isVisible) {
@@ -259,7 +249,7 @@ class AddAccountDialog: BaseDialog() {
         } else {
             iban_edittext.getString()
         }
-        accountViewModel.addAccounts(accountName_edittext.getString(), accountType,
+        accountViewModel.addAccounts(accountName_edittext.getString(), accountTypeSpinner,
                 currency, networth, accountRole, creditCardType, creditCardDate,
                 liabilityType, liabilityAmount, liabilityStartDate, liabilityInterest,
                 interest_period, accountNumber, iban).observe(this, Observer {

@@ -140,7 +140,7 @@ class ListAccountFragment: BaseFragment() {
         fab.display {
             fab.isClickable = false
             val addAccount = AddAccountDialog()
-            addAccount.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to convertString())
+            addAccount.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to accountType)
             addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
             fab.isClickable = true
         }
@@ -162,10 +162,10 @@ class ListAccountFragment: BaseFragment() {
 
     private fun convertString(): String{
         return when {
-            Objects.equals(accountType, "asset") -> "Asset Account"
-            Objects.equals(accountType, "expense") -> "Expense Account"
-            Objects.equals(accountType, "revenue") -> "Revenue Account"
-            Objects.equals(accountType, "liability") -> "Liability Account"
+            Objects.equals(accountType, "asset") -> resources.getString(R.string.asset_account)
+            Objects.equals(accountType, "expense") -> resources.getString(R.string.expense_account)
+            Objects.equals(accountType, "revenue") -> resources.getString(R.string.revenue_account)
+            Objects.equals(accountType, "liability") -> resources.getString(R.string.liability_account)
             else -> "Accounts"
         }
     }

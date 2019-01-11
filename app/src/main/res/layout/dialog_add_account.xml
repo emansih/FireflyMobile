@@ -235,8 +235,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:drawablePadding="12dp"
+                    android:inputType="numberDecimal"
+                    android:digits="0123456789.,"
                     android:hint="Liability Amount"
-                    android:focusable="false"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -279,8 +280,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:drawablePadding="12dp"
+                    android:inputType="numberDecimal"
+                    android:digits="0123456789.,"
                     android:hint="Liability Interest"
-                    android:focusable="false"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
