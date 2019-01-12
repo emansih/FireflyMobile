@@ -78,7 +78,9 @@ class DashboardFragment: BaseFragment() {
                 addToBackStack(null)
             }
             fab.isClickable = true
-
+        }
+        if(requireFragmentManager().findFragmentByTag("fragmentTransaction") is AddTransactionFragment) {
+            fab.isGone = true
         }
     }
 

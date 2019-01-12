@@ -33,6 +33,10 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
+        val homeActivity = Intent(this, HomeActivity::class.java)
+        if(installShortCut()){
+            homeActivity.putExtra("transaction", "transactionFragment")
+        }
         if(Objects.equals("oauth", accManager.authMethod) &&
                 AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isNotEmpty()){
             if (accManager.isTokenValid()) {
@@ -47,7 +51,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                 }
                 GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
                     delay(500)
-                    startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
+                    startActivity(homeActivity)
                     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 }
@@ -59,7 +63,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
             }
             GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
                 delay(500)
-                startActivity(Intent(this@OnboardingActivity, HomeActivity::class.java))
+                startActivity(homeActivity)
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 finish()
             }
@@ -77,6 +81,21 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                 }
             }
         }
+    }
+
+    private fun installShortCut(): Boolean{
+        if (Intent.ACTION_CREATE_SHORTCUT == intent.action || intent.action == "xyz.hisname.fireflyiii.shortcut.transaction") {
+            val shortCutIntent = Intent()
+            val iconResource = Intent.ShortcutIconResource.fromContext(this, R.drawable.app_icon)
+            shortCutIntent.action = "xyz.hisname.fireflyiii.shortcut.transaction"
+            val newIntent = Intent()
+            newIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortCutIntent)
+                    .putExtra(Intent.EXTRA_SHORTCUT_NAME, "Add Transactions")
+                    .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource)
+            setResult(RESULT_OK, newIntent)
+            return true
+        }
+        return false
     }
 
     override fun onNewIntent(intent: Intent?) {

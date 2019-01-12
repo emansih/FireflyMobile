@@ -9,6 +9,7 @@ import android.preference.PreferenceManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
 import com.bumptech.glide.Glide
@@ -48,6 +49,7 @@ import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
 import xyz.hisname.fireflyiii.ui.transaction.AddTransactionDialog
+import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
 
@@ -85,6 +87,14 @@ class HomeActivity: BaseActivity(){
                 "Transfer" -> {
                     addTransactionDialog.show(supportFragmentManager.beginTransaction(),"addTrans").apply {
                         addTransactionDialog.arguments = bundleOf("transactionType" to "Transfer")
+                    }
+                }
+                "transactionFragment" -> {
+                    supportFragmentManager.commit {
+                        val addTransactionFragment = AddTransactionFragment()
+                        addTransactionFragment.arguments = bundleOf("revealX" to globalFAB.width / 2, "revealY" to globalFAB.height / 2)
+                        replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
+                        addToBackStack(null)
                     }
                 }
             }
