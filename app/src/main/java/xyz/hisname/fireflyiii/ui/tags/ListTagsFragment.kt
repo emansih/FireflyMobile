@@ -80,6 +80,7 @@ class ListTagsFragment: BaseFragment() {
                                         val addTags = AddTagsFragment()
                                         addTags.arguments = bundleOf("revealX" to fab.width / 2,
                                                 "revealY" to fab.height / 2, "tagId" to tagsData.tagsId)
+                                        addToBackStack(null)
                                         replace(R.id.bigger_fragment_container, addTags)
                                     }
                                 }
@@ -122,6 +123,7 @@ class ListTagsFragment: BaseFragment() {
             requireFragmentManager().commit {
                 val addTags = AddTagsFragment()
                 addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                addToBackStack(null)
                 replace(R.id.bigger_fragment_container, addTags)
             }
             fab.isClickable = true
@@ -140,7 +142,6 @@ class ListTagsFragment: BaseFragment() {
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light)
     }
-
 
     override fun onAttach(context: Context){
         super.onAttach(context)

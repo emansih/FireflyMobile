@@ -138,6 +138,7 @@ class ListAccountFragment: BaseFragment() {
             fab.isClickable = false
             requireFragmentManager().commit {
                 replace(R.id.bigger_fragment_container, AddAccountFragment())
+                addToBackStack(null)
                 arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to accountType)
             }
             fab.isClickable = true

@@ -72,6 +72,7 @@ class ListBillFragment: BaseFragment() {
     private fun itemClicked(billData: BillData){
         requireFragmentManager().commit {
             replace(R.id.bigger_fragment_container, AddBillFragment())
+            addToBackStack(null)
             arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "billId" to billData.billId)
         }
     }
@@ -81,6 +82,7 @@ class ListBillFragment: BaseFragment() {
             fab.isClickable = false
             requireFragmentManager().commit {
                 replace(R.id.bigger_fragment_container, AddBillFragment())
+                addToBackStack(null)
                 arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
             }
             fab.isClickable = true

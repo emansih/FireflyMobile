@@ -8,6 +8,7 @@ import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,6 +38,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
+        fab.isInvisible = true
         return inflater.create(R.layout.fragment_piggy_detail,container)
     }
 
