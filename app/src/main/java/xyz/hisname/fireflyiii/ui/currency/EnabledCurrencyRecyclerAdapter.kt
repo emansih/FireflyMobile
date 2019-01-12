@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.ui.currency
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -17,8 +16,8 @@ import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.Flags
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class CurrencyRecyclerAdapter(private val items: MutableList<CurrencyData>, private val clickListener:(CurrencyData) -> Unit):
-DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
+class EnabledCurrencyRecyclerAdapter (private val items: MutableList<CurrencyData>, private val clickListener:(CurrencyData) -> Unit):
+        DiffUtilAdapter<CurrencyData, EnabledCurrencyRecyclerAdapter.CurrencyHolder>() {
 
     private lateinit var context: Context
 
@@ -32,8 +31,8 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
     override fun onBindViewHolder(holder: CurrencyHolder, position: Int) = holder.bind(items[position], clickListener)
 
 
-    inner class CurrencyHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-        fun bind(currencyData: CurrencyData, clickListener: (CurrencyData) -> Unit){
+    inner class CurrencyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(currencyData: CurrencyData, clickListener: (CurrencyData) -> Unit) {
             val currency = currencyData.currencyAttributes
             itemView.currencySymbol.text = currency?.symbol.toString()
             val requestOptions =
@@ -44,17 +43,12 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
                             .error(IconicsDrawable(context)
                                     .icon(GoogleMaterial.Icon.gmd_error)
                                     .sizeDp(24))
-            if(currency?.enabled!!){
-                itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
-            } else {
-                itemView.currencyName.text = currency?.name + " (" + currency?.code + ")" + " (Disabled)"
-                itemView.currencyName.setTextColor(ContextCompat.getColor(context, R.color.md_grey_400))
-                itemView.currencySymbol.setTextColor(ContextCompat.getColor(context, R.color.md_grey_400))
-            }
+            itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             Glide.with(context)
-                    .load(Flags.getFlagByIso(currency?.code!!))
+                    .load(Flags.getFlagByIso(currency!!.code))
                     .apply(requestOptions)
                     .into(itemView.flagImage)
+
             itemView.setOnClickListener {
                 clickListener(currencyData)
             }

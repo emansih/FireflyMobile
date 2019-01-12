@@ -9,6 +9,8 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
@@ -32,6 +34,7 @@ class CurrencyListFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         hideKeyboard()
         runLayoutAnimation(recycler_view)
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
         initFab()
         pullToRefresh()
         displayView()

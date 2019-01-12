@@ -36,6 +36,11 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return repository.allCurrency
     }
 
+    fun getEnabledCurrency(): LiveData<MutableList<CurrencyData>> {
+        loadRemoteData()
+        return repository.enabledCurrency
+    }
+
     fun addCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
                     enabled: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<CurrencySuccessModel>> =  MediatorLiveData()

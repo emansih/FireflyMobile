@@ -35,11 +35,11 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
             addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
             adapter?.notifyDataSetChanged()
         }
-        currencyViewModel.getCurrency().observe(this, Observer {currencyData ->
+        currencyViewModel.getEnabledCurrency().observe(this, Observer {currencyData ->
             currencyData?.sortWith(Comparator { initial, after ->
                 initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
             })
-            recycler_view.adapter = CurrencyRecyclerAdapter(currencyData) { data: CurrencyData -> itemClicked(data) }
+            recycler_view.adapter = EnabledCurrencyRecyclerAdapter(currencyData) { data: CurrencyData -> itemClicked(data) }
         })
     }
 

@@ -8,6 +8,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao) {
 
     val allCurrency = currencyDao.getAllCurrency()
     val defaultCurrency = currencyDao.getDefaultCurrency()
+    val enabledCurrency = currencyDao.getEnabledCurrencyByCode()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
