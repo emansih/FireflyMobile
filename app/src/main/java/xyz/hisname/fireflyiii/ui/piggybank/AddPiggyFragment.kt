@@ -16,16 +16,15 @@ import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_piggy.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.base.BaseDialog
+import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddPiggyDialog: BaseDialog() {
+class AddPiggyFragment: BaseAddObjectFragment() {
 
     private var accounts = ArrayList<String>()
     private var piggyId: Long = 0
@@ -37,7 +36,7 @@ class AddPiggyDialog: BaseDialog() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.dialog_add_piggy, container, false)
+        return inflater.create(R.layout.dialog_add_piggy, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,7 +65,7 @@ class AddPiggyDialog: BaseDialog() {
         super.onStart()
         addPiggyFab.setOnClickListener {
             hideKeyboard()
-            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             currentAmount = if (current_amount_edittext.isBlank()) {
                 null
             } else {
@@ -93,7 +92,7 @@ class AddPiggyDialog: BaseDialog() {
                 updatePiggyBank()
             }
         }
-        placeHolderToolbar.setOnClickListener {
+        placeHolderToolbar.setNavigationOnClickListener {
             unReveal(dialog_add_piggy_layout)
         }
     }
@@ -171,7 +170,7 @@ class AddPiggyDialog: BaseDialog() {
             piggyViewModel.addPiggyBank(description_edittext.getString(), accountData[0].accountId.toString(),
                     currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
                     .observe(this, Observer {
-                        ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         val errorMessage = it.getErrorMessage()
                         if (errorMessage != null) {
                             toastError(errorMessage)
@@ -192,13 +191,13 @@ class AddPiggyDialog: BaseDialog() {
                                 piggyBroadcast.putExtras(extras)
                                 requireActivity().sendBroadcast(piggyBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
-                                dialog?.dismiss()
+                                requireFragmentManager().popBackStack()
                             } else {
                                 toastError("Error saving piggy bank")
                             }
                         } else if (it.getResponse() != null) {
                             toastSuccess("Piggy bank saved")
-                            dialog?.dismiss()
+                            requireFragmentManager().popBackStack()
                         }
                     })
         })
@@ -208,7 +207,7 @@ class AddPiggyDialog: BaseDialog() {
         accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
             piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), accountData[0].accountId.toString(),
                     currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(this, Observer {
-                ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 if (it.getErrorMessage() != null) {
                     toastError(it.getErrorMessage())
                 } else if (it.getError() != null) {
@@ -221,10 +220,14 @@ class AddPiggyDialog: BaseDialog() {
                         replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
                         addToBackStack(null)
                     }
-                    dialog?.dismiss()
+                    requireFragmentManager().popBackStack()
                 }
             })
         })
     }
 
+    override fun onStop() {
+        super.onStop()
+        unReveal(dialog_add_piggy_layout)
+    }
 }

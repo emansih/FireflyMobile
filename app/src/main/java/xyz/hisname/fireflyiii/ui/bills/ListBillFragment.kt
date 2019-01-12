@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -18,19 +18,14 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 
 class ListBillFragment: BaseFragment() {
 
-    private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     private var dataAdapter = ArrayList<BillData>()
-    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -75,17 +70,19 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun itemClicked(billData: BillData){
-        val addBill = AddBillDialog()
-        addBill.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "billId" to billData.billId)
-        addBill.show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
+        requireFragmentManager().commit {
+            replace(R.id.bigger_fragment_container, AddBillFragment())
+            arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "billId" to billData.billId)
+        }
     }
 
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            val addBill = AddBillDialog()
-            addBill.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-            addBill.show(requireFragmentManager().beginTransaction(), "add_bill_dialog")
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, AddBillFragment())
+                arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+            }
             fab.isClickable = true
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){

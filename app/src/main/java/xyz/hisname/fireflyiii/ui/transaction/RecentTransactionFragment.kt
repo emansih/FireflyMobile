@@ -21,7 +21,6 @@ import java.util.*
 
 class RecentTransactionFragment: BaseFragment() {
 
-    private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     private var dataAdapter = ArrayList<TransactionData>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter
 

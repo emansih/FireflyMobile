@@ -7,24 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 
 class CurrencyListFragment: BaseFragment() {
 
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
     private var dataAdapter = arrayListOf<CurrencyData>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -58,9 +54,10 @@ class CurrencyListFragment: BaseFragment() {
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            val addCurrency = AddCurrencyDialog()
-            addCurrency.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-            addCurrency.show(requireFragmentManager().beginTransaction(), "add_currency_dialog")
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, AddCurrencyFragment())
+                arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+            }
             fab.isClickable = true
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){

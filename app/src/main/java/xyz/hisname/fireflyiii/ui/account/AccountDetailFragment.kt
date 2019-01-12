@@ -23,7 +23,6 @@ import xyz.hisname.fireflyiii.util.extension.*
 
 class AccountDetailFragment: BaseDetailFragment() {
 
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val accountId: Long by lazy { arguments?.getLong("accountId") as Long  }
     private var accountAttributes: AccountAttributes? = null
     private var accountList: MutableList<BaseDetailModel> = ArrayList()

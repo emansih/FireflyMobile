@@ -15,14 +15,15 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_account.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.ui.base.BaseDialog
+import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
 import java.util.*
 
-class AddAccountDialog: BaseDialog() {
+class AddAccountFragment: BaseAddObjectFragment() {
 
     private val accountType: String by lazy { arguments?.getString("accountType") ?: "" }
     private var currency: String = ""
@@ -72,7 +73,7 @@ class AddAccountDialog: BaseDialog() {
                         .sizeDp(24),null, null, null)
         placeHolderToolbar.navigationIcon = navIcon
         placeHolderToolbar.setNavigationOnClickListener {
-            dialog?.dismiss()
+            unReveal(dialog_add_account_layout)
         }
         addAccountFab.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary_dark))
         addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_credit_card)
@@ -164,6 +165,13 @@ class AddAccountDialog: BaseDialog() {
         addAccountFab.setOnClickListener {
             submitData()
         }
+        accountViewModel.isLoading.observe(this, Observer {
+            if(it == true){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        })
 
     }
 
@@ -256,7 +264,7 @@ class AddAccountDialog: BaseDialog() {
             val error = it.getError()
             if (it.getResponse() != null) {
                 toastSuccess("Account saved!")
-                dialog?.dismiss()
+                requireFragmentManager().popBackStack()
             } else if (it.getErrorMessage() != null) {
                 toastError(it.getErrorMessage())
             } else if (error != null) {
@@ -285,7 +293,7 @@ class AddAccountDialog: BaseDialog() {
                             .build()
                     WorkManager.getInstance().enqueue(accountWork)
                     toastOffline(getString(R.string.data_added_when_user_online, "Account"))
-                    dialog?.dismiss()
+                    requireFragmentManager().popBackStack()
                 } else {
                     toastError(error.localizedMessage)
                 }
@@ -294,4 +302,11 @@ class AddAccountDialog: BaseDialog() {
             }
         })
     }
+
+    override fun onStop() {
+        super.onStop()
+        unReveal(dialog_add_account_layout)
+    }
+
+
 }

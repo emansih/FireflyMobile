@@ -12,25 +12,19 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
-import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 
 class ListPiggyFragment: BaseFragment() {
 
     private var dataAdapter = ArrayList<PiggyData>()
-    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
-    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -94,11 +88,11 @@ class ListPiggyFragment: BaseFragment() {
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            val addPiggy = AddPiggyDialog()
-            addPiggy.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-            addPiggy.show(requireFragmentManager().beginTransaction(), "add_piggy_dialog")
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, AddPiggyFragment())
+                arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+            }
             fab.isClickable = true
-
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

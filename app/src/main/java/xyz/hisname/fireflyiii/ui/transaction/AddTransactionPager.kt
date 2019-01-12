@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
@@ -27,15 +28,8 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_transaction_pager.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
-import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
-import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
-import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
-import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.account.AddAccountDialog
+import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -45,14 +39,6 @@ import java.util.*
 class AddTransactionPager: BaseFragment() {
 
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
-    private val billViewModel: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
-    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
-    private val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
-    private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
-    private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
     private var currency = ""
     private var accounts = ArrayList<String>()
     private var tags = ArrayList<String>()
@@ -72,6 +58,8 @@ class AddTransactionPager: BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
+        fab.isGone = true
+        fragmentContainer.isVisible = false
         return inflater.create(R.layout.fragment_add_transaction_pager, container)
     }
 
@@ -81,7 +69,7 @@ class AddTransactionPager: BaseFragment() {
         setWidgets()
         contextSwitch()
         add_transaction_button.setOnClickListener {
-            ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
+            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             hideKeyboard()
             billName = if(bill_edittext.isBlank()){
                 null
@@ -222,9 +210,9 @@ class AddTransactionPager: BaseFragment() {
         })
         accountViewModel.isLoading.observe(this, Observer {
             if(it == true){
-                ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
-                ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         })
         accountViewModel.emptyAccount.observe(this, Observer {
@@ -234,9 +222,10 @@ class AddTransactionPager: BaseFragment() {
                         .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
                                 "to add an asset account first? ")
                         .setPositiveButton("OK"){ _,_ ->
-                            val addAccount = AddAccountDialog()
-                            addAccount.arguments = bundleOf("accountType" to "Asset Account")
-                            addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
+                            requireFragmentManager().commit {
+                                replace(R.id.bigger_fragment_container, AddAccountFragment())
+                                arguments = bundleOf("accountType" to "asset")
+                            }
                         }
                         .setNegativeButton("No"){ _,_ ->
 
@@ -353,7 +342,7 @@ class AddTransactionPager: BaseFragment() {
                 transaction_date_edittext.getString(), piggyBank, billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
                 currency, categoryName, transactionTags).observe(this, Observer { transactionResponse ->
-            ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
                 toastSuccess(resources.getString(R.string.transaction_added))

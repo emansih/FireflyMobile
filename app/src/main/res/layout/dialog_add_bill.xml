@@ -7,8 +7,6 @@
     android:id="@+id/dialog_add_bill_layout"
     android:orientation="vertical">
 
-    <include layout="@layout/progress_overlay" />
-
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"

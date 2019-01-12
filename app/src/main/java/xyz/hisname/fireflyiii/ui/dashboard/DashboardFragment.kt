@@ -38,11 +38,7 @@ import kotlin.math.roundToInt
 // TODO: Refactor this god class (7 Jan 2019)
 class DashboardFragment: BaseFragment() {
 
-    private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
-    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
     private var depositSum = 0.toBigDecimal()
     private var withdrawSum = 0.toBigDecimal()
     private var transaction = 0.toBigDecimal()
@@ -74,13 +70,14 @@ class DashboardFragment: BaseFragment() {
             requireFragmentManager().commit {
                 val addTransactionFragment = AddTransactionFragment()
                 addTransactionFragment.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-                replace(R.id.bigger_fragment_container, addTransactionFragment)
+                replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
                 addToBackStack(null)
             }
             fab.isClickable = true
         }
         if(requireFragmentManager().findFragmentByTag("fragmentTransaction") is AddTransactionFragment) {
             fab.isGone = true
+
         }
     }
 

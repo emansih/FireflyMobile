@@ -31,9 +31,10 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.fragment.app.commit
 import androidx.work.Data
 import com.hootsuite.nachos.chip.ChipCreator
-import xyz.hisname.fireflyiii.ui.account.AddAccountDialog
+import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 import kotlin.collections.ArrayList
 
@@ -307,10 +308,10 @@ class AddTransactionDialog: BaseDialog() {
                          .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
                                  "to add an asset account first? ")
                          .setPositiveButton("OK"){ _,_ ->
-                             val addAccount = AddAccountDialog()
-                             addAccount.arguments = bundleOf("accountType" to "Asset Account")
-                             addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
-                             dialog?.dismiss()
+                             requireFragmentManager().commit {
+                                 replace(R.id.bigger_fragment_container, AddAccountFragment())
+                                 arguments = bundleOf("accountType" to "asset")
+                             }
                          }
                          .setNegativeButton("No"){ _,_ ->
                              dialog?.dismiss()

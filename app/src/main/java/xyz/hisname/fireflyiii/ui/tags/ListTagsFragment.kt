@@ -5,32 +5,31 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.google.android.material.chip.Chip
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import kotlinx.android.synthetic.main.fragment_lists_tags.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 
 class ListTagsFragment: BaseFragment() {
 
-    private val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     private lateinit var chipTags: Chip
-    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
+    private val baseLayout by lazy { requireActivity().findViewById<FrameLayout>(R.id.fragment_container) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -77,9 +76,12 @@ class ListTagsFragment: BaseFragment() {
                                     deleteTag(tagName)
                                 }
                                 setOnClickListener {
-                                    val addTags = AddTagsDialog()
-                                    addTags.arguments = bundleOf("tagId" to tagsData.tagsId)
-                                    addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
+                                    requireFragmentManager().commit {
+                                        val addTags = AddTagsFragment()
+                                        addTags.arguments = bundleOf("revealX" to fab.width / 2,
+                                                "revealY" to fab.height / 2, "tagId" to tagsData.tagsId)
+                                        replace(R.id.bigger_fragment_container, addTags)
+                                    }
                                 }
                             }
                             swipe_tags.isRefreshing = false
@@ -116,9 +118,12 @@ class ListTagsFragment: BaseFragment() {
     private fun setFab(){
         fab.display {
             fab.isClickable = false
-            val addTags = AddTagsDialog()
-            addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-            addTags.show(requireFragmentManager().beginTransaction(), "add_tags_dialog")
+            baseLayout.isInvisible = true
+            requireFragmentManager().commit {
+                val addTags = AddTagsFragment()
+                addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                replace(R.id.bigger_fragment_container, addTags)
+            }
             fab.isClickable = true
         }
     }

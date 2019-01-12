@@ -28,7 +28,6 @@ import kotlin.collections.ArrayList
 
 class TransactionFragment: BaseFragment(){
 
-    private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     private var dataAdapter = arrayListOf<TransactionData>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter
     private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }

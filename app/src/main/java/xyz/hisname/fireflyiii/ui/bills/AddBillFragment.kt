@@ -13,18 +13,17 @@ import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.dialog_add_bill.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.BillReceiver
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.base.BaseDialog
+import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddBillDialog: BaseDialog() {
+class AddBillFragment: BaseAddObjectFragment() {
 
     private var billAttribute: BillAttributes? = null
     private var notes: String? = null
@@ -36,7 +35,7 @@ class AddBillDialog: BaseDialog() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.dialog_add_bill, container, false)
+        return inflater.create(R.layout.dialog_add_bill, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,7 +68,7 @@ class AddBillDialog: BaseDialog() {
         super.onStart()
         addBillFab.setOnClickListener {
             hideKeyboard()
-            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             notes = if(notes_edittext.isBlank()){
                 null
             } else {
@@ -167,7 +166,7 @@ class AddBillDialog: BaseDialog() {
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
                     currency, notes)
                 .observe(this, Observer { response ->
-                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     val errorMessage = response.getErrorMessage()
                     if (errorMessage != null) {
                         toastError(errorMessage)
@@ -187,10 +186,10 @@ class AddBillDialog: BaseDialog() {
                         billBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(billBroadcast)
                         toastOffline(getString(R.string.data_added_when_user_online, "Bill"))
-                        dismiss()
+                        requireFragmentManager().popBackStack()
                     } else if (response.getResponse() != null) {
                         toastSuccess("Bill saved")
-                        dismiss()
+                        requireFragmentManager().popBackStack()
                     }
                 })
     }
@@ -200,15 +199,20 @@ class AddBillDialog: BaseDialog() {
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
                 currency, notes).observe(this, Observer { response ->
-            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             if (response.getErrorMessage() != null) {
                 toastError(response.getErrorMessage())
             } else if (response.getError() != null) {
                 toastError(response.getError()?.localizedMessage)
             } else if (response.getResponse() != null) {
                 toastSuccess("Bill updated")
-                dismiss()
+                requireFragmentManager().popBackStack()
             }
         })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unReveal(dialog_add_bill_layout)
     }
 }

@@ -8,6 +8,7 @@ import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -17,7 +18,6 @@ import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
-import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
@@ -27,7 +27,6 @@ import kotlin.collections.ArrayList
 
 class PiggyDetailFragment: BaseDetailFragment() {
 
-    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     private val piggyId: Long by lazy { arguments?.getLong("piggyId") as Long  }
     private var piggyAttribute: PiggyAttributes? = null
     private var currentAmount: BigDecimal? = 0.toBigDecimal()
@@ -137,9 +136,10 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         R.id.menu_item_edit -> consume {
-            val addPiggy = AddPiggyDialog()
-            addPiggy.arguments = bundleOf("piggyId" to piggyId)
-            addPiggy.show(requireFragmentManager().beginTransaction(), "add_piggy_dialog")
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, AddPiggyFragment())
+                arguments = bundleOf("piggyId" to piggyId)
+            }
         }
         R.id.menu_item_delete -> consume {
             deleteItem()

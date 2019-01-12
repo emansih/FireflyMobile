@@ -17,12 +17,12 @@ import kotlinx.android.synthetic.main.dialog_add_tags.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.base.BaseDialog
+import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
-class AddTagsDialog: BaseDialog() {
+class AddTagsFragment: BaseAddObjectFragment() {
 
     private var date: String? = null
     private var description: String? = null
@@ -32,8 +32,7 @@ class AddTagsDialog: BaseDialog() {
     private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.dialog_add_tags, container)
+        return inflater.create(R.layout.dialog_add_tags, container)
     }
 
     override fun onStart() {
@@ -172,6 +171,11 @@ class AddTagsDialog: BaseDialog() {
                 }
             }
         })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unReveal(dialog_add_tags_layout)
     }
 
 }

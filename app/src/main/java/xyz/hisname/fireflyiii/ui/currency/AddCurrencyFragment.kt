@@ -13,14 +13,14 @@ import kotlinx.android.synthetic.main.dialog_add_currency.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.base.BaseDialog
+import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.extension.*
 
-class AddCurrencyDialog: BaseDialog() {
+class AddCurrencyFragment: BaseAddObjectFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.dialog_add_currency, container)
+        return inflater.create(R.layout.dialog_add_currency, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -33,7 +33,7 @@ class AddCurrencyDialog: BaseDialog() {
 
     override fun onStart() {
         super.onStart()
-        placeHolderToolbar.setOnClickListener {
+        placeHolderToolbar.setNavigationOnClickListener {
             unReveal(dialog_add_currency_layout)
         }
     }
@@ -80,4 +80,10 @@ class AddCurrencyDialog: BaseDialog() {
                     }
                 })
     }
+
+    override fun onStop() {
+        super.onStop()
+        unReveal(dialog_add_currency_layout)
+    }
+
 }

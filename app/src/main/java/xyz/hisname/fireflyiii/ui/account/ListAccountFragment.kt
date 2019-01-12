@@ -10,29 +10,26 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
+import androidx.fragment.app.commitNow
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import java.util.*
 
 class ListAccountFragment: BaseFragment() {
 
     private var dataAdapter = ArrayList<AccountData>()
-    private val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
-    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private val accountType by lazy { arguments?.getString("accountType") ?: "" }
     private val noAccountImage by lazy { requireActivity().findViewById<ImageView>(R.id.listImage) }
     private val noAccountText by lazy { requireActivity().findViewById<TextView>(R.id.listText) }
@@ -139,9 +136,10 @@ class ListAccountFragment: BaseFragment() {
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            val addAccount = AddAccountDialog()
-            addAccount.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to accountType)
-            addAccount.show(requireFragmentManager().beginTransaction(), "add_account_dialog")
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, AddAccountFragment())
+                arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to accountType)
+            }
             fab.isClickable = true
         }
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
