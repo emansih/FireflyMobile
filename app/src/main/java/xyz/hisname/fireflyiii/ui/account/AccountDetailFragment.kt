@@ -28,6 +28,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private var accountAttributes: AccountAttributes? = null
     private var accountList: MutableList<BaseDetailModel> = ArrayList()
     private var currencySymbol = ""
+    private var accountNameString: String = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -39,6 +40,7 @@ class AccountDetailFragment: BaseDetailFragment() {
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
         accountViewModel.getAccountById(accountId).observe(this, Observer {
             accountAttributes = it[0].accountAttributes
+            accountNameString = accountAttributes?.name.toString()
             if (accountAttributes?.currency_symbol != null) {
                 currencySymbol = accountAttributes?.currency_symbol!!
             }
@@ -83,9 +85,9 @@ class AccountDetailFragment: BaseDetailFragment() {
             }
         })
         AlertDialog.Builder(requireContext())
-                .setTitle(R.string.get_confirmation)
-                .setMessage(R.string.irreversible_action)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
+                .setTitle(resources.getString(R.string.delete_account_title, accountNameString))
+                .setMessage(resources.getString(R.string.delete_account_message, accountNameString))
+                .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     accountViewModel.deleteAccountById(accountId).observe(this, Observer {
                         if(it == true){
                             requireFragmentManager().popBackStack()

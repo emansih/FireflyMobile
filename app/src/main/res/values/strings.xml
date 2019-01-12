@@ -27,9 +27,8 @@
     <string name="yesterday_target">Oh no! Your target was yesterday</string>
     <string name="days_to_go">%1$d days to go</string>
     <string name="get_confirmation">Are you sure?</string>
-    <string name="irreversible_action">This action is irreversible.</string>
-    <string name="piggy_bank_deleted">Piggy bank deleted</string>
-    <string name="bill_deleted">Bill deleted</string>
+    <string name="piggy_bank_deleted">Success! Deleted piggy bank %1$s</string>
+    <string name="bill_deleted">Success! Deleted bill %1$s</string>
     <string name="generic_delete_error">An error occurred while deleting</string>
     <string name="overview">Overview</string>
     <string name="income">Income</string>
@@ -88,9 +87,9 @@
     <string name="min_amount">Min Amount</string>
     <string name="max_amount">Max Amount</string>
     <string name="skip">Skip</string>
-    <string name="delete_piggy_bank">Are you sure you want to delete the piggy bank named %1$s ?</string>
-    <string name="delete_bill">Are you sure you want to delete the bill named %1$s ?</string>
-    <string name="delete_transaction">Are you sure you want to delete the transaction described %1$s ?</string>
+    <string name="delete_piggy_bank_message">Are you sure you want to delete the piggy bank named %1$s ?</string>
+    <string name="delete_bill_message">Are you sure you want to delete the bill named %1$s ?</string>
+    <string name="delete_transaction_message">Are you sure you want to delete the transaction described %1$s ?</string>
     <string name="options">Options</string>
     <string name="transaction">Transactions</string>
     <string name="account">Accounts</string>
@@ -125,5 +124,13 @@
         <item>Credit Card</item>
     </string-array>
     <string name="personal_access_token">Personal Access Token</string>
-    <string name="delete_tag">Are you sure you want to delete the tag named %1$s ?</string>
+    <string name="delete_tag_message">Are you sure you want to delete the tag named %1$s ?</string>
+    <string name="delete_account_title">Delete account %1$s</string>
+    <string name="delete_permanently">Delete permanently</string>
+    <string name="delete_transaction_title">Delete transaction with description %1$s</string>
+    <string name="delete_tag_title">Delete Tag %1$s</string>
+    <string name="delete_piggy_bank_title">Delete piggy bank %1$s</string>
+    <string name="delete_bill_title">Delete Bill %1$s</string>
+    <string name="delete_account_message">Are you sure you want to delete the account named %1$s</string>
+    <string name="tag_deleted">Success! Deleted tag %1$s</string>
 </resources>

@@ -20,9 +20,8 @@
     <string name="skip">Überspringen</string>
     <string name="client_secret">Kundengeheimnis</string>
     <string name="options">Einstellungen</string>
-    <string name="delete_bill">Möchten Sie die Rechnung %1$s wirklich löschen?</string>
-    <string name="delete_piggy_bank">Möchten Sie das Sparschwein %1$s wirklich löschen?</string>
-    <string name="delete_transaction">Sind Sie sicher, dass Sie die Überweisung mit dem Namen %1$s löschen möchten?</string>
+    <string name="delete_bill_message">Möchten Sie die Rechnung %1$s wirklich löschen?</string>
+    <string name="delete_piggy_bank_message">Möchten Sie das Sparschwein %1$s wirklich löschen?</string>
     <string name="destination_account">Zielkonto</string>
     <string name="expense_account">Debitor (Ausgabe)</string>
     <string name="source_account">Quellkonto</string>
@@ -31,6 +30,19 @@
     <string name="personal_access_token">Persönliche Zugangs-Authentifizierungsschlüssel</string>
     <string name="currency_symbol">Zeichen</string>
     <string name="currency_code">Schlüssel</string>
-    <string name="delete_tag">Möchten Sie das Schlagwort %1$s wirklich löschen?</string>
+    <string name="delete_tag_message">Möchten Sie das Schlagwort %1$s wirklich löschen?</string>
+    <string name="delete_permanently">Dauerhaft löschen</string>
+    <string name="delete_transaction_message">Sind Sie sicher, dass Sie die Überweisung mit dem Namen %1$s löschen möchten?</string>
+    <string name="delete_transaction_title">Lösche Überweisung mit Beschreibung %1$s</string>
+    <string name="delete_account_title">Konto %1$s löschen</string>
+    <string name="delete_tag_title">Schlagwort %1$s entfernen</string>
+    <string name="delete_piggy_bank_title">Sparschwein %1$s löschen</string>
+    <string name="delete_bill_title">Rechnung %1$s löschen</string>
+    <string name="delete_account_message">Möchten Sie das Konto %1$s wirklich löschen?</string>
+    <string name="bill_deleted">Geschafft! Rechnung %1$s gelöscht</string>
+    <string name="tag_deleted">Geschafft! Schlagwort %1$s entfernt</string>
+    <string name="sign_in">Anmelden</string>
+    <string name="overview">Übersicht</string>
+    <string name="piggy_bank_deleted">Geschafft! Sparschwein %1$s gelöscht</string>
 
 </resources>

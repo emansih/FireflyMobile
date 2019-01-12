@@ -93,15 +93,15 @@ class ListTagsFragment: BaseFragment() {
 
     private fun deleteTag(tagName: String){
         AlertDialog.Builder(requireContext())
-                .setTitle(R.string.get_confirmation)
-                .setMessage(resources.getString(R.string.delete_tag, tagName))
-                .setPositiveButton("Yes"){_, _ ->
+                .setTitle(resources.getString(R.string.delete_tag_title, tagName))
+                .setMessage(resources.getString(R.string.delete_tag_message, tagName))
+                .setPositiveButton(R.string.delete_permanently){_, _ ->
                     tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
                         if (status) {
                             requireFragmentManager().commit {
                                 replace(R.id.fragment_container, ListTagsFragment())
                             }
-                            toastSuccess("$tagName Deleted")
+                            toastSuccess(resources.getString(R.string.tag_deleted, tagName))
                         } else {
                             toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
                         }

@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.ui.bills
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -27,15 +26,15 @@ class DeleteBillDialog: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return AlertDialog.Builder(requireContext())
-                .setTitle(R.string.get_confirmation)
-                .setMessage(resources.getString(R.string.delete_bill, billDescription))
+                .setTitle(resources.getString(R.string.delete_bill_message, billDescription))
+                .setMessage(resources.getString(R.string.delete_bill_message, billDescription))
                 .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
                         .sizeDp(24)
                         .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
-                .setPositiveButton("Yes"){ _,_ ->
+                .setPositiveButton(R.string.delete_permanently){ _,_ ->
                     billViewModel.deleteBillById(billId).observe(this, Observer {
                         if(it == true){
-                            toastSuccess(resources.getString(R.string.bill_deleted))
+                            toastSuccess(resources.getString(R.string.bill_deleted, billDescription))
                             dialog?.dismiss()
                             requireFragmentManager().commit {
                                 remove(requireFragmentManager().findFragmentByTag("add_bill_dialog") ?: Fragment())

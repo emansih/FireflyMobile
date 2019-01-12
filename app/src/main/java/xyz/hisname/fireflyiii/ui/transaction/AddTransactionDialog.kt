@@ -31,7 +31,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
-import androidx.fragment.app.commit
 import androidx.work.Data
 import com.hootsuite.nachos.chip.ChipCreator
 import xyz.hisname.fireflyiii.ui.account.AddAccountDialog
@@ -212,12 +211,12 @@ class AddTransactionDialog: BaseDialog() {
             placeHolderToolbar.setOnMenuItemClickListener { item ->
                 if (item.itemId == R.id.menu_item_delete) {
                     AlertDialog.Builder(requireContext())
-                            .setTitle(R.string.get_confirmation)
-                            .setMessage(resources.getString(R.string.delete_transaction, transactionDescription))
+                            .setTitle(R.string.delete_account_title)
+                            .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
                             .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
                                     .sizeDp(24)
                                     .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
-                            .setPositiveButton("Yes") { _, _ ->
+                            .setPositiveButton(R.string.delete_permanently) { _, _ ->
                                 ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
                                 transactionViewModel.deleteTransaction(transactionId).observe(this, Observer {
                                     ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)

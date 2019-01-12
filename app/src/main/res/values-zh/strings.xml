@@ -16,9 +16,9 @@
     <string name="skip">略過</string>
     <string name="client_secret">客戶端金鑰</string>
     <string name="get_confirmation">你確定吗?</string>
-    <string name="delete_piggy_bank">你確定你想要刪除名為 %1$s 的小豬撲滿?</string>
-    <string name="delete_bill">你確定你想要刪除名為 %1$s 的帳單?</string>
-    <string name="delete_transaction">你真的要刪除這個描述為 %1$s 的交易嗎</string>
+    <string name="delete_piggy_bank_message">你確定你想要刪除名為 %1$s 的小豬撲滿?</string>
+    <string name="delete_bill_message">你確定你想要刪除名為 %1$s 的帳單?</string>
+    <string name="delete_transaction_message">你真的要刪除這個描述為 %1$s 的交易嗎</string>
     <string name="options">選項</string>
     <string name="transaction">交易</string>
     <string name="account">帳戶</string>
@@ -54,5 +54,17 @@
     <string name="currency_symbol">符號</string>
     <string name="currency_code">代碼</string>
     <string name="decimal_places">小數位數</string>
-    <string name="delete_tag">你真的要要刪除標籤 %1$s 嗎？</string>
+    <string name="delete_tag_message">你真的要要刪除標籤 %1$s 嗎？</string>
+    <string name="delete_account_title">刪除帳戶 %1$s</string>
+    <string name="delete_permanently">永久刪除</string>
+    <string name="delete_transaction_title">刪除包含描述 %1$s 的交易</string>
+    <string name="delete_tag_title">刪除標籤 %1$s</string>
+    <string name="delete_piggy_bank_title">删除小豬撲滿 %1$s</string>
+    <string name="delete_bill_title">刪除帳單 %1$s</string>
+    <string name="delete_account_message">你確定你想要刪除名為 %1$s 的帳戶?</string>
+    <string name="bill_deleted">成功！已刪除帳單 %1$s</string>
+    <string name="tag_deleted">成功！刪除了標籤 %1$s</string>
+    <string name="sign_in">登入</string>
+    <string name="overview">概覽</string>
+    <string name="piggy_bank_deleted">成功！删除小豬撲滿 %1$s</string>
 </resources>

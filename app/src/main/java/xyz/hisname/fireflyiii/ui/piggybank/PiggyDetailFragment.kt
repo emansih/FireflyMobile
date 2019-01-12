@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.animation.ObjectAnimator
-import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
@@ -15,11 +14,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
-import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
@@ -103,16 +100,16 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun deleteItem() {
         AlertDialog.Builder(requireContext())
-                .setTitle(R.string.get_confirmation)
-                .setMessage(resources.getString(R.string.delete_piggy_bank, piggyName))
-                .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                .setTitle(resources.getString(R.string.delete_piggy_bank_title, piggyName))
+                .setMessage(resources.getString(R.string.delete_piggy_bank_message, piggyName))
+                .setPositiveButton(R.string.delete_permanently) { dialog, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
                     piggyViewModel.deletePiggyById(piggyId).observe(this, Observer {
                         ProgressBar.animateView(requireActivity().findViewById<View>(R.id.progress_overlay),
                                 View.GONE, 0f, 200)
                         if(it == true){
                             requireFragmentManager().popBackStack()
-                            toastSuccess("Piggy Bank Deleted")
+                            toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyName))
                         } else {
                             val parentLayout: View = requireActivity().findViewById(R.id.coordinatorlayout)
                             Snackbar.make(parentLayout, R.string.generic_delete_error, Snackbar.LENGTH_LONG)
