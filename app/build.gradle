@@ -95,8 +95,7 @@ dependencies {
     implementation Dependencies.aboutLib
     implementation Dependencies.nachos
     implementation Dependencies.acraMail
-    implementation Dependencies.acraDialog
-
+    implementation Dependencies.osmdroid
     // Project Lib
     api project(path: ":languagepack")
 

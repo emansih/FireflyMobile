@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.tags
 import android.app.DatePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -126,6 +127,26 @@ class AddTagsFragment: BaseAddObjectFragment() {
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
+        mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        mapTextview.setOnClickListener {
+            val mapsFragment = MapsFragment()
+            mapsFragment.show(requireFragmentManager(), "mapsDialog")
+        }
+        mapsViewModel.latitude.observe(this, Observer {
+            if(it != "0.0"){
+                latitude_edittext.setText(it)
+            }
+        })
+        mapsViewModel.longitude.observe(this, Observer {
+            if(it != "0.0"){
+                longitude_edittext.setText(it)
+            }
+        })
+        mapsViewModel.zoomLevel.observe(this, Observer {
+            if(it != "0.0"){
+                zoom_edittext.setText(it)
+            }
+        })
     }
 
     override fun setIcons(){

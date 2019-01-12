@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
@@ -38,6 +39,7 @@ abstract class BaseFragment: Fragment() {
     protected val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
     protected val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
+    protected val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         requireActivity().findViewById<AppBarLayout>(R.id.activity_appbar)?.setExpanded(true,true)

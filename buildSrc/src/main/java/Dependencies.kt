@@ -27,6 +27,7 @@ object Dependencies{
     private const val debugDbVersion = "1.0.4"
     private const val nachosVersion = "1.1.1"
     private const val acraVersion = "5.1.3"
+    private const val osmdroidVersion = "6.0.3"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
@@ -59,5 +60,5 @@ object Dependencies{
     val debugDb = "com.amitshekhar.android:debug-db:$debugDbVersion"
     val nachos = "com.hootsuite.android:nachos:$nachosVersion"
     val acraMail = "ch.acra:acra-mail:$acraVersion"
-    val acraDialog = "ch.acra:acra-dialog:$acraVersion"
+    val osmdroid = "org.osmdroid:osmdroid-android:$osmdroidVersion"
 }
