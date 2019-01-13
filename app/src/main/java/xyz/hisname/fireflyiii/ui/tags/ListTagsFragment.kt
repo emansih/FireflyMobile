@@ -51,6 +51,7 @@ class ListTagsFragment: BaseFragment() {
     private fun displayView(){
         swipe_tags.isRefreshing = true
         tagsViewModel.getAllTags().observe(this, Observer { tags ->
+            all_tags.removeAllViewsInLayout()
             tagsViewModel.isLoading.observe(this, Observer { isLoading ->
                 if(isLoading == false){
                     if(tags.isEmpty()){
