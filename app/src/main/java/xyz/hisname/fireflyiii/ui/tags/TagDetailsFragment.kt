@@ -85,9 +85,10 @@ class TagDetailsFragment: BaseDetailFragment() {
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         R.id.menu_item_edit -> consume {
             requireFragmentManager().commit {
-                replace(R.id.bigger_fragment_container, AddTagsFragment())
+                replace(R.id.bigger_fragment_container, AddTagsFragment().apply {
+                    arguments = bundleOf("tagId" to tagId)
+                })
                 addToBackStack(null)
-                arguments = bundleOf("tagId" to tagId)
             }
         }
         R.id.menu_item_delete -> consume {
