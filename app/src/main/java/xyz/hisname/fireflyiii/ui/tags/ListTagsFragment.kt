@@ -77,11 +77,11 @@ class ListTagsFragment: BaseFragment() {
                                 }
                                 setOnClickListener {
                                     requireFragmentManager().commit {
-                                        val addTags = AddTagsFragment()
-                                        addTags.arguments = bundleOf("revealX" to fab.width / 2,
+                                        val tagDetails = TagDetailsFragment()
+                                        tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
                                                 "revealY" to fab.height / 2, "tagId" to tagsData.tagsId)
                                         addToBackStack(null)
-                                        replace(R.id.bigger_fragment_container, addTags)
+                                        replace(R.id.fragment_container, tagDetails)
                                     }
                                 }
                             }
