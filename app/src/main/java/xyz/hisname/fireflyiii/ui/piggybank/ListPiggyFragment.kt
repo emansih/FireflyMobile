@@ -89,9 +89,10 @@ class ListPiggyFragment: BaseFragment() {
         fab.display {
             fab.isClickable = false
             requireFragmentManager().commit {
-                replace(R.id.bigger_fragment_container, AddPiggyFragment())
+                replace(R.id.bigger_fragment_container, AddPiggyFragment().apply {
+                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                })
                 addToBackStack(null)
-                arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
             }
             fab.isClickable = true
         }
