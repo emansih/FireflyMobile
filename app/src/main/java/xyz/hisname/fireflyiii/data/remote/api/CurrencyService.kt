@@ -9,7 +9,7 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/currency.html
 interface CurrencyService {
 
-    @GET(CURRENCY_API_ENDPOINT)
+    @GET("$CURRENCY_API_ENDPOINT/")
     fun getPaginatedCurrency(@Query("page") page: Int): Call<CurrencyModel>
 
     @GET("$CURRENCY_API_ENDPOINT/{id}")

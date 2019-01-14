@@ -21,7 +21,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient(FIREFLY_BASEURL)?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.OAUTH_API_ENDPOINT}/token")
+                "https://$FIREFLY_BASEURL/${Constants.OAUTH_API_ENDPOINT}/token")
     }
 
     @Test
@@ -29,7 +29,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.OAUTH_API_ENDPOINT}/token")
+                "https://$FIREFLY_BASEURL/${Constants.OAUTH_API_ENDPOINT}/token")
     }
 
     @Test
@@ -37,7 +37,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("https://$FIREFLY_BASEURL")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.OAUTH_API_ENDPOINT}/token")
+                "https://$FIREFLY_BASEURL/${Constants.OAUTH_API_ENDPOINT}/token")
     }
 
     @Test
@@ -45,7 +45,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login${Constants.OAUTH_API_ENDPOINT}/token")
+                "https://$FIREFLY_BASEURL/login/${Constants.OAUTH_API_ENDPOINT}/token")
     }
 
     @Test
@@ -53,7 +53,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login/")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login${Constants.OAUTH_API_ENDPOINT}/token")
+                "https://$FIREFLY_BASEURL/login/${Constants.OAUTH_API_ENDPOINT}/token")
     }
 
     @Test
@@ -61,7 +61,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("https://$FIREFLY_BASEURL/login")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login${Constants.OAUTH_API_ENDPOINT}/token")
+                "https://$FIREFLY_BASEURL/login/${Constants.OAUTH_API_ENDPOINT}/token")
     }
 
     @Test
@@ -69,7 +69,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("http://$FIREFLY_BASEURL/login")?.create(OAuthService::class.java)?.getAccessToken(
                 "", "", "", "", "")
         assertEquals(auth?.request()?.url().toString(),
-                "http://$FIREFLY_BASEURL/login${Constants.OAUTH_API_ENDPOINT}/token")
+                "http://$FIREFLY_BASEURL/login/${Constants.OAUTH_API_ENDPOINT}/token")
     }
 
     @Test
@@ -77,7 +77,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient(FIREFLY_BASEURL)?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
+                "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
@@ -85,7 +85,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
+                "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
@@ -93,7 +93,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("https://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
+                "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
@@ -101,7 +101,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("http://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "http://$FIREFLY_BASEURL${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
+                "http://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
@@ -109,7 +109,7 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login")?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
+                "https://$FIREFLY_BASEURL/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
@@ -117,6 +117,6 @@ class FireflyApiTestCase {
         val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
         assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
+                "https://$FIREFLY_BASEURL/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 }

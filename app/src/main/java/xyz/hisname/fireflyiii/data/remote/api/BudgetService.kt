@@ -10,13 +10,13 @@ import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListMode
 
 interface BudgetService {
 
-    @GET(AVAILABLE_BUDGET_API_ENDPOINT)
+    @GET("$AVAILABLE_BUDGET_API_ENDPOINT/")
     fun getAllBudget(): Call<BudgetModel>
 
-    @GET(AVAILABLE_BUDGET_API_ENDPOINT)
+    @GET("$AVAILABLE_BUDGET_API_ENDPOINT/")
     fun getPaginatedBudget(@Query("page") page: Int): Call<BudgetModel>
 
-    @GET(BUDGET_API_ENDPOINT)
+    @GET("$BUDGET_API_ENDPOINT/")
     fun getPaginatedSpentBudget(@Query("page") page: Int, @Query("start") start: String,
                                 @Query("end") end: String): Call<BudgetListModel>
 

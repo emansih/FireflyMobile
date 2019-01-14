@@ -104,9 +104,9 @@ class LoginFragment: Fragment() {
                 clientIdLiveData.value = fireflyId
                 secretKeyLiveData.value = fireflySecretKey
                 fireflyUrl = if(fireflyUrl.endsWith("/")){
-                    StringBuilder(fireflyUrl).deleteCharAt(fireflyUrl.length - 1).toString()
-                } else {
                     fireflyUrl
+                } else {
+                    "$fireflyUrl/"
                 }
                 val browserIntent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl${Constants.OAUTH_API_ENDPOINT}" +
                         "/authorize?client_id=$fireflyId&redirect_uri=${Constants.REDIRECT_URI}" +

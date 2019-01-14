@@ -9,7 +9,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/accounts.html
 interface AccountsService {
 
-    @GET(ACCOUNTS_API_ENDPOINT)
+    @GET("$ACCOUNTS_API_ENDPOINT/")
     fun getPaginatedAccountType(@Query("type") type: String, @Query("page") page: Int): Call<AccountsModel>
 
     @FormUrlEncoded

@@ -9,7 +9,7 @@ import xyz.hisname.fireflyiii.repository.models.tags.TagsSuccessModel
 
 interface TagsService {
 
-    @GET(TAGS_API_ENDPOINT)
+    @GET("$TAGS_API_ENDPOINT/")
     fun getAllTags(): Call<TagsModel>
 
     @DELETE("$TAGS_API_ENDPOINT/{tagName}")
