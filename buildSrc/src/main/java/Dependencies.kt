@@ -26,7 +26,7 @@ object Dependencies{
     private const val glideVersion = "4.8.0"
     private const val debugDbVersion = "1.0.4"
     private const val nachosVersion = "1.1.1"
-    private const val acraVersion = "5.1.3"
+    private const val acraVersion = "5.2.1"
     private const val osmdroidVersion = "6.0.3"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"

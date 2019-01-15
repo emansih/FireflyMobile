@@ -23,7 +23,7 @@ class CustomApp: Application() {
         super.onCreate()
         AndroidThreeTen.init(this)
         LanguageChanger.init(this)
-        if(!BuildConfig.DEBUG) {
+        if(BuildConfig.BUILD_TYPE == "release") {
             ACRA.init(this)
         }
     }
