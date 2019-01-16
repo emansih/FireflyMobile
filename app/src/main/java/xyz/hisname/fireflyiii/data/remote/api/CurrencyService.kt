@@ -23,7 +23,7 @@ interface CurrencyService {
 
     @FormUrlEncoded
     @PUT("$CURRENCY_API_ENDPOINT/{currencyId}")
-    fun updatePiggyBank(@Path("currencyId") currencyId: Long,
+    fun updateCurrency(@Path("currencyId") currencyId: Long,
                         @Field("name") name: String, @Field("code") code: String,
                         @Field("symbol") symbol: String, @Field("decimal_places") decimalPlaces: String,
                         @Field("enabled") default: Boolean): Call<CurrencySuccessModel>

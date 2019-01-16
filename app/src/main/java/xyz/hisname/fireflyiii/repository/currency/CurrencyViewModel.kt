@@ -56,7 +56,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                        enabled: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<CurrencySuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<CurrencySuccessModel>> = MutableLiveData()
-        currencyService?.updatePiggyBank(currencyId, name, code, symbol, decimalPlaces, enabled)?.enqueue(retrofitCallback({
+        currencyService?.updateCurrency(currencyId, name, code, symbol, decimalPlaces, enabled)?.enqueue(retrofitCallback({
             response ->
             var errorMessage = ""
             val responseErrorBody = response.errorBody()
