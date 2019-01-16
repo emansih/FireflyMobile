@@ -39,6 +39,7 @@ import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
+import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
@@ -201,6 +202,10 @@ class HomeActivity: BaseActivity(){
         val categories = PrimaryDrawerItem()
                 .withIdentifier(7)
                 .withName("Categories")
+                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
+                .withSelectedIconColor(ContextCompat.getColor(this,R.color.material_blue_grey_800))
+                .withIconTintingEnabled(true)
+                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_chart_bar).sizeDp(24))
         val tags = PrimaryDrawerItem()
                 .withIdentifier(8)
                 .withName(R.string.tags)
@@ -301,8 +306,8 @@ class HomeActivity: BaseActivity(){
                 .withFullscreen(true)
                 .withToolbar(activity_toolbar)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(dashboard, transactions,account, tags, /* budgets, categories, tags, reports,
-                        ,*/ moneyManagement, options, about)
+                .addDrawerItems(dashboard, transactions,account, tags, categories, /* budgets, tags, reports,
+                        */ moneyManagement, options, about)
                 .withOnDrawerItemClickListener{ _, _, drawerItem ->
                     when {
                         drawerItem.identifier == 1L -> {
@@ -322,6 +327,9 @@ class HomeActivity: BaseActivity(){
                         drawerItem.identifier == 5L -> {
                             val bundle = bundleOf("accountType" to "revenue")
                             changeFragment(ListAccountFragment().apply { arguments = bundle })
+                        }
+                        drawerItem.identifier == 7L ->{
+                            changeFragment(CategoriesFragment())
                         }
                         drawerItem.identifier == 8L -> {
                             changeFragment(ListTagsFragment())
