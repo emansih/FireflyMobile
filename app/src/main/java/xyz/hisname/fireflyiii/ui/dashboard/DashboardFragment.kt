@@ -209,10 +209,7 @@ class DashboardFragment: BaseFragment() {
 
     private fun setBarChart() {
         monthText.text = DateTimeUtil.getCurrentMonth()
-        val dataColor = arrayListOf<Int>()
-        for (c in ColorTemplate.MATERIAL_COLORS) {
-            dataColor.add(c)
-        }
+        val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700), ContextCompat.getColor(requireContext(), R.color.md_green_500))
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
             if(defaultCurrency.isNotEmpty()) {
                 val currencyData = defaultCurrency[0].currencyAttributes
@@ -225,8 +222,8 @@ class DashboardFragment: BaseFragment() {
                             budgeted = budget.second.toFloat()
                             val budgetLeftPercentage = (budgetSpent / budgeted) * 100
                             val budgetSpentPercentage = (budgeted - budgetSpent) / budgeted * 100
-                            val dataSet = PieDataSet(arrayListOf(PieEntry(budgetLeftPercentage, "Left"),
-                                    PieEntry(budgetSpentPercentage, "Spent")), "").apply {
+                            val dataSet = PieDataSet(arrayListOf(PieEntry(budgetLeftPercentage, "Spent"),
+                                    PieEntry(budgetSpentPercentage, "Left")), "").apply {
                                 setDrawIcons(true)
                                 sliceSpace = 2f
                                 iconsOffset = MPPointF(0f, 40f)
