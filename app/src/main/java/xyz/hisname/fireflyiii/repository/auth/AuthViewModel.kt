@@ -32,9 +32,13 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
                 isAuthenticated.value = true
             } else {
                 if(errorBody != null) {
-                    val errorBodyMessage = String(errorBody.bytes())
-                    val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
-                    authFailedReason.value = gson.message
+                    try {
+                        val errorBodyMessage = String(errorBody.bytes())
+                        val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                        authFailedReason.value = gson.message
+                    } catch (exception: Exception){
+                        authFailedReason.value = "Authentication Failed"
+                    }
                 } else {
                     authFailedReason.value = "Authentication Failed"
                 }
