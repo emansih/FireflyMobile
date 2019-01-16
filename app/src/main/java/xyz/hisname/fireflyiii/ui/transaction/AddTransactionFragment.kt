@@ -33,6 +33,14 @@ class AddTransactionFragment: BaseFragment() {
             fragmentContainer.isVisible = true
             fab.isVisible = true
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+        fragment_add_transaction_root.isVisible = false
+        fragmentContainer.isVisible = true
+        fab.isVisible = true
 
     }
 
