@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 
 
 class CategoriesFragment: BaseFragment() {
-    
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_base_list, container)
@@ -76,12 +76,12 @@ class CategoriesFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Categories"
+        activity?.activity_toolbar?.title = resources.getString(R.string.categories)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = "Categories"
+        activity?.activity_toolbar?.title = resources.getString(R.string.categories)
     }
 
 }

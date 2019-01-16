@@ -14,7 +14,6 @@
     <string name="money_management">Geldverwaltung</string>
     <string name="min_amount">Mindestbetrag</string>
     <string name="max_amount">Höchstbetrag</string>
-    <string name="min_amount_save_per_month">Monatlich empfohlen</string>
     <string name="amount">Betrag</string>
     <string name="decimal_places">Nachkommastellen</string>
     <string name="skip">Überspringen</string>
@@ -44,5 +43,31 @@
     <string name="sign_in">Anmelden</string>
     <string name="overview">Übersicht</string>
     <string name="piggy_bank_deleted">Geschafft! Sparschwein %1$s gelöscht</string>
+    <string name="welcome">Willkommen!</string>
+    <string name="client_id">Client ID</string>
+    <string name="transaction">Buchungen</string>
+    <string-array name="account_role">
+        <item>Standard-Bestandskonto</item>
+        <item>Gemeinsames Bestandskonto</item>
+        <item>Sparkonto</item>
+        <item>Kreditkarte</item>
+    </string-array>
+    <string-array name="repeat_frequency">
+        <item>wöchentlich</item>
+        <item>monatlich</item>
+        <item>vierteljährlich</item>
+        <item>halbjährlich</item>
+        <item>jährlich</item>
+    </string-array>
+    <string-array name="interest_freq">
+        <item>Täglich</item>
+        <item>Monatlich</item>
+        <item>Jährlich</item>
+    </string-array>
+    <string name="categories">Kategorien</string>
+    <string name="deposit">Einnahme</string>
+    <string name="income">Einnahmen / Einkommen</string>
+    <string name="expense">Ausgaben</string>
+    <string name="edit">Bearbeiten</string>
 
 </resources>

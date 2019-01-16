@@ -48,7 +48,7 @@
         <item>每半年</item>
         <item>每年</item>
     </string-array>
-    <string name="welcome">歡迎</string>
+    <string name="welcome">歡迎使用!</string>
     <string name="client_id">客戶端 ID</string>
     <string name="personal_access_token">個人訪問權杖</string>
     <string name="currency_symbol">符號</string>
@@ -67,4 +67,8 @@
     <string name="sign_in">登入</string>
     <string name="overview">概覽</string>
     <string name="piggy_bank_deleted">成功！删除小豬撲滿 %1$s</string>
+    <string name="categories">分類</string>
+    <string name="expense">支出</string>
+    <string name="income">收入 / 所得</string>
+    <string name="edit">編輯</string>
 </resources>
