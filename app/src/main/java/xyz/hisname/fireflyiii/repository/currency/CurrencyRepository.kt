@@ -21,4 +21,9 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao) {
     suspend fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData>{
         return currencyDao.getCurrencyByCode(currencyCode)
     }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getCurrencyById(currencyId: Long) = currencyDao.getCurrencyById(currencyId)
+
 }

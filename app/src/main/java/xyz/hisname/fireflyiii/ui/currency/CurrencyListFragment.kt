@@ -50,17 +50,27 @@ class CurrencyListFragment: BaseFragment() {
             currencyData.sortWith(Comparator { initial, after ->
                 initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
             })
-            recycler_view.adapter = CurrencyRecyclerAdapter(currencyData) { data: CurrencyData ->  }
+            recycler_view.adapter = CurrencyRecyclerAdapter(currencyData) { data: CurrencyData ->  clickListener(data)}
         })
+    }
+
+    private fun clickListener(data: CurrencyData){
+        requireFragmentManager().commit {
+            replace(R.id.bigger_fragment_container, AddCurrencyFragment().apply {
+                arguments = bundleOf("currencyId" to data.currencyId)
+            })
+            addToBackStack(null)
+        }
     }
 
     private fun initFab(){
         fab.display {
             fab.isClickable = false
             requireFragmentManager().commit {
-                replace(R.id.bigger_fragment_container, AddCurrencyFragment())
+                replace(R.id.bigger_fragment_container, AddCurrencyFragment().apply {
+                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                })
                 addToBackStack(null)
-                arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
             }
             fab.isClickable = true
         }

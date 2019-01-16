@@ -36,9 +36,53 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return repository.allCurrency
     }
 
+    fun getCurrencyById(currencyId: Long): LiveData<MutableList<CurrencyData>>{
+        val currencyData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
+        var data: MutableList<CurrencyData> = arrayListOf()
+        scope.async(Dispatchers.IO){
+            data = repository.getCurrencyById(currencyId)
+        }.invokeOnCompletion {
+            currencyData.postValue(data)
+        }
+        return currencyData
+    }
+
     fun getEnabledCurrency(): LiveData<MutableList<CurrencyData>> {
         loadRemoteData()
         return repository.enabledCurrency
+    }
+
+    fun updateCurrency(currencyId: Long, name: String, code: String, symbol: String, decimalPlaces: String,
+                       enabled: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
+        val apiResponse: MediatorLiveData<ApiResponses<CurrencySuccessModel>> =  MediatorLiveData()
+        val apiLiveData: MutableLiveData<ApiResponses<CurrencySuccessModel>> = MutableLiveData()
+        currencyService?.updatePiggyBank(currencyId, name, code, symbol, decimalPlaces, enabled)?.enqueue(retrofitCallback({
+            response ->
+            var errorMessage = ""
+            val responseErrorBody = response.errorBody()
+            if (responseErrorBody != null){
+                errorMessage = String(responseErrorBody.bytes())
+                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                errorMessage = when {
+                    gson.errors.name != null -> gson.errors.name[0]
+                    gson.errors.code != null -> gson.errors.code[0]
+                    gson.errors.symbol != null -> gson.errors.symbol[0]
+                    gson.errors.decimalPlaces != null -> gson.errors.decimalPlaces[0]
+                    else -> "Error occurred while updating currency"
+                }
+            }
+            val networkData = response.body()
+            if (networkData != null) {
+                scope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
+                apiLiveData.postValue(ApiResponses(response.body()))
+            } else {
+                apiLiveData.postValue(ApiResponses(errorMessage))
+            }
+
+        })
+        { throwable -> apiResponse.postValue(ApiResponses(throwable)) })
+        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
+        return apiResponse
     }
 
     fun addCurrency(name: String, code: String, symbol: String, decimalPlaces: String,

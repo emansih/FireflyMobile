@@ -24,4 +24,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("SELECT * FROM currency WHERE enabled = :enabled")
     abstract fun getEnabledCurrencyByCode(enabled: Boolean = true): LiveData<MutableList<CurrencyData>>
 
+    @Query("SELECT * FROM currency WHERE currencyId =:currencyId")
+    abstract fun getCurrencyById(currencyId: Long): MutableList<CurrencyData>
+
 }

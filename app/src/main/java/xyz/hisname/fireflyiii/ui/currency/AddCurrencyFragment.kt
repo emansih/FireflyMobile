@@ -18,6 +18,8 @@ import xyz.hisname.fireflyiii.util.extension.*
 
 class AddCurrencyFragment: BaseAddObjectFragment() {
 
+    private val currencyId by lazy { arguments?.getLong("currencyId") ?: 0L }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.dialog_add_currency, container)
@@ -26,8 +28,26 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_currency_layout)
+        if(currencyId != 0L){
+            currencyViewModel.getCurrencyById(currencyId).observe(this, Observer {
+                val currencyAttributes = it[0].currencyAttributes
+                name_edittext.setText(currencyAttributes?.name)
+                decimal_places_edittext.setText(currencyAttributes?.decimal_places.toString())
+                symbol_edittext.setText(currencyAttributes?.symbol)
+                code_edittext.setText(currencyAttributes?.code)
+                if(currencyAttributes?.enabled == true){
+                    enabled_checkbox.isChecked = true
+                }
+            })
+        }
         addCurrencyFab.setOnClickListener {
-            submitData()
+            hideKeyboard()
+            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
+            if(currencyId != 0L){
+                updateData()
+            } else {
+                submitData()
+            }
         }
     }
 
@@ -64,9 +84,22 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         }
     }
 
+    private fun updateData(){
+        currencyViewModel.updateCurrency(currencyId, name_edittext.getString(), code_edittext.getString(),
+                symbol_edittext.getString(), decimal_places_edittext.getString(), enabled_checkbox.isChecked)
+                .observe(this, Observer { response ->
+                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+                    val errorMessage = response.getErrorMessage()
+                    if (errorMessage != null) {
+                        toastError(errorMessage)
+                    } else if (response.getResponse() != null) {
+                        toastSuccess("Currency updated")
+                        unReveal(addCurrencyFab)
+                    }
+                })
+    }
+
     override fun submitData(){
-        hideKeyboard()
-        ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
         currencyViewModel.addCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(), enabled_checkbox.isChecked)
                 .observe(this, Observer { response ->
