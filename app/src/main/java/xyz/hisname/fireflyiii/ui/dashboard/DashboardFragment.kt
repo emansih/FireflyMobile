@@ -77,7 +77,6 @@ class DashboardFragment: BaseFragment() {
         }
         if(requireFragmentManager().findFragmentByTag("fragmentTransaction") is AddTransactionFragment) {
             fab.isGone = true
-
         }
     }
 
@@ -90,6 +89,11 @@ class DashboardFragment: BaseFragment() {
                     accountViewModel.isLoading.observe(this, Observer { load ->
                         if(load == false){
                             netWorthText.text = currencyData.symbol + " " + money
+                        }
+                        // For some reason fragment transaction needs to be done here. Calling at some
+                        // other places will cause the dashboard to scroll to some weird spot....
+                        requireFragmentManager().commit {
+                            replace(R.id.recentTransactionCard, RecentTransactionFragment())
                         }
                     })
                 })
@@ -197,11 +201,6 @@ class DashboardFragment: BaseFragment() {
                     animateY(1000)
                     setTouchEnabled(true)
                     invalidate()
-                }
-                // For some reason fragment transaction needs to be done here. Calling at some
-                // other places will cause the dashboard to scroll to some weird spot....
-                requireFragmentManager().commit {
-                    replace(R.id.recentTransactionCard, RecentTransactionFragment())
                 }
             }
         })
