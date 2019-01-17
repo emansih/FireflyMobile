@@ -201,7 +201,7 @@ class HomeActivity: BaseActivity(){
                 .withName("Budgets")
         val categories = PrimaryDrawerItem()
                 .withIdentifier(7)
-                .withName("Categories")
+                .withName(R.string.categories)
                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.material_blue_grey_800))
                 .withIconTintingEnabled(true)

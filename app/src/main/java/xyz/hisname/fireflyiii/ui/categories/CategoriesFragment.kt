@@ -17,6 +17,8 @@ import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.toastError
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 
 
@@ -51,7 +53,9 @@ class CategoriesFragment: BaseFragment() {
                         listText.text = "No category found"
                         listText.isVisible = true
                         listImage.isVisible = true
-                        listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank))
+                        listImage.setImageDrawable(IconicsDrawable(requireContext())
+                                .icon(FontAwesome.Icon.faw_chart_bar)
+                                .sizeDp(24))
                         recycler_view.isVisible = false
                     }
                 }
