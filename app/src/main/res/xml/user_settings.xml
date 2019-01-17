@@ -21,7 +21,7 @@
         app:iconSpaceReserved="false">
 
         <ListPreference
-            app:title="@string/language_title"
+            app:title="Languages"
             app:key="language_pref"
             app:iconSpaceReserved="false"
             app:entries="@array/language_string"
