@@ -8,6 +8,7 @@ import xyz.hisname.fireflyiii.R
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
+import androidx.preference.ListPreference
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
+import xyz.hisname.languagepack.LanguageChanger
 
 
 class SettingsFragment: BaseSettings() {
@@ -29,9 +31,21 @@ class SettingsFragment: BaseSettings() {
         addPreferencesFromResource(R.xml.user_settings)
         setAccountSection()
         setTransactionSection()
+        setLanguagePref()
     }
 
-   private fun setAccountSection(){
+    private fun setLanguagePref(){
+        val languagePref = findPreference("language_pref") as ListPreference
+        languagePref.summary = languagePref.entry
+        languagePref.setOnPreferenceChangeListener { _, newValue ->
+            AppPref(sharedPref).languagePref = newValue.toString()
+            LanguageChanger.init(requireContext(), AppPref(sharedPref).languagePref)
+            requireActivity().recreate()
+            true
+        }
+    }
+
+    private fun setAccountSection(){
        val logout = findPreference("logout")
        logout.setOnPreferenceClickListener {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {

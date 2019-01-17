@@ -3,23 +3,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        android:title="Account">
+        app:iconSpaceReserved="false"
+        android:title="@string/account">
         <Preference
             app:key="logout"
+            app:iconSpaceReserved="false"
             app:title="Logout" />
 
         <Preference
             app:key="account_more_options"
+            app:iconSpaceReserved="false"
             app:title="More Options" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="Transaction"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            app:title="@string/language_title"
+            app:key="language_pref"
+            app:iconSpaceReserved="false"
+            app:entries="@array/language_string"
+            app:entryValues="@array/language_values"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/transaction"
+        app:iconSpaceReserved="false"
         app:summary="Add Transaction anytime anywhere">
 
         <CheckBoxPreference
             app:key="persistent_notification"
+            app:iconSpaceReserved="false"
             app:title="Show Notification Shortcut">
         </CheckBoxPreference>
 

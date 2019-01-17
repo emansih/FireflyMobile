@@ -10,5 +10,6 @@ interface PreferenceHelper {
     var userOs: String
     var enableCertPinning: Boolean
     var certValue: String
+    var languagePref: String
     fun clearPref()
 }

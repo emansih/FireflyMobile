@@ -22,4 +22,16 @@
         <item>60</item>
     </string-array>
 
+    <string-array name="language_string">
+        <item>English</item>
+        <item>Deutsch(German)</item>
+        <item>Chinese Traditional</item>
+    </string-array>
+
+    <string-array name="language_values">
+        <item>en</item>
+        <item>de</item>
+        <item>zh</item>
+    </string-array>
+
 </resources>
