@@ -28,7 +28,6 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
     private inline val Context.manager: NotificationManager get() =
     getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-    @TargetApi(Build.VERSION_CODES.O)
     fun setupChannels(){
         manager.createNotificationChannels(arrayListOf(
                 NotificationChannel(Constants.ACCOUNT_CHANNEL,
