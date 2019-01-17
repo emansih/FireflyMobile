@@ -52,11 +52,11 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return repository.enabledCurrency
     }
 
-    fun updateCurrency(currencyId: Long, name: String, code: String, symbol: String, decimalPlaces: String,
+    fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
                        enabled: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<CurrencySuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<CurrencySuccessModel>> = MutableLiveData()
-        currencyService?.updateCurrency(currencyId, name, code, symbol, decimalPlaces, enabled)?.enqueue(retrofitCallback({
+        currencyService?.updateCurrency(code, name, code, symbol, decimalPlaces, enabled)?.enqueue(retrofitCallback({
             response ->
             var errorMessage = ""
             val responseErrorBody = response.errorBody()

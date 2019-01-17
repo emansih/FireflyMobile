@@ -85,7 +85,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     }
 
     private fun updateData(){
-        currencyViewModel.updateCurrency(currencyId, name_edittext.getString(), code_edittext.getString(),
+        currencyViewModel.updateCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(), enabled_checkbox.isChecked)
                 .observe(this, Observer { response ->
                     ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
