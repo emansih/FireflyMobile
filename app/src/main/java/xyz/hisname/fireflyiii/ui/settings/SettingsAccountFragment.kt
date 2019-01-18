@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.ui.settings
 
 import android.accounts.AccountManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
 import android.widget.Toast
@@ -13,11 +14,17 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.activity_base.*
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
+import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.toastInfo
@@ -130,7 +137,19 @@ class SettingsAccountFragment: BaseSettings() {
             WorkManager.getInstance().enqueue(workBuilder)
             true
         }
-
+        val logout = findPreference("logout")
+        logout.setOnPreferenceClickListener {
+            GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
+                AppDatabase.clearDb(requireContext())
+                AppPref(sharedPref).clearPref()
+                accManager.destroyAccount()
+            }
+            val loginActivity = Intent(requireActivity(), OnboardingActivity::class.java)
+            startActivity(loginActivity)
+            RetrofitBuilder.destroyInstance()
+            requireActivity().finish()
+            true
+        }
     }
 
     override fun onAttach(context: Context) {

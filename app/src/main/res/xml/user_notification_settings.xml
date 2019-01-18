@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        app:key="persistent_notification"
+        app:title="@string/transaction"
+        app:summary="Add Transaction anytime anywhere">
+    </CheckBoxPreference>
+
+
+
+</PreferenceScreen>

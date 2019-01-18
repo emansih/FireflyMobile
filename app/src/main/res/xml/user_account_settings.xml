@@ -7,6 +7,10 @@
         app:title="Authentication Method">
     </Preference>
 
+    <Preference
+        app:key="logout"
+        app:title="Logout" />
+
     <EditTextPreference
         app:key="fireflyUrl"
         app:title="Firefly URL">

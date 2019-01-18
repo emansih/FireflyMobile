@@ -2,44 +2,18 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory
-        app:iconSpaceReserved="false"
-        android:title="@string/account">
-        <Preference
-            app:key="logout"
-            app:iconSpaceReserved="false"
-            app:title="Logout" />
+    <Preference
+        app:key="account_options"
+        app:title="@string/account" />
 
-        <Preference
-            app:key="account_more_options"
-            app:iconSpaceReserved="false"
-            app:title="More Options" />
+    <ListPreference
+        app:title="Languages"
+        app:key="language_pref"
+        app:entries="@array/language_string"
+        app:entryValues="@array/language_values"/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        app:iconSpaceReserved="false">
-
-        <ListPreference
-            app:title="Languages"
-            app:key="language_pref"
-            app:iconSpaceReserved="false"
-            app:entries="@array/language_string"
-            app:entryValues="@array/language_values"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        app:title="@string/transaction"
-        app:iconSpaceReserved="false"
-        app:summary="Add Transaction anytime anywhere">
-
-        <CheckBoxPreference
-            app:key="persistent_notification"
-            app:iconSpaceReserved="false"
-            app:title="Show Notification Shortcut">
-        </CheckBoxPreference>
-
-    </PreferenceCategory>
+    <Preference
+        app:key="notification_settings"
+        app:title="Notification Settings" />
 
 </PreferenceScreen>
