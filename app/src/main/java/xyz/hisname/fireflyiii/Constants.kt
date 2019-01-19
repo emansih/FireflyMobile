@@ -18,6 +18,8 @@ class Constants private constructor() {
         const val AVAILABLE_BUDGET_API_ENDPOINT = "api/v1/available_budgets"
         const val BUDGET_API_ENDPOINT = "api/v1/budgets"
         const val TAGS_API_ENDPOINT = "api/v1/tags"
+        const val SUMMARY_API_ENDPOINT = "api/v1/summary/basic"
+        const val ACCOUNT_OVERVIEW_API_ENDPOINT = "api/v1/chart/account/overview"
         const val DB_NAME = "firefly.db"
         const val PIGGY_BANK_CHANNEL = "xyz.hisname.fireflyiii.PIGGY_BANK"
         const val PIGGY_BANK_CHANNEL_DESCRIPTION = "Show Piggy Bank Notifications"
