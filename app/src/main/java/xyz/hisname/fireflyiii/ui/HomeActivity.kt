@@ -279,7 +279,7 @@ class HomeActivity: BaseActivity(){
                 .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_settings).sizeDp(24))
                 .withSelectable(false)
                 .withSubItems(
-                        SecondaryDrawerItem().withName("Settings")
+                        SecondaryDrawerItem().withName(R.string.settings)
                                 .withLevel(4)
                                 .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
                                 .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_teal_500))

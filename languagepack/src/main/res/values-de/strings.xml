@@ -66,8 +66,16 @@
     </string-array>
     <string name="categories">Kategorien</string>
     <string name="deposit">Einnahme</string>
-    <string name="income">Einnahmen / Einkommen</string>
+    <string name="income">Einnahmen</string>
     <string name="expense">Ausgaben</string>
     <string name="edit">Bearbeiten</string>
+    <string name="net_worth">Vermögen</string>
+    <string name="left_to_spend">Verbleibend zum Ausgeben</string>
+    <string name="balance">Kontostand</string>
+    <string name="budget">Budget</string>
+    <string name="language">Sprache</string>
+    <string name="warning">Achtung!</string>
+    <string name="settings">Einstellungen</string>
+    <string name="target_amount">Zielbetrag</string>
 
 </resources>

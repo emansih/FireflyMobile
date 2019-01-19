@@ -82,5 +82,12 @@
         <item>Half-yearly</item>
         <item>Yearly</item>
     </string-array>
-
+    <string name="net_worth">Net Worth</string>
+    <string name="left_to_spend">Left To Spend</string>
+    <string name="balance">Balance</string>
+    <string name="budget">Budget</string>
+    <string name="language">Language</string>
+    <string name="warning">Warning!</string>
+    <string name="settings">Settings</string>
+    <string name="target_amount">Target Amount</string>
 </resources>

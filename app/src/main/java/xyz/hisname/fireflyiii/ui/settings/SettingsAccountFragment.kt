@@ -59,9 +59,9 @@ class SettingsAccountFragment: BaseSettings() {
         val authMethod = findPreference("auth_method")
 
         if(Objects.equals(authMethodPref, "oauth")){
-            authMethod.summary = "OAuth Authentication"
+            authMethod.summary = "Open Authentication"
         } else {
-            authMethod.summary = "Personal Access Authentication"
+            authMethod.summary = resources.getString(R.string.personal_access_token)
         }
 
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->
@@ -114,7 +114,7 @@ class SettingsAccountFragment: BaseSettings() {
                 WorkManager.getInstance().cancelAllWorkByTag("refresh_worker")
             } else {
                 AlertDialog.Builder(requireContext())
-                        .setTitle("Warning!")
+                        .setTitle(R.string.warning)
                         .setMessage("This feature may not work as expected on certain devices." +
                                 "Currently, it ensures that your device is charging, connected to a " +
                                 "network and the battery is not low before running.")

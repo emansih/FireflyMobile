@@ -7,7 +7,7 @@
         app:title="@string/account" />
 
     <ListPreference
-        app:title="Languages"
+        app:title="@string/language"
         app:key="language_pref"
         app:entries="@array/language_string"
         app:entryValues="@array/language_values"/>

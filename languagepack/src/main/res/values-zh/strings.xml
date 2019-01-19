@@ -71,4 +71,12 @@
     <string name="expense">支出</string>
     <string name="income">收入 / 所得</string>
     <string name="edit">編輯</string>
+    <string name="net_worth">淨值</string>
+    <string name="left_to_spend">剩餘可花費</string>
+    <string name="balance">餘額</string>
+    <string name="budget">預算</string>
+    <string name="language">語系</string>
+    <string name="warning">警告!</string>
+    <string name="settings">設定</string>
+    <string name="target_amount">目標金額</string>
 </resources>
