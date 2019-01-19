@@ -10,8 +10,8 @@ android {
         applicationId "xyz.hisname.fireflyiii"
         minSdkVersion(Dependencies.minSdk)
         targetSdkVersion(Dependencies.targetSdk)
-        versionCode 20
-        versionName "1.2.0"
+        versionCode 21
+        versionName "1.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         def appConfigFile = file('config.properties')
