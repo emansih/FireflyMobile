@@ -24,8 +24,8 @@
 
     <string-array name="language_string">
         <item>English</item>
-        <item>Deutsch(German)</item>
-        <item>Chinese Traditional</item>
+        <item>Deutsch</item>
+        <item>正體中文</item>
     </string-array>
 
     <string-array name="language_values">

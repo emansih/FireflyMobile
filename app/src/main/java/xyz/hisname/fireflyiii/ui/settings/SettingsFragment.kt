@@ -23,6 +23,7 @@ class SettingsFragment: BaseSettings() {
 
     private fun setLanguagePref(){
         val languagePref = findPreference("language_pref") as ListPreference
+        languagePref.value = AppPref(sharedPref).languagePref
         languagePref.setOnPreferenceChangeListener { _, newValue ->
             AppPref(sharedPref).languagePref = newValue.toString()
             LanguageChanger.init(requireContext(), AppPref(sharedPref).languagePref)

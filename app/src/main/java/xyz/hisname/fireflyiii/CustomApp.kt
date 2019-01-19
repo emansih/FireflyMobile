@@ -31,8 +31,8 @@ class CustomApp: Application() {
     }
 
     override fun attachBaseContext(newBase: Context) {
-        LanguageChanger.init(newBase, AppPref(PreferenceManager.getDefaultSharedPreferences(newBase)).languagePref)
-        super.attachBaseContext(newBase)
+        super.attachBaseContext(LanguageChanger.init(newBase,
+                AppPref(PreferenceManager.getDefaultSharedPreferences(newBase)).languagePref))
     }
 
 }
