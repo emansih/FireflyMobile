@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color.rgb
 import android.os.Bundle
 import android.view.*
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -74,8 +75,6 @@ class AddBillFragment: BaseAddObjectFragment() {
             } else {
                 notes_edittext.getString()
             }
-            repeatFreq = frequency_spinner.selectedItem.toString().substring(0,1).toLowerCase() +
-                    frequency_spinner.selectedItem.toString().substring(1)
             if(billId == 0L){
                 submitData()
             } else {
@@ -127,6 +126,20 @@ class AddBillFragment: BaseAddObjectFragment() {
         freqAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_item, resources.getStringArray(R.array.repeat_frequency))
         freqAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         frequency_spinner.adapter = freqAdapter
+        frequency_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem = parent.selectedItemId
+                repeatFreq = when (selectedItem) {
+                    0L -> "weekly"
+                    1L -> "monthly"
+                    2L -> "quarterly"
+                    3L -> "half-yearly"
+                    4L -> "yearly"
+                    else -> ""
+                }
+            }
+        }
         val calendar = Calendar.getInstance()
         val startDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->

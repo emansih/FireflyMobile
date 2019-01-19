@@ -189,6 +189,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginStart="12dp"
+                android:entries="@array/repeat_frequency"
                 app:layout_constraintStart_toStartOf="@+id/skip_layout"
                 app:layout_constraintEnd_toEndOf="@+id/skip_layout"
                 app:layout_constraintTop_toBottomOf="@+id/skip_layout" />
