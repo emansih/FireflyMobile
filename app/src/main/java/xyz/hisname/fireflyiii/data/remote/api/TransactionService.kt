@@ -12,7 +12,7 @@ interface TransactionService {
     /* Start date and end date is an optional query. Do not pass NULL into it, instead pass
     an empty string to it.
     */
-    @GET("$TRANSACTION_API_ENDPOINT/")
+    @GET(TRANSACTION_API_ENDPOINT)
     fun getAllTransactions(@Query("start") startDate: String?,
                            @Query("end") endDate: String?,
                            @Query("type") type: String): Call<TransactionModel>

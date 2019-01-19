@@ -10,10 +10,10 @@ import xyz.hisname.fireflyiii.repository.models.userinfo.user.UserDataModel
 // Link to relevant docs: https://firefly-iii.readthedocs.io/en/latest/api/about.html
 interface SystemInfoService {
 
-    @GET("$SYSTEM_INFO_ENDPOINT/")
+    @GET(SYSTEM_INFO_ENDPOINT)
     fun getSystemInfo(): Call<SystemInfoModel>
 
-    @GET("$SYSTEM_INFO_ENDPOINT/user/")
+    @GET("$SYSTEM_INFO_ENDPOINT/user")
     fun getCurrentUserInfo(): Call<UserDataModel>
 
 }
