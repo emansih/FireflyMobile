@@ -47,4 +47,23 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
         isLoading.value = false
         return apiOk
     }
+
+    fun userApiVersion(): LiveData<String>{
+        isLoading.value = true
+        val apiVersion: MutableLiveData<String> = MutableLiveData()
+        systemService?.getSystemInfo()?.enqueue(retrofitCallback({ response ->
+            val systemData = response.body()?.systemData
+            if (systemData != null) {
+                AppPref(sharedPref).serverVersion = systemData.version
+                AppPref(sharedPref).remoteApiVersion = systemData.api_version
+                AppPref(sharedPref).userOs = systemData.os
+                apiVersion.value = systemData.api_version
+            } else {
+                apiVersion.value = AppPref(sharedPref).remoteApiVersion
+            }
+        })
+        { throwable -> apiVersion.value = AppPref(sharedPref).remoteApiVersion })
+        isLoading.value = false
+        return apiVersion
+    }
 }

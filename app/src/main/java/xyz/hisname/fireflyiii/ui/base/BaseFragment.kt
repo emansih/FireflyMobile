@@ -21,6 +21,7 @@ import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
+import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
@@ -40,6 +41,7 @@ abstract class BaseFragment: Fragment() {
     protected val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     protected val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
+    protected val userApiVersion by lazy { getViewModel(UserInfoViewModel::class.java).userApiVersion() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         requireActivity().findViewById<AppBarLayout>(R.id.activity_appbar)?.setExpanded(true,true)

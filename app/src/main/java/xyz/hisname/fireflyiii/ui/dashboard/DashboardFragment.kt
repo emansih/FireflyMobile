@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,14 +24,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
+import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.roundToInt
 
@@ -39,6 +43,8 @@ import kotlin.math.roundToInt
 class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
+    private val prefManager by lazy { AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())) }
+    private val summaryViewModel by lazy { getViewModel(SummaryViewModel::class.java) }
     private var depositSum = 0.toBigDecimal()
     private var withdrawSum = 0.toBigDecimal()
     private var transaction = 0.toBigDecimal()
@@ -81,22 +87,34 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setNetWorth(){
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
-            if(defaultCurrency.isNotEmpty()) {
-                val currencyData = defaultCurrency[0].currencyAttributes
-                val currencyCode = currencyData?.code!!
-                accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
-                    accountViewModel.isLoading.observe(this, Observer { load ->
+        userApiVersion.observe(this, Observer { apiVersion ->
+            if(Version(apiVersion).compareTo(Version("0.9.0")) == 0) {
+                currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+                    if (defaultCurrency.isNotEmpty()) {
+                        val currencyData = defaultCurrency[0].currencyAttributes
+                        val currencyCode = currencyData?.code!!
+                        accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
+                            accountViewModel.isLoading.observe(this, Observer { load ->
+                                if (load == false) {
+                                    netWorthText.text = currencyData.symbol + " " + money
+                                }
+                            })
+                        })
+                    }
+                })
+            } else {
+                summaryViewModel.getSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth()).observe(this, Observer { summaryData ->
+                    summaryViewModel.isLoading.observe(this, Observer { load ->
                         if(load == false){
-                            netWorthText.text = currencyData.symbol + " " + money
-                        }
-                        // For some reason fragment transaction needs to be done here. Calling at some
-                        // other places will cause the dashboard to scroll to some weird spot....
-                        requireFragmentManager().commit {
-                            replace(R.id.recentTransactionCard, RecentTransactionFragment())
+                            netWorthText.text = summaryData
                         }
                     })
                 })
+            }
+            // For some reason fragment transaction needs to be done here. Calling at some
+            // other places will cause the dashboard to scroll to some weird spot....
+            requireFragmentManager().commit {
+                replace(R.id.recentTransactionCard, RecentTransactionFragment())
             }
         })
     }
