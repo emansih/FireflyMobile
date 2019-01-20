@@ -1,0 +1,31 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+
+configurations {
+    register("bom")
+    register("upToDate")
+    register("exceedLatest")
+    register("upgradesFound")
+    register("upgradesFound2")
+    register("unresolvable")
+    register("unresolvable2")
+}
+
+tasks.named<DependencyUpdatesTask>("dependencyUpdates") {
+    resolutionStrategy {
+        componentSelection {
+            all {
+                val rejected = listOf("alpha", "beta", "rc", "cr", "m", "preview")
+                        .map { qualifier -> Regex("(?i).*[.-]$qualifier[.\\d-]*") }
+                        .any { it.matches(candidate.version) }
+                if (rejected) {
+                    reject("Release candidate")
+                }
+            }
+        }
+    }
+    // optional parameters
+    checkForGradleUpdate = true
+    outputFormatter = "plain"
+    outputDir = "build/dependencyUpdates"
+    reportfileName = "report"
+}

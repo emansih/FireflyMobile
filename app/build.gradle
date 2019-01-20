@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.akaita.android.easylauncher'
+apply plugin: "com.github.ben-manes.versions"
+apply from: "${rootDir}/scripts/ChangeApkName.gradle"
 
 android {
     compileSdkVersion(Dependencies.compileSdk)
@@ -70,6 +72,11 @@ android {
         ignoreAssetsPattern "NOTICE.txt"
     }
     configurations {all*.exclude group: 'com.android.support'}
+}
+
+afterEvaluate {
+    assembleGithubRelease.dependsOn test
+    assembleGithubRelease.finalizedBy(changeName)
 }
 
 dependencies {
