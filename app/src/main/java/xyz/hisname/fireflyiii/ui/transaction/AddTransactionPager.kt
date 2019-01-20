@@ -33,6 +33,7 @@ import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
+import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
@@ -231,13 +232,20 @@ class AddTransactionPager: BaseFragment() {
                         .show()
             }
         })
+        piggy_edittext.setOnClickListener {
+            val piggyBankDialog = PiggyDialog()
+            piggyBankDialog.show(requireFragmentManager(), "piggyDialog")
+        }
+        piggyViewModel.piggyName.observe(this, Observer {
+            piggy_edittext.setText(it)
+        })
     }
 
     private fun contextSwitch(){
         when {
-            Objects.equals(transactionType, "Transfer") -> zipLiveData(accountViewModel.getAssetAccounts(), piggyViewModel.getAllPiggyBanks())
+            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAssetAccounts()
                     .observe(this, Observer { transferData ->
-                        transferData.first.forEachIndexed { _, accountData ->
+                        transferData.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
                         }
                         val uniqueAccount = HashSet(accounts).toArray()
@@ -251,14 +259,7 @@ class AddTransactionPager: BaseFragment() {
                         destination_spinner.isVisible = true
                         destination_textview.isVisible = true
                         destination_spinner.adapter = spinnerAdapter
-                        transferData.second.forEachIndexed { _, piggyData ->
-                            piggyBankList.add(piggyData.piggyAttributes?.name!!)
-                        }
                         piggy_layout.isVisible = true
-                        val uniquePiggy = HashSet(piggyBankList).toArray()
-                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniquePiggy)
-                        piggy_edittext.threshold = 1
-                        piggy_edittext.setAdapter(adapter)
                         val sourcePosition = spinnerAdapter.getPosition(sourceName)
                         source_spinner.setSelection(sourcePosition)
                         val destinationPosition = spinnerAdapter.getPosition(destinationName)

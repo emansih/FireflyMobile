@@ -38,5 +38,8 @@ class PiggyRepository(private val piggyDao: PiggyDataDao) {
     @WorkerThread
     suspend fun allPiggyBanks() = piggyDao.getAllPiggy()
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun searchPiggyByName(piggyName: String) = piggyDao.searchPiggyName(piggyName)
 
 }

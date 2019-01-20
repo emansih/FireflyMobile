@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.dialog_categories.*
+import kotlinx.android.synthetic.main.dialog_search.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
@@ -23,7 +23,7 @@ class CategoriesDialog: BaseDialog(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.dialog_categories, container)
+        return inflater.create(R.layout.dialog_search, container)
     }
 
     private fun displayView(){
@@ -50,7 +50,7 @@ class CategoriesDialog: BaseDialog(){
     }
 
     private fun searchData(){
-        categorySearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean{
                 categoryViewModel.postCategoryName(query)
                 dialog?.dismiss()

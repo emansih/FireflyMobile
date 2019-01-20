@@ -24,6 +24,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
     val repository: PiggyRepository
     private val piggyService by lazy { genericService()?.create(PiggybankService::class.java) }
+    val piggyName =  MutableLiveData<String>()
 
     init {
         val piggyDataDao = AppDatabase.getInstance(application).piggyDataDao()
@@ -187,6 +188,21 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         })
         apiResponse.addSource(apiLiveData) { apiResponse.value = it }
         return apiResponse
+    }
+
+    fun getPiggyByName(piggyBankName: String): LiveData<MutableList<PiggyData>>{
+        var piggyData: MutableList<PiggyData> = arrayListOf()
+        val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
+        scope.async(Dispatchers.IO) {
+            piggyData = repository.searchPiggyByName("%$piggyBankName%")
+        }.invokeOnCompletion {
+            data.postValue(piggyData)
+        }
+        return data
+    }
+
+    fun postPiggyName(details: String?){
+        piggyName.value = details
     }
 
     private fun deletePiggy(piggyId: Long){

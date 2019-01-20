@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
@@ -20,4 +19,8 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
 
     @Query("DELETE FROM piggy")
     abstract fun deleteAllPiggyBank(): Int
+
+    @Query("SELECT * FROM piggy WHERE name LIKE :piggyName")
+    abstract fun searchPiggyName(piggyName: String): MutableList<PiggyData>
+
 }

@@ -15,7 +15,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
-import kotlinx.android.synthetic.main.dialog_add_piggy.*
+import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -36,7 +36,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.dialog_add_piggy, container)
+        return inflater.create(R.layout.fragment_add_piggy, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
