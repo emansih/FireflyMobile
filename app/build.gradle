@@ -29,21 +29,43 @@ android {
         buildConfigField("String", "HOSTNAME", hostName)
     }
 
+    signingConfigs {
+        githubRelease {
+            storeFile file(System.getenv("FireflyKeystoreFile"))
+            storePassword System.getenv("FireflyKeystorePassword")
+            keyAlias System.getenv("FireflyKeystoreAlias")
+            keyPassword System.getenv("FireflyKeystorePassword")
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            matchingFallbacks = ['release']
         }
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
             minifyEnabled false
+            matchingFallbacks = ['debug']
+        }
+        // This build type is no different from `release`.
+        // It's created so that it is compatible with Fdroid build system
+        githubRelease{
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            matchingFallbacks = ['release']
+            signingConfig signingConfigs.githubRelease
         }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
         }
     }
+
     aaptOptions {
         ignoreAssetsPattern "NOTICE.txt"
     }
