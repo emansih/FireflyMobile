@@ -3,7 +3,7 @@ object Dependencies{
     const val minSdk = 19
     const val targetSdk = 28
     const val compileSdk = 28
-    const val kotlinVersion = "1.3.10"
+    const val kotlinVersion = "1.3.11"
     private const val retrofitVersion = "2.5.0"
     private const val lifecycleVersion = "2.0.0"
     private const val roomVersion = "2.0.0"
@@ -12,7 +12,7 @@ object Dependencies{
     private const val androidxFragmentVersion = "1.1.0-alpha02"
     private const val androidxAnnotationVersion = "1.0.0"
     private const val androidxRecyclerViewVersion = "1.0.0"
-    private const val materialDesignVersion = "1.1.0-alpha01"
+    private const val materialDesignVersion = "1.1.0-alpha02"
     private const val androidxCoreVersion = "1.0.1"
     private const val androidxConstraintLayoutVersion = "1.1.3"
     private const val androidxPrefVersion = "1.1.0-alpha01"
