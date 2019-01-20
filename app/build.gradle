@@ -75,8 +75,10 @@ android {
 }
 
 afterEvaluate {
-    assembleGithubRelease.dependsOn test
-    assembleGithubRelease.finalizedBy(changeName)
+    if(build.name.contains("Github")) {
+        assembleGithubRelease.dependsOn test
+        assembleGithubRelease.finalizedBy(changeName)
+    }
 }
 
 dependencies {
