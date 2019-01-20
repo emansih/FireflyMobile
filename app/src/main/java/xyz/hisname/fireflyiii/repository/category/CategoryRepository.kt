@@ -6,7 +6,6 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 
 class CategoryRepository(private val categoryDao: CategoryDataDao){
 
-    val allCategory = categoryDao.getAllCategory()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -14,5 +13,15 @@ class CategoryRepository(private val categoryDao: CategoryDataDao){
         categoryDao.insert(category)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun allCategory() = categoryDao.getAllCategory()
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteAllCategory() = categoryDao.deleteAllCategory()
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun searchCategoryByName(categoryName: String) = categoryDao.searchCategory(categoryName)
 }

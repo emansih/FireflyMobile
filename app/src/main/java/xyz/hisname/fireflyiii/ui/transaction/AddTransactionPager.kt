@@ -31,6 +31,7 @@ import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -173,16 +174,12 @@ class AddTransactionPager: BaseFragment() {
                     calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                     .show()
         }
-        categoryViewModel.getAllCategory().observe(this, Observer {
-            if(it.isNotEmpty()){
-                val category = ArrayList<String>()
-                it.forEachIndexed { _,element ->
-                    category.add(element.categoryAttributes!!.name)
-                }
-                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, category)
-                category_edittext.threshold = 1
-                category_edittext.setAdapter(adapter)
-            }
+        category_edittext.setOnClickListener {
+            val catDialog = CategoriesDialog()
+            catDialog.show(requireFragmentManager(), "categoryDialog")
+        }
+        categoryViewModel.categoryName.observe(this, Observer {
+            category_edittext.setText(it)
         })
         currencyViewModel.currencyCode.observe(this, Observer {
             currency = it
