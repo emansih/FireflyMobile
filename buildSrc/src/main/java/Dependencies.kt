@@ -28,6 +28,10 @@ object Dependencies{
     private const val nachosVersion = "1.1.1"
     private const val acraVersion = "5.2.1"
     private const val osmdroidVersion = "6.0.3"
+    private const val jUnitVersion = "4.12"
+    private const val espressoVersion = "3.1.1"
+    private const val androidTestVersion = "1.1.1"
+    private const val androidTestCoreVersion = "1.0.0"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
@@ -61,4 +65,10 @@ object Dependencies{
     val nachos = "com.hootsuite.android:nachos:$nachosVersion"
     val acraMail = "ch.acra:acra-mail:$acraVersion"
     val osmdroid = "org.osmdroid:osmdroid-android:$osmdroidVersion"
+    val jUnit = "junit:junit:$jUnitVersion"
+    val espresso = "androidx.test.espresso:espresso-core:$espressoVersion"
+    val androidTest = "androidx.test:runner:$androidTestVersion"
+    val androidTestCore = "androidx.test:core:$androidTestCoreVersion"
+    val androidTestExt = "androidx.test.ext:junit:$androidTestCoreVersion"
+
 }
