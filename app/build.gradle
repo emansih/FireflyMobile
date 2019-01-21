@@ -14,6 +14,7 @@ android {
         targetSdkVersion(Dependencies.targetSdk)
         versionCode 21
         versionName "1.2.1"
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         def appConfigFile = file('config.properties')
@@ -95,6 +96,7 @@ dependencies {
     implementation Dependencies.androidxConstraintLayout
     implementation Dependencies.androidxPref
     implementation Dependencies.androidxWork
+    implementation Dependencies.multiDex
 
     // Lifecycle component
     implementation Dependencies.lifecycleLibs
@@ -127,6 +129,7 @@ dependencies {
     implementation Dependencies.nachos
     implementation Dependencies.acraMail
     implementation Dependencies.osmdroid
+    implementation Dependencies.accordionView
     // Project Lib
     api project(path: ":languagepack")
 

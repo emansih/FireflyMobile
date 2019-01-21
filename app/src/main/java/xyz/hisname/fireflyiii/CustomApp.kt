@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii
 import android.app.Application
 import android.content.Context
 import android.preference.PreferenceManager
+import androidx.multidex.MultiDexApplication
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.acra.ACRA
 import org.acra.ReportField
@@ -20,7 +21,7 @@ import xyz.hisname.languagepack.LanguageChanger
         ReportField.BUILD_CONFIG, ReportField.STACK_TRACE, ReportField.LOGCAT])
 @AcraMailSender(reportAsFile = true, mailTo = "", resSubject = R.string.app_name,
         reportFileName = "Fireflyiii-mobile.txt")
-class CustomApp: Application() {
+class CustomApp: MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()

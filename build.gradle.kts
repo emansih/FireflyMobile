@@ -2,6 +2,7 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven("https://dl.bintray.com/florent37/maven")
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.3.0")
@@ -16,5 +17,6 @@ allprojects {
         google()
         maven("https://jitpack.io")
         jcenter()
+        maven("https://dl.bintray.com/florent37/maven")
     }
 }

@@ -9,12 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
-import kotlinx.android.synthetic.main.dialog_add_tags.*
+import kotlinx.android.synthetic.main.fragment_add_tags.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -33,7 +35,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
     private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.create(R.layout.dialog_add_tags, container)
+        return inflater.create(R.layout.fragment_add_tags, container)
     }
 
     override fun onStart() {
@@ -46,6 +48,13 @@ class AddTagsFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_tags_layout)
+        expansionLayout.addListener { expansionLayout, expanded ->
+            if(expanded){
+                optionalLayout.isVisible = true
+            } else {
+                optionalLayout.isInvisible = true
+            }
+        }
         if(tagId != 0L){
             updateData()
         }

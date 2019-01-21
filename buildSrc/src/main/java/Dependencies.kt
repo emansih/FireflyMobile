@@ -32,6 +32,8 @@ object Dependencies{
     private const val espressoVersion = "3.1.1"
     private const val androidTestVersion = "1.1.1"
     private const val androidTestCoreVersion = "1.0.0"
+    private const val accordionViewVersion = "1.2.2"
+    private const val multiDexVersion = "2.0.1"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
@@ -70,5 +72,6 @@ object Dependencies{
     val androidTest = "androidx.test:runner:$androidTestVersion"
     val androidTestCore = "androidx.test:core:$androidTestCoreVersion"
     val androidTestExt = "androidx.test.ext:junit:$androidTestCoreVersion"
-
+    val accordionView = "com.github.florent37:expansionpanel:$accordionViewVersion"
+    val multiDex = "androidx.multidex:multidex:$multiDexVersion"
 }
