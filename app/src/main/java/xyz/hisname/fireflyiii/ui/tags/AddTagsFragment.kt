@@ -99,7 +99,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                             requireFragmentManager().commit {
                                 replace(R.id.fragment_container, ListTagsFragment())
                             }
-                            toastSuccess(tag_edittext.getString() + " updated!")
+                            toastSuccess(resources.getString(R.string.tag_updated, tag_edittext.getString()))
                             unReveal(dialog_add_tags_layout)
                         }
                     }
@@ -196,7 +196,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                     requireFragmentManager().commit {
                         replace(R.id.fragment_container, ListTagsFragment())
                     }
-                    toastSuccess(tag_edittext.getString()+ " saved!")
+                    toastSuccess(resources.getString(R.string.tag_created, tag_edittext.getString()))
                     unReveal(dialog_add_tags_layout)
                 }
             }

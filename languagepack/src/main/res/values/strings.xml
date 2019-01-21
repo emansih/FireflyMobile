@@ -36,11 +36,11 @@
     <string name="delete_piggy_bank_title">Delete piggy bank %1$s</string>
     <string name="delete_bill_title">Delete Bill %1$s</string>
     <string name="delete_account_message">Are you sure you want to delete the account named %1$s</string>
-    <string name="bill_deleted">Success! Deleted bill %1$s</string>
-    <string name="tag_deleted">Success! Deleted tag %1$s</string>
+    <string name="bill_deleted">Deleted bill %1$s</string>
+    <string name="tag_deleted">Deleted tag %1$s</string>
     <string name="sign_in">Sign In</string>
     <string name="overview">Overview</string>
-    <string name="piggy_bank_deleted">Success! Deleted piggy bank %1$s</string>
+    <string name="piggy_bank_deleted">Deleted piggy bank %1$s</string>
     <string name="delete_transaction_message">Are you sure you want to delete the transaction described %1$s ?</string>
     <string name="bill">Bill</string>
     <string name="transaction">Transactions</string>
@@ -90,4 +90,8 @@
     <string name="warning">Warning!</string>
     <string name="settings">Settings</string>
     <string name="target_amount">Target Amount</string>
+    <string name="date">Date</string>
+    <string name="optional_field">Optional Fields</string>
+    <string name="tag_created">Tag %1$s has been created!</string>
+    <string name="tag_updated">Updated tag %1$s</string>
 </resources>

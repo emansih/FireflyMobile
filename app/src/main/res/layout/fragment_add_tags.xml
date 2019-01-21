@@ -87,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="120dp"
                     android:layout_width="wrap_content"
-                    android:text="Optionals"
+                    android:text="@string/optional_field"
                     style="@style/TextAppearance.MaterialComponents.Headline5"/>
 
                 <ImageView
@@ -122,7 +122,7 @@
                         android:layout_height="wrap_content"
                         android:drawablePadding="12dp"
                         android:focusable="false"
-                        android:hint="Date"
+                        android:hint="@string/date"
                         android:textSize="16sp"
                         android:layout_marginTop="12dp"
                         app:expansion_expanded="false"
@@ -147,7 +147,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:drawablePadding="12dp"
-                        android:hint="Description"
+                        android:hint="@string/description"
                         android:textSize="16sp"
                         app:layout_constraintTop_toBottomOf="@+id/linedivider"
                         app:layout_constraintStart_toStartOf="@+id/date_edittext"

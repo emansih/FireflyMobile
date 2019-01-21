@@ -59,5 +59,9 @@
     <string name="warning">Achtung!</string>
     <string name="settings">Einstellungen</string>
     <string name="target_amount">Zielbetrag</string>
+    <string name="date">Datum</string>
+    <string name="optional_field">Optionale Felder</string>
+    <string name="tag_created">Schlagwort %1$s wurde angelegt!</string>
+    <string name="tag_updated">Schlagwort %1$s aktualisiertern</string>
 
 </resources>
