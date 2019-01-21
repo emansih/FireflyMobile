@@ -64,4 +64,7 @@
     <string name="optional_field">選填欄位</string>
     <string name="tag_created">標籤 %1$s 已被建立！</string>
     <string name="tag_updated">已更新標籤 %1$s</string>
+    <string name="enabled">已啟用</string>
+    <string name="currency_created">%1$s 貨幣已建立</string>
+    <string name="currency_updated">%1$s 貨幣已更新</string>
 </resources>

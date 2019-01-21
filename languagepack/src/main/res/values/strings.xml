@@ -94,4 +94,7 @@
     <string name="optional_field">Optional Fields</string>
     <string name="tag_created">Tag %1$s has been created!</string>
     <string name="tag_updated">Updated tag %1$s</string>
+    <string name="enabled">Enabled</string>
+    <string name="currency_created">Currency %1$s created</string>
+    <string name="currency_updated">Currency %1$s updated</string>
 </resources>

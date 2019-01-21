@@ -70,89 +70,93 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/decimal_places_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/decimal_places_edittext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="52dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginStart="30dp"
+                android:digits="0123456789"
+                android:drawablePadding="12dp"
+                android:hint="@string/decimal_places"
+                android:inputType="number"
+                android:textSize="16sp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"/>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/decimal_places_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:digits="0123456789"
-                    android:drawablePadding="12dp"
-                    android:hint="@string/decimal_places"
-                    android:inputType="number"
-                    android:textSize="16sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <View
+                android:id="@+id/linedivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E1E1E1"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/decimal_places_edittext"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/symbol_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/symbol_edittext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="52dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginStart="30dp"
-                app:layout_constraintTop_toBottomOf="@+id/decimal_places_layout"
+                android:layout_marginTop="20dp"
+                android:drawablePadding="12dp"
+                android:hint="@string/currency_symbol"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@+id/linedivider"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/symbol_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:drawablePadding="12dp"
-                    android:hint="@string/currency_symbol"
-                    android:textSize="16sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <View
+                android:id="@+id/linedivider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E1E1E1"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/symbol_edittext"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/code_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/code_edittext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="52dp"
-                android:layout_marginEnd="30dp"
-                android:layout_marginStart="30dp"
-                app:layout_constraintTop_toBottomOf="@+id/symbol_layout"
+                android:layout_marginTop="20dp"
+                android:drawablePadding="12dp"
+                android:hint="@string/currency_code"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@+id/linedivider1"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/code_edittext"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:drawablePadding="12dp"
-                    android:hint="@string/currency_code"
-                    android:textSize="16sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <View
+                android:id="@+id/linedivider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E1E1E1"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/code_edittext"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/enabled_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="52dp"
-                android:layout_marginStart="30dp"
-                app:layout_constraintTop_toBottomOf="@+id/code_layout"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:layout_marginEnd="20dp"
+                app:layout_constraintTop_toTopOf="@+id/enabled_textview"
+                app:layout_constraintBottom_toBottomOf="@+id/enabled_textview"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/enabled_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enabled?"
+                android:text="@string/enabled"
+                android:layout_marginTop="20dp"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_marginStart="12dp"
-                app:layout_constraintTop_toTopOf="@+id/enabled_checkbox"
-                app:layout_constraintBottom_toBottomOf="@+id/enabled_checkbox"
-                app:layout_constraintStart_toEndOf="@+id/enabled_checkbox"/>
+                app:layout_constraintTop_toBottomOf="@+id/linedivider2"
+                app:layout_constraintStart_toStartOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

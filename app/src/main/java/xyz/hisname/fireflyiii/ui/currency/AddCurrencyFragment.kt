@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
-import kotlinx.android.synthetic.main.dialog_add_currency.*
+import kotlinx.android.synthetic.main.fragment_add_currency.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -22,7 +22,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.dialog_add_currency, container)
+        return inflater.create(R.layout.fragment_add_currency, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,7 +73,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                 .sizeDp(24),null, null, null)
         placeHolderToolbar.navigationIcon = navIcon
         addCurrencyFab.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary_dark))
-        addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
+        addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
                 .sizeDp(24))
     }
@@ -93,7 +93,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                     if (errorMessage != null) {
                         toastError(errorMessage)
                     } else if (response.getResponse() != null) {
-                        toastSuccess("Currency updated")
+                        toastSuccess(resources.getString(R.string.currency_updated, name_edittext.getString()))
                         unReveal(addCurrencyFab)
                     }
                 })
@@ -108,7 +108,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                     if (errorMessage != null) {
                         toastError(errorMessage)
                     } else if (response.getResponse() != null) {
-                        toastSuccess("Currency saved")
+                        toastSuccess(resources.getString(R.string.currency_created, name_edittext.getString()))
                         unReveal(addCurrencyFab)
                     }
                 })

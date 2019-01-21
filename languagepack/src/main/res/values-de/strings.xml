@@ -63,5 +63,8 @@
     <string name="optional_field">Optionale Felder</string>
     <string name="tag_created">Schlagwort %1$s wurde angelegt!</string>
     <string name="tag_updated">Schlagwort %1$s aktualisiertern</string>
+    <string name="enabled">Aktiviert</string>
+    <string name="currency_created">Währung %1$s erstellt</string>
+    <string name="currency_updated">Währung %1$s aktualisiert</string>
 
 </resources>
