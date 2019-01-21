@@ -25,7 +25,7 @@ class CustomApp: Application() {
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
-        if(BuildConfig.BUILD_TYPE == "release") {
+        if(BuildConfig.DEBUG == false) {
             ACRA.init(this)
         }
     }
