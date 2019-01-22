@@ -15,6 +15,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
@@ -239,6 +240,13 @@ class AddTransactionPager: BaseFragment() {
         piggyViewModel.piggyName.observe(this, Observer {
             piggy_edittext.setText(it)
         })
+        expansionLayout.addListener { expansionLayout, expanded ->
+            if(expanded){
+                optionalLayout.isVisible = true
+            } else {
+                optionalLayout.isInvisible = true
+            }
+        }
     }
 
     private fun contextSwitch(){
