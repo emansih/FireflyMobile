@@ -48,13 +48,6 @@
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/billDue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/md_red_900"
-                app:layout_constraintTop_toBottomOf="@id/billAmount" />
-
-            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/billFreq"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

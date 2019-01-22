@@ -33,7 +33,7 @@ class BillsRecyclerAdapter(private val items: MutableList<BillData>, private val
     inner class BillsHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(billData: BillData, clickListener: (BillData) -> Unit) = with(itemView) {
             val billResponse = billData.billAttributes
-            val date = billResponse?.date
+            /*val date = billResponse?.date
             val daysDiff = DateTimeUtil.getDaysDifference(date).toInt()
             itemView.billDue.let {
                 when {
@@ -47,7 +47,7 @@ class BillsRecyclerAdapter(private val items: MutableList<BillData>, private val
                                 DateTimeUtil.getDayOfWeek(date!!),date)
                     }
                 }
-            }
+            }*/
             val billName = billResponse?.name
             if(billName != null){
                 if(billName.length >= 17){
