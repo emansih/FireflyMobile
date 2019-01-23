@@ -6,15 +6,23 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -47,7 +55,6 @@ import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
-import xyz.hisname.fireflyiii.ui.transaction.AddTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.DeviceUtil
 
@@ -69,29 +76,33 @@ class HomeActivity: BaseActivity(){
         setUpDrawer(savedInstanceState)
         supportActionBar?.title = ""
         setNavIcon()
+        setBottomNav()
         if(intent.getStringExtra("transaction") != null) {
             val transaction = intent.getStringExtra("transaction")
-            val addTransactionDialog = AddTransactionDialog()
+            val addTransactionFragment = AddTransactionFragment()
             when (transaction) {
                 "Withdrawal" -> {
-                    addTransactionDialog.show(supportFragmentManager.beginTransaction(),"addTrans").apply {
-                        addTransactionDialog.arguments = bundleOf("transactionType" to "Withdrawal")
+                    supportFragmentManager.commitNow(true) {
+                        addTransactionFragment.arguments = bundleOf("transactionType" to "Withdrawal")
+                        replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
                     }
                 }
                 "Deposit" -> {
-                    addTransactionDialog.show(supportFragmentManager.beginTransaction(),"addTrans").apply {
-                        addTransactionDialog.arguments = bundleOf("transactionType" to "Deposit")
+                    supportFragmentManager.commitNow(true) {
+                        addTransactionFragment.arguments = bundleOf("transactionType" to "Deposit")
+                        replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
                     }
                 }
                 "Transfer" -> {
-                    addTransactionDialog.show(supportFragmentManager.beginTransaction(),"addTrans").apply {
-                        addTransactionDialog.arguments = bundleOf("transactionType" to "Transfer")
+                    supportFragmentManager.commitNow(true) {
+                        addTransactionFragment.arguments = bundleOf("transactionType" to "Transfer")
+                        replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
                     }
                 }
+                // Home screen shortcut
                 "transactionFragment" -> {
                     supportFragmentManager.commit {
-                        val addTransactionFragment = AddTransactionFragment()
-                        addTransactionFragment.arguments = bundleOf("revealX" to globalFAB.width / 2, "revealY" to globalFAB.height / 2)
+                        addTransactionFragment.arguments = bundleOf("revealX" to globalFAB.width / 2, "revealY" to globalFAB.height / 2, "transactionType" to "Withdrawal")
                         replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
                         addToBackStack(null)
                     }
@@ -408,6 +419,21 @@ class HomeActivity: BaseActivity(){
                     result?.setSelection(1)
                 }
             }
+            supportFragmentManager.backStackEntryCount == 1 -> {
+                if(supportFragmentManager.findFragmentByTag("fragmentTransaction") is AddTransactionFragment){
+                    supportFragmentManager.commit {
+                        remove(AddTransactionFragment())
+                    }
+                    findViewById<CoordinatorLayout>(R.id.fragment_add_transaction_root).isVisible = false
+                    findViewById<FloatingActionButton>(R.id.globalFAB).isVisible = true
+                    findViewById<BottomNavigationView>(R.id.transactionBottomView).isGone = true
+                    findViewById<FrameLayout>(R.id.fragment_container).isVisible = true
+                    val drawerLayout = result?.drawerLayout
+                    drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                    supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                    result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
+                }
+            }
             else -> super.onBackPressed()
         }
     }
@@ -425,6 +451,48 @@ class HomeActivity: BaseActivity(){
                 drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
+            }
+        }
+    }
+
+    private fun setBottomNav(){
+        transactionBottomView.apply {
+            menu.add(Menu.NONE, 0, Menu.NONE, R.string.withdrawal).setIcon(R.drawable.ic_arrow_left)
+            menu.add(Menu.NONE, 1, Menu.NONE, R.string.income).setIcon(R.drawable.ic_arrow_right)
+            menu.add(Menu.NONE, 2, Menu.NONE, R.string.transfer).icon = IconicsDrawable(this@HomeActivity)
+                    .icon(FontAwesome.Icon.faw_exchange_alt)
+                    .sizeDp(24)
+        }
+        transactionBottomView.setOnNavigationItemSelectedListener {item: MenuItem ->
+            when(item.itemId){
+                0 -> {
+                    supportFragmentManager.commitNow(true) {
+                        val addTransactionFragment = AddTransactionFragment()
+                        addTransactionFragment.arguments = bundleOf("transactionType" to "Withdrawal")
+                        replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
+                    }
+                    true
+                }
+                1 -> {
+                    supportFragmentManager.commitNow(true) {
+                        val addTransactionFragment = AddTransactionFragment()
+                        addTransactionFragment.arguments = bundleOf("transactionType" to "Deposit")
+                        replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
+
+                    }
+                    true
+                }
+                2 -> {
+                    supportFragmentManager.commitNow(true) {
+                        val addTransactionFragment = AddTransactionFragment()
+                        addTransactionFragment.arguments = bundleOf("transactionType" to "Transfer")
+                        replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
+                    }
+                    true
+                }
+                else -> {
+                    false
+                }
             }
         }
     }

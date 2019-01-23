@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,18 +17,12 @@ import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
@@ -43,7 +36,6 @@ import kotlin.math.roundToInt
 class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
-    private val prefManager by lazy { AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())) }
     private val summaryViewModel by lazy { getViewModel(SummaryViewModel::class.java) }
     private var depositSum = 0.toBigDecimal()
     private var withdrawSum = 0.toBigDecimal()
@@ -75,7 +67,7 @@ class DashboardFragment: BaseFragment() {
             fab.isClickable = false
             requireFragmentManager().commit {
                 val addTransactionFragment = AddTransactionFragment()
-                addTransactionFragment.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                addTransactionFragment.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2,"transactionType" to "Withdrawal")
                 replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
                 addToBackStack(null)
             }
