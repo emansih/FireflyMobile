@@ -28,14 +28,11 @@ import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 import android.content.Intent
 import android.view.*
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
-import androidx.work.Data
 import com.hootsuite.nachos.chip.ChipCreator
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
-import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 import kotlin.collections.ArrayList
 
 
@@ -211,31 +208,11 @@ class AddTransactionDialog: BaseDialog() {
             placeHolderToolbar.inflateMenu(R.menu.delete_menu)
             placeHolderToolbar.setOnMenuItemClickListener { item ->
                 if (item.itemId == R.id.menu_item_delete) {
-                    AlertDialog.Builder(requireContext())
-                            .setTitle(R.string.delete_account_title)
-                            .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
-                            .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
-                                    .sizeDp(24)
-                                    .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
-                            .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                                ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
-                                transactionViewModel.deleteTransaction(transactionId).observe(this, Observer {
-                                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-                                    if (it == true) {
-                                        toastSuccess(resources.getString(R.string.transaction_deleted))
-                                        dialog?.dismiss()
-                                    } else {
-                                        DeleteTransactionWorker.setupWorker(Data.Builder(), transactionId)
-                                        toastInfo("There was an issue deleting your transaction. It will be " +
-                                                "deleted in the background.",
-                                                Toast.LENGTH_LONG)
-                                    }
-                                })
-                            }
-                            .setNegativeButton("No") { _, _ ->
-                                toastInfo("Transaction not deleted")
-                            }
-                            .show()
+                    requireFragmentManager().commit {
+                        add(DeleteTransactionDialog().apply {
+                            arguments = bundleOf("transactionId" to transactionId, "transactionDescription" to transactionDescription)
+                        }, "")
+                    }
                 }
                 true
             }

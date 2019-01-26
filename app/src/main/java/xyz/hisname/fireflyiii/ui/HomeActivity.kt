@@ -432,6 +432,8 @@ class HomeActivity: BaseActivity(){
                     drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                     supportActionBar?.setDisplayHomeAsUpEnabled(false)
                     result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
+                } else {
+                    supportFragmentManager.popBackStack()
                 }
             }
             else -> super.onBackPressed()

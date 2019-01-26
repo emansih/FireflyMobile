@@ -7,16 +7,16 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import java.util.*
 
 class RecentTransactionFragment: BaseFragment() {
@@ -64,9 +64,11 @@ class RecentTransactionFragment: BaseFragment() {
     }
 
     private fun itemClicked(data: TransactionData){
-        val addTransaction = AddTransactionDialog()
-        addTransaction.arguments = bundleOf("transactionId" to data.transactionId,
-                "transactionType" to data.transactionAttributes?.transactionType)
-        addTransaction.show(requireFragmentManager().beginTransaction(), "add_transaction_dialog")
+        requireFragmentManager().commit {
+            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
+                arguments = bundleOf("transactionId" to data.transactionId)
+            })
+            addToBackStack(null)
+        }
     }
 }
