@@ -33,7 +33,7 @@
     <string name="client_id">客戶端 ID</string>
     <string name="personal_access_token">個人訪問權杖</string>
     <string name="currency_symbol">符號</string>
-    <string name="currency_code">代碼</string>
+    <string name="currency_code">貨幣代碼</string>
     <string name="decimal_places">小數位數</string>
     <string name="delete_tag_message">你真的要要刪除標籤 %1$s 嗎？</string>
     <string name="delete_account_title">刪除帳戶 %1$s</string>
@@ -43,14 +43,14 @@
     <string name="delete_piggy_bank_title">删除小豬撲滿 %1$s</string>
     <string name="delete_bill_title">刪除帳單 %1$s</string>
     <string name="delete_account_message">你確定你想要刪除名為 %1$s 的帳戶?</string>
-    <string name="bill_deleted">成功！已刪除帳單 %1$s</string>
-    <string name="tag_deleted">成功！刪除了標籤 %1$s</string>
+    <string name="bill_deleted">已刪除帳單 %1$s</string>
+    <string name="tag_deleted">刪除了標籤 %1$s</string>
     <string name="sign_in">登入</string>
     <string name="overview">概覽</string>
-    <string name="piggy_bank_deleted">成功！删除小豬撲滿 %1$s</string>
+    <string name="piggy_bank_deleted">删除小豬撲滿 %1$s</string>
     <string name="categories">分類</string>
     <string name="expense">支出</string>
-    <string name="income">收入 / 所得</string>
+    <string name="income">收入</string>
     <string name="edit">編輯</string>
     <string name="net_worth">淨值</string>
     <string name="left_to_spend">剩餘可花費</string>
@@ -67,4 +67,5 @@
     <string name="enabled">已啟用</string>
     <string name="currency_created">%1$s 貨幣已建立</string>
     <string name="currency_updated">%1$s 貨幣已更新</string>
+    <string name="spent">支出</string>
 </resources>

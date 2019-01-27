@@ -28,7 +28,7 @@
     <string name="revenue_account">Kreditor (Einnahme)</string>
     <string name="personal_access_token">Persönliche Zugangs-Authentifizierungsschlüssel</string>
     <string name="currency_symbol">Zeichen</string>
-    <string name="currency_code">Schlüssel</string>
+    <string name="currency_code">Währungscode</string>
     <string name="delete_tag_message">Möchten Sie das Schlagwort %1$s wirklich löschen?</string>
     <string name="delete_permanently">Dauerhaft löschen</string>
     <string name="delete_transaction_message">Sind Sie sicher, dass Sie die Überweisung mit dem Namen %1$s löschen möchten?</string>
@@ -38,13 +38,12 @@
     <string name="delete_piggy_bank_title">Sparschwein %1$s löschen</string>
     <string name="delete_bill_title">Rechnung %1$s löschen</string>
     <string name="delete_account_message">Möchten Sie das Konto %1$s wirklich löschen?</string>
-    <string name="bill_deleted">Geschafft! Rechnung %1$s gelöscht</string>
-    <string name="tag_deleted">Geschafft! Schlagwort %1$s entfernt</string>
+    <string name="bill_deleted">Rechnung %1$s gelöscht</string>
+    <string name="tag_deleted">Schlagwort %1$s entfernt</string>
     <string name="sign_in">Anmelden</string>
     <string name="overview">Übersicht</string>
-    <string name="piggy_bank_deleted">Geschafft! Sparschwein %1$s gelöscht</string>
+    <string name="piggy_bank_deleted">Sparschwein %1$s gelöscht</string>
     <string name="welcome">Willkommen!</string>
-    <string name="client_id">Client ID</string>
     <string name="transaction">Buchungen</string>
     <string name="categories">Kategorien</string>
     <string name="deposit">Einnahme</string>
@@ -54,7 +53,6 @@
     <string name="net_worth">Vermögen</string>
     <string name="left_to_spend">Verbleibend zum Ausgeben</string>
     <string name="balance">Kontostand</string>
-    <string name="budget">Budget</string>
     <string name="language">Sprache</string>
     <string name="warning">Achtung!</string>
     <string name="settings">Einstellungen</string>
@@ -66,5 +64,7 @@
     <string name="enabled">Aktiviert</string>
     <string name="currency_created">Währung %1$s erstellt</string>
     <string name="currency_updated">Währung %1$s aktualisiert</string>
+    <string name="spent">Ausgegeben</string>
+    <string name="client_id">Client-ID</string>
 
 </resources>

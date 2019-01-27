@@ -1,4 +1,6 @@
-<resources>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
     <string name="app_name" translatable="false">Language Changer</string>
 	<string name="dashboard">Dashboard</string>
     <string name="transfer">Transfer</string>
@@ -26,7 +28,7 @@
     <string name="asset_account">Asset Accounts</string>
     <string name="revenue_account">Revenue Accounts</string>
     <string name="personal_access_token">Personal Access Token</string>
-    <string name="currency_symbol">Currency Symbol</string>
+    <string name="currency_symbol">Symbol</string>
     <string name="currency_code">Currency Code</string>
     <string name="delete_tag_message">Are you sure you want to delete the tag named %1$s ?</string>
     <string name="delete_account_title">Delete account %1$s</string>
@@ -83,7 +85,6 @@
         <item>Yearly</item>
     </string-array>
     <string name="net_worth">Net Worth</string>
-    <string name="left_to_spend">Left To Spend</string>
     <string name="balance">Balance</string>
     <string name="budget">Budget</string>
     <string name="language">Language</string>
@@ -97,4 +98,6 @@
     <string name="enabled">Enabled</string>
     <string name="currency_created">Currency %1$s created</string>
     <string name="currency_updated">Currency %1$s updated</string>
+    <string name="spent">Spent</string>
+    <string name="left_to_spend">Left To Spend</string>
 </resources>

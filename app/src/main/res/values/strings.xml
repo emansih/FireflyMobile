@@ -9,9 +9,7 @@
     <string name="bill_due_tomorrow">Bill due tomorrow</string>
     <string name="bill_due_yesterday">Bill due yesterday</string>
     <string name="error_loading_bills">Error loading bills</string>
-    <string name="unable_ping_server">Unable to reach server</string>
     <string name="authorization_error">Authorization Error</string>
-    <string name="timeout_connecting">Timeout connecting to server</string>
     <string name="syncing_account">Syncing your account…</string>
     <string name="no_bills">Hurray! You have no bills</string>
     <string name="bill_amount">-%1$s %2$s</string>
@@ -28,7 +26,6 @@
     <string name="authentication_failed">Authentication Failed</string>
     <string name="authentication_failed_message">There was an issue retrieving access token from your Firefly III instance. Ensure you are using %1$s as your redirect URI in your Firefly III config.</string>
     <string name="details">Details</string>
-    <string name="view_report">View Report (%1$s)</string>
     <string name="data_added_when_user_online">%1$s will be added when you are back online</string>
     <string name="no_piggy_bank">No Piggy Bank found</string>
     <string name="no_transaction_found">No %1$s found</string>
@@ -39,10 +36,6 @@
     <string name="transaction_added">Transaction Added</string>
     <string name="issue_refreshing_token">There was an issue refreshing your token</string>
     <string name="refreshing_token">Refreshing your access token…</string>
-    <string name="bill_name_optional">Bill Name(Optional)</string>
-    <string name="piggy_bank_name_optional">Piggy Bank Name(Optional)</string>
-    <string name="category_optional">Category(Optional)</string>
-    <string name="tags_optional">Tags(optional), Comma separated</string>
     <string name="url">URL</string>
     <string name="server_version">Server Version</string>
     <string name="mobile_version">Mobile Version</string>

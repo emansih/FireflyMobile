@@ -223,8 +223,9 @@ class DashboardFragment: BaseFragment() {
                             budgeted = budget.second.toFloat()
                             val budgetLeftPercentage = (budgetSpent / budgeted) * 100
                             val budgetSpentPercentage = (budgeted - budgetSpent) / budgeted * 100
-                            val dataSet = PieDataSet(arrayListOf(PieEntry(budgetLeftPercentage, "Spent"),
-                                    PieEntry(budgetSpentPercentage, "Left")), "").apply {
+                            val dataSet = PieDataSet(arrayListOf(PieEntry(budgetLeftPercentage,
+                                    resources.getString(R.string.spent)), PieEntry(budgetSpentPercentage,
+                                            resources.getString(R.string.left_to_spend))), "").apply {
                                 setDrawIcons(true)
                                 sliceSpace = 2f
                                 iconsOffset = MPPointF(0f, 40f)

@@ -26,12 +26,20 @@
         <item>English</item>
         <item>Deutsch</item>
         <item>正體中文</item>
+        <item>Français</item>
+        <item>Italiano</item>
+        <item>Nederlands</item>
+        <item>Español </item>
     </string-array>
 
     <string-array name="language_values">
         <item>en</item>
         <item>de</item>
         <item>zh</item>
+        <item>fr</item>
+        <item>it</item>
+        <item>nl</item>
+        <item>es</item>
     </string-array>
 
 </resources>
