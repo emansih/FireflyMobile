@@ -3,13 +3,13 @@ package xyz.hisname.fireflyiii.ui.dashboard
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
@@ -24,8 +24,8 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.extension.*
@@ -65,16 +65,8 @@ class DashboardFragment: BaseFragment() {
         })
         fab.display {
             fab.isClickable = false
-            requireFragmentManager().commit {
-                val addTransactionFragment = AddTransactionFragment()
-                addTransactionFragment.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2,"transactionType" to "Withdrawal")
-                replace(R.id.bigger_fragment_container, addTransactionFragment, "fragmentTransaction")
-                addToBackStack(null)
-            }
+            requireActivity().startActivity(Intent(requireContext(), AddTransactionActivity::class.java))
             fab.isClickable = true
-        }
-        if(requireFragmentManager().findFragmentByTag("fragmentTransaction") is AddTransactionFragment) {
-            fab.isGone = true
         }
     }
 

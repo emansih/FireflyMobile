@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_withdraw"
+        android:enabled="true"
+        android:icon="@drawable/ic_arrow_left"
+        android:title="@string/withdrawal" />
+    <item
+        android:id="@+id/action_deposit"
+        android:enabled="true"
+        android:icon="@drawable/ic_arrow_right"
+        android:title="@string/deposit" />
+    <item
+        android:id="@+id/action_transfer"
+        android:enabled="true"
+        android:icon="@drawable/ic_bank_transfer"
+        android:title="@string/transfer" />
+
+
+</menu>

@@ -45,6 +45,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.HomeActivity" />
+        <activity android:name=".ui.transaction.addtransaction.AddTransactionActivity" />
 
         <receiver android:name=".receiver.TransactionReceiver"
             tools:ignore="ExportedReceiver">

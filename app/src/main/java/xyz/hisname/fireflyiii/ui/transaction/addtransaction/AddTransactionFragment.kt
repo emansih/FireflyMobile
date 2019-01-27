@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.transaction
+package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -17,6 +17,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
 import com.hootsuite.nachos.chip.ChipSpan
@@ -40,7 +41,8 @@ import java.util.*
 class AddTransactionFragment: BaseFragment() {
 
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
-    private val transactionBottomView by lazy { requireActivity().findViewById<BottomNavigationView>(R.id.transactionBottomView) }
+    private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
+    private val transactionId by lazy { arguments?.getLong("transactionId") ?: 0 }
     private var currency = ""
     private var accounts = ArrayList<String>()
     private var tags = ArrayList<String>()
@@ -60,8 +62,6 @@ class AddTransactionFragment: BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        fab.isGone = true
-        fragmentContainer.isVisible = false
         return inflater.create(R.layout.fragment_add_transaction, container)
     }
 
@@ -69,7 +69,14 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setIcons()
         setWidgets()
+        if(transactionId != 0L){
+            updateTransactionSetup()
+        }
         contextSwitch()
+        setFab()
+    }
+
+    private fun setFab(){
         addTransactionFab.setOnClickListener {
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             hideKeyboard()
@@ -109,8 +116,32 @@ class AddTransactionFragment: BaseFragment() {
                     destinationAccount = destination_spinner.selectedItem.toString()
                 }
             }
-            submitData()
+            if(transactionId != 0L){
+                updateData()
+            } else {
+                submitData()
+            }
         }
+    }
+
+    private fun updateData(){
+        transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
+                transaction_date_edittext.getString(), billName,
+                transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
+                currency, categoryName, transactionTags).observe(this, Observer { transactionResponse->
+            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            val errorMessage = transactionResponse.getErrorMessage()
+            if (transactionResponse.getResponse() != null) {
+                toastSuccess(resources.getString(R.string.transaction_updated))
+                requireFragmentManager().popBackStack()
+                fragmentContainer.isVisible = true
+                requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+            } else if(errorMessage != null) {
+                toastError(errorMessage)
+            } else if(transactionResponse.getError() != null) {
+                toastError(transactionResponse.getError()?.localizedMessage)
+            }
+        })
     }
 
     private fun setIcons(){
@@ -249,15 +280,15 @@ class AddTransactionFragment: BaseFragment() {
                 optionalLayout.isInvisible = true
             }
         }
-        transactionBottomView.isVisible = true
         placeHolderToolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material)
         placeHolderToolbar.setNavigationOnClickListener {
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            fragment_add_transaction_root.isVisible = false
-            requireFragmentManager().popBackStack()
-            fragmentContainer.isVisible = true
-            requireActivity().findViewById<BottomNavigationView>(R.id.transactionBottomView).isGone = true
-            fab.isVisible = true
+            if(nastyHack){
+                requireFragmentManager().popBackStack()
+                fragmentContainer.isVisible = true
+                requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+            } else {
+                requireActivity().finish()
+            }
         }
     }
 
@@ -363,7 +394,13 @@ class AddTransactionFragment: BaseFragment() {
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
                 toastSuccess(resources.getString(R.string.transaction_added))
-                requireFragmentManager().popBackStack()
+                if(nastyHack){
+                    requireFragmentManager().popBackStack()
+                    fragmentContainer.isVisible = true
+                    requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+                } else {
+                    requireActivity().finish()
+                }
             } else if (errorMessage != null) {
                 toastError(errorMessage)
             } else if (transactionResponse.getError() != null) {
@@ -421,17 +458,57 @@ class AddTransactionFragment: BaseFragment() {
                     }
                 }
                 toastOffline(getString(R.string.data_added_when_user_online, transactionType))
-                requireFragmentManager().popBackStack()
+                if(nastyHack){
+                    requireFragmentManager().popBackStack()
+                    fragmentContainer.isVisible = true
+                    requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+                } else {
+                    requireActivity().finish()
+                }
+            }
+        })
+    }
+
+    private fun updateTransactionSetup(){
+        transactionViewModel.getTransactionById(transactionId).observe(this, Observer {
+            val transactionAttributes = it[0].transactionAttributes
+            description_edittext.setText(transactionAttributes?.description)
+            transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount
+                    ?: 0.toDouble()).toString())
+            currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this, Observer { currencyData ->
+                val currencyAttributes = currencyData[0].currencyAttributes
+                currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
+            })
+            currency = transactionAttributes?.currency_code.toString()
+            transaction_date_edittext.setText(transactionAttributes?.date)
+            bill_edittext.setText(transactionAttributes?.bill_name)
+            piggy_edittext.setText(transactionAttributes?.piggy_bank_name)
+            category_edittext.setText(transactionAttributes?.category_name)
+            if(transactionAttributes?.tags != null){
+                tags_chip.setText(transactionAttributes.tags + ",")
+            }
+            when {
+                Objects.equals("Withdrawal", transactionType) -> {
+                    destination_edittext.setText(transactionAttributes?.destination_name)
+                    sourceName = transactionAttributes?.source_name
+                }
+                Objects.equals("Transfer", transactionType) -> {
+                    sourceName = transactionAttributes?.source_name
+                    destinationName = transactionAttributes?.destination_name
+                }
+                Objects.equals("Deposit", transactionType) -> {
+                    source_edittext.setText(transactionAttributes?.source_name)
+                    destinationName = transactionAttributes?.destination_name
+                }
             }
         })
     }
 
     override fun onStop() {
         super.onStop()
-        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-        fragment_add_transaction_root.isVisible = false
-        fragmentContainer.isVisible = true
-        fab.isVisible = true
-        transactionBottomView.isGone = true
+        if(nastyHack){
+            fragmentContainer.isVisible = true
+            requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+        }
     }
 }

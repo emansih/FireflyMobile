@@ -47,15 +47,4 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/transactionBottomView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="?android:attr/windowBackground"
-        android:foreground="?attr/selectableItemBackground"
-        android:layout_gravity="bottom"
-        app:itemTextColor="@color/white"
-        app:itemBackground="@color/md_red_700"/>
-
 </FrameLayout>

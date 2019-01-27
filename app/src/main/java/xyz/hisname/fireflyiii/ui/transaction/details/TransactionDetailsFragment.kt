@@ -15,8 +15,9 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.AddTransactionDialog
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.extension.consume
 import xyz.hisname.fireflyiii.util.extension.create
 
@@ -149,10 +150,12 @@ class TransactionDetailsFragment: BaseFragment() {
             }
         }
         R.id.menu_item_edit -> consume {
-            val addTransactionDialog = AddTransactionDialog().apply {
+            val addTransaction = AddTransactionFragment().apply {
                 arguments = bundleOf("transactionId" to transactionId)
             }
-            addTransactionDialog.show(requireFragmentManager(), "")
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, addTransaction)
+            }
         }
         else -> super.onOptionsItemSelected(item)
     }

@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
@@ -20,8 +21,10 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionDialog
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.collections.ArrayList
@@ -129,10 +132,12 @@ class TransactionFragment: BaseFragment(){
     }
 
     private fun itemClicked(data: TransactionData){
-        val addTransaction = AddTransactionDialog()
-        addTransaction.arguments = bundleOf("transactionId" to data.transactionId,
-                "transactionType" to data.transactionAttributes?.transactionType)
-        addTransaction.show(requireFragmentManager().beginTransaction(), "add_transaction_dialog")
+        requireFragmentManager().commit {
+            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
+                arguments = bundleOf("transactionId" to data.transactionId)
+            })
+            addToBackStack(null)
+        }
     }
 
     override fun onAttach(context: Context){
@@ -174,11 +179,17 @@ class TransactionFragment: BaseFragment(){
             }
             setOnClickListener {
                 addTransactionFab.isClickable = false
-                val addTransaction = AddTransactionDialog()
+                val addTransaction = AddTransactionFragment()
                 addTransaction.arguments = bundleOf("revealX" to addTransactionFab.width / 2,
-                        "revealY" to addTransactionFab.height / 2, "transactionType" to transactionType)
-                addTransaction.show(requireFragmentManager().beginTransaction(), "add_transaction_dialog")
+                        "revealY" to addTransactionFab.height / 2, "transactionType" to transactionType,
+                        "SHOULD_HIDE" to true)
+                requireFragmentManager().commit {
+                    replace(R.id.bigger_fragment_container, addTransaction)
+                    addToBackStack(null)
+                }
                 addTransactionFab.isClickable = true
+                addTransactionFab.isVisible = false
+                fragmentContainer.isVisible = false
             }
             setImageDrawable(IconicsDrawable(requireContext())
                     .icon(GoogleMaterial.Icon.gmd_add)
