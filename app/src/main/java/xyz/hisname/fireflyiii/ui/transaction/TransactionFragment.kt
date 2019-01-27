@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.fragment_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
