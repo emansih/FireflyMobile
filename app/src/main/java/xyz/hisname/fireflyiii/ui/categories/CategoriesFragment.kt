@@ -88,4 +88,7 @@ class CategoriesFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.categories)
     }
 
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

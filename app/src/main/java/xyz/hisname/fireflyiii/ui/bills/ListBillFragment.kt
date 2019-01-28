@@ -130,4 +130,8 @@ class ListBillFragment: BaseFragment() {
         super.onDetach()
         fab.isGone = true
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

@@ -3,9 +3,12 @@ package xyz.hisname.fireflyiii.ui.about
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.Observer
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
@@ -16,6 +19,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
@@ -25,6 +29,7 @@ class AboutFragment: MaterialAboutFragment() {
     private val serverVersion by lazy { sharedPref.getString("server_version","") ?: ""}
     private val apiVersion by lazy { sharedPref.getString("api_version","") ?: ""}
     private val userOs by lazy { sharedPref.getString("user_os","") ?: ""}
+    private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
 
     override fun onStart() {
         super.onStart()
@@ -33,6 +38,11 @@ class AboutFragment: MaterialAboutFragment() {
 
     override fun getMaterialAboutList(context: Context): MaterialAboutList{
         return createMaterialAboutList()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        handleBack()
     }
 
     override fun getTheme() = R.style.AppTheme_MaterialAboutActivity_Fragment
@@ -91,5 +101,13 @@ class AboutFragment: MaterialAboutFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = resources.getString(R.string.about)
+    }
+
+    private fun handleBack() {
+        globalViewModel.backPress.observe(this, Observer { backPressValue ->
+            if(backPressValue == true) {
+                requireFragmentManager().popBackStack()
+            }
+        })
     }
 }

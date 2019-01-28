@@ -157,4 +157,7 @@ class SettingsAccountFragment: BaseSettings() {
         requireActivity().activity_toolbar.title = "Account Settings"
     }
 
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

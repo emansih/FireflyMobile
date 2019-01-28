@@ -121,4 +121,7 @@ class TagDetailsFragment: BaseDetailFragment() {
                 .show()
     }
 
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

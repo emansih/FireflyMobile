@@ -51,13 +51,6 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        placeHolderToolbar.setNavigationOnClickListener {
-            unReveal(dialog_add_currency_layout)
-        }
-    }
-
     override fun setIcons(){
         decimal_places_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_dot_circle)
@@ -81,6 +74,9 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     override fun setWidgets(){
         enabled_textview.setOnClickListener {
             enabled_checkbox.performClick()
+        }
+        placeHolderToolbar.setNavigationOnClickListener {
+            handleBack()
         }
     }
 
@@ -114,9 +110,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                 })
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun handleBack() {
         unReveal(dialog_add_currency_layout)
     }
-
 }

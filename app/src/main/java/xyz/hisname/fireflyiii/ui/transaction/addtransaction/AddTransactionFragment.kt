@@ -282,13 +282,7 @@ class AddTransactionFragment: BaseFragment() {
         }
         placeHolderToolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material)
         placeHolderToolbar.setNavigationOnClickListener {
-            if(nastyHack){
-                requireFragmentManager().popBackStack()
-                fragmentContainer.isVisible = true
-                requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
-            } else {
-                requireActivity().finish()
-            }
+            handleBack()
         }
     }
 
@@ -394,13 +388,7 @@ class AddTransactionFragment: BaseFragment() {
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
                 toastSuccess(resources.getString(R.string.transaction_added))
-                if(nastyHack){
-                    requireFragmentManager().popBackStack()
-                    fragmentContainer.isVisible = true
-                    requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
-                } else {
-                    requireActivity().finish()
-                }
+                handleBack()
             } else if (errorMessage != null) {
                 toastError(errorMessage)
             } else if (transactionResponse.getError() != null) {
@@ -458,13 +446,7 @@ class AddTransactionFragment: BaseFragment() {
                     }
                 }
                 toastOffline(getString(R.string.data_added_when_user_online, transactionType))
-                if(nastyHack){
-                    requireFragmentManager().popBackStack()
-                    fragmentContainer.isVisible = true
-                    requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
-                } else {
-                    requireActivity().finish()
-                }
+                handleBack()
             }
         })
     }
@@ -504,11 +486,13 @@ class AddTransactionFragment: BaseFragment() {
         })
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun handleBack() {
         if(nastyHack){
+            requireFragmentManager().popBackStack()
             fragmentContainer.isVisible = true
             requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+        } else {
+            requireActivity().finish()
         }
     }
 }

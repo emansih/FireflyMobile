@@ -65,4 +65,8 @@ class RulesFragment: BaseFragment() {
         super.onResume()
         activity?.activity_toolbar?.title = "Rules"
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

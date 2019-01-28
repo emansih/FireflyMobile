@@ -166,7 +166,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         currencyViewModel.currencyDetails.observe(this, Observer {
             currency_edittext.setText(it)
         })
-        placeHolderToolbar.setNavigationOnClickListener{ unReveal(dialog_add_bill_layout) }
+        placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
@@ -224,8 +224,8 @@ class AddBillFragment: BaseAddObjectFragment() {
         })
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun handleBack() {
         unReveal(dialog_add_bill_layout)
     }
+
 }

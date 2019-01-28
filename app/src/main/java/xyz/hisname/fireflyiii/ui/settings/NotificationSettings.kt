@@ -34,4 +34,8 @@ class NotificationSettings: BaseSettings() {
         super.onResume()
         activity?.activity_toolbar?.title = "Notifications"
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

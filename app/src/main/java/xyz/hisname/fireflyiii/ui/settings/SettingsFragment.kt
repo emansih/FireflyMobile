@@ -68,4 +68,8 @@ class SettingsFragment: BaseSettings() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.settings)
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

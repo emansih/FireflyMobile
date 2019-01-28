@@ -158,4 +158,8 @@ class TransactionDetailsFragment: BaseFragment() {
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

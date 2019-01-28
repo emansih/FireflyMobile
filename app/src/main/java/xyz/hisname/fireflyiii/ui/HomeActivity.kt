@@ -36,6 +36,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -50,6 +51,7 @@ import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DeviceUtil
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 
 class HomeActivity: BaseActivity(){
@@ -58,6 +60,7 @@ class HomeActivity: BaseActivity(){
     private lateinit var headerResult: AccountHeader
     private var profile: IProfile<*>? = null
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
+    private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -395,17 +398,22 @@ class HomeActivity: BaseActivity(){
     }
 
     override fun onBackPressed() {
-        when {
-            result?.isDrawerOpen!! -> result?.closeDrawer()
-            supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
-            supportFragmentManager.backStackEntryCount == 0 -> {
-                if(supportFragmentManager.findFragmentByTag("dash") is DashboardFragment){
-                    finish()
-                } else {
-                    result?.setSelection(1)
+        if(result?.isDrawerOpen!!) {
+            result?.closeDrawer()
+        } else {
+            when {
+                //supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
+                supportFragmentManager.backStackEntryCount == 0 -> {
+                    if (supportFragmentManager.findFragmentByTag("dash") is DashboardFragment) {
+                        finish()
+                    } else {
+                        result?.setSelection(1)
+                    }
+                }
+                else -> {
+                    globalViewModel.handleBackPress(true)
                 }
             }
-            else -> super.onBackPressed()
         }
     }
 

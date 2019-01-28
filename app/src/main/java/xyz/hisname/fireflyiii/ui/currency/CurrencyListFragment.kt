@@ -121,4 +121,7 @@ class CurrencyListFragment: BaseFragment() {
         fab.isGone = true
     }
 
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

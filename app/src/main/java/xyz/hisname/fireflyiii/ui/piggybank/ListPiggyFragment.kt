@@ -126,4 +126,8 @@ class ListPiggyFragment: BaseFragment() {
         super.onDetach()
         fab.isGone = true
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

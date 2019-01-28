@@ -154,4 +154,8 @@ class PiggyDetailFragment: BaseDetailFragment() {
         super.onDestroy()
         piggyList.clear()
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

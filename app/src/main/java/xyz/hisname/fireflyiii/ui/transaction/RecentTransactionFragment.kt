@@ -20,6 +20,8 @@ import xyz.hisname.fireflyiii.util.extension.create
 import java.util.*
 
 class RecentTransactionFragment: BaseFragment() {
+    override fun handleBack() {
+    }
 
     private var dataAdapter = ArrayList<TransactionData>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter

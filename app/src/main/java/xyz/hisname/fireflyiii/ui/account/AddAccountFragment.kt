@@ -303,10 +303,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
         })
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun handleBack() {
         unReveal(dialog_add_account_layout)
     }
-
 
 }

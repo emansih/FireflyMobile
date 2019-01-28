@@ -111,4 +111,8 @@ class AccountDetailFragment: BaseDetailFragment() {
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

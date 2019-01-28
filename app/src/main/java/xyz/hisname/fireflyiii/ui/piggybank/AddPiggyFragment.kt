@@ -92,9 +92,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 updatePiggyBank()
             }
         }
-        placeHolderToolbar.setNavigationOnClickListener {
-            unReveal(dialog_add_piggy_layout)
-        }
+
     }
 
     override fun setIcons(){
@@ -163,6 +161,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 account_spinner.adapter = accountAdapter
             }
         })
+        placeHolderToolbar.setNavigationOnClickListener {
+            handleBack()
+        }
     }
 
     override fun submitData(){
@@ -226,8 +227,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         })
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun handleBack() {
         unReveal(dialog_add_piggy_layout)
     }
 }

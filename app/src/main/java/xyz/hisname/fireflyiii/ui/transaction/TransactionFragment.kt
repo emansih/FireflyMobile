@@ -222,4 +222,8 @@ class TransactionFragment: BaseFragment(){
         }
     }
 
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
+
 }

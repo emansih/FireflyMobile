@@ -49,4 +49,8 @@ class DeleteTransactionDialog: BaseFragment() {
                 }
                 .show()
     }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 }

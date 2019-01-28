@@ -38,13 +38,6 @@ class AddTagsFragment: BaseAddObjectFragment() {
         return inflater.create(R.layout.fragment_add_tags, container)
     }
 
-    override fun onStart() {
-        super.onStart()
-        placeHolderToolbar.setOnClickListener {
-            unReveal(dialog_add_tags_layout)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_tags_layout)
@@ -156,6 +149,9 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 zoom_edittext.setText(it)
             }
         })
+        placeHolderToolbar.setOnClickListener {
+            handleBack()
+        }
     }
 
     override fun setIcons(){
@@ -203,8 +199,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
         })
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun handleBack() {
         unReveal(dialog_add_tags_layout)
     }
 

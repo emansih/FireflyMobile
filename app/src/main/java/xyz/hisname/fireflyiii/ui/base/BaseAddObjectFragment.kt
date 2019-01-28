@@ -21,7 +21,7 @@ abstract class BaseAddObjectFragment: BaseFragment() {
     }
 
     protected fun unReveal(rootView: View){
-        /*if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             val x= rootView.width / 2
             val y= rootView.height / 2
             val finalRadius = (Math.max(rootView.width, rootView.height) * 1.1).toFloat()
@@ -32,7 +32,11 @@ abstract class BaseAddObjectFragment: BaseFragment() {
             circularReveal.addListener(object : AnimatorListenerAdapter(){
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
-                    requireFragmentManager().popBackStack()
+                    try {
+                        requireFragmentManager().popBackStack()
+                    } catch(illegal: IllegalStateException){
+
+                    }
                     rootView.isVisible = false
                     fragmentContainer.isVisible = true
                     fab.isVisible = true
@@ -40,19 +44,14 @@ abstract class BaseAddObjectFragment: BaseFragment() {
             })
             circularReveal.start()
         } else {
-            requireFragmentManager().popBackStack()
+            try {
+                requireFragmentManager().popBackStack()
+            } catch(illegal: IllegalStateException){
+
+            }
             fragmentContainer.isVisible = true
             fab.isVisible = true
-        }*/
-        rootView.isVisible = false
-        requireFragmentManager().popBackStack()
-        fragmentContainer.isVisible = true
-        fab.isVisible = true
-    }
-
-    override fun onStop() {
-        super.onStop()
-        fragmentContainer.isVisible = true
+        }
     }
 
     abstract fun setIcons()

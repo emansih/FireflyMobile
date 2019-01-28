@@ -160,5 +160,8 @@ class ListTagsFragment: BaseFragment() {
         fab.isGone = true
     }
 
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
 
 }

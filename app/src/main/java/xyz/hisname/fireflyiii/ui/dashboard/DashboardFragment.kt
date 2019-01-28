@@ -280,4 +280,8 @@ class DashboardFragment: BaseFragment() {
         super.onDetach()
         fab.isGone = true
     }
+
+    override fun handleBack() {
+        requireActivity().finish()
+    }
 }

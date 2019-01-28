@@ -185,4 +185,8 @@ class ListAccountFragment: BaseFragment() {
         fab.isGone = true
     }
 
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+    }
+
 }
