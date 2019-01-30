@@ -17,6 +17,7 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
+import java.text.DecimalFormat
 import kotlin.math.round
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
@@ -106,6 +107,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     fun getAllAccountWithNetworthAndCurrency(currencyCode: String): LiveData<String>{
         isLoading.value = true
         val accountValue: MutableLiveData<String> = MutableLiveData()
+        val df = DecimalFormat("#.##")
         var currentBalance = 0.toDouble()
         accountsService?.getPaginatedAccountType("all", 1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
@@ -133,7 +135,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                         accountData?.forEachIndexed { _, accountData ->
                             currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
                         }
-                        accountValue.postValue(currentBalance.toString())
+                        accountValue.postValue(df.format(currentBalance).toString())
                     }
                     isLoading.value = false
                 }
@@ -150,7 +152,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     accountData?.forEachIndexed { _, accountData ->
                         currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
                     }
-                    accountValue.postValue(currentBalance.toString())
+                    accountValue.postValue(df.format(currentBalance).toString())
                 }
                 isLoading.value = false
             }
