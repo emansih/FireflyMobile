@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
@@ -17,9 +19,11 @@ import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.toastError
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
+import xyz.hisname.fireflyiii.util.extension.display
 
 
 class CategoriesFragment: BaseFragment() {
@@ -32,6 +36,7 @@ class CategoriesFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         displayView()
+        initFab()
         pullToRefresh()
     }
 
@@ -64,6 +69,33 @@ class CategoriesFragment: BaseFragment() {
 
         categoryViewModel.apiResponse.observe(this, Observer {
             toastError(it)
+        })
+    }
+
+    private fun initFab(){
+        fab.display {
+            fab.isClickable = false
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, AddCategoriesFragment().apply {
+                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                })
+                addToBackStack(null)
+            }
+            fab.isClickable = true
+        }
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if(dy > 0 && fab.isShown){
+                    fab.hide()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if(newState == RecyclerView.SCROLL_STATE_IDLE){
+                    fab.show()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
         })
     }
 
