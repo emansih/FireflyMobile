@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
@@ -192,13 +193,20 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                                 piggyBroadcast.putExtras(extras)
                                 requireActivity().sendBroadcast(piggyBroadcast)
                                 toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
-                                requireFragmentManager().popBackStack()
+                                handleBack()
                             } else {
                                 toastError("Error saving piggy bank")
                             }
                         } else if (it.getResponse() != null) {
                             toastSuccess("Piggy bank saved")
-                            requireFragmentManager().popBackStack()
+                            val bundle = bundleOf("piggyId" to it.getResponse()?.data?.piggyId)
+                            requireFragmentManager().commit {
+                                replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
+                                addToBackStack(null)
+                            }
+                            dialog_add_piggy_layout.isVisible = false
+                            fragmentContainer.isVisible = true
+
                         }
                     })
         })
@@ -215,13 +223,12 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                     toastError(it.getError()?.localizedMessage)
                 } else if (it.getResponse() != null) {
                     toastSuccess("Piggy bank updated")
-                    requireFragmentManager().popBackStack()
+                    handleBack()
                     val bundle = bundleOf("piggyId" to piggyId)
                     requireFragmentManager().commit {
                         replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
                         addToBackStack(null)
                     }
-                    requireFragmentManager().popBackStack()
                 }
             })
         })
