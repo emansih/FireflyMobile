@@ -170,6 +170,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+            currency = currencyData?.code.toString()
         })
     }
 
@@ -199,10 +200,10 @@ class AddBillFragment: BaseAddObjectFragment() {
                         billBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(billBroadcast)
                         toastOffline(getString(R.string.data_added_when_user_online, "Bill"))
-                        requireFragmentManager().popBackStack()
+                        handleBack()
                     } else if (response.getResponse() != null) {
                         toastSuccess("Bill saved")
-                        requireFragmentManager().popBackStack()
+                        handleBack()
                     }
                 })
     }
@@ -219,7 +220,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                 toastError(response.getError()?.localizedMessage)
             } else if (response.getResponse() != null) {
                 toastSuccess("Bill updated")
-                requireFragmentManager().popBackStack()
+                handleBack()
             }
         })
     }
