@@ -63,6 +63,7 @@ object Dependencies{
     val kotlinLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     val glideLib = "com.github.bumptech.glide:glide:$glideVersion"
     val glideCompiler = "com.github.bumptech.glide:compiler:$glideVersion"
+    val glideOkHttpExtension = "com.github.bumptech.glide:okhttp3-integration:$glideVersion"
     val debugDb = "com.amitshekhar.android:debug-db:$debugDbVersion"
     val nachos = "com.hootsuite.android:nachos:$nachosVersion"
     val acraMail = "ch.acra:acra-mail:$acraVersion"

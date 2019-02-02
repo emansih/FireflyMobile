@@ -115,6 +115,7 @@ dependencies {
 
     // Glide
     implementation Dependencies.glideLib
+    implementation Dependencies.glideOkHttpExtension
     kapt Dependencies.glideCompiler
 
     implementation Dependencies.materialDrawer

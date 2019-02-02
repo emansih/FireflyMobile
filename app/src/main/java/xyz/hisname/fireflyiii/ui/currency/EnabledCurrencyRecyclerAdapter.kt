@@ -5,10 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
-import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.currency_list.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
@@ -35,18 +31,9 @@ class EnabledCurrencyRecyclerAdapter (private val items: MutableList<CurrencyDat
         fun bind(currencyData: CurrencyData, clickListener: (CurrencyData) -> Unit) {
             val currency = currencyData.currencyAttributes
             itemView.currencySymbol.text = currency?.symbol.toString()
-            val requestOptions =
-                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(IconicsDrawable(context)
-                                    .icon(GoogleMaterial.Icon.gmd_file_download)
-                                    .sizeDp(24))
-                            .error(IconicsDrawable(context)
-                                    .icon(GoogleMaterial.Icon.gmd_error)
-                                    .sizeDp(24))
             itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             Glide.with(context)
                     .load(Flags.getFlagByIso(currency!!.code))
-                    .apply(requestOptions)
                     .into(itemView.flagImage)
 
             itemView.setOnClickListener {
