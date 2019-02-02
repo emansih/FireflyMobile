@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#00608c</color>
     <color name="colorAccent">#73bdef</color>
     <color name="white">#ffffff</color>
+    <color name="immersive_bars">#99000000</color>
 </resources>

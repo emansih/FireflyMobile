@@ -31,6 +31,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme_LoginTheme)
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
         val homeActivity = Intent(this, HomeActivity::class.java)
