@@ -108,7 +108,6 @@ class AddBillFragment: BaseAddObjectFragment() {
         addBillFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
                 .sizeDp(24))
-        placeHolderToolbar.navigationIcon = navIcon
         if(billId != 0L) {
             placeHolderToolbar.inflateMenu(R.menu.delete_menu)
             placeHolderToolbar.setOnMenuItemClickListener { item ->

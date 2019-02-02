@@ -28,6 +28,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/primary"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:navigationIcon="@drawable/abc_ic_clear_material"
                 app:layout_collapseMode="none"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>

@@ -39,7 +39,6 @@ abstract class BaseFragment: Fragment() {
     protected val fragmentContainer by lazy { requireActivity().findViewById<FrameLayout>(R.id.fragment_container) }
     protected val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
     protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
-    protected val navIcon by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material) }
     protected val billViewModel: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     protected val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     protected val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }

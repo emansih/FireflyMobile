@@ -71,7 +71,6 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_not_interested)
                         .color(ContextCompat.getColor(requireContext(), R.color.md_brown_500))
                         .sizeDp(24),null, null, null)
-        placeHolderToolbar.navigationIcon = navIcon
         placeHolderToolbar.setNavigationOnClickListener {
             unReveal(dialog_add_account_layout)
         }

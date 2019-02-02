@@ -64,7 +64,6 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                 .icon(GoogleMaterial.Icon.gmd_code)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_deep_purple_400))
                 .sizeDp(24),null, null, null)
-        placeHolderToolbar.navigationIcon = navIcon
         addCurrencyFab.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary_dark))
         addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
