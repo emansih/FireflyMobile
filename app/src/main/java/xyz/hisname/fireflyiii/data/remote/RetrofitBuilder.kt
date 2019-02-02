@@ -69,15 +69,24 @@ class RetrofitBuilder {
             } catch (malformed: MalformedURLException){
                 URL("https://$initialUrl")
             }
+            val basePort = if(baseUrl.port == -1){
+                // User has no port in base Url.
+                //  Example: https://demo.firefly-iii.org
+                ""
+            } else {
+                // User has port in base Url.
+                //  Example: https://demo.firefly-iii.org:1234
+                ":" + baseUrl.port
+            }
             val baseProtocol = baseUrl.protocol
             // Remove protocol. Example: https://demo.firefly-iii.org becomes demo.firefly-iii.org
             val baseUrlHost = baseUrl.host
             val apiUrl = if(baseUrl.path.isEmpty()){
                 // User has no path in url(demo.firefly-iii.org)
-                baseUrlHost
+                baseUrlHost + basePort
             } else {
                 // User has path in url(demo.firefly-iii.org/login)
-                baseUrlHost + baseUrl.path
+                baseUrlHost + basePort + baseUrl.path
             }
             return "$baseProtocol://$apiUrl/"
         }
