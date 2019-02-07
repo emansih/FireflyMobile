@@ -43,3 +43,4 @@
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 -dontwarn okhttp3.**
 -dontwarn okio.**
+-keep public class * implements com.bumptech.glide.module.GlideModule
