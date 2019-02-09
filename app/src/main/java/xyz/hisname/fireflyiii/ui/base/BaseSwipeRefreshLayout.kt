@@ -10,6 +10,10 @@ class BaseSwipeRefreshLayout@JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null): SwipeRefreshLayout(context,attrs) {
 
+    init {
+        setColorSchemeResources()
+    }
+
     override fun setColorSchemeResources(@ColorRes vararg colorResIds: Int) {
         val colorScheme = arrayListOf(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
