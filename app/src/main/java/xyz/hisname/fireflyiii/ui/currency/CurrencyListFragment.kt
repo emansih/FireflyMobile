@@ -11,7 +11,6 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
@@ -19,6 +18,7 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
+import xyz.hisname.fireflyiii.util.extension.hideFab
 import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 
 class CurrencyListFragment: BaseFragment() {
@@ -82,20 +82,7 @@ class CurrencyListFragment: BaseFragment() {
             }
             fab.isClickable = true
         }
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(dy > 0 && fab.isShown){
-                    fab.hide()
-                }
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if(newState == RecyclerView.SCROLL_STATE_IDLE){
-                    fab.show()
-                }
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-        })
+        recycler_view.hideFab(fab)
     }
 
     private fun pullToRefresh(){
