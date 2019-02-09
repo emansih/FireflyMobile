@@ -272,7 +272,7 @@
                         android:visibility="invisible">
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/bill_layout"
+                            android:id="@+id/time_layout"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -284,6 +284,29 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent">
 
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/time_edittext"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:drawablePadding="12dp"
+                                android:hint="Time"
+                                android:textSize="16sp"
+                                android:focusable="false"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/bill_layout"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginEnd="30dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/time_layout">
+
                             <xyz.hisname.fireflyiii.ui.base.TextInputAutoCompleteTextView
                                 android:id="@+id/bill_edittext"
                                 android:layout_width="match_parent"
@@ -291,6 +314,7 @@
                                 android:drawablePadding="12dp"
                                 android:hint="@string/bill"
                                 android:textSize="16sp"
+                                android:focusable="false"
                                 style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
                         </com.google.android.material.textfield.TextInputLayout>
 

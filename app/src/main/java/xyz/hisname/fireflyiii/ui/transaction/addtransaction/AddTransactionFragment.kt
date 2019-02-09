@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -35,6 +36,7 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
@@ -59,6 +61,8 @@ class AddTransactionFragment: BaseFragment() {
     private lateinit var spinnerAdapter: ArrayAdapter<Any>
     private var sourceName: String? = ""
     private var destinationName: String? = ""
+    private val calendar by lazy {  Calendar.getInstance() }
+    private var selectedTime = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -125,10 +129,15 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun updateData(){
+        val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
+            transaction_date_edittext.getString() + " " + selectedTime
+        } else {
+            transaction_date_edittext.getString()
+        }
         transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
-                transaction_date_edittext.getString(), billName,
-                transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags).observe(this, Observer { transactionResponse->
+                transactionDateTime, billName, transaction_amount_edittext.getString(),
+                sourceAccount, destinationAccount, currency, categoryName,
+                transactionTags).observe(this, Observer { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -173,7 +182,10 @@ class AddTransactionFragment: BaseFragment() {
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
                         .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
                         .sizeDp(24),null, null, null)
-
+        time_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_clock)
+                        .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                        .sizeDp(24),null, null, null)
         tags_chip.chipTokenizer = SpanChipTokenizer(requireContext(), object : ChipCreator<ChipSpan> {
             override fun configureChip(chip: ChipSpan, chipConfiguration: ChipConfiguration) {
             }
@@ -194,7 +206,6 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun setWidgets(){
         transaction_date_edittext.setText(DateTimeUtil.getTodayDate())
-        val calendar = Calendar.getInstance()
         val transactionDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
             run {
@@ -284,6 +295,21 @@ class AddTransactionFragment: BaseFragment() {
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
+        userApiVersion.observe(this, Observer { apiVersion ->
+            if(apiVersion > Version("0.9.1").get()){
+                time_layout.isVisible = true
+                time_edittext.setOnClickListener {
+                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                    val minute = calendar.get(Calendar.MINUTE)
+                    TimePickerDialog(requireContext(), TimePickerDialog.OnTimeSetListener {
+                        _, selectedHour, selectedMin ->
+                        // We don't have to be really accurate down to seconds.
+                       selectedTime = "$selectedHour:$selectedMin"
+                        time_edittext.setText(selectedTime)
+                    },hour, minute, true).show()
+                }
+            }
+        })
     }
 
     private fun contextSwitch(){
@@ -380,8 +406,13 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun submitData() {
+        val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
+            transaction_date_edittext.getString() + " " + selectedTime
+        } else {
+            transaction_date_edittext.getString()
+        }
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
-                transaction_date_edittext.getString(), piggyBank, billName,
+                transactionDateTime, piggyBank, billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
                 currency, categoryName, transactionTags).observe(this, Observer { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
@@ -399,7 +430,7 @@ class AddTransactionFragment: BaseFragment() {
                         }
                         val extras = bundleOf(
                                 "description" to description_edittext.getString(),
-                                "date" to transaction_date_edittext.getString(),
+                                "date" to transactionDateTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "sourceName" to sourceAccount,
@@ -417,7 +448,7 @@ class AddTransactionFragment: BaseFragment() {
                         }
                         val extras = bundleOf(
                                 "description" to description_edittext.getString(),
-                                "date" to transaction_date_edittext.getString(),
+                                "date" to transactionDateTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "destinationName" to destinationAccount,
@@ -433,7 +464,7 @@ class AddTransactionFragment: BaseFragment() {
                         }
                         val extras = bundleOf(
                                 "description" to description_edittext.getString(),
-                                "date" to transaction_date_edittext.getString(),
+                                "date" to transactionDateTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "sourceName" to sourceAccount,
