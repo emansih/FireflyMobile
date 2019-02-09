@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout
         android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -18,6 +18,6 @@
             android:layoutAnimation="@anim/layout_animation_fall_down"
             />
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

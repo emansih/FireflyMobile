@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout
         android:id="@+id/swipe_tags"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout>
 
     <include layout="@layout/fragment_base_list"/>
 
