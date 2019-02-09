@@ -24,7 +24,7 @@ import xyz.hisname.fireflyiii.util.extension.toastError
 
 class ListPiggyFragment: BaseFragment() {
 
-    private var dataAdapter = ArrayList<PiggyData>()
+    private var dataAdapter = arrayListOf<PiggyData>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -33,23 +33,26 @@ class ListPiggyFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        runLayoutAnimation(recycler_view)
         displayView()
         pullToRefresh()
         initFab()
     }
 
     private fun displayView(){
-        runLayoutAnimation(recycler_view)
         swipeContainer.isRefreshing = true
         piggyViewModel.getAllPiggyBanks().observe(this, Observer { piggyBankData ->
             piggyViewModel.isLoading.observe(this, Observer { loading ->
                 if (loading == false) {
                     swipeContainer.isRefreshing = false
                     if (piggyBankData.isNotEmpty()) {
-                        listText.isVisible = false
+                        dataAdapter = ArrayList(piggyBankData)
+                                listText.isVisible = false
                         listImage.isVisible = false
                         recycler_view.isVisible = true
-                        recycler_view.adapter = PiggyRecyclerAdapter(piggyBankData) { data: PiggyData -> itemClicked(data) }
+                        recycler_view.adapter =  PiggyRecyclerAdapter(dataAdapter){ data: PiggyData -> itemClicked(data) }.apply {
+                            update(dataAdapter)
+                        }
                     } else {
                         listText.text = resources.getString(R.string.no_piggy_bank)
                         listText.isVisible = true

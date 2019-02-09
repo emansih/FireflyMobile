@@ -165,8 +165,9 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                         }
                     }
                 }
-
+                isLoading.value = false
             } else {
+                isLoading.value = false
                 val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
@@ -175,7 +176,10 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                 }
             }
         })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
+        { throwable ->
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
+
     }
 }

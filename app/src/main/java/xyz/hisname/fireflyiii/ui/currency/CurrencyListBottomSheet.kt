@@ -21,6 +21,7 @@ import java.util.*
 class CurrencyListBottomSheet: BottomSheetDialogFragment() {
 
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
+    private var dataAdapter = arrayListOf<CurrencyData>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -33,13 +34,21 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
         recycler_view.apply {
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
-            adapter?.notifyDataSetChanged()
         }
-        currencyViewModel.getEnabledCurrency().observe(this, Observer {currencyData ->
-            currencyData?.sortWith(Comparator { initial, after ->
-                initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
+        currencyViewModel.getEnabledCurrency().observe(this, Observer { currencyData ->
+            currencyViewModel.isLoading.observe(this, Observer { loading ->
+                if(loading == false){
+                    currencyData?.sortWith(Comparator { initial, after ->
+                        initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
+                    })
+                    dataAdapter = ArrayList(currencyData)
+                    recycler_view.adapter = EnabledCurrencyRecyclerAdapter(currencyData) { data: CurrencyData ->
+                        itemClicked(data)
+                    }.apply {
+                        update(dataAdapter)
+                    }
+                }
             })
-            recycler_view.adapter = EnabledCurrencyRecyclerAdapter(currencyData) { data: CurrencyData -> itemClicked(data) }
         })
     }
 
