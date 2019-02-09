@@ -14,24 +14,21 @@ abstract class DiffUtilAdapter<D, VH : RecyclerView.ViewHolder> : RecyclerView.A
 
     protected var dataSet: List<D> = listOf()
     private val diffCallback by lazy(LazyThreadSafetyMode.NONE) { DiffCallback() }
-    private val eventActor =
-            GlobalScope.actor<List<D>>(Dispatchers.Default, capacity = Channel.CONFLATED, block = {
+    private val eventActor by lazy { GlobalScope.actor<List<D>>(Dispatchers.IO, capacity = Channel.CONFLATED,
+            block = {
                 for (list in channel) internalUpdate(list)
             })
+    }
 
     fun update (list: List<D>) = eventActor.offer(list)
 
     private suspend fun internalUpdate(list: List<D>) {
-        GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT) {
+        GlobalScope.launch(Dispatchers.IO, CoroutineStart.LAZY) {
             dataSet = list
             DiffUtil.calculateDiff(diffCallback.apply { newList = list },false)
                     .dispatchUpdatesTo(this@DiffUtilAdapter)
-            /* The code taken from Geoffrey Métais didn't call `notifyDataSetChanged()`
-            and it resulted in
-            `java.lang.IndexOutOfBoundsException: Inconsistency detected. Invalid item`
-            */
-            notifyDataSetChanged()
         }.join()
+
     }
 
     private inner class DiffCallback : DiffUtil.Callback() {
