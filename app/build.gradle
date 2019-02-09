@@ -131,6 +131,8 @@ dependencies {
     implementation Dependencies.acraMail
     implementation Dependencies.osmdroid
     implementation Dependencies.accordionView
+    implementation Dependencies.fancyshowcaseview
+
     // Project Lib
     api project(path: ":languagepack")
 

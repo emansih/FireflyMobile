@@ -27,6 +27,8 @@ import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
+import me.toptas.fancyshowcase.FancyShowCaseView
+import me.toptas.fancyshowcase.FocusShape
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -287,6 +289,18 @@ class AddTransactionFragment: BaseFragment() {
         expansionLayout.addListener { expansionLayout, expanded ->
             if(expanded){
                 optionalLayout.isVisible = true
+                if (piggy_layout.isVisible){
+                    FancyShowCaseView.Builder(requireActivity())
+                            .focusOn(piggy_layout)
+                            .title(resources.getString(R.string.transactions_create_transfer_ffInput_piggy_bank_id))
+                            .enableAutoTextPosition()
+                            .fitSystemWindows(true)
+                            .showOnce("transactionPiggyShowCase")
+                            .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                            .closeOnTouch(true)
+                            .build()
+                            .show()
+                }
             } else {
                 optionalLayout.isInvisible = true
             }

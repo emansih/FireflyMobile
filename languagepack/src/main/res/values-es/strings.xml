@@ -53,4 +53,13 @@
     <string name="delete_bill_title">Eliminar factura %1$s"</string>
     <string name="delete_account_message">¿Seguro que quieres eliminar la cuenta llamada %1$s"?</string>
     <string name="bill_deleted">Eliminar factura %1$s"</string>
+    <string name="piggy_bank_description_help_text">¿Cuál es tu meta? ¿Un nuevo sofá, una cámara, dinero para emergencias?</string>
+    <string name="piggy_bank_date_help_text">Usted puede establecer una fecha objetivo o una fecha limite para su alcancía.</string>
+    <string name="bills_create_intro">Use facturas para rastrear la cantidad de dinero correspondiente a cada período. Piense en gastos como renta, seguro o pagos de hipoteca.</string>
+    <string name="bills_create_name">Use un nombre descriptivo como \"alquiler\" o \"seguro de salud\".</string>
+    <string name="bills_create_amount_min_holder">Seleccione un monto mínimo y uno máximo para esta factura.</string>
+    <string name="bills_create_repeat_freq_holder">La mayoría de facturas se repiten mensualmente, pero usted puede establecer otra frecuencia aquí.</string>
+    <string name="bills_create_skip_holder">Si una cuenta se repite cada 2 semanas, el campo \"saltar\" debe estar marcado como \"1\" para saltar una semana y generar el gasto cada 2.</string>
+    <string name="transactions_create_switch_box">Utilice estos botones para cambiar rápidamente el tipo de transacción que usted desea guardar.</string>
+    <string name="transactions_create_transfer_ffInput_piggy_bank_id">Seleccione una alcancía y vincule esta transferencia con sus ahorros.</string>
 </resources>

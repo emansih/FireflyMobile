@@ -54,5 +54,14 @@
     <string name="delete_bill_title">Elimina bolletta %1$s</string>
     <string name="delete_account_message">Sei sicuro di voler eliminare il conto %1$s?</string>
     <string name="bill_deleted">Bolletta eliminata %1$s</string>
+    <string name="piggy_bank_description_help_text">Qual è il tuo obiettivo? Un nuovo divano, una macchina fotografica, soldi per le emergenze?</string>
+    <string name="piggy_bank_date_help_text">È possibile impostare una data come obiettivo o una scadenza per il salvadanaio.</string>
+    <string name="bills_create_intro">Usa le bollette per tenere traccia della quantità di denaro che devi pagare ogni periodo. Pensa alle spese come l\\\'affitto, l\\\'assicurazione o le rate del muto.</string>
+    <string name="bills_create_name">Utilizzare un nome descrittivo come \"Affitto\" o \"Assicurazione sanitaria\".</string>
+    <string name="bills_create_amount_min_holder">Seleziona un importo minimo e massimo per questo conto.</string>
+    <string name="bills_create_repeat_freq_holder">La maggior parte dei pagamenti si ripetono mensilmente, ma qui puoi impostare un\\\'altra frequenza.</string>
+    <string name="bills_create_skip_holder">Se una bolletta si ripete ogni 2 settimane, il campo \"salta\" deve essere impostato a \"1\" per saltare ogni volta una settimana.</string>
+    <string name="transactions_create_switch_box">Usa questi pulsanti per cambiare rapidamente il tipo di transazione che desideri salvare.</string>
+    <string name="transactions_create_transfer_ffInput_piggy_bank_id">Seleziona un salvadanaio e collega questo trasferimento ai tuoi risparmi.</string>
 
 </resources>

@@ -52,4 +52,13 @@
     <string name="delete_bill_title">Verwijder contract %1$s</string>
     <string name="delete_account_message">Weet je zeker dat je de rekening met naam %1$s wilt verwijderen?</string>
     <string name="bill_deleted">Contract %1$s verwijderd</string>
+    <string name="piggy_bank_description_help_text">Wat is je doel? Een nieuwe zithoek, een camera of geld voor noodgevallen?</string>
+    <string name="piggy_bank_date_help_text">Je kan een doeldatum of een deadline voor je spaarpot instellen.</string>
+    <string name="bills_create_intro">Gebruik contracten om de hoeveelheid geld te volgen die je elke periode moet betalen. Denk aan uitgaven zoals huur, verzekering of hypotheekbetalingen.</string>
+    <string name="bills_create_name">Gebruik een beschrijvende naam zoals \"huur\" of \"zorgverzekering\".</string>
+    <string name="bills_create_amount_min_holder">Stel ook een minimum- en maximumbedrag in.</string>
+    <string name="bills_create_repeat_freq_holder">De meeste contracten herhalen maandelijks, maar dat kan je eventueel veranderen.</string>
+    <string name="bills_create_skip_holder">Als een contract elke twee weken herhaalt, zet je het \"skip\"-veld op 1 om elke andere week over te slaan.</string>
+    <string name="transactions_create_switch_box">Gebruik deze knoppen om snel van transactietype te wisselen.</string>
+    <string name="transactions_create_transfer_ffInput_piggy_bank_id">Selecteer een spaarpotje en link deze overschrijving aan je spaargeld.</string>
 </resources>

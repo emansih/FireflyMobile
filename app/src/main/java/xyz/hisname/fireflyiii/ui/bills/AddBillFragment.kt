@@ -13,7 +13,10 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
-import kotlinx.android.synthetic.main.dialog_add_bill.*
+import kotlinx.android.synthetic.main.fragment_add_bill.*
+import me.toptas.fancyshowcase.FancyShowCaseQueue
+import me.toptas.fancyshowcase.FancyShowCaseView
+import me.toptas.fancyshowcase.FocusShape
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.BillReceiver
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
@@ -33,10 +36,11 @@ class AddBillFragment: BaseAddObjectFragment() {
     private val billId by lazy { arguments?.getLong("billId") ?: 0 }
     private lateinit var freqAdapter: ArrayAdapter<String>
     private var billDescription: String? = ""
+    private lateinit var queue: FancyShowCaseQueue
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.dialog_add_bill, container)
+        return inflater.create(R.layout.fragment_add_bill, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,6 +67,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                 frequency_spinner.setSelection(spinnerPosition)
             })
         }
+        showHelpText()
     }
 
     override fun onStart() {
@@ -119,6 +124,66 @@ class AddBillFragment: BaseAddObjectFragment() {
                 true
             }
         }
+    }
+
+    private fun showHelpText(){
+        val addBillDescriptionCaseView = FancyShowCaseView.Builder(requireActivity())
+                .focusOn(appbar)
+                .title(resources.getString(R.string.bills_create_intro))
+                .enableAutoTextPosition()
+                .fitSystemWindows(true)
+                .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                .showOnce("addBillDescriptionCaseView")
+                .closeOnTouch(true)
+                .build()
+
+        val descriptionCaseView = FancyShowCaseView.Builder(requireActivity())
+                .focusOn(description_edittext)
+                .title(resources.getString(R.string.bills_create_name))
+                .closeOnTouch(true)
+                .enableAutoTextPosition()
+                .fitSystemWindows(true)
+                .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                .showOnce("descriptionCaseView")
+                .build()
+
+        val minMaxAmountCaseView = FancyShowCaseView.Builder(requireActivity())
+                .focusOn(min_amount_layout)
+                .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                .enableAutoTextPosition()
+                .title(resources.getString(R.string.bills_create_amount_min_holder))
+                .closeOnTouch(true)
+                .fitSystemWindows(true)
+                .showOnce("minMaxAmountCaseView")
+                .build()
+
+        val freqCaseView = FancyShowCaseView.Builder(requireActivity())
+                .focusOn(frequency_spinner)
+                .title(resources.getString(R.string.bills_create_repeat_freq_holder))
+                .closeOnTouch(true)
+                .enableAutoTextPosition()
+                .fitSystemWindows(true)
+                .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                .showOnce("freqCaseView")
+                .build()
+
+        val skipCaseView = FancyShowCaseView.Builder(requireActivity())
+                .focusOn(skip_layout)
+                .title(resources.getString(R.string.bills_create_skip_holder))
+                .closeOnTouch(true)
+                .enableAutoTextPosition()
+                .fitSystemWindows(true)
+                .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                .showOnce("skipCaseView")
+                .build()
+
+        queue = FancyShowCaseQueue()
+                .add(addBillDescriptionCaseView)
+                .add(descriptionCaseView)
+                .add(minMaxAmountCaseView)
+                .add(skipCaseView)
+                .add(freqCaseView)
+        queue.show()
     }
 
     override fun setWidgets(){

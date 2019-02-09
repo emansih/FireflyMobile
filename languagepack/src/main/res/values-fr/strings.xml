@@ -52,4 +52,13 @@
     <string name="delete_bill_title">Supprimer la facture %1$s</string>
     <string name="delete_account_message">Êtes-vous sûr de vouloir supprimer le compte nommé %1$s?</string>
     <string name="bill_deleted">Facture %1$s supprimée</string>
+    <string name="piggy_bank_description_help_text">Quel est votre objectif ? Un nouveau divan, une caméra, de l\\\'argent pour les urgences ?</string>
+    <string name="piggy_bank_date_help_text">Vous pouvez définir une date butoir ou une date limite pour votre tirelire.</string>
+    <string name="bills_create_intro">Utilisez des factures pour suivre les sommes que vous avez à payer à chaque période. Pensez aux dépenses comme le loyer, l\\\'assurance ou les remboursements d\\\'emprunts.</string>
+    <string name="bills_create_name">Utilisez un nom parlant tel que \"Loyer\" ou \"Assurance maladie\".</string>
+    <string name="bills_create_amount_min_holder">Sélectionnez un montant minimum et maximum pour cette facture.</string>
+    <string name="bills_create_repeat_freq_holder">La plupart des factures sont mensuelles, mais vous pouvez définir une autre fréquence ici.</string>
+    <string name="bills_create_skip_holder">Si une facture se répète toutes les 2 semaines, le champ \"sauter\" doit être réglé sur \"1\" pour sauter une semaine sur deux.</string>
+    <string name="transactions_create_switch_box">Utilisez ces boutons pour changer rapidement le type de transaction que vous souhaitez enregistrer.</string>
+    <string name="transactions_create_transfer_ffInput_piggy_bank_id">Sélectionnez une tirelire et reliez ce transfert à vos économies.</string>
 </resources>

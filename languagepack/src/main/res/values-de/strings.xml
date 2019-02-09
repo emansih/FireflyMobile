@@ -66,5 +66,14 @@
     <string name="currency_updated">Währung %1$s aktualisiert</string>
     <string name="spent">Ausgegeben</string>
     <string name="client_id">Client-ID</string>
+    <string name="piggy_bank_description_help_text">Worauf sparen Sie? Eine neue Couch, eine Kamera, Geld für Notfälle?</string>
+    <string name="piggy_bank_date_help_text">Sie können ein Zieldatum oder einen Termin für Ihr Sparschwein festlegen.</string>
+    <string name="bills_create_intro">Verwendet Rechnungen, um den Gesamtbetrag zu ermitteln, den Sie in jedem Zeitraum zahlen müssen. Denken Sie an Ausgaben wie Miete, Versicherung oder Hypothekenzahlungen.</string>
+    <string name="bills_create_name">Verwenden Sie einen aussagekräftigen Namen wie \"Miete\" oder \"Krankenversicherung\".</string>
+    <string name="bills_create_amount_min_holder">Wählen Sie einen Mindest- und Höchstbetrag für diese Rechnung aus.</string>
+    <string name="bills_create_repeat_freq_holder">Die meisten Rechnungen wiederholen sich monatlich, aber Sie können hier eine andere Frequenz einstellen.</string>
+    <string name="bills_create_skip_holder">Wenn eine Rechnung alle 2 Wochen wiederholt wird, sollte das Feld „Überspringen” auf „1” festgelegt werden, um jede zweite Woche zu überspringen.</string>
+    <string name="transactions_create_switch_box">Verwenden Sie diese Schaltflächen, um schnell den Typ der Transaktion zu ändern, die Sie speichern möchten.</string>
+    <string name="transactions_create_transfer_ffInput_piggy_bank_id">Wählen Sie ein Sparschwein aus und verknüpfen Sie diese Umbuchung mit Ihren Ersparnissen.</string>
 
 </resources>

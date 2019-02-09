@@ -21,6 +21,7 @@ import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.DeviceUtil
+import xyz.hisname.fireflyiii.util.extension.onAnimationEnd
 import java.util.*
 
 
@@ -118,14 +119,5 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         super.finish()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
-
-    private inline fun ViewPropertyAnimator.onAnimationEnd(crossinline continuation: (Animator) -> Unit) {
-        setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                continuation(animation)
-            }
-        })
-    }
-
 }
 
