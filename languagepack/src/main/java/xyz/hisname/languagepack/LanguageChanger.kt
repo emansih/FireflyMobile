@@ -17,10 +17,11 @@ class LanguageChanger(baseContext: Context): ContextWrapper(baseContext){
 // Code adapted from: https://stackoverflow.com/questions/40221711/android-context-getresources-updateconfiguration-deprecated
         fun init(context: Context, language: String?): ContextWrapper{
             config = context.resources.configuration
-            locale = if(language.isNullOrEmpty()) {
-                Locale(ConfigurationCompat.getLocales(config)[0].language)
-            } else {
-                Locale(language)
+            locale = when {
+                language.isNullOrEmpty() -> Locale(ConfigurationCompat.getLocales(config)[0].language)
+                language == "zh-rCN" -> Locale("zh", "CN")
+                language == "zh-rTW" -> Locale("zh", "TW")
+                else -> Locale(language)
             }
             Locale.setDefault(locale)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="piggy_bank_description_help_text">你的目标是什麽？一个新沙发、一个相机、急难用金？</string>
+    <string name="piggy_bank_date_help_text">您可以为小猪存钱罐设定目标日期或截止日期。</string>
+    <string name="bills_create_intro">使用帐单来跟踪你每个区间到期的金额。想想租金、保险或抵押贷款等支出。</string>
+    <string name="bills_create_name">使用描述性名称, 如 "租金" 或 "健康保险"。</string>
+    <string name="bills_create_amount_min_holder">选择此帐单的最小和最大金额。</string>
+    <string name="bills_create_repeat_freq_holder">大多数帐单每月重複一次，但你可以在这裡设定另一个频次。</string>
+    <string name="bills_create_skip_holder">如果帐单每2週重複一次，则应将 "略过" 栏位设定为 "1"，以便每隔一週跳一次。</string>
+    <string name="transactions_create_switch_box">使用这些按钮可以快速切换要保存的交易类型。</string>
+    <string name="transactions_create_transfer_ffInput_piggy_bank_id">选择一个小猪存钱罐，并将此转帐连结到您的储蓄。</string>
+    <string name="dashboard">监控面板</string>
+    <string name="account">帐户</string>
+    <string name="bill">帐单</string>
+    <string name="budget">预算</string>
+    <string name="categories">分类</string>
+    <string name="tags">标签</string>
+    <string name="transaction">交易</string>
+    <string name="asset_account">资产帐户</string>
+    <string name="expense_account">支出帐户</string>
+    <string name="revenue_account">收入帐户</string>
+    <string name="liability_account">债务</string>
+    <string name="max_amount">最大金额</string>
+    <string name="deposit">存款</string>
+    <string name="description">描述</string>
+    <string name="piggy_bank">小猪存钱罐</string>
+    <string name="decimal_places">小数位数</string>
+    <string name="currency_symbol">代码</string>
+    <string name="delete_permanently">永久刪除</string>
+    <string name="money_management">金钱管理</string>
+    <string name="source_account">来源帐户</string>
+    <string name="amount">"金额 "</string>
+    <string name="delete_transaction_title">"删除包含描述 %1$s 的交易 "</string>
+    <string name="delete_transaction_message">"你真的要删除这个描述为 %1$s 的交易吗？  "</string>
+    <string name="expense">支出</string>
+    <string name="revenue_income_menu">收入 / 所得</string>
+    <string name="transfer">转帐</string>
+    <string name="withdrawal">提款</string>
+    <string name="destination_account">目标帐户</string>
+    <string name="min_amount">最小金额</string>
+    <string name="skip">略过</string>
+</resources>
