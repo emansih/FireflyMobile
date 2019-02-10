@@ -3,6 +3,7 @@
 [<img src="https://f-droid.org/badge/get-it-on.png"
       alt="Get it on F-Droid"
       height="80">](https://f-droid.org/packages/xyz.hisname.fireflyiii/)
+           
 
 An unofficial Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 
@@ -78,7 +79,7 @@ are signed with the same release key, this ensure that the APK comes from me and
 
 To get latest update notifications, add [this RSS feed](https://github.com/emansih/FireflyMobile/releases.atom). 
 
-It's also available via F-Droid [here](https://f-droid.org/packages/xyz.hisname.fireflyiii/).
+It's also available via F-Droid [here](https://f-droid.org/packages/xyz.hisname.fireflyiii/). I have also added my own FDroid repo for users with Privileged Extension. For more info, take a look at the [wiki](https://github.com/emansih/FireflyMobile/wiki/FDroid)
 
 If there is enough interest, I might upload it to Google Play Store.
 
