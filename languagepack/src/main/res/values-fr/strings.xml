@@ -61,4 +61,5 @@
     <string name="bills_create_skip_holder">Si une facture se répète toutes les 2 semaines, le champ \"sauter\" doit être réglé sur \"1\" pour sauter une semaine sur deux.</string>
     <string name="transactions_create_switch_box">Utilisez ces boutons pour changer rapidement le type de transaction que vous souhaitez enregistrer.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Sélectionnez une tirelire et reliez ce transfert à vos économies.</string>
+    <string name="target_amount">Montant cible</string>
 </resources>

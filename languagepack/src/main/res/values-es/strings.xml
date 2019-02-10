@@ -62,4 +62,6 @@
     <string name="bills_create_skip_holder">Si una cuenta se repite cada 2 semanas, el campo \"saltar\" debe estar marcado como \"1\" para saltar una semana y generar el gasto cada 2.</string>
     <string name="transactions_create_switch_box">Utilice estos botones para cambiar rápidamente el tipo de transacción que usted desea guardar.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Seleccione una alcancía y vincule esta transferencia con sus ahorros.</string>
+    <string name="target_amount">Cantidad objetivo</string>
+    <string name="date">Fecha</string>
 </resources>

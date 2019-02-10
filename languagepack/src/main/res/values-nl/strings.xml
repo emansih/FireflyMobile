@@ -61,4 +61,6 @@
     <string name="bills_create_skip_holder">Als een contract elke twee weken herhaalt, zet je het \"skip\"-veld op 1 om elke andere week over te slaan.</string>
     <string name="transactions_create_switch_box">Gebruik deze knoppen om snel van transactietype te wisselen.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Selecteer een spaarpotje en link deze overschrijving aan je spaargeld.</string>
+    <string name="target_amount">Doelbedrag</string>
+    <string name="date">Datum</string>
 </resources>

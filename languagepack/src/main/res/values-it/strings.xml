@@ -63,5 +63,7 @@
     <string name="bills_create_skip_holder">Se una bolletta si ripete ogni 2 settimane, il campo \"salta\" deve essere impostato a \"1\" per saltare ogni volta una settimana.</string>
     <string name="transactions_create_switch_box">Usa questi pulsanti per cambiare rapidamente il tipo di transazione che desideri salvare.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Seleziona un salvadanaio e collega questo trasferimento ai tuoi risparmi.</string>
+    <string name="target_amount">Importo obiettivo</string>
+    <string name="date">Data</string>
 
 </resources>
