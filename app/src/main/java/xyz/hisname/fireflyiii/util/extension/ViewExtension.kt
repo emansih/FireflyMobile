@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment as SupportFragment
 
 fun ViewGroup.inflate(layoutRes: Int, attachToRoot: Boolean = false): View {
@@ -32,4 +33,13 @@ fun Activity.hideKeyboard() {
 fun Context.hideKeyboard(view: View) {
     val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+fun <T> lazyUnsynchronised(initializer: () -> T): Lazy<T> =
+        lazy(LazyThreadSafetyMode.NONE, initializer)
+
+fun <ViewT : View> SupportFragment.bindView(@IdRes idRes: Int): Lazy<ViewT> {
+    return lazyUnsynchronised {
+        requireActivity().findViewById<ViewT>(idRes)
+    }
 }

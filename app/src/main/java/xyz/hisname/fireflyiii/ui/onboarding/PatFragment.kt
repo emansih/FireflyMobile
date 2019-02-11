@@ -22,7 +22,7 @@ import xyz.hisname.fireflyiii.util.extension.*
 
 class PatFragment: Fragment() {
 
-    private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
+    private val progressOverlay by bindView<View>(R.id.progress_overlay)
     private val model by lazy { getViewModel(AccountsViewModel::class.java) }
     private lateinit var fireflyUrl: String
 

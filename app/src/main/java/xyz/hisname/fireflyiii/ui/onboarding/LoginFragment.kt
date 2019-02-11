@@ -35,7 +35,7 @@ import java.util.*
 class LoginFragment: Fragment() {
 
     private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
-    private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
+    private val progressOverlay by bindView<View>(R.id.progress_overlay)
     private var baseUrlLiveData: MutableLiveData<String> = MutableLiveData()
     private var clientIdLiveData: MutableLiveData<String> = MutableLiveData()
     private var secretKeyLiveData: MutableLiveData<String> = MutableLiveData()
