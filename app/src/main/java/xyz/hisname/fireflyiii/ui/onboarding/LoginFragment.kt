@@ -148,8 +148,8 @@ class LoginFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         val uri = requireActivity().intent.data
-        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
+            ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
             val code = uri.getQueryParameter("code")
             if(code != null) {
                 AppPref(sharedPref).baseUrl = baseUrlLiveData.value ?: ""
@@ -159,17 +159,18 @@ class LoginFragment: Fragment() {
                     clientId = clientIdLiveData.value ?: ""
                 }
                 authViewModel.getAccessToken(code).observe(this, Observer {
-                    ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                     if(it == true){
                         accManager.authMethod = "oauth"
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
                         toastSuccess(resources.getString(R.string.welcome))
+                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         requireFragmentManager().commit {
                             setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                             replace(R.id.bigger_fragment_container, OnboardingFragment())
                         }
                     } else {
+                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         if(!authViewModel.authFailedReason.value.toString().isBlank()){
                             toastInfo( authViewModel.authFailedReason.value.toString())
                         }
