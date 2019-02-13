@@ -68,7 +68,9 @@ class PatFragment: Fragment() {
                                         .commit()
                                 toastSuccess(resources.getString(R.string.welcome))
                             } else {
-                               // toastError(resources.getString(R.string.authentication_failed))
+                                if(model.apiResponse.value != null){
+                                    toastError(model.apiResponse.value)
+                                }
                             }
                         }
                     })
