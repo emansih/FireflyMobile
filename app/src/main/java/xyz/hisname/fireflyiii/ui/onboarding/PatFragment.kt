@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.fragment_pat.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.extension.*
@@ -25,6 +26,7 @@ class PatFragment: Fragment() {
     private val progressOverlay by bindView<View>(R.id.progress_overlay)
     private val model by lazy { getViewModel(AccountsViewModel::class.java) }
     private lateinit var fireflyUrl: String
+    private val accountManager by lazy { AccountManager.get(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -50,10 +52,12 @@ class PatFragment: Fragment() {
                 }
             }  else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
+                RetrofitBuilder.destroyInstance()
+                AuthenticatorManager(accountManager).destroyAccount()
                 fireflyUrl = firefly_url_edittext.getString()
-                AuthenticatorManager(AccountManager.get(requireContext())).initializeAccount()
+                AuthenticatorManager(accountManager).initializeAccount()
                 AppPref(PreferenceManager.getDefaultSharedPreferences(context)).baseUrl = fireflyUrl
-                AuthenticatorManager(AccountManager.get(requireContext())).accessToken = firefly_access_edittext.getString()
+                AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString()
                 model.getAllAccounts().observe(this, Observer { accountData ->
                     model.isLoading.observe(this, Observer { loading ->
                         if(!loading){
@@ -72,7 +76,9 @@ class PatFragment: Fragment() {
                     })
                 })
                 model.apiResponse.observe(this, Observer { error ->
-                    toastError(model.apiResponse.value)
+                    if(error != null){
+                        toastError(error)
+                    }
                 })
             }
 
