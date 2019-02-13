@@ -67,13 +67,12 @@ class PatFragment: Fragment() {
                                         .add(R.id.bigger_fragment_container, OnboardingFragment())
                                         .commit()
                                 toastSuccess(resources.getString(R.string.welcome))
-                            } else {
-                                if(model.apiResponse.value != null){
-                                    toastError(model.apiResponse.value)
-                                }
                             }
                         }
                     })
+                })
+                model.apiResponse.observe(this, Observer { error ->
+                    toastError(model.apiResponse.value)
                 })
             }
 
