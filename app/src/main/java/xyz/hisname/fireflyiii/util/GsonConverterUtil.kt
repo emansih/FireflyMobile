@@ -3,6 +3,11 @@ package xyz.hisname.fireflyiii.util
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.Relationships
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.Spent
@@ -124,6 +129,19 @@ object GsonConverterUtil{
     @JvmStatic
     fun fromRelationShips(relationships: String): Relationships {
         return Gson().fromJson(relationships, Relationships::class.java)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromTimestamp(value: Long?): LocalDateTime? {
+        return value?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneOffset.UTC) }
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun dateToTimestamp(date: LocalDateTime?): Long? {
+        println("date: " + date)
+        return date?.atZone(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
     }
 
 }

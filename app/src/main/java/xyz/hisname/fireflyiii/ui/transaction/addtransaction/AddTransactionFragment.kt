@@ -507,7 +507,7 @@ class AddTransactionFragment: BaseFragment() {
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
             })
             currency = transactionAttributes?.currency_code.toString()
-            transaction_date_edittext.setText(transactionAttributes?.date)
+            transaction_date_edittext.setText(transactionAttributes?.date.toString())
             bill_edittext.setText(transactionAttributes?.bill_name)
             piggy_edittext.setText(transactionAttributes?.piggy_bank_name)
             category_edittext.setText(transactionAttributes?.category_name)

@@ -55,7 +55,7 @@ class TransactionDetailsFragment: BaseFragment() {
                     DetailModel(resources.getString(R.string.source_account), details?.source_name),
                     DetailModel(resources.getString(R.string.destination_account), details?.destination_name),
                     DetailModel(resources.getString(R.string.amount),details?.currency_symbol + details?.amount.toString()),
-                    DetailModel(resources.getString(R.string.date), details?.date))
+                    DetailModel(resources.getString(R.string.date), details?.date.toString()))
             transactionDescription = details?.description ?: ""
             sourceAccountId = details?.source_id?.toLong() ?: 0L
             destinationAccountId = details?.destination_id?.toLong() ?: 0L

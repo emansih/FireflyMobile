@@ -34,7 +34,7 @@ class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>
                itemView.transactionNameText.text = transactionAttributes.description
            }
            itemView.sourceNameText.text = transactionAttributes.source_name
-           itemView.dateText.text = transactionAttributes.date
+           itemView.dateText.text = transactionAttributes.date.toString()
            if(transactionAttributes.amount.toString().startsWith("-")){
                // Negative value means it's a withdrawal
                itemView.transactionAmountText.setTextColor(ContextCompat.getColor(context, R.color.md_red_500))

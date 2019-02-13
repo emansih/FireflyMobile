@@ -1,10 +1,15 @@
 package xyz.hisname.fireflyiii.data.remote
 
 import android.util.Base64
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import xyz.hisname.fireflyiii.util.LocalDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
@@ -34,11 +39,21 @@ class RetrofitBuilder {
                     INSTANCE = Retrofit.Builder()
                             .baseUrl(generateUrl(baseUrl))
                             .client(client.build())
-                            .addConverterFactory(GsonConverterFactory.create())
+                            .addConverterFactory(GsonConverterFactory.create(convertIso8601()))
                             .build()
                 }
             }
             return INSTANCE
+        }
+
+        private fun convertIso8601(): Gson {
+            return GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeConverter())
+                    .enableComplexMapKeySerialization()
+                    .serializeNulls()
+                    .setPrettyPrinting()
+                    .setVersion(1.0)
+                    .create()
         }
 
         fun getClient(baseUrl: String): Retrofit?{
