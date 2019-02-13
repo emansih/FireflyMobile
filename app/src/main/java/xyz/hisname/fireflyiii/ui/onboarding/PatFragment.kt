@@ -49,30 +49,29 @@ class PatFragment: Fragment() {
                     firefly_access_layout.showRequiredError()
                 }
             }  else {
+                ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 fireflyUrl = firefly_url_edittext.getString()
                 AuthenticatorManager(AccountManager.get(requireContext())).initializeAccount()
                 AppPref(PreferenceManager.getDefaultSharedPreferences(context)).baseUrl = fireflyUrl
                 AuthenticatorManager(AccountManager.get(requireContext())).accessToken = firefly_access_edittext.getString()
                 model.getAllAccounts().observe(this, Observer { accountData ->
-                    if(accountData.isNotEmpty()){
-                        AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
-                        val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
-                        layout.isVisible = false
-                        requireActivity().supportFragmentManager.beginTransaction()
-                                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                                .add(R.id.bigger_fragment_container, OnboardingFragment())
-                                .commit()
-                        toastSuccess(resources.getString(R.string.welcome))
-                    } else {
-                        toastError(resources.getString(R.string.authentication_failed))
-                    }
-                })
-                model.isLoading.observe(this, Observer {  loading ->
-                    if(loading == true) {
-                        ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
-                    } else {
-                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    }
+                    model.isLoading.observe(this, Observer { loading ->
+                        if(!loading){
+                            ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+                            if(accountData.isNotEmpty()){
+                                AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
+                                val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
+                                layout.isVisible = false
+                                requireActivity().supportFragmentManager.beginTransaction()
+                                        .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                                        .add(R.id.bigger_fragment_container, OnboardingFragment())
+                                        .commit()
+                                toastSuccess(resources.getString(R.string.welcome))
+                            } else {
+                               // toastError(resources.getString(R.string.authentication_failed))
+                            }
+                        }
+                    })
                 })
             }
 

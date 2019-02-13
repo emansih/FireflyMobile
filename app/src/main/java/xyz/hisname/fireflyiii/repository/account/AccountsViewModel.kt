@@ -339,13 +339,14 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                             scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
                         }
                         for (pagination in 2..networkData.meta.pagination.total_pages) {
-                            accountsService!!.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({ respond ->
+                            accountsService?.getPaginatedAccountType(source, pagination)?.enqueue(retrofitCallback({ respond ->
                                 respond.body()?.data?.forEachIndexed { _, accountPagination ->
                                     scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
                                 }
                             }))
                         }
                     }
+                    isLoading.value = false
                 }
             } else {
                 val responseError = response.errorBody()
@@ -354,10 +355,13 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
+                isLoading.value = false
             }
         })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
+        { throwable ->
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
     }
 
 }

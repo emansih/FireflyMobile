@@ -54,19 +54,13 @@ class OnboardingFragment: Fragment() {
     }
 
     private fun getUser(){
-        zipLiveData(transaction.getAllData(DateTimeUtil.getStartOfMonth(6),
-                DateTimeUtil.getTodayDate()), categoryViewModel.getAllCategory())
         onboarding_text.text = "Retrieving your data..."
         ObjectAnimator.ofInt(onboarding_progress,"progress", 45).start()
-        budgetViewModel.retrieveAllBudgetLimits()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
-        zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem(),piggyViewModel.getAllPiggyBanks(),
-                billViewModel.getAllBills(), currencyViewModel.getCurrency(),
-                accountViewModel.getAllAccounts()).observe(this, Observer { multipleLiveData ->
+        zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem()).observe(this, Observer { multipleLiveData ->
             ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
             onboarding_text.text = "Almost there!"
-            if(multipleLiveData.fifth.isNotEmpty() && multipleLiveData.first && multipleLiveData.second &&
-                    multipleLiveData.sixth.isNotEmpty()){
+            if(multipleLiveData.first && multipleLiveData.second){
                 startActivity(Intent(requireActivity(), HomeActivity::class.java))
                 requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 requireActivity().finish()
