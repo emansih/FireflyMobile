@@ -151,7 +151,7 @@ class LoginFragment: Fragment() {
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
             val code = uri.getQueryParameter("code")
-            if(code != null) {
+            if(code != null && code.isNotBlank() && code.isNotEmpty()) {
                 AppPref(sharedPref).baseUrl = baseUrlLiveData.value ?: ""
                 accManager.initializeAccount()
                 accManager.apply {
