@@ -18,7 +18,6 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
     val authFailedReason: MutableLiveData<String> = MutableLiveData()
 
     fun getAccessToken(code: String): LiveData<Boolean> {
-        isLoading.value = true
         authFailedReason.value = ""
         val oAuthService= RetrofitBuilder.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
         oAuthService?.getAccessToken(code, accManager.clientId, accManager.secretKey, Constants.REDIRECT_URI,
@@ -29,6 +28,7 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
                 accManager.accessToken = authResponse.access_token
                 accManager.refreshToken = authResponse.refresh_token
                 accManager.tokenExpiry = authResponse.expires_in
+                accManager.authMethod = "oauth"
                 isAuthenticated.value = true
             } else {
                 if(errorBody != null) {
@@ -49,7 +49,6 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
             authFailedReason.value = throwable.localizedMessage
             isAuthenticated.value = false
         })
-        isLoading.value = false
         return isAuthenticated
     }
 

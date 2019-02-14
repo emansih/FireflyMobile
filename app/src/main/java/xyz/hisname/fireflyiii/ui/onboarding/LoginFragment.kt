@@ -158,9 +158,8 @@ class LoginFragment: Fragment() {
                     secretKey = secretKeyLiveData.value ?: ""
                     clientId = clientIdLiveData.value ?: ""
                 }
-                authViewModel.getAccessToken(code).observe(this, Observer {
-                    if(it == true){
-                        accManager.authMethod = "oauth"
+                authViewModel.getAccessToken(code).observe(this, Observer { isAuth ->
+                    if(isAuth == true){
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
                         toastSuccess(resources.getString(R.string.welcome))
@@ -171,9 +170,11 @@ class LoginFragment: Fragment() {
                         }
                     } else {
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                        if(!authViewModel.authFailedReason.value.toString().isBlank()){
-                            toastInfo( authViewModel.authFailedReason.value.toString())
-                        }
+                        authViewModel.authFailedReason.observe(this, Observer { reason ->
+                            if(reason.isNotBlank()){
+                                toastError(reason)
+                            }
+                        })
                     }
                 })
             } else {
