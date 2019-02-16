@@ -6,11 +6,13 @@ import org.threeten.bp.format.TextStyle
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAdjusters.*
 import org.threeten.bp.temporal.WeekFields
+import org.threeten.bp.DateTimeUtils as ThreeTenBpUtils
 import java.lang.Long.parseLong
 import java.util.*
 
-
 object DateTimeUtil {
+
+    private val epochSecondsInMillis by lazy { 86399.times(1000) }
 
     fun getCalToString(date: String): String{
         return Instant.ofEpochMilli(parseLong(date))
@@ -18,6 +20,20 @@ object DateTimeUtil {
                 .toLocalDate()
                 .toString()
     }
+
+    fun getStartOfDayInCalendarToEpoch(calendarDate: String): String{
+        val startOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        val startOfDayMilli = startOfDay.times(1000)
+        return startOfDayMilli.toString()
+    }
+
+
+    fun getEndOfDayInCalendarToEpoch(calendarDate: String): String{
+        val endOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC).plus(epochSecondsInMillis)
+        val endOfDayMilli = endOfDay.times(1000)
+        return endOfDayMilli.toString()
+    }
+
 
     /*
     Takes in end date in yyyy-MM-dd format

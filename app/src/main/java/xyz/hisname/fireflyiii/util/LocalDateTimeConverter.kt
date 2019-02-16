@@ -33,7 +33,7 @@ import java.lang.reflect.Type
 class LocalDateTimeConverter: JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
 
     companion object {
-        private val FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        private val FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     }
 
     override fun serialize(src: LocalDateTime, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {

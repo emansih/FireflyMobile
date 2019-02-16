@@ -140,7 +140,6 @@ object GsonConverterUtil{
     @TypeConverter
     @JvmStatic
     fun dateToTimestamp(date: LocalDateTime?): Long? {
-        println("date: " + date)
         return date?.atZone(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
     }
 

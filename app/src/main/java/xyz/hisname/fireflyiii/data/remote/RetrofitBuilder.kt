@@ -1,12 +1,10 @@
 package xyz.hisname.fireflyiii.data.remote
 
 import android.util.Base64
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.google.gson.*
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import xyz.hisname.fireflyiii.util.LocalDateTimeConverter

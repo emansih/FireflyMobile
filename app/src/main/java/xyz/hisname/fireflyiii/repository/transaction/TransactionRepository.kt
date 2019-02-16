@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 
 class TransactionRepository(private val transactionDao: TransactionDataDao) {
 
@@ -24,7 +25,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
         return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
             transactionDao.getTransaction("Withdrawal")
         } else {
-            transactionDao.getTransaction(startDate, endDate, "Withdrawal")
+            transactionDao.getTransaction(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),"Withdrawal")
         }
     }
 
@@ -37,7 +39,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
            transactionDao.getTransaction("Deposit")
        } else {
-           transactionDao.getTransaction(startDate, endDate, "Deposit")
+           transactionDao.getTransaction(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                   DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Deposit")
        }
    }
 
@@ -45,7 +48,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
         return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
             transactionDao.getTransaction("Transfer")
         } else {
-            transactionDao.getTransaction(startDate, endDate, "Transfer")
+            transactionDao.getTransaction(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Transfer")
         }
     }
 
