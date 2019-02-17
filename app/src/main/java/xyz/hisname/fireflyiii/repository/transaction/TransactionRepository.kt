@@ -21,6 +21,15 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
     suspend fun allWithdrawalWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String) =
             transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(startDate, endDate, "Withdrawal", currencyCode)
 
+    fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<TransactionData>{
+        return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
+            transactionDao.getTransactionList(null, null,source)
+        } else {
+            transactionDao.getTransactionList(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),source)
+        }
+    }
+
     fun withdrawalList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>>{
         return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
             transactionDao.getTransaction("Withdrawal")
@@ -65,5 +74,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
     @WorkerThread
     suspend fun deleteTransactionById(transactionId: Long) = transactionDao.deleteTransactionById(transactionId)
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{
+        return transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate!!),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate!!), transactionType)
+    }
 
 }
