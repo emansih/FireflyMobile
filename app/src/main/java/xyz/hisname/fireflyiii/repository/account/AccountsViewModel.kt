@@ -18,16 +18,9 @@ import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 import java.text.DecimalFormat
-import kotlin.math.round
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
 
-    private var asset = 0.toDouble()
-    private var assetValue: MutableLiveData<String> = MutableLiveData()
-    private var cash = 0.toDouble()
-    private var cashValue: MutableLiveData<String> = MutableLiveData()
-    private var expense = 0.toDouble()
-    private var expenseValue: MutableLiveData<String> = MutableLiveData()
     val repository: AccountRepository
     var accountData: MutableList<AccountData>? = null
     private val accountsService by lazy { genericService()?.create(AccountsService::class.java) }
@@ -38,66 +31,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         repository = AccountRepository(accountDao)
     }
 
-
-    fun getTotalAssetAccount(currencyCode: String): LiveData<String> {
-        loadRemoteData("asset")
-        asset = 0.toDouble()
-        scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByTypeWithCurrency("asset", currencyCode)
-        }.invokeOnCompletion {
-            isLoading.postValue(false)
-            if (accountData.isNullOrEmpty()) {
-                asset = 0.toDouble()
-            } else {
-                accountData?.forEachIndexed { _, accountData ->
-                    asset += accountData.accountAttributes?.current_balance!!
-                }
-            }
-            asset = round(asset)
-            assetValue.postValue(asset.toString())
-        }
-        return assetValue
-    }
-
-    fun getTotalCashAccount(currencyCode: String): LiveData<String>{
-        loadRemoteData("cash")
-        cash = 0.toDouble()
-        scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByTypeWithCurrency("cash", currencyCode)
-        }.invokeOnCompletion {
-            isLoading.postValue(false)
-            if (accountData.isNullOrEmpty()) {
-                cash = 0.toDouble()
-            } else {
-                accountData?.forEachIndexed { _, accountData ->
-                    cash += accountData.accountAttributes?.current_balance!!
-                }
-            }
-            cash = round(cash)
-            cashValue.postValue(cash.toString())
-        }
-        return cashValue
-    }
-
-    fun getTotalExpenseAccount(currencyCode: String): LiveData<String>{
-        loadRemoteData("expense")
-        expense = 0.toDouble()
-        scope.async(Dispatchers.IO) {
-            accountData = repository.retrieveAccountByTypeWithCurrency("expense", currencyCode)
-        }.invokeOnCompletion {
-            isLoading.postValue(false)
-            if (accountData.isNullOrEmpty()) {
-                expense = 0.toDouble()
-            } else {
-                accountData?.forEachIndexed { _, accountData ->
-                    expense += accountData.accountAttributes?.current_balance!!
-                }
-            }
-            expense = round(expense)
-            expenseValue.postValue(expense.toString())
-        }
-        return expenseValue
-    }
 
     fun getAllAccounts(): LiveData<MutableList<AccountData>> {
         loadRemoteData("all")
@@ -179,7 +112,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                 val networkData = response.body()
                 if (networkData != null) {
                     for (pagination in 1..networkData.meta.pagination.total_pages) {
-                        accountsService!!.getPaginatedAccountType("asset", pagination).enqueue(retrofitCallback({ respond ->
+                        accountsService?.getPaginatedAccountType("asset", pagination)?.enqueue(retrofitCallback({ respond ->
                             respond.body()?.data?.forEachIndexed { _, accountPagination ->
                                 scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
                             }
@@ -326,7 +259,8 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     private fun loadRemoteData(source: String){
         isLoading.value = true
-        accountsService?.getPaginatedAccountType(source, 1)?.enqueue(retrofitCallback({ response ->
+        apiResponse.value = null
+        genericService()?.create(AccountsService::class.java)?.getPaginatedAccountType(source, 1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
@@ -339,13 +273,14 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                             scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
                         }
                         for (pagination in 2..networkData.meta.pagination.total_pages) {
-                            accountsService!!.getPaginatedAccountType(source, pagination).enqueue(retrofitCallback({ respond ->
+                            genericService()?.create(AccountsService::class.java)?.getPaginatedAccountType(source, pagination)?.enqueue(retrofitCallback({ respond ->
                                 respond.body()?.data?.forEachIndexed { _, accountPagination ->
                                     scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
                                 }
                             }))
                         }
                     }
+                    isLoading.value = false
                 }
             } else {
                 val responseError = response.errorBody()
@@ -354,10 +289,13 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
+                isLoading.value = false
             }
         })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
+        { throwable ->
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
     }
 
 }
