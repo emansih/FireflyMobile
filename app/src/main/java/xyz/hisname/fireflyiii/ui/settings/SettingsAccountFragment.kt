@@ -9,6 +9,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.SwitchPreference
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
@@ -56,7 +59,7 @@ class SettingsAccountFragment: BaseSettings() {
             title = "Access Token"
             summary = accManager.secretKey
         }
-        val authMethod = findPreference("auth_method")
+        val authMethod = findPreference("auth_method") as Preference
 
         if(Objects.equals(authMethodPref, "oauth")){
             authMethod.summary = "Open Authentication"
@@ -75,7 +78,7 @@ class SettingsAccountFragment: BaseSettings() {
             RetrofitBuilder.destroyInstance()
             true
         }
-        val refreshToken = findPreference("refresh_token")
+        val refreshToken = findPreference("refresh_token") as Preference
         refreshToken.setOnPreferenceClickListener {
             toastInfo("Refreshing your token...")
             authViewModel.getRefreshToken().observe(this, Observer { success ->
@@ -87,12 +90,12 @@ class SettingsAccountFragment: BaseSettings() {
             })
             true
         }
-        val certBolean = findPreference("enable_cert_pinning")
+        val certBolean = findPreference("enable_cert_pinning") as SwitchPreference
         certBolean.setOnPreferenceChangeListener { _, _ ->
             RetrofitBuilder.destroyInstance()
             true
         }
-        val certValue = findPreference("cert_value")
+        val certValue = findPreference("cert_value") as Preference
         certValue.setOnPreferenceChangeListener{ _, newValue ->
             try {
                 Base64.decode(newValue.toString(), Base64.DEFAULT).toString(Charsets.UTF_8)
@@ -107,8 +110,8 @@ class SettingsAccountFragment: BaseSettings() {
             RetrofitBuilder.destroyInstance()
             true
         }
-        val autoRefreshToken = findPreference("auto_refresh_token")
-        val refreshTokenInterval = findPreference("refresh_token_interval")
+        val autoRefreshToken = findPreference("auto_refresh_token") as SwitchPreference
+        val refreshTokenInterval = findPreference("refresh_token_interval") as ListPreference
         autoRefreshToken.setOnPreferenceChangeListener { _, newValue ->
             if(newValue == false){
                 WorkManager.getInstance().cancelAllWorkByTag("refresh_worker")
@@ -137,7 +140,7 @@ class SettingsAccountFragment: BaseSettings() {
             WorkManager.getInstance().enqueue(workBuilder)
             true
         }
-        val logout = findPreference("logout")
+        val logout = findPreference("logout") as Preference
         logout.setOnPreferenceClickListener {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
                 AppDatabase.clearDb(requireContext())

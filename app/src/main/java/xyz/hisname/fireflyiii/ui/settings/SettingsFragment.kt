@@ -5,6 +5,7 @@ import android.os.Bundle
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
 import androidx.preference.ListPreference
+import androidx.preference.Preference
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -34,7 +35,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setAccountSection(){
-        val accountOptions = findPreference("account_options")
+        val accountOptions = findPreference("account_options") as Preference
         accountOptions.setOnPreferenceClickListener {
             requireFragmentManager().commit {
                 addToBackStack(null)
@@ -47,7 +48,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setTransactionSection(){
-        val notificationPref = findPreference("notification_settings")
+        val notificationPref = findPreference("notification_settings") as Preference
         notificationPref.setOnPreferenceClickListener {
             requireFragmentManager().commit {
                 addToBackStack(null)

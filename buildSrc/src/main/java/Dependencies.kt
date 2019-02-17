@@ -19,7 +19,7 @@ object Dependencies{
     private const val androidxWorkVersion = "1.0.0-rc01"
     private const val materialDrawerVersion = "6.1.1"
     private const val iconicsVersion = "3.1.0"
-    private const val toastyVersion = "1.4.0"
+    private const val toastyVersion = "1.3.1"
     private const val threeTenVersion = "1.1.1"
     private const val chartVersion = "v3.0.3"
     private const val aboutLibVersion = "2.4.2"
