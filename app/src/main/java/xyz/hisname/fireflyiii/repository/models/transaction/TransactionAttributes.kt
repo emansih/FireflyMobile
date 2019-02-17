@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.models.transaction
 
 import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
+import org.threeten.bp.LocalDateTime
 
 @Entity
 data class TransactionAttributes(
@@ -9,7 +10,7 @@ data class TransactionAttributes(
         val created_at: String,
         val description: String,
         val transaction_description: String?,
-        val date: String,
+        val date: LocalDateTime,
         @SerializedName("type")
         val transactionType: String,
         val identifier: Int,

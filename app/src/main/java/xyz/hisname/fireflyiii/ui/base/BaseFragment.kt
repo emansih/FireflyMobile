@@ -29,14 +29,15 @@ import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
+import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import kotlin.coroutines.CoroutineContext
 
 abstract class BaseFragment: Fragment() {
 
-    protected val progressLayout: View by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
-    protected val fab by lazy { requireActivity().findViewById<FloatingActionButton>(R.id.globalFAB) }
-    protected val fragmentContainer by lazy { requireActivity().findViewById<FrameLayout>(R.id.fragment_container) }
+    protected val progressLayout by bindView<View>(R.id.progress_overlay)
+    protected val fab by bindView<FloatingActionButton>(R.id.globalFAB)
+    protected val fragmentContainer by bindView<FrameLayout>(R.id.fragment_container)
     protected val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
     protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
     protected val billViewModel: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }

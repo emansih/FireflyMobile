@@ -34,20 +34,11 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return repository.allTransaction
     }
 
-    fun getWithdrawalList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
-        loadRemoteData(startDate, endDate, "withdrawal")
-        return repository.withdrawalList(startDate, endDate)
-    }
+    fun getWithdrawalList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "withdrawal")
 
-    fun getDepositList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
-        loadRemoteData(startDate, endDate, "deposit")
-        return repository.depositList(startDate,endDate)
-    }
+    fun getDepositList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "deposit")
 
-    fun getTransferList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
-        loadRemoteData(startDate, endDate, "transfer")
-        return repository.transferList(startDate,endDate)
-    }
+    fun getTransferList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "transfer")
 
     fun getRecentTransaction(limit: Int): LiveData<MutableList<TransactionData>>{
         isLoading.value = true
@@ -247,30 +238,41 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
 
-    private fun loadRemoteData(startDate: String?, endDate: String?, source: String){
+    private fun loadRemoteData(startDate: String?, endDate: String?, source: String): LiveData<MutableList<TransactionData>>{
         isLoading.value = true
-        transactionService?.getAllTransactions(startDate, endDate, source)?.enqueue(retrofitCallback({ response ->
+        var transactionData: MutableList<TransactionData> = arrayListOf()
+        val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
+        transactionService?.getPaginatedTransactions(startDate, endDate, source, 1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
                     if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
-                        networkData.data.forEachIndexed{ _, transactionData ->
-                            scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionData) }
-                        }
-                    } else {
-                        networkData.data.forEachIndexed { _, transactionData ->
-                            scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionData) }
-                        }
-                        for (pagination in 2..networkData.meta.pagination.total_pages) {
-                            transactionService?.getPaginatedTransactions(startDate, endDate, source, pagination)?.enqueue(retrofitCallback({ respond ->
-                                respond.body()?.data?.forEachIndexed { _, transactionPagination ->
-                                    scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionPagination) }
+                        scope.launch(Dispatchers.IO){
+                            repository.deleteTransactionsByDate(startDate, endDate, convertString(source))
+                        }.invokeOnCompletion {
+                            transactionData.addAll(networkData.data)
+                            networkData.data.forEachIndexed{ _, transactionData ->
+                                scope.launch(Dispatchers.IO) { repository.insertTransaction(transactionData) }
+                            }
+                            if(networkData.meta.pagination.total_pages > networkData.meta.pagination.current_page) {
+                                for(items in 2..networkData.meta.pagination.total_pages){
+                                    transactionService?.getPaginatedTransactions(startDate, endDate, source, items)?.enqueue(retrofitCallback({ pagination ->
+                                        pagination.body()?.data?.forEachIndexed{ _, transData ->
+                                            transactionData.add(transData)
+                                        }
+                                    }))
                                 }
-                            }))
+                            }
+                            transactionData.forEachIndexed{ _, transData ->
+                                scope.launch(Dispatchers.IO) {
+                                    repository.insertTransaction(transData)
+                                }
+                            }
+                            data.postValue(transactionData.toMutableList())
                         }
                     }
+                    isLoading.value = false
                 }
-
             } else {
                 val responseError = response.errorBody()
                 if (responseError != null) {
@@ -278,10 +280,25 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
+                scope.async(Dispatchers.IO) {
+                    transactionData = repository.transactionList(startDate, endDate, convertString(source))
+                }.invokeOnCompletion {
+                    data.postValue(transactionData)
+                }
+
+                isLoading.value = false
             }
         })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
+        { throwable ->
+            scope.async(Dispatchers.IO) {
+                transactionData = repository.transactionList(startDate, endDate, convertString(source))
+            }.invokeOnCompletion {
+
+            }
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
+        return data
     }
 
 }

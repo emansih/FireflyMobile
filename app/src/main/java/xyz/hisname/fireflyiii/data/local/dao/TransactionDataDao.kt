@@ -17,8 +17,8 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<TransactionData>>
 
-    @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :type")
-    abstract fun getTransactionsByTypeWithDate(startDate: String?, endDate: String?, type: String): MutableList<TransactionData>
+    @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
+    abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<TransactionData>
 
     // That is a really loooooooong name
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) " +
@@ -33,5 +33,8 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
 
     @Query("DELETE FROM transactions WHERE transactionId = :transactionId")
     abstract fun deleteTransactionById(transactionId: Long): Int
+
+    @Query("DELETE FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
+    abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String): Int
 
 }

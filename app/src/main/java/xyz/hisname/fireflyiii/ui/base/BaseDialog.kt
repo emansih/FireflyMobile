@@ -25,14 +25,9 @@ abstract class BaseDialog: DialogFragment() {
 
     private val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
     private val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
-    protected val navIcon by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material) }
-    protected val billViewModel: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
     protected val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     protected val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
-    protected val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     protected val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
-    protected val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
-    protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

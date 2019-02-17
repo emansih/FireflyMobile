@@ -211,8 +211,13 @@ class TransactionFragment: BaseFragment(){
             } else {
                 dayOfMonth.toString()
             }
+            val correctMonth: String = if(month in 1..9){
+                "0" + ((1 + month).toString())
+                //"0$month" + 1
+            } else {
+                (month + 1).toString()
+            }
             // the start of month is 0?! start calendar view is stupid really???!!
-            val correctMonth = month + 1
             currentDate = "$year-$correctMonth-$correctDate"
             loadTransaction()
         }

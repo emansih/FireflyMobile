@@ -35,7 +35,7 @@ import java.util.*
 class LoginFragment: Fragment() {
 
     private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
-    private val progressOverlay by lazy { requireActivity().findViewById<View>(R.id.progress_overlay) }
+    private val progressOverlay by bindView<View>(R.id.progress_overlay)
     private var baseUrlLiveData: MutableLiveData<String> = MutableLiveData()
     private var clientIdLiveData: MutableLiveData<String> = MutableLiveData()
     private var secretKeyLiveData: MutableLiveData<String> = MutableLiveData()
@@ -148,31 +148,33 @@ class LoginFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         val uri = requireActivity().intent.data
-        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
+            ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
             val code = uri.getQueryParameter("code")
-            if(code != null) {
+            if(code != null && code.isNotBlank() && code.isNotEmpty()) {
                 AppPref(sharedPref).baseUrl = baseUrlLiveData.value ?: ""
                 accManager.initializeAccount()
                 accManager.apply {
                     secretKey = secretKeyLiveData.value ?: ""
                     clientId = clientIdLiveData.value ?: ""
                 }
-                authViewModel.getAccessToken(code).observe(this, Observer {
-                    ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    if(it == true){
-                        accManager.authMethod = "oauth"
+                authViewModel.getAccessToken(code).observe(this, Observer { isAuth ->
+                    if(isAuth == true){
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
                         toastSuccess(resources.getString(R.string.welcome))
+                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         requireFragmentManager().commit {
                             setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                             replace(R.id.bigger_fragment_container, OnboardingFragment())
                         }
                     } else {
-                        if(!authViewModel.authFailedReason.value.toString().isBlank()){
-                            toastInfo( authViewModel.authFailedReason.value.toString())
-                        }
+                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+                        authViewModel.authFailedReason.observe(this, Observer { reason ->
+                            if(reason.isNotBlank()){
+                                toastError(reason)
+                            }
+                        })
                     }
                 })
             } else {
