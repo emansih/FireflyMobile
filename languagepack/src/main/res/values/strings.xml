@@ -109,4 +109,5 @@
     <string name="bills_create_skip_holder">If a bill repeats every 2 weeks, the "skip"-field should be set to "1" to skip every other week.</string>
     <string name="transactions_create_switch_box">Use these buttons to quickly switch the type of transaction you wish to save.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Select a piggy bank and link this transfer to your savings.</string>
+    <string name="add_transaction_shortcut">Add Transaction</string>
 </resources>

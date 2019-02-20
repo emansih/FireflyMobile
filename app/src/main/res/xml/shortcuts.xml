@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="addTransaction"
+        android:enabled="true"
+        android:icon="@drawable/ic_bank_transfer"
+        android:shortcutShortLabel="@string/add_transaction_shortcut"
+        android:shortcutLongLabel="@string/add_transaction_shortcut">
+        <intent
+            android:action="xyz.hisname.fireflyiii.ADD_TRANSACTION"
+            android:targetPackage="xyz.hisname.fireflyiii.debug"
+            android:targetClass="xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity"/>
+
+        <intent
+            android:action="xyz.hisname.fireflyiii.ADD_TRANSACTION"
+            android:targetPackage="xyz.hisname.fireflyiii"
+            android:targetClass="xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity"/>
+    </shortcut>
+</shortcuts>

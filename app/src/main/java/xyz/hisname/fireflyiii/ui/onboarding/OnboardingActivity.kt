@@ -1,12 +1,15 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
 import android.accounts.AccountManager
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
+import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.ShortcutManager
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.view.ViewPropertyAnimator
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -23,6 +26,8 @@ import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.DeviceUtil
 import xyz.hisname.fireflyiii.util.extension.onAnimationEnd
 import java.util.*
+import android.R.mipmap
+import xyz.hisname.fireflyiii.BuildConfig
 
 
 class OnboardingActivity: AccountAuthenticatorActivity() {
@@ -36,7 +41,10 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
         val homeActivity = Intent(this, HomeActivity::class.java)
-        if(installShortCut()){
+        if(intent.action == "xyz.hisname.fireflyiii.ADD_TRANSACTION"){
+            homeActivity.putExtra("transaction", "transactionFragment")
+        }
+        if(installShortCut()) {
             homeActivity.putExtra("transaction", "transactionFragment")
         }
         if(Objects.equals("oauth", accManager.authMethod) &&
@@ -86,19 +94,23 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
     }
 
     private fun installShortCut(): Boolean{
-        if (Intent.ACTION_CREATE_SHORTCUT == intent.action || intent.action == "xyz.hisname.fireflyiii.shortcut.transaction") {
-            val shortCutIntent = Intent()
+        if (Intent.ACTION_CREATE_SHORTCUT == intent.action) {
+            val shortCutIntent = Intent(this, OnboardingActivity::class.java)
             val iconResource = Intent.ShortcutIconResource.fromContext(this, R.drawable.app_icon)
-            shortCutIntent.action = "xyz.hisname.fireflyiii.shortcut.transaction"
+            shortCutIntent.action = "xyz.hisname.fireflyiii.ADD_TRANSACTION"
             val newIntent = Intent()
             newIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortCutIntent)
                     .putExtra(Intent.EXTRA_SHORTCUT_NAME, "Add Transactions")
                     .putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource)
+                    .putExtra("duplicate", false)
+                    .action = "com.android.launcher.action.INSTALL_SHORTCUT"
+            this.sendBroadcast(newIntent)
             setResult(RESULT_OK, newIntent)
             return true
         }
-        return false
+        return true
     }
+
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
