@@ -108,7 +108,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
             setResult(RESULT_OK, newIntent)
             return true
         }
-        return true
+        return false
     }
 
 
