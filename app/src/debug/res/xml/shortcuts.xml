@@ -9,7 +9,7 @@
         android:shortcutLongLabel="@string/add_transaction_shortcut">
         <intent
             android:action="xyz.hisname.fireflyiii.ADD_TRANSACTION"
-            android:targetPackage="xyz.hisname.fireflyiii"
+            android:targetPackage="xyz.hisname.fireflyiii.debug"
             android:targetClass="xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity"/>
     </shortcut>
 </shortcuts>
