@@ -108,8 +108,10 @@ class ListAccountFragment: BaseFragment() {
                 }
             })
         }
-        accountViewModel.apiResponse.observe(this, Observer {
-            toastError(it)
+        accountViewModel.apiResponse.observe(this, Observer { errorMessage ->
+            if(errorMessage != null){
+                toastError(errorMessage)
+            }
         })
     }
 
