@@ -14,6 +14,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
@@ -104,6 +105,16 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         }
     }
 
+    private fun setAccordion(){
+        expansionLayout.addListener { _, expanded ->
+            if(expanded){
+                optionalLayout.isVisible = true
+            } else {
+                optionalLayout.isInvisible = true
+            }
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         addPiggyFab.setOnClickListener {
@@ -162,6 +173,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun setWidgets(){
+        setAccordion()
         val calendar = Calendar.getInstance()
         val startDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
