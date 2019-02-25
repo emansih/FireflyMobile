@@ -202,4 +202,28 @@ class FireflyApiTestCase {
         assertEquals(auth?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset")
     }
+
+    @Test
+    fun testPaginatedTransactionWithPathInBaseUrl() {
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login")?.create(TransactionService::class.java)?.getPaginatedTransactions(
+                "2019-01-01", "2019-12-12", "asset", 1)
+        assertEquals(auth?.request()?.url().toString(),
+                "https://$FIREFLY_BASEURL/login/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset&page=1")
+    }
+
+    @Test
+    fun testPaginatedTransactionWithPathInBaseUrlAndSlash() {
+        val auth = RetrofitBuilder.getClient("$FIREFLY_BASEURL/login/")?.create(TransactionService::class.java)?.getPaginatedTransactions(
+                "2019-01-01", "2019-12-12", "asset", 1)
+        assertEquals(auth?.request()?.url().toString(),
+                "https://$FIREFLY_BASEURL/login/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset&page=1")
+    }
+
+    @Test
+    fun testPaginatedTransaction() {
+        val auth = RetrofitBuilder.getClient(FIREFLY_BASEURL)?.create(TransactionService::class.java)?.getPaginatedTransactions(
+                "2019-01-01", "2019-12-12", "asset", 1)
+        assertEquals(auth?.request()?.url().toString(),
+                "https://$FIREFLY_BASEURL/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset&page=1")
+    }
 }
