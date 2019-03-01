@@ -83,8 +83,8 @@ class AddTransactionFragment: BaseFragment() {
         setIcons()
         setWidgets()
         if(transactionId != 0L){
-            attachment_Text.isVisible = true
-            attachment_Text.setOnClickListener {
+            add_attachment_button.isVisible = true
+            add_attachment_button.setOnClickListener {
                 openDocViewer()
             }
             updateTransactionSetup()
