@@ -14,7 +14,7 @@ data class TransactionAttributes(
         @SerializedName("type")
         val transactionType: String,
         val identifier: Int,
-        val journal_id: Int,
+        val journal_id: Long,
         val journal_description: String,
         val reconciled: Boolean,
         val amount: Double,

@@ -1,9 +1,12 @@
 package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
+import android.Manifest
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -17,7 +20,6 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
@@ -40,6 +42,7 @@ import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import java.util.*
 
 class AddTransactionFragment: BaseFragment() {
@@ -66,6 +69,10 @@ class AddTransactionFragment: BaseFragment() {
     private val calendar by lazy {  Calendar.getInstance() }
     private var selectedTime = ""
 
+    companion object {
+        private const val OPEN_REQUEST_CODE  = 41
+        private const val STORAGE_REQUEST_CODE = 1337
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_transaction, container)
@@ -76,6 +83,10 @@ class AddTransactionFragment: BaseFragment() {
         setIcons()
         setWidgets()
         if(transactionId != 0L){
+            attachment_Text.isVisible = true
+            attachment_Text.setOnClickListener {
+                openDocViewer()
+            }
             updateTransactionSetup()
         }
         contextSwitch()
@@ -529,6 +540,44 @@ class AddTransactionFragment: BaseFragment() {
                 }
             }
         })
+    }
+
+    private fun openDocViewer(){
+        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
+        } else {
+            val documentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "*/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+            startActivityForResult(documentIntent, OPEN_REQUEST_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode) {
+            STORAGE_REQUEST_CODE -> {
+                if (grantResults.size == 1
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openDocViewer()
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+        if(resultCode == Activity.RESULT_OK){
+            if (requestCode == OPEN_REQUEST_CODE) {
+                if (resultData != null) {
+                    val fileUri = resultData.data
+                    AttachmentWorker.initWorker(fileUri, transactionId)
+                    toastInfo("File will be uploaded in the background")
+                }
+            }
+        }
     }
 
     override fun handleBack() {

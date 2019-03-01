@@ -50,6 +50,7 @@ class RetrofitBuilder {
                     .enableComplexMapKeySerialization()
                     .serializeNulls()
                     .setPrettyPrinting()
+                    .setLenient()
                     .setVersion(1.0)
                     .create()
         }
