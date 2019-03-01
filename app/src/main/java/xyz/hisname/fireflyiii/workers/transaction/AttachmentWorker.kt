@@ -61,8 +61,15 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                     }
                 })
                 { throwable ->
-                    context.displayNotification(throwable.localizedMessage, channelName,
-                            Constants.TRANSACTION_CHANNEL, channelIcon)
+                    val throwMessage = throwable.message
+                    if(throwMessage != null && throwMessage.startsWith("Write error: ssl=")){
+                        context.displayNotification("Unable to add attachment to transaction as " +
+                                "there is a file limit on server side", channelName,
+                                Constants.TRANSACTION_CHANNEL, channelIcon)
+                    } else {
+                        context.displayNotification(throwable.localizedMessage, channelName,
+                                Constants.TRANSACTION_CHANNEL, channelIcon)
+                    }
                 })
             }
         })
