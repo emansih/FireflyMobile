@@ -584,6 +584,7 @@ class AddTransactionFragment: BaseFragment() {
         if(nastyHack){
             requireFragmentManager().popBackStack()
             fragmentContainer.isVisible = true
+            fragment_add_transaction_root.isVisible = false
             requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
         } else {
             requireActivity().finish()
