@@ -45,13 +45,12 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         val filePath = FileUtils.getPathFromUri(context, fileUri)
         val fileObject = File(filePath)
         val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context, fileUri)), fileObject)
-        val fileToUpload = MultipartBody.Part.createFormData("fileUpload", fileObject.name, requestFile)
         val fileName = FileUtils.getFileName(context, fileUri) ?: ""
         service?.storeAttachment(fileName, "Transaction", transactionId, fileName,
                 "File uploaded by " + BuildConfig.APPLICATION_ID)?.enqueue(retrofitCallback({ response ->
             val responseBody = response.body()
             if (response.code() == 200 && responseBody != null) {
-                service.uploadFile(responseBody.data.id, fileToUpload).enqueue(retrofitCallback({ uploadFileResponse ->
+                service.uploadFile(responseBody.data.id, requestFile).enqueue(retrofitCallback({ uploadFileResponse ->
                     if(uploadFileResponse.code() == 204) {
                         context.displayNotification("File uploaded", channelName,
                                 Constants.TRANSACTION_CHANNEL, channelIcon)
