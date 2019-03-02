@@ -10,9 +10,9 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 interface AttachmentService {
 
     @Multipart
+    @Headers("Content-Type: application/x-www-form-urlencoded")
     @POST("$ATTACHMENT_API_ENDPOINT/{id}/upload")
     fun uploadFile(@Path("id") id: Long,
-                   @Part("description") description: RequestBody,
                    @Part file: MultipartBody.Part): Call<Void>
 
     @FormUrlEncoded

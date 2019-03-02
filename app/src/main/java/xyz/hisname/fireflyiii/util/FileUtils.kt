@@ -104,7 +104,7 @@ class FileUtils {
         }
 
         fun getMimeType(context: Context, uri: Uri): String{
-            var mimeType: String? = null
+            val mimeType: String?
             mimeType = if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
                 context.contentResolver.getType(uri)
             } else {
