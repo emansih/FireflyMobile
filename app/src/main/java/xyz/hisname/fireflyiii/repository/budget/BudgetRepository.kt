@@ -37,4 +37,8 @@ class BudgetRepository(private val budget: BudgetDataDao, private val budgetList
         return budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun searchBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)
+
 }

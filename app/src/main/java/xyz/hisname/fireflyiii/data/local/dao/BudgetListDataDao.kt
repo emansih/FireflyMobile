@@ -13,4 +13,7 @@ abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
     @Query("DELETE FROM budget_list")
     abstract fun deleteAllBudgetList(): Int
 
+    @Query("SELECT * FROM budget_list WHERE name LIKE :budgetName")
+    abstract fun searchBudgetName(budgetName: String): MutableList<BudgetListData>
+
 }

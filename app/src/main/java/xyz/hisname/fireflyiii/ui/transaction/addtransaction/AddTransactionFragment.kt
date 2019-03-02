@@ -36,6 +36,7 @@ import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
@@ -68,6 +69,7 @@ class AddTransactionFragment: BaseFragment() {
     private var destinationName: String? = ""
     private val calendar by lazy {  Calendar.getInstance() }
     private var selectedTime = ""
+    private var budgetName: String? = ""
 
     companion object {
         private const val OPEN_REQUEST_CODE  = 41
@@ -119,6 +121,11 @@ class AddTransactionFragment: BaseFragment() {
                 val beforeTags = tags_chip.allChips.toString().substring(1)
                 beforeTags.substring(0, beforeTags.length - 1)
             }
+            budgetName = if(budget_edittext.isBlank()){
+                null
+            } else {
+                budget_edittext.getString()
+            }
             when {
                 Objects.equals("Withdrawal", transactionType) -> {
                     sourceAccount = source_spinner.selectedItem.toString()
@@ -150,14 +157,12 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
                 transactionDateTime, billName, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
-                transactionTags).observe(this, Observer { transactionResponse->
+                transactionTags, budgetName).observe(this, Observer { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
                 toastSuccess(resources.getString(R.string.transaction_updated))
-                requireFragmentManager().popBackStack()
-                fragmentContainer.isVisible = true
-                requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+                handleBack()
             } else if(errorMessage != null) {
                 toastError(errorMessage)
             } else if(transactionResponse.getError() != null) {
@@ -215,6 +220,10 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_plus)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
                 .sizeDp(24))
+        budget_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_gratipay)
+                        .color(ContextCompat.getColor(requireContext(), R.color.md_amber_300))
+                        .sizeDp(24),null, null, null)
     }
 
     private fun setWidgets(){
@@ -296,6 +305,13 @@ class AddTransactionFragment: BaseFragment() {
         }
         piggyViewModel.piggyName.observe(this, Observer {
             piggy_edittext.setText(it)
+        })
+        budget_edittext.setOnClickListener {
+            val budgetDialog = BudgetSearchDialog()
+            budgetDialog.show(requireFragmentManager(), "budgetDialog")
+        }
+        budgetViewModel.budgetName.observe(this, Observer { name ->
+            budget_edittext.setText(name)
         })
         expansionLayout.addListener { expansionLayout, expanded ->
             if(expanded){
@@ -439,7 +455,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transactionDateTime, piggyBank, billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags).observe(this, Observer { transactionResponse ->
+                currency, categoryName, transactionTags, budgetName).observe(this, Observer { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -513,6 +529,7 @@ class AddTransactionFragment: BaseFragment() {
             description_edittext.setText(transactionAttributes?.description)
             transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount
                     ?: 0.toDouble()).toString())
+            budget_edittext.setText(transactionAttributes?.budget_name)
             currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this, Observer { currencyData ->
                 val currencyAttributes = currencyData[0].currencyAttributes
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")

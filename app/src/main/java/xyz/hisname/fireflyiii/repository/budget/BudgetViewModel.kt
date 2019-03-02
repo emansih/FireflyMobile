@@ -27,6 +27,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     private var currentMonthSpentValue: MutableLiveData<String> = MutableLiveData()
     val spentBudgetLoader: MutableLiveData<Boolean> = MutableLiveData()
     val currentMonthBudgetLoader: MutableLiveData<Boolean> = MutableLiveData()
+    val budgetName =  MutableLiveData<String>()
 
     init {
         val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
@@ -34,9 +35,74 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         repository = BudgetRepository(budgetDao, budgetListDao)
     }
 
-    fun retrieveAllBudgetLimits(): LiveData<MutableList<BudgetData>> {
-        loadRemoteLimit()
-        return repository.allBudget
+    fun retrieveAllBudgetLimits(): LiveData<MutableList<BudgetListData>> {
+        isLoading.value = true
+        var budgetListData: MutableList<BudgetListData> = arrayListOf()
+        val data: MutableLiveData<MutableList<BudgetListData>> = MutableLiveData()
+        budgetService?.getPaginatedSpentBudget(1)?.enqueue(retrofitCallback({ response ->
+            val responseBody = response.body()
+            if(responseBody != null) {
+                val networkData = responseBody.data
+                scope.launch(Dispatchers.IO) {
+                    repository.deleteBudgetList()
+                }.invokeOnCompletion {
+                    budgetListData.addAll(networkData)
+                    if (responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
+                        for(items in 2..responseBody.meta.pagination.total_pages){
+                            budgetService?.getPaginatedSpentBudget(items)?.enqueue(retrofitCallback({ pagination ->
+                                pagination.body()?.data?.forEachIndexed{ _, pigData ->
+                                    budgetListData.add(pigData)
+                                }
+                            }))
+                        }
+                    }
+                    budgetListData.forEachIndexed{ _, budgetData ->
+                        scope.launch(Dispatchers.IO) {
+                            repository.insertBudgetList(budgetData)
+                        }
+                    }
+                    data.postValue(budgetListData.toMutableList())
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+                scope.async(Dispatchers.IO) {
+                    budgetListData = repository.allBudgetList()
+                }.invokeOnCompletion {
+                    data.postValue(budgetListData)
+                }
+            }
+            isLoading.value = false
+        })
+        { throwable ->
+            scope.async(Dispatchers.IO) {
+                budgetListData = repository.allBudgetList()
+            }.invokeOnCompletion {
+                data.postValue(budgetListData)
+            }
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
+        return data
+    }
+
+    fun getBudgetByName(budgetName: String): LiveData<MutableList<BudgetListData>>{
+        var budgetListData: MutableList<BudgetListData> = arrayListOf()
+        val data: MutableLiveData<MutableList<BudgetListData>> = MutableLiveData()
+        scope.async(Dispatchers.IO) {
+            budgetListData = repository.searchBudgetByName("%$budgetName%")
+        }.invokeOnCompletion {
+            data.postValue(budgetListData)
+        }
+        return data
+    }
+
+    fun postBudgetName(details: String?){
+        budgetName.value = details
     }
 
     fun retrieveCurrentMonthBudget(currencyCode: String): LiveData<String>{

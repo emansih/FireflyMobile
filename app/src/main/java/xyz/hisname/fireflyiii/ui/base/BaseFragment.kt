@@ -22,6 +22,7 @@ import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
+import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
@@ -45,6 +46,7 @@ abstract class BaseFragment: Fragment() {
     protected val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     protected val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     protected val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
+    protected val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     protected val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     protected val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }

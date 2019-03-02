@@ -150,7 +150,8 @@ class TransactionDetailsFragment: BaseFragment() {
         }
         R.id.menu_item_edit -> consume {
             val addTransaction = AddTransactionFragment().apply {
-                arguments = bundleOf("transactionId" to transactionId, "SHOULD_HIDE" to true)
+                arguments = bundleOf("transactionId" to transactionId, "SHOULD_HIDE" to true,
+                        "transactionType" to transactionInfo)
             }
             fragmentContainer.isVisible = false
             requireFragmentManager().commit {

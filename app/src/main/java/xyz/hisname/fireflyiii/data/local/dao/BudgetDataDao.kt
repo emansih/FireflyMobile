@@ -17,4 +17,5 @@ abstract class BudgetDataDao: BaseDao<BudgetData> {
     abstract fun getConstraintBudgetWithCurrency(startDate: String, endDate: String,
                                                  currencyCode: String): MutableList<BudgetData>
 
+
 }

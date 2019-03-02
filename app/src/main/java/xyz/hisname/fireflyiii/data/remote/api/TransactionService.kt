@@ -37,7 +37,8 @@ interface TransactionService {
                        @Field("transactions[0][destination_name]") destinationName: String?,
                        @Field("transactions[0][currency_code]") currency: String,
                        @Field("transactions[0][category_name]") category: String?,
-                       @Field("tags") tags: String?): Call<TransactionSuccessModel>
+                       @Field("tags") tags: String?,
+                       @Field("transactions[0][budget_name]") budgetName: String?): Call<TransactionSuccessModel>
 
     @FormUrlEncoded
     @PUT("$TRANSACTION_API_ENDPOINT/{transactionId}")
@@ -49,7 +50,8 @@ interface TransactionService {
                           @Field("transactions[0][destination_name]") destinationName: String?,
                           @Field("transactions[0][currency_code]") currency: String,
                           @Field("transactions[0][category_name]") category: String?,
-                          @Field("tags") tags: String?): Call<TransactionSuccessModel>
+                          @Field("tags") tags: String?,
+                          @Field("transactions[0][budget_name]") budgetName: String?): Call<TransactionSuccessModel>
 
     @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)

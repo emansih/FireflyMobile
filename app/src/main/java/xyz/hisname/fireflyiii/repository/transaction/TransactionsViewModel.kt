@@ -129,11 +129,11 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun addTransaction(type: String, description: String,
                        date: String, piggyBankName: String?, billName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
+                       category: String?, tags: String?, budgetName: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         transactionService?.addTransaction(convertString(type),description,date,piggyBankName,billName,
-                amount,sourceName,destinationName,currencyName, category, tags)?.enqueue(retrofitCallback({ response ->
+                amount,sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
             if (errorBody != null) {
@@ -168,11 +168,11 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun updateTransaction(transactionId: Long, type: String, description: String,
                        date: String, billName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
+                       category: String?, tags: String?, budgetName: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         transactionService?.updateTransaction(transactionId, convertString(type),description,date,billName,
-                amount,sourceName,destinationName,currencyName, category, tags)?.enqueue(retrofitCallback({ response ->
+                amount,sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
             if (errorBody != null) {
@@ -192,7 +192,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             }
             if (response.isSuccessful) {
                 response.body()?.data?.forEachIndexed { _, transaction ->
-                    scope.launch(Dispatchers.IO) { repository.insertTransaction(transaction) }
+                    scope.launch(Dispatchers.IO) {
+                        repository.insertTransaction(transaction)
+                    }
                 }
                 transaction.postValue(ApiResponses(response.body()))
             } else {
