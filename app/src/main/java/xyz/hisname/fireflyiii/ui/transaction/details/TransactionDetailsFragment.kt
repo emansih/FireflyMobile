@@ -197,11 +197,6 @@ class TransactionDetailsFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.details)
     }
 
-    override fun onStop() {
-        super.onStop()
-        fab.isVisible = true
-    }
-
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         android.R.id.home -> consume {
             requireFragmentManager().popBackStack()
