@@ -26,7 +26,13 @@ class TransactionDetailsRecyclerAdapter(private val items: MutableList<DetailMod
     inner class TransactionInfoAdapter(view: View): RecyclerView.ViewHolder(view) {
         fun bind(transactionInfo: DetailModel, clickListener: Int){
             itemView.infotext.text = transactionInfo.title
-            itemView.infotext_content.text = transactionInfo.subTitle
+            val transactionSubTitle = transactionInfo.subTitle
+            if(transactionSubTitle != null && transactionSubTitle.isNotEmpty() && transactionSubTitle.isNotBlank() &&
+                    transactionSubTitle.length >= 15){
+                itemView.infotext_content.text = transactionSubTitle.substring(0,15) + "..."
+            } else {
+                itemView.infotext_content.text = transactionSubTitle
+            }
             itemView.setOnClickListener { clickListener(clickListener) }
         }
     }

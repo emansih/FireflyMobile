@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.transaction.details
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -35,6 +36,9 @@ class TransactionDetailsFragment: BaseFragment() {
     private var destinationAccountId = 0L
     private var transactionInfo = ""
     private var transactionDescription  = ""
+    private var transactionDate = ""
+    private var transactionCategory = ""
+    private var transactionBudget = ""
     private lateinit var chipTags: Chip
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,6 +72,7 @@ class TransactionDetailsFragment: BaseFragment() {
             sourceAccountId = details?.source_id?.toLong() ?: 0L
             destinationAccountId = details?.destination_id?.toLong() ?: 0L
             transactionInfo = details?.transactionType ?: ""
+            transactionDate = details?.date.toString()
             transactionList.addAll(model)
             transaction_info.layoutManager = LinearLayoutManager(requireContext())
             transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
@@ -79,6 +84,8 @@ class TransactionDetailsFragment: BaseFragment() {
         metaDataList.clear()
         transactionViewModel.getTransactionById(transactionId).observe(this, Observer {
             val details = it[0].transactionAttributes
+            transactionCategory = details?.category_name ?: ""
+            transactionBudget = details?.budget_name ?: ""
             val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
                     details?.category_name), DetailModel(resources.getString(R.string.budget), details?.budget_name))
             metaDataList.addAll(model)
@@ -101,12 +108,39 @@ class TransactionDetailsFragment: BaseFragment() {
 
             meta_information.layoutManager = LinearLayoutManager(requireContext())
             meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> }
+            meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
         })
+    }
+
+    private fun setMetaInfoClick(position: Int){
+        when(position) {
+            0 -> {
+                if (transactionCategory.isNotEmpty()) {
+                    AlertDialog.Builder(requireContext())
+                            .setTitle(resources.getString(R.string.categories))
+                            .setMessage(transactionCategory)
+                            .show()
+                }
+            }
+            1 -> {
+                if (transactionBudget.isNotEmpty()) {
+                    AlertDialog.Builder(requireContext())
+                            .setTitle(resources.getString(R.string.budget))
+                            .setMessage(transactionBudget)
+                            .show()
+                }
+            }
+        }
     }
 
     private fun setTransactionInfoClick(position: Int){
         when(position){
+            1 ->{
+               AlertDialog.Builder(requireContext())
+                       .setTitle(resources.getString(R.string.description))
+                       .setMessage(transactionDescription)
+                       .show()
+            }
             2 -> {
                 requireFragmentManager().commit {
                     replace(R.id.fragment_container, AccountDetailFragment().apply {
@@ -122,6 +156,12 @@ class TransactionDetailsFragment: BaseFragment() {
                     })
                     addToBackStack(null)
                 }
+            }
+            5 -> {
+                AlertDialog.Builder(requireContext())
+                        .setTitle(resources.getString(R.string.date))
+                        .setMessage(transactionDate)
+                        .show()
             }
         }
     }
