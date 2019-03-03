@@ -3,12 +3,17 @@ package xyz.hisname.fireflyiii.ui.transaction.details
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import xyz.hisname.fireflyiii.R
@@ -19,6 +24,7 @@ import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.extension.consume
 import xyz.hisname.fireflyiii.util.extension.create
+import java.util.*
 
 class TransactionDetailsFragment: BaseFragment() {
 
@@ -29,6 +35,8 @@ class TransactionDetailsFragment: BaseFragment() {
     private var destinationAccountId = 0L
     private var transactionInfo = ""
     private var transactionDescription  = ""
+    private lateinit var chipTags: Chip
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_transaction_details, container)
@@ -74,6 +82,23 @@ class TransactionDetailsFragment: BaseFragment() {
             val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
                     details?.category_name), DetailModel(resources.getString(R.string.budget), details?.budget_name))
             metaDataList.addAll(model)
+            val tagsInTransaction = details?.tags
+            if(tagsInTransaction != null){
+                transaction_tags.setChipSpacing(16)
+                val tagsArray = tagsInTransaction.split(",")
+                tagsArray.forEachIndexed { _, nameOfTag ->
+                    chipTags = Chip(requireContext())
+                    chipTags.apply {
+                        text = nameOfTag
+                        chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
+                                .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                    }
+                    transaction_tags.addView(chipTags)
+                }
+            } else {
+                transaction_tags_card.isGone = true
+            }
+
             meta_information.layoutManager = LinearLayoutManager(requireContext())
             meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> }
