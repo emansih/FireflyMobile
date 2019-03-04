@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:id="@+id/menu_item_deposit"
-        android:title="Convert to Deposit" />
-
-    <item android:id="@+id/menu_item_transfer"
-        android:title="Convert to Transfer" />
-
-    <item android:id="@+id/menu_item_withdraw"
-        android:title="Convert to Withdrawal" />
-
+    
     <item android:id="@+id/menu_item_edit"
         android:title="@string/edit" />
 
