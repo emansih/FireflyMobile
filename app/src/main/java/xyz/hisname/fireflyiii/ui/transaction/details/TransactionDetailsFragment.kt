@@ -183,8 +183,7 @@ class TransactionDetailsFragment: BaseFragment() {
 
     private fun setDownloadClickListener(attachmentData: AttachmentData){
         val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-        attachmentViewModel.downloadAttachment(attachmentData.attributes.download_uri,
-                attachmentData.attributes.filename).observe(this, Observer {  isDownloaded ->
+        attachmentViewModel.downloadAttachment(attachmentData).observe(this, Observer {  isDownloaded ->
             attachmentViewModel.isLoading.observe(this, Observer { isLoading ->
                 if(isDownloaded && !isLoading){
                     toastSuccess(attachmentData.attributes.filename + " downloaded!")

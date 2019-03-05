@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.util
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -13,8 +14,7 @@ import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import okhttp3.ResponseBody
 import java.io.*
-
-
+import java.lang.Exception
 
 
 // https://gist.github.com/micer/ae5de2984dbbdb386dd262782cfdb39c
@@ -165,6 +165,17 @@ class FileUtils {
                 }
             }
             return ret
+        }
+
+        fun openFile(context: Context, fileName: String, fileMimeType: String): Boolean{
+            return try {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(Uri.fromFile(File("$folderDirectory/$fileName.$fileMimeType")), fileMimeType)
+                context.startActivity(intent)
+                true
+            } catch (e: Exception){
+                false
+            }
         }
 
         private fun isMediaDocument(uri: Uri?): Boolean {
