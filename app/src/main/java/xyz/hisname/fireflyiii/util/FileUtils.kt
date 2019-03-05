@@ -11,12 +11,18 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
+import okhttp3.ResponseBody
+import java.io.*
+
+
 
 
 // https://gist.github.com/micer/ae5de2984dbbdb386dd262782cfdb39c
 class FileUtils {
 
     companion object {
+
+        private val folderDirectory by lazy { File(Environment.getExternalStorageDirectory(), "FireflyIIIMobile") }
 
         fun getPathFromUri(context: Context, uri: Uri?): String? {
             val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
@@ -114,6 +120,51 @@ class FileUtils {
                         fileExtension.toLowerCase())
             }
             return mimeType
+        }
+
+        fun writeResponseToDisk(body: ResponseBody, fileName: String): Boolean {
+            if(!createDirIfNotExists()){
+                return false
+            }
+            try {
+                var inputStream: InputStream? = null
+                var outputStream: OutputStream? = null
+
+                try {
+                    val fileReader = ByteArray(4096)
+                    var fileSizeDownloaded: Long = 0
+                    inputStream = body.byteStream()
+                    outputStream = FileOutputStream("$folderDirectory/$fileName")
+                    while (true) {
+                        val read = inputStream.read(fileReader)
+                        if (read == -1) {
+                            break
+                        }
+                        outputStream.write(fileReader, 0, read)
+                        fileSizeDownloaded += read.toLong()
+                    }
+
+                    outputStream.flush()
+                    return true
+                } catch (e: IOException) {
+                    return false
+                } finally {
+                    inputStream?.close()
+                    outputStream?.close()
+                }
+            } catch (e: IOException) {
+                return false
+            }
+        }
+
+        private fun createDirIfNotExists(): Boolean{
+            var ret = true
+            if(!folderDirectory.exists()){
+                if(!folderDirectory.mkdir()){
+                    ret = false
+                }
+            }
+            return ret
         }
 
         private fun isMediaDocument(uri: Uri?): Boolean {

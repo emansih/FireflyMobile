@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.work.*
 import okhttp3.MediaType
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.Constants
@@ -50,7 +49,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                 "File uploaded by " + BuildConfig.APPLICATION_ID)?.enqueue(retrofitCallback({ response ->
             val responseBody = response.body()
             if (response.code() == 200 && responseBody != null) {
-                service.uploadFile(responseBody.data.id, requestFile).enqueue(retrofitCallback({ uploadFileResponse ->
+                service.uploadFile(responseBody.data[0].id, requestFile).enqueue(retrofitCallback({ uploadFileResponse ->
                     if(uploadFileResponse.code() == 204) {
                         context.displayNotification("File uploaded", channelName,
                                 Constants.TRANSACTION_CHANNEL, channelIcon)

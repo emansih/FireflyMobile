@@ -18,20 +18,22 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
-import xyz.hisname.fireflyiii.util.extension.consume
-import xyz.hisname.fireflyiii.util.extension.create
-import java.util.*
+import xyz.hisname.fireflyiii.util.extension.*
+import kotlin.collections.ArrayList
 
 class TransactionDetailsFragment: BaseFragment() {
 
     private val transactionId by lazy { arguments?.getLong("transactionId", 0) ?: 0 }
     private var transactionList: MutableList<DetailModel> = ArrayList()
     private var metaDataList: MutableList<DetailModel> = arrayListOf()
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private var sourceAccountId = 0L
     private var destinationAccountId = 0L
     private var transactionInfo = ""
@@ -50,6 +52,7 @@ class TransactionDetailsFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTransactionInfo()
         setMetaInfo()
+        downloadAttachment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,10 +105,8 @@ class TransactionDetailsFragment: BaseFragment() {
                     }
                     transaction_tags.addView(chipTags)
                 }
-            } else {
-                transaction_tags_card.isGone = true
+                transaction_tags_card.isVisible = true
             }
-
             meta_information.layoutManager = LinearLayoutManager(requireContext())
             meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
@@ -166,24 +167,37 @@ class TransactionDetailsFragment: BaseFragment() {
         }
     }
 
+    private fun downloadAttachment(){
+        transactionViewModel.getTransactionAttachment(transactionId).observe(this, Observer { attachment ->
+            transactionViewModel.isLoading.observe(this, Observer { loading ->
+                if(!loading && attachment.isNotEmpty()){
+                    attachment_information_card.isVisible = true
+                    attachmentDataAdapter = ArrayList(attachment)
+                    attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                    attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(ArrayList(attachment)){ data: AttachmentData -> setDownloadClickListener(data) }
+                }
+            })
+        })
+    }
+
+    private fun setDownloadClickListener(attachmentData: AttachmentData){
+        val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
+        attachmentViewModel.downloadAttachment(attachmentData.attributes.download_uri,
+                attachmentData.attributes.filename).observe(this, Observer {  isDownloaded ->
+            attachmentViewModel.isLoading.observe(this, Observer { isLoading ->
+                if(isDownloaded && !isLoading){
+                    toastSuccess(attachmentData.attributes.filename + " downloaded!")
+                } else {
+                    toastError("There was an issue downloading " + attachmentData.attributes.filename)
+                }
+            })
+        })
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.transaction_details_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
-        when(transactionInfo) {
-            "Withdrawal" -> {
-                menu.removeItem(R.id.menu_item_withdraw)
-            }
-            "Deposit" -> {
-                menu.removeItem(R.id.menu_item_deposit)
-            }
-            "Transfer" -> {
-                menu.removeItem(R.id.menu_item_transfer)
-            }
-        }
     }
 
     override fun onAttach(context: Context) {

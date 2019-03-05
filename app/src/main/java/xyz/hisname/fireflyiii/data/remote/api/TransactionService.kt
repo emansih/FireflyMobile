@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.data.remote.api
 import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.TRANSACTION_API_ENDPOINT
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 
@@ -67,5 +68,7 @@ interface TransactionService {
                        @Field("process_date") processDate: String?, @Field("due_date") dueDate: String?,
                        @Field("payment_date") paymentDate: String?, @Field("invoice_date") invoiceDate: String?): Call<TransactionSuccessModel>
 
+    @GET("$TRANSACTION_API_ENDPOINT/{id}/attachments")
+    fun getTransactionAttachment(@Path("id") transactionId: Long): Call<AttachmentModel>
 
 }

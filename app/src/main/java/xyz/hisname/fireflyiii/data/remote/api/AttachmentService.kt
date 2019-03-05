@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.remote.api
 
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.ATTACHMENT_API_ENDPOINT
@@ -20,4 +21,9 @@ interface AttachmentService {
                         @Field("model_id") modelId: Long,
                         @Field("title") title: String,
                         @Field("notes") notes: String): Call<AttachmentModel>
+
+    @Streaming
+    @GET
+    fun downloadFile(@Url fileUrl: String?): Call<ResponseBody>
+
 }

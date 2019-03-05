@@ -9,12 +9,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
@@ -297,6 +301,24 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             }.invokeOnCompletion {
 
             }
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
+        return data
+    }
+
+    fun getTransactionAttachment(transactionId: Long): MutableLiveData<MutableList<AttachmentData>>{
+        isLoading.value = true
+        val data: MutableLiveData<MutableList<AttachmentData>> = MutableLiveData()
+        transactionService?.getTransactionAttachment(transactionId)?.enqueue(retrofitCallback({ response ->
+            if(response.isSuccessful){
+                data.postValue(response.body()?.data)
+                isLoading.value = false
+            } else {
+                isLoading.value = false
+            }
+        })
+        { throwable ->
             isLoading.value = false
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
