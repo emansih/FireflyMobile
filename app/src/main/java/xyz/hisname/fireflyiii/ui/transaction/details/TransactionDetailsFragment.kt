@@ -1,12 +1,13 @@
 package xyz.hisname.fireflyiii.ui.transaction.details
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
@@ -42,6 +43,11 @@ class TransactionDetailsFragment: BaseFragment() {
     private var transactionCategory = ""
     private var transactionBudget = ""
     private lateinit var chipTags: Chip
+    private lateinit var attachmentData: AttachmentData
+
+    companion object {
+        private const val STORAGE_REQUEST_CODE = 1337
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -170,28 +176,46 @@ class TransactionDetailsFragment: BaseFragment() {
     private fun downloadAttachment(){
         transactionViewModel.getTransactionAttachment(transactionId).observe(this, Observer { attachment ->
             transactionViewModel.isLoading.observe(this, Observer { loading ->
-                if(!loading && attachment.isNotEmpty()){
+                if (!loading && attachment.isNotEmpty()) {
                     attachment_information_card.isVisible = true
                     attachmentDataAdapter = ArrayList(attachment)
                     attachment_information.layoutManager = LinearLayoutManager(requireContext())
                     attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(ArrayList(attachment)){ data: AttachmentData -> setDownloadClickListener(data) }
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(ArrayList(attachment)) { data: AttachmentData ->
+                        attachmentData = data
+                        setDownloadClickListener(data)
+                    }
                 }
             })
         })
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData){
-        val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-        attachmentViewModel.downloadAttachment(attachmentData).observe(this, Observer {  isDownloaded ->
-            attachmentViewModel.isLoading.observe(this, Observer { isLoading ->
-                if(isDownloaded && !isLoading){
-                    toastSuccess(attachmentData.attributes.filename + " downloaded!")
-                } else {
-                    toastError("There was an issue downloading " + attachmentData.attributes.filename)
-                }
+        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
+        } else {
+            val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
+            attachmentViewModel.downloadAttachment(attachmentData).observe(this, Observer { isDownloaded ->
+                attachmentViewModel.isLoading.observe(this, Observer { isLoading ->
+                    if (!isDownloaded && !isLoading) {
+                        toastError("There was an issue downloading " + attachmentData.attributes.filename)
+                    }
+                })
             })
-        })
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode) {
+            STORAGE_REQUEST_CODE -> {
+                if (grantResults.size == 1
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    setDownloadClickListener(attachmentData)
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

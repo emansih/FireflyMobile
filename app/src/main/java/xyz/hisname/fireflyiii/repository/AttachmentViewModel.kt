@@ -17,19 +17,19 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
 
     fun downloadAttachment(attachmentData: AttachmentData): LiveData<Boolean> {
         val isDownloaded: MutableLiveData<Boolean> = MutableLiveData()
-        var writtenToDisk = false
         val fileDownloadUrl = attachmentData.attributes.download_uri
         val fileName = attachmentData.attributes.filename
-        if(!FileUtils.openFile(getApplication(), fileName, attachmentData.attributes.mime)) {
+        isLoading.value = true
+        if(!FileUtils.openFile(getApplication(), fileName)) {
             attachmentService?.downloadFile(fileDownloadUrl)?.enqueue(retrofitCallback({ downloadResponse ->
                 val fileResponse = downloadResponse.body()
                 if (fileResponse != null) {
                     scope.launch(Dispatchers.IO) {
-                        writtenToDisk = FileUtils.writeResponseToDisk(fileResponse, fileName)
+                        FileUtils.writeResponseToDisk(fileResponse, fileName)
                     }.invokeOnCompletion {
-                        isDownloaded.value = writtenToDisk
-                        isLoading.value = false
-                        FileUtils.openFile(getApplication(), fileName, attachmentData.attributes.mime)
+                        isDownloaded.postValue(true)
+                        isLoading.postValue(false)
+                        FileUtils.openFile(getApplication(), fileName)
                     }
                 } else {
                     isLoading.value = false

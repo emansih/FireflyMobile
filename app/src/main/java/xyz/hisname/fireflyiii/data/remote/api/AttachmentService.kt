@@ -22,7 +22,7 @@ interface AttachmentService {
                         @Field("title") title: String,
                         @Field("notes") notes: String): Call<AttachmentModel>
 
-    @Streaming
+    //@Streaming
     @GET
     fun downloadFile(@Url fileUrl: String?): Call<ResponseBody>
 

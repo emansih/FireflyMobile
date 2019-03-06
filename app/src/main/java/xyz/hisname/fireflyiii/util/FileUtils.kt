@@ -12,6 +12,8 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import okhttp3.ResponseBody
 import java.io.*
 import java.lang.Exception
@@ -167,13 +169,15 @@ class FileUtils {
             return ret
         }
 
-        fun openFile(context: Context, fileName: String, fileMimeType: String): Boolean{
-            return try {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.setDataAndType(Uri.fromFile(File("$folderDirectory/$fileName.$fileMimeType")), fileMimeType)
-                context.startActivity(intent)
+        fun openFile(context: Context, fileName: String): Boolean{
+            val fileToOpen = File("$folderDirectory/$fileName")
+            return if(fileToOpen.exists() && !fileToOpen.isDirectory){
+                val fileIntent = Intent(Intent.ACTION_VIEW)
+                fileIntent.setDataAndType(Uri.parse("$folderDirectory/$fileName"), getMimeType(context, "$folderDirectory/$fileName".toUri()))
+                val openFileIntent = Intent.createChooser(fileIntent, "Open File")
+                context.startActivity(openFileIntent)
                 true
-            } catch (e: Exception){
+            } else {
                 false
             }
         }
