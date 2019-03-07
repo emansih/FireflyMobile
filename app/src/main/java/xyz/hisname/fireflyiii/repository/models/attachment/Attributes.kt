@@ -1,5 +1,8 @@
 package xyz.hisname.fireflyiii.repository.models.attachment
 
+import androidx.room.Entity
+
+@Entity
 data class Attributes(
         val attachable_id: Int,
         val attachable_type: String,

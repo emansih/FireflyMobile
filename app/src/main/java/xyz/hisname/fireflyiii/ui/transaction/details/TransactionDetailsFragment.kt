@@ -19,7 +19,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.AttachmentViewModel
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
@@ -58,7 +58,6 @@ class TransactionDetailsFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTransactionInfo()
         setMetaInfo()
-        downloadAttachment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,6 +81,7 @@ class TransactionDetailsFragment: BaseFragment() {
             destinationAccountId = details?.destination_id?.toLong() ?: 0L
             transactionInfo = details?.transactionType ?: ""
             transactionDate = details?.date.toString()
+            downloadAttachment(details?.journal_id ?: 0)
             transactionList.addAll(model)
             transaction_info.layoutManager = LinearLayoutManager(requireContext())
             transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
@@ -173,8 +173,8 @@ class TransactionDetailsFragment: BaseFragment() {
         }
     }
 
-    private fun downloadAttachment(){
-        transactionViewModel.getTransactionAttachment(transactionId).observe(this, Observer { attachment ->
+    private fun downloadAttachment(journalId: Long){
+        transactionViewModel.getTransactionAttachment(transactionId, journalId).observe(this, Observer { attachment ->
             transactionViewModel.isLoading.observe(this, Observer { loading ->
                 if (!loading && attachment.isNotEmpty()) {
                     attachment_information_card.isVisible = true
@@ -199,7 +199,7 @@ class TransactionDetailsFragment: BaseFragment() {
             attachmentViewModel.downloadAttachment(attachmentData).observe(this, Observer { isDownloaded ->
                 attachmentViewModel.isLoading.observe(this, Observer { isLoading ->
                     if (!isDownloaded && !isLoading) {
-                        toastError("There was an issue downloading " + attachmentData.attributes.filename)
+                        toastError("There was an issue downloading " + attachmentData.attachmentAttributes.filename)
                     }
                 })
             })

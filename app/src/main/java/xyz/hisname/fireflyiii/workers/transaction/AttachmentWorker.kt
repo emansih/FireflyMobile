@@ -49,7 +49,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                 "File uploaded by " + BuildConfig.APPLICATION_ID)?.enqueue(retrofitCallback({ response ->
             val responseBody = response.body()
             if (response.code() == 200 && responseBody != null) {
-                service.uploadFile(responseBody.data[0].id, requestFile).enqueue(retrofitCallback({ uploadFileResponse ->
+                service.uploadFile(responseBody.data[0].attachmentId, requestFile).enqueue(retrofitCallback({ uploadFileResponse ->
                     if(uploadFileResponse.code() == 204) {
                         context.displayNotification("File uploaded", channelName,
                                 Constants.TRANSACTION_CHANNEL, channelIcon)

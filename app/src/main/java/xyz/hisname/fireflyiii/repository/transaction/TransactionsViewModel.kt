@@ -12,6 +12,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
@@ -307,19 +308,44 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getTransactionAttachment(transactionId: Long): MutableLiveData<MutableList<AttachmentData>>{
+    fun getTransactionAttachment(transactionId: Long, journalId: Long): MutableLiveData<MutableList<AttachmentData>>{
         isLoading.value = true
+        val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao())
         val data: MutableLiveData<MutableList<AttachmentData>> = MutableLiveData()
+        var attachmentData: MutableList<AttachmentData> = arrayListOf()
         transactionService?.getTransactionAttachment(transactionId)?.enqueue(retrofitCallback({ response ->
             if(response.isSuccessful){
+                response.body()?.data?.forEachIndexed { _, attachmentData ->
+                    scope.launch(Dispatchers.IO){
+                        attachmentRepository.insertAttachmentInfo(attachmentData)
+                    }
+                }
                 data.postValue(response.body()?.data)
                 isLoading.value = false
             } else {
-                isLoading.value = false
+                /** 7 March 2019
+                 * In an ideal world, we should be using foreign keys and relationship to
+                 * retrieve related attachments by transaction ID. but alas! the world we live in
+                 * isn't ideal, therefore we have to develop a hack.
+                 *
+                 * P.S. This was a bad database design mistake I made when I wrote this software. On
+                 * hindsight I should have looked at James Cole's design schema. But hindsight 10/10
+                 **/
+                scope.launch(Dispatchers.IO){
+                    attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
+                }.invokeOnCompletion {
+                    isLoading.postValue(false)
+                    data.postValue(attachmentData)
+                }
             }
         })
         { throwable ->
-            isLoading.value = false
+            scope.launch(Dispatchers.IO){
+                attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
+            }.invokeOnCompletion {
+                isLoading.postValue(false)
+                data.postValue(attachmentData)
+            }
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
         return data

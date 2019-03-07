@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
@@ -20,8 +21,9 @@ import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 
 @Database(entities = [PiggyData::class, BillData::class, AccountData::class, CurrencyData::class,
-    TransactionData::class, CategoryData::class, BudgetData::class, BudgetListData::class, TagsData::class],
-        version = 5,exportSchema = false)
+    TransactionData::class, CategoryData::class, BudgetData::class, BudgetListData::class,
+    TagsData::class, AttachmentData::class],
+        version = 6,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
@@ -34,6 +36,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun budgetDataDao(): BudgetDataDao
     abstract fun budgetListDataDao(): BudgetListDataDao
     abstract fun tagsDataDao(): TagsDataDao
+    abstract fun attachmentDataDao(): AttachmentDataDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

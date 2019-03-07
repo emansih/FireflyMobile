@@ -1,9 +1,6 @@
 package xyz.hisname.fireflyiii.repository.models.transaction
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "transactions")
