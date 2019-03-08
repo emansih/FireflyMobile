@@ -18,8 +18,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun allWithdrawalWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String) =
-            transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(startDate, endDate, "Withdrawal", currencyCode)
+    suspend fun allWithdrawalWithCurrencyCode(startDate: String, endDate: String, currencyCode: String) =
+            transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Withdrawal", currencyCode)
 
     fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<TransactionData>{
         return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
@@ -41,8 +42,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun allDepositWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String) =
-            transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(startDate, endDate, "Deposit", currencyCode)
+    suspend fun allDepositWithCurrencyCode(startDate: String, endDate: String, currencyCode: String) =
+            transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Deposit", currencyCode)
 
     fun depositList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {

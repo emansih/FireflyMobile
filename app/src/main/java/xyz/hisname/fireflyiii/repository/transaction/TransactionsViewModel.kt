@@ -67,21 +67,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getWithdrawalWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<MutableList<TransactionData>> {
-        isLoading.value = true
-        var withdrawData: MutableList<TransactionData> = arrayListOf()
-        val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        loadRemoteData(startDate, endDate, "withdrawal")
-        scope.async(Dispatchers.IO) {
-            withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
-        }.invokeOnCompletion {
-            data.postValue(withdrawData)
-            isLoading.postValue(false)
-        }
-        return data
-    }
-
-    fun getWithdrawalAmountWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<BigDecimal>{
+    fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
         isLoading.value = true
         var withdrawData: MutableList<TransactionData> = arrayListOf()
         var withdrawAmount: BigDecimal = 0.toBigDecimal()
@@ -99,7 +85,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getDepositAmountWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<BigDecimal>{
+    fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
         isLoading.value = true
         var depositData: MutableList<TransactionData> = arrayListOf()
         var depositAmount: BigDecimal = 0.toBigDecimal()
@@ -112,20 +98,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 depositAmount = depositAmount.add(transactionData.transactionAttributes?.amount?.toBigDecimal()?.abs())
             }
             data.postValue(depositAmount)
-            isLoading.postValue(false)
-        }
-        return data
-    }
-
-    fun getDepositWithCurrencyCode(startDate: String?, endDate: String?, currencyCode: String): LiveData<MutableList<TransactionData>> {
-        isLoading.value = true
-        var depositData: MutableList<TransactionData> = arrayListOf()
-        val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        loadRemoteData(startDate, endDate, "deposit")
-        scope.async(Dispatchers.IO) {
-            depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
-        }.invokeOnCompletion {
-            data.postValue(depositData)
             isLoading.postValue(false)
         }
         return data
@@ -246,7 +218,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
 
     private fun loadRemoteData(startDate: String?, endDate: String?, source: String): LiveData<MutableList<TransactionData>>{
-        isLoading.value = true
         var transactionData: MutableList<TransactionData> = arrayListOf()
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
         transactionService?.getPaginatedTransactions(startDate, endDate, source, 1)?.enqueue(retrofitCallback({ response ->
@@ -278,7 +249,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                             data.postValue(transactionData.toMutableList())
                         }
                     }
-                    isLoading.value = false
                 }
             } else {
                 val responseError = response.errorBody()
@@ -293,16 +263,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                     data.postValue(transactionData)
                 }
 
-                isLoading.value = false
             }
         })
         { throwable ->
-            scope.async(Dispatchers.IO) {
+            scope.launch(Dispatchers.IO) {
                 transactionData = repository.transactionList(startDate, endDate, convertString(source))
-            }.invokeOnCompletion {
-
             }
-            isLoading.value = false
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
         return data
