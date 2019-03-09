@@ -26,7 +26,6 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
         val isDownloaded: MutableLiveData<Boolean> = MutableLiveData()
         val fileDownloadUrl = attachmentData.attachmentAttributes.download_uri
         val fileName = attachmentData.attachmentAttributes.filename
-        File(fileName)
         isLoading.value = true
         val fileToOpen = File("${FileUtils().folderDirectory}/$fileName")
         // Check file integrity before opening

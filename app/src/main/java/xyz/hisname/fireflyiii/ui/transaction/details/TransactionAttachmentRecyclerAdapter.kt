@@ -11,7 +11,9 @@ import kotlinx.android.synthetic.main.transaction_attachment_items.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.inflate
+import java.io.File
 
 class TransactionAttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
                                            private val clickListener:(AttachmentData) -> Unit):
@@ -38,10 +40,18 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
             } else {
                 itemView.attachment_name.text = fileName
             }
-            Glide.with(context).load(IconicsDrawable(context)
-                    .icon(GoogleMaterial.Icon.gmd_file_download)
-                    .sizeDp(12))
-                    .into(itemView.downloadButton)
+
+            if(File("${FileUtils().folderDirectory}/$fileName").exists()){
+                Glide.with(context).load(IconicsDrawable(context)
+                        .icon(GoogleMaterial.Icon.gmd_folder_open)
+                        .sizeDp(12))
+                        .into(itemView.downloadButton)
+            } else {
+                Glide.with(context).load(IconicsDrawable(context)
+                        .icon(GoogleMaterial.Icon.gmd_file_download)
+                        .sizeDp(12))
+                        .into(itemView.downloadButton)
+            }
             itemView.downloadButton.setOnClickListener { clickListener(attachmentData) }
         }
     }
