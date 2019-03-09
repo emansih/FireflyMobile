@@ -131,8 +131,11 @@ class AddTagsFragment: BaseAddObjectFragment() {
         }
         mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         mapTextview.setOnClickListener {
-            val mapsFragment = MapsFragment()
-            mapsFragment.show(requireFragmentManager(), "mapsDialog")
+            requireFragmentManager().commit {
+                replace(R.id.dialog_add_tags_layout, MapsFragment())
+                addToBackStack(null)
+            }
+            addTagFab.isInvisible = true
         }
         mapsViewModel.latitude.observe(this, Observer {
             if(it != "0.0"){

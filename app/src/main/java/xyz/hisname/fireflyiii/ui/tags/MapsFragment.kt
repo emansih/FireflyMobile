@@ -15,8 +15,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
+import androidx.core.view.isVisible
 import androidx.preference.PreferenceManager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -29,29 +30,29 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.MapsViewModel
+import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastInfo
+import java.io.File
 
-class MapsFragment: DialogFragment() {
+class MapsFragment: BaseFragment() {
 
     private val locationService by lazy { requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
     private val mapController by lazy { maps.controller }
     private lateinit var startMarker: Marker
     private val groomLake by lazy { GeoPoint(37.276675, -115.798936) }
-    private val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
     private var longitude: Double = 0.0
     private var latitude: Double = 0.0
 
     companion object {
         private const val PERMISSION_LOCATION_REQUEST = 123
-        private const val PERMISSION_STORAGE_REQUEST = 321
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+        Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
+        Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
         return inflater.create(R.layout.fragment_map, container)
     }
 
@@ -65,13 +66,13 @@ class MapsFragment: DialogFragment() {
             mapsViewModel.setLatitude(latitude)
             mapsViewModel.setLongitude(longitude)
             mapsViewModel.setZoomLevel(maps.zoomLevelDouble)
-            dialog?.dismiss()
+            handleBack()
         }
         cancelButton.setOnClickListener {
             mapsViewModel.setLatitude(0.0)
             mapsViewModel.setLongitude(0.0)
             mapsViewModel.setZoomLevel(0.0)
-            dialog?.dismiss()
+            handleBack()
         }
     }
 
@@ -131,7 +132,6 @@ class MapsFragment: DialogFragment() {
                             }
                             .setNegativeButton("No"){ _,_ ->
                                 toastInfo("Alright...")
-                                askStoragePerm()
                             }
                             .show()
                 } else {
@@ -142,28 +142,6 @@ class MapsFragment: DialogFragment() {
                 locationService.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
             }
         }
-    }
-
-    private fun askStoragePerm(){
-        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                            Manifest.permission.ACCESS_FINE_LOCATION)) {
-                AlertDialog.Builder(requireActivity())
-                        .setTitle("Would you like to cache location data?")
-                        .setMessage("This allows map data to initialize faster")
-                        .setPositiveButton("OK") { _, _ ->
-                            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_STORAGE_REQUEST)
-                        }
-                        .setNegativeButton("No") { _, _ ->
-                        }
-                        .show()
-            } else {
-                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_STORAGE_REQUEST)
-
-            }
-        }
-
     }
 
     private val locationListener: LocationListener = object : LocationListener {
@@ -203,17 +181,9 @@ class MapsFragment: DialogFragment() {
                         toastInfo("Waiting for location...")
                         locationService.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
                         locationService.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
-                        askStoragePerm()
                     }
                 }
             }
-            PERMISSION_STORAGE_REQUEST -> {
-                if (grantResults.size == 1
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    }
-                }
-
         }
     }
 
@@ -237,5 +207,10 @@ class MapsFragment: DialogFragment() {
                 == PackageManager.PERMISSION_GRANTED) {
             locationService.removeUpdates(locationListener)
         }
+    }
+
+    override fun handleBack() {
+        requireFragmentManager().popBackStack()
+        requireActivity().findViewById<FloatingActionButton>(R.id.addTagFab).isVisible = true
     }
 }
