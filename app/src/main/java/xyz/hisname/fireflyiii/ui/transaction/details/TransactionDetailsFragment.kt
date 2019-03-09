@@ -24,6 +24,7 @@ import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
 import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -108,6 +109,15 @@ class TransactionDetailsFragment: BaseFragment() {
                         text = nameOfTag
                         chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
                                 .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                        setOnClickListener {
+                            requireFragmentManager().commit {
+                                val tagDetails = TagDetailsFragment()
+                                tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
+                                        "revealY" to fab.height / 2, "tagName" to nameOfTag)
+                                addToBackStack(null)
+                                replace(R.id.fragment_container, tagDetails)
+                            }
+                        }
                     }
                     transaction_tags.addView(chipTags)
                 }

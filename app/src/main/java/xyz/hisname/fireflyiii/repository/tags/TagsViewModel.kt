@@ -165,4 +165,15 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
         }
         return tagData
     }
+
+    fun getTagByName(nameOfTag: String): LiveData<MutableList<TagsData>>{
+        val tagData: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
+        var data: MutableList<TagsData> = arrayListOf()
+        scope.async(Dispatchers.IO){
+            data = repository.retrieveTagByName(nameOfTag)
+        }.invokeOnCompletion {
+            tagData.postValue(data)
+        }
+        return tagData
+    }
 }

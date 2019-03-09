@@ -16,4 +16,6 @@ abstract class TagsDataDao: BaseDao<TagsData>{
     @Query("SELECT * FROM tags WHERE tagsId = :tagId")
     abstract fun getTagById(tagId: Long): MutableList<TagsData>
 
+    @Query("SELECT * FROM tags WHERE tag = :nameOfTag")
+    abstract fun getTagByName(nameOfTag: String): MutableList<TagsData>
 }

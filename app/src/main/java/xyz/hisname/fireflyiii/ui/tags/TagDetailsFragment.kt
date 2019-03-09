@@ -21,6 +21,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Marker
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -28,7 +29,9 @@ import xyz.hisname.fireflyiii.util.extension.*
 class TagDetailsFragment: BaseDetailFragment() {
 
     private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
+    private val nameOfTagFromBundle by lazy { arguments?.getString("tagName") ?: ""}
     private lateinit var nameOfTag: String
+    private lateinit var startMarker: Marker
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
@@ -39,7 +42,7 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val startMarker = Marker(tagDetailsMap)
+        startMarker = Marker(tagDetailsMap)
         tagDetailsMap.setTileSource(TileSourceFactory.MAPNIK)
         tagDetailsMap.setMultiTouchControls(true)
         tagDetailsMap.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
@@ -48,33 +51,44 @@ class TagDetailsFragment: BaseDetailFragment() {
                 .icon(FontAwesome.Icon.faw_map_marker)
                 .color(ContextCompat.getColor(requireContext(), R.color.md_red_700))
                 .sizeDp(16)
-        tagsViewModel.getTagById(tagId).observe(this, Observer {
-            val tagsAttributes = it[0].tagsAttributes
-            if(tagsAttributes?.tag != null){
-                tagName.text = tagsAttributes.tag
-                nameOfTag = tagsAttributes.tag
-            }
-            if(tagsAttributes?.latitude == null || tagsAttributes.longitude == null || tagsAttributes.zoom_level == null){
-                latitude_text.text = "No location set"
-                longitude_text.text = "No location set"
-                zoom_text.text = "No location set"
-                val groomLake = GeoPoint(37.276675, -115.798936)
-                startMarker.position = groomLake
-                tagDetailsMap.controller.animateTo(groomLake)
-                tagDetailsMap.controller.setZoom(15.0)
-            } else {
-                latitude_text.text = tagsAttributes.latitude
-                longitude_text.text = tagsAttributes.longitude
-                val userCoord = GeoPoint(tagsAttributes.latitude.toDouble(),
-                        tagsAttributes.longitude.toDouble())
-                startMarker.position = userCoord
-                startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                tagDetailsMap.controller.animateTo(userCoord)
-                tagDetailsMap.controller.setZoom(tagsAttributes.zoom_level.toDouble())
-                zoom_text.text = tagsAttributes.zoom_level
-            }
-            tagDescription.text = tagsAttributes?.description
-        })
+        if(tagId != 0L) {
+            tagsViewModel.getTagById(tagId).observe(this, Observer { data ->
+                setTagData(data)
+            })
+        } else {
+            tagsViewModel.getTagByName(nameOfTagFromBundle).observe(this, Observer { data ->
+                setTagData(data)
+            })
+        }
+
+    }
+
+    private fun setTagData(tagData: MutableList<TagsData>){
+        val tagsAttributes = tagData[0].tagsAttributes
+        if(tagsAttributes?.tag != null){
+            tagName.text = tagsAttributes.tag
+            nameOfTag = tagsAttributes.tag
+        }
+        if(tagsAttributes?.latitude == null || tagsAttributes.longitude == null || tagsAttributes.zoom_level == null){
+            latitude_text.text = "No location set"
+            longitude_text.text = "No location set"
+            zoom_text.text = "No location set"
+            val groomLake = GeoPoint(37.276675, -115.798936)
+            startMarker.position = groomLake
+            tagDetailsMap.controller.animateTo(groomLake)
+            tagDetailsMap.controller.setZoom(15.0)
+        } else {
+            latitude_text.text = tagsAttributes.latitude
+            longitude_text.text = tagsAttributes.longitude
+            val userCoord = GeoPoint(tagsAttributes.latitude.toDouble(),
+                    tagsAttributes.longitude.toDouble())
+            startMarker.position = userCoord
+            startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            tagDetailsMap.controller.animateTo(userCoord)
+            tagDetailsMap.controller.setZoom(tagsAttributes.zoom_level.toDouble())
+            zoom_text.text = tagsAttributes.zoom_level
+        }
+        tagDescription.text = tagsAttributes?.description
     }
 
     override fun onStop() {
