@@ -5,6 +5,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.ATTACHMENT_API_ENDPOINT
+import xyz.hisname.fireflyiii.repository.models.attachment.Attachment
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 
 interface AttachmentService {
@@ -20,7 +21,7 @@ interface AttachmentService {
                         @Field("model") model: String,
                         @Field("model_id") modelId: Long,
                         @Field("title") title: String,
-                        @Field("notes") notes: String): Call<AttachmentModel>
+                        @Field("notes") notes: String): Call<Attachment>
 
     //@Streaming
     @GET
