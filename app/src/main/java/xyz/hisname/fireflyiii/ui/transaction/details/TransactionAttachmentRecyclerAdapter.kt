@@ -52,7 +52,7 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
                         .sizeDp(12))
                         .into(itemView.downloadButton)
             }
-            itemView.downloadButton.setOnClickListener { clickListener(attachmentData) }
+            itemView.setOnClickListener { clickListener(attachmentData) }
         }
     }
 }
