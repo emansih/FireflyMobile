@@ -16,4 +16,8 @@
         app:key="notification_settings"
         app:title="Notification Settings" />
 
+    <CheckBoxPreference
+        app:key="night_mode"
+        app:title="Enable Night Mode" />
+
 </PreferenceScreen>

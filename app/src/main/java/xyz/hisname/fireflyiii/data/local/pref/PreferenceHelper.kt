@@ -11,5 +11,6 @@ interface PreferenceHelper {
     var enableCertPinning: Boolean
     var certValue: String
     var languagePref: String
+    var nightModeEnabled: Boolean
     fun clearPref()
 }

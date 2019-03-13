@@ -2,8 +2,10 @@ package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
+import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
@@ -20,6 +22,7 @@ class SettingsFragment: BaseSettings() {
         setAccountSection()
         setTransactionSection()
         setLanguagePref()
+        setNightModeSection()
     }
 
     private fun setLanguagePref(){
@@ -58,6 +61,16 @@ class SettingsFragment: BaseSettings() {
             true
         }
         notificationPref.icon = IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_notifications).sizeDp(24)
+    }
+
+    private fun setNightModeSection(){
+        val nightModePref = findPreference("night_mode") as CheckBoxPreference
+        nightModePref.setOnPreferenceChangeListener { preference, newValue ->
+            val nightMode = newValue as Boolean
+            AppPref(sharedPref).nightModeEnabled = nightMode
+            globalViewModel.handleNightMode(nightMode)
+            true
+        }
     }
 
     override fun onAttach(context: Context) {

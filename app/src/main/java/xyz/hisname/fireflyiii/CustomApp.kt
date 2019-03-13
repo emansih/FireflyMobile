@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii
 
-import android.app.Application
 import android.content.Context
 import android.preference.PreferenceManager
 import androidx.multidex.MultiDexApplication
@@ -35,5 +34,4 @@ class CustomApp: MultiDexApplication() {
         super.attachBaseContext(LanguageChanger.init(newBase,
                 AppPref(PreferenceManager.getDefaultSharedPreferences(newBase)).languagePref))
     }
-
 }
