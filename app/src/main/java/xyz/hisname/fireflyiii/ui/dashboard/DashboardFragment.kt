@@ -14,6 +14,7 @@ import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
@@ -28,8 +29,8 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.extension.*
+import java.math.RoundingMode
 import kotlin.math.roundToInt
 
 
@@ -64,6 +65,7 @@ class DashboardFragment: BaseFragment() {
                 setNetIncome(currencyData)
                 setBarChart(currencyData)
                 setNetWorth(currencyData)
+                setAverage(currencyData)
             }
         })
         currencyViewModel.apiResponse.observe(this, Observer {
@@ -193,6 +195,85 @@ class DashboardFragment: BaseFragment() {
             invalidate()
         }
 
+    }
+
+    private fun setAverage(currencyData: CurrencyAttributes?){
+        val currencyCode = currencyData?.code!!
+        zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
+                DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode)).observe(this, Observer { transactionData ->
+            transactionViewModel.isLoading.observe(this, Observer { loader ->
+                if(loader == false) {
+                    val firstDay = transactionData.first
+                    val secondDay = transactionData.second
+                    val thirdDay = transactionData.third
+                    val fourthDay = transactionData.fourth
+                    val fifthDay = transactionData.fifth
+                    val sixthDay = transactionData.sixth
+                    val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).divide(6.toBigDecimal())
+                    sixDaysAverage.text = currencyData.symbol + sixDayAverage.toString()
+                    val expenseHistory = arrayListOf(
+                            BarEntry(1f, firstDay.toFloat()),
+                            BarEntry(2f, secondDay.toFloat()),
+                            BarEntry(3f, thirdDay.toFloat()),
+                            BarEntry(4f, fourthDay.toFloat()),
+                            BarEntry(5f, fifthDay.toFloat()),
+                            BarEntry(6f, sixthDay.toFloat())
+                    )
+                    val expenseSet = BarDataSet(expenseHistory, resources.getString(R.string.expense))
+                    expenseSet.apply {
+                        valueTextColor = Color.RED
+                        color = Color.RED
+                        valueTextSize = 15f
+                    }
+                    dailySummaryChart.apply {
+                        description.isEnabled = false
+                        isScaleXEnabled = false
+                        setDrawBarShadow(false)
+                        setDrawGridBackground(false)
+                        // Some kind of bug? The first xAxis value is ignored therefore I had to
+                        // insert the variable *twice*
+                        xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
+                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2))),
+                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3))),
+                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4))),
+                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5))),
+                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6)))))
+                        data = BarData(expenseSet)
+                        xAxis.position = XAxis.XAxisPosition.BOTTOM
+                        data.isHighlightEnabled = false
+                        animateY(1000)
+                        setTouchEnabled(true)
+                        invalidate()
+                    }
+                }
+            })
+        })
+        transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
+                DateTimeUtil.getTodayDate(), currencyCode).observe(this, Observer { transactionData ->
+            transactionViewModel.isLoading.observe(this, Observer { loader ->
+                if(loader == false) {
+                    thirtyDaysAverage.text = currencyData.symbol + transactionData.divide(30.toBigDecimal(), 2, RoundingMode.HALF_UP)
+                }
+            })
+        })
     }
 
     private fun setBarChart(currencyData: CurrencyAttributes?) {

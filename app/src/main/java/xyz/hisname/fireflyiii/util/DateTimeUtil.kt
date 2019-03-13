@@ -8,6 +8,7 @@ import org.threeten.bp.temporal.TemporalAdjusters.*
 import org.threeten.bp.temporal.WeekFields
 import org.threeten.bp.DateTimeUtils as ThreeTenBpUtils
 import java.lang.Long.parseLong
+import java.text.DateFormatSymbols
 import java.util.*
 
 object DateTimeUtil {
@@ -138,5 +139,11 @@ object DateTimeUtil {
     fun getDaysBefore(date: String, days: Long): String{
         val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         return localDate.minusDays(days).toString()
+    }
+
+    // Outputs date in dd/MM
+    fun getDayAndMonth(date: String): String{
+        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        return localDate.dayOfMonth.toString() + "/" + localDate.monthValue.toString()
     }
 }
