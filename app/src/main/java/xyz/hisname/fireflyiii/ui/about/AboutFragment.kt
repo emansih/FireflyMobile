@@ -19,6 +19,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -45,7 +46,11 @@ class AboutFragment: MaterialAboutFragment() {
         handleBack()
     }
 
-    override fun getTheme() = R.style.AppTheme_MaterialAboutActivity_Fragment
+    override fun getTheme() = if(AppPref(sharedPref).nightModeEnabled){
+        R.style.AppTheme_MaterialAboutActivity_Dark
+    } else {
+        R.style.AppTheme_MaterialAboutActivity_Light
+    }
 
     private fun createMaterialAboutList(): MaterialAboutList{
         val appCardBuilder = MaterialAboutCard.Builder()

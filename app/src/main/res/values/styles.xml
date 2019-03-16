@@ -30,7 +30,7 @@
     </style>
 
 
-    <style name="AppTheme.MaterialAboutActivity.Fragment" tools:targetApi="lollipop"
+    <style name="AppTheme.MaterialAboutActivity.Light" tools:targetApi="lollipop"
         parent="@style/Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -41,6 +41,18 @@
         <item name="mal_color_primary">@color/mal_text_primary</item>
         <item name="mal_color_secondary">@color/mal_text_secondary</item>
         <item name="mal_card_background">@color/cardview_light_background</item>
+        <item name="android:windowEnterTransition">@transition/about_enter</item>
+        <item name="android:windowReturnTransition">@transition/about_return</item>
+    </style>
+
+    <style name="AppTheme.MaterialAboutActivity.Dark" tools:targetApi="lollipop"
+        parent="@style/Theme.Mal.Dark">
+        <item name="android:textSize">16sp</item>
+        <item name="mal_toolbarTheme">@style/Theme.Mal.Toolbar.Dark</item>
+        <item name="mal_toolbarPopupTheme">@style/Theme.Mal.Toolbar.Dark</item>
+        <item name="mal_color_primary">@color/mal_text_primary_dark</item>
+        <item name="mal_color_secondary">@color/mal_text_secondary_dark</item>
+        <item name="mal_card_background">@color/cardview_dark_background</item>
         <item name="android:windowEnterTransition">@transition/about_enter</item>
         <item name="android:windowReturnTransition">@transition/about_return</item>
     </style>
