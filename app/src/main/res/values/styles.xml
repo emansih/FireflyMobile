@@ -51,4 +51,23 @@
         <item name="android:windowIsFloating">false</item>
     </style>
 
+    <style name="AppTheme.DrawerTheme" parent="AppTheme">
+        <item name="material_drawer_background">@color/md_black_1000</item>
+        <item name="material_drawer_primary_text">@color/md_white_1000</item>
+        <item name="material_drawer_primary_icon">@color/md_white_1000</item>
+        <item name="material_drawer_secondary_text">@color/md_white_1000</item>
+        <item name="material_drawer_hint_text">@color/material_drawer_hint_text</item>
+        <item name="material_drawer_divider">@color/material_drawer_divider</item>
+        <item name="material_drawer_selected">@color/material_drawer_selected</item> <!-- Material 2 defines 12% alpha, primary color -->
+        <item name="material_drawer_selected_legacy">@color/material_drawer_selected</item> <!-- Defines the color if legacy style (Material 1, is enabled) -->
+        <item name="material_drawer_selected_text">@color/material_drawer_selected_text</item>
+        <item name="material_drawer_header_selection_text">@color/material_drawer_header_selection_text</item>
+        <item name="material_drawer_header_selection_subtext">@color/material_drawer_dark_header_selection_subtext</item>
+        <item name="material_drawer_legacy_style">false</item> <!-- Enables legacy Material 1 style -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- Here we setting appcompat’s actionBarStyle -->
+        <item name="drawerArrowStyle">@style/Material.DrawerArrowStyle</item>
+    </style>
+
 </resources>

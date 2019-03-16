@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.languagepack.LanguageChanger
 
@@ -26,12 +27,15 @@ open class BaseActivity: AppCompatActivity() {
             if(key == "night_mode"){
                 if(sharedPref(this).nightModeEnabled){
                     delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    setTheme(R.style.AppTheme_DrawerTheme)
                 } else {
+                    setTheme(R.style.AppTheme)
                     delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 }
             }
         }
         if(sharedPref(this).nightModeEnabled){
+            setTheme(R.style.AppTheme_DrawerTheme)
             delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener)

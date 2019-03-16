@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -35,7 +34,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
@@ -59,7 +57,6 @@ class HomeActivity: BaseActivity(){
     private var result: Drawer? = null
     private lateinit var headerResult: AccountHeader
     private var profile: IProfile<*>? = null
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
     private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,7 +104,7 @@ class HomeActivity: BaseActivity(){
     private fun setUpHeader(savedInstanceState: Bundle?){
         profile = ProfileDrawerItem()
                 .withName(AuthenticatorManager(AccountManager.get(this)).userEmail)
-                .withEmail(AppPref(sharedPref).userRole)
+                .withEmail(sharedPref(this).userRole)
                 .withIcon(Constants.PROFILE_URL)
         headerResult = AccountHeaderBuilder()
                 .withActivity(this)
@@ -118,9 +115,11 @@ class HomeActivity: BaseActivity(){
                 .addProfiles(profile)
                 .withSavedInstance(savedInstanceState)
                 .build()
+
         val headerView = headerResult.headerBackgroundView
         headerView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
     }
+
 
     private fun setProfileImage(){
         DrawerImageLoader.init(object : AbstractDrawerImageLoader(){
@@ -218,6 +217,7 @@ class HomeActivity: BaseActivity(){
                 .withName("Reports")
         val transactions = ExpandableDrawerItem().withName(R.string.transaction)
                 .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_refresh).sizeDp(24))
+                .withIconTintingEnabled(true)
                 .withIdentifier(10)
                 .withSelectable(false)
                 .withSubItems(
@@ -246,6 +246,7 @@ class HomeActivity: BaseActivity(){
         val moneyManagement = ExpandableDrawerItem().withName(R.string.money_management)
                 .withIdentifier(14)
                 .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_euro_symbol).sizeDp(24))
+                .withIconTintingEnabled(true)
                 .withSelectable(false)
                 .withSubItems(
                         SecondaryDrawerItem().withName(R.string.piggy_bank)
@@ -278,6 +279,7 @@ class HomeActivity: BaseActivity(){
                 .withIdentifier(14)
                 .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_settings).sizeDp(24))
                 .withSelectable(false)
+                .withIconTintingEnabled(true)
                 .withSubItems(
                         SecondaryDrawerItem().withName(R.string.settings)
                                 .withLevel(4)
