@@ -229,7 +229,7 @@ class DashboardFragment: BaseFragment() {
                     val fourthDay = transactionData.fourth
                     val fifthDay = transactionData.fifth
                     val sixthDay = transactionData.sixth
-                    val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).divide(6.toBigDecimal())
+                    val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).divide(6.toBigDecimal(),2, RoundingMode.HALF_UP)
                     sixDaysAverage.text = currencyData.symbol + sixDayAverage.toString()
                     val expenseHistory = arrayListOf(
                             BarEntry(1f, firstDay.toFloat()),
