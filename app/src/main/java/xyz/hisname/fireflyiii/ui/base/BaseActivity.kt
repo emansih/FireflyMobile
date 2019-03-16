@@ -27,7 +27,7 @@ open class BaseActivity: AppCompatActivity() {
             if(key == "night_mode"){
                 if(sharedPref(this).nightModeEnabled){
                     delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    setTheme(R.style.AppTheme_DrawerTheme)
+                    setTheme(R.style.AppTheme_Dark_DrawerTheme)
                 } else {
                     setTheme(R.style.AppTheme)
                     delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -35,7 +35,7 @@ open class BaseActivity: AppCompatActivity() {
             }
         }
         if(sharedPref(this).nightModeEnabled){
-            setTheme(R.style.AppTheme_DrawerTheme)
+            setTheme(R.style.AppTheme_Dark_DrawerTheme)
             delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener)

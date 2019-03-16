@@ -29,6 +29,7 @@ import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
@@ -186,9 +187,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         }
 
         date_target_edittext.setOnClickListener {
-            DatePickerDialog(requireContext(), startDate, calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                    .show()
+            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), startDate, calendar)
         }
         val endDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
@@ -200,9 +199,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
             }
         }
         date_started_edittext.setOnClickListener {
-            DatePickerDialog(requireContext(), endDate, calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                    .show()
+            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), endDate, calendar)
         }
         accountViewModel.getAssetAccounts().observe(this, Observer {
             if(it.isNotEmpty()) {

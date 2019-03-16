@@ -24,6 +24,7 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
@@ -216,9 +217,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         }
         bill_date_edittext.setOnClickListener {
             hideKeyboard()
-            DatePickerDialog(requireContext(), startDate, calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                    .show()
+            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), startDate, calendar)
         }
         currency_edittext.setOnClickListener{
             CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )

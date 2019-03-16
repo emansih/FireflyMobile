@@ -22,6 +22,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
@@ -125,9 +126,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
             }
         }
         date_edittext.setOnClickListener {
-            DatePickerDialog(requireContext(), calendarDate, calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                    .show()
+            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), calendarDate, calendar)
         }
         mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         mapTextview.setOnClickListener {

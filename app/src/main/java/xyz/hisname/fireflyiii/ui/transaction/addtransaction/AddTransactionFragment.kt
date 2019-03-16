@@ -9,7 +9,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
@@ -42,6 +41,7 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
@@ -239,9 +239,7 @@ class AddTransactionFragment: BaseFragment() {
             }
         }
         transaction_date_edittext.setOnClickListener {
-            DatePickerDialog(requireContext(), transactionDate, calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                    .show()
+            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), transactionDate, calendar)
         }
         category_edittext.setOnClickListener {
             val catDialog = CategoriesDialog()
