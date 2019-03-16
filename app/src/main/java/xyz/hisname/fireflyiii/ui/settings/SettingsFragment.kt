@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
@@ -68,7 +67,6 @@ class SettingsFragment: BaseSettings() {
         nightModePref.setOnPreferenceChangeListener { preference, newValue ->
             val nightMode = newValue as Boolean
             AppPref(sharedPref).nightModeEnabled = nightMode
-            globalViewModel.handleNightMode(nightMode)
             true
         }
     }
