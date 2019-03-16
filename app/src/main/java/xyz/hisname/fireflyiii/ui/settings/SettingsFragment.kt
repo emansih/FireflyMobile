@@ -1,12 +1,16 @@
 package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.preference.PreferenceManager
+import androidx.core.content.ContextCompat
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -15,6 +19,8 @@ import xyz.hisname.languagepack.LanguageChanger
 
 
 class SettingsFragment: BaseSettings() {
+
+    private val nightMode by lazy {  AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())).nightModeEnabled }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -33,7 +39,9 @@ class SettingsFragment: BaseSettings() {
             requireActivity().recreate()
             true
         }
-        languagePref.icon =  IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_language).sizeDp(24)
+        languagePref.icon = IconicsDrawable(requireContext())
+                .icon(GoogleMaterial.Icon.gmd_language)
+                .sizeDp(24).setIconColor()
     }
 
     private fun setAccountSection(){
@@ -46,7 +54,9 @@ class SettingsFragment: BaseSettings() {
             }
             true
         }
-        accountOptions.icon = IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_account_circle).sizeDp(24)
+        accountOptions.icon = IconicsDrawable(requireContext())
+                .icon(GoogleMaterial.Icon.gmd_account_circle)
+                .sizeDp(24).setIconColor()
     }
 
     private fun setTransactionSection(){
@@ -59,7 +69,10 @@ class SettingsFragment: BaseSettings() {
             }
             true
         }
-        notificationPref.icon = IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_notifications).sizeDp(24)
+
+        notificationPref.icon = IconicsDrawable(requireContext())
+                .icon(GoogleMaterial.Icon.gmd_notifications)
+                .sizeDp(24).setIconColor()
     }
 
     private fun setNightModeSection(){
@@ -69,6 +82,9 @@ class SettingsFragment: BaseSettings() {
             AppPref(sharedPref).nightModeEnabled = nightMode
             true
         }
+        nightModePref.icon = IconicsDrawable(requireContext())
+                .icon(GoogleMaterial.Icon.gmd_invert_colors)
+                .sizeDp(24).setIconColor()
     }
 
     override fun onAttach(context: Context) {
@@ -83,5 +99,13 @@ class SettingsFragment: BaseSettings() {
 
     override fun handleBack() {
         requireFragmentManager().popBackStack()
+    }
+
+    fun IconicsDrawable.setIconColor(): Drawable{
+        return if(nightMode){
+            this.color(ContextCompat.getColor(requireContext(), R.color.md_white_1000))
+        } else {
+            this.color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+        }
     }
 }
