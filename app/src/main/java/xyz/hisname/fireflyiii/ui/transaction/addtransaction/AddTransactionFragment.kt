@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
@@ -202,7 +203,7 @@ class AddTransactionFragment: BaseFragment() {
                         .sizeDp(24),null, null, null)
         time_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_clock)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                        .color(ContextCompat.getColor(requireContext(), R.color.md_red_400))
                         .sizeDp(24),null, null, null)
         tags_chip.chipTokenizer = SpanChipTokenizer(requireContext(), object : ChipCreator<ChipSpan> {
             override fun configureChip(chip: ChipSpan, chipConfiguration: ChipConfiguration) {

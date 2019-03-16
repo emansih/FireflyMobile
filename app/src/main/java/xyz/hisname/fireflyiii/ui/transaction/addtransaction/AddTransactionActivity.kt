@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
 import android.os.Bundle
 import android.view.animation.AnimationUtils
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import kotlinx.android.synthetic.main.activity_add_transaction.*
@@ -50,6 +51,10 @@ class AddTransactionActivity: BaseActivity() {
     }
 
     private fun setBottomNav(){
+        if(sharedPref(this).nightModeEnabled) {
+            transactionBottomView.itemTextColor = ContextCompat.getColorStateList(this, R.color.white)
+            transactionBottomView.itemIconTintList = ContextCompat.getColorStateList(this, R.color.white)
+        }
         transactionBottomView.setOnNavigationItemSelectedListener{ item ->
             when(item.itemId){
                 R.id.action_withdraw -> {

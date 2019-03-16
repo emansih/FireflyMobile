@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,8 @@ import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
 import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
@@ -59,6 +62,7 @@ class DashboardFragment: BaseFragment() {
         twoMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(2)
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
+        changeTheme()
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
             if (defaultCurrency.isNotEmpty()) {
                 val currencyData = defaultCurrency[0].currencyAttributes
@@ -329,7 +333,14 @@ class DashboardFragment: BaseFragment() {
         })
     }
 
-
+    private fun changeTheme(){
+        val sharedPref =  PreferenceManager.getDefaultSharedPreferences(requireContext())
+        if (AppPref(sharedPref).nightModeEnabled){
+            netEarningsExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+            dailySummaryExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+            budgetExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+        }
+    }
 
     override fun onAttach(context: Context){
         super.onAttach(context)
