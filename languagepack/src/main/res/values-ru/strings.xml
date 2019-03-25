@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard">Сводка</string>
+    <string name="transfer">Перевод</string>
+    <string name="tags">Метки</string>
+    <string name="account">Учетные записи</string>
+    <string name="withdrawal">Расход</string>
+    <string name="revenue_income_menu">Счета доходов</string>
+    <string name="currency">Валюта</string>
+    <string name="description">Описание</string>
+    <string name="piggy_bank">Копилки</string>
+    <string name="liability_account">Долги</string>
+    <string name="money_management">Управление </string>
+    <string name="min_amount">Минимальная сумма</string>
+    <string name="max_amount">Максимальная сумма</string>
+    <string name="amount">Количество</string>
+    <string name="decimal_places">Точек после запятой</string>
+    <string name="skip">Пропустить</string>
+    <string name="client_secret">Client Secret</string>
+    <string name="options">Настройки</string>
+    <string name="delete_bill_message">Вы уверены, что хотите удалить счет %1$s ?</string>
+    <string name="delete_piggy_bank_message">Вы уверены, что хотите удалить счет копилки %1$s ?</string>
+    <string name="destination_account">Целевой счет</string>
+    <string name="expense_account">Расходные счета</string>
+    <string name="source_account">Счет источник</string>
+    <string name="asset_account">Активные счета</string>
+    <string name="revenue_account">Счета доходов</string>
+    <string name="personal_access_token">Личный токен (Personal Access Token)</string>
+    <string name="currency_symbol">Символ валюты</string>
+    <string name="currency_code">Код валюты</string>
+    <string name="delete_tag_message">Вы уверены, что хотите удалить метку %1$s ?</string>
+    <string name="delete_account_title">Удалить счет %1$s</string>
+    <string name="delete_permanently">Удалить навсегда</string>
+    <string name="delete_transaction_title">Удалить запись с описанием %1$s</string>
+    <string name="delete_tag_title">Удалить метку %1$s</string>
+    <string name="delete_piggy_bank_title">Удалить копилку %1$s</string>
+    <string name="delete_bill_title">Удалить платеж %1$s</string>
+    <string name="delete_account_message">Вы уверены, что хотите удалить счет %1$s</string>
+    <string name="bill_deleted">Удален счет %1$s</string>
+    <string name="tag_deleted">Удалена метка %1$s</string>
+    <string name="sign_in">Войти</string>
+    <string name="overview">Обзор</string>
+    <string name="piggy_bank_deleted">Удалена копилка %1$s</string>
+    <string name="delete_transaction_message">Вы уверены, что хотите удалить операции %1$s ?</string>
+    <string name="bill">Счет</string>
+    <string name="transaction">Операции</string>
+    <string name="deposit">Вклад</string>
+    <string name="income">Доход</string>
+    <string name="expense">Расходы</string>
+    <string name="client_id">Идентификатор клиента</string>
+    <string name="welcome">Добро пожаловать!</string>
+    <string name="get_confirmation">Вы уверены?</string>
+    <string name="categories">Категории</string>
+    <string name="edit">Правка</string>
+    <string-array name="account_type">
+        <item>Собсвенность</item>
+        <item>Расход</item>
+        <item>Доход</item>
+        <item>Долг</item>
+    </string-array>
+    <string-array name="account_role">
+        <item>Актив по умолчанию</item>
+        <item>Общий актив</item>
+        <item>Сберегательный актив</item>
+        <item>Кредитная карта</item>
+    </string-array>
+    <string-array name="interest_freq">
+        <item>Ежедневно</item>
+        <item>Ежемесячно</item>
+        <item>Ежегодно</item>
+    </string-array>
+    <string-array name="liability">
+        <item>Кредит</item>
+        <item>Долг</item>
+        <item>Ипотека</item>
+        <item>Кредитная карта</item>
+    </string-array>
+    <string-array name="repeat_frequency">
+        <item>Еженедельно</item>
+        <item>Ежемесячно</item>
+        <item>Ежеквартально</item>
+        <item>Раз в пол года</item>
+        <item>Ежегодно</item>
+    </string-array>
+    <string name="net_worth">Капитал</string>
+    <string name="balance">Баланс</string>
+    <string name="budget">Бюджет</string>
+    <string name="language">Язык</string>
+    <string name="warning">Внимание!</string>
+    <string name="settings">Настройки</string>
+    <string name="target_amount">Планируемая сумма</string>
+    <string name="date">Дата</string>
+    <string name="optional_field">Дополнительные поля</string>
+    <string name="tag_created">Метка %1$s успешно создана!</string>
+    <string name="tag_updated">Метка %1$s успешно изменена!</string>
+    <string name="enabled">Включено</string>
+    <string name="currency_created">Валюта %1$s успешно создана!</string>
+    <string name="currency_updated">Валюта %1$s успешно обновлена!</string>
+    <string name="spent">Потрачено</string>
+    <string name="left_to_spend">Осталось потратить</string>
+    <string name="piggy_bank_description_help_text">Какова ваша цель? Новый iPhone, диван, фотоаппарат, деньги на экстренные случаи?</string>
+    <string name="piggy_bank_date_help_text">Вы можете установить целевую дату или крайний срок для вашей копилки.</string>
+    <string name="bills_create_intro">Используйте счета, чтобы отслеживать сумму, которую вы должны каждый период. Подумайте о расходах, таких как аренда, страхование или ипотечные платежи.</string>
+    <string name="bills_create_name">Используйте описательное название, например "аренда " или "медицинское страхование".</string>
+    <string name="bills_create_amount_min_holder">Выберите минимальную и максимальную сумму для этого счета.</string>
+    <string name="bills_create_repeat_freq_holder">Большинство счетов повторяются ежемесячно, но вы можете выбрать любую повторямость.</string>
+    <string name="bills_create_skip_holder">Если оплата повторяется каждые 2 недели, в поле "Пропустить" укажите "1", чтобы пропустить каждую вторую неделю.</string>
+    <string name="transactions_create_switch_box">Используйте эти кнопки для быстрого переключения типа транзакции, которую вы желаете сохранить.</string>
+    <string name="transactions_create_transfer_ffInput_piggy_bank_id">Выберите копилку и свяжите этот перевод с вашими сбережениями.</string>
+    <string name="add_transaction_shortcut">Добавить запись</string>
+</resources>
