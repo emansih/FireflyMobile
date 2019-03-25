@@ -68,4 +68,7 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
     @Query("DELETE FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String): Int
 
+    @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND source_name = :accountName")
+    abstract fun getTransactionListByDateAndAccount(startDate: String, endDate: String, accountName: String): MutableList<TransactionData>
+
 }

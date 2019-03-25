@@ -93,4 +93,10 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate!!), transactionType)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getTransactionListByDateAndAccount(startDate: String, endDate: String, accountName: String) =
+            transactionDao.getTransactionListByDateAndAccount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountName)
+
 }

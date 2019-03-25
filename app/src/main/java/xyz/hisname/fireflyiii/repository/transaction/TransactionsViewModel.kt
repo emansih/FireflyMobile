@@ -167,6 +167,18 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
+    fun getTransactionListByDateAndAccount(startDate: String, endDate: String,
+                                            accountName: String): MutableLiveData<MutableList<TransactionData>>{
+        val transactionData: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
+        var data: MutableList<TransactionData> = arrayListOf()
+        scope.async(Dispatchers.IO) {
+            data = repository.getTransactionListByDateAndAccount(startDate, endDate, accountName)
+        }.invokeOnCompletion {
+            transactionData.postValue(data)
+        }
+        return transactionData
+    }
+
     fun addTransaction(type: String, description: String,
                        date: String, piggyBankName: String?, billName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,

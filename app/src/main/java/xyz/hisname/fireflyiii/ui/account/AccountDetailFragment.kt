@@ -8,9 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -18,8 +21,11 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.fragment_account_detail.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
@@ -42,12 +48,12 @@ class AccountDetailFragment: BaseDetailFragment() {
         super.onViewCreated(view, savedInstanceState)
         currencyViewModel.getDefaultCurrency().observe(this, Observer { currencyData ->
             if(currencyData.isNotEmpty()){
-                setLineChart(currencyData[0].currencyAttributes?.code ?: "")
+                setLineChart(currencyData[0].currencyAttributes?.code ?: "", currencyData[0].currencyAttributes?.symbol ?: "")
             }
         })
     }
 
-    private fun setLineChart(currencyCode: String){
+    private fun setLineChart(currencyCode: String, currencySymbol: String){
         accountViewModel.getAccountById(accountId).observe(this, Observer { accountData ->
             if(accountData.isNotEmpty()){
                 zipLiveData(transactionViewModel.getTransactionsByAccountAndCurrencyCodeAndDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
@@ -120,12 +126,17 @@ class AccountDetailFragment: BaseDetailFragment() {
                         }
                     })
                 })
-                setExpensesByCategory(currencyCode, accountData[0].accountAttributes?.name ?: "")
+                balanceHistoryCardText.text = "Chart for all transactions for account " +
+                        accountData[0].accountAttributes?.name + " between " +
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6) +
+                        " and " + DateTimeUtil.getTodayDate()
+                getAccountTransaction(accountData[0].accountAttributes?.name ?: "")
+                setExpensesByCategory(currencyCode, accountData[0].accountAttributes?.name ?: "", currencySymbol)
             }
         })
     }
 
-    private fun setExpensesByCategory(currencyCode: String, accountName: String){
+    private fun setExpensesByCategory(currencyCode: String, accountName: String, currencySymbol: String){
         val coloring = arrayListOf<Int>()
         for (col in ColorTemplate.MATERIAL_COLORS) {
             coloring.add(col)
@@ -154,9 +165,11 @@ class AccountDetailFragment: BaseDetailFragment() {
                 }
                 if(isDarkMode()){
                     categoryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+                    categoryPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
                 }
                 categoryPieChart.apply {
-                    description = Description().apply { text = "" }
+                    description.text = currencySymbol + transactionData.first.toString()
+                    description.textSize = 15f
                     legend.form = Legend.LegendForm.CIRCLE
                     isDrawHoleEnabled = false
                     setUsePercentValues(true)
@@ -167,6 +180,29 @@ class AccountDetailFragment: BaseDetailFragment() {
                 categoryPieChart.invalidate()
             }
         })
+    }
+
+    private fun getAccountTransaction(accountName: String){
+        accountTransactionList.layoutManager = LinearLayoutManager(requireContext())
+        accountTransactionList.addItemDecoration(DividerItemDecoration(requireContext(),
+                DividerItemDecoration.VERTICAL))
+        transactionViewModel.getTransactionListByDateAndAccount(DateTimeUtil.getDaysBefore(
+                DateTimeUtil.getTodayDate(), 6), DateTimeUtil.getTodayDate(), accountName).observe(this,
+                Observer { transactionData ->
+                    val rtAdapter = TransactionRecyclerAdapter(transactionData){ data: TransactionData -> itemClicked(data) }
+                    accountTransactionList.adapter = rtAdapter
+                    rtAdapter.apply { accountTransactionList.adapter as TransactionRecyclerAdapter }
+                    rtAdapter.notifyDataSetChanged()
+        })
+    }
+
+    private fun itemClicked(data: TransactionData){
+        requireFragmentManager().commit {
+            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
+                arguments = bundleOf("transactionId" to data.transactionId)
+            })
+            addToBackStack(null)
+        }
     }
 
     override fun deleteItem() {
