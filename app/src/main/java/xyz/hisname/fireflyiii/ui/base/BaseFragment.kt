@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.base
 
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
@@ -78,6 +80,10 @@ abstract class BaseFragment: Fragment() {
     }
 
     protected fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
+
+    protected fun isDarkMode(): Boolean{
+        return AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())).nightModeEnabled
+    }
 
     private fun handleBackPress() {
         globalViewModel.backPress.observe(this, Observer { backPressValue ->

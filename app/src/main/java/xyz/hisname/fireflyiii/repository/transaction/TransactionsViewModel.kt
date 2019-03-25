@@ -9,17 +9,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.remote.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
-import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
-import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
@@ -99,6 +96,73 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             }
             data.postValue(depositAmount)
             isLoading.postValue(false)
+        }
+        return data
+    }
+
+    // My god.... the name of this function is sooooooo looong...
+    fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
+                                                               currencyCode: String,
+                                                               accountName: String): LiveData<BigDecimal>{
+        isLoading.value = true
+        var transactionAmount: BigDecimal = 0.toBigDecimal()
+        var transactionData: MutableList<TransactionData> = arrayListOf()
+        val data: MutableLiveData<BigDecimal> = MutableLiveData()
+        loadRemoteData(startDate, endDate, "all")
+        scope.launch(Dispatchers.IO){
+            transactionData = repository.getTransactionsByAccountAndCurrencyCodeAndDate(startDate, endDate, currencyCode, accountName)
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            transactionData.forEachIndexed { _, transactionData ->
+                transactionAmount = transactionAmount.add(transactionData.transactionAttributes?.amount?.toBigDecimal()?.abs())
+            }
+            data.postValue(transactionAmount)
+        }
+        return data
+    }
+
+    fun getUniqueCategoryByDate(startDate: String, endDate: String, currencyCode: String,
+                                sourceName: String, transactionType: String): MutableLiveData<MutableList<String>>{
+        isLoading.value = true
+        var transactionData: MutableList<String> = arrayListOf()
+        val data: MutableLiveData<MutableList<String>> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionData = repository.getUniqueCategoryByDate(startDate, endDate, currencyCode, sourceName, transactionType)
+        }.invokeOnCompletion {
+            data.postValue(transactionData)
+            isLoading.postValue(false)
+        }
+        return data
+    }
+
+    fun getTotalTransactionAmountByDateAndCurrency(startDate: String, endDate: String,
+                                             currencyCode: String, accountName: String,
+                                                   transactionType: String): MutableLiveData<Double>{
+        isLoading.value = true
+        var transactionAmount: Double = 0.toDouble()
+        val data: MutableLiveData<Double> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionAmount = repository.getTotalTransactionTypeByCategory(startDate, endDate,
+                    currencyCode, accountName, transactionType)
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            data.postValue(transactionAmount)
+        }
+        return data
+    }
+
+    fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String,
+                                                   currencyCode: String, accountName: String,
+                                                   transactionType: String, categoryName: String?): MutableLiveData<Double>{
+        isLoading.value = true
+        var transactionAmount: Double = 0.toDouble()
+        val data: MutableLiveData<Double> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionAmount = repository.getTransactionByDateAndCategoryAndCurrency(startDate, endDate,
+                    currencyCode, accountName, transactionType, categoryName)
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            data.postValue(transactionAmount)
         }
         return data
     }

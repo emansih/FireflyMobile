@@ -76,5 +76,15 @@ object GsonConverterUtil{
         return date?.atZone(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
     }
 
-}
+    @TypeConverter
+    @JvmStatic
+    fun toDouble(value: Double): String{
+        return Gson().toJson(value)
+    }
 
+    @TypeConverter
+    @JvmStatic
+    fun fromDouble(value: String): Double{
+        return Gson().fromJson(value, Double::class.java)
+    }
+}

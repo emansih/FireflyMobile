@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -31,38 +30,49 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
         }
     }
 
-    fun withdrawalList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>>{
-        return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
-            transactionDao.getTransaction("Withdrawal")
-        } else {
-            transactionDao.getTransaction(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),"Withdrawal")
-        }
-    }
-
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun allDepositWithCurrencyCode(startDate: String, endDate: String, currencyCode: String) =
             transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Deposit", currencyCode)
 
-    fun depositList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
-       return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
-           transactionDao.getTransaction("Deposit")
-       } else {
-           transactionDao.getTransaction(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                   DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Deposit")
-       }
-   }
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
+                                                                       currencyCode: String, accountName: String) =
+            transactionDao.getTransactionsByAccountAndCurrencyCodeAndDate(
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName)
 
-    fun transferList(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>> {
-        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
-            transactionDao.getTransaction("Transfer")
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getTotalTransactionTypeByCategory(startDate: String, endDate: String, currencyCode: String,
+                                                  accountName: String, transactionType: String) =
+            transactionDao.getTotalTransactionTypeByCategory(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType)
+
+
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String, currencyCode: String,
+                                                  accountName: String, transactionType: String, categoryName: String?): Double {
+        return if(categoryName != null){
+            transactionDao.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType, categoryName)
         } else {
-            transactionDao.getTransaction(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Transfer")
+            transactionDao.getTransactionByDateAndNullCategoryAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType)
         }
     }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun getUniqueCategoryByDate(startDate: String, endDate: String, currencyCode: String,
+                                        sourceName: String, transactionType: String) =
+            transactionDao.getUniqueCategoryByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, sourceName, transactionType)
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
