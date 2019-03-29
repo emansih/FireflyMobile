@@ -44,5 +44,5 @@
     <string name="author">Author</string>
     <string name="view_on_github">View on Github</string>
     <string name="about">About</string>
-
+    <string name="urge_user_to_post_bug_on_github">PLEASE POST THE ATTACHED STACK TRACE ON GITHUB IF POSSIBLE</string>
 </resources>

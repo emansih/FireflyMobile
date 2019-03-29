@@ -18,7 +18,7 @@ import xyz.hisname.languagepack.LanguageChanger
         reportContent = [ReportField.REPORT_ID, ReportField.APP_VERSION_NAME,
         ReportField.PHONE_MODEL, ReportField.BRAND, ReportField.PRODUCT, ReportField.ANDROID_VERSION,
         ReportField.BUILD_CONFIG, ReportField.STACK_TRACE, ReportField.LOGCAT])
-@AcraMailSender(reportAsFile = true, mailTo = "", resSubject = R.string.app_name,
+@AcraMailSender(reportAsFile = true, mailTo = "", resSubject = R.string.urge_user_to_post_bug_on_github,
         reportFileName = "Fireflyiii-mobile.txt")
 class CustomApp: MultiDexApplication() {
 
