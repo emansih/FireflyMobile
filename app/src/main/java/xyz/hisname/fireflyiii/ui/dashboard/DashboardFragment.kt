@@ -13,12 +13,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.utils.MPPointF
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
@@ -46,6 +46,8 @@ class DashboardFragment: BaseFragment() {
     private var month3Depot = 0.toBigDecimal()
     private var month2With = 0.toBigDecimal()
     private var month3With = 0.toBigDecimal()
+    private val loadingSnackbar by lazy { Snackbar.make(requireActivity().findViewById(R.id.coordinatorlayout),
+            "Syncing your data", Snackbar.LENGTH_INDEFINITE) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -54,6 +56,15 @@ class DashboardFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        zipLiveData(accountViewModel.isLoading, transactionViewModel.isLoading).observe(this, Observer { load ->
+            if(load.first || load.second){
+                loadingSnackbar.show()
+            } else {
+                if(loadingSnackbar.isShown){
+                    loadingSnackbar.dismiss()
+                }
+            }
+        })
         twoMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(2)
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
