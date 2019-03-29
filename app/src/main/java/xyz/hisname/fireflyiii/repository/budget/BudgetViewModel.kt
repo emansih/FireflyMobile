@@ -106,10 +106,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun retrieveCurrentMonthBudget(currencyCode: String): LiveData<String>{
-        currentMonthBudgetLoader.value = true
         var availableBudget: MutableList<BudgetData>? = null
         loadRemoteLimit()
-        currentMonthBudgetLimit = 0.toDouble()
         scope.async(Dispatchers.IO){
             availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
                     DateTimeUtil.getEndOfMonth(), currencyCode)
@@ -123,14 +121,12 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 }
             }
             currentMonthBudgetValue.postValue(currentMonthBudgetLimit.toString())
-            currentMonthBudgetLoader.postValue(false)
         }
         return currentMonthBudgetValue
     }
 
     fun retrieveSpentBudget(): LiveData<String>{
         spentBudgetLoader.value = true
-        currentMonthSpent = 0.toDouble()
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
         budgetService?.getPaginatedSpentBudget(1, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ response ->

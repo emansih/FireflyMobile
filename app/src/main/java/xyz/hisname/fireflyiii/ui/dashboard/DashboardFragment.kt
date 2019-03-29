@@ -28,6 +28,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.RoundingMode
 import kotlin.math.roundToInt
@@ -287,9 +288,6 @@ class DashboardFragment: BaseFragment() {
         val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700), ContextCompat.getColor(requireContext(), R.color.md_green_500))
         zipLiveData(budgetLimit.retrieveSpentBudget(),
                 budgetLimit.retrieveCurrentMonthBudget(currencyData?.code!!)).observe(this, Observer { budget ->
-            zipLiveData(budgetLimit.spentBudgetLoader, budgetLimit.currentMonthBudgetLoader).observe(this, Observer {
-                loading ->
-                if(loading.first == false && loading.second == false){
                     budgetSpent = budget.first.toFloat()
                     budgeted = budget.second.toFloat()
                     val budgetLeftPercentage = (budgetSpent / budgeted) * 100
@@ -302,6 +300,7 @@ class DashboardFragment: BaseFragment() {
                         iconsOffset = MPPointF(0f, 40f)
                         colors = dataColor
                         valueTextSize = 15f
+                        valueFormatter = MpAndroidPercentFormatter()
                     }
                     budgetAmount.text = currencyData.symbol + " " + budgeted
                     spentAmount.text = currencyData.symbol + " " + budgetSpent
@@ -329,8 +328,6 @@ class DashboardFragment: BaseFragment() {
                         }
                         ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
                     }
-                }
-            })
         })
     }
 
