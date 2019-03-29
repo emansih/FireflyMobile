@@ -33,8 +33,7 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
 
     inner class AttachmentAdapter(view: View): RecyclerView.ViewHolder(view) {
         fun bind(attachmentData: AttachmentData, clickListener: (AttachmentData) -> Unit){
-            val fileName = attachmentData.attachmentAttributes.filename
-
+            val fileName = attachmentData.attachmentAttributes?.filename ?: ""
             if(fileName.length >= 15){
                 itemView.attachment_name.text = fileName.substring(0, 15) + "..."
             } else {

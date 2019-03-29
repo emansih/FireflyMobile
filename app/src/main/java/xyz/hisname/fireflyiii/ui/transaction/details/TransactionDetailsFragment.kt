@@ -209,7 +209,7 @@ class TransactionDetailsFragment: BaseFragment() {
             attachmentViewModel.downloadAttachment(attachmentData).observe(this, Observer { isDownloaded ->
                 attachmentViewModel.isLoading.observe(this, Observer { isLoading ->
                     if (!isDownloaded && !isLoading) {
-                        toastError("There was an issue downloading " + attachmentData.attachmentAttributes.filename)
+                        toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                     }
                 })
             })

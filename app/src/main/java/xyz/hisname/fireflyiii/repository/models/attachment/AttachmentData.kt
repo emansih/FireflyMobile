@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 data class AttachmentData(
         @Embedded
         @SerializedName("attributes")
-        var attachmentAttributes: Attributes = Attributes(0,"","","","","","","",0,"","",""),
+        var attachmentAttributes: Attributes? = null,
         @PrimaryKey(autoGenerate = false)
         @SerializedName("id")
         var attachmentId: Long = 0,

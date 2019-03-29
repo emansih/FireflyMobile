@@ -24,12 +24,12 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
 
     fun downloadAttachment(attachmentData: AttachmentData): LiveData<Boolean> {
         val isDownloaded: MutableLiveData<Boolean> = MutableLiveData()
-        val fileDownloadUrl = attachmentData.attachmentAttributes.download_uri
-        val fileName = attachmentData.attachmentAttributes.filename
+        val fileDownloadUrl = attachmentData.attachmentAttributes?.download_uri
+        val fileName = attachmentData.attachmentAttributes?.filename ?: ""
         isLoading.value = true
         val fileToOpen = File("${FileUtils().folderDirectory}/$fileName")
         // Check file integrity before opening
-        if(fileToOpen.checkMd5Hash(attachmentData.attachmentAttributes.md5)){
+        if(fileToOpen.checkMd5Hash(attachmentData.attachmentAttributes?.md5 ?: "")){
             viewModelContext.openFile(fileName)
             isDownloaded.value = true
             isLoading.value = false
