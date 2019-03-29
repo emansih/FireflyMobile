@@ -24,7 +24,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
 import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
@@ -41,7 +40,6 @@ import kotlin.math.roundToInt
 class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
-    private val summaryViewModel by lazy { getViewModel(SummaryViewModel::class.java) }
     private var depositSum = 0.toBigDecimal()
     private var withdrawSum = 0.toBigDecimal()
     private var transaction = 0.toBigDecimal()
@@ -80,6 +78,9 @@ class DashboardFragment: BaseFragment() {
             requireActivity().startActivity(Intent(requireContext(), AddTransactionActivity::class.java))
             fab.isClickable = true
         }
+        requireFragmentManager().commit {
+            replace(R.id.recentTransactionCard, RecentTransactionFragment())
+        }
     }
 
     private fun setNetWorth(currencyData: CurrencyAttributes?){
@@ -92,11 +93,6 @@ class DashboardFragment: BaseFragment() {
                     }
                 })
             })
-            // For some reason fragment transaction needs to be done here. Calling at some
-            // other places will cause the dashboard to scroll to some weird spot....
-            requireFragmentManager().commit {
-                replace(R.id.recentTransactionCard, RecentTransactionFragment())
-            }
         })
     }
 
@@ -196,7 +192,6 @@ class DashboardFragment: BaseFragment() {
             data.isHighlightEnabled = false
             animateY(1000)
             setTouchEnabled(true)
-            invalidate()
         }
 
     }
@@ -265,7 +260,6 @@ class DashboardFragment: BaseFragment() {
                         data.isHighlightEnabled = false
                         animateY(1000)
                         setTouchEnabled(true)
-                        invalidate()
                     }
                 }
             })
@@ -307,7 +301,6 @@ class DashboardFragment: BaseFragment() {
                         data = PieData(dataSet)
                         description = Description().apply { text = "Budget Percentage" }
                         highlightValue(null)
-                        invalidate()
                     }
                     val progressDrawable = budgetProgress.progressDrawable.mutate()
                     leftToSpentText.text = currencyData.symbol + " " + String.format("%.2f",(budgeted - budgetSpent))
