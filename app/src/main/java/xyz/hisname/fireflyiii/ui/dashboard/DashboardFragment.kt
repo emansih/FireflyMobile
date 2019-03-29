@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,10 +22,8 @@ import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
-import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
@@ -299,7 +296,7 @@ class DashboardFragment: BaseFragment() {
                     spentAmount.text = currencyData.symbol + " " + budgetSpent
                     budgetChart.apply {
                         data = PieData(dataSet)
-                        description = Description().apply { text = "Budget Percentage" }
+                        description.text = "Budget Percentage"
                         highlightValue(null)
                     }
                     val progressDrawable = budgetProgress.progressDrawable.mutate()
@@ -327,11 +324,20 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun changeTheme(){
-        val sharedPref =  PreferenceManager.getDefaultSharedPreferences(requireContext())
-        if (AppPref(sharedPref).nightModeEnabled){
+        if (isDarkMode()){
             netEarningsExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+            netEarningsChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            netEarningsChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            netEarningsChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            netEarningsChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             dailySummaryExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+            dailySummaryChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            dailySummaryChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            dailySummaryChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            dailySummaryChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             budgetExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+            budgetChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            budgetChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
         }
     }
 
