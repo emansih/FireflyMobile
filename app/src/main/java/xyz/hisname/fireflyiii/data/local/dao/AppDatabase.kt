@@ -23,7 +23,7 @@ import xyz.hisname.fireflyiii.util.GsonConverterUtil
 @Database(entities = [PiggyData::class, BillData::class, AccountData::class, CurrencyData::class,
     TransactionData::class, CategoryData::class, BudgetData::class, BudgetListData::class,
     TagsData::class, AttachmentData::class],
-        version = 6,exportSchema = false)
+        version = 7,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
