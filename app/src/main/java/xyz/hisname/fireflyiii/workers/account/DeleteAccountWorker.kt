@@ -20,6 +20,24 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
     private val accountDatabase by lazy { AppDatabase.getInstance(context).accountDataDao() }
     private val channelIcon = R.drawable.ic_euro_sign
 
+    companion object {
+        fun deleteWorker(accountId: Long){
+            val accountTag =
+                    WorkManager.getInstance().getWorkInfosByTag("delete_account_$accountId").get()
+            if(accountTag == null || accountTag.size == 0) {
+                val accountData = Data.Builder()
+                        .putLong("id", accountId)
+                        .build()
+                val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteAccountWorker::class.java)
+                        .setInputData(accountData)
+                        .addTag("delete_account_$accountId")
+                        .setConstraints(Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED).build())
+                        .build()
+                WorkManager.getInstance().enqueue(deleteAccountWork)
+            }
+        }
+    }
 
     override fun doWork(): Result {
         val id = inputData.getLong("accountId", 0L)

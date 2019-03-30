@@ -240,22 +240,8 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return apiResponse
     }
 
-    private fun deleteAccount(id: Long){
-        val accountTag =
-                WorkManager.getInstance().getWorkInfosByTag("delete_account_$id").get()
-        if(accountTag == null || accountTag.size == 0) {
-            val accountData = Data.Builder()
-                    .putLong("id", id)
-                    .build()
-            val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteAccountWorker::class.java)
-                    .setInputData(accountData)
-                    .addTag("delete_account_$id")
-                    .setConstraints(Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED).build())
-                    .build()
-            WorkManager.getInstance().enqueue(deleteAccountWork)
-        }
-    }
+    private fun deleteAccount(id: Long) = DeleteAccountWorker.deleteWorker(id)
+
 
     private fun loadRemoteData(source: String){
         isLoading.value = true
