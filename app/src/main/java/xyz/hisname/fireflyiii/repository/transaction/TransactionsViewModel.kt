@@ -20,6 +20,8 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessMo
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
+import java.text.DecimalFormat
+import kotlin.math.absoluteValue
 
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
@@ -83,39 +85,137 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
+    fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
         isLoading.value = true
-        var withdrawData: MutableList<TransactionData> = arrayListOf()
-        var withdrawAmount: BigDecimal = 0.toBigDecimal()
-        val data: MutableLiveData<BigDecimal> = MutableLiveData()
-        loadRemoteData(startDate, endDate, "withdrawal")
-        scope.async(Dispatchers.IO) {
-            withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
-        }.invokeOnCompletion {
-            withdrawData.forEachIndexed { _, transactionData ->
-                withdrawAmount = withdrawAmount.add(transactionData.transactionAttributes?.amount?.toBigDecimal()?.abs())
+        var withdrawData: Double = 0.toDouble()
+        val decimalFormat = DecimalFormat(".##")
+        val data: MutableLiveData<Double> = MutableLiveData()
+        val transactionData: MutableList<TransactionData> = arrayListOf()
+        transactionService?.getPaginatedTransactions(startDate, endDate, "withdrawal", 1)?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                val networkData = response.body()
+                if (networkData != null) {
+                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
+                        scope.launch(Dispatchers.IO){
+                            repository.deleteTransactionsByDate(startDate, endDate, convertString("withdrawal"))
+                        }.invokeOnCompletion {
+                            transactionData.addAll(networkData.data)
+                            if(networkData.meta.pagination.total_pages > networkData.meta.pagination.current_page) {
+                                for(items in 2..networkData.meta.pagination.total_pages){
+                                    transactionService?.getPaginatedTransactions(startDate, endDate, "withdrawal", items)?.enqueue(retrofitCallback({ pagination ->
+                                        pagination.body()?.data?.forEachIndexed{ _, transData ->
+                                            transactionData.add(transData)
+                                        }
+                                    }))
+                                }
+                            }
+                            scope.launch(Dispatchers.IO){
+                                transactionData.forEachIndexed { _, transData ->
+                                    repository.insertTransaction(transData)
+                                }
+                            }.invokeOnCompletion {
+                                scope.launch(Dispatchers.IO) {
+                                    withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
+                                }.invokeOnCompletion {
+                                    data.postValue(decimalFormat.format(withdrawData.absoluteValue).toDouble())
+                                    isLoading.postValue(false)
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+                scope.launch(Dispatchers.IO) {
+                    withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
+                }.invokeOnCompletion {
+                    data.postValue(decimalFormat.format(withdrawData.absoluteValue).toDouble())
+                    isLoading.postValue(false)
+                }
+
             }
-            data.postValue(withdrawAmount)
-            isLoading.postValue(false)
-        }
+        })
+        { throwable ->
+            scope.launch(Dispatchers.IO) {
+                withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
+            }.invokeOnCompletion {
+                data.postValue(decimalFormat.format(withdrawData.absoluteValue).toDouble())
+                isLoading.postValue(false)
+            }
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
         return data
     }
 
-    fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
+    fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
         isLoading.value = true
-        var depositData: MutableList<TransactionData> = arrayListOf()
-        var depositAmount: BigDecimal = 0.toBigDecimal()
-        val data: MutableLiveData<BigDecimal> = MutableLiveData()
-        loadRemoteData(startDate, endDate, "deposit")
-        scope.async(Dispatchers.IO) {
-            depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
-        }.invokeOnCompletion {
-            depositData.forEachIndexed { _, transactionData ->
-                depositAmount = depositAmount.add(transactionData.transactionAttributes?.amount?.toBigDecimal()?.abs())
+        var depositData: Double = 0.toDouble()
+        val decimalFormat = DecimalFormat(".##")
+        val data: MutableLiveData<Double> = MutableLiveData()
+        val transactionData: MutableList<TransactionData> = arrayListOf()
+        transactionService?.getPaginatedTransactions(startDate, endDate, "deposit", 1)?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                val networkData = response.body()
+                if (networkData != null) {
+                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
+                        scope.launch(Dispatchers.IO){
+                            repository.deleteTransactionsByDate(startDate, endDate, convertString("deposit"))
+                        }.invokeOnCompletion {
+                            transactionData.addAll(networkData.data)
+                            if(networkData.meta.pagination.total_pages > networkData.meta.pagination.current_page) {
+                                for(items in 2..networkData.meta.pagination.total_pages){
+                                    transactionService?.getPaginatedTransactions(startDate, endDate, "deposit", items)?.enqueue(retrofitCallback({ pagination ->
+                                        pagination.body()?.data?.forEachIndexed{ _, transData ->
+                                            transactionData.add(transData)
+                                        }
+                                    }))
+                                }
+                            }
+                            scope.launch(Dispatchers.IO){
+                                transactionData.forEachIndexed { _, transData ->
+                                    repository.insertTransaction(transData)
+                                }
+                            }.invokeOnCompletion {
+                                scope.launch(Dispatchers.IO) {
+                                    depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
+                                }.invokeOnCompletion {
+                                    data.postValue(decimalFormat.format(depositData).toDouble())
+                                    isLoading.postValue(false)
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+                scope.launch(Dispatchers.IO) {
+                    depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
+                }.invokeOnCompletion {
+                    data.postValue(decimalFormat.format(depositData).toDouble())
+                    isLoading.postValue(false)
+                }
+
             }
-            data.postValue(depositAmount)
-            isLoading.postValue(false)
-        }
+        })
+        { throwable ->
+            scope.launch(Dispatchers.IO) {
+                depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
+            }.invokeOnCompletion {
+                data.postValue(decimalFormat.format(depositData).toDouble())
+                isLoading.postValue(false)
+            }
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
         return data
     }
 

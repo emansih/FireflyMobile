@@ -30,6 +30,8 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.RoundingMode
+import java.text.DecimalFormat
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 
@@ -37,15 +39,16 @@ import kotlin.math.roundToInt
 class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
-    private var depositSum = 0.toBigDecimal()
-    private var withdrawSum = 0.toBigDecimal()
-    private var transaction = 0.toBigDecimal()
+    private var depositSum = 0.toDouble()
+    private var withdrawSum = 0.toDouble()
+    private var transaction = 0.toDouble()
     private var budgetSpent = 0f
     private var budgeted = 0f
-    private var month2Depot = 0.toBigDecimal()
-    private var month3Depot = 0.toBigDecimal()
-    private var month2With = 0.toBigDecimal()
-    private var month3With = 0.toBigDecimal()
+    private var month2Depot = 0.toDouble()
+    private var month3Depot = 0.toDouble()
+    private var month2With = 0.toDouble()
+    private var month3With = 0.toDouble()
+    private val decimalFormat = DecimalFormat(".##")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -112,30 +115,30 @@ class DashboardFragment: BaseFragment() {
             month2Depot = transactionData.fourth
             month3With = transactionData.fifth
             month3Depot = transactionData.sixth
-
             currentExpense.text = currencyData.symbol + " " + withdrawSum.toString()
             currentMonthIncome.text = currencyData.symbol + " " + depositSum.toString()
-            if(transaction.signum() == -1){
+            transaction = depositSum - withdrawSum
+            if(Math.copySign(1.toDouble(), transaction) < 0){
                 currentNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            balanceText.text = currencyData.symbol + " " + transaction.toString()
-            currentNetIncome.text = currencyData.symbol + " " + transaction.toString()
+            balanceText.text = currencyData.symbol + " " + decimalFormat.format(transaction)
+            currentNetIncome.text = currencyData.symbol + " " + decimalFormat.format(transaction)
 
             transaction = month2Depot - month2With
             oneMonthBeforeExpense.text = currencyData.symbol + " " + month2With.toString()
             oneMonthBeforeIncome.text = currencyData.symbol + " " + month2Depot.toString()
-            if(transaction.signum() == -1){
+            if(Math.copySign(1.toDouble(), transaction) < 0){
                 oneMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            oneMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
+            oneMonthBeforeNetIncome.text = currencyData.symbol + " " + decimalFormat.format(transaction)
 
             transaction = month3Depot - month3With
             twoMonthBeforeExpense.text = currencyData.symbol + " " + month3With.toString()
             twoMonthBeforeIncome.text = currencyData.symbol + " " + month3Depot.toString()
-            if(transaction.signum() == -1){
+            if(Math.copySign(1.toDouble(), transaction) < 0){
                 twoMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            twoMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
+            twoMonthBeforeNetIncome.text = currencyData.symbol + " " + decimalFormat.format(transaction)
 
             val withDrawalHistory = arrayListOf(
                     BarEntry(0f, month3With.toFloat()),
@@ -207,8 +210,8 @@ class DashboardFragment: BaseFragment() {
                     val fourthDay = transactionData.fourth
                     val fifthDay = transactionData.fifth
                     val sixthDay = transactionData.sixth
-                    val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).divide(6.toBigDecimal(),2, RoundingMode.HALF_UP)
-                    sixDaysAverage.text = currencyData.symbol + sixDayAverage.toString()
+                    val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).div(6)
+                    sixDaysAverage.text = currencyData.symbol + decimalFormat.format(sixDayAverage)
                     val expenseHistory = arrayListOf(
                             BarEntry(0f, firstDay.toFloat()),
                             BarEntry(1f, secondDay.toFloat()),
@@ -248,7 +251,7 @@ class DashboardFragment: BaseFragment() {
                 DateTimeUtil.getTodayDate(), currencyCode).observe(this, Observer { transactionData ->
             transactionViewModel.isLoading.observe(this, Observer { loader ->
                 if(loader == false) {
-                    thirtyDaysAverage.text = currencyData.symbol + transactionData.divide(30.toBigDecimal(), 2, RoundingMode.HALF_UP)
+                    thirtyDaysAverage.text = currencyData.symbol + decimalFormat.format(transactionData.div(30))
                 }
             })
         })

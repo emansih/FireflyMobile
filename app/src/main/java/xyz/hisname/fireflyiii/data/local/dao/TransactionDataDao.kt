@@ -21,9 +21,10 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
     abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<TransactionData>
 
     // That is a really loooooooong name
-    @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) " +
-            "AND transactionType = :type AND currency_code = :currencyCode")
-    abstract fun getTransactionsByTypeWithDateAndCurrencyCode(startDate: String?, endDate: String?, type: String, currencyCode: String): MutableList<TransactionData>
+    @Query("SELECT sum(amount) FROM transactions WHERE (date BETWEEN :startDate AND :endDate)" +
+            " AND transactionType = :type AND currency_code = :currencyCode")
+    abstract fun getTransactionsByTypeWithDateAndCurrencyCode(startDate: String?, endDate: String?,
+                                                              type: String, currencyCode: String): Double
 
     // This too is looong
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) " +

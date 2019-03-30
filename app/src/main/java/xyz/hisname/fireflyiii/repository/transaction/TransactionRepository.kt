@@ -19,7 +19,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao) {
     @WorkerThread
     suspend fun allWithdrawalWithCurrencyCode(startDate: String, endDate: String, currencyCode: String) =
             transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Withdrawal", currencyCode)
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Withdrawal", currencyCode)
+
 
     fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<TransactionData>{
         return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
