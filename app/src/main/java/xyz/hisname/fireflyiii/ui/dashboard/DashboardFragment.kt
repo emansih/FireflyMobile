@@ -236,12 +236,12 @@ class DashboardFragment: BaseFragment() {
                     val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).divide(6.toBigDecimal(),2, RoundingMode.HALF_UP)
                     sixDaysAverage.text = currencyData.symbol + sixDayAverage.toString()
                     val expenseHistory = arrayListOf(
-                            BarEntry(1f, firstDay.toFloat()),
-                            BarEntry(2f, secondDay.toFloat()),
-                            BarEntry(3f, thirdDay.toFloat()),
-                            BarEntry(4f, fourthDay.toFloat()),
-                            BarEntry(5f, fifthDay.toFloat()),
-                            BarEntry(6f, sixthDay.toFloat())
+                            BarEntry(0f, firstDay.toFloat()),
+                            BarEntry(1f, secondDay.toFloat()),
+                            BarEntry(2f, thirdDay.toFloat()),
+                            BarEntry(3f, fourthDay.toFloat()),
+                            BarEntry(4f, fifthDay.toFloat()),
+                            BarEntry(5f, sixthDay.toFloat())
                     )
                     val expenseSet = BarDataSet(expenseHistory, resources.getString(R.string.expense))
                     expenseSet.apply {
@@ -254,10 +254,7 @@ class DashboardFragment: BaseFragment() {
                         isScaleXEnabled = false
                         setDrawBarShadow(false)
                         setDrawGridBackground(false)
-                        // Some kind of bug? The first xAxis value is ignored therefore I had to
-                        // insert the variable *twice*
                         xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
-                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
                                 DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
                                 DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2))),
                                 DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3))),
