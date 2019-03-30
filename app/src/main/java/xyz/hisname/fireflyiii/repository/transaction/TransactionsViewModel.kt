@@ -62,6 +62,13 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                     }
                     isLoading.postValue(false)
                 }
+            } else {
+                scope.launch(Dispatchers.IO){
+                    recentData = repository.recentTransactions(limit)
+                }.invokeOnCompletion {
+                    data.postValue(recentData)
+                    isLoading.postValue(false)
+                }
             }
         })
         { throwable ->
