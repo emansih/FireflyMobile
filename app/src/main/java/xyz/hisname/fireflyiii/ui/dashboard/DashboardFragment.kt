@@ -138,13 +138,13 @@ class DashboardFragment: BaseFragment() {
             twoMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
 
             val withDrawalHistory = arrayListOf(
-                    BarEntry(month3With.toFloat(), month3With.toFloat()),
-                    BarEntry(month2With.toFloat(), month2With.toFloat()),
-                    BarEntry(withdrawSum.toFloat(), withdrawSum.toFloat()))
+                    BarEntry(0f, month3With.toFloat()),
+                    BarEntry(1f, month2With.toFloat()),
+                    BarEntry(2f, withdrawSum.toFloat()))
             val depositHistory = arrayListOf(
-                    BarEntry(month3Depot.toFloat(), month3Depot.toFloat()),
-                    BarEntry(month2Depot.toFloat(), month2Depot.toFloat()),
-                    BarEntry(depositSum.toFloat(), depositSum.toFloat()))
+                    BarEntry(0f, month3Depot.toFloat()),
+                    BarEntry(1f, month2Depot.toFloat()),
+                    BarEntry(2f, depositSum.toFloat()))
 
             val withDrawalSets = BarDataSet(withDrawalHistory, resources.getString(R.string.withdrawal))
             val depositSets = BarDataSet(depositHistory, resources.getString(R.string.deposit))
@@ -172,9 +172,9 @@ class DashboardFragment: BaseFragment() {
                 barData.barWidth = 0.3f
                 xAxis.axisMaximum = netEarningsChart.barData.getGroupWidth(0.4f, 0f) * 3
                 groupBars(0f, 0.4f, 0f)
+                xAxis.setCenterAxisLabels(true)
                 data.isHighlightEnabled = false
                 animateY(1000)
-                notifyDataSetChanged()
             }
         })
     }
