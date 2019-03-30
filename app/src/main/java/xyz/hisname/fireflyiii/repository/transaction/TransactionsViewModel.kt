@@ -55,7 +55,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                         repository.insertTransaction(transactionData)
                     }
                 }.invokeOnCompletion {
-                    if(limit > networkData?.data?.size ?: 0){
+                    if(limit < networkData?.data?.size ?: 0){
                         data.postValue(recentData.take(limit).toMutableList())
                     } else {
                         data.postValue(recentData)
