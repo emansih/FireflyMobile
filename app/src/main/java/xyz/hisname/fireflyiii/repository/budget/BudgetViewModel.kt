@@ -106,22 +106,78 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun retrieveCurrentMonthBudget(currencyCode: String): LiveData<String>{
-        var availableBudget: MutableList<BudgetData>? = null
-        loadRemoteLimit()
-        scope.async(Dispatchers.IO){
-            availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                    DateTimeUtil.getEndOfMonth(), currencyCode)
-        }.invokeOnCompletion {
-            if(availableBudget.isNullOrEmpty()){
-                currentMonthBudgetLimit = 0.toDouble()
-                currentMonthBudgetLoader.postValue(false)
-            } else {
-                availableBudget?.forEachIndexed { _, budgetData ->
-                   currentMonthBudgetLimit += budgetData.budgetAttributes?.amount?.toDouble() ?: 0.toDouble()
+        var availableBudget: MutableList<BudgetData> = arrayListOf()
+        budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                val networkData = response.body()
+                if (networkData != null) {
+                    scope.launch(Dispatchers.IO) {
+                        repository.deleteAllBudget()
+                    }.invokeOnCompletion {
+                        if (networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages) {
+                            networkData.budgetData.forEachIndexed { _, budgetData ->
+                                availableBudget.add(budgetData)
+                            }
+                        } else {
+                            networkData.budgetData.forEachIndexed { _, budgetData ->
+                                availableBudget.add(budgetData)
+                            }
+                            for (pagination in 2..networkData.meta.pagination.total_pages) {
+                                budgetService?.getPaginatedBudget(pagination)?.enqueue(retrofitCallback({ respond ->
+                                    respond.body()?.budgetData?.forEachIndexed { _, budgetList ->
+                                        availableBudget.add(budgetList)
+                                    }
+                                }))
+                            }
+                        }
+                        scope.launch(Dispatchers.IO){
+                            availableBudget.forEachIndexed { _, budgetData ->
+                                repository.insertBudget(budgetData)
+                            }
+                        }.invokeOnCompletion {
+                            scope.launch(Dispatchers.IO){
+                                availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                        DateTimeUtil.getEndOfMonth(), currencyCode)
+                            }.invokeOnCompletion {
+                                currentMonthBudgetValue.postValue(availableBudget[0].budgetAttributes?.amount.toString())
+                            }
+                        }
+                    }
+                } else {
+                    val responseError = response.errorBody()
+                    if (responseError != null) {
+                        val errorBody = String(responseError.bytes())
+                        val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                        apiResponse.postValue(gson.message)
+                    }
+                    scope.launch(Dispatchers.IO){
+                        availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                DateTimeUtil.getEndOfMonth(), currencyCode)
+                    }.invokeOnCompletion {
+                        scope.launch(Dispatchers.IO){
+                            availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                    DateTimeUtil.getEndOfMonth(), currencyCode)
+                        }.invokeOnCompletion {
+                            currentMonthBudgetValue.postValue(availableBudget[0].budgetAttributes?.amount.toString())
+                        }
+                    }
                 }
             }
-            currentMonthBudgetValue.postValue(currentMonthBudgetLimit.toString())
-        }
+        })
+        { throwable ->
+            scope.launch(Dispatchers.IO){
+                availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                        DateTimeUtil.getEndOfMonth(), currencyCode)
+            }.invokeOnCompletion {
+                scope.launch(Dispatchers.IO){
+                    availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), currencyCode)
+                }.invokeOnCompletion {
+                    currentMonthBudgetValue.postValue(availableBudget[0].budgetAttributes?.amount.toString())
+                }
+            }
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
         return currentMonthBudgetValue
     }
 
@@ -208,43 +264,5 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
         return currentMonthSpentValue
-    }
-
-    private fun loadRemoteLimit(){
-        isLoading.value = true
-        budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                if (networkData != null) {
-                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
-                        networkData.budgetData.forEachIndexed { _, budgetData ->
-                            scope.launch(Dispatchers.IO) { repository.insertBudget(budgetData) }
-                        }
-                    } else {
-                        networkData.budgetData.forEachIndexed { _, budgetData ->
-                            scope.launch(Dispatchers.IO) { repository.insertBudget(budgetData) }
-                        }
-                        for (pagination in 2..networkData.meta.pagination.total_pages) {
-                            budgetService?.getPaginatedBudget(pagination)?.enqueue(retrofitCallback({ respond ->
-                                respond.body()?.budgetData?.forEachIndexed { _, budgetList ->
-                                    scope.launch(Dispatchers.IO) { repository.insertBudget(budgetList) }
-                                }
-                            }))
-                        }
-                    }
-                }
-
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-            }
-        })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
-
     }
 }

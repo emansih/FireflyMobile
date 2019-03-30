@@ -18,4 +18,6 @@ abstract class BudgetDataDao: BaseDao<BudgetData> {
                                                  currencyCode: String): MutableList<BudgetData>
 
 
+    @Query("DELETE FROM budget")
+    abstract fun deleteAllBudget(): Int
 }

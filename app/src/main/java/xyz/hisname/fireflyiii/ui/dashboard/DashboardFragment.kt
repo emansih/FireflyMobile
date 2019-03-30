@@ -97,100 +97,86 @@ class DashboardFragment: BaseFragment() {
     private fun setNetIncome(currencyData: CurrencyAttributes?){
         val currencyCode = currencyData?.code!!
         zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), currencyCode),
-                transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), currencyCode)).observe(this, Observer { transactionData ->
-            transactionViewModel.isLoading.observe(this, Observer { loader ->
-                if(loader == false){
-                    depositSum = transactionData.second
-                    withdrawSum = transactionData.first
-                    transaction = depositSum - withdrawSum
-                    currentExpense.text = currencyData.symbol + " " + withdrawSum.toString()
-                    currentMonthIncome.text = currencyData.symbol + " " + depositSum.toString()
-                    if(transaction.signum() == -1){
-                        currentNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
-                    }
-                    balanceText.text = currencyData.symbol + " " + transaction.toString()
-                    currentNetIncome.text = currencyData.symbol + " " + transaction.toString()
-                }
-            })
-        })
-        zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
+                DateTimeUtil.getEndOfMonth(), currencyCode), transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+                DateTimeUtil.getEndOfMonth(), currencyCode), transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
                 DateTimeUtil.getEndOfMonth(1), currencyCode),
                 transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
-                        DateTimeUtil.getEndOfMonth(1), currencyCode)).observe(this, Observer { transactionData ->
-            transactionViewModel.isLoading.observe(this, Observer { loader ->
-                if(loader == false){
-                    month2Depot = transactionData.second
-                    month2With = transactionData.first
-                    transaction = month2Depot - month2With
-                    oneMonthBeforeExpense.text = currencyData.symbol + " " + month2With.toString()
-                    oneMonthBeforeIncome.text = currencyData.symbol + " " + month2Depot.toString()
-                    if(transaction.signum() == -1){
-                        oneMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
-                    }
-                    oneMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
-                }
-            })
-        })
-
-        zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
+                        DateTimeUtil.getEndOfMonth(1), currencyCode), transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
                 DateTimeUtil.getEndOfMonth(2), currencyCode),
                 transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
                         DateTimeUtil.getEndOfMonth(2), currencyCode)).observe(this, Observer { transactionData ->
-            transactionViewModel.isLoading.observe(this, Observer { loader ->
-                if(loader == false){
-                    month3Depot = transactionData.second
-                    month3With = transactionData.first
-                    transaction = month3Depot - month3With
-                    twoMonthBeforeExpense.text = currencyData.symbol + " " + month3With.toString()
-                    twoMonthBeforeIncome.text = currencyData.symbol + " " + month3Depot.toString()
-                    if(transaction.signum() == -1){
-                        twoMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
-                    }
-                    twoMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
-                }
-            })
-        })
-        val withDrawalHistory = arrayListOf(
-                BarEntry(month3With.toFloat(), month3With.toFloat()),
-                BarEntry(month2With.toFloat(), month2With.toFloat()),
-                BarEntry(withdrawSum.toFloat(), withdrawSum.toFloat()))
-        val depositHistory = arrayListOf(
-                BarEntry(month3Depot.toFloat(), month3Depot.toFloat()),
-                BarEntry(month2Depot.toFloat(), month2Depot.toFloat()),
-                BarEntry(depositSum.toFloat(), depositSum.toFloat()))
-        val withDrawalSets = BarDataSet(withDrawalHistory, resources.getString(R.string.withdrawal))
-        val depositSets = BarDataSet(depositHistory, resources.getString(R.string.deposit))
-        depositSets.apply {
-            valueFormatter = LargeValueFormatter()
-            valueTextColor = Color.GREEN
-            color = Color.GREEN
-            valueTextSize = 12f
-        }
-        withDrawalSets.apply {
-            valueTextColor = Color.RED
-            color = Color.RED
-            valueFormatter = LargeValueFormatter()
-            valueTextSize = 12f
-        }
-        netEarningsChart.apply {
-            description.isEnabled = false
-            isScaleXEnabled = false
-            setDrawBarShadow(false)
-            setDrawGridBackground(false)
-            xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(DateTimeUtil.getPreviousMonthShortName(2),
-                    DateTimeUtil.getPreviousMonthShortName(1),
-                    DateTimeUtil.getCurrentMonthShortName()))
-            data = BarData(depositSets, withDrawalSets)
-            barData.barWidth = 0.3f
-            xAxis.axisMaximum = netEarningsChart.barData.getGroupWidth(0.4f, 0f) * 3
-            groupBars(0f, 0.4f, 0f)
-            data.isHighlightEnabled = false
-            animateY(1000)
-            setTouchEnabled(true)
-        }
 
+            withdrawSum = transactionData.first
+            depositSum = transactionData.second
+            month2With = transactionData.third
+            month2Depot = transactionData.fourth
+            month3With = transactionData.fifth
+            month3Depot = transactionData.sixth
+
+            currentExpense.text = currencyData.symbol + " " + withdrawSum.toString()
+            currentMonthIncome.text = currencyData.symbol + " " + depositSum.toString()
+            if(transaction.signum() == -1){
+                currentNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+            }
+            balanceText.text = currencyData.symbol + " " + transaction.toString()
+            currentNetIncome.text = currencyData.symbol + " " + transaction.toString()
+
+            transaction = month2Depot - month2With
+            oneMonthBeforeExpense.text = currencyData.symbol + " " + month2With.toString()
+            oneMonthBeforeIncome.text = currencyData.symbol + " " + month2Depot.toString()
+            if(transaction.signum() == -1){
+                oneMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+            }
+            oneMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
+
+            transaction = month3Depot - month3With
+            twoMonthBeforeExpense.text = currencyData.symbol + " " + month3With.toString()
+            twoMonthBeforeIncome.text = currencyData.symbol + " " + month3Depot.toString()
+            if(transaction.signum() == -1){
+                twoMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+            }
+            twoMonthBeforeNetIncome.text = currencyData.symbol + " " + transaction.toString()
+
+            val withDrawalHistory = arrayListOf(
+                    BarEntry(month3With.toFloat(), month3With.toFloat()),
+                    BarEntry(month2With.toFloat(), month2With.toFloat()),
+                    BarEntry(withdrawSum.toFloat(), withdrawSum.toFloat()))
+            val depositHistory = arrayListOf(
+                    BarEntry(month3Depot.toFloat(), month3Depot.toFloat()),
+                    BarEntry(month2Depot.toFloat(), month2Depot.toFloat()),
+                    BarEntry(depositSum.toFloat(), depositSum.toFloat()))
+
+            val withDrawalSets = BarDataSet(withDrawalHistory, resources.getString(R.string.withdrawal))
+            val depositSets = BarDataSet(depositHistory, resources.getString(R.string.deposit))
+            depositSets.apply {
+                valueFormatter = LargeValueFormatter()
+                valueTextColor = Color.GREEN
+                color = Color.GREEN
+                valueTextSize = 12f
+            }
+            withDrawalSets.apply {
+                valueTextColor = Color.RED
+                color = Color.RED
+                valueFormatter = LargeValueFormatter()
+                valueTextSize = 12f
+            }
+            netEarningsChart.apply {
+                description.isEnabled = false
+                isScaleXEnabled = false
+                setDrawBarShadow(false)
+                setDrawGridBackground(false)
+                xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(DateTimeUtil.getPreviousMonthShortName(2),
+                        DateTimeUtil.getPreviousMonthShortName(1),
+                        DateTimeUtil.getCurrentMonthShortName()))
+                data = BarData(depositSets, withDrawalSets)
+                barData.barWidth = 0.3f
+                xAxis.axisMaximum = netEarningsChart.barData.getGroupWidth(0.4f, 0f) * 3
+                groupBars(0f, 0.4f, 0f)
+                data.isHighlightEnabled = false
+                animateY(1000)
+                notifyDataSetChanged()
+            }
+        })
     }
 
     private fun setAverage(currencyData: CurrencyAttributes?){
@@ -293,6 +279,7 @@ class DashboardFragment: BaseFragment() {
                         data = PieData(dataSet)
                         description.text = "Budget Percentage"
                         highlightValue(null)
+                        isDrawHoleEnabled = false
                     }
                     val progressDrawable = budgetProgress.progressDrawable.mutate()
                     leftToSpentText.text = currencyData.symbol + " " + String.format("%.2f",(budgeted - budgetSpent))

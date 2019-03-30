@@ -18,6 +18,11 @@ class BudgetRepository(private val budget: BudgetDataDao, private val budgetList
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
+    suspend fun deleteAllBudget() = budget.deleteAllBudget()
+
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun insertBudgetList(budgetData: BudgetListData) = budgetList.insert(budgetData)
 
     @Suppress("RedundantSuspendModifier")
