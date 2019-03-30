@@ -49,18 +49,30 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         transactionService?.getAllTransactions("","", "all")?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
-                networkData?.data?.forEachIndexed { _, data ->
-                    scope.launch(Dispatchers.IO) { repository.insertTransaction(data) }
+                recentData = networkData?.data?.toMutableList() ?: arrayListOf()
+                scope.launch(Dispatchers.IO){
+                    networkData?.data?.forEachIndexed { _, transactionData ->
+                        repository.insertTransaction(transactionData)
+                    }
+                }.invokeOnCompletion {
+                    if(limit > networkData?.data?.size ?: 0){
+                        data.postValue(recentData.take(limit).toMutableList())
+                    } else {
+                        data.postValue(recentData)
+                    }
+                    isLoading.postValue(false)
                 }
             }
         })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        scope.async(Dispatchers.IO){
-            recentData = repository.recentTransactions(limit)
-        }.invokeOnCompletion {
-            data.postValue(recentData)
-            isLoading.postValue(false)
-        }
+        { throwable ->
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+            scope.launch(Dispatchers.IO){
+                recentData = repository.recentTransactions(limit)
+            }.invokeOnCompletion {
+                data.postValue(recentData)
+                isLoading.postValue(false)
+            }
+        })
         return data
     }
 
