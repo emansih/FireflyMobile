@@ -29,6 +29,7 @@ import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
+import java.text.DecimalFormat
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -36,7 +37,7 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private val accountId: Long by lazy { arguments?.getLong("accountId") as Long  }
     private var accountNameString: String = ""
-    private val pieEntryArray = arrayListOf<PieEntry>()
+    private var pieEntryArray = arrayListOf<PieEntry>()
     private var pieDataSet: PieDataSet = PieDataSet(pieEntryArray, "")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -145,10 +146,11 @@ class AccountDetailFragment: BaseDetailFragment() {
                 DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal"),transactionViewModel.getUniqueCategoryByDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal")).observe(this, Observer { transactionData ->
             if(transactionData.second.isNotEmpty()) {
+                pieEntryArray = ArrayList(transactionData.second.size)
                 transactionData.second.forEachIndexed { index, uniqueMeow ->
                     transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                             DateTimeUtil.getTodayDate(), currencyCode, accountName,
-                            "Withdrawal", uniqueMeow).observe(this@AccountDetailFragment, Observer { transactionAmount ->
+                            "Withdrawal", uniqueMeow).observe(this, Observer { transactionAmount ->
                         val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(transactionData.first.absoluteValue.roundToInt().toDouble()).times(100)
                         if (uniqueMeow == "null" || uniqueMeow == null) {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category"))
@@ -167,8 +169,9 @@ class AccountDetailFragment: BaseDetailFragment() {
                     categoryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
                     categoryPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
                 }
+                val decimalFormat = DecimalFormat(".##")
                 categoryPieChart.apply {
-                    description.text = currencySymbol + transactionData.first.toString()
+                    description.text = currencySymbol + decimalFormat.format(transactionData.first)
                     description.textSize = 15f
                     legend.form = Legend.LegendForm.CIRCLE
                     isDrawHoleEnabled = false
