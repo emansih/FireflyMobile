@@ -18,6 +18,8 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.fragment_account_detail.*
 import xyz.hisname.fireflyiii.R
@@ -153,9 +155,9 @@ class AccountDetailFragment: BaseDetailFragment() {
                             "Withdrawal", uniqueMeow).observe(this, Observer { transactionAmount ->
                         val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(transactionData.first.absoluteValue.roundToInt().toDouble()).times(100)
                         if (uniqueMeow == "null" || uniqueMeow == null) {
-                            pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category"))
+                            pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category", transactionAmount))
                         } else {
-                            pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueMeow))
+                            pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueMeow, transactionAmount))
                         }
                         pieDataSet = PieDataSet(pieEntryArray, "")
                         pieDataSet.valueFormatter = MpAndroidPercentFormatter()
@@ -179,6 +181,15 @@ class AccountDetailFragment: BaseDetailFragment() {
                     legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
                     setTransparentCircleAlpha(0)
                 }
+                categoryPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener{
+                    override fun onNothingSelected() {
+                    }
+
+                    override fun onValueSelected(e: Entry, h: Highlight) {
+                       toastInfo(currencySymbol + e.data)
+                    }
+
+                })
             } else {
                 categoryPieChart.invalidate()
             }
