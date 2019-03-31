@@ -106,7 +106,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun retrieveCurrentMonthBudget(currencyCode: String): LiveData<String>{
-        var availableBudget: MutableList<BudgetData> = arrayListOf()
+        val availableBudget: MutableList<BudgetData> = arrayListOf()
+        var currencyMonthBud = 0.toBigDecimal()
         budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
@@ -136,45 +137,35 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                             }
                         }.invokeOnCompletion {
                             scope.launch(Dispatchers.IO){
-                                availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                currencyMonthBud = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
                                         DateTimeUtil.getEndOfMonth(), currencyCode)
                             }.invokeOnCompletion {
-                                currentMonthBudgetValue.postValue(availableBudget[0].budgetAttributes?.amount.toString())
+                                currentMonthBudgetValue.postValue(currencyMonthBud.toString())
                             }
                         }
                     }
-                } else {
-                    val responseError = response.errorBody()
-                    if (responseError != null) {
-                        val errorBody = String(responseError.bytes())
-                        val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                        apiResponse.postValue(gson.message)
-                    }
-                    scope.launch(Dispatchers.IO){
-                        availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                DateTimeUtil.getEndOfMonth(), currencyCode)
-                    }.invokeOnCompletion {
-                        scope.launch(Dispatchers.IO){
-                            availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                    DateTimeUtil.getEndOfMonth(), currencyCode)
-                        }.invokeOnCompletion {
-                            currentMonthBudgetValue.postValue(availableBudget[0].budgetAttributes?.amount.toString())
-                        }
-                    }
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+                scope.launch(Dispatchers.IO){
+                    currencyMonthBud = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), currencyCode)
+                }.invokeOnCompletion {
+                    currentMonthBudgetValue.postValue(currencyMonthBud.toString())
                 }
             }
         })
         { throwable ->
             scope.launch(Dispatchers.IO){
-                availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                currencyMonthBud = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), currencyCode)
             }.invokeOnCompletion {
-                scope.launch(Dispatchers.IO){
-                    availableBudget = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), currencyCode)
-                }.invokeOnCompletion {
-                    currentMonthBudgetValue.postValue(availableBudget[0].budgetAttributes?.amount.toString())
-                }
+                currentMonthBudgetValue.postValue(currencyMonthBud.toString())
             }
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
@@ -189,28 +180,25 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
+                    val networkData = responseBody.data
+                    budgetListData.addAll(networkData)
                     scope.launch(Dispatchers.IO) {
                         repository.deleteBudgetList()
                     }.invokeOnCompletion {
-                        val networkData = responseBody.data
-                        scope.launch(Dispatchers.Main) {
-                            networkData.forEachIndexed { _, budgetData ->
-                                budgetListData.add(budgetData)
-                            }
-                        }.invokeOnCompletion {
-                            if (responseBody.meta.pagination.total_pages >= responseBody.meta.pagination.current_page) {
-                                for (pagination in 2..responseBody.meta.pagination.total_pages) {
-                                    budgetService?.getPaginatedSpentBudget(pagination, DateTimeUtil.getStartOfMonth(),
-                                            DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ respond ->
-                                        respond.body()?.data?.forEachIndexed { _, budgetList ->
-                                            budgetListData.add(budgetList)
-                                        }
-                                    }))
-                                }
+                        if (responseBody.meta.pagination.current_page > responseBody.meta.pagination.total_pages) {
+                            for (pagination in 2..responseBody.meta.pagination.total_pages) {
+                                budgetService?.getPaginatedSpentBudget(pagination, DateTimeUtil.getStartOfMonth(),
+                                        DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ respond ->
+                                    respond.body()?.data?.forEachIndexed { _, budgetList ->
+                                        budgetListData.add(budgetList)
+                                    }
+                                }))
                             }
                         }
                         scope.launch(Dispatchers.IO) {
-                            budgetListData.forEachIndexed { _, data -> repository.insertBudgetList(data) }
+                            budgetListData.forEachIndexed { _, data ->
+                                repository.insertBudgetList(data)
+                            }
                         }.invokeOnCompletion {
                             scope.launch(Dispatchers.IO) {
                                 budgetListData = repository.allBudgetList()
@@ -226,25 +214,25 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                             }
                         }
                     }
-                } else {
-                    val responseError = response.errorBody()
-                    if (responseError != null) {
-                        val errorBody = String(responseError.bytes())
-                        val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                        apiResponse.postValue(gson.message)
-                    }
-                    scope.launch(Dispatchers.IO) {
-                        budgetListData = repository.allBudgetList()
-                    }.invokeOnCompletion {
-                        currentMonthSpent = 0.toDouble()
-                        budgetListData.forEachIndexed { _, budgetData ->
-                            budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
-                                currentMonthSpent += spent.amount
-                            }
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+                scope.launch(Dispatchers.IO) {
+                    budgetListData = repository.allBudgetList()
+                }.invokeOnCompletion {
+                    currentMonthSpent = 0.toDouble()
+                    budgetListData.forEachIndexed { _, budgetData ->
+                        budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
+                            currentMonthSpent += spent.amount
                         }
-                        spentBudgetLoader.postValue(false)
-                        currentMonthSpentValue.postValue(Math.abs(currentMonthSpent).toString())
                     }
+                    spentBudgetLoader.postValue(false)
+                    currentMonthSpentValue.postValue(Math.abs(currentMonthSpent).toString())
                 }
             }
         })
