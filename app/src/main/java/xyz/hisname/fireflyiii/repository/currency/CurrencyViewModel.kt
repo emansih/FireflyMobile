@@ -129,8 +129,62 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun getDefaultCurrency(): LiveData<MutableList<CurrencyData>>{
-        loadRemoteData()
-        return repository.defaultCurrency
+        isLoading.value = true
+        var defaultCurrencyList: MutableList<CurrencyData> = arrayListOf()
+        val data: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
+        currencyService?.getPaginatedCurrency(1)?.enqueue(retrofitCallback({ response ->
+            if (response.isSuccessful) {
+                val networkData = response.body()
+                if (networkData != null) {
+                    scope.launch(Dispatchers.IO){
+                        repository.deleteDefaultCurrency()
+                    }.invokeOnCompletion {
+                        defaultCurrencyList.addAll(networkData.data)
+                        if (networkData.meta.pagination.current_page < networkData.meta.pagination.total_pages) {
+                            for (pagination in 2..networkData.meta.pagination.total_pages) {
+                                currencyService?.getPaginatedCurrency(pagination)?.enqueue(retrofitCallback({ respond ->
+                                    respond.body()?.data?.forEachIndexed { _, currencyPagination ->
+                                        defaultCurrencyList.add(currencyPagination)
+                                    }
+                                }))
+                            }
+                        }
+                        scope.launch(Dispatchers.IO) {
+                            defaultCurrencyList.forEachIndexed { _, currencyData ->
+                                repository.insertCurrency(currencyData)
+                            }
+                        }.invokeOnCompletion {
+                            scope.launch(Dispatchers.IO){
+                                defaultCurrencyList = repository.defaultCurrency()
+                            }.invokeOnCompletion {
+                                data.postValue(defaultCurrencyList)
+                            }
+                        }
+                    }
+                }
+            } else {
+                val responseError = response.errorBody()
+                if (responseError != null) {
+                    val errorBody = String(responseError.bytes())
+                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    apiResponse.postValue(gson.message)
+                }
+                scope.launch(Dispatchers.IO){
+                    defaultCurrencyList = repository.defaultCurrency()
+                }.invokeOnCompletion {
+                    data.postValue(defaultCurrencyList)
+                }
+            }
+        })
+        { throwable ->
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+            scope.launch(Dispatchers.IO){
+                defaultCurrencyList = repository.defaultCurrency()
+            }.invokeOnCompletion {
+                data.postValue(defaultCurrencyList)
+            }
+        })
+        return data
     }
 
 
