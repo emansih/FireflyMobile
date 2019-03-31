@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
@@ -42,15 +43,6 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        startMarker = Marker(tagDetailsMap)
-        tagDetailsMap.setTileSource(TileSourceFactory.MAPNIK)
-        tagDetailsMap.setMultiTouchControls(true)
-        tagDetailsMap.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        tagDetailsMap.overlays.add(startMarker)
-        startMarker.icon = IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_map_marker)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_red_700))
-                .sizeDp(16)
         if(tagId != 0L) {
             tagsViewModel.getTagById(tagId).observe(this, Observer { data ->
                 setTagData(data)
@@ -73,11 +65,19 @@ class TagDetailsFragment: BaseDetailFragment() {
             latitude_text.text = "No location set"
             longitude_text.text = "No location set"
             zoom_text.text = "No location set"
-            val groomLake = GeoPoint(37.276675, -115.798936)
-            startMarker.position = groomLake
-            tagDetailsMap.controller.animateTo(groomLake)
-            tagDetailsMap.controller.setZoom(15.0)
+            tagDetailsMapText.isVisible = true
+            tagDetailsMap.isInvisible = true
         } else {
+            tagDetailsMap.isVisible = true
+            startMarker = Marker(tagDetailsMap)
+            tagDetailsMap.setTileSource(TileSourceFactory.MAPNIK)
+            tagDetailsMap.setMultiTouchControls(true)
+            tagDetailsMap.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+            tagDetailsMap.overlays.add(startMarker)
+            startMarker.icon = IconicsDrawable(requireContext())
+                    .icon(FontAwesome.Icon.faw_map_marker)
+                    .color(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+                    .sizeDp(16)
             latitude_text.text = tagsAttributes.latitude
             longitude_text.text = tagsAttributes.longitude
             val userCoord = GeoPoint(tagsAttributes.latitude.toDouble(),
