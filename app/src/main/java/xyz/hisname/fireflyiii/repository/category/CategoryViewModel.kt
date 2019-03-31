@@ -51,8 +51,8 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
                                 }))
                             }
                         }
-                        categoryData.forEachIndexed{ _, catData ->
-                            scope.launch(Dispatchers.IO) {
+                        scope.launch(Dispatchers.IO){
+                            categoryData.forEachIndexed { _, catData ->
                                 repository.insertCategory(catData)
                             }
                         }
