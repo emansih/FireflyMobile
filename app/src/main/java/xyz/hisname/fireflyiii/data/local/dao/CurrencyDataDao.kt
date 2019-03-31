@@ -9,7 +9,7 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 abstract class CurrencyDataDao: BaseDao<CurrencyData> {
 
     @Query("SELECT * FROM currency")
-    abstract fun getAllCurrency(): LiveData<MutableList<CurrencyData>>
+    abstract fun getAllCurrency(): MutableList<CurrencyData>
 
     @Query("DELETE FROM currency WHERE currencyId = :currencyId")
     abstract fun deleteCurrencyById(currencyId: Long): Int
@@ -28,4 +28,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
 
     @Query("DELETE FROM currency WHERE currencyDefault =:defaultCurrency")
     abstract fun deleteDefaultCurrency(defaultCurrency: Boolean = true): Int
+
+    @Query("DELETE FROM currency")
+    abstract fun deleteAllCurrency(): Int
 }
