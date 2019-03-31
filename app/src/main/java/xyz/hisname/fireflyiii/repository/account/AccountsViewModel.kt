@@ -106,33 +106,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     }
 
     fun getAssetAccounts(): LiveData<MutableList<AccountData>> {
-        isLoading.value = true
-        accountsService?.getPaginatedAccountType("asset", 1)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                if (networkData != null) {
-                    for (pagination in 1..networkData.meta.pagination.total_pages) {
-                        accountsService?.getPaginatedAccountType("asset", pagination)?.enqueue(retrofitCallback({ respond ->
-                            respond.body()?.data?.forEachIndexed { _, accountPagination ->
-                                scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
-                            }
-                        }))
-                    }
-                    if(networkData.data.isEmpty()){
-                        emptyAccount.value = true
-                    }
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-            }
-        })
-        { throwable -> apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage)) })
-        isLoading.value = false
+        loadRemoteData("asset")
         return repository.assetAccount
     }
 
@@ -246,24 +220,28 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     private fun loadRemoteData(source: String){
         isLoading.value = true
         apiResponse.value = null
+        val totalAccountList = arrayListOf<AccountData>()
         genericService()?.create(AccountsService::class.java)?.getPaginatedAccountType(source, 1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
-                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages) {
-                        networkData.data.forEachIndexed { _, accountData ->
-                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
-                        }
-                    } else {
-                        networkData.data.forEachIndexed { _, accountData ->
-                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
-                        }
+                    totalAccountList.addAll(networkData.data)
+                    if(networkData.meta.pagination.current_page > networkData.meta.pagination.total_pages) {
                         for (pagination in 2..networkData.meta.pagination.total_pages) {
                             genericService()?.create(AccountsService::class.java)?.getPaginatedAccountType(source, pagination)?.enqueue(retrofitCallback({ respond ->
                                 respond.body()?.data?.forEachIndexed { _, accountPagination ->
-                                    scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
+                                    totalAccountList.add(accountPagination)
                                 }
                             }))
+                        }
+                    }
+                    scope.launch(Dispatchers.IO){
+                        repository.deleteAccountByType(source)
+                    }.invokeOnCompletion {
+                        scope.launch(Dispatchers.IO) {
+                            totalAccountList.forEachIndexed { _, accountData ->
+                                repository.insertAccount(accountData)
+                            }
                         }
                     }
                     isLoading.value = false
