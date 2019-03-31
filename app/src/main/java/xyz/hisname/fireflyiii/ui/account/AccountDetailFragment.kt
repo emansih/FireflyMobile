@@ -40,7 +40,10 @@ class AccountDetailFragment: BaseDetailFragment() {
     private val accountId: Long by lazy { arguments?.getLong("accountId") as Long  }
     private var accountNameString: String = ""
     private var pieEntryArray = arrayListOf<PieEntry>()
+    private var pieEntryBudgetArray = arrayListOf<PieEntry>()
     private var pieDataSet: PieDataSet = PieDataSet(pieEntryArray, "")
+    private var pieDataSetBudget:  PieDataSet = PieDataSet(pieEntryBudgetArray, "")
+    private val coloring = arrayListOf<Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -49,6 +52,9 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        for (col in ColorTemplate.MATERIAL_COLORS) {
+            coloring.add(col)
+        }
         currencyViewModel.getDefaultCurrency().observe(this, Observer { currencyData ->
             if(currencyData.isNotEmpty()){
                 setLineChart(currencyData[0].currencyAttributes?.code ?: "", currencyData[0].currencyAttributes?.symbol ?: "")
@@ -135,19 +141,17 @@ class AccountDetailFragment: BaseDetailFragment() {
                         " and " + DateTimeUtil.getTodayDate()
                 getAccountTransaction(accountData[0].accountAttributes?.name ?: "")
                 setExpensesByCategory(currencyCode, accountData[0].accountAttributes?.name ?: "", currencySymbol)
+
             }
         })
     }
 
     private fun setExpensesByCategory(currencyCode: String, accountName: String, currencySymbol: String){
-        val coloring = arrayListOf<Int>()
-        for (col in ColorTemplate.MATERIAL_COLORS) {
-            coloring.add(col)
-        }
         zipLiveData(transactionViewModel.getTotalTransactionAmountByDateAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal"),transactionViewModel.getUniqueCategoryByDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal")).observe(this, Observer { transactionData ->
             if(transactionData.second.isNotEmpty()) {
+                setExpensesByBudget(currencyCode, accountName, currencySymbol, transactionData.first)
                 pieEntryArray = ArrayList(transactionData.second.size)
                 transactionData.second.forEachIndexed { index, uniqueMeow ->
                     transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
@@ -192,6 +196,58 @@ class AccountDetailFragment: BaseDetailFragment() {
                 })
             } else {
                 categoryPieChart.invalidate()
+            }
+        })
+    }
+
+    private fun setExpensesByBudget(currencyCode: String, accountName: String, currencySymbol: String, totalAmount: Double){
+        transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
+                DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal").observe(this, Observer { transactionData ->
+            if(transactionData.isNotEmpty()){
+                pieEntryBudgetArray = ArrayList(transactionData.size)
+                transactionData.forEachIndexed { _, uniqueBudget ->
+                    transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
+                            DateTimeUtil.getTodayDate(), currencyCode, accountName,
+                            "Withdrawal", uniqueBudget).observe(this, Observer { transactionAmount ->
+                        val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(totalAmount.absoluteValue.roundToInt().toDouble()).times(100)
+                        if (uniqueBudget == "null" || uniqueBudget == null) {
+                            pieEntryBudgetArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Budget", transactionAmount))
+                        } else {
+                            pieEntryBudgetArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueBudget, transactionAmount))
+                        }
+                        pieDataSetBudget = PieDataSet(pieEntryBudgetArray, "")
+                        pieDataSetBudget.valueFormatter = MpAndroidPercentFormatter()
+                        pieDataSetBudget.colors = coloring
+                        pieDataSetBudget.valueTextSize = 15f
+                        budgetPieChart.data = PieData(pieDataSetBudget)
+                        budgetPieChart.invalidate()
+                    })
+                }
+                if(isDarkMode()){
+                    budgetPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+                    budgetPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+                }
+                val decimalFormat = DecimalFormat(".##")
+                budgetPieChart.apply {
+                    description.text = currencySymbol + decimalFormat.format(totalAmount)
+                    description.textSize = 15f
+                    legend.form = Legend.LegendForm.CIRCLE
+                    isDrawHoleEnabled = false
+                    setUsePercentValues(true)
+                    legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                    setTransparentCircleAlpha(0)
+                }
+                budgetPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener{
+                    override fun onNothingSelected() {
+                    }
+
+                    override fun onValueSelected(e: Entry, h: Highlight) {
+                        toastInfo(currencySymbol + e.data)
+                    }
+
+                })
+            } else {
+                budgetPieChart.invalidate()
             }
         })
     }

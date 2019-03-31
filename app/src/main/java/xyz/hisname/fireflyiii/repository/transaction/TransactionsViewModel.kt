@@ -254,6 +254,20 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
+    fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
+                              sourceName: String, transactionType: String): MutableLiveData<MutableList<String>>{
+        isLoading.value = true
+        var transactionData: MutableList<String> = arrayListOf()
+        val data: MutableLiveData<MutableList<String>> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionData = repository.getUniqueBudgetByDate(startDate, endDate, currencyCode, sourceName, transactionType)
+        }.invokeOnCompletion {
+            data.postValue(transactionData)
+            isLoading.postValue(false)
+        }
+        return data
+    }
+
     fun getTotalTransactionAmountByDateAndCurrency(startDate: String, endDate: String,
                                              currencyCode: String, accountName: String,
                                                    transactionType: String): MutableLiveData<Double>{
@@ -261,7 +275,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         var transactionAmount: Double = 0.toDouble()
         val data: MutableLiveData<Double> = MutableLiveData()
         scope.launch(Dispatchers.IO){
-            transactionAmount = repository.getTotalTransactionTypeByCategory(startDate, endDate,
+            transactionAmount = repository.getTotalTransactionType(startDate, endDate,
                     currencyCode, accountName, transactionType)
         }.invokeOnCompletion {
             isLoading.postValue(false)
@@ -269,6 +283,8 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         }
         return data
     }
+
+
 
     fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String,
                                                    currencyCode: String, accountName: String,
@@ -279,6 +295,22 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         scope.launch(Dispatchers.IO){
             transactionAmount = repository.getTransactionByDateAndCategoryAndCurrency(startDate, endDate,
                     currencyCode, accountName, transactionType, categoryName)
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            data.postValue(transactionAmount)
+        }
+        return data
+    }
+
+    fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
+                                                   currencyCode: String, accountName: String,
+                                                   transactionType: String, budgetName: String?): MutableLiveData<Double>{
+        isLoading.value = true
+        var transactionAmount: Double = 0.toDouble()
+        val data: MutableLiveData<Double> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionAmount = repository.getTransactionByDateAndBudgetAndCurrency(startDate, endDate,
+                    currencyCode, accountName, transactionType, budgetName)
         }.invokeOnCompletion {
             isLoading.postValue(false)
             data.postValue(transactionAmount)
