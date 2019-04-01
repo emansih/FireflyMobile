@@ -16,6 +16,7 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import java.math.BigDecimal
 
 class BudgetViewModel(application: Application): BaseViewModel(application) {
 
@@ -107,7 +108,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
 
     fun retrieveCurrentMonthBudget(currencyCode: String): LiveData<String>{
         val availableBudget: MutableList<BudgetData> = arrayListOf()
-        var currencyMonthBud = 0.toBigDecimal()
+        var currencyMonthBud: BigDecimal? = 0.toBigDecimal()
         budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
@@ -137,8 +138,13 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                             }
                         }.invokeOnCompletion {
                             scope.launch(Dispatchers.IO){
-                                currencyMonthBud = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                        DateTimeUtil.getEndOfMonth(), currencyCode)
+                                currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                                DateTimeUtil.getEndOfMonth(), currencyCode) != null){
+                                    repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                            DateTimeUtil.getEndOfMonth(), currencyCode)
+                                } else {
+                                    0.toBigDecimal()
+                                }
                             }.invokeOnCompletion {
                                 currentMonthBudgetValue.postValue(currencyMonthBud.toString())
                             }
@@ -153,8 +159,13 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     apiResponse.postValue(gson.message)
                 }
                 scope.launch(Dispatchers.IO){
-                    currencyMonthBud = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), currencyCode)
+                    currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                    DateTimeUtil.getEndOfMonth(), currencyCode) != null){
+                        repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                DateTimeUtil.getEndOfMonth(), currencyCode)
+                    } else {
+                        0.toBigDecimal()
+                    }
                 }.invokeOnCompletion {
                     currentMonthBudgetValue.postValue(currencyMonthBud.toString())
                 }
@@ -162,8 +173,13 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         })
         { throwable ->
             scope.launch(Dispatchers.IO){
-                currencyMonthBud = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), currencyCode)
+                currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                DateTimeUtil.getEndOfMonth(), currencyCode) != null){
+                    repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), currencyCode)
+                } else {
+                    0.toBigDecimal()
+                }
             }.invokeOnCompletion {
                 currentMonthBudgetValue.postValue(currencyMonthBud.toString())
             }

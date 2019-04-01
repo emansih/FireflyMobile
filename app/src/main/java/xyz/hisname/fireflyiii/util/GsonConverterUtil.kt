@@ -32,7 +32,7 @@ object GsonConverterUtil{
 
     @TypeConverter
     @JvmStatic
-    fun fromBigDecimal(value: String): BigDecimal{
+    fun fromBigDecimal(value: String?): BigDecimal?{
         return Gson().fromJson(value, BigDecimal::class.java)
     }
 
