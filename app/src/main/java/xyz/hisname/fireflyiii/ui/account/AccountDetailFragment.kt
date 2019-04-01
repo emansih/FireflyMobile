@@ -42,7 +42,10 @@ class AccountDetailFragment: BaseDetailFragment() {
     private var pieEntryArray = arrayListOf<PieEntry>()
     private var pieEntryBudgetArray = arrayListOf<PieEntry>()
     private var pieDataSet: PieDataSet = PieDataSet(pieEntryArray, "")
-    private var pieDataSetBudget:  PieDataSet = PieDataSet(pieEntryBudgetArray, "")
+    private var pieDataSetBudget: PieDataSet = PieDataSet(pieEntryBudgetArray, "")
+    private var incomePieEntryArray = arrayListOf<PieEntry>()
+    private var incomePieDataSet = PieDataSet(incomePieEntryArray, "")
+
     private val coloring = arrayListOf<Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -153,7 +156,9 @@ class AccountDetailFragment: BaseDetailFragment() {
             if(transactionData.second.isNotEmpty()) {
                 setExpensesByBudget(currencyCode, accountName, currencySymbol, transactionData.first)
                 pieEntryArray = ArrayList(transactionData.second.size)
-                transactionData.second.forEachIndexed { index, uniqueMeow ->
+                incomePieEntryArray = ArrayList(transactionData.second.size)
+                transactionData.second.forEachIndexed { _, uniqueMeow ->
+                    setIncomeByCategory(currencyCode, accountName, uniqueMeow, transactionData.first)
                     transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                             DateTimeUtil.getTodayDate(), currencyCode, accountName,
                             "Withdrawal", uniqueMeow).observe(this, Observer { transactionAmount ->
@@ -196,6 +201,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 })
             } else {
                 categoryPieChart.invalidate()
+                incomePieChart.invalidate()
             }
         })
     }
@@ -249,6 +255,26 @@ class AccountDetailFragment: BaseDetailFragment() {
             } else {
                 budgetPieChart.invalidate()
             }
+        })
+    }
+
+    private fun setIncomeByCategory(currencyCode: String, accountName: String, categoryName: String,
+                                    totalSum: Double){
+        transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
+                DateTimeUtil.getTodayDate(), currencyCode, accountName,
+                "Deposit", categoryName).observe(this, Observer { transactionAmount ->
+            val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(totalSum.absoluteValue.roundToInt().toDouble()).times(100)
+            if (categoryName == "null" || categoryName == null) {
+                incomePieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category", transactionAmount))
+            } else {
+                incomePieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), categoryName, transactionAmount))
+            }
+            incomePieDataSet = PieDataSet(incomePieEntryArray, "")
+            incomePieDataSet.valueFormatter = MpAndroidPercentFormatter()
+            incomePieDataSet.colors = coloring
+            incomePieDataSet.valueTextSize = 15f
+            incomePieChart.data = PieData(incomePieDataSet)
+            incomePieChart.invalidate()
         })
     }
 
