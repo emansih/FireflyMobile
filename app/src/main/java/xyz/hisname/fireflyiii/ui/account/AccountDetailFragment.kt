@@ -63,6 +63,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 setLineChart(currencyData[0].currencyAttributes?.code ?: "", currencyData[0].currencyAttributes?.symbol ?: "")
             }
         })
+        setDarkMode()
     }
 
     private fun setLineChart(currencyCode: String, currencySymbol: String){
@@ -200,8 +201,24 @@ class AccountDetailFragment: BaseDetailFragment() {
 
                 })
             } else {
-                categoryPieChart.invalidate()
-                incomePieChart.invalidate()
+                categoryPieChart.apply {
+                    description.text = "No expenses Found!"
+                    description.textSize = 15f
+                    legend.form = Legend.LegendForm.CIRCLE
+                    isDrawHoleEnabled = false
+                    setUsePercentValues(true)
+                    legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                    setTransparentCircleAlpha(0)
+                }
+                incomePieChart.apply {
+                    description.text = "No deposits Found!"
+                    description.textSize = 15f
+                    legend.form = Legend.LegendForm.CIRCLE
+                    isDrawHoleEnabled = false
+                    setUsePercentValues(true)
+                    legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                    setTransparentCircleAlpha(0)
+                }
             }
         })
     }
@@ -229,10 +246,6 @@ class AccountDetailFragment: BaseDetailFragment() {
                         budgetPieChart.invalidate()
                     })
                 }
-                if(isDarkMode()){
-                    budgetPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-                    budgetPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-                }
                 val decimalFormat = DecimalFormat(".##")
                 budgetPieChart.apply {
                     description.text = currencySymbol + decimalFormat.format(totalAmount)
@@ -256,6 +269,15 @@ class AccountDetailFragment: BaseDetailFragment() {
                 budgetPieChart.invalidate()
             }
         })
+    }
+
+    private fun setDarkMode(){
+        if(isDarkMode()){
+            budgetPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            budgetPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            incomePieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            incomePieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+        }
     }
 
     private fun setIncomeByCategory(currencyCode: String, accountName: String, categoryName: String,
