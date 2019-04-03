@@ -38,5 +38,10 @@ data class Errors(
         val longitude: List<String>?,
         @SerializedName("zoom_level")
         val zoomLevel: List<String>?,
-        val iban: List<String>?
+        val iban: List<String>?,
+        val bic: List<String>?,
+        val opening_balance: List<String>?,
+        val opening_balance_date: List<String>?,
+        val interest_period: List<String>?,
+        val liability_amount: List<String>?
 )

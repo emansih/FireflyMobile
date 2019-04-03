@@ -1,169 +1,444 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/add_account_layout"
     android:orientation="vertical">
 
-    <androidx.core.widget.NestedScrollView
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_tool_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:elevation="0dp"
+            app:expandedTitleTextAppearance="@style/Widget.AppCompat.ActionBar.TabText"
+            app:layout_scrollFlags="enterAlways"
+            app:statusBarScrim="?attr/colorAccent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/placeHolderToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/primary"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:layout_collapseMode="none"
+                app:navigationIcon="@drawable/abc_ic_clear_material"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/accountToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="112dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_collapseMode="none"
+            app:elevation="0dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            android:background="@color/colorPrimary">
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/accountName"
+                android:id="@+id/description_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:hint="Name"
+                android:textColor="@color/md_black_1000"
+                android:textSize="28sp" />
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="166dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/currency_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="52dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/currency_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/currency"
+                android:drawablePadding="12dp"
+                android:focusable="false"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/liabilityTypeSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:entries="@array/liability_type"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/currency_layout"
+            app:layout_constraintStart_toStartOf="@+id/currency_layout"
+            app:layout_constraintEnd_toEndOf="@+id/currency_layout"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/start_amount_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/liabilityTypeSpinner"
+            app:layout_constraintStart_toStartOf="@+id/currency_layout"
+            app:layout_constraintEnd_toEndOf="@+id/currency_layout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/start_amount_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Start amount of debt"
+                android:inputType="numberDecimal"
+                android:drawablePadding="12dp"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/start_amount_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="Please enter the original amount of this liability as a positive number. You may also enter the current amount. Make sure to edit the date below to match."
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="@+id/start_amount_layout"
+            app:layout_constraintEnd_toEndOf="@+id/start_amount_layout"
+            app:layout_constraintTop_toBottomOf="@+id/start_amount_layout"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/start_date_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/start_amount_text"
+            app:layout_constraintStart_toStartOf="@+id/currency_layout"
+            app:layout_constraintEnd_toEndOf="@+id/currency_layout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/start_date_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Start date of debt"
+                android:inputType="date"
+                android:drawablePadding="12dp"
+                android:focusable="false"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/interest_layout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/start_date_layout"
+            app:layout_constraintStart_toStartOf="@+id/currency_layout"
+            app:layout_constraintEnd_toEndOf="@+id/currency_layout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/interest_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Interest"
+                android:inputType="numberDecimal"
+                android:drawablePadding="12dp"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/interestPeriodSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            android:entries="@array/interest_period"
+            app:layout_constraintTop_toBottomOf="@+id/interest_layout"
+            app:layout_constraintStart_toStartOf="@+id/currency_layout"
+            app:layout_constraintEnd_toEndOf="@+id/currency_layout" />
+
+        <com.github.florent37.expansionpanel.ExpansionHeader
+            android:id="@+id/expansionHeader"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginTop="52dp"
+            app:expansion_headerIndicator="@id/headerIndicator"
+            app:expansion_layout="@id/expansionLayout"
+            app:expansion_toggleOnClick="true"
+            app:layout_constraintTop_toBottomOf="@+id/interestPeriodSpinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/optional_field_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/optionalField"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="@string/optional_field"
+                    style="@style/TextAppearance.MaterialComponents.Headline5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ImageView
+                android:adjustViewBounds="true"
+                android:id="@+id/headerIndicator"
+                android:layout_gravity="center_vertical|end"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="30dp"
+                android:layout_width="wrap_content"
+                app:srcCompat="@drawable/ic_expansion_header_indicator_grey_24dp" />
+
+        </com.github.florent37.expansionpanel.ExpansionHeader>
+
+        <com.github.florent37.expansionpanel.ExpansionLayout
+            android:id="@+id/expansionLayout"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            app:expansion_expanded="false"
+            app:layout_constraintTop_toBottomOf="@+id/expansionHeader"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/optionalLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="24dp"
-                android:hint="Account Name"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:visibility="gone">
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/accountType"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:layout_constraintEnd_toEndOf="@+id/accountName"
-                app:layout_constraintStart_toStartOf="@+id/accountName"
-                app:layout_constraintTop_toBottomOf="@+id/accountName" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/iban_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginTop="36dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/currencyCode"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:layout_marginTop="16dp"
-                android:hint="Currency Code"
-                app:layout_constraintEnd_toEndOf="@+id/accountName"
-                app:layout_constraintStart_toStartOf="@+id/accountName"
-                app:layout_constraintTop_toBottomOf="@+id/accountType" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/iban_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="IBAN"
+                        android:inputType="number"
+                        android:drawablePadding="12dp"
+                        android:focusable="false"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/netWorthText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Include Net Worth?"
-                android:layout_marginStart="12dp"
-                app:layout_constraintBottom_toBottomOf="@+id/netWorthCheckbox"
-                app:layout_constraintStart_toEndOf="@+id/netWorthCheckbox"
-                app:layout_constraintTop_toTopOf="@+id/netWorthCheckbox" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/bic_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintTop_toBottomOf="@+id/iban_layout"
+                    app:layout_constraintStart_toStartOf="@+id/iban_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/iban_layout">
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/netWorthCheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:layout_constraintStart_toStartOf="@+id/currencyCode"
-                app:layout_constraintTop_toBottomOf="@+id/currencyCode" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/bic_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="BIC"
+                        android:inputType="number"
+                        android:drawablePadding="12dp"
+                        android:focusable="false"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/accountNumber"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Account Number (Optional)"
-                android:inputType="number"
-                app:layout_constraintEnd_toEndOf="@+id/currencyCode"
-                app:layout_constraintStart_toStartOf="@+id/netWorthCheckbox"
-                app:layout_constraintTop_toBottomOf="@+id/netWorthCheckbox" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/account_number_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintTop_toBottomOf="@+id/bic_layout"
+                    app:layout_constraintStart_toStartOf="@+id/bic_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/bic_layout">
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/accountRole"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/accountNumber"
-                app:layout_constraintStart_toStartOf="@+id/accountNumber"
-                app:layout_constraintTop_toBottomOf="@+id/accountNumber" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/account_number_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Account number"
+                        android:inputType="number"
+                        android:drawablePadding="12dp"
+                        android:focusable="false"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/ccType"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                android:hint="Credit Card Type"
-                app:layout_constraintEnd_toEndOf="@+id/accountRole"
-                app:layout_constraintStart_toStartOf="@+id/accountRole"
-                app:layout_constraintTop_toBottomOf="@+id/accountRole"/>
+                <TextView
+                    android:id="@+id/includeInNetWorthText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Include in net worth"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintStart_toEndOf="@+id/includeInNetWorthCheck"
+                    app:layout_constraintBottom_toBottomOf="@+id/includeInNetWorthCheck"
+                    app:layout_constraintTop_toTopOf="@+id/includeInNetWorthCheck"/>
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/ccPaymentDate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                android:focusable="false"
-                android:hint="Credit Card Payment Date"
-                app:layout_constraintEnd_toEndOf="@+id/ccType"
-                app:layout_constraintStart_toStartOf="@+id/ccType"
-                app:layout_constraintTop_toBottomOf="@+id/ccType"/>
+                <CheckBox
+                    android:id="@+id/includeInNetWorthCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintTop_toBottomOf="@+id/account_number_layout"
+                    app:layout_constraintStart_toStartOf="@+id/account_number_layout"/>
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/liabilityType"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/accountName"
-                app:layout_constraintStart_toStartOf="@+id/accountName"
-                app:layout_constraintTop_toBottomOf="@+id/accountNumber"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/opening_balance_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/includeInNetWorthCheck"
+                    app:layout_constraintStart_toStartOf="@+id/iban_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/iban_layout">
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/liabilityAmount"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:inputType="numberDecimal"
-                android:hint="Liability Amount"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/accountName"
-                app:layout_constraintStart_toStartOf="@+id/accountName"
-                app:layout_constraintTop_toBottomOf="@+id/liabilityType"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/opening_balance_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Opening balance"
+                        android:inputType="numberDecimal"
+                        android:drawablePadding="12dp"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/liabilityStartDate"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:inputType="date"
-                android:hint="Liability Start Date"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/accountName"
-                app:layout_constraintStart_toStartOf="@+id/accountName"
-                app:layout_constraintTop_toBottomOf="@+id/liabilityAmount"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/opening_balance_date_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/opening_balance_layout"
+                    app:layout_constraintStart_toStartOf="@+id/iban_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/iban_layout">
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/liabilityInterest"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:inputType="numberDecimal"
-                android:hint="Liability Interest"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/accountName"
-                app:layout_constraintStart_toStartOf="@+id/accountName"
-                app:layout_constraintTop_toBottomOf="@+id/liabilityStartDate"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/opening_balance_date_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Opening balance date"
+                        android:drawablePadding="12dp"
+                        android:focusable="false"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/interestPeriod"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/accountName"
-                app:layout_constraintStart_toStartOf="@+id/accountName"
-                app:layout_constraintTop_toBottomOf="@+id/liabilityInterest"/>
+                <Spinner
+                    android:id="@+id/accountRoleSpinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:entries="@array/account_role"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/opening_balance_date_layout"
+                    app:layout_constraintStart_toStartOf="@+id/iban_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/iban_layout"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/virtual_balance_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/accountRoleSpinner"
+                    app:layout_constraintStart_toStartOf="@+id/iban_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/iban_layout">
 
-    </androidx.core.widget.NestedScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/virtual_balance_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Virtual balance"
+                        android:inputType="numberDecimal"
+                        android:drawablePadding="12dp"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/note_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="36dp"
+                    app:layout_constraintTop_toBottomOf="@+id/virtual_balance_layout"
+                    app:layout_constraintStart_toStartOf="@+id/iban_layout"
+                    app:layout_constraintEnd_toEndOf="@+id/iban_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/note_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:gravity="top"
+                        android:inputType="textMultiLine"
+                        android:drawablePadding="12dp"
+                        android:hint="Notes"
+                        android:textSize="16sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <View
+                    android:id="@+id/placeHolderView"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    app:layout_constraintTop_toBottomOf="@+id/note_layout"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.github.florent37.expansionpanel.ExpansionLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addAccountFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        app:layout_anchor="@id/accountToolbar"
+        app:layout_anchorGravity="bottom|right|end" />
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

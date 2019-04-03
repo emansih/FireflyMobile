@@ -15,23 +15,64 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
 
     private val channelIcon = R.drawable.ic_euro_sign
 
+    companion object {
+        fun initWorker(accountName: String, accountType: String,
+                       currencyCode: String?, iban: String?, bic: String?, accountNumber: String?,
+                       openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
+                       virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
+                       liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?){
+            val accountData = Data.Builder()
+                    .putString("name", accountName)
+                    .putString("type", accountType)
+                    .putString("currencyCode", currencyCode)
+                    .putString("iban", iban)
+                    .putString("bic", bic)
+                    .putString("accountNumber", accountNumber)
+                    .putString("openingBalance", openingBalance)
+                    .putString("openingBalanceDate", openingBalanceDate)
+                    .putString("virtualBalance", virtualBalance)
+                    .putBoolean("includeNetWorth", includeInNetWorth)
+                    .putString("accountRole", accountRole)
+                    .putString("notes", notes)
+                    .putString("liabilityType", liabilityType)
+                    .putString("liabilityAmount", liabilityAmount)
+                    .putString("liabilityStartDate", liabilityStartDate)
+                    .putString("interest", interest)
+                    .putString("interestPeriod", interestPeriod)
+                    .build()
+            val accountWork = OneTimeWorkRequest.Builder(AccountWorker::class.java)
+                    .setInputData(accountData)
+                    .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build())
+                    .build()
+            WorkManager.getInstance().enqueue(accountWork)
+        }
+    }
+
     override fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
-        val type = inputData.getString("type") ?: ""
+        val accountType = inputData.getString("type") ?: ""
         val currencyCode = inputData.getString("currencyCode") ?: ""
-        val includeNetWorth = inputData.getInt("includeNetWorth",0)
-        val accountRole = inputData.getString("accountRole")
-        val ccType = inputData.getString("ccType")
-        val ccMonthlyPaymentDate = inputData.getString("ccMonthlyPaymentDate")
-        val liabilityType = inputData.getString("liabilityType")
-        val liabilityAmount = inputData.getString("liabilityAmount")
-        val liabilityStartDate = inputData.getString("liabilityStartDate")
-        val interest = inputData.getString("interest")
-        val interestPeriod = inputData.getString("interestPeriod")
-        val accountNumber = inputData.getString("accountNumber")
-        val iban = inputData.getString("iban")
-        genericService?.create(AccountsService::class.java)?.addAccount(name,type,currencyCode,1,includeNetWorth,accountRole,ccType,
-                ccMonthlyPaymentDate,liabilityType,liabilityAmount,liabilityStartDate,interest,interestPeriod,accountNumber, iban)?.enqueue(
+        val includeNetWorth = inputData.getBoolean("includeNetWorth",false)
+        val accountRole = inputData.getString("accountRole") ?: ""
+        val liabilityType = inputData.getString("liabilityType") ?: ""
+        val liabilityAmount = inputData.getString("liabilityAmount") ?: ""
+        val liabilityStartDate = inputData.getString("liabilityStartDate") ?: ""
+        val interest = inputData.getString("interest") ?: ""
+        val interestPeriod = inputData.getString("interestPeriod") ?: ""
+        val accountNumber = inputData.getString("accountNumber") ?: ""
+        val iBanString = inputData.getString("iban") ?: ""
+        val bicString = inputData.getString("bic") ?: ""
+        val openingBalance = inputData.getString("openingBalance") ?: ""
+        val openingBalanceDate = inputData.getString("openingBalanceDate") ?: ""
+        val virtualBalance = inputData.getString("virtualBalance") ?: ""
+        val notes = inputData.getString("notes") ?: ""
+
+        genericService?.create(AccountsService::class.java)?.addAccount(name, accountType, currencyCode,
+                iBanString, bicString, accountNumber, openingBalance, openingBalanceDate,
+                accountRole, virtualBalance, includeNetWorth, notes, liabilityType, liabilityAmount,
+                liabilityStartDate, interest, interestPeriod)?.enqueue(
                 retrofitCallback({ response ->
                     var errorBody = ""
                     var error = ""

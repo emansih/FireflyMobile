@@ -16,33 +16,42 @@ interface AccountsService {
     @POST(ACCOUNTS_API_ENDPOINT)
     fun addAccount(@Field("name") name: String,
                    @Field("type") type: String,
-                   @Field("currency_code") currencyCode: String,
-                   @Field("active") active: Int,
-                   @Field("include_net_worth") includeNetWorth: Int,
+                   @Field("currency_code") currencyCode: String?,
+                   @Field("iban") iban: String?,
+                   @Field("bic") bic: String?,
+                   @Field("account_number") accountNumber: String?,
+                   @Field("opening_balance") openingBalance: String?,
+                   @Field("opening_balance_date") openingBalanceDate: String?,
                    @Field("account_role") accountRole: String?,
-                   @Field("cc_type") ccType: String?,
-                   @Field("cc_monthly_payment_date") ccMonthlyPaymentDate: String?,
+                   @Field("virtual_balance") virtualBalance: String?,
+                   @Field("include_net_worth") includeNetWorth: Boolean,
+                   @Field("notes") notes: String?,
                    @Field("liability_type") liabilityType: String?,
                    @Field("liability_amount") liabilityAmount: String?,
                    @Field("liability_start_date") liabilityStartDate: String?,
                    @Field("interest") interest: String?,
-                   @Field("interest_period") interestPeriod: String?,
-                   @Field("account_number") accountNumber: String?,
-                   @Field("iban") iban: String?): Call<AccountSuccessModel>
+                   @Field("interest_period") interestPeriod: String?): Call<AccountSuccessModel>
 
     @FormUrlEncoded
-    @PUT(ACCOUNTS_API_ENDPOINT)
-    fun updateAccount(@Field("name") name: String,
-                      @Field("currency_code") currencyCode: String,
-                      @Field("active") active: Int,
-                      @Field("cc_type") ccType: String?,
-                      @Field("cc_monthly_payment_date") ccMonthlyPaymentDate: String?,
+    @PUT("$ACCOUNTS_API_ENDPOINT/{accountId}")
+    fun updateAccount(@Path("accountId") accountId: Long,
+                      @Field("name") name: String,
+                      @Field("type") type: String,
+                      @Field("currency_code") currencyCode: String?,
+                      @Field("iban") iban: String?,
+                      @Field("bic") bic: String?,
+                      @Field("account_number") accountNumber: String?,
+                      @Field("opening_balance") openingBalance: String?,
+                      @Field("opening_balance_date") openingBalanceDate: String?,
+                      @Field("account_role") accountRole: String?,
+                      @Field("virtual_balance") virtualBalance: String?,
+                      @Field("include_net_worth") includeNetWorth: Boolean,
+                      @Field("notes") notes: String?,
                       @Field("liability_type") liabilityType: String?,
                       @Field("liability_amount") liabilityAmount: String?,
                       @Field("liability_start_date") liabilityStartDate: String?,
                       @Field("interest") interest: String?,
-                      @Field("interest_period") interestPeriod: String?,
-                      @Field("account_number") accountNumber: String?): Call<AccountSuccessModel>
+                      @Field("interest_period") interestPeriod: String?): Call<AccountSuccessModel>
 
     @DELETE("$ACCOUNTS_API_ENDPOINT/{id}")
     fun deleteAccountById(@Path("id") id: Long): Call<AccountsModel>

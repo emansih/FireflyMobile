@@ -45,6 +45,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private var pieDataSetBudget: PieDataSet = PieDataSet(pieEntryBudgetArray, "")
     private var incomePieEntryArray = arrayListOf<PieEntry>()
     private var incomePieDataSet = PieDataSet(incomePieEntryArray, "")
+    private lateinit var accountType: String
 
     private val coloring = arrayListOf<Int>()
 
@@ -68,6 +69,7 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setLineChart(currencyCode: String, currencySymbol: String){
         accountViewModel.getAccountById(accountId).observe(this, Observer { accountData ->
+            accountType = accountData[0].accountAttributes?.type ?: ""
             if(accountData.isNotEmpty()){
                 zipLiveData(transactionViewModel.getTransactionsByAccountAndCurrencyCodeAndDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
@@ -356,6 +358,16 @@ class AccountDetailFragment: BaseDetailFragment() {
         }
         android.R.id.home -> consume {
             requireFragmentManager().popBackStack()
+        }
+        R.id.menu_item_edit -> consume {
+            val account = bundleOf("accountId" to accountId)
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, AddAccountFragment().apply{
+                    arguments = bundleOf("accountType" to accountType, "accountId" to account)
+                })
+                addToBackStack(null)
+
+            }
         }
         else -> super.onOptionsItemSelected(item)
     }

@@ -54,29 +54,6 @@
     <string name="get_confirmation">Are you sure?</string>
     <string name="categories">Categories</string>
     <string name="edit">Edit</string>
-    <string-array name="account_type">
-        <item>Asset</item>
-        <item>Expense</item>
-        <item>Revenue</item>
-        <item>Liability</item>
-    </string-array>
-    <string-array name="account_role">
-        <item>Default Asset</item>
-        <item>Shared Asset</item>
-        <item>Saving Asset</item>
-        <item>Credit Card Asset</item>
-    </string-array>
-    <string-array name="interest_freq">
-        <item>Daily</item>
-        <item>Monthly</item>
-        <item>Yearly</item>
-    </string-array>
-    <string-array name="liability">
-        <item>Loan</item>
-        <item>Debt</item>
-        <item>Mortgage</item>
-        <item>Credit Card</item>
-    </string-array>
     <string-array name="repeat_frequency">
         <item>Weekly</item>
         <item>Monthly</item>
