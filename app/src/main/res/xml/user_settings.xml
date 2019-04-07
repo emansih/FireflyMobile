@@ -10,6 +10,7 @@
         app:title="@string/language"
         app:key="language_pref"
         app:entries="@array/language_string"
+        app:summary="%s"
         app:entryValues="@array/language_values"/>
 
     <Preference
