@@ -51,7 +51,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
-                android:hint="Name"
+                android:hint="@string/name"
                 android:textColor="@color/md_black_1000"
                 android:textSize="28sp" />
         </androidx.appcompat.widget.Toolbar>
@@ -115,7 +115,7 @@
                 android:id="@+id/start_amount_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Start amount of debt"
+                android:hint="@string/debt_start_amount"
                 android:inputType="numberDecimal"
                 android:drawablePadding="12dp"
                 android:textSize="16sp" />
@@ -126,7 +126,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            android:text="Please enter the original amount of this liability as a positive number. You may also enter the current amount. Make sure to edit the date below to match."
+            android:text="@string/debt_start_amount_text"
             android:layout_marginTop="12dp"
             app:layout_constraintStart_toStartOf="@+id/start_amount_layout"
             app:layout_constraintEnd_toEndOf="@+id/start_amount_layout"
@@ -147,7 +147,7 @@
                 android:id="@+id/start_date_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Start date of debt"
+                android:hint="@string/debt_start_date"
                 android:inputType="date"
                 android:drawablePadding="12dp"
                 android:focusable="false"
@@ -169,7 +169,7 @@
                 android:id="@+id/interest_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Interest"
+                android:hint="@string/interest"
                 android:inputType="numberDecimal"
                 android:drawablePadding="12dp"
                 android:textSize="16sp" />
@@ -257,7 +257,7 @@
                         android:id="@+id/iban_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="IBAN"
+                        android:hint="@string/iban"
                         android:inputType="number"
                         android:drawablePadding="12dp"
                         android:focusable="false"
@@ -299,7 +299,7 @@
                         android:id="@+id/account_number_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="Account number"
+                        android:hint="@string/account_number"
                         android:inputType="number"
                         android:drawablePadding="12dp"
                         android:focusable="false"
@@ -310,7 +310,7 @@
                     android:id="@+id/includeInNetWorthText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Include in net worth"
+                    android:text="@string/include_in_net_worth"
                     android:layout_marginEnd="24dp"
                     app:layout_constraintStart_toEndOf="@+id/includeInNetWorthCheck"
                     app:layout_constraintBottom_toBottomOf="@+id/includeInNetWorthCheck"
@@ -339,7 +339,7 @@
                         android:id="@+id/opening_balance_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="Opening balance"
+                        android:hint="@string/opening_balance"
                         android:inputType="numberDecimal"
                         android:drawablePadding="12dp"
                         android:textSize="16sp" />
@@ -360,7 +360,7 @@
                         android:id="@+id/opening_balance_date_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="Opening balance date"
+                        android:hint="@string/opening_balance_date"
                         android:drawablePadding="12dp"
                         android:focusable="false"
                         android:textSize="16sp" />
@@ -415,7 +415,7 @@
                         android:gravity="top"
                         android:inputType="textMultiLine"
                         android:drawablePadding="12dp"
-                        android:hint="Notes"
+                        android:hint="@string/notes"
                         android:textSize="16sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>

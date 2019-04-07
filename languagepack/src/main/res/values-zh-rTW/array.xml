@@ -1,0 +1,23 @@
+<resources>
+
+    <string-array name="interest_period">
+        <item>每日</item>
+        <item>每月</item>
+        <item>每年</item>
+    </string-array>
+
+    <string-array name="account_role">
+        <item>預設資產帳戶</item>
+        <item>共用資產帳戶</item>
+        <item>儲蓄帳戶</item>
+        <item>信用卡</item>
+        <item>現金錢包</item>
+    </string-array>
+
+    <string-array name="liability_type">
+        <item>抵押</item>
+        <item>負債</item>
+        <item>貸款</item>
+    </string-array>
+
+</resources>

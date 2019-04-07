@@ -1,0 +1,23 @@
+<resources>
+
+    <string-array name="interest_period">
+        <item>Par jour</item>
+        <item>Par mois</item>
+        <item>Par an</item>
+    </string-array>
+
+    <string-array name="account_role">
+        <item>Compte d'actif par défaut</item>
+        <item>Compte d'actif partagé</item>
+        <item>Compte d’épargne</item>
+        <item>Carte de crédit</item>
+        <item>Porte-monnaie</item>
+    </string-array>
+
+    <string-array name="liability_type">
+        <item>Dette</item>
+        <item>Prêt</item>
+        <item>Prêt hypothécaire</item>
+    </string-array>
+
+</resources>

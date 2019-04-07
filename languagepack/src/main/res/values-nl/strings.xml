@@ -63,4 +63,15 @@
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Selecteer een spaarpotje en link deze overschrijving aan je spaargeld.</string>
     <string name="target_amount">Doelbedrag</string>
     <string name="date">Datum</string>
+    <string name="name">Naam</string>
+    <string name="debt_start_amount">Beginbedrag van schuld</string>
+    <string name="debt_start_amount_text">Voer de originele schuld in als een positief getal. Je mag ook je huidige schuld invullen. Pas de datum hier op aan.</string>
+    <string name="debt_start_date">Begindatum van schuld</string>
+    <string name="interest">Rente</string>
+    <string name="notes">Notities</string>
+    <string name="virtual_balance">Virtuele saldo</string>
+    <string name="include_in_net_worth">Meetellen in kapitaal</string>
+    <string name="account_number">Rekeningnummer</string>
+    <string name="opening_balance">Startsaldo</string>
+    <string name="opening_balance_date">Startsaldodatum</string>
 </resources>

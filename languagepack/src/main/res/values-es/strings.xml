@@ -64,4 +64,15 @@
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Seleccione una alcancía y vincule esta transferencia con sus ahorros.</string>
     <string name="target_amount">Cantidad objetivo</string>
     <string name="date">Fecha</string>
+    <string name="name">Nombre</string>
+    <string name="debt_start_amount">Cantidad inicial de la deuda</string>
+    <string name="debt_start_amount_text">Introduce la cantidad original de este pasivo como un número positivo. También puede ingresar la cantidad actual. Asegúrese de editar la fecha de abajo para que coincida.</string>
+    <string name="interest">Interés</string>
+    <string name="debt_start_date">Fecha de inicio de deuda</string>
+    <string name="include_in_net_worth">Incluir en valor neto</string>
+    <string name="notes">Notas</string>
+    <string name="virtual_balance">Saldo virtual</string>
+    <string name="account_number">Número de cuenta</string>
+    <string name="opening_balance">Saldo inicial</string>
+    <string name="opening_balance_date">Fecha del saldo inicial</string>
 </resources>

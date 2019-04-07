@@ -77,4 +77,16 @@
     <string name="bills_create_skip_holder">如果帳單每2週重複一次，則應將 \"略過\" 欄位設定為 \"1\"，以便每隔一週跳一次。</string>
     <string name="transactions_create_switch_box">使用這些按鈕可以快速切換要保存的交易類型。</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">選擇一個小豬撲滿，並將此轉帳連結到您的儲蓄。</string>
+    <string name="name">名稱</string>
+    <string name="debt_start_amount">負債開始金額</string>
+    <string name="debt_start_amount_text">請以正數輸入此債務的原始金額，您也可以輸入目前的金額。請確定修改下方的日期以符合需求。</string>
+    <string name="debt_start_date">負債開始日期</string>
+    <string name="interest">利率</string>
+    <string name="iban">國際銀行帳戶號碼 (IBAN)</string>
+    <string name="account_number">帳戶號碼</string>
+    <string name="include_in_net_worth">包括淨值</string>
+    <string name="opening_balance_date">帳戶角色</string>
+    <string name="opening_balance">初始餘額日期</string>
+    <string name="notes">備註</string>
+    <string name="virtual_balance">虛擬餘額</string>
 </resources>

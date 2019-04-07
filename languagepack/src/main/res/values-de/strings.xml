@@ -75,5 +75,16 @@
     <string name="bills_create_skip_holder">Wenn eine Rechnung alle 2 Wochen wiederholt wird, sollte das Feld „Überspringen” auf „1” festgelegt werden, um jede zweite Woche zu überspringen.</string>
     <string name="transactions_create_switch_box">Verwenden Sie diese Schaltflächen, um schnell den Typ der Transaktion zu ändern, die Sie speichern möchten.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Wählen Sie ein Sparschwein aus und verknüpfen Sie diese Umbuchung mit Ihren Ersparnissen.</string>
+    <string name="name">Name</string>
+    <string name="debt_start_amount">Startbetrag der Verschuldung</string>
+    <string name="debt_start_amount_text">Bitte geben Sie den ursprünglichen Betrag dieser Forderung als positive Zahl ein. Sie können auch den aktuellen Betrag eingeben. Stellen Sie sicher, dass Sie das untenstehende Datum so ändern, dass es mit dem Datum übereinstimmt.</string>
+    <string name="debt_start_date">Startdatum der Verschuldung</string>
+    <string name="interest">Zinsen</string>
+    <string name="include_in_net_worth">Im Nettovermögen enthalten</string>
+    <string name="notes">Notizen</string>
+    <string name="virtual_balance">Virtueller Kontostand</string>
+    <string name="opening_balance_date">Eröffnungsbilanzdatum</string>
+    <string name="opening_balance">Eröffnungsbilanz</string>
+    <string name="account_number">Kontonummer</string>
 
 </resources>

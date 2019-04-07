@@ -1,0 +1,23 @@
+<resources>
+
+    <string-array name="interest_period">
+        <item>Al giorno</item>
+        <item>Al mese</item>
+        <item>All'anno</item>
+    </string-array>
+
+    <string-array name="account_role">
+        <item>Conto attività predefinito</item>
+        <item>Conto attività condiviso</item>
+        <item>Conto risparmio</item>
+        <item>Carta di credito</item>
+        <item>Portafoglio</item>
+    </string-array>
+
+    <string-array name="liability_type">
+        <item>Debito</item>
+        <item>Mutuo</item>
+        <item>Prestito</item>
+    </string-array>
+
+</resources>

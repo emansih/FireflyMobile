@@ -55,4 +55,18 @@
     <string name="delete_tag_title">删除标签 %1$s</string>
     <string name="delete_bill_title">删除帐单 %1$s</string>
     <string name="personal_access_token">个人访问令牌</string>
+    <string name="name">名称</string>
+    <string name="debt_start_amount_text">请以正数输入此债务的原始金额，您也可以输入目前的金额。请确定修改下方的日期以符合需求。</string>
+    <string name="debt_start_amount">负债开始金额</string>
+    <string name="delete_tag_message">"你真的要要删除标签 %1$s 吗？  "</string>
+    <string name="tag_deleted">已删除标签 %1$s</string>
+    <string name="debt_start_date">负债开始日期</string>
+    <string name="interest">利率</string>
+    <string name="iban">国际银行帐户号码 (IBAN)</string>
+    <string name="account_number">帐户号码</string>
+    <string name="include_in_net_worth">包括淨值</string>
+    <string name="notes">备注</string>
+    <string name="virtual_balance">虚拟余额</string>
+    <string name="opening_balance_date">初始余额日期</string>
+    <string name="opening_balance">初始余额</string>
 </resources>

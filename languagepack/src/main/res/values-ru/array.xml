@@ -1,0 +1,31 @@
+<resources>
+
+    <string-array name="interest_period">
+        <item>Ежедневно</item>
+        <item>Ежемесячно</item>
+        <item>Ежегодно</item>
+    </string-array>
+
+    <string-array name="repeat_frequency">
+        <item>Еженедельно</item>
+        <item>Ежемесячно</item>
+        <item>Ежеквартально</item>
+        <item>Раз в пол года</item>
+        <item>Ежегодно</item>
+    </string-array>
+
+    <string-array name="account_role">
+        <item>Счёт по умолчанию</item>
+        <item>Общий основной счёт</item>
+        <item>Сберегательный счет</item>
+        <item>Кредитная карта</item>
+        <item>Кошелёк с наличными</item>
+    </string-array>
+
+    <string-array name="liability_type">
+        <item>Дебит</item>
+        <item>Заём</item>
+        <item>Ипотека</item>
+    </string-array>
+
+</resources>

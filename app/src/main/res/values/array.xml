@@ -46,24 +46,4 @@
         <item>ru</item>
     </string-array>
 
-    <string-array name="account_role">
-        <item>Default asset account</item>
-        <item>Shared asset account</item>
-        <item>Savings account</item>
-        <item>Credit card</item>
-        <item>Cash wallet</item>
-    </string-array>
-    
-    <string-array name="liability_type">
-        <item>Debt</item>
-        <item>Loan</item>
-        <item>Mortgage</item>
-    </string-array>
-
-    <string-array name="interest_period">
-        <item>Per day</item>
-        <item>Per month</item>
-        <item>Per year</item>
-    </string-array>
-
 </resources>

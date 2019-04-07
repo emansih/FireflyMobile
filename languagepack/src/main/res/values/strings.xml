@@ -54,13 +54,6 @@
     <string name="get_confirmation">Are you sure?</string>
     <string name="categories">Categories</string>
     <string name="edit">Edit</string>
-    <string-array name="repeat_frequency">
-        <item>Weekly</item>
-        <item>Monthly</item>
-        <item>Quarterly</item>
-        <item>Half-yearly</item>
-        <item>Yearly</item>
-    </string-array>
     <string name="net_worth">Net Worth</string>
     <string name="balance">Balance</string>
     <string name="budget">Budget</string>
@@ -87,4 +80,16 @@
     <string name="transactions_create_switch_box">Use these buttons to quickly switch the type of transaction you wish to save.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Select a piggy bank and link this transfer to your savings.</string>
     <string name="add_transaction_shortcut">Add Transaction</string>
+    <string name="name">Name</string>
+    <string name="debt_start_amount">Start amount of debt</string>
+    <string name="debt_start_amount_text">Please enter the original amount of this liability as a positive number. You may also enter the current amount. Make sure to edit the date below to match</string>
+    <string name="debt_start_date">Start date of debt</string>
+    <string name="interest">Interest</string>
+    <string name="account_number">Account Number</string>
+    <string name="include_in_net_worth">Include in net worth</string>
+    <string name="opening_balance">Opening balance</string>
+    <string name="opening_balance_date">Opening balance date</string>
+    <string name="virtual_balance">Virtual balance</string>
+    <string name="notes">Notes</string>
+    <string name="iban">IBAN</string>
 </resources>

@@ -62,4 +62,15 @@
     <string name="transactions_create_switch_box">Utilisez ces boutons pour changer rapidement le type de transaction que vous souhaitez enregistrer.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Sélectionnez une tirelire et reliez ce transfert à vos économies.</string>
     <string name="target_amount">Montant cible</string>
+    <string name="name">Nom</string>
+    <string name="debt_start_amount">Montant initial de la dette</string>
+    <string name="debt_start_amount_text">Veuillez saisir le montant d\'origine de ce passif en tant que nombre positif. Vous pouvez également saisir son montant actuel. Assurez-vous de modifier la date ci-dessous pour que cela corresponde.</string>
+    <string name="debt_start_date">Date de début de la dette</string>
+    <string name="interest">Intérêt</string>
+    <string name="iban">Numéro IBAN</string>
+    <string name="include_in_net_worth">Inclure dans l\'avoir net</string>
+    <string name="opening_balance">Solde initial</string>
+    <string name="opening_balance_date">Date du solde initial</string>
+    <string name="virtual_balance">Solde virtuel</string>
+    <string name="account_number">N° de compte</string>
 </resources>

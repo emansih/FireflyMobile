@@ -65,5 +65,15 @@
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Seleziona un salvadanaio e collega questo trasferimento ai tuoi risparmi.</string>
     <string name="target_amount">Importo obiettivo</string>
     <string name="date">Data</string>
+    <string name="name">Nome</string>
+    <string name="debt_start_amount">Importo iniziale del debito</string>
+    <string name="debt_start_amount_text">Inserisci l\'importo originario di questa passività come un numero positivo. Puoi anche inserire l\'importo corrente. Assicurati di modificare i dati sottostanti in modo che corrispondano.</string>
+    <string name="debt_start_date">Data di inizio del debito</string>
+    <string name="interest">Interesse</string>
+    <string name="include_in_net_worth">Includi nel patrimonio</string>
+    <string name="account_number">Numero conto</string>
+    <string name="opening_balance">Saldo di apertura</string>
+    <string name="opening_balance_date">Data saldo di apertura</string>
+    <string name="virtual_balance">Saldo virtuale</string>
 
 </resources>

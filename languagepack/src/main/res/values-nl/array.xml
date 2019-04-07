@@ -1,0 +1,23 @@
+<resources>
+
+    <string-array name="interest_period">
+        <item>Per dag</item>
+        <item>Per maand</item>
+        <item>Per jaar</item>
+    </string-array>
+
+    <string-array name="account_role">
+        <item>Standaard betaalrekening</item>
+        <item>Gedeelde betaalrekening</item>
+        <item>Spaarrekening</item>
+        <item>Credit card</item>
+        <item>Cash</item>
+    </string-array>
+
+    <string-array name="liability_type">
+        <item>Hypotheek</item>
+        <item>Lening</item>
+        <item>Schuld</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,23 @@
+<resources>
+
+    <string-array name="interest_period">
+        <item>Täglich</item>
+        <item>Monatlich</item>
+        <item>Jährlich</item>
+    </string-array>
+
+    <string-array name="account_role">
+        <item>Standard-Bestandskonto</item>
+        <item>Gemeinsames Bestandskonto</item>
+        <item>Sparkonto</item>
+        <item>Kreditkarte</item>
+        <item>Geldbörse</item>
+    </string-array>
+
+    <string-array name="liability_type">
+        <item>Haftungsart</item>
+        <item>Hypothek</item>
+        <item>Schuld</item>
+    </string-array>
+
+</resources>

@@ -52,36 +52,6 @@
     <string name="get_confirmation">Вы уверены?</string>
     <string name="categories">Категории</string>
     <string name="edit">Правка</string>
-    <string-array name="account_type">
-        <item>Собсвенность</item>
-        <item>Расход</item>
-        <item>Доход</item>
-        <item>Долг</item>
-    </string-array>
-    <string-array name="account_role">
-        <item>Актив по умолчанию</item>
-        <item>Общий актив</item>
-        <item>Сберегательный актив</item>
-        <item>Кредитная карта</item>
-    </string-array>
-    <string-array name="interest_freq">
-        <item>Ежедневно</item>
-        <item>Ежемесячно</item>
-        <item>Ежегодно</item>
-    </string-array>
-    <string-array name="liability">
-        <item>Кредит</item>
-        <item>Долг</item>
-        <item>Ипотека</item>
-        <item>Кредитная карта</item>
-    </string-array>
-    <string-array name="repeat_frequency">
-        <item>Еженедельно</item>
-        <item>Ежемесячно</item>
-        <item>Ежеквартально</item>
-        <item>Раз в пол года</item>
-        <item>Ежегодно</item>
-    </string-array>
     <string name="net_worth">Капитал</string>
     <string name="balance">Баланс</string>
     <string name="budget">Бюджет</string>
@@ -108,4 +78,12 @@
     <string name="transactions_create_switch_box">Используйте эти кнопки для быстрого переключения типа транзакции, которую вы желаете сохранить.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Выберите копилку и свяжите этот перевод с вашими сбережениями.</string>
     <string name="add_transaction_shortcut">Добавить запись</string>
+    <string name="name">Название</string>
+    <string name="interest">Процентная ставка</string>
+    <string name="include_in_net_worth">Включать в \"Мои сбережения\"</string>
+    <string name="account_number">Номер счета</string>
+    <string name="opening_balance">Начальный баланс</string>
+    <string name="opening_balance_date">Дата начального баланса</string>
+    <string name="virtual_balance">Виртуальный баланс</string>
+    <string name="notes">Заметки</string>
 </resources>
