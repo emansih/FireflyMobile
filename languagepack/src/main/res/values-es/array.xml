@@ -6,10 +6,18 @@
         <item>Par an</item>
     </string-array>
 
+    <string-array name="repeat_frequency">
+        <item>semanalmente</item>
+        <item>mensualmente</item>
+        <item>trimestralmente</item>
+        <item>cada medio año</item>
+        <item>anualmente</item>
+    </string-array>
+
     <string-array name="account_role">
-        <item>Compte d'actif par défaut</item>
-        <item>Compte d'actif partagé</item>
-        <item>Compte d’épargne</item>
+        <item>Compte d\'actif par défaut</item>
+        <item>Compte d\'actif partagé</item>
+        <item>Compte d\’épargne</item>
         <item>Carte de crédit</item>
         <item>Porte-monnaie</item>
     </string-array>

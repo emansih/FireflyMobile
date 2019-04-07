@@ -75,4 +75,11 @@
     <string name="account_number">Número de cuenta</string>
     <string name="opening_balance">Saldo inicial</string>
     <string name="opening_balance_date">Fecha del saldo inicial</string>
+    <string name="account_chart_description">Gráfico para las transacciones de la cuenta %1$s entre %2$s y %3$s</string>
+    <string name="income_by_category">Ingresos por categoría</string>
+    <string name="no_data_to_generate_chart">No hay suficiente información (todavía) para generar este gráfico.</string>
+    <string name="expenses_by_category">Gastos por categoría</string>
+    <string name="expenses_by_budget">Gastos por presupuesto</string>
+    <string name="transaction_information">Información de transacción</string>
+    <string name="meta_info">Información Meta</string>
 </resources>

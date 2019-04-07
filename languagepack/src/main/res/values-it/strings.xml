@@ -75,5 +75,12 @@
     <string name="opening_balance">Saldo di apertura</string>
     <string name="opening_balance_date">Data saldo di apertura</string>
     <string name="virtual_balance">Saldo virtuale</string>
+    <string name="account_chart_description">Grafico di tutte le transazioni per il conto %1$s fra %2$s e %3$s</string>
+    <string name="income_by_category">Entrate per categoria</string>
+    <string name="no_data_to_generate_chart">Non ci sono (ancora) abbastanza informazioni per generare questo grafico.</string>
+    <string name="expenses_by_budget">Spese per budget</string>
+    <string name="expenses_by_category">Spese per categorie</string>
+    <string name="transaction_information">Informazioni transazione</string>
+    <string name="meta_info">Meta informazioni</string>
 
 </resources>

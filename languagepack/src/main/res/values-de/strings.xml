@@ -86,5 +86,12 @@
     <string name="opening_balance_date">Eröffnungsbilanzdatum</string>
     <string name="opening_balance">Eröffnungsbilanz</string>
     <string name="account_number">Kontonummer</string>
+    <string name="account_chart_description">Diagramm für alle Transaktionen des Kontos „%1$s” zwischen %2$s und %3$s</string>
+    <string name="income_by_category">Einnahmen nach Kategorie</string>
+    <string name="no_data_to_generate_chart">Es gibt derzeit (noch) nicht genügend Informationen, um dieses Diagramm zu generieren.</string>
+    <string name="expenses_by_budget">Ausgaben nach Budget</string>
+    <string name="expenses_by_category">Ausgaben nach Kategorie</string>
+    <string name="transaction_information">Transaktionsinformationen</string>
+    <string name="meta_info">Metainformationen</string>
 
 </resources>

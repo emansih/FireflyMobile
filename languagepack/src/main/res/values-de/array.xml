@@ -6,6 +6,14 @@
         <item>Jährlich</item>
     </string-array>
 
+    <string-array name="repeat_frequency">
+        <item>wöchentlich</item>
+        <item>monatlich</item>
+        <item>vierteljährlich</item>
+        <item>halbjährlich</item>
+        <item>jährlich</item>
+    </string-array>
+
     <string-array name="account_role">
         <item>Standard-Bestandskonto</item>
         <item>Gemeinsames Bestandskonto</item>

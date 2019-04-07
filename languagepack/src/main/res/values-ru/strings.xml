@@ -86,4 +86,11 @@
     <string name="opening_balance_date">Дата начального баланса</string>
     <string name="virtual_balance">Виртуальный баланс</string>
     <string name="notes">Заметки</string>
+    <string name="account_chart_description">Диаграмма всех транзакций для счёта %1$s между %2$s и %3$s</string>
+    <string name="no_data_to_generate_chart">Недостаточно информации (пока) для построения этой диаграммы.</string>
+    <string name="income_by_category">"Доход по категориям "</string>
+    <string name="expenses_by_category">"Расходы по категориям "</string>
+    <string name="expenses_by_budget">Расходы по бюджетам</string>
+    <string name="transaction_information">Информация о транзакции</string>
+    <string name="meta_info">Дополнительная информация</string>
 </resources>

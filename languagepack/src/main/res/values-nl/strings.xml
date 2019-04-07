@@ -74,4 +74,11 @@
     <string name="account_number">Rekeningnummer</string>
     <string name="opening_balance">Startsaldo</string>
     <string name="opening_balance_date">Startsaldodatum</string>
+    <string name="account_chart_description">Grafiek voor alle transacties voor rekening %1$s tussen %2$s en %3$s</string>
+    <string name="income_by_category">Inkomsten per categorie</string>
+    <string name="expenses_by_category">Uitgaven per categorie</string>
+    <string name="expenses_by_budget">Uitgaven per budget</string>
+    <string name="no_data_to_generate_chart">Er is (nog) niet genoeg informatie om deze grafiek te tekenen.</string>
+    <string name="transaction_information">Transactieinformatie</string>
+    <string name="meta_info">Metainformatie</string>
 </resources>

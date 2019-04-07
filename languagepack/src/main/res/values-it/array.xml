@@ -3,7 +3,15 @@
     <string-array name="interest_period">
         <item>Al giorno</item>
         <item>Al mese</item>
-        <item>All'anno</item>
+        <item>All\'anno</item>
+    </string-array>
+
+    <string-array name="repeat_frequency">
+        <item>settimanalmente</item>
+        <item>mensilmente</item>
+        <item>trimestralmente</item>
+        <item>semestralmente</item>
+        <item>annualmente</item>
     </string-array>
 
     <string-array name="account_role">

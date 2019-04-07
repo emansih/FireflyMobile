@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.account
 
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -65,6 +66,9 @@ class AccountDetailFragment: BaseDetailFragment() {
             }
         })
         setDarkMode()
+        incomePieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
+        budgetPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
+        categoryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
     }
 
     private fun setLineChart(currencyCode: String, currencySymbol: String){
@@ -141,10 +145,9 @@ class AccountDetailFragment: BaseDetailFragment() {
                         }
                     })
                 })
-                balanceHistoryCardText.text = "Chart for all transactions for account " +
-                        accountData[0].accountAttributes?.name + " between " +
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6) +
-                        " and " + DateTimeUtil.getTodayDate()
+                balanceHistoryCardText.text = resources.getString(R.string.account_chart_description,
+                        accountData[0].accountAttributes?.name, DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
+                        DateTimeUtil.getTodayDate())
                 getAccountTransaction(accountData[0].accountAttributes?.name ?: "")
                 setExpensesByCategory(currencyCode, accountData[0].accountAttributes?.name ?: "", currencySymbol)
 
@@ -202,25 +205,6 @@ class AccountDetailFragment: BaseDetailFragment() {
                     }
 
                 })
-            } else {
-                categoryPieChart.apply {
-                    description.text = "No expenses Found!"
-                    description.textSize = 15f
-                    legend.form = Legend.LegendForm.CIRCLE
-                    isDrawHoleEnabled = false
-                    setUsePercentValues(true)
-                    legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                    setTransparentCircleAlpha(0)
-                }
-                incomePieChart.apply {
-                    description.text = "No deposits Found!"
-                    description.textSize = 15f
-                    legend.form = Legend.LegendForm.CIRCLE
-                    isDrawHoleEnabled = false
-                    setUsePercentValues(true)
-                    legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                    setTransparentCircleAlpha(0)
-                }
             }
         })
     }

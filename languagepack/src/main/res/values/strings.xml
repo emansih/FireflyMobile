@@ -92,4 +92,11 @@
     <string name="virtual_balance">Virtual balance</string>
     <string name="notes">Notes</string>
     <string name="iban">IBAN</string>
+    <string name="account_chart_description">Chart for all transactions for account %1$s between %2$s and %3$s</string>
+    <string name="no_data_to_generate_chart">There is not enough information (yet) to generate this chart.</string>
+    <string name="income_by_category">Income by category</string>
+    <string name="expenses_by_category">Expenses by category</string>
+    <string name="expenses_by_budget">Expenses by budget</string>
+    <string name="transaction_information">Transaction information</string>
+    <string name="meta_info">Meta information</string>
 </resources>

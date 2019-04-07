@@ -36,7 +36,7 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
                         style="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:text="Transaction Information"
+                        android:text="@string/transaction_information"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -84,7 +84,7 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
                         style="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:text="Meta Information"
+                        android:text="@string/meta_info"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"/>
 

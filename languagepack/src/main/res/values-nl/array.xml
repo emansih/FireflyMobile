@@ -6,6 +6,14 @@
         <item>Per jaar</item>
     </string-array>
 
+    <string-array name="repeat_frequency">
+        <item>wekelijks</item>
+        <item>maandelijks</item>
+        <item>elk kwartaal</item>
+        <item>elk half jaar</item>
+        <item>jaarlijks</item>
+    </string-array>
+
     <string-array name="account_role">
         <item>Standaard betaalrekening</item>
         <item>Gedeelde betaalrekening</item>

@@ -69,4 +69,15 @@
     <string name="virtual_balance">虚拟余额</string>
     <string name="opening_balance_date">初始余额日期</string>
     <string name="opening_balance">初始余额</string>
+    <string name="account_chart_description">"帐户「%1$s」自 %2$s 至 %3$s 所有交易的图表 "</string>
+    <string name="no_data_to_generate_chart">"目前 (尚) 没有足够资讯以产生此图表。"</string>
+    <string name="income_by_category">"按分类的收入 "</string>
+    <string name="expenses_by_category">按分类的支出</string>
+    <string name="expenses_by_budget">按预算的支出</string>
+    <string name="transaction_information">交易资讯</string>
+    <string name="meta_info">后设资讯</string>
+    <string name="delete_piggy_bank_message">你确定你想要删除名为 %1$s 的小猪扑满?</string>
+    <string name="delete_bill_message">"你确定你想要删除名为 %1$s 的帐单?  "</string>
+    <string name="bill_deleted">已删除帐单 %1$s</string>
+    <string name="piggy_bank_deleted">删除小猪存钱罐 %1$s</string>
 </resources>

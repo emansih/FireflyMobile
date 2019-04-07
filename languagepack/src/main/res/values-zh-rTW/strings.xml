@@ -89,4 +89,11 @@
     <string name="opening_balance">初始餘額日期</string>
     <string name="notes">備註</string>
     <string name="virtual_balance">虛擬餘額</string>
+    <string name="account_chart_description">帳戶「%1$s」自 %2$s 號 至 %3$s 號 所有交易的圖表</string>
+    <string name="income_by_category">按分類的收入</string>
+    <string name="expenses_by_category">按分類的支出</string>
+    <string name="expenses_by_budget">按預算的支出</string>
+    <string name="no_data_to_generate_chart">目前 (尚) 沒有足夠資訊以產生此圖表。</string>
+    <string name="transaction_information">交易資訊</string>
+    <string name="meta_info">後設資訊</string>
 </resources>

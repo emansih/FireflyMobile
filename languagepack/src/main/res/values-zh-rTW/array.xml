@@ -6,6 +6,14 @@
         <item>每年</item>
     </string-array>
 
+    <string-array name="repeat_frequency">
+        <item>每週</item>
+        <item>每月</item>
+        <item>每季</item>
+        <item>每半年</item>
+        <item>每年</item>
+    </string-array>
+
     <string-array name="account_role">
         <item>預設資產帳戶</item>
         <item>共用資產帳戶</item>

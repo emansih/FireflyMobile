@@ -188,9 +188,6 @@ class AddBillFragment: BaseAddObjectFragment() {
     }
 
     override fun setWidgets(){
-        freqAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_item, resources.getStringArray(R.array.repeat_frequency))
-        freqAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        frequency_spinner.adapter = freqAdapter
         frequency_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>) {}
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {

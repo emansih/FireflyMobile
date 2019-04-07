@@ -73,4 +73,11 @@
     <string name="opening_balance_date">Date du solde initial</string>
     <string name="virtual_balance">Solde virtuel</string>
     <string name="account_number">N° de compte</string>
+    <string name="account_chart_description">"Graphique pour toutes les transactions pour le compte %1$s entre  %2$s et %3$s "</string>
+    <string name="income_by_category">Revenu par catégorie</string>
+    <string name="expenses_by_category">Dépenses par catégorie</string>
+    <string name="expenses_by_budget">Dépenses par budget</string>
+    <string name="no_data_to_generate_chart">Il n\'y a pas assez d\'informations (pour le moment) pour générer ce graphique.</string>
+    <string name="transaction_information">Informations sur les transactions</string>
+    <string name="meta_info">Méta informations</string>
 </resources>
