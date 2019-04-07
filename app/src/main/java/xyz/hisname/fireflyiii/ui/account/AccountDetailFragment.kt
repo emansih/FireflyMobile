@@ -360,13 +360,11 @@ class AccountDetailFragment: BaseDetailFragment() {
             requireFragmentManager().popBackStack()
         }
         R.id.menu_item_edit -> consume {
-            val account = bundleOf("accountId" to accountId)
             requireFragmentManager().commit {
                 replace(R.id.bigger_fragment_container, AddAccountFragment().apply{
-                    arguments = bundleOf("accountType" to accountType, "accountId" to account)
+                    arguments = bundleOf("accountType" to accountType, "accountId" to accountId)
                 })
                 addToBackStack(null)
-
             }
         }
         else -> super.onOptionsItemSelected(item)

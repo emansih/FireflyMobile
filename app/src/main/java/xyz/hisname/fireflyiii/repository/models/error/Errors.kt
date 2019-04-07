@@ -43,5 +43,6 @@ data class Errors(
         val opening_balance: List<String>?,
         val opening_balance_date: List<String>?,
         val interest_period: List<String>?,
-        val liability_amount: List<String>?
+        val liability_amount: List<String>?,
+        val exception: List<String>?
 )

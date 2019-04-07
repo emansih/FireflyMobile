@@ -14,6 +14,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -34,6 +35,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(add_account_layout)
+        updateData()
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
@@ -111,11 +113,13 @@ class AddAccountFragment: BaseAddObjectFragment() {
             val currencyListFragment = CurrencyListBottomSheet()
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
         }
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
-            val currencyData = defaultCurrency[0].currencyAttributes
-            currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
-            currency = currencyData?.code ?: ""
-        })
+        if(accountId == 0L) {
+            currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+                val currencyData = defaultCurrency[0].currencyAttributes
+                currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+                currency = currencyData?.code ?: ""
+            })
+        }
         if(accountType == "asset"){
             opening_balance_date_layout.isVisible = true
             opening_balance_date_edittext.setOnClickListener {
@@ -165,6 +169,13 @@ class AddAccountFragment: BaseAddObjectFragment() {
         includeInNetWorthText.setOnClickListener {
             includeInNetWorthCheck.performClick()
         }
+        accountViewModel.isLoading.observe(this, Observer { loader ->
+            if(loader){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        })
     }
 
     override fun submitData() {
@@ -253,8 +264,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         } else {
             null
         }
-
-        if(accountId != 0L){
+        if(accountId == 0L){
             addAccount(description_edittext.getString(), accountType, currencyToBeSubmitted,
                     iBanString, bicString, accountNumberString, openingBalanceValue, openingBalanceDate,
                     accountRoleSpinner, virtualBalanceString, netWorth, notesText, liabilityType, startAmountOfDebt,
@@ -277,11 +287,13 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
                 liabilityStartDate, interest, interestPeriod).observe(this, Observer {
             val error = it.getError()
-            if (error != null) {
-                toastError(error.localizedMessage)
-            } else if (it.getResponse() != null) {
-                toastSuccess("Account updated")
-                handleBack()
+            when {
+                error != null -> toastError(error.localizedMessage)
+                it.getResponse() != null -> {
+                    toastSuccess("Account updated")
+                    handleBack()
+                }
+                else -> toastError(it.getErrorMessage())
             }
         })
     }
@@ -308,6 +320,56 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 handleBack()
             }
         })
+    }
+
+    private fun updateData(){
+        if(accountId != 0L){
+            accountViewModel.getAccountById(accountId).observe(this, Observer { accountData ->
+                val accountAttributes = accountData[0].accountAttributes
+                description_edittext.setText(accountAttributes?.name)
+                currency_edittext.setText(accountAttributes?.currency_code + " (" + accountAttributes?.currency_symbol + " )")
+                currency = accountAttributes?.currency_code ?: ""
+                val liabilityType = accountAttributes?.liability_type
+                if(liabilityType != null){
+                    when (liabilityType) {
+                        "debt" -> liabilityTypeSpinner.setSelection(0)
+                        "loan" -> liabilityTypeSpinner.setSelection(1)
+                        "mortgage" -> liabilityTypeSpinner.setSelection(2)
+                    }
+                }
+                start_amount_edittext.setText(accountAttributes?.liability_amount)
+                start_date_edittext.setText(accountAttributes?.liability_start_date)
+                interest_edittext.setText(accountAttributes?.interest)
+                val interestPeriod = accountAttributes?.interest_period
+                if(interestPeriod != null){
+                    when(interestPeriod){
+                        "daily" -> interestPeriodSpinner.setSelection(0)
+                        "monthly" -> interestPeriodSpinner.setSelection(1)
+                        "yearly" -> interestPeriodSpinner.setSelection(2)
+                    }
+                }
+                iban_edittext.setText(accountAttributes?.iban)
+                bic_edittext.setText(accountAttributes?.bic)
+                account_number_edittext.setText(accountAttributes?.account_number)
+                if(accountAttributes?.include_net_worth == true){
+                    includeInNetWorthCheck.performClick()
+                }
+                opening_balance_edittext.setText(accountAttributes?.opening_balance)
+                opening_balance_date_edittext.setText(accountAttributes?.opening_balance_date)
+                val accountRole = accountAttributes?.account_role
+                if(accountRole != null){
+                    when(accountRole){
+                        "defaultAsset" -> accountRoleSpinner.setSelection(0)
+                        "sharedAsset" -> accountRoleSpinner.setSelection(1)
+                        "savingAsset" -> accountRoleSpinner.setSelection(2)
+                        "ccAsset" -> accountRoleSpinner.setSelection(3)
+                        "cashWalletAsset" -> accountRoleSpinner.setSelection(4)
+                    }
+                }
+                virtual_balance_edittext.setText(accountAttributes?.virtual_balance.toString())
+                note_edittext.setText(accountAttributes?.notes)
+            })
+        }
     }
 
     override fun handleBack() {

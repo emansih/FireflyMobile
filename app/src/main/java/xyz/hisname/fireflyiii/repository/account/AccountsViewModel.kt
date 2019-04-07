@@ -198,6 +198,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     gson.errors.opening_balance_date != null -> gson.errors.opening_balance_date[0]
                     gson.errors.interest_period != null -> gson.errors.interest_period[0]
                     gson.errors.liability_amount != null -> gson.errors.liability_amount[0]
+                    gson.errors.exception != null -> gson.errors.exception[0]
                     else -> "Error occurred while saving Account"
                 }
             }
@@ -211,16 +212,16 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
             }
-
+            isLoading.value = false
         })
         { throwable ->
             apiLiveData.postValue(ApiResponses(throwable))
             AccountWorker.initWorker(accountName, accountType, currencyCode, iban, bic, accountNumber,
                     openingBalance, openingBalanceDate, accountRole, virtualBalance, includeInNetWorth,
                     notes, liabilityType, liabilityAmount, liabilityStartDate, interest, interestPeriod)
+            isLoading.value = false
         })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
-        isLoading.value = false
         return apiResponse
     }
 
@@ -253,6 +254,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     gson.errors.opening_balance_date != null -> gson.errors.opening_balance_date[0]
                     gson.errors.interest_period != null -> gson.errors.interest_period[0]
                     gson.errors.liability_amount != null -> gson.errors.liability_amount[0]
+                    gson.errors.exception != null -> gson.errors.exception[0]
                     else -> "Error occurred while updating Account"
                 }
             }
@@ -266,11 +268,13 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
             }
-
+            isLoading.value = false
         })
-        { throwable -> apiLiveData.postValue(ApiResponses(throwable)) })
+        { throwable ->
+            apiLiveData.postValue(ApiResponses(throwable))
+            isLoading.value = false
+        })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
-        isLoading.value = false
         return apiResponse
     }
 
