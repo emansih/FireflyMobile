@@ -20,10 +20,10 @@ abstract class BaseAddObjectFragment: BaseFragment() {
         setWidgets()
     }
 
-    protected fun unReveal(rootView: View){
+    protected fun unReveal(rootView: View, shouldShow: Boolean = false){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            val x= rootView.width / 2
-            val y= rootView.height / 2
+            val x = rootView.width / 2
+            val y = rootView.height / 2
             val finalRadius = (Math.max(rootView.width, rootView.height) * 1.1).toFloat()
             val circularReveal= ViewAnimationUtils.createCircularReveal(
                     rootView, x, y,finalRadius, 0f)
@@ -39,7 +39,9 @@ abstract class BaseAddObjectFragment: BaseFragment() {
                     }
                     rootView.isVisible = false
                     fragmentContainer.isVisible = true
-                    fab.isVisible = true
+                    if(shouldShow) {
+                        fab.isVisible = true
+                    }
                 }
             })
             circularReveal.start()
@@ -50,7 +52,9 @@ abstract class BaseAddObjectFragment: BaseFragment() {
 
             }
             fragmentContainer.isVisible = true
-            fab.isVisible = true
+            if(shouldShow) {
+                fab.isVisible = true
+            }
         }
     }
 

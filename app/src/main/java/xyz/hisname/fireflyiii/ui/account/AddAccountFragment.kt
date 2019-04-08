@@ -373,7 +373,11 @@ class AddAccountFragment: BaseAddObjectFragment() {
     }
 
     override fun handleBack() {
-        unReveal(add_account_layout)
+        if(accountId == 0L) {
+            unReveal(add_account_layout, true)
+        } else {
+            unReveal(add_account_layout)
+        }
     }
 
 }
