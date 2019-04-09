@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,6 +18,7 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
+import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
@@ -88,7 +90,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
         isLoading.value = true
         var withdrawData: Double = 0.toDouble()
-        val decimalFormat = DecimalFormat(".##")
         val data: MutableLiveData<Double> = MutableLiveData()
         val transactionData: MutableList<TransactionData> = arrayListOf()
         transactionService?.getPaginatedTransactions(startDate, endDate, "withdrawal", 1)?.enqueue(retrofitCallback({ response ->
@@ -117,7 +118,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                                 scope.launch(Dispatchers.IO) {
                                     withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
                                 }.invokeOnCompletion {
-                                    data.postValue(decimalFormat.format(withdrawData.absoluteValue).toDouble())
+                                    data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
                                     isLoading.postValue(false)
                                 }
                             }
@@ -134,7 +135,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 scope.launch(Dispatchers.IO) {
                     withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
                 }.invokeOnCompletion {
-                    data.postValue(decimalFormat.format(withdrawData.absoluteValue).toDouble())
+                    data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
                     isLoading.postValue(false)
                 }
 
@@ -144,7 +145,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             scope.launch(Dispatchers.IO) {
                 withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
             }.invokeOnCompletion {
-                data.postValue(decimalFormat.format(withdrawData.absoluteValue).toDouble())
+                data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
                 isLoading.postValue(false)
             }
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
@@ -155,7 +156,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
         isLoading.value = true
         var depositData: Double = 0.toDouble()
-        val decimalFormat = DecimalFormat(".##")
         val data: MutableLiveData<Double> = MutableLiveData()
         val transactionData: MutableList<TransactionData> = arrayListOf()
         transactionService?.getPaginatedTransactions(startDate, endDate, "deposit", 1)?.enqueue(retrofitCallback({ response ->
@@ -184,7 +184,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                                 scope.launch(Dispatchers.IO) {
                                     depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
                                 }.invokeOnCompletion {
-                                    data.postValue(decimalFormat.format(depositData).toDouble())
+                                    data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
                                     isLoading.postValue(false)
                                 }
                             }
@@ -201,7 +201,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 scope.launch(Dispatchers.IO) {
                     depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
                 }.invokeOnCompletion {
-                    data.postValue(decimalFormat.format(depositData).toDouble())
+                    data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
                     isLoading.postValue(false)
                 }
 
@@ -211,7 +211,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             scope.launch(Dispatchers.IO) {
                 depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
             }.invokeOnCompletion {
-                data.postValue(decimalFormat.format(depositData).toDouble())
+                data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
                 isLoading.postValue(false)
             }
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))

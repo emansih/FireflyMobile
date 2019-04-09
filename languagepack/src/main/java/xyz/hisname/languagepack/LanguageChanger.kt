@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.core.os.ConfigurationCompat
 import java.util.*
 
@@ -40,6 +41,14 @@ class LanguageChanger(baseContext: Context): ContextWrapper(baseContext){
         @TargetApi(Build.VERSION_CODES.N)
         private fun setSystemLocale() {
             config.setLocale(locale)
+        }
+
+        fun getLocale(context: Context): Locale{
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                context.resources.configuration.locales.get(0)
+            } else {
+                context.resources.configuration.locale
+            }
         }
     }
 }
