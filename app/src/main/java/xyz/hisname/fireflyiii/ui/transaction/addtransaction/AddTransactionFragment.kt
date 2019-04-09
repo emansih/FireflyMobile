@@ -429,14 +429,13 @@ class AddTransactionFragment: BaseFragment() {
                             val destinationPosition = spinnerAdapter.getPosition(destinationName)
                             destination_spinner.setSelection(destinationPosition)
                         })
-                billViewModel.getAllBills().observe(this, Observer {
-                    if(it.isNotEmpty()){
-                        it.forEachIndexed { _,billData ->
-                            bill.add(billData.billAttributes?.name!!)
-                        }
+                billViewModel.getAllBills().observe(this, Observer { billListing ->
+                    if(billListing.isNotEmpty()){
                         bill_layout.isVisible = true
-                        val uniqueBill = HashSet(bill).toArray()
-                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueBill)
+                        billListing.forEachIndexed { _, billData ->
+                            bill.add(billData.billAttributes?.name ?: "")
+                        }
+                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
                         bill_edittext.threshold = 1
                         bill_edittext.setAdapter(adapter)
                     }

@@ -314,7 +314,6 @@
                                 android:drawablePadding="12dp"
                                 android:hint="@string/bill"
                                 android:textSize="16sp"
-                                android:focusable="false"
                                 style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
                         </com.google.android.material.textfield.TextInputLayout>
 
