@@ -211,9 +211,8 @@ class TransactionFragment: BaseFragment(){
             } else {
                 dayOfMonth.toString()
             }
-            val correctMonth: String = if(month in 1..9){
+            val correctMonth: String = if(month in 0..8){
                 "0" + ((1 + month).toString())
-                //"0$month" + 1
             } else {
                 (month + 1).toString()
             }
