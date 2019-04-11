@@ -1,15 +1,9 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
 import android.accounts.AccountManager
-import android.app.PendingIntent
 import android.content.Intent
-import android.content.pm.ShortcutManager
-import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
-import androidx.core.content.pm.ShortcutInfoCompat
-import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.graphics.drawable.IconCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -24,10 +18,8 @@ import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.DeviceUtil
-import xyz.hisname.fireflyiii.util.extension.onAnimationEnd
 import java.util.*
-import android.R.mipmap
-import xyz.hisname.fireflyiii.BuildConfig
+import xyz.hisname.fireflyiii.util.extension.*
 
 
 class OnboardingActivity: AccountAuthenticatorActivity() {
@@ -47,8 +39,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         if(installShortCut()) {
             homeActivity.putExtra("transaction", "transactionFragment")
         }
-        if(Objects.equals("oauth", accManager.authMethod) &&
-                AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isNotEmpty()){
+        if(Objects.equals("oauth", accManager.authMethod)){
             if (accManager.isTokenValid()) {
                 val bundle = bundleOf("ACTION" to "REFRESH_TOKEN")
                 supportFragmentManager.commit{
@@ -66,8 +57,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                     finish()
                 }
             }
-        } else if(Objects.equals("pat", accManager.authMethod) &&
-                AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isNotEmpty()){
+        } else if(Objects.equals("pat", accManager.authMethod)){
             if(AppPref(sharedPref).isTransactionPersistent){
                 NotificationUtils(this).showTransactionPersistentNotification()
             }
@@ -83,7 +73,6 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                 interpolator = FastOutSlowInInterpolator()
                 duration = 900
                 onAnimationEnd {
-                    AuthenticatorManager(AccountManager.get(this@OnboardingActivity)).destroyAccount()
                     app_name_textview.isVisible = true
                     supportFragmentManager.commit(allowStateLoss = true){
                         replace(R.id.fragment_container, AuthChooserFragment())
@@ -110,7 +99,6 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         }
         return false
     }
-
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)

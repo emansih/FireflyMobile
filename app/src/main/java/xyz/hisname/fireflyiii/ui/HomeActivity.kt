@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -34,6 +35,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
@@ -42,6 +44,7 @@ import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
+import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment
@@ -58,47 +61,56 @@ class HomeActivity: BaseActivity(){
     private lateinit var headerResult: AccountHeader
     private var profile: IProfile<*>? = null
     private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
+    private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_base)
-        animateToolbar()
-        setProfileImage()
-        setUpHeader(savedInstanceState)
-        setSupportActionBar(activity_toolbar)
-        setUpDrawer(savedInstanceState)
-        supportActionBar?.title = ""
-        setNavIcon()
-        if(intent.getStringExtra("transaction") != null) {
-            val transaction = intent.getStringExtra("transaction")
-            when (transaction) {
-                "Withdrawal" -> {
-                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                        bundleOf("transactionType" to "Withdrawal")
-                    }))
-                }
-                "Deposit" -> {
-                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                        bundleOf("transactionType" to "Deposit")
-                    }))
-                }
-                "Transfer" -> {
-                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                        bundleOf("transactionType" to "Transfer")
-                    }))
-                }
-                // Home screen shortcut
-                "transactionFragment" -> {
-                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                        bundleOf("transactionType" to "Withdrawal")
-                    }))
+        if(accountManager.authMethod.isBlank()||
+                AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isBlank()){
+            AuthenticatorManager(AccountManager.get(this)).destroyAccount()
+            val onboardingActivity = Intent(this, OnboardingActivity::class.java)
+            startActivity(onboardingActivity)
+            finish()
+        } else {
+            setContentView(R.layout.activity_base)
+            animateToolbar()
+            setProfileImage()
+            setUpHeader(savedInstanceState)
+            setSupportActionBar(activity_toolbar)
+            setUpDrawer(savedInstanceState)
+            supportActionBar?.title = ""
+            setNavIcon()
+            if (intent.getStringExtra("transaction") != null) {
+                val transaction = intent.getStringExtra("transaction")
+                when (transaction) {
+                    "Withdrawal" -> {
+                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                            bundleOf("transactionType" to "Withdrawal")
+                        }))
+                    }
+                    "Deposit" -> {
+                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                            bundleOf("transactionType" to "Deposit")
+                        }))
+                    }
+                    "Transfer" -> {
+                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                            bundleOf("transactionType" to "Transfer")
+                        }))
+                    }
+                    // Home screen shortcut
+                    "transactionFragment" -> {
+                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                            bundleOf("transactionType" to "Withdrawal")
+                        }))
+                    }
                 }
             }
+            supportFragmentManager.commit {
+                replace(R.id.fragment_container, DashboardFragment(), "dash")
+            }
+            globalFAB.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_add).sizeDp(24))
         }
-        supportFragmentManager.commit{
-            replace(R.id.fragment_container, DashboardFragment(), "dash")
-        }
-        globalFAB.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_add).sizeDp(24))
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
