@@ -30,7 +30,6 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
-import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 
@@ -47,7 +46,6 @@ class DashboardFragment: BaseFragment() {
     private var month3Depot = 0.toDouble()
     private var month2With = 0.toDouble()
     private var month3With = 0.toDouble()
-    private val decimalFormat = DecimalFormat(".##")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -120,8 +118,8 @@ class DashboardFragment: BaseFragment() {
             if(Math.copySign(1.toDouble(), transaction) < 0){
                 currentNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            balanceText.text = currencyData.symbol + " " + decimalFormat.format(transaction)
-            currentNetIncome.text = currencyData.symbol + " " + decimalFormat.format(transaction)
+            balanceText.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
+            currentNetIncome.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
             transaction = month2Depot - month2With
             oneMonthBeforeExpense.text = currencyData.symbol + " " + month2With.toString()
@@ -129,7 +127,7 @@ class DashboardFragment: BaseFragment() {
             if(Math.copySign(1.toDouble(), transaction) < 0){
                 oneMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            oneMonthBeforeNetIncome.text = currencyData.symbol + " " + decimalFormat.format(transaction)
+            oneMonthBeforeNetIncome.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
             transaction = month3Depot - month3With
             twoMonthBeforeExpense.text = currencyData.symbol + " " + month3With.toString()
@@ -137,7 +135,7 @@ class DashboardFragment: BaseFragment() {
             if(Math.copySign(1.toDouble(), transaction) < 0){
                 twoMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            twoMonthBeforeNetIncome.text = currencyData.symbol + " " + decimalFormat.format(transaction)
+            twoMonthBeforeNetIncome.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
             val withDrawalHistory = arrayListOf(
                     BarEntry(0f, month3With.toFloat()),
@@ -210,7 +208,7 @@ class DashboardFragment: BaseFragment() {
                     val fifthDay = transactionData.fifth
                     val sixthDay = transactionData.sixth
                     val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).div(6)
-                    sixDaysAverage.text = currencyData.symbol + decimalFormat.format(sixDayAverage)
+                    sixDaysAverage.text = currencyData.symbol + LocaleNumberParser.parseDecimal(sixDayAverage, requireContext())
                     val expenseHistory = arrayListOf(
                             BarEntry(0f, firstDay.toFloat()),
                             BarEntry(1f, secondDay.toFloat()),
@@ -250,7 +248,8 @@ class DashboardFragment: BaseFragment() {
                 DateTimeUtil.getTodayDate(), currencyCode).observe(this, Observer { transactionData ->
             transactionViewModel.isLoading.observe(this, Observer { loader ->
                 if(loader == false) {
-                    thirtyDaysAverage.text = currencyData.symbol + decimalFormat.format(transactionData.div(30))
+                    thirtyDaysAverage.text = currencyData.symbol + LocaleNumberParser.parseDecimal(
+                            transactionData.div(30), requireContext())
                 }
             })
         })
