@@ -27,11 +27,10 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
-import java.math.RoundingMode
 import java.text.DecimalFormat
-import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 
@@ -262,47 +261,49 @@ class DashboardFragment: BaseFragment() {
         val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700), ContextCompat.getColor(requireContext(), R.color.md_green_500))
         zipLiveData(budgetLimit.retrieveSpentBudget(),
                 budgetLimit.retrieveCurrentMonthBudget(currencyData?.code!!)).observe(this, Observer { budget ->
-                    budgetSpent = budget.first.toFloat()
-                    budgeted = budget.second.toFloat()
-                    val budgetLeftPercentage = (budgetSpent / budgeted) * 100
-                    val budgetSpentPercentage = (budgeted - budgetSpent) / budgeted * 100
-                    val dataSet = PieDataSet(arrayListOf(PieEntry(budgetLeftPercentage,
-                            resources.getString(R.string.spent)), PieEntry(budgetSpentPercentage,
-                            resources.getString(R.string.left_to_spend))), "").apply {
-                        setDrawIcons(true)
-                        sliceSpace = 2f
-                        iconsOffset = MPPointF(0f, 40f)
-                        colors = dataColor
-                        valueTextSize = 15f
-                        valueFormatter = MpAndroidPercentFormatter()
+            budgetSpent = budget.first.toFloat()
+            budgeted = budget.second.toFloat()
+            val budgetLeftPercentage = (budgetSpent / budgeted) * 100
+            val budgetSpentPercentage = (budgeted - budgetSpent) / budgeted * 100
+            val dataSet = PieDataSet(arrayListOf(PieEntry(budgetLeftPercentage,
+                    resources.getString(R.string.spent)), PieEntry(budgetSpentPercentage,
+                    resources.getString(R.string.left_to_spend))), "").apply {
+                setDrawIcons(true)
+                sliceSpace = 2f
+                iconsOffset = MPPointF(0f, 40f)
+                colors = dataColor
+                valueTextSize = 15f
+                valueFormatter = MpAndroidPercentFormatter()
+            }
+            budgetAmount.text = currencyData.symbol + " " + budgeted
+            spentAmount.text = currencyData.symbol + " " + budgetSpent
+            budgetChart.apply {
+                data = PieData(dataSet)
+                description.text = "Budget Percentage"
+                highlightValue(null)
+                isDrawHoleEnabled = false
+            }
+            val progressDrawable = budgetProgress.progressDrawable.mutate()
+
+            leftToSpentText.text = currencyData.symbol + " " +
+                    LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
+            if(!budgetLeftPercentage.isNaN()) {
+                when {
+                    budgetLeftPercentage.roundToInt() >= 80 -> {
+                        progressDrawable.setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN)
+                        budgetProgress.progressDrawable = progressDrawable
                     }
-                    budgetAmount.text = currencyData.symbol + " " + budgeted
-                    spentAmount.text = currencyData.symbol + " " + budgetSpent
-                    budgetChart.apply {
-                        data = PieData(dataSet)
-                        description.text = "Budget Percentage"
-                        highlightValue(null)
-                        isDrawHoleEnabled = false
+                    budgetLeftPercentage.roundToInt() in 50..80 -> {
+                        progressDrawable.setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN)
+                        budgetProgress.progressDrawable = progressDrawable
                     }
-                    val progressDrawable = budgetProgress.progressDrawable.mutate()
-                    leftToSpentText.text = currencyData.symbol + " " + String.format("%.2f",(budgeted - budgetSpent))
-                    if(!budgetLeftPercentage.isNaN()) {
-                        when {
-                            budgetLeftPercentage.roundToInt() >= 80 -> {
-                                progressDrawable.setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN)
-                                budgetProgress.progressDrawable = progressDrawable
-                            }
-                            budgetLeftPercentage.roundToInt() in 50..80 -> {
-                                progressDrawable.setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN)
-                                budgetProgress.progressDrawable = progressDrawable
-                            }
-                            else -> {
-                                progressDrawable.setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN)
-                                budgetProgress.progressDrawable = progressDrawable
-                            }
-                        }
-                        ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
+                    else -> {
+                        progressDrawable.setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN)
+                        budgetProgress.progressDrawable = progressDrawable
                     }
+                }
+                ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
+            }
         })
     }
 
