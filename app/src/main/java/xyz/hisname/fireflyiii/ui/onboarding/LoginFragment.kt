@@ -98,16 +98,15 @@ class LoginFragment: Fragment() {
             } else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 baseUrlLiveData.value = fireflyUrl
+                AppPref(sharedPref).baseUrl = fireflyUrl
                 if (!fireflyUrl.startsWith("http")) {
                     fireflyUrl = "https://$fireflyUrl"
                 }
+                if(!fireflyUrl.endsWith("/")){
+                    fireflyUrl = "$fireflyUrl/"
+                }
                 clientIdLiveData.value = fireflyId
                 secretKeyLiveData.value = fireflySecretKey
-                fireflyUrl = if(fireflyUrl.endsWith("/")){
-                    fireflyUrl
-                } else {
-                    "$fireflyUrl/"
-                }
                 val browserIntent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl${Constants.OAUTH_API_ENDPOINT}" +
                         "/authorize?client_id=$fireflyId&redirect_uri=${Constants.REDIRECT_URI}" +
                         "&scope=&response_type=code&state=").toUri())
@@ -152,7 +151,6 @@ class LoginFragment: Fragment() {
             ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
             val code = uri.getQueryParameter("code")
             if(code != null && code.isNotBlank() && code.isNotEmpty()) {
-                AppPref(sharedPref).baseUrl = baseUrlLiveData.value ?: ""
                 accManager.initializeAccount()
                 accManager.apply {
                     secretKey = secretKeyLiveData.value ?: ""
