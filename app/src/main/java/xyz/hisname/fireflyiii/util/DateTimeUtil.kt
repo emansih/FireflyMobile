@@ -146,4 +146,19 @@ object DateTimeUtil {
         val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         return localDate.dayOfMonth.toString() + "/" + localDate.monthValue.toString()
     }
+
+    // Outputs dd mm yyyy - dd mm yyyy
+    // Example: 1 Apr 2019 -  30 Apr 2019
+    fun getDurationText(): String{
+        val localDateTime = LocalDate.now()
+        val startOfMonth = LocalDate.of(localDateTime.year, localDateTime.monthValue,
+                localDateTime.dayOfMonth).with(firstDayOfMonth())
+        val endOfMonth = LocalDate.of(localDateTime.year, localDateTime.monthValue,
+                localDateTime.dayOfMonth).with(lastDayOfMonth())
+        val startDate = startOfMonth.dayOfMonth.toString() + " "  + startOfMonth.month.getDisplayName(TextStyle.SHORT,
+                Locale.getDefault()) + " " + startOfMonth.year
+        val endDate = endOfMonth.dayOfMonth.toString() + " "  + endOfMonth.month.getDisplayName(TextStyle.SHORT,
+                Locale.getDefault()) + " " + endOfMonth.year
+        return "$startDate - $endDate"
+    }
 }

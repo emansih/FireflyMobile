@@ -22,12 +22,10 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
 
     val repository: BudgetRepository
     private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
-    private var currentMonthBudgetLimit = 0.toDouble()
     private var currentMonthSpent = 0.toDouble()
     private var currentMonthBudgetValue: MutableLiveData<String> = MutableLiveData()
     private var currentMonthSpentValue: MutableLiveData<String> = MutableLiveData()
     val spentBudgetLoader: MutableLiveData<Boolean> = MutableLiveData()
-    val currentMonthBudgetLoader: MutableLiveData<Boolean> = MutableLiveData()
     val budgetName =  MutableLiveData<String>()
 
     init {

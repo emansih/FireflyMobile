@@ -24,6 +24,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -62,7 +63,7 @@ class DashboardFragment: BaseFragment() {
             if (defaultCurrency.isNotEmpty()) {
                 val currencyData = defaultCurrency[0].currencyAttributes
                 setNetIncome(currencyData)
-                setBarChart(currencyData)
+                setPieChart(currencyData)
                 setNetWorth(currencyData)
                 setAverage(currencyData)
             }
@@ -255,7 +256,7 @@ class DashboardFragment: BaseFragment() {
         })
     }
 
-    private fun setBarChart(currencyData: CurrencyAttributes?) {
+    private fun setPieChart(currencyData: CurrencyAttributes?) {
         monthText.text = DateTimeUtil.getCurrentMonth()
         val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700), ContextCompat.getColor(requireContext(), R.color.md_green_500))
         zipLiveData(budgetLimit.retrieveSpentBudget(),
@@ -304,6 +305,18 @@ class DashboardFragment: BaseFragment() {
                 ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
             }
         })
+        budgetCard.setOnClickListener {
+            requireFragmentManager().commit {
+                replace(R.id.fragment_container, BudgetSummaryFragment())
+                addToBackStack(null)
+            }
+        }
+        budgetChart.setOnClickListener {
+            requireFragmentManager().commit {
+                replace(R.id.fragment_container, BudgetSummaryFragment())
+                addToBackStack(null)
+            }
+        }
     }
 
     private fun changeTheme(){

@@ -15,5 +15,4 @@ abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
 
     @Query("SELECT * FROM budget_list WHERE name LIKE :budgetName")
     abstract fun searchBudgetName(budgetName: String): MutableList<BudgetListData>
-
 }

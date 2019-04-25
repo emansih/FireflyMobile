@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,11 +17,11 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
-import java.text.DecimalFormat
 import kotlin.math.absoluteValue
 
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
@@ -268,6 +267,20 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
+    fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
+                              transactionType: String): MutableLiveData<MutableList<String>>{
+        isLoading.value = true
+        var transactionData: MutableList<String> = arrayListOf()
+        val data: MutableLiveData<MutableList<String>> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionData = repository.getUniqueBudgetByDate(startDate, endDate, currencyCode, transactionType)
+        }.invokeOnCompletion {
+            data.postValue(transactionData)
+            isLoading.postValue(false)
+        }
+        return data
+    }
+
     fun getTotalTransactionAmountByDateAndCurrency(startDate: String, endDate: String,
                                              currencyCode: String, accountName: String,
                                                    transactionType: String): MutableLiveData<Double>{
@@ -284,7 +297,21 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-
+    fun getTotalTransactionAmountByDateAndCurrency(startDate: String, endDate: String,
+                                                   currencyCode: String,
+                                                   transactionType: String): MutableLiveData<Double>{
+        isLoading.value = true
+        var transactionAmount = 0.0
+        val data: MutableLiveData<Double> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionAmount = repository.getTotalTransactionType(startDate, endDate,
+                    currencyCode, transactionType)
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            data.postValue(transactionAmount)
+        }
+        return data
+    }
 
     fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String,
                                                    currencyCode: String, accountName: String,
@@ -303,14 +330,30 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
-                                                   currencyCode: String, accountName: String,
-                                                   transactionType: String, budgetName: String?): MutableLiveData<Double>{
+                                                  currencyCode: String, accountName: String,
+                                                  transactionType: String, budgetName: String?): MutableLiveData<Double>{
         isLoading.value = true
         var transactionAmount: Double = 0.toDouble()
         val data: MutableLiveData<Double> = MutableLiveData()
         scope.launch(Dispatchers.IO){
             transactionAmount = repository.getTransactionByDateAndBudgetAndCurrency(startDate, endDate,
                     currencyCode, accountName, transactionType, budgetName)
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            data.postValue(transactionAmount)
+        }
+        return data
+    }
+
+    fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
+                                                 currencyCode: String,
+                                                 transactionType: String, budgetName: String?): MutableLiveData<Double>{
+        isLoading.value = true
+        var transactionAmount: Double = 0.toDouble()
+        val data: MutableLiveData<Double> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionAmount = repository.getTransactionByDateAndBudgetAndCurrency(startDate, endDate,
+                    currencyCode, transactionType, budgetName)
         }.invokeOnCompletion {
             isLoading.postValue(false)
             data.postValue(transactionAmount)
@@ -542,6 +585,17 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
         return data
+    }
+
+    fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): LiveData<MutableList<TransactionData>>{
+        val transactionData: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
+        var data: MutableList<TransactionData> = arrayListOf()
+        scope.async(Dispatchers.IO) {
+            data = repository.getTransactionListByDateAndBudget(startDate, endDate, budgetName)
+        }.invokeOnCompletion {
+            transactionData.postValue(data)
+        }
+        return transactionData
     }
 
 }
