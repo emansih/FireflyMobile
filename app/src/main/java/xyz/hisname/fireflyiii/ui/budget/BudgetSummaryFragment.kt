@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -46,10 +48,13 @@ class BudgetSummaryFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        for (col in ColorTemplate.MATERIAL_COLORS) {
+        for (col in ColorTemplate.COLORFUL_COLORS) {
             coloring.add(col)
         }
-        budgetSummaryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
+        for (col in ColorTemplate.JOYFUL_COLORS){
+            coloring.add(col)
+        }
+        budgetSummaryPieChart.isDrawHoleEnabled = false
         currencyViewModel.getDefaultCurrency().observe(this, Observer { currency ->
             setText(currency[0])
             getExpensesTransaction(currency[0])
@@ -90,20 +95,25 @@ class BudgetSummaryFragment: BaseFragment() {
                 actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgetSpent
                 remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
                         LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
+                showTransactionButton.isGone = true
             }
 
             override fun onValueSelected(entry: Entry, high: Highlight) {
-                val pe = entry as PieEntry
-                val transactionDialog  = TransactionByBudgetDialogFragment()
-                transactionDialog.arguments = bundleOf("budgetName" to pe.label)
-                transactionDialog.show(requireFragmentManager(), "transaction_budget_dialog")
-
+                showTransactionButton.isVisible = true
+                showTransactionButton.setOnClickListener {
+                    val pe = entry as PieEntry
+                    val transactionDialog  = TransactionByBudgetDialogFragment()
+                    transactionDialog.arguments = bundleOf("budgetName" to pe.label)
+                    transactionDialog.show(requireFragmentManager(), "transaction_budget_dialog")
+                }
             }
 
         })
     }
 
     private fun setText(currencyData: CurrencyData){
+        budgetSummaryPieChart.description.isEnabled = false
+        budgetSummaryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
         budgetDuration.text = DateTimeUtil.getDurationText()
         zipLiveData(budgetLimit.retrieveSpentBudget(),
                 budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: "")).observe(this, Observer { budget ->

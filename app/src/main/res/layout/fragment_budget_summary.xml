@@ -79,6 +79,16 @@
                 app:layout_constraintTop_toTopOf="@+id/remainingBudgetText"
                 app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
 
+            <Button
+                android:id="@+id/showTransactionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show Expenses"
+                android:visibility="gone"
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/remainingAmountValue" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
