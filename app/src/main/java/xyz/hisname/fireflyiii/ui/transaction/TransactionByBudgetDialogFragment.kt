@@ -32,6 +32,7 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        recentTransactionText.text = "Recent Withdrawal"
         recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
         recentTransactionList.addItemDecoration(DividerItemDecoration(requireContext(),
                 DividerItemDecoration.VERTICAL))
