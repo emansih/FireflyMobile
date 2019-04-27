@@ -99,9 +99,21 @@ class BudgetSummaryFragment: BaseFragment() {
             }
 
             override fun onValueSelected(entry: Entry, high: Highlight) {
+                val pe = entry as PieEntry
                 showTransactionButton.isVisible = true
+                budgetAmountValue.text = "--.--"
+                actualAmountValue.text = "--.--"
+                remainingAmountValue.text = "--.--"
+                transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
+                        DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal", pe.label).observe(this@BudgetSummaryFragment, Observer { value ->
+                    budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + entry.value
+                    actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
+                            LocaleNumberParser.parseDecimal(value, requireContext())
+                    remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
+                            LocaleNumberParser.parseDecimal((entry.value - Math.abs(value)), requireContext())
+
+                })
                 showTransactionButton.setOnClickListener {
-                    val pe = entry as PieEntry
                     val transactionDialog  = TransactionByBudgetDialogFragment()
                     transactionDialog.arguments = bundleOf("budgetName" to pe.label)
                     transactionDialog.show(requireFragmentManager(), "transaction_budget_dialog")
