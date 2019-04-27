@@ -43,6 +43,7 @@ class TransactionDetailsFragment: BaseFragment() {
     private var transactionDate = ""
     private var transactionCategory = ""
     private var transactionBudget = ""
+    private var transactionAmount = ""
     private lateinit var chipTags: Chip
     private lateinit var attachmentData: AttachmentData
 
@@ -75,8 +76,17 @@ class TransactionDetailsFragment: BaseFragment() {
                     DetailModel(resources.getString(R.string.description), details?.description),
                     DetailModel(resources.getString(R.string.source_account), details?.source_name),
                     DetailModel(resources.getString(R.string.destination_account), details?.destination_name),
-                    DetailModel(resources.getString(R.string.amount),details?.currency_symbol + details?.amount.toString()),
                     DetailModel(resources.getString(R.string.date), details?.date.toString()))
+            if(details?.foreign_amount != null && details.foreign_currency_symbol != null){
+                transactionList.add(DetailModel(resources.getString(R.string.amount),
+                        details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol
+                + details.foreign_amount + ")"))
+                transactionAmount = details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol +
+                        details.foreign_amount + ")"
+            } else {
+                transactionAmount = details?.currency_symbol + details?.amount
+                transactionList.add(DetailModel(resources.getString(R.string.amount),details?.currency_symbol + details?.amount.toString()))
+            }
             transactionDescription = details?.description ?: ""
             sourceAccountId = details?.source_id?.toLong() ?: 0L
             destinationAccountId = details?.destination_id?.toLong() ?: 0L
@@ -152,6 +162,12 @@ class TransactionDetailsFragment: BaseFragment() {
 
     private fun setTransactionInfoClick(position: Int){
         when(position){
+            0 -> {
+                AlertDialog.Builder(requireContext())
+                        .setTitle(resources.getString(R.string.amount))
+                        .setMessage(transactionAmount)
+                        .show()
+            }
             1 ->{
                AlertDialog.Builder(requireContext())
                        .setTitle(resources.getString(R.string.description))
