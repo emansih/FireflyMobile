@@ -93,4 +93,5 @@
     <string name="expenses_by_budget">Расходы по бюджетам</string>
     <string name="transaction_information">Информация о транзакции</string>
     <string name="meta_info">Дополнительная информация</string>
+    <string name="no_location_set">Местоположение не указано</string>
 </resources>

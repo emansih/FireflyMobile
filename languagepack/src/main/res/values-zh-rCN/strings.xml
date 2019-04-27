@@ -80,4 +80,11 @@
     <string name="delete_bill_message">"你确定你想要删除名为 %1$s 的帐单?  "</string>
     <string name="bill_deleted">已删除帐单 %1$s</string>
     <string name="piggy_bank_deleted">删除小猪存钱罐 %1$s</string>
+    <string name="no_location_set">没有设定位置</string>
+    <string name="delete_account_message">你确定你想要删除名为 %1$s 的帐户?</string>
+    <string name="delete_account_title">删除帐户%1$s</string>
+    <string name="tag_created">标签 %1$s 已被建立!</string>
+    <string name="tag_updated">已更新标签 %1$s</string>
+    <string name="delete_piggy_bank_title">删除小猪存钱罐 %1$s</string>
+    <string name="enabled">已启用</string>
 </resources>

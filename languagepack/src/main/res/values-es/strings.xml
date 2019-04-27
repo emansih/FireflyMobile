@@ -82,4 +82,6 @@
     <string name="expenses_by_budget">Gastos por presupuesto</string>
     <string name="transaction_information">Información de transacción</string>
     <string name="meta_info">Información Meta</string>
+    <string name="no_location_set">Ubicación no establecida</string>
+    <string name="enabled">Habilitado</string>
 </resources>

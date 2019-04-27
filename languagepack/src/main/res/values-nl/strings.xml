@@ -81,4 +81,5 @@
     <string name="no_data_to_generate_chart">Er is (nog) niet genoeg informatie om deze grafiek te tekenen.</string>
     <string name="transaction_information">Transactieinformatie</string>
     <string name="meta_info">Metainformatie</string>
+    <string name="no_location_set">Zonder plaats</string>
 </resources>

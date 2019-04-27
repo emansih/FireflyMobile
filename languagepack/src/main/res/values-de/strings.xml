@@ -93,5 +93,6 @@
     <string name="expenses_by_category">Ausgaben nach Kategorie</string>
     <string name="transaction_information">Transaktionsinformationen</string>
     <string name="meta_info">Metainformationen</string>
+    <string name="no_location_set">Kein Ort gesetzt</string>
 
 </resources>

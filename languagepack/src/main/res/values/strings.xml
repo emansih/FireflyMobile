@@ -99,4 +99,5 @@
     <string name="expenses_by_budget">Expenses by budget</string>
     <string name="transaction_information">Transaction information</string>
     <string name="meta_info">Meta information</string>
+    <string name="no_location_set">No location set</string>
 </resources>

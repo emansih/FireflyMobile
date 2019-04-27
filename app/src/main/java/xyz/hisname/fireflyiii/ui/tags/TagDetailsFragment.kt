@@ -62,9 +62,9 @@ class TagDetailsFragment: BaseDetailFragment() {
             nameOfTag = tagsAttributes.tag
         }
         if(tagsAttributes?.latitude == null || tagsAttributes.longitude == null || tagsAttributes.zoom_level == null){
-            latitude_text.text = "No location set"
-            longitude_text.text = "No location set"
-            zoom_text.text = "No location set"
+            latitude_text.text = resources.getString(R.string.no_location_set)
+            longitude_text.text = resources.getString(R.string.no_location_set)
+            zoom_text.text = resources.getString(R.string.no_location_set)
             tagDetailsMapText.isVisible = true
             tagDetailsMap.isInvisible = true
         } else {
@@ -129,7 +129,7 @@ class TagDetailsFragment: BaseDetailFragment() {
                         }
                     })
                 }
-                .setNegativeButton("No"){ _, _ ->
+                .setNegativeButton(resources.getString(android.R.string.no)){ _, _ ->
                     toastInfo("Tag not deleted")
                 }
                 .show()

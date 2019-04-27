@@ -96,4 +96,5 @@
     <string name="no_data_to_generate_chart">目前 (尚) 沒有足夠資訊以產生此圖表。</string>
     <string name="transaction_information">交易資訊</string>
     <string name="meta_info">後設資訊</string>
+    <string name="no_location_set">沒有設定位置</string>
 </resources>
