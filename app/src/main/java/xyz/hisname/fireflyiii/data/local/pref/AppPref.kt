@@ -45,5 +45,9 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("night_mode", false)
         set(value) = sharedPref.edit { putBoolean("night_mode", value) }
 
+    override var isKeyguardEnabled: Boolean
+        get() = sharedPref.getBoolean("keyguard", false)
+        set(value) = sharedPref.edit{ putBoolean("keyguard", value)}
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

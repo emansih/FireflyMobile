@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat
@@ -15,6 +16,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.util.KeyguardUtil
 import xyz.hisname.languagepack.LanguageChanger
 
 
@@ -28,6 +30,7 @@ class SettingsFragment: BaseSettings() {
         setTransactionSection()
         setLanguagePref()
         setNightModeSection()
+        setPinCode()
     }
 
     private fun setLanguagePref(){
@@ -101,11 +104,22 @@ class SettingsFragment: BaseSettings() {
         requireFragmentManager().popBackStack()
     }
 
-    fun IconicsDrawable.setIconColor(): Drawable{
+    private fun IconicsDrawable.setIconColor(): Drawable{
         return if(nightMode){
             this.color(ContextCompat.getColor(requireContext(), R.color.md_white_1000))
         } else {
             this.color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+        }
+    }
+
+    private fun setPinCode(){
+        val keyguardPref = findPreference("keyguard") as Preference
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ){
+            keyguardPref.isVisible = false
+        }
+        if(!KeyguardUtil(requireActivity()).isDeviceKeyguardEnabled()){
+            keyguardPref.isSelectable = false
+            keyguardPref.summary = "Please enable pin / password / biometrics in your device settings"
         }
     }
 }

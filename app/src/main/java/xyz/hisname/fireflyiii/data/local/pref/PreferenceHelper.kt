@@ -12,5 +12,6 @@ interface PreferenceHelper {
     var certValue: String
     var languagePref: String
     var nightModeEnabled: Boolean
+    var isKeyguardEnabled: Boolean
     fun clearPref()
 }

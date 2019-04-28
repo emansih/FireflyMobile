@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui
 
 import android.accounts.AccountManager
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -52,7 +53,9 @@ import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DeviceUtil
+import xyz.hisname.fireflyiii.util.KeyguardUtil
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.extension.toastError
 
 
 class HomeActivity: BaseActivity(){
@@ -62,7 +65,10 @@ class HomeActivity: BaseActivity(){
     private var profile: IProfile<*>? = null
     private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
     private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
+    private val keyguardUtil by lazy { KeyguardUtil(this) }
+    private var instanceState: Bundle? = null
 
+    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if(accountManager.authMethod.isBlank()||
@@ -72,45 +78,55 @@ class HomeActivity: BaseActivity(){
             startActivity(onboardingActivity)
             finish()
         } else {
-            setContentView(R.layout.activity_base)
-            animateToolbar()
-            setProfileImage()
-            setUpHeader(savedInstanceState)
-            setSupportActionBar(activity_toolbar)
-            setUpDrawer(savedInstanceState)
-            supportActionBar?.title = ""
-            setNavIcon()
-            if (intent.getStringExtra("transaction") != null) {
-                val transaction = intent.getStringExtra("transaction")
-                when (transaction) {
-                    "Withdrawal" -> {
-                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                            bundleOf("transactionType" to "Withdrawal")
-                        }))
-                    }
-                    "Deposit" -> {
-                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                            bundleOf("transactionType" to "Deposit")
-                        }))
-                    }
-                    "Transfer" -> {
-                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                            bundleOf("transactionType" to "Transfer")
-                        }))
-                    }
-                    // Home screen shortcut
-                    "transactionFragment" -> {
-                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                            bundleOf("transactionType" to "Withdrawal")
-                        }))
-                    }
+            instanceState = savedInstanceState
+            if(keyguardUtil.isAppKeyguardEnabled()){
+                keyguardUtil.initKeyguard()
+            } else {
+                setup(savedInstanceState)
+            }
+
+        }
+    }
+
+    private fun setup(savedInstanceState: Bundle?){
+        setContentView(R.layout.activity_base)
+        animateToolbar()
+        setProfileImage()
+        setUpHeader(savedInstanceState)
+        setSupportActionBar(activity_toolbar)
+        setUpDrawer(savedInstanceState)
+        supportActionBar?.title = ""
+        setNavIcon()
+        if (intent.getStringExtra("transaction") != null) {
+            val transaction = intent.getStringExtra("transaction")
+            when (transaction) {
+                "Withdrawal" -> {
+                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                        bundleOf("transactionType" to "Withdrawal")
+                    }))
+                }
+                "Deposit" -> {
+                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                        bundleOf("transactionType" to "Deposit")
+                    }))
+                }
+                "Transfer" -> {
+                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                        bundleOf("transactionType" to "Transfer")
+                    }))
+                }
+                // Home screen shortcut
+                "transactionFragment" -> {
+                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                        bundleOf("transactionType" to "Withdrawal")
+                    }))
                 }
             }
-            supportFragmentManager.commit {
-                replace(R.id.fragment_container, DashboardFragment(), "dash")
-            }
-            globalFAB.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_add).sizeDp(24))
         }
+        supportFragmentManager.commit {
+            replace(R.id.fragment_container, DashboardFragment(), "dash")
+        }
+        globalFAB.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_add).sizeDp(24))
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
@@ -444,6 +460,17 @@ class HomeActivity: BaseActivity(){
                 drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(2804 == requestCode){
+            if(resultCode == RESULT_OK){
+                setup(instanceState)
+            } else {
+                toastError("Authentication fail")
             }
         }
     }

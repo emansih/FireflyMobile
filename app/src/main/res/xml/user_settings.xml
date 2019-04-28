@@ -21,4 +21,8 @@
         app:key="night_mode"
         app:title="Enable Night Mode" />
 
+    <CheckBoxPreference
+        app:key="keyguard"
+        app:title="Activate System's Keyguard on Launch" />
+
 </PreferenceScreen>
