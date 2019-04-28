@@ -30,5 +30,7 @@ interface TagsService {
                   @Field("latitude") latitude: String?, @Field("longitude") longitude: String?,
                   @Field("zoom_level") zoomLevel: String?): Call<TagsSuccessModel>
 
+    @GET("$TAGS_API_ENDPOINT/{tagName}")
+    fun getTagByName(@Path("tagName") tagName: String): Call<TagsModel>
 
 }

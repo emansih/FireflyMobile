@@ -168,11 +168,25 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
 
     fun getTagByName(nameOfTag: String): LiveData<MutableList<TagsData>>{
         val tagData: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
-        var data: MutableList<TagsData> = arrayListOf()
+        var data: MutableList<TagsData>? = arrayListOf()
         scope.async(Dispatchers.IO){
             data = repository.retrieveTagByName(nameOfTag)
         }.invokeOnCompletion {
-            tagData.postValue(data)
+            if(data == null){
+                tagsService?.getTagByName(nameOfTag)?.enqueue(retrofitCallback({ response ->
+                    if (response.isSuccessful) {
+                        val networkData = response.body()?.data
+                        networkData?.forEachIndexed { _, element ->
+                            scope.launch(Dispatchers.IO) {
+                                repository.insertTags(element)
+                            }
+                        }
+                        tagData.postValue(networkData?.toMutableList())
+                    }
+                }))
+            } else {
+                tagData.postValue(data)
+            }
         }
         return tagData
     }
