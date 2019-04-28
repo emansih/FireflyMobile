@@ -24,10 +24,16 @@ class CustomApp: MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidThreeTen.init(this)
-        if(BuildConfig.DEBUG == false) {
-            ACRA.init(this)
-        }
+        newThread()
+    }
+
+    private fun newThread(){
+        Thread(Runnable {
+            AndroidThreeTen.init(this)
+            if(BuildConfig.DEBUG == false) {
+                ACRA.init(this)
+            }
+        }).start()
     }
 
     override fun attachBaseContext(newBase: Context) {
