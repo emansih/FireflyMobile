@@ -69,7 +69,7 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
                         it.text = context.getString(R.string.user_did_it)
                     }
                 } else {
-                    it.text = context.getString(R.string.no_target_date)
+                    it.text = "No target Date"
                 }
             }
             itemView.piggyCard.setOnClickListener{clickListener(piggyData)}
