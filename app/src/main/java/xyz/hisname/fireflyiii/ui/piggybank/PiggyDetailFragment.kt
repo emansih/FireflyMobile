@@ -18,6 +18,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
+import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
@@ -33,7 +34,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     private var currentAmount: BigDecimal? = 0.toBigDecimal()
     private var percentage: Int = 0
     private var currencyCode: String = ""
-    private var piggyList: MutableList<BaseDetailModel> = ArrayList()
+    private var piggyList: MutableList<DetailModel> = ArrayList()
     private var piggyName: String? = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -43,8 +44,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
         piggyViewModel.getPiggyById(piggyId).observe(this, Observer {
             piggyAttribute = it[0].piggyAttributes
             piggyName = piggyAttribute?.name
@@ -52,7 +51,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
             percentage = piggyAttribute!!.percentage
             currencyCode = piggyAttribute!!.currency_code
             setupWidgets()
-            recycler_view.adapter = BaseDetailRecyclerAdapter(piggyList)
             setupProgressBar()
         })
     }
@@ -60,31 +58,19 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     private fun setupWidgets(){
         val piggy = arrayListOf(
-                BaseDetailModel("Created At", piggyAttribute?.created_at,
-                        IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_create).sizeDp(24)),
-                BaseDetailModel("Updated At", piggyAttribute?.updated_at,
-                        IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update).sizeDp(24)),
-                BaseDetailModel("Left To Save", piggyAttribute?.left_to_save.toString(),
-                        IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_save).sizeDp(24)),
-                BaseDetailModel("Save Per Month", piggyAttribute?.save_per_month.toString(),
-                        IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_save).sizeDp(24)),
-                if (piggyAttribute?.start_date != null) {
-                    BaseDetailModel("Start Date", piggyAttribute?.start_date,
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
+                DetailModel(resources.getString(R.string.account), piggyAttribute?.account_name),
+                DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
+                DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
+                DetailModel("Saved so far", piggyAttribute?.save_per_month.toString()),
+                DetailModel("Left to save", piggyAttribute?.left_to_save.toString()),
+                DetailModel("Start Date", piggyAttribute?.start_date),
+                if(piggyAttribute?.target_date == null){
+                    DetailModel("Target Date", "No target date")
                 } else {
-                    BaseDetailModel("Start Date", "No Date Set",
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
-                },
-                if (piggyAttribute?.target_date != null) {
-                    BaseDetailModel("Target Date", piggyAttribute?.target_date,
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
-                } else {
-                    BaseDetailModel("Target Date", "No Date Set",
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_calendar_blank))
-                },
-                BaseDetailModel("Notes", piggyAttribute?.notes,
-                        IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_note).sizeDp(24))
+                    DetailModel("Target Date", piggyAttribute?.target_date)
+                }
         )
+
         piggyList.addAll(piggy)
         if(percentage <= 15){
             piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),

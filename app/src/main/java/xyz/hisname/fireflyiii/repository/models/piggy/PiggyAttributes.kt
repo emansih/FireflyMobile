@@ -9,6 +9,7 @@ data class PiggyAttributes(
         val created_at: String,
         val name: String,
         val account_id: Long,
+        val account_name: String,
         val currency_id: Int,
         val currency_code: String,
         val currency_symbol: String,

@@ -105,6 +105,9 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
     @Query("SELECT * FROM transactions order by transactionId desc limit :limit")
     abstract fun getRecentTransactions(limit: Int): MutableList<TransactionData>
 
+    @Query("SELECT * FROM transactions WHERE transactionType = :transactionType order by transactionId desc limit :limit")
+    abstract fun getRecentTransactions(limit: Int, transactionType: String): MutableList<TransactionData>
+
     @Query("SELECT * FROM transactions WHERE transactionId = :transactionId")
     abstract fun getTransactionById(transactionId: Long): MutableList<TransactionData>
 
