@@ -39,11 +39,11 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return repository.allTransaction
     }
 
-    fun getWithdrawalList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "withdrawal")
+    fun getWithdrawalList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "Withdrawal")
 
-    fun getDepositList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "deposit")
+    fun getDepositList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "Deposit")
 
-    fun getTransferList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "transfer")
+    fun getTransferList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "Transfer")
 
     fun getRecentTransaction(limit: Int): LiveData<MutableList<TransactionData>>{
         isLoading.value = true
@@ -97,7 +97,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 if (networkData != null) {
                     if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
                         scope.launch(Dispatchers.IO){
-                            repository.deleteTransactionsByDate(startDate, endDate, convertString("withdrawal"))
+                            repository.deleteTransactionsByDate(startDate, endDate, "Withdrawal")
                         }.invokeOnCompletion {
                             transactionData.addAll(networkData.data)
                             if(networkData.meta.pagination.total_pages > networkData.meta.pagination.current_page) {
@@ -163,7 +163,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 if (networkData != null) {
                     if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
                         scope.launch(Dispatchers.IO){
-                            repository.deleteTransactionsByDate(startDate, endDate, convertString("deposit"))
+                            repository.deleteTransactionsByDate(startDate, endDate, "Deposit")
                         }.invokeOnCompletion {
                             transactionData.addAll(networkData.data)
                             if(networkData.meta.pagination.total_pages > networkData.meta.pagination.current_page) {
@@ -496,7 +496,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 if (networkData != null) {
                     if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
                         scope.launch(Dispatchers.IO){
-                            repository.deleteTransactionsByDate(startDate, endDate, convertString(source))
+                            repository.deleteTransactionsByDate(startDate, endDate, source)
                         }.invokeOnCompletion {
                             transactionData.addAll(networkData.data)
                             networkData.data.forEachIndexed{ _, transactionData ->
@@ -527,17 +527,16 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.async(Dispatchers.IO) {
-                    transactionData = repository.transactionList(startDate, endDate, convertString(source))
+                scope.launch(Dispatchers.IO) {
+                    transactionData = repository.transactionList(startDate, endDate, source)
                 }.invokeOnCompletion {
                     data.postValue(transactionData)
                 }
-
             }
         })
         { throwable ->
             scope.launch(Dispatchers.IO) {
-                transactionData = repository.transactionList(startDate, endDate, convertString(source))
+                transactionData = repository.transactionList(startDate, endDate, source)
             }
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
