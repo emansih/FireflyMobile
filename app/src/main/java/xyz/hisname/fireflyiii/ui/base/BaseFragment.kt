@@ -69,13 +69,18 @@ abstract class BaseFragment: Fragment() {
     }
 
     // Taken from: https://proandroiddev.com/enter-animation-using-recyclerview-and-layoutanimation-part-1-list-75a874a5d213
-    fun runLayoutAnimation(recyclerView: RecyclerView){
+    fun runLayoutAnimation(recyclerView: RecyclerView, reverse: Boolean = false){
         val controller = AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_animation_fall_down)
+        val linearLayout = LinearLayoutManager(requireContext())
         recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = linearLayout
             layoutAnimation = controller
             adapter?.notifyDataSetChanged()
             scheduleLayoutAnimation()
+        }
+        if(reverse){
+            linearLayout.reverseLayout = true
+            linearLayout.stackFromEnd = true
         }
     }
 

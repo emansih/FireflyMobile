@@ -46,11 +46,12 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
-import xyz.hisname.fireflyiii.ui.transaction.TransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV2
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV1
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DeviceUtil
 import xyz.hisname.fireflyiii.util.KeyguardUtil
@@ -71,8 +72,7 @@ class HomeActivity: BaseActivity(){
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(accountManager.authMethod.isBlank()||
-                AppPref(PreferenceManager.getDefaultSharedPreferences(this)).baseUrl.isBlank()){
+        if(accountManager.authMethod.isBlank()|| sharedPref(this).baseUrl.isBlank()){
             AuthenticatorManager(AccountManager.get(this)).destroyAccount()
             val onboardingActivity = Intent(this, OnboardingActivity::class.java)
             startActivity(onboardingActivity)
@@ -366,15 +366,27 @@ class HomeActivity: BaseActivity(){
                         }
                         drawerItem.identifier == 11L -> {
                             val bundle = bundleOf("transactionType" to "Withdrawal")
-                            changeFragment(TransactionFragment().apply { arguments = bundle })
+                            if(sharedPref(this).transactionListType){
+                                changeFragment(TransactionFragmentV1().apply { arguments = bundle })
+                            } else {
+                                changeFragment(TransactionFragmentV2().apply { arguments = bundle })
+                            }
                         }
                         drawerItem.identifier == 12L -> {
                             val bundle = bundleOf("transactionType" to "Deposit")
-                            changeFragment(TransactionFragment().apply { arguments = bundle })
-                        }
+                            if(sharedPref(this).transactionListType){
+                                changeFragment(TransactionFragmentV1().apply { arguments = bundle })
+                            } else {
+                                changeFragment(TransactionFragmentV2().apply { arguments = bundle })
+                            }
+                            }
                         drawerItem.identifier == 13L -> {
                             val bundle = bundleOf("transactionType" to "Transfer")
-                            changeFragment(TransactionFragment().apply { arguments = bundle })
+                            if(sharedPref(this).transactionListType){
+                                changeFragment(TransactionFragmentV1().apply { arguments = bundle })
+                            } else {
+                                changeFragment(TransactionFragmentV2().apply { arguments = bundle })
+                            }
                         }
                         drawerItem.identifier == 15L -> {
                             changeFragment(ListPiggyFragment())

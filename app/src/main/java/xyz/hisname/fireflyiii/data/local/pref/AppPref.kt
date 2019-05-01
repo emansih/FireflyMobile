@@ -49,5 +49,9 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("keyguard", false)
         set(value) = sharedPref.edit{ putBoolean("keyguard", value)}
 
+    override var transactionListType: Boolean
+        get() = sharedPref.getBoolean("transactionListType", false)
+        set(value) = sharedPref.edit{ putBoolean("transactionListType", value)}
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

@@ -14,8 +14,8 @@
         app:entryValues="@array/language_values"/>
 
     <Preference
-        app:key="notification_settings"
-        app:title="Notification Settings" />
+        app:key="transaction_settings"
+        app:title="Transaction Settings" />
 
     <CheckBoxPreference
         app:key="night_mode"

@@ -4,10 +4,14 @@
 
     <CheckBoxPreference
         app:key="persistent_notification"
-        app:title="@string/transaction"
+        app:title="Persistent Notification"
         app:summary="Add Transaction anytime anywhere">
     </CheckBoxPreference>
 
-
+    <CheckBoxPreference
+        app:key="transactionListType"
+        app:title="Toggle between List view or List view with calendar in Transaction"
+        app:summary="Check to use List view only">
+    </CheckBoxPreference>
 
 </PreferenceScreen>

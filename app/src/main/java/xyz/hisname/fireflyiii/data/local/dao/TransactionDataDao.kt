@@ -12,13 +12,14 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
     abstract fun getTransaction(): LiveData<MutableList<TransactionData>>
 
     @Query("SELECT * FROM transactions WHERE transactionType =:type")
-    abstract fun getTransaction(type: String): LiveData<MutableList<TransactionData>>
+    abstract fun getTransactionList(type: String): MutableList<TransactionData>
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<TransactionData>>
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<TransactionData>
+
 
     // That is a really loooooooong name
     @Query("SELECT sum(amount) FROM transactions WHERE (date BETWEEN :startDate AND :endDate)" +
@@ -122,4 +123,8 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND budget_name = :budgetName")
     abstract fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): MutableList<TransactionData>
+
+    @Query("DELETE FROM transactions")
+    abstract fun deleteTransaction(): Int
+
 }

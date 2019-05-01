@@ -8,10 +8,14 @@ import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
-class NotificationSettings: BaseSettings() {
+class TransactionSettings: BaseSettings() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.user_notification_settings)
+        addPreferencesFromResource(R.xml.user_transaction_settings)
+        addPermNotif()
+    }
+
+    private fun addPermNotif(){
         val transactionPref = findPreference("persistent_notification") as CheckBoxPreference
         val notification = NotificationUtils(requireContext())
         transactionPref.setOnPreferenceChangeListener { _, newValue ->
@@ -22,7 +26,6 @@ class NotificationSettings: BaseSettings() {
             }
             true
         }
-
     }
 
     override fun onAttach(context: Context) {

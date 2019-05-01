@@ -1,11 +1,8 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.view.animation.OvershootInterpolator
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -16,37 +13,27 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
-import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
-import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
-import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.collections.ArrayList
 
-class TransactionFragment: BaseFragment(){
+class TransactionFragmentV2: BaseTransactionFragment(){
 
-    private var dataAdapter = arrayListOf<TransactionData>()
-    private lateinit var rtAdapter: TransactionRecyclerAdapter
-    private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private var currentDate = DateTimeUtil.getTodayDate()
-    private val noTransactionText by lazy { requireActivity().findViewById<TextView>(R.id.listText) }
-    private val noTransactionImage by lazy { requireActivity().findViewById<ImageView>(R.id.listImage) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        setHasOptionsMenu(true)
         return inflater.create(R.layout.fragment_transaction, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         runLayoutAnimation(recycler_view)
-        setupFab()
         getDate()
         pullToRefresh()
     }
@@ -125,48 +112,9 @@ class TransactionFragment: BaseFragment(){
         transactionViewModel.isLoading.observe(this, Observer {
             swipeContainer.isRefreshing = it == true
         })
-        transactionViewModel.apiResponse.observe(this, Observer {
-            toastInfo(it)
-        })
     }
 
-    private fun itemClicked(data: TransactionData){
-        requireFragmentManager().commit {
-            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionId" to data.transactionId)
-            })
-            addToBackStack(null)
-        }
-    }
-
-    override fun onAttach(context: Context){
-        super.onAttach(context)
-        val toolBarTitle = when {
-            transactionType.contains("Withdrawal") -> resources.getString(R.string.withdrawal)
-            transactionType.contains("Deposit") -> resources.getString(R.string.deposit)
-            transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
-            else -> ""
-        }
-        activity?.activity_toolbar?.title = toolBarTitle
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val toolBarTitle = when {
-            transactionType.contains("Withdrawal") -> resources.getString(R.string.withdrawal)
-            transactionType.contains("Deposit") -> resources.getString(R.string.deposit)
-            transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
-            else -> ""
-        }
-        activity?.activity_toolbar?.title = toolBarTitle
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        requireActivity().globalFAB.isGone = true
-    }
-
-    private fun setupFab(){
+    override fun setupFab(){
         addTransactionFab.apply {
             translationX = (6 * 56).toFloat()
             animate().apply {
@@ -221,9 +169,4 @@ class TransactionFragment: BaseFragment(){
             loadTransaction()
         }
     }
-
-    override fun handleBack() {
-        requireFragmentManager().popBackStack()
-    }
-
 }

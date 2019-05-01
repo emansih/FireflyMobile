@@ -11,7 +11,6 @@ import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -63,17 +62,17 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setTransactionSection(){
-        val notificationPref = findPreference("notification_settings") as Preference
-        notificationPref.setOnPreferenceClickListener {
+        val transactionSettings = findPreference("transaction_settings") as Preference
+        transactionSettings.setOnPreferenceClickListener {
             requireFragmentManager().commit {
                 addToBackStack(null)
                 setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                replace(R.id.fragment_container, NotificationSettings())
+                replace(R.id.fragment_container, TransactionSettings())
             }
             true
         }
 
-        notificationPref.icon = IconicsDrawable(requireContext())
+        transactionSettings.icon = IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_notifications)
                 .sizeDp(24).setIconColor()
     }

@@ -13,5 +13,6 @@ interface PreferenceHelper {
     var languagePref: String
     var nightModeEnabled: Boolean
     var isKeyguardEnabled: Boolean
+    var transactionListType: Boolean
     fun clearPref()
 }
