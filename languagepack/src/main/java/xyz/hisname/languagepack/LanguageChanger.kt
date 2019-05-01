@@ -15,14 +15,21 @@ class LanguageChanger(baseContext: Context): ContextWrapper(baseContext){
 
         private lateinit var locale: Locale
         private lateinit var config: Configuration
-// Code adapted from: https://stackoverflow.com/questions/40221711/android-context-getresources-updateconfiguration-deprecated
+        private val supportedLocale by lazy { arrayListOf("en", "de", "es", "fr", "it", "nl", "ru", "zh-rCN", "zh-rTW") }
+
+        // Code adapted from: https://stackoverflow.com/questions/40221711/android-context-getresources-updateconfiguration-deprecated
+
         fun init(context: Context, language: String?): ContextWrapper{
             config = context.resources.configuration
-            locale = when {
-                language.isNullOrEmpty() -> Locale(ConfigurationCompat.getLocales(config)[0].language)
-                language == "zh-rCN" -> Locale("zh", "CN")
-                language == "zh-rTW" -> Locale("zh", "TW")
-                else -> Locale(language)
+            if(supportedLocale.contains(language)) {
+                locale = when {
+                    language.isNullOrEmpty() -> Locale("en")
+                    language == "zh-rCN" -> Locale("zh", "CN")
+                    language == "zh-rTW" -> Locale("zh", "TW")
+                    else -> Locale(language)
+                }
+            } else {
+                locale = Locale("en")
             }
             Locale.setDefault(locale)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
