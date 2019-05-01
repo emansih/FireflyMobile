@@ -94,5 +94,12 @@
     <string name="transaction_information">Transaktionsinformationen</string>
     <string name="meta_info">Metainformationen</string>
     <string name="no_location_set">Kein Ort gesetzt</string>
+    <string name="saved_so_far">Gespart</string>
+    <string name="start_date">Startdatum</string>
+    <string name="target_date">Zieldatum</string>
+    <string name="category_added">Neue Kategorie %1$s gespeichert</string>
+    <string name="budget_left">"Übrig "</string>
+    <string name="expenses_without_budget">Ausgaben ohne Budget</string>
+    <string name="left_to_save">Zu Sparen</string>
 
 </resources>

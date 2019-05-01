@@ -75,7 +75,9 @@ class BudgetSummaryFragment: BaseFragment() {
                             "Withdrawal", uniqueBudget).observe(this, Observer { transactionAmount ->
                         val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(transactionData.first.absoluteValue.roundToInt().toDouble()).times(100)
                         if (uniqueBudget == "null" || uniqueBudget == null) {
-                            pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category", transactionAmount))
+                            pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(),
+                                    requireContext().getString(R.string.expenses_without_budget),
+                                    transactionAmount))
                         } else {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueBudget, transactionAmount))
                         }

@@ -51,7 +51,6 @@
     <string name="expense">Expenses</string>
     <string name="client_id">Client ID</string>
     <string name="welcome">Welcome!</string>
-    <string name="get_confirmation">Are you sure?</string>
     <string name="categories">Categories</string>
     <string name="edit">Edit</string>
     <string name="net_worth">Net Worth</string>
@@ -100,4 +99,11 @@
     <string name="transaction_information">Transaction information</string>
     <string name="meta_info">Meta information</string>
     <string name="no_location_set">No location set</string>
+    <string name="saved_so_far">Saved so far</string>
+    <string name="left_to_save">Left to save</string>
+    <string name="start_date">Start Date</string>
+    <string name="target_date">Target Date</string>
+    <string name="category_added">Stored new category %1$s</string>
+    <string name="budget_left">Left</string>
+    <string name="expenses_without_budget">Expenses without budget</string>
 </resources>

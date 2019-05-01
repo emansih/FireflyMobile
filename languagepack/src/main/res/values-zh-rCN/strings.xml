@@ -87,4 +87,11 @@
     <string name="tag_updated">已更新标签 %1$s</string>
     <string name="delete_piggy_bank_title">删除小猪存钱罐 %1$s</string>
     <string name="enabled">已启用</string>
+    <string name="saved_so_far">保存到目前为止</string>
+    <string name="start_date">开始日期</string>
+    <string name="target_date">目标日期</string>
+    <string name="category_added">已储存新分类 %1$s</string>
+    <string name="budget_left">剩余</string>
+    <string name="expenses_without_budget">无预算支出</string>
+    <string name="left_to_save">剩余可供储蓄</string>
 </resources>

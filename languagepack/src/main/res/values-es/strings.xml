@@ -84,4 +84,16 @@
     <string name="meta_info">Información Meta</string>
     <string name="no_location_set">Ubicación no establecida</string>
     <string name="enabled">Habilitado</string>
+    <string name="saved_so_far">Guardado hasta el momento</string>
+    <string name="start_date">Fecha de inicio</string>
+    <string name="target_date">Fecha objetivo</string>
+    <string name="tag_created">Etiqueta %1$s ha sido creado!</string>
+    <string name="tag_updated">Actualizar etiqueta %1$s</string>
+    <string name="tag_deleted">Eliminar etiqueta %1$s</string>
+    <string name="currency_created">Moneda %1$s creada</string>
+    <string name="currency_updated">Moneda %1$s actualizada</string>
+    <string name="category_added">Nueva categoría guardada %1$s</string>
+    <string name="budget_left">Izquierda</string>
+    <string name="expenses_without_budget">Gastos sin presupuesto</string>
+    <string name="left_to_save">Saldo para guardar</string>
 </resources>

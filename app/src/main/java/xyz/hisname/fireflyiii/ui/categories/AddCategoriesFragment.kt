@@ -49,7 +49,7 @@ class AddCategoriesFragment: BaseAddObjectFragment() {
             } else if (it.getError() != null) {
                 toastError(it.getError()?.localizedMessage)
             } else if (it.getResponse() != null) {
-                toastSuccess("Category Added")
+                toastSuccess(requireContext().getString(R.string.category_added))
                 unReveal(addCategoryFab)
             }
         })

@@ -61,13 +61,13 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 DetailModel(resources.getString(R.string.account), piggyAttribute?.account_name),
                 DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
                 DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
-                DetailModel("Saved so far", piggyAttribute?.save_per_month.toString()),
-                DetailModel("Left to save", piggyAttribute?.left_to_save.toString()),
-                DetailModel("Start Date", piggyAttribute?.start_date),
+                DetailModel(resources.getString(R.string.saved_so_far), piggyAttribute?.save_per_month.toString()),
+                DetailModel(resources.getString(R.string.left_to_save), piggyAttribute?.left_to_save.toString()),
+                DetailModel(resources.getString(R.string.start_date), piggyAttribute?.start_date),
                 if(piggyAttribute?.target_date == null){
-                    DetailModel("Target Date", "No target date")
+                    DetailModel(resources.getString(R.string.target_date), "")
                 } else {
-                    DetailModel("Target Date", piggyAttribute?.target_date)
+                    DetailModel(resources.getString(R.string.target_date), piggyAttribute?.target_date)
                 }
         )
 

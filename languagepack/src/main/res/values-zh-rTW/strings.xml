@@ -15,7 +15,6 @@
     <string name="currency">貨幣</string>
     <string name="skip">略過</string>
     <string name="client_secret">客戶端金鑰</string>
-    <string name="get_confirmation">你確定吗?</string>
     <string name="delete_piggy_bank_message">你確定你想要刪除名為 %1$s 的小豬撲滿?</string>
     <string name="delete_bill_message">你確定你想要刪除名為 %1$s 的帳單?</string>
     <string name="delete_transaction_message">你真的要刪除這個描述為 %1$s 的交易嗎</string>
@@ -97,4 +96,11 @@
     <string name="transaction_information">交易資訊</string>
     <string name="meta_info">後設資訊</string>
     <string name="no_location_set">沒有設定位置</string>
+    <string name="saved_so_far">保存到目前为止</string>
+    <string name="start_date">開始日期</string>
+    <string name="target_date">目標日期</string>
+    <string name="category_added">已儲存新分類 %1$s</string>
+    <string name="budget_left">"剩餘 "</string>
+    <string name="expenses_without_budget">無預算支出</string>
+    <string name="left_to_save">剩餘可供儲蓄</string>
 </resources>

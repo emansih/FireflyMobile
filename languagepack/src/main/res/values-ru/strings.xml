@@ -49,7 +49,6 @@
     <string name="expense">Расходы</string>
     <string name="client_id">Идентификатор клиента</string>
     <string name="welcome">Добро пожаловать!</string>
-    <string name="get_confirmation">Вы уверены?</string>
     <string name="categories">Категории</string>
     <string name="edit">Правка</string>
     <string name="net_worth">Капитал</string>
@@ -94,4 +93,11 @@
     <string name="transaction_information">Информация о транзакции</string>
     <string name="meta_info">Дополнительная информация</string>
     <string name="no_location_set">Местоположение не указано</string>
+    <string name="saved_so_far">Сохранено на данный момент</string>
+    <string name="start_date">Дата начала</string>
+    <string name="target_date">Конечная дата</string>
+    <string name="category_added">Новая категория %1$s успешно сохранена</string>
+    <string name="budget_left">Осталось</string>
+    <string name="expenses_without_budget">Расходы вне бюджета</string>
+    <string name="left_to_save">Осталось накопить</string>
 </resources>

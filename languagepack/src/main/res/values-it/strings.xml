@@ -83,5 +83,17 @@
     <string name="transaction_information">Informazioni transazione</string>
     <string name="meta_info">Meta informazioni</string>
     <string name="no_location_set">Nessuna posizione impostata</string>
+    <string name="saved_so_far">Risparmiato finora</string>
+    <string name="start_date">Data inizio</string>
+    <string name="target_date">Data fine</string>
+    <string name="tag_created">Etichetta %1$s creata correttamente</string>
+    <string name="tag_deleted">Etichetta %1$s eliminata</string>
+    <string name="tag_updated">Etichetta %1$s aggiornata</string>
+    <string name="currency_created">Valuta %1$s creata</string>
+    <string name="currency_updated">Valuta %1$s aggiornata</string>
+    <string name="category_added">Salva nuova categoria %1$s</string>
+    <string name="budget_left">Resto</string>
+    <string name="expenses_without_budget">Spese senza budget</string>
+    <string name="left_to_save">Rimanente da risparmiare</string>
 
 </resources>
