@@ -87,7 +87,7 @@
                     android:layout_height="match_parent"
                     android:digits="0123456789.,"
                     android:drawablePadding="12dp"
-                    android:hint="Target Amount"
+                    android:hint="@string/target_amount"
                     android:inputType="numberDecimal"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -184,7 +184,7 @@
                         android:layout_height="match_parent"
                         android:digits="0123456789.,"
                         android:drawablePadding="12dp"
-                        android:hint="Current Amount"
+                        android:hint="@string/saved_so_far"
                         android:inputType="numberDecimal"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -207,7 +207,7 @@
                     android:layout_height="match_parent"
                     android:drawablePadding="12dp"
                     android:focusable="false"
-                    android:hint="Date Started"
+                    android:hint="@string/start_date"
                     android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -227,7 +227,7 @@
                         android:layout_height="match_parent"
                         android:drawablePadding="12dp"
                         android:focusable="false"
-                        android:hint="Target Date"
+                        android:hint="@string/target_date"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -248,7 +248,7 @@
                         android:gravity="top"
                         android:inputType="textMultiLine"
                         android:drawablePadding="12dp"
-                        android:hint="Notes"
+                        android:hint="@string/notes"
                         android:textSize="16sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
