@@ -94,4 +94,5 @@
     <string name="budget_left">Over</string>
     <string name="expenses_without_budget">Uitgaven zonder budget</string>
     <string name="left_to_save">Te sparen</string>
+    <string name="save_on_account">Sparen op rekening</string>
 </resources>

@@ -93,4 +93,5 @@
     <string name="budget_left">Reste</string>
     <string name="expenses_without_budget">Dépenses non budgétisées</string>
     <string name="left_to_save">Reste à mettre de côté</string>
+    <string name="save_on_account">Mis de côté sur le compte</string>
 </resources>

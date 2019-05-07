@@ -95,5 +95,6 @@
     <string name="budget_left">Resto</string>
     <string name="expenses_without_budget">Spese senza budget</string>
     <string name="left_to_save">Rimanente da risparmiare</string>
+    <string name="save_on_account">Risparmio sul conto</string>
 
 </resources>

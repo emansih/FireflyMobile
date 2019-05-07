@@ -94,4 +94,5 @@
     <string name="budget_left">剩余</string>
     <string name="expenses_without_budget">无预算支出</string>
     <string name="left_to_save">剩余可供储蓄</string>
+    <string name="save_on_account">存于帐户</string>
 </resources>

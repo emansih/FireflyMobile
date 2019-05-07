@@ -103,4 +103,5 @@
     <string name="budget_left">"剩餘 "</string>
     <string name="expenses_without_budget">無預算支出</string>
     <string name="left_to_save">剩餘可供儲蓄</string>
+    <string name="save_on_account">存於帳戶</string>
 </resources>

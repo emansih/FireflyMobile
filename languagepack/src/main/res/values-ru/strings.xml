@@ -100,4 +100,5 @@
     <string name="budget_left">Осталось</string>
     <string name="expenses_without_budget">Расходы вне бюджета</string>
     <string name="left_to_save">Осталось накопить</string>
+    <string name="save_on_account">Сохранить на счёте</string>
 </resources>

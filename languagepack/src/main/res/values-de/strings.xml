@@ -101,5 +101,6 @@
     <string name="budget_left">"Übrig "</string>
     <string name="expenses_without_budget">Ausgaben ohne Budget</string>
     <string name="left_to_save">Zu Sparen</string>
+    <string name="save_on_account">Rücklagen für Konto</string>
 
 </resources>

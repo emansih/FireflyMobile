@@ -96,4 +96,5 @@
     <string name="budget_left">Izquierda</string>
     <string name="expenses_without_budget">Gastos sin presupuesto</string>
     <string name="left_to_save">Saldo para guardar</string>
+    <string name="save_on_account">Guardar en cuenta</string>
 </resources>
