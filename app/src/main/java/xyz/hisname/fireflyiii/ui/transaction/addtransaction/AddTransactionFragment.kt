@@ -149,9 +149,6 @@ class AddTransactionFragment: BaseFragment() {
         }
     }
 
-    private fun setExposedMenu(){
-    }
-
     private fun updateData(){
         val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
             transaction_date_edittext.getString() + " " + selectedTime
@@ -373,6 +370,8 @@ class AddTransactionFragment: BaseFragment() {
                         piggy_layout.isVisible = true
                         source_exposed_dropdown.setAdapter(spinnerAdapter)
                         destination_exposed_dropdown.setAdapter(spinnerAdapter)
+                        source_exposed_dropdown.setText(sourceName)
+                        destination_exposed_dropdown.setText(destinationName)
                     })
             Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAssetAccounts())
                     .observe(this , Observer {
@@ -390,6 +389,7 @@ class AddTransactionFragment: BaseFragment() {
                                 R.layout.cat_exposed_dropdown_popup_item,
                                 uniqueDestination)
                         destination_exposed_dropdown.setAdapter(spinnerAdapter)
+                        destination_exposed_dropdown.setText(destinationName)
                         destination_layout.isVisible = false
                         val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueSource)
                         source_edittext.threshold = 1
@@ -419,6 +419,7 @@ class AddTransactionFragment: BaseFragment() {
                             destination_edittext.setAdapter(autocompleteAdapter)
                             destination_exposed_menu.isVisible = false
                             source_exposed_dropdown.setAdapter(spinnerAdapter)
+                            source_exposed_dropdown.setText(sourceName)
                             destination_exposed_dropdown.setAdapter(spinnerAdapter)
                         })
                 billViewModel.getAllBills().observe(this, Observer { billListing ->
