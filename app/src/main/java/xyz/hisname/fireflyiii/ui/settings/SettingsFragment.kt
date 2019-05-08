@@ -120,5 +120,8 @@ class SettingsFragment: BaseSettings() {
             keyguardPref.isSelectable = false
             keyguardPref.summary = "Please enable pin / password / biometrics in your device settings"
         }
+        keyguardPref.icon = IconicsDrawable(requireContext())
+                .icon(GoogleMaterial.Icon.gmd_lock)
+                .sizeDp(24).setIconColor()
     }
 }
