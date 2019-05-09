@@ -5,11 +5,9 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
@@ -64,7 +62,8 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 note_edittext.setText(piggyAttributes?.notes)
                 accountViewModel.getAccountById(piggyAttributes?.account_id!!).observe(this, Observer { accountData ->
                     val accountName = accountData[0].accountAttributes?.name
-                    account_exposed_dropdown.setText(accountName)
+                    val spinnerPosition = accountAdapter.getPosition(accountName)
+                    account_spinner.setSelection(spinnerPosition)
                 })
             })
         }
@@ -206,8 +205,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                     accounts.add(accountData.accountAttributes?.name!!)
                 }
                 val uniqueAccount = HashSet(accounts).toArray()
-                accountAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, uniqueAccount)
-                account_exposed_dropdown.setAdapter(accountAdapter)
+                accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
+                accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                account_spinner.adapter = accountAdapter
             }
         })
         placeHolderToolbar.setNavigationOnClickListener {
@@ -216,7 +216,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(this, Observer { accountData ->
+        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
             piggyViewModel.addPiggyBank(description_edittext.getString(), accountData[0].accountId.toString(),
                     currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
                     .observe(this, Observer {
@@ -261,7 +261,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun updatePiggyBank(){
-        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(this, Observer { accountData ->
+        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
             piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), accountData[0].accountId.toString(),
                     currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(this, Observer {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)

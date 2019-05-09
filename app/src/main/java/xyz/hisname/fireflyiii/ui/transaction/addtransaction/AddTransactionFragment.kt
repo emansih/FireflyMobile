@@ -129,16 +129,16 @@ class AddTransactionFragment: BaseFragment() {
             }
             when {
                 Objects.equals("Withdrawal", transactionType) -> {
-                    sourceAccount = source_exposed_dropdown.getString()
+                    sourceAccount = source_spinner.selectedItem.toString()
                     destinationAccount = destination_edittext.getString()
                 }
                 Objects.equals("Transfer", transactionType) -> {
-                    sourceAccount = source_exposed_dropdown.getString()
-                    destinationAccount = destination_exposed_dropdown.getString()
+                    sourceAccount = source_spinner.selectedItem.toString()
+                    destinationAccount = destination_spinner.selectedItem.toString()
                 }
                 Objects.equals("Deposit", transactionType) -> {
                     sourceAccount = source_edittext.getString()
-                    destinationAccount = destination_exposed_dropdown.getString()
+                    destinationAccount = destination_spinner.selectedItem.toString()
                 }
             }
             if(transactionId != 0L){
@@ -335,21 +335,16 @@ class AddTransactionFragment: BaseFragment() {
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
-        userApiVersion.observe(this, Observer { apiVersion ->
-            if(apiVersion > Version("0.9.1").get()){
-                time_layout.isVisible = true
-                time_edittext.setOnClickListener {
-                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-                    val minute = calendar.get(Calendar.MINUTE)
-                    TimePickerDialog(requireContext(), TimePickerDialog.OnTimeSetListener {
-                        _, selectedHour, selectedMin ->
-                        // We don't have to be really accurate down to seconds.
-                       selectedTime = "$selectedHour:$selectedMin"
-                        time_edittext.setText(selectedTime)
-                    },hour, minute, true).show()
-                }
-            }
-        })
+        time_edittext.setOnClickListener {
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+            TimePickerDialog(requireContext(), TimePickerDialog.OnTimeSetListener {
+                _, selectedHour, selectedMin ->
+                // We don't have to be really accurate down to seconds.
+                selectedTime = "$selectedHour:$selectedMin"
+                time_edittext.setText(selectedTime)
+            },hour, minute, true).show()
+        }
     }
 
     private fun contextSwitch(){
@@ -360,18 +355,21 @@ class AddTransactionFragment: BaseFragment() {
                             accounts.add(accountData.accountAttributes?.name!!)
                         }
                         val uniqueAccount = HashSet(accounts).toArray()
-                        spinnerAdapter = ArrayAdapter(requireContext(),
-                                R.layout.cat_exposed_dropdown_popup_item,
-                                uniqueAccount)
-                        source_exposed_menu.isVisible = true
+                        spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
+                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        source_spinner.isVisible = true
+                        source_textview.isVisible = true
                         source_layout.isGone = true
+                        source_spinner.adapter = spinnerAdapter
                         destination_layout.isGone = true
-                        destination_exposed_menu.isVisible = true
+                        destination_spinner.isVisible = true
+                        destination_textview.isVisible = true
+                        destination_spinner.adapter = spinnerAdapter
                         piggy_layout.isVisible = true
-                        source_exposed_dropdown.setAdapter(spinnerAdapter)
-                        destination_exposed_dropdown.setAdapter(spinnerAdapter)
-                        source_exposed_dropdown.setText(sourceName)
-                        destination_exposed_dropdown.setText(destinationName)
+                        val sourcePosition = spinnerAdapter.getPosition(sourceName)
+                        source_spinner.setSelection(sourcePosition)
+                        val destinationPosition = spinnerAdapter.getPosition(destinationName)
+                        destination_spinner.setSelection(destinationPosition)
                     })
             Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAssetAccounts())
                     .observe(this , Observer {
@@ -385,16 +383,18 @@ class AddTransactionFragment: BaseFragment() {
                             destinationAccounts.add(accountData.accountAttributes?.name!!)
                         }
                         val uniqueDestination = HashSet(destinationAccounts).toArray()
-                        spinnerAdapter = ArrayAdapter(requireContext(),
-                                R.layout.cat_exposed_dropdown_popup_item,
-                                uniqueDestination)
-                        destination_exposed_dropdown.setAdapter(spinnerAdapter)
-                        destination_exposed_dropdown.setText(destinationName)
+                        spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueDestination)
+                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        destination_spinner.adapter = spinnerAdapter
+                        destination_textview.isVisible = true
                         destination_layout.isVisible = false
                         val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueSource)
                         source_edittext.threshold = 1
                         source_edittext.setAdapter(autocompleteAdapter)
-                        source_exposed_menu.isVisible = false
+                        source_spinner.isVisible = false
+                        source_textview.isVisible = false
+                        val destinationPosition = spinnerAdapter.getPosition(destinationName)
+                        destination_spinner.setSelection(destinationPosition)
                     })
             else -> {
                 zipLiveData(accountViewModel.getAssetAccounts(), accountViewModel.getExpenseAccounts())
@@ -404,11 +404,11 @@ class AddTransactionFragment: BaseFragment() {
                                 sourceAccounts.add(accountData.accountAttributes?.name!!)
                             }
                             val uniqueSource = HashSet(sourceAccounts).toArray()
-                            spinnerAdapter = ArrayAdapter(requireContext(),
-                                    R.layout.cat_exposed_dropdown_popup_item,
-                                    uniqueSource)
+                            spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueSource)
+                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                             source_layout.isVisible = false
-                            source_exposed_dropdown.setAdapter(spinnerAdapter)
+                            source_spinner.adapter = spinnerAdapter
+                            source_textview.isVisible = true
                             // This is used for auto complete for destination account
                             it.second.forEachIndexed { _, accountData ->
                                 destinationAccounts.add(accountData.accountAttributes?.name!!)
@@ -417,10 +417,12 @@ class AddTransactionFragment: BaseFragment() {
                             val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueDestination)
                             destination_edittext.threshold = 1
                             destination_edittext.setAdapter(autocompleteAdapter)
-                            destination_exposed_menu.isVisible = false
-                            source_exposed_dropdown.setAdapter(spinnerAdapter)
-                            source_exposed_dropdown.setText(sourceName)
-                            destination_exposed_dropdown.setAdapter(spinnerAdapter)
+                            destination_spinner.isVisible = false
+                            destination_textview.isVisible = false
+                            val spinnerPosition = spinnerAdapter.getPosition(sourceName)
+                            source_spinner.setSelection(spinnerPosition)
+                            val destinationPosition = spinnerAdapter.getPosition(destinationName)
+                            destination_spinner.setSelection(destinationPosition)
                         })
                 billViewModel.getAllBills().observe(this, Observer { billListing ->
                     if(billListing.isNotEmpty()){
