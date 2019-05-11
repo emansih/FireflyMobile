@@ -82,14 +82,12 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setNetWorth(currencyData: CurrencyAttributes?){
-        userApiVersion.observe(this, Observer { apiVersion ->
-            val currencyCode = currencyData?.code!!
-            accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
-                accountViewModel.isLoading.observe(this, Observer { load ->
-                    if (load == false) {
-                        netWorthText.text = currencyData.symbol + " " + money
-                    }
-                })
+        val currencyCode = currencyData?.code!!
+        accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
+            accountViewModel.isLoading.observe(this, Observer { load ->
+                if (load == false) {
+                    netWorthText.text = currencyData.symbol + " " + money
+                }
             })
         })
     }
