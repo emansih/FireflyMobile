@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.base
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,9 @@ open class BaseActivity: AppCompatActivity() {
 
     private fun setTheme(){
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM){
+            AppPref(sharedPref).nightModeEnabled = true
+        }
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             if(key == "night_mode"){
                 if(sharedPref(this).nightModeEnabled){

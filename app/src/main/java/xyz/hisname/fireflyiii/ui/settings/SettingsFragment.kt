@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
@@ -79,6 +80,9 @@ class SettingsFragment: BaseSettings() {
 
     private fun setNightModeSection(){
         val nightModePref = findPreference("night_mode") as CheckBoxPreference
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM){
+            nightModePref.isEnabled = false
+        }
         nightModePref.setOnPreferenceChangeListener { preference, newValue ->
             val nightMode = newValue as Boolean
             AppPref(sharedPref).nightModeEnabled = nightMode
