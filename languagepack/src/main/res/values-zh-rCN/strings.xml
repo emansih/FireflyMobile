@@ -95,4 +95,5 @@
     <string name="expenses_without_budget">无预算支出</string>
     <string name="left_to_save">剩余可供储蓄</string>
     <string name="save_on_account">存于帐户</string>
+    <string name="dashboard_balance_help_text">这个小盒子和这个旁边的盒子会提供您财务状况的快速概览。</string>
 </resources>

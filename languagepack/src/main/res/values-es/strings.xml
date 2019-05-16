@@ -97,4 +97,5 @@
     <string name="expenses_without_budget">Gastos sin presupuesto</string>
     <string name="left_to_save">Saldo para guardar</string>
     <string name="save_on_account">Guardar en cuenta</string>
+    <string name="dashboard_balance_help_text">Esta pequeña caja y las cajas a continuación te darán una visión rápida de tu situación financiera.</string>
 </resources>

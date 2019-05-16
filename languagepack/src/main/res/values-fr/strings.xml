@@ -94,4 +94,5 @@
     <string name="expenses_without_budget">Dépenses non budgétisées</string>
     <string name="left_to_save">Reste à mettre de côté</string>
     <string name="save_on_account">Mis de côté sur le compte</string>
+    <string name="dashboard_balance_help_text">Cette petite boîte et les cases à côté de celle-ci vous donneront un rapide aperçu de votre situation financière.</string>
 </resources>

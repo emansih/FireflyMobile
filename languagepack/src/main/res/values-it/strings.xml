@@ -96,5 +96,6 @@
     <string name="expenses_without_budget">Spese senza budget</string>
     <string name="left_to_save">Rimanente da risparmiare</string>
     <string name="save_on_account">Risparmio sul conto</string>
+    <string name="dashboard_balance_help_text">Questa piccola casella e le caselle accanto a questa ti daranno una rapida panoramica della tua situazione finanziaria.</string>
 
 </resources>

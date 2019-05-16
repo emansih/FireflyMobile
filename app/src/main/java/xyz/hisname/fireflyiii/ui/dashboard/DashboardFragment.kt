@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
@@ -20,6 +21,9 @@ import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
+import me.toptas.fancyshowcase.FancyShowCaseQueue
+import me.toptas.fancyshowcase.FancyShowCaseView
+import me.toptas.fancyshowcase.FocusShape
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
@@ -79,6 +83,7 @@ class DashboardFragment: BaseFragment() {
         requireFragmentManager().commit {
             replace(R.id.recentTransactionCard, RecentTransactionFragment())
         }
+        showHelpText()
     }
 
     private fun setNetWorth(currencyData: CurrencyAttributes?){
@@ -333,6 +338,22 @@ class DashboardFragment: BaseFragment() {
             budgetChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             budgetChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
         }
+    }
+
+    private fun showHelpText(){
+        val enterAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_from_left)
+        val balanceLayoutCaseView = FancyShowCaseView.Builder(requireActivity())
+                .focusOn(balanceLayout)
+                .title(resources.getString(R.string.dashboard_balance_help_text))
+                .enableAutoTextPosition()
+                .showOnce("balanceLayoutCaseView")
+                .fitSystemWindows(true)
+                .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                .enterAnimation(enterAnimation)
+                .closeOnTouch(true)
+
+        FancyShowCaseQueue()
+                .add(balanceLayoutCaseView.build()).show()
     }
 
     override fun onAttach(context: Context){

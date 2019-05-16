@@ -104,4 +104,5 @@
     <string name="expenses_without_budget">無預算支出</string>
     <string name="left_to_save">剩餘可供儲蓄</string>
     <string name="save_on_account">存於帳戶</string>
+    <string name="dashboard_balance_help_text">這小方塊 (以及旁邊的) 給您一個財務狀況的快速概覽。</string>
 </resources>

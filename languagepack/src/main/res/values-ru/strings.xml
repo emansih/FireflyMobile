@@ -101,4 +101,5 @@
     <string name="expenses_without_budget">Расходы вне бюджета</string>
     <string name="left_to_save">Осталось накопить</string>
     <string name="save_on_account">Сохранить на счёте</string>
+    <string name="dashboard_balance_help_text">Небольшие блоки, собранные на этой странице, показывают общее положение дел с вашими финансами.</string>
 </resources>
