@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
@@ -21,9 +20,6 @@ import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
-import me.toptas.fancyshowcase.FancyShowCaseQueue
-import me.toptas.fancyshowcase.FancyShowCaseView
-import me.toptas.fancyshowcase.FocusShape
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
@@ -340,21 +336,9 @@ class DashboardFragment: BaseFragment() {
         }
     }
 
-    private fun showHelpText(){
-        val enterAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_from_left)
-        val balanceLayoutCaseView = FancyShowCaseView.Builder(requireActivity())
-                .focusOn(balanceLayout)
-                .title(resources.getString(R.string.dashboard_balance_help_text))
-                .enableAutoTextPosition()
-                .showOnce("balanceLayoutCaseView")
-                .fitSystemWindows(true)
-                .focusShape(FocusShape.ROUNDED_RECTANGLE)
-                .enterAnimation(enterAnimation)
-                .closeOnTouch(true)
+    private fun showHelpText() =
+            showCase(R.string.dashboard_balance_help_text, "balanceLayoutCaseView", balanceLayout).show()
 
-        FancyShowCaseQueue()
-                .add(balanceLayoutCaseView.build()).show()
-    }
 
     override fun onAttach(context: Context){
         super.onAttach(context)

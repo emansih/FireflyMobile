@@ -2,12 +2,10 @@ package xyz.hisname.fireflyiii.util.extension
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.ScrollView
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment as SupportFragment
 
@@ -46,10 +44,4 @@ fun <ViewT : View> SupportFragment.bindView(@IdRes idRes: Int): Lazy<ViewT> {
     }
 }
 
-fun View.isFullyVisible(scrollView: ScrollView): Boolean{
-    val scrollBounds = Rect()
-    scrollView.getDrawingRect(scrollBounds)
-    val top = this.y
-    val bottom = top + this.height
-    return scrollBounds.top < top && scrollBounds.bottom > bottom
-}
+fun View.focusOnView() = this.parent.requestChildFocus(this, this)

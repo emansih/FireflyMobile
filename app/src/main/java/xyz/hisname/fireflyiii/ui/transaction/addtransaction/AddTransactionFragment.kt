@@ -312,20 +312,12 @@ class AddTransactionFragment: BaseFragment() {
         budgetViewModel.budgetName.observe(this, Observer { name ->
             budget_edittext.setText(name)
         })
-        expansionLayout.addListener { expansionLayout, expanded ->
+        expansionLayout.addListener { _, expanded ->
             if(expanded){
                 optionalLayout.isVisible = true
                 if (piggy_layout.isVisible){
-                    FancyShowCaseView.Builder(requireActivity())
-                            .focusOn(piggy_layout)
-                            .title(resources.getString(R.string.transactions_create_transfer_ffInput_piggy_bank_id))
-                            .enableAutoTextPosition()
-                            .fitSystemWindows(true)
-                            .showOnce("transactionPiggyShowCase")
-                            .focusShape(FocusShape.ROUNDED_RECTANGLE)
-                            .closeOnTouch(true)
-                            .build()
-                            .show()
+                    showCase(R.string.transactions_create_transfer_ffInput_piggy_bank_id,
+                            "transactionPiggyShowCase", piggy_layout).show()
                 }
             } else {
                 optionalLayout.isInvisible = true
