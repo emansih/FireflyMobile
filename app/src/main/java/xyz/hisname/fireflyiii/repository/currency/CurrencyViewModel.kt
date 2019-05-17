@@ -50,10 +50,10 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
-                       enabled: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
+                       enabled: Boolean, default: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<CurrencySuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<CurrencySuccessModel>> = MutableLiveData()
-        currencyService?.updateCurrency(code, name, code, symbol, decimalPlaces, enabled)?.enqueue(retrofitCallback({
+        currencyService?.updateCurrency(code, name, code, symbol, decimalPlaces, enabled, default)?.enqueue(retrofitCallback({
             response ->
             var errorMessage = ""
             val responseErrorBody = response.errorBody()
@@ -70,7 +70,17 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
+                var defaultCurrency: MutableList<CurrencyData> = arrayListOf()
+                scope.launch(Dispatchers.IO) {
+                    defaultCurrency = repository.defaultCurrency()
+                }.invokeOnCompletion {
+                    // This is needed otherwise we might get wrong default currency
+                    if(defaultCurrency[0].currencyAttributes?.name == name &&
+                            defaultCurrency[0].currencyAttributes?.currencyDefault != default){
+                        scope.launch(Dispatchers.IO) { repository.deleteDefaultCurrency() }
+                    }
+                    scope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
+                }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
@@ -83,10 +93,10 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun addCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
-                    enabled: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
+                    enabled: Boolean,default: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{
         val apiResponse: MediatorLiveData<ApiResponses<CurrencySuccessModel>> =  MediatorLiveData()
         val apiLiveData: MutableLiveData<ApiResponses<CurrencySuccessModel>> = MutableLiveData()
-        currencyService?.createCurrency(name, code, symbol, decimalPlaces, enabled)?.enqueue(retrofitCallback({
+        currencyService?.createCurrency(name, code, symbol, decimalPlaces, enabled, default)?.enqueue(retrofitCallback({
             response ->
             var errorMessage = ""
             val responseErrorBody = response.errorBody()

@@ -38,6 +38,9 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                 if(currencyAttributes?.enabled == true){
                     enabled_checkbox.isChecked = true
                 }
+                if(currencyAttributes?.currencyDefault == true){
+                    default_checkbox.isChecked = true
+                }
             })
         }
         addCurrencyFab.setOnClickListener {
@@ -74,6 +77,9 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         enabled_textview.setOnClickListener {
             enabled_checkbox.performClick()
         }
+        default_textview.setOnClickListener {
+            default_checkbox.performClick()
+        }
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
@@ -81,7 +87,8 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
 
     private fun updateData(){
         currencyViewModel.updateCurrency(name_edittext.getString(), code_edittext.getString(),
-                symbol_edittext.getString(), decimal_places_edittext.getString(), enabled_checkbox.isChecked)
+                symbol_edittext.getString(), decimal_places_edittext.getString(),
+                enabled_checkbox.isChecked, default_checkbox.isChecked)
                 .observe(this, Observer { response ->
                     ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                     val errorMessage = response.getErrorMessage()
@@ -96,7 +103,8 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
 
     override fun submitData(){
         currencyViewModel.addCurrency(name_edittext.getString(), code_edittext.getString(),
-                symbol_edittext.getString(), decimal_places_edittext.getString(), enabled_checkbox.isChecked)
+                symbol_edittext.getString(), decimal_places_edittext.getString(),
+                enabled_checkbox.isChecked, default_checkbox.isChecked)
                 .observe(this, Observer { response ->
                     ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
                     val errorMessage = response.getErrorMessage()

@@ -17,15 +17,22 @@ interface CurrencyService {
 
     @FormUrlEncoded
     @POST(CURRENCY_API_ENDPOINT)
-    fun createCurrency(@Field("name") name: String, @Field("code") code: String,
-                       @Field("symbol") symbol: String, @Field("decimal_places") decimalPlaces: String,
-                       @Field("enabled") default: Boolean): Call<CurrencySuccessModel>
+    fun createCurrency(@Field("name") name: String,
+                       @Field("code") code: String,
+                       @Field("symbol") symbol: String,
+                       @Field("decimal_places") decimalPlaces: String,
+                       @Field("enabled") enabled: Boolean,
+                       @Field("default") default: Boolean): Call<CurrencySuccessModel>
 
     @FormUrlEncoded
     @PUT("$CURRENCY_API_ENDPOINT/{currencyCode}")
-    fun updateCurrency(@Path("currencyCode") currencyCode: String, @Field("name") name: String,
-                       @Field("code") code: String, @Field("symbol") symbol: String, @Field("decimal_places") decimalPlaces: String,
-                       @Field("enabled") default: Boolean): Call<CurrencySuccessModel>
+    fun updateCurrency(@Path("currencyCode") currencyCode: String,
+                       @Field("name") name: String,
+                       @Field("code") code: String,
+                       @Field("symbol") symbol: String,
+                       @Field("decimal_places") decimalPlaces: String,
+                       @Field("enabled") enabled: Boolean,
+                       @Field("default") default: Boolean): Call<CurrencySuccessModel>
 
 
     @DELETE("$CURRENCY_API_ENDPOINT/{id}")

@@ -94,16 +94,6 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <View
-                android:id="@+id/linedivider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E1E1E1"
-                android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@+id/decimal_places_layout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/symbol_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -112,7 +102,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="30dp"
                 android:layout_marginStart="30dp"
-                app:layout_constraintTop_toBottomOf="@+id/linedivider"
+                app:layout_constraintTop_toBottomOf="@+id/decimal_places_layout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -125,16 +115,6 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <View
-                android:id="@+id/linedivider1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E1E1E1"
-                android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@+id/symbol_layout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/code_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -143,7 +123,7 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="30dp"
                 android:layout_marginStart="30dp"
-                app:layout_constraintTop_toBottomOf="@+id/linedivider1"
+                app:layout_constraintTop_toBottomOf="@+id/symbol_layout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
 
@@ -156,24 +136,13 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <View
-                android:id="@+id/linedivider2"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E1E1E1"
-                android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@+id/code_layout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/enabled_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="@+id/enabled_textview"
                 app:layout_constraintBottom_toBottomOf="@+id/enabled_textview"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/enabled_textview"
@@ -183,9 +152,27 @@
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="12dp"
                 style="@style/TextAppearance.MaterialComponents.Headline6"
-                app:layout_constraintTop_toBottomOf="@+id/linedivider2"
+                app:layout_constraintTop_toBottomOf="@+id/code_layout"
                 app:layout_constraintStart_toStartOf="parent"/>
 
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/default_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/default_textview"
+                app:layout_constraintBottom_toBottomOf="@+id/default_textview"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/default_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Default"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="12dp"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                app:layout_constraintTop_toBottomOf="@+id/enabled_textview"
+                app:layout_constraintStart_toStartOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
