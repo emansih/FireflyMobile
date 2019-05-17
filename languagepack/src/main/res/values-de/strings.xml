@@ -103,5 +103,9 @@
     <string name="left_to_save">Zu Sparen</string>
     <string name="save_on_account">Rücklagen für Konto</string>
     <string name="dashboard_balance_help_text">Diese kleine und deren benachbarten Boxen geben Ihnen einen schnellen Überblick über Ihre finanzielle Situation.</string>
+    <string name="add_account_currency_help_text">Firefly III unterstützt mehrere Währungen. Bestandskonten ist eine Hauptwährung zugeordnet, die Sie hier festlegen müssen.</string>
+    <string name="iban_help_text">Geben Sie Ihren Konten eine gültige IBAN. Dies könnte einen Datenimport in Zukunft sehr einfach machen.</string>
+    <string name="opening_balance_help_text">Bestandskonten können eine \"Eröffnungsbilanz\" haben, welche den Beginn des Verlaufs dieses Kontos in Firefly III angibt.</string>
+    <string name="virtual_balance_help_text">Es kann manchmal helfen, Ihrem Konto ein virtuelles Gleichgewicht zu geben: eine zusätzliche Menge, die dem tatsächlichen Kontostand immer hinzugefügt oder daraus entfernt wird.</string>
 
 </resources>

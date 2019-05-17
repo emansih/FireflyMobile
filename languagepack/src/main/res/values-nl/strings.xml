@@ -96,4 +96,8 @@
     <string name="left_to_save">Te sparen</string>
     <string name="save_on_account">Sparen op rekening</string>
     <string name="dashboard_balance_help_text">Dit vakje en de vakjes er naast geven een snel overzicht van je financiële situatie.</string>
+    <string name="add_account_currency_help_text">Firefly III ondersteunt meerdere valuta. Hier stel je de valuta in van je betaalrekening.</string>
+    <string name="iban_help_text">Geef je rekeningen een geldige IBAN. Dat scheelt met importeren van data.</string>
+    <string name="opening_balance_help_text">Betaalrekeningen kunnen een startsaldo hebben, waarmee het begin van deze rekening in Firefly III wordt aangegeven.</string>
+    <string name="virtual_balance_help_text">Soms is het handig om je betaalrekening een virtueel saldo te geven: een extra bedrag dat altijd bij het daadwerkelijke saldo wordt opgeteld.</string>
 </resources>

@@ -108,4 +108,8 @@
     <string name="expenses_without_budget">Expenses without budget</string>
     <string name="save_on_account">Save on account</string>
     <string name="dashboard_balance_help_text">This little box and the boxes next to this one will give you a quick overview of your financial situation.</string>
+    <string name="iban_help_text">Give your accounts a valid IBAN. This could make a data import very easy in the future.</string>
+    <string name="opening_balance_help_text">Assets accounts may have an "opening balance", indicating the start of this account\'s history in Firefly III.</string>
+    <string name="add_account_currency_help_text">Firefly III supports multiple currencies. Asset accounts have one main currency, which you must set here.</string>
+    <string name="virtual_balance_help_text">It can sometimes help to give your account a virtual balance: an extra amount always added to or removed from the actual balance.</string>
 </resources>

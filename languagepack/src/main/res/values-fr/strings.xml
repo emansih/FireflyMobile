@@ -95,4 +95,8 @@
     <string name="left_to_save">Reste à mettre de côté</string>
     <string name="save_on_account">Mis de côté sur le compte</string>
     <string name="dashboard_balance_help_text">Cette petite boîte et les cases à côté de celle-ci vous donneront un rapide aperçu de votre situation financière.</string>
+    <string name="add_account_currency_help_text">Firefly III prend en charge plusieurs devises. Les comptes d\\\'actifs ont une devise principale, que vous devez définir ici.</string>
+    <string name="iban_help_text">Donnez à vos comptes un IBAN valide. Cela pourrait rendre une importation de données très facile à l\\\'avenir.</string>
+    <string name="opening_balance_help_text">Les comptes d\\\'actifs peuvent avoir un «solde d\\\'ouverture», indiquant le début de l\\\'historique de ce compte dans Firefly III.</string>
+    <string name="virtual_balance_help_text">Il peut parfois être utile de donner à votre compte un solde virtuel : un montant supplémentaire toujours ajouté ou soustrait du solde réel.</string>
 </resources>

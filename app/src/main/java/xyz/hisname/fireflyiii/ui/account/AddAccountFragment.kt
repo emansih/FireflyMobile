@@ -1,10 +1,12 @@
 package xyz.hisname.fireflyiii.ui.account
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -13,6 +15,8 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_account.*
+import me.toptas.fancyshowcase.FancyShowCaseView
+import me.toptas.fancyshowcase.FocusShape
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
@@ -27,6 +31,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private val accountId: Long by lazy { arguments?.getLong("accountId") ?: 0L }
     private var currency: String = ""
     private val calendar by lazy { Calendar.getInstance() }
+    private val enterAnimation by lazy { AnimationUtils.loadAnimation(requireContext(), R.anim.slide_from_left) }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -95,6 +101,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         expansionLayout.addListener { _, expanded ->
             if(expanded){
                 optionalLayout.isVisible = true
+                showHiddenHelpText()
             } else {
                 optionalLayout.isInvisible = true
             }
@@ -369,6 +376,72 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 virtual_balance_edittext.setText(accountAttributes?.virtual_balance.toString())
                 note_edittext.setText(accountAttributes?.notes)
             })
+        } else {
+            showHelpText()
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun showHelpText(){
+        add_account_scrollview.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            showHiddenHelpText()
+        }
+
+        FancyShowCaseView.Builder(requireActivity())
+                .focusOn(currency_layout)
+                .title(resources.getString(R.string.add_account_currency_help_text))
+                .enableAutoTextPosition()
+                .showOnce("addAccountCurrencyCaseView")
+                .fitSystemWindows(true)
+                .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                .enterAnimation(enterAnimation)
+                .closeOnTouch(true)
+                .build()
+                .show()
+
+
+    }
+
+    private fun showHiddenHelpText(){
+        if(virtual_balance_layout.isFullyVisible(add_account_scrollview)) {
+            FancyShowCaseView.Builder(requireActivity())
+                    .focusOn(virtual_balance_layout)
+                    .title(resources.getString(R.string.virtual_balance_help_text))
+                    .enableAutoTextPosition()
+                    .showOnce("virtualBalanceCaseView")
+                    .fitSystemWindows(true)
+                    .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                    .enterAnimation(enterAnimation)
+                    .closeOnTouch(true)
+                    .build()
+                    .show()
+        }
+        if(iban_layout.isFullyVisible(add_account_scrollview)) {
+            FancyShowCaseView.Builder(requireActivity())
+                    .focusOn(iban_layout)
+                    .title(resources.getString(R.string.iban_help_text))
+                    .enableAutoTextPosition()
+                    .showOnce("ibanCaseView")
+                    .fitSystemWindows(true)
+                    .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                    .enterAnimation(enterAnimation)
+                    .closeOnTouch(true)
+                    .build()
+                    .show()
+        }
+
+        if(opening_balance_layout.isFullyVisible(add_account_scrollview)){
+            FancyShowCaseView.Builder(requireActivity())
+                    .focusOn(opening_balance_layout)
+                    .title(resources.getString(R.string.opening_balance_help_text))
+                    .enableAutoTextPosition()
+                    .showOnce("openingBalanceCaseView")
+                    .fitSystemWindows(true)
+                    .focusShape(FocusShape.ROUNDED_RECTANGLE)
+                    .enterAnimation(enterAnimation)
+                    .closeOnTouch(true)
+                    .build()
+                    .show()
         }
     }
 

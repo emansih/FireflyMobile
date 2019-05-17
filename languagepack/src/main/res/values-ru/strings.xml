@@ -102,4 +102,8 @@
     <string name="left_to_save">Осталось накопить</string>
     <string name="save_on_account">Сохранить на счёте</string>
     <string name="dashboard_balance_help_text">Небольшие блоки, собранные на этой странице, показывают общее положение дел с вашими финансами.</string>
+    <string name="add_account_currency_help_text">Firefly III поддерживает несколько валют. Каждый счёт связан с одной основной валютой, которую вы должны указать здесь.</string>
+    <string name="iban_help_text">Задайте вашим счетам действующий IBAN. В будущем это может сделать импорт данных очень простым.</string>
+    <string name="opening_balance_help_text">У счёта активов всегда есть «начальный баланс», показывающий, какая сумма была на этом счету, когда вы начали работать с ним в Firefly III.</string>
+    <string name="virtual_balance_help_text">Иногда бывает удобно предоставить вашему счёту виртуальный баланс: дополнительная сумма, всегда добавленная или выведенная из фактического баланса.</string>
 </resources>

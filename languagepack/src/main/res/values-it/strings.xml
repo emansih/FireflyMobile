@@ -97,5 +97,9 @@
     <string name="left_to_save">Rimanente da risparmiare</string>
     <string name="save_on_account">Risparmio sul conto</string>
     <string name="dashboard_balance_help_text">Questa piccola casella e le caselle accanto a questa ti daranno una rapida panoramica della tua situazione finanziaria.</string>
+    <string name="add_account_currency_help_text">Firefly III supporta più valute. I conti attività hanno una valuta principale, che devi impostare qui.</string>
+    <string name="iban_help_text">Dai ai tuoi conti un IBAN valido. Ciò potrebbe rendere molto facile l\\\'importazione dei dati in futuro.</string>
+    <string name="opening_balance_help_text">I conti attività possono avere un \"saldo di apertura\", che indica l\\\'inizio della cronologia di questo conto in Firefly III.</string>
+    <string name="virtual_balance_help_text">A volte può aiutare a fornire al tuo conto un saldo virtuale: un ulteriore importo sempre aggiunto o rimosso dal saldo effettivo.</string>
 
 </resources>
