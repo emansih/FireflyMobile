@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
@@ -28,6 +30,7 @@ import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.DeviceUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
@@ -79,7 +82,7 @@ class DashboardFragment: BaseFragment() {
         requireFragmentManager().commit {
             replace(R.id.recentTransactionCard, RecentTransactionFragment())
         }
-        showHelpText()
+        animateCard(statsCard, netEarningsCard, dailySummaryCard, recentTransactionCard, budgetCard)
     }
 
     private fun setNetWorth(currencyData: CurrencyAttributes?){
@@ -336,9 +339,23 @@ class DashboardFragment: BaseFragment() {
         }
     }
 
-    private fun showHelpText() =
-            showCase(R.string.dashboard_balance_help_text, "balanceLayoutCaseView", balanceLayout).show()
-
+    private fun animateCard(vararg frameLayout: FrameLayout){
+        for(frames in frameLayout){
+            frames.translationY = DeviceUtil.getScreenHeight(requireContext()).toFloat()
+            frames.animate()
+                    .translationY(0f)
+                    .setInterpolator(DecelerateInterpolator(5f))
+                    .setDuration(3000)
+                    .withEndAction {
+                        if(frames == budgetCard){
+                            val helpText = showCase(R.string.dashboard_balance_help_text,
+                                    "balanceLayoutCaseView", balanceLayout)
+                            dashboardNested.smoothScrollTo(0, 0)
+                            helpText.show()
+                        }
+                    }
+        }
+    }
 
     override fun onAttach(context: Context){
         super.onAttach(context)
