@@ -227,7 +227,7 @@
                             android:layout_height="match_parent"
                             android:drawablePadding="12dp"
                             android:focusable="false"
-                            android:hint="@string/target_date"
+                            android:hint="@string/target_date_text"
                             android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
