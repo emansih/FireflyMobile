@@ -72,7 +72,10 @@ object DateTimeUtil {
 
     fun getStartOfMonth(duration: Long): String {
         val localDateTime = LocalDate.now()
-        return localDateTime.minusMonths(duration).toString()
+        val previousMonth = localDateTime.minusMonths(duration)
+        val previousLocalDate =
+                LocalDate.of(previousMonth.year, previousMonth.monthValue, previousMonth.dayOfMonth)
+        return previousLocalDate.with(firstDayOfMonth()).toString()
     }
 
     fun getStartOfMonth(): String{
@@ -145,6 +148,14 @@ object DateTimeUtil {
     fun getDayAndMonth(date: String): String{
         val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         return localDate.dayOfMonth.toString() + "/" + localDate.monthValue.toString()
+    }
+
+    // Outputs date in MM YY
+    // Mar 2019
+    fun getMonthAndYear(date: String): String{
+        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        return localDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()).toString() +
+                " " + localDate.year.toString()
     }
 
     // Outputs dd mm yyyy - dd mm yyyy

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -59,7 +60,7 @@ import xyz.hisname.fireflyiii.util.extension.toastError
 
 class HomeActivity: BaseActivity(){
 
-    private var result: Drawer? = null
+    private lateinit var result: Drawer
     private lateinit var headerResult: AccountHeader
     private var profile: IProfile<*>? = null
     private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
@@ -366,6 +367,7 @@ class HomeActivity: BaseActivity(){
                             val bundle = bundleOf("transactionType" to "Withdrawal")
                             if(sharedPref(this).transactionListType){
                                 changeFragment(TransactionFragmentV1().apply { arguments = bundle })
+
                             } else {
                                 changeFragment(TransactionFragmentV2().apply { arguments = bundle })
                             }
@@ -421,7 +423,7 @@ class HomeActivity: BaseActivity(){
                 .withSavedInstance(savedInstanceState)
                 .build()
         supportActionBar?.setHomeButtonEnabled(true)
-        result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
+        result.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
     }
 
     // sick animation stolen from here: http://frogermcs.github.io/Instagram-with-Material-Design-concept-is-getting-real/
@@ -438,8 +440,8 @@ class HomeActivity: BaseActivity(){
     }
 
     override fun onBackPressed() {
-        if(result?.isDrawerOpen!!) {
-            result?.closeDrawer()
+        if(result.isDrawerOpen) {
+            result.closeDrawer()
         } else {
             when {
                 //supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
@@ -447,7 +449,7 @@ class HomeActivity: BaseActivity(){
                     if (supportFragmentManager.findFragmentByTag("dash") is DashboardFragment) {
                         finish()
                     } else {
-                        result?.setSelection(1)
+                        result.setSelection(1)
                     }
                 }
                 else -> {
@@ -461,15 +463,15 @@ class HomeActivity: BaseActivity(){
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount >= 1){
                 // show back icon and lock nav drawer
-                val drawerLayout = result?.drawerLayout
+                val drawerLayout = result.drawerLayout
                 drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-                result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
+                result.actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
             } else {
-                val drawerLayout = result?.drawerLayout
+                val drawerLayout = result.drawerLayout
                 drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
-                result?.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
+                result.actionBarDrawerToggle?.isDrawerIndicatorEnabled = true
             }
         }
     }

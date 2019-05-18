@@ -15,8 +15,10 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMonth
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
@@ -301,6 +303,28 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             data.postValue(transactionAmount)
         }
         return data
+    }
+
+    fun getTotalTransactionAmountAndFreqByDateAndCurrency(startDate: String, endDate: String,
+                                                          currencyCode: String,
+                                                          transactionType: String,
+                                                          currencySymbol: String): MutableLiveData<TransactionAmountMonth>{
+        loadRemoteData(startDate, endDate, transactionType)
+        isLoading.value = true
+        var transactionAmount = 0.0
+        var transactionFreq = 0
+        val transactionData: MutableLiveData<TransactionAmountMonth> = MutableLiveData()
+        scope.launch(Dispatchers.IO){
+            transactionAmount = repository.getTotalTransactionType(startDate, endDate,
+                    currencyCode, transactionType)
+            transactionFreq = repository.transactionList(startDate, endDate, transactionType).size
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            transactionData.postValue(TransactionAmountMonth(DateTimeUtil.getMonthAndYear(startDate),
+                    currencySymbol + LocaleNumberParser.parseDecimal(transactionAmount, getApplication()),
+                    transactionFreq))
+        }
+        return transactionData
     }
 
     fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String,
