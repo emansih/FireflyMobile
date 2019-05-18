@@ -68,10 +68,6 @@ abstract class BaseTransactionFragment: BaseFragment() {
                     recycler_view.adapter = rtAdapter
                     recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
                             DividerItemDecoration.VERTICAL))
-                    rtAdapter.apply {
-                        recycler_view.adapter as TransactionRecyclerAdapter
-                        update(dataAdapter)
-                    }
                 }
             }
         })
