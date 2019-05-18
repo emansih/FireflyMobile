@@ -41,8 +41,6 @@ class CategoriesFragment: BaseFragment() {
 
     private fun displayView(){
         runLayoutAnimation(recycler_view)
-        val dividerItemDecoration = DividerItemDecoration(recycler_view.context, LinearLayoutManager(requireContext()).orientation)
-        recycler_view.addItemDecoration(dividerItemDecoration)
         swipeContainer.isRefreshing = true
         categoryViewModel.getAllCategory().observe(this, Observer { categoryData ->
             categoryViewModel.isLoading.observe(this, Observer { loading ->

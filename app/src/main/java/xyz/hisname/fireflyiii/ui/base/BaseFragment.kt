@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
@@ -77,6 +78,7 @@ abstract class BaseFragment: Fragment() {
             layoutAnimation = controller
             adapter?.notifyDataSetChanged()
             scheduleLayoutAnimation()
+            addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         }
         if(reverse){
             linearLayout.reverseLayout = true

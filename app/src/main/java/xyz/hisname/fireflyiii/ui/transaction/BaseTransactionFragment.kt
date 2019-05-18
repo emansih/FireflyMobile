@@ -10,7 +10,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -52,6 +51,7 @@ abstract class BaseTransactionFragment: BaseFragment() {
 
     private fun loadingData(){
         transactionViewModel.isLoading.observe(this, Observer {  load ->
+            swipeContainer.isRefreshing = load == true
             if(!load){
                 if(dataAdapter.isEmpty()){
                     recycler_view.isGone = true
@@ -64,15 +64,11 @@ abstract class BaseTransactionFragment: BaseFragment() {
                     recycler_view.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
+                    runLayoutAnimation(recycler_view)
                     rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
                     recycler_view.adapter = rtAdapter
-                    recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
-                            DividerItemDecoration.VERTICAL))
                 }
             }
-        })
-        transactionViewModel.isLoading.observe(this, Observer {
-            swipeContainer.isRefreshing = it == true
         })
     }
 

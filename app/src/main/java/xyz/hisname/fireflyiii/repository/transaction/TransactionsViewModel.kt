@@ -309,7 +309,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                                                           currencyCode: String,
                                                           transactionType: String,
                                                           currencySymbol: String): MutableLiveData<TransactionAmountMonth>{
-        loadRemoteData(startDate, endDate, transactionType)
         var transactionAmount = 0.0
         var transactionFreq = 0
         val transactionData: MutableLiveData<TransactionAmountMonth> = MutableLiveData()
@@ -501,7 +500,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     private fun loadRemoteData(startDate: String?, endDate: String?, source: String): LiveData<MutableList<TransactionData>>{
         var transactionData: MutableList<TransactionData> = arrayListOf()
-        transactionData.clear()
         isLoading.value = true
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
         transactionService?.getPaginatedTransactions(startDate, endDate, source, 1)?.enqueue(retrofitCallback({ response ->

@@ -48,7 +48,6 @@ class ListAccountFragment: BaseFragment() {
     private fun displayView(){
         swipeContainer.isRefreshing = accountViewModel.isLoading.value == true
         runLayoutAnimation(recycler_view)
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         when (accountType) {
             "asset" -> accountViewModel.getAssetAccounts().observe(this, Observer {
                 if(it.isEmpty()){
