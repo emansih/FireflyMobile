@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -19,9 +18,6 @@ import androidx.lifecycle.Observer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
-import me.toptas.fancyshowcase.FancyShowCaseQueue
-import me.toptas.fancyshowcase.FancyShowCaseView
-import me.toptas.fancyshowcase.FocusShape
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -40,7 +36,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private var startDate: String? = null
     private var targetDate: String? = null
     private var notes: String? = null
-    private lateinit var queue: FancyShowCaseQueue
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -70,44 +65,17 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         showHelpText()
     }
 
-    private fun showHelpText(){
-        val enterAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_from_left)
-        val exitAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_to_right)
-        val descriptionCaseView = FancyShowCaseView.Builder(requireActivity())
-                .focusOn(description_edittext)
-                .title(resources.getString(R.string.piggy_bank_description_help_text))
-                .enableAutoTextPosition()
-                .showOnce("descriptionCaseView")
-                .fitSystemWindows(true)
-                .focusShape(FocusShape.ROUNDED_RECTANGLE)
-                .closeOnTouch(true)
-                .build()
+    private fun showHelpText() = showCase(R.string.piggy_bank_description_help_text,
+                "descriptionCaseView", description_edittext).show()
 
-        val dateStartedCaseView = FancyShowCaseView.Builder(requireActivity())
-                .focusOn(date_started_edittext)
-                .title(resources.getString(R.string.piggy_bank_date_help_text))
-                .closeOnTouch(true)
-                .enableAutoTextPosition()
-                .showOnce("dateStartedCaseView")
-                .fitSystemWindows(true)
-                .focusShape(FocusShape.ROUNDED_RECTANGLE)
-                .enterAnimation(enterAnimation)
-                .exitAnimation(exitAnimation)
-                .build()
-
-        queue = FancyShowCaseQueue()
-                .add(descriptionCaseView)
-                .add(dateStartedCaseView)
-        queue.show()
-        exitAnimation.onAnimationEnd {
-            dateStartedCaseView.removeView()
-        }
-    }
 
     private fun setAccordion(){
         expansionLayout.addListener { _, expanded ->
             if(expanded){
                 optionalLayout.isVisible = true
+                showCase(R.string.piggy_bank_date_help_text,
+                        "dateStartedCaseView", date_started_edittext).show()
+
             } else {
                 optionalLayout.isInvisible = true
             }
