@@ -3,11 +3,12 @@ package xyz.hisname.fireflyiii.ui.base
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.languagepack.LanguageChanger
@@ -30,8 +31,7 @@ open class BaseActivity: AppCompatActivity() {
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             if(key == "night_mode"){
                 if(sharedPref(this).nightModeEnabled){
-                    delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    setTheme(R.style.AppTheme_Dark_DrawerTheme)
+                    enableDarkMode()
                 } else {
                     setTheme(R.style.AppTheme)
                     delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -39,10 +39,17 @@ open class BaseActivity: AppCompatActivity() {
             }
         }
         if(sharedPref(this).nightModeEnabled){
-            setTheme(R.style.AppTheme_Dark_DrawerTheme)
-            delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            enableDarkMode()
         }
         sharedPref.registerOnSharedPreferenceChangeListener(prefListener)
+    }
+
+    private fun enableDarkMode(){
+        setTheme(R.style.AppTheme_Dark_DrawerTheme)
+        delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.md_black_1000)
+        }
     }
 
     override fun attachBaseContext(newBase: Context) {
