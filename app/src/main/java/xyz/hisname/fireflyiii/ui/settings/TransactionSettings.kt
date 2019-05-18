@@ -30,12 +30,12 @@ class TransactionSettings: BaseSettings() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Notifications"
+        activity?.activity_toolbar?.title = "Transaction Settings"
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = "Notifications"
+        activity?.activity_toolbar?.title = "Transaction Settings"
     }
 
     override fun handleBack() {
