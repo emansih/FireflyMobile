@@ -5,18 +5,14 @@ import android.view.*
 import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -40,77 +36,8 @@ class TransactionFragmentV2: BaseTransactionFragment(){
 
     private fun loadTransaction(){
         dataAdapter.clear()
-        when (transactionType) {
-            "Withdrawal" -> transactionViewModel.getWithdrawalList(currentDate, currentDate).observe(this, Observer{
-                dataAdapter = ArrayList(it)
-                if(dataAdapter.isEmpty()) {
-                    recycler_view.isGone = true
-                    noTransactionText.isVisible = true
-                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
-                    noTransactionImage.isVisible = true
-                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_left))
-                } else {
-                    recycler_view.isVisible = true
-                    noTransactionText.isGone = true
-                    noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
-                    recycler_view.adapter = rtAdapter
-                    recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
-                            DividerItemDecoration.VERTICAL))
-                    rtAdapter.apply {
-                        recycler_view.adapter as TransactionRecyclerAdapter
-                        update(dataAdapter)
-                    }
-                }
-            })
-            "Transfer" -> transactionViewModel.getTransferList(currentDate, currentDate).observe(this, Observer {
-                dataAdapter = ArrayList(it)
-                if(it.isEmpty()) {
-                    recycler_view.isGone = true
-                    noTransactionText.isVisible = true
-                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
-                    noTransactionImage.isVisible = true
-                    noTransactionImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
-                } else {
-                    recycler_view.isVisible = true
-                    noTransactionText.isGone = true
-                    noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
-                    recycler_view.adapter = rtAdapter
-                    recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
-                            DividerItemDecoration.VERTICAL))
-                    rtAdapter.apply {
-                        recycler_view.adapter as TransactionRecyclerAdapter
-                        update(dataAdapter)
-                    }
-                }
-            })
-            "Deposit" -> transactionViewModel.getDepositList(currentDate, currentDate).observe(this, Observer {
-                dataAdapter = ArrayList(it)
-                if(it.isEmpty()) {
-                    recycler_view.isGone = true
-                    noTransactionText.isVisible = true
-                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
-                    noTransactionImage.isVisible = true
-                    noTransactionImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_right))
-                } else {
-                    recycler_view.isVisible = true
-                    noTransactionText.isGone = true
-                    noTransactionImage.isGone = true
-                    rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
-                    recycler_view.adapter = rtAdapter
-                    recycler_view.addItemDecoration(DividerItemDecoration(requireContext(),
-                            DividerItemDecoration.VERTICAL))
-                    rtAdapter.apply {
-                        recycler_view.adapter as TransactionRecyclerAdapter
-                        update(dataAdapter)
-                    }
-                }
-            })
-        }
-        transactionViewModel.isLoading.observe(this, Observer {
-            swipeContainer.isRefreshing = it == true
+        transactionViewModel.getTransactionList(currentDate, currentDate, transactionType).observe(this, Observer {
+            dataAdapter = ArrayList(it)
         })
     }
 

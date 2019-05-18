@@ -17,7 +17,6 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
-import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
@@ -34,16 +33,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         repository = TransactionRepository(transactionDataDao)
     }
 
-    fun getAllData(startDate: String?, endDate: String?): LiveData<MutableList<TransactionData>>  {
-        loadRemoteData(startDate, endDate, "all")
-        return repository.allTransaction
-    }
-
-    fun getWithdrawalList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "Withdrawal")
-
-    fun getDepositList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "Deposit")
-
-    fun getTransferList(startDate: String?, endDate: String?) = loadRemoteData(startDate, endDate, "Transfer")
+    fun getTransactionList(startDate: String?, endDate: String?, transactionType: String) = loadRemoteData(startDate, endDate, transactionType)
 
     fun getRecentTransaction(limit: Int): LiveData<MutableList<TransactionData>>{
         isLoading.value = true
