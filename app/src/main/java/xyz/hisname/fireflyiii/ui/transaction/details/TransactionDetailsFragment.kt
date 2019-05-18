@@ -168,13 +168,13 @@ class TransactionDetailsFragment: BaseFragment() {
                         .setMessage(transactionAmount)
                         .show()
             }
-            1 ->{
+            2 ->{
                AlertDialog.Builder(requireContext())
                        .setTitle(resources.getString(R.string.description))
                        .setMessage(transactionDescription)
                        .show()
             }
-            2 -> {
+            3 -> {
                 requireFragmentManager().commit {
                     replace(R.id.fragment_container, AccountDetailFragment().apply {
                         arguments = bundleOf("accountId" to sourceAccountId)
@@ -182,7 +182,7 @@ class TransactionDetailsFragment: BaseFragment() {
                     addToBackStack(null)
                 }
             }
-            3 -> {
+            4 -> {
                 requireFragmentManager().commit {
                     replace(R.id.fragment_container, AccountDetailFragment().apply {
                         arguments = bundleOf("accountId" to destinationAccountId)
