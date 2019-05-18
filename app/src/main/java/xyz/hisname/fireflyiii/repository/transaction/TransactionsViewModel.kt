@@ -310,7 +310,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                                                           transactionType: String,
                                                           currencySymbol: String): MutableLiveData<TransactionAmountMonth>{
         loadRemoteData(startDate, endDate, transactionType)
-        isLoading.value = true
         var transactionAmount = 0.0
         var transactionFreq = 0
         val transactionData: MutableLiveData<TransactionAmountMonth> = MutableLiveData()
@@ -319,7 +318,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                     currencyCode, transactionType)
             transactionFreq = repository.transactionList(startDate, endDate, transactionType).size
         }.invokeOnCompletion {
-            isLoading.postValue(false)
             transactionData.postValue(TransactionAmountMonth(DateTimeUtil.getMonthAndYear(startDate),
                     currencySymbol + LocaleNumberParser.parseDecimal(transactionAmount, getApplication()),
                     transactionFreq))
@@ -503,6 +501,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     private fun loadRemoteData(startDate: String?, endDate: String?, source: String): LiveData<MutableList<TransactionData>>{
         var transactionData: MutableList<TransactionData> = arrayListOf()
+        transactionData.clear()
         isLoading.value = true
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
         transactionService?.getPaginatedTransactions(startDate, endDate, source, 1)?.enqueue(retrofitCallback({ response ->
@@ -558,8 +557,10 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         { throwable ->
             scope.launch(Dispatchers.IO) {
                 transactionData = repository.transactionList(startDate, endDate, source)
+            }.invokeOnCompletion {
+                data.postValue(transactionData)
+                isLoading.postValue(false)
             }
-            isLoading.value = false
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
         return data

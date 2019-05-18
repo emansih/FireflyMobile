@@ -94,7 +94,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         }
     }
 
-    private fun loadTransaction(startDate: String?, endDate: String?) {
+    private fun loadTransaction(startDate: String, endDate: String) {
         dataAdapter.clear()
         transactionViewModel.getTransactionList(startDate, endDate, transactionType).observe(this, Observer {
             dataAdapter = ArrayList(it)
