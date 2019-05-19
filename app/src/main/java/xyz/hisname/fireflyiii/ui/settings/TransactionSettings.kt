@@ -16,7 +16,7 @@ class TransactionSettings: BaseSettings() {
     }
 
     private fun addPermNotif(){
-        val transactionPref = findPreference("persistent_notification") as CheckBoxPreference
+        val transactionPref = findPreference<CheckBoxPreference>("persistent_notification") as CheckBoxPreference
         val notification = NotificationUtils(requireContext())
         transactionPref.setOnPreferenceChangeListener { _, newValue ->
             if(newValue == true){
