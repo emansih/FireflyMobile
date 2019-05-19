@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.fragment_date_range.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.DateRangeViewModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.isBlank
 import java.util.*
@@ -41,11 +42,8 @@ class TransactionDateRangeBottomSheet: BottomSheetDialogFragment() {
                 startDateEditText.setText(startDateText)
             }
         }
-
         startDateEditText.setOnClickListener {
-            DatePickerDialog(requireContext(), startDate, calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                    .show()
+            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), startDate, calendar)
         }
         val endDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
@@ -58,9 +56,7 @@ class TransactionDateRangeBottomSheet: BottomSheetDialogFragment() {
             }
         }
         endDateEditText.setOnClickListener {
-            DatePickerDialog(requireContext(), endDate, calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                    .show()
+            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), endDate, calendar)
         }
         applyButton.setOnClickListener{
             if(startDateEditText.isBlank() or endDateEditText.isBlank()){
