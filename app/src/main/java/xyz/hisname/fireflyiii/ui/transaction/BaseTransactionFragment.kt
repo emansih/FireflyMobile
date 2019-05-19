@@ -35,7 +35,6 @@ abstract class BaseTransactionFragment: BaseFragment() {
             toastInfo(it)
         })
         setupFab()
-        loadingData()
     }
 
     abstract fun setupFab()
@@ -49,27 +48,23 @@ abstract class BaseTransactionFragment: BaseFragment() {
         }
     }
 
-    private fun loadingData(){
-        transactionViewModel.isLoading.observe(this, Observer {  load ->
-            swipeContainer.isRefreshing = load == true
-            if(!load){
-                if(dataAdapter.isEmpty()){
-                    recycler_view.isGone = true
-                    noTransactionText.isVisible = true
-                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
-                    noTransactionImage.isVisible = true
-                    noTransactionImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
-                } else {
-                    recycler_view.isVisible = true
-                    noTransactionText.isGone = true
-                    noTransactionImage.isGone = true
-                    runLayoutAnimation(recycler_view)
-                    rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
-                    recycler_view.adapter = rtAdapter
-                }
-            }
-        })
+    protected fun displayResults(){
+        swipeContainer.isRefreshing = false
+        if(dataAdapter.isEmpty()){
+            recycler_view.isGone = true
+            noTransactionText.isVisible = true
+            noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
+            noTransactionImage.isVisible = true
+            noTransactionImage.setImageDrawable(IconicsDrawable(requireContext())
+                    .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
+        } else {
+            recycler_view.isVisible = true
+            noTransactionText.isGone = true
+            noTransactionImage.isGone = true
+            runLayoutAnimation(recycler_view)
+            rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
+            recycler_view.adapter = rtAdapter
+        }
     }
 
     override fun onDetach() {

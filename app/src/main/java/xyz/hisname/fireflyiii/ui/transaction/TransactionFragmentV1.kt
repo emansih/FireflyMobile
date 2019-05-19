@@ -33,8 +33,11 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        runLayoutAnimation(recycler_view, true)
-        loadTransaction(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+        swipeContainer.isRefreshing = true
+        transactionViewModel.getTransactionList(DateTimeUtil.getTodayDate(), DateTimeUtil.getStartOfMonth(6),
+                transactionType).observe(this, Observer {
+            loadTransaction(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+        })
         setDateTransaction()
         setTransactionCard()
     }
@@ -98,6 +101,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         dataAdapter.clear()
         transactionViewModel.getTransactionList(startDate, endDate, transactionType).observe(this, Observer {
             dataAdapter = ArrayList(it)
+            displayResults()
         })
     }
 
