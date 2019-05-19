@@ -1,5 +1,9 @@
 object Dependencies{
 
+    /* Note: !!!DO NOT UPDATE any AndroidX libs!!! This includes Google's Material Design lib.
+    Only update to non rc / beta / alpha versions.
+    Currently AndroidX does not play well when enabling night mode and changing locale
+     */
     const val minSdk = 19
     const val targetSdk = 28
     const val compileSdk = 28
@@ -9,13 +13,13 @@ object Dependencies{
     private const val roomVersion = "2.0.0"
     private const val coroutineVersion = "1.2.1"
     private const val appCompatVersion = "1.0.2"
-    private const val androidxFragmentVersion = "1.1.0-alpha09"
+    private const val androidxFragmentVersion = "1.1.0-alpha04"
     private const val androidxAnnotationVersion = "1.0.0"
     private const val androidxRecyclerViewVersion = "1.0.0"
     private const val materialDesignVersion = "1.1.0-alpha04"
     private const val androidxCoreVersion = "1.0.1"
     private const val androidxConstraintLayoutVersion = "1.1.3"
-    private const val androidxPrefVersion = "1.1.0-alpha05"
+    private const val androidxPrefVersion = "1.1.0-alpha03"
     private const val androidxWorkVersion = "1.0.1"
     private const val materialDrawerVersion = "6.1.2"
     private const val iconicsVersion = "3.2.5"
