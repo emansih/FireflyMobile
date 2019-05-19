@@ -11,6 +11,7 @@ import xyz.hisname.fireflyiii.util.LocalDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 class RetrofitBuilder {
 
@@ -23,6 +24,10 @@ class RetrofitBuilder {
             if(INSTANCE == null){
                 val client = OkHttpClient().newBuilder()
                         .addInterceptor(HeaderInterceptor(accessToken))
+                        .callTimeout(1, TimeUnit.MINUTES)
+                        .connectTimeout(1, TimeUnit.MINUTES)
+                        .writeTimeout(1, TimeUnit.MINUTES)
+                        .readTimeout(1, TimeUnit.MINUTES)
                 if(!certPinValue.isBlank()){
                     try {
                         val certPinner = CertificatePinner.Builder()
