@@ -36,6 +36,8 @@ import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+
+// TODO: Remove explicit type arguments. Broken on pref(1.1.0-alpha05)
 class SettingsAccountFragment: BaseSettings() {
 
     private val accManager by lazy { AuthenticatorManager(AccountManager.get(requireContext())) }
@@ -48,18 +50,18 @@ class SettingsAccountFragment: BaseSettings() {
     }
 
     private fun setAccountSection(){
-        val fireflyUrlPref = findPreference("fireflyUrl") as EditTextPreference
+        val fireflyUrlPref = findPreference<EditTextPreference>("fireflyUrl") as EditTextPreference
         fireflyUrlPref.apply {
             title = "Firefly URL"
             summary = AppPref(sharedPref).baseUrl
         }
 
-        val accessTokenPref = findPreference("access_token") as EditTextPreference
+        val accessTokenPref = findPreference<EditTextPreference>("access_token") as EditTextPreference
         accessTokenPref.apply {
             title = "Access Token"
             summary = accManager.secretKey
         }
-        val authMethod = findPreference("auth_method") as Preference
+        val authMethod = findPreference<Preference>("auth_method") as Preference
 
         if(Objects.equals(authMethodPref, "oauth")){
             authMethod.summary = "Open Authentication"
@@ -78,7 +80,7 @@ class SettingsAccountFragment: BaseSettings() {
             RetrofitBuilder.destroyInstance()
             true
         }
-        val refreshToken = findPreference("refresh_token") as Preference
+        val refreshToken = findPreference<Preference>("refresh_token") as Preference
         refreshToken.setOnPreferenceClickListener {
             toastInfo("Refreshing your token...")
             authViewModel.getRefreshToken().observe(this, Observer { success ->
@@ -90,12 +92,12 @@ class SettingsAccountFragment: BaseSettings() {
             })
             true
         }
-        val certBolean = findPreference("enable_cert_pinning") as SwitchPreference
+        val certBolean = findPreference<SwitchPreference>("enable_cert_pinning") as SwitchPreference
         certBolean.setOnPreferenceChangeListener { _, _ ->
             RetrofitBuilder.destroyInstance()
             true
         }
-        val certValue = findPreference("cert_value") as Preference
+        val certValue = findPreference<Preference>("cert_value") as Preference
         certValue.setOnPreferenceChangeListener{ _, newValue ->
             try {
                 Base64.decode(newValue.toString(), Base64.DEFAULT).toString(Charsets.UTF_8)
@@ -110,8 +112,8 @@ class SettingsAccountFragment: BaseSettings() {
             RetrofitBuilder.destroyInstance()
             true
         }
-        val autoRefreshToken = findPreference("auto_refresh_token") as SwitchPreference
-        val refreshTokenInterval = findPreference("refresh_token_interval") as ListPreference
+        val autoRefreshToken = findPreference<SwitchPreference>("auto_refresh_token") as SwitchPreference
+        val refreshTokenInterval = findPreference<ListPreference>("refresh_token_interval") as ListPreference
         autoRefreshToken.setOnPreferenceChangeListener { _, newValue ->
             if(newValue == false){
                 WorkManager.getInstance().cancelAllWorkByTag("refresh_worker")
@@ -140,7 +142,7 @@ class SettingsAccountFragment: BaseSettings() {
             WorkManager.getInstance().enqueue(workBuilder)
             true
         }
-        val logout = findPreference("logout") as Preference
+        val logout = findPreference<Preference>("logout") as Preference
         logout.setOnPreferenceClickListener {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
                 AppDatabase.clearDb(requireContext())

@@ -140,7 +140,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                                 data.isHighlightEnabled = false
                                 setTouchEnabled(true)
                                 setPinchZoom(true)
-                                animateY(1000, Easing.EasingOption.EaseOutBack)
+                                animateY(1000, Easing.EaseOutBack)
                             }
                         }
                     })

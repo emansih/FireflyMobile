@@ -34,7 +34,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setLanguagePref(){
-        val languagePref = findPreference("language_pref") as ListPreference
+        val languagePref = findPreference<ListPreference>("language_pref") as ListPreference
         languagePref.value = AppPref(sharedPref).languagePref
         languagePref.setOnPreferenceChangeListener { _, newValue ->
             AppPref(sharedPref).languagePref = newValue.toString()
@@ -48,7 +48,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setAccountSection(){
-        val accountOptions = findPreference("account_options") as Preference
+        val accountOptions = findPreference<Preference>("account_options") as Preference
         accountOptions.setOnPreferenceClickListener {
             requireFragmentManager().commit {
                 addToBackStack(null)
@@ -63,7 +63,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setTransactionSection(){
-        val transactionSettings = findPreference("transaction_settings") as Preference
+        val transactionSettings = findPreference<Preference>("transaction_settings") as Preference
         transactionSettings.setOnPreferenceClickListener {
             requireFragmentManager().commit {
                 addToBackStack(null)
@@ -79,7 +79,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setNightModeSection(){
-        val nightModePref = findPreference("night_mode") as CheckBoxPreference
+        val nightModePref = findPreference<CheckBoxPreference>("night_mode") as CheckBoxPreference
         if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM){
             nightModePref.isEnabled = false
         }
@@ -116,7 +116,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setPinCode(){
-        val keyguardPref = findPreference("keyguard") as Preference
+        val keyguardPref = findPreference<Preference>("keyguard") as Preference
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ){
             keyguardPref.isVisible = false
         }

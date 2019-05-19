@@ -1,15 +1,13 @@
 package xyz.hisname.fireflyiii.util.extension
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.widget.Toast
-import com.bumptech.glide.Glide
+import androidx.core.content.ContextCompat
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
-import es.dmoral.toasty.R
 import es.dmoral.toasty.Toasty
+import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.Fragment as SupportFragment
 
 fun Context.toastInfo(message: String, duration: Int = Toast.LENGTH_SHORT) =
@@ -20,13 +18,6 @@ fun Context.toastError(message: String?, duration: Int = Toast.LENGTH_SHORT) =
 
 fun Context.toastSuccess(message: String, duration: Int = Toast.LENGTH_SHORT) =
         Toasty.success(this, message, duration).show()
-
-
-fun Context.toastOffline(message: String, duration: Int = Toast.LENGTH_SHORT) =
-        Toasty.custom(this, message, IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_cloud_off).sizeDp(24),
-                Color.parseColor("#3F51B5"), duration, true, true).show()
-
 
 fun SupportFragment.toastInfo(message: String, duration: Int = Toast.LENGTH_SHORT) =
         requireActivity().toastInfo(message, duration)
@@ -40,6 +31,9 @@ fun SupportFragment.toastSuccess(message: String, duration: Int = Toast.LENGTH_S
 fun SupportFragment.toastOffline(message: String, duration: Int = Toast.LENGTH_SHORT) =
        Toasty.custom(requireActivity(), message, IconicsDrawable(requireContext())
         .icon(GoogleMaterial.Icon.gmd_cloud_off).sizeDp(24),
-        Color.parseColor("#3F51B5"), duration, true, true).show()
+               ContextCompat.getColor(requireContext(),R.color.darkBlue),
+               ContextCompat.getColor(requireContext(), R.color.white),
+               duration, true, true).show()
+
 
 

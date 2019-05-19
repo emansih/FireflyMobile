@@ -162,7 +162,7 @@ class HomeActivity: BaseActivity(){
                 Glide.with(imageView.context).clear(imageView)
                 super.cancel(imageView)
             }
-            override fun placeholder(ctx: Context?, tag: String): Drawable {
+            override fun placeholder(ctx: Context, tag: String): Drawable {
                 return when (tag) {
                     DrawerImageLoader.Tags.PROFILE.name -> DrawerUIUtils.getPlaceHolder(ctx)
                     DrawerImageLoader.Tags.ACCOUNT_HEADER.name -> IconicsDrawable(ctx).iconText(" ")
