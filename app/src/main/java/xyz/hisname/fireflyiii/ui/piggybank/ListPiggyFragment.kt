@@ -2,9 +2,8 @@ package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.CheckBox
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -25,6 +24,7 @@ import xyz.hisname.fireflyiii.util.extension.toastError
 class ListPiggyFragment: BaseFragment() {
 
     private var dataAdapter = arrayListOf<PiggyData>()
+    private var whichPiggy = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -34,38 +34,50 @@ class ListPiggyFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         runLayoutAnimation(recycler_view)
-        displayView()
+        setHasOptionsMenu(true)
+        displayAll()
         pullToRefresh()
         initFab()
     }
 
     private fun displayView(){
-        swipeContainer.isRefreshing = true
-        piggyViewModel.getAllPiggyBanks().observe(this, Observer { piggyBankData ->
-            piggyViewModel.isLoading.observe(this, Observer { loading ->
-                if (loading == false) {
-                    swipeContainer.isRefreshing = false
-                    if (piggyBankData.isNotEmpty()) {
-                        dataAdapter = ArrayList(piggyBankData)
-                                listText.isVisible = false
-                        listImage.isVisible = false
-                        recycler_view.isVisible = true
-                        recycler_view.adapter =  PiggyRecyclerAdapter(dataAdapter){ data: PiggyData -> itemClicked(data) }.apply {
-                            update(dataAdapter)
-                        }
-                    } else {
-                        listText.text = resources.getString(R.string.no_piggy_bank)
-                        listText.isVisible = true
-                        listImage.isVisible = true
-                        listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank))
-                        recycler_view.isVisible = false
-                    }
-                }
-            })
+        if (dataAdapter.isNotEmpty()) {
+            listText.isVisible = false
+            listImage.isVisible = false
+            recycler_view.isVisible = true
+            recycler_view.adapter =  PiggyRecyclerAdapter(dataAdapter){ data: PiggyData -> itemClicked(data) }.apply {
+                update(dataAdapter)
+            }
+        } else {
+            listText.text = resources.getString(R.string.no_piggy_bank)
+            listText.isVisible = true
+            listImage.isVisible = true
+            listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank))
+            recycler_view.isVisible = false
+        }
+
+        piggyViewModel.isLoading.observe(this, Observer {
+            swipeContainer.isRefreshing = it == true
         })
 
         piggyViewModel.apiResponse.observe(this, Observer {
             toastError(it)
+        })
+    }
+
+    private fun displayAll(){
+        dataAdapter.clear()
+        piggyViewModel.getAllPiggyBanks().observe(this, Observer { piggyBankData ->
+            dataAdapter = ArrayList(piggyBankData)
+            displayView()
+        })
+    }
+
+    private fun displayIncomplete(){
+        dataAdapter.clear()
+        piggyViewModel.getNonCompletedPiggyBanks().observe(this, Observer { piggyBankData ->
+            dataAdapter = ArrayList(piggyBankData)
+            displayView()
         })
     }
 
@@ -80,7 +92,11 @@ class ListPiggyFragment: BaseFragment() {
     private fun pullToRefresh(){
         swipeContainer.setOnRefreshListener {
             dataAdapter.clear()
-            displayView()
+            if(whichPiggy){
+                displayAll()
+            } else {
+                displayIncomplete()
+            }
         }
     }
 
@@ -96,6 +112,27 @@ class ListPiggyFragment: BaseFragment() {
             fab.isClickable = true
         }
         recycler_view.hideFab(fab)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.piggy_bank_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        item.isCheckable = true
+        if(id == R.id.menu_incomplete){
+            if(item.isChecked){
+                item.isChecked = false
+                displayAll()
+                whichPiggy = true
+            } else {
+                item.isChecked = true
+                displayIncomplete()
+                whichPiggy = false
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onAttach(context: Context){

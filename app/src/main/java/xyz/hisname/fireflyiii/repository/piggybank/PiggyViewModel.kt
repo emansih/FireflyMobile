@@ -177,7 +177,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.updatePiggy(networkData.data) }
+                scope.launch(Dispatchers.IO) { repository.insertPiggy(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
@@ -203,6 +203,17 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
     fun postPiggyName(details: String?){
         piggyName.value = details
+    }
+
+    fun getNonCompletedPiggyBanks(): LiveData<MutableList<PiggyData>>{
+        var piggyData: MutableList<PiggyData> = arrayListOf()
+        val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
+        scope.launch(Dispatchers.IO) {
+            piggyData = repository.getNonCompletedPiggyBanks()
+        }.invokeOnCompletion {
+            data.postValue(piggyData)
+        }
+        return data
     }
 
     private fun deletePiggy(piggyId: Long){

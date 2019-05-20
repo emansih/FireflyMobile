@@ -23,4 +23,7 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
     @Query("SELECT * FROM piggy WHERE name LIKE :piggyName")
     abstract fun searchPiggyName(piggyName: String): MutableList<PiggyData>
 
+    @Query("SELECT * FROM piggy WHERE percentage != 100")
+    abstract fun getNonCompletedPiggyBanks(): MutableList<PiggyData>
+
 }
