@@ -44,10 +44,8 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return currencyData
     }
 
-    fun getEnabledCurrency(): LiveData<MutableList<CurrencyData>> {
-        loadRemoteData()
-        return repository.enabledCurrency
-    }
+    fun getEnabledCurrency() = loadRemoteData()
+
 
     fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
                        enabled: Boolean, default: Boolean): LiveData<ApiResponses<CurrencySuccessModel>>{

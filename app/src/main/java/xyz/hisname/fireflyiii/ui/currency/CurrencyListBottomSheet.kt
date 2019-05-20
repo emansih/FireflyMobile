@@ -36,19 +36,12 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
             addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
         }
         currencyViewModel.getEnabledCurrency().observe(this, Observer { currencyData ->
-            currencyViewModel.isLoading.observe(this, Observer { loading ->
-                if(loading == false){
-                    currencyData?.sortWith(Comparator { initial, after ->
-                        initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
-                    })
-                    dataAdapter = ArrayList(currencyData)
-                    recycler_view.adapter = EnabledCurrencyRecyclerAdapter(currencyData) { data: CurrencyData ->
-                        itemClicked(data)
-                    }.apply {
-                        update(dataAdapter)
-                    }
-                }
-            })
+            dataAdapter = ArrayList(currencyData)
+            recycler_view.adapter = EnabledCurrencyRecyclerAdapter(currencyData) { data: CurrencyData ->
+                itemClicked(data)
+            }.apply {
+                update(dataAdapter)
+            }
         })
     }
 

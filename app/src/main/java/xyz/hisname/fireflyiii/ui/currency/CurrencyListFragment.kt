@@ -46,19 +46,12 @@ class CurrencyListFragment: BaseFragment() {
 
     private fun displayView(){
         currencyViewModel.getCurrency().observe(this, Observer {currencyData ->
-            currencyViewModel.isLoading.observe(this, Observer { loading ->
-                if(loading == false) {
-                    currencyData.sortWith(Comparator { initial, after ->
-                        initial.currencyAttributes?.name!!.compareTo(after.currencyAttributes?.name!!)
-                    })
-                    dataAdapter = ArrayList(currencyData)
-                    recycler_view.adapter = CurrencyRecyclerAdapter(dataAdapter) { data: CurrencyData ->
-                        clickListener(data)
-                    }.apply {
-                        update(dataAdapter)
-                    }
-                }
-            })
+            dataAdapter = ArrayList(currencyData)
+            recycler_view.adapter = CurrencyRecyclerAdapter(dataAdapter) { data: CurrencyData ->
+                clickListener(data)
+            }.apply {
+                update(dataAdapter)
+            }
         })
     }
 
