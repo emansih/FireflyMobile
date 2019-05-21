@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -30,7 +29,6 @@ import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -59,6 +57,7 @@ class BudgetSummaryFragment: BaseFragment() {
             setText(currency[0])
             getExpensesTransaction(currency[0])
         })
+        setTheme()
     }
 
     private fun getExpensesTransaction(currencyData: CurrencyData) {
@@ -123,6 +122,12 @@ class BudgetSummaryFragment: BaseFragment() {
             }
 
         })
+    }
+
+    private fun setTheme(){
+        if(isDarkMode()){
+            budgetSummaryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+        }
     }
 
     private fun setText(currencyData: CurrencyData){
