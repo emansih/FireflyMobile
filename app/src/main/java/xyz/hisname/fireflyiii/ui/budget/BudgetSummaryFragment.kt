@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.ui.budget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -37,8 +38,8 @@ class BudgetSummaryFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
     private val coloring = arrayListOf<Int>()
-    private var budgetSpent = 0.toFloat()
-    private var budgeted = 0.toFloat()
+    private var budgetSpent = 0f
+    private var budgeted = 0f
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.create(R.layout.fragment_budget_summary, container)
@@ -54,25 +55,30 @@ class BudgetSummaryFragment: BaseFragment() {
         }
         budgetSummaryPieChart.isDrawHoleEnabled = false
         currencyViewModel.getDefaultCurrency().observe(this, Observer { currency ->
-            setText(currency[0])
-            getExpensesTransaction(currency[0])
+            retrieveData(currency[0])
+            setBudgetSummary(currency[0])
         })
         setTheme()
     }
 
-    private fun getExpensesTransaction(currencyData: CurrencyData) {
+    private fun retrieveData(currencyData: CurrencyData){
         val currencyCode = currencyData.currencyAttributes?.code ?: ""
-        zipLiveData(transactionViewModel.getTotalTransactionAmountByDateAndCurrency(DateTimeUtil.getStartOfMonth(),
+        zipLiveData(zipLiveData(transactionViewModel.getTotalTransactionAmountByDateAndCurrency(DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal"),
                 transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal")).observe(this, Observer { transactionData ->
-            if(transactionData.second.isNotEmpty()) {
-                val pieEntryArray: ArrayList<PieEntry> = ArrayList(transactionData.second.size)
-                transactionData.second.forEachIndexed { _, uniqueBudget ->
+                        DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal")),
+                zipLiveData(budgetLimit.retrieveSpentBudget(),
+                        budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(this, Observer { fireflyData ->
+            if(fireflyData.first.second.isNotEmpty()) {
+                val pieEntryArray: ArrayList<PieEntry> = ArrayList(fireflyData.first.second.size)
+                fireflyData.first.second.forEachIndexed { _, uniqueBudget ->
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), currencyCode,
                             "Withdrawal", uniqueBudget).observe(this, Observer { transactionAmount ->
-                        val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(transactionData.first.absoluteValue.roundToInt().toDouble()).times(100)
+                        val percentageCategory = transactionAmount.absoluteValue.roundToInt()
+                                .toDouble()
+                                .div(fireflyData.first.first.absoluteValue.roundToInt().toDouble())
+                                .times(100)
                         if (uniqueBudget == "null" || uniqueBudget == null) {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(),
                                     requireContext().getString(R.string.expenses_without_budget),
@@ -89,7 +95,25 @@ class BudgetSummaryFragment: BaseFragment() {
                     })
                 }
             }
+            setBudgetData(fireflyData.second, currencyData)
         })
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun setBudgetData(fireflyData: Pair<String, String>, currencyData: CurrencyData){
+        val currencySymbol = currencyData.currencyAttributes?.symbol ?: ""
+        budgetSpent = fireflyData.first.toFloat()
+        budgeted = fireflyData.second.toFloat()
+        budgetAmountValue.text = "$currencySymbol $budgeted"
+        actualAmountValue.text = "$currencySymbol $budgetSpent"
+        remainingAmountValue.text = currencySymbol + " " +
+                LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun setBudgetSummary(currencyData: CurrencyData){
+        val currencyCode = currencyData.currencyAttributes?.code ?: ""
         budgetSummaryPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onNothingSelected() {
                 budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgeted
@@ -120,29 +144,16 @@ class BudgetSummaryFragment: BaseFragment() {
                     transactionDialog.show(requireFragmentManager(), "transaction_budget_dialog")
                 }
             }
-
         })
+        budgetSummaryPieChart.description.isEnabled = false
+        budgetSummaryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
+        budgetDuration.text = DateTimeUtil.getDurationText()
     }
 
     private fun setTheme(){
         if(isDarkMode()){
             budgetSummaryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
         }
-    }
-
-    private fun setText(currencyData: CurrencyData){
-        budgetSummaryPieChart.description.isEnabled = false
-        budgetSummaryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
-        budgetDuration.text = DateTimeUtil.getDurationText()
-        zipLiveData(budgetLimit.retrieveSpentBudget(),
-                budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: "")).observe(this, Observer { budget ->
-            budgetSpent = budget.first.toFloat()
-            budgeted = budget.second.toFloat()
-            budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgeted
-            actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgetSpent
-            remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
-                    LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
-        })
     }
 
     override fun onAttach(context: Context){
