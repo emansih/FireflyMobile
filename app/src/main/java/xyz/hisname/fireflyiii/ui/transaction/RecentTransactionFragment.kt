@@ -41,8 +41,10 @@ class RecentTransactionFragment: BaseFragment() {
         recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
         recentTransactionList.addItemDecoration(DividerItemDecoration(recentTransactionList.context,
                 DividerItemDecoration.VERTICAL))
+        transactionLoader.show()
         transactionViewModel.getRecentTransaction(5).observe(this, Observer {
             dataAdapter = ArrayList(it)
+            transactionLoader.hide()
             if (dataAdapter.size == 0) {
                 recentTransactionList.isGone = true
                 noTransactionText.isVisible = true
@@ -53,14 +55,6 @@ class RecentTransactionFragment: BaseFragment() {
                 recentTransactionList.adapter = rtAdapter
                 rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
                 rtAdapter.notifyDataSetChanged()
-            }
-        })
-        transactionViewModel.isLoading.observe(this, Observer {
-            if(it == true){
-                transactionLoader.bringToFront()
-                transactionLoader.show()
-            } else {
-                transactionLoader.hide()
             }
         })
     }
