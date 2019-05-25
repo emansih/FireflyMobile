@@ -32,10 +32,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     }
 
 
-    fun getAllAccounts(): LiveData<MutableList<AccountData>> {
-        loadRemoteData("all")
-        return repository.allAccounts
-    }
+    fun getAllAccounts() = loadRemoteData("all")
 
     fun getAllAccountWithNetworthAndCurrency(currencyCode: String): LiveData<String>{
         isLoading.value = true

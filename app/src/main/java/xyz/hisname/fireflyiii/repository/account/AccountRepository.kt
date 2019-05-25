@@ -8,12 +8,6 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 @WorkerThread
 class AccountRepository(private val accountDao: AccountsDataDao){
 
-    val allAccounts = accountDao.getAllAccounts()
-    val assetAccount = accountDao.getAccountByType("asset")
-    val expenseAccount = accountDao.getAccountByType("expense")
-    val revenueAccount = accountDao.getAccountByType("revenue")
-    val liabilityAccount = accountDao.getAccountByType("liabilities")
-
     suspend fun insertAccount(account: AccountData){
         accountDao.insert(account)
     }
