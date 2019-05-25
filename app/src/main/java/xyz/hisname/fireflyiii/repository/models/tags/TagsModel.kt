@@ -7,6 +7,5 @@ import androidx.room.Entity
 data class TagsModel(
         @Embedded
         val data: List<TagsData>,
-        val links: Links,
         val meta: Meta
 )

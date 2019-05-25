@@ -7,6 +7,5 @@ import androidx.room.Entity
 data class CategoryModel(
         @Embedded
         val data: MutableCollection<CategoryData>,
-        val links: Links,
         val meta: Meta
 )

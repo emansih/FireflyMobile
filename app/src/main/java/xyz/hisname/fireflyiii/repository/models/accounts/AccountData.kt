@@ -15,7 +15,5 @@ data class AccountData(
         var accountId: Long? = null,
         @Embedded
         @SerializedName("attributes")
-        var accountAttributes: AccountAttributes? = null,
-        @Ignore
-        var links: Links? = null
+        var accountAttributes: AccountAttributes? = null
 )

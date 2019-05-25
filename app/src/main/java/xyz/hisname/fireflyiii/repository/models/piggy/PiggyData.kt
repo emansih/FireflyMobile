@@ -15,7 +15,5 @@ data class PiggyData(
         var piggyId: Long? = null,
         @Embedded
         @SerializedName("attributes")
-        var piggyAttributes: PiggyAttributes? = null,
-        @Ignore
-        var links: LinksX? = null
+        var piggyAttributes: PiggyAttributes? = null
 )
