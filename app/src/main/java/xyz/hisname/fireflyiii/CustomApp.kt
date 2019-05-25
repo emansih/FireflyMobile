@@ -29,7 +29,7 @@ class CustomApp: MultiDexApplication() {
 
     private fun newThread(){
         Thread(Runnable {
-            AndroidThreeTen.init(this)
+            AndroidThreeTen.init(this, "2019a-TZDB.dat")
             if(BuildConfig.DEBUG == false) {
                 ACRA.init(this)
             }

@@ -70,13 +70,14 @@ android {
     }
 
     aaptOptions {
-        ignoreAssetsPattern "NOTICE.txt"
+        ignoreAssetsPattern "TZDB.dat:NOTICE.txt"
     }
+	
     configurations {all*.exclude group: 'com.android.support'}
 }
 
 afterEvaluate {
-    if(build.name.contains("Github")) {
+    if(build.name.contains("github")) {
         assembleGithubRelease.dependsOn test
         assembleGithubRelease.finalizedBy(changeName)
     }
