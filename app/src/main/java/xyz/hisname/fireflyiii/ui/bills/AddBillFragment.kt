@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_bill.*
@@ -46,17 +47,17 @@ class AddBillFragment: BaseAddObjectFragment() {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_bill_layout)
         if(billId != 0L){
-            billViewModel.getBillById(billId).observe(this, Observer {
+            billViewModel.getBillById(billId).observe(this) {
                 billAttribute = it[0].billAttributes
                 description_edittext.setText(billAttribute?.name)
                 billDescription = billAttribute?.name
                 min_amount_edittext.setText(billAttribute?.amount_min.toString())
                 max_amount_edittext.setText(billAttribute?.amount_max.toString())
                 currency = billAttribute?.currency_code ?: ""
-                currencyViewModel.getCurrencyByCode(currency).observe(this, Observer { currencyList ->
+                currencyViewModel.getCurrencyByCode(currency).observe(this) { currencyList ->
                     val currencyData = currencyList[0].currencyAttributes
                     currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
-                })
+                }
                 bill_date_edittext.setText(billAttribute?.date)
                 skip_edittext.setText(billAttribute?.skip.toString())
                 notes_edittext.setText(billAttribute?.notes)
@@ -64,7 +65,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                         billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase() +
                                 billAttribute?.repeat_freq?.substring(1))
                 frequency_spinner.setSelection(spinnerPosition)
-            })
+            }
         }
         showHelpText()
     }
@@ -170,27 +171,26 @@ class AddBillFragment: BaseAddObjectFragment() {
         currency_edittext.setOnClickListener{
             CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )
         }
-        currencyViewModel.currencyCode.observe(this, Observer {
+        currencyViewModel.currencyCode.observe(this) {
             currency = it
-        })
+        }
 
-        currencyViewModel.currencyDetails.observe(this, Observer {
+        currencyViewModel.currencyDetails.observe(this) {
             currency_edittext.setText(it)
-        })
+        }
         placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             currency = currencyData?.code.toString()
-        })
+        }
     }
 
     override fun submitData(){
         billViewModel.addBill(description_edittext.getString(),
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
-                    currency, notes)
-                .observe(this, Observer { response ->
+                    currency, notes).observe(this) { response ->
                     ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     val errorMessage = response.getErrorMessage()
                     if (errorMessage != null) {
@@ -216,14 +216,14 @@ class AddBillFragment: BaseAddObjectFragment() {
                         toastSuccess("Bill saved")
                         handleBack()
                     }
-                })
+                }
     }
 
     private fun updateBill(){
         billViewModel.updateBill(billId, description_edittext.getString(),
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
-                currency, notes).observe(this, Observer { response ->
+                currency, notes).observe(this) { response ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             if (response.getErrorMessage() != null) {
                 toastError(response.getErrorMessage())
@@ -233,7 +233,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                 toastSuccess("Bill updated")
                 handleBack()
             }
-        })
+        }
     }
 
     override fun handleBack() {

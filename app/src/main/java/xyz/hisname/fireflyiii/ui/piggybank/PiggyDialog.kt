@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.dialog_search.*
@@ -32,14 +32,10 @@ class PiggyDialog: BaseDialog() {
             adapter?.notifyDataSetChanged()
         }
         swipeContainer.isRefreshing = true
-        piggyViewModel.getAllPiggyBanks().observe(this, Observer { piggyBankData ->
-            piggyViewModel.isLoading.observe(this, Observer { loading ->
-                if (loading == false) {
-                    swipeContainer.isRefreshing = false
-                    recycler_view.adapter = PiggyRecyclerAdapter(piggyBankData) { data: PiggyData -> itemClicked(data) }
-                }
-            })
-        })
+        piggyViewModel.getAllPiggyBanks().observe(this) { piggyBankData ->
+            swipeContainer.isRefreshing = false
+            recycler_view.adapter = PiggyRecyclerAdapter(piggyBankData) { data: PiggyData -> itemClicked(data) }
+        }
     }
 
     private fun searchData(){
@@ -66,14 +62,14 @@ class PiggyDialog: BaseDialog() {
 
     private fun filter(piggyName: String){
         dataAdapter.clear()
-        piggyViewModel.getPiggyByName(piggyName).observe(this, Observer { piggyData ->
+        piggyViewModel.getPiggyByName(piggyName).observe(this) { piggyData ->
             piggyData.forEachIndexed { _, catData ->
                 dataAdapter.add(catData)
             }
             piggyRecyclerAdapter = PiggyRecyclerAdapter(dataAdapter) { data: PiggyData ->  itemClicked(data)}
             piggyRecyclerAdapter.notifyDataSetChanged()
             recycler_view.adapter = piggyRecyclerAdapter
-        })
+        }
     }
 
 

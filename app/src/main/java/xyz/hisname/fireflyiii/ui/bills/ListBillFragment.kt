@@ -10,6 +10,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -41,26 +42,21 @@ class ListBillFragment: BaseFragment() {
 
     private fun displayView(){
         runLayoutAnimation(recycler_view)
-        billViewModel.getAllBills().observe(this, Observer { billList ->
-            billViewModel.isLoading.observe(this, Observer { loader ->
-                if(loader == false){
-                    if (billList.isNotEmpty()) {
-                        listText.isVisible = false
-                        listImage.isVisible = false
-                        recycler_view.isVisible = true
-                        recycler_view.adapter = BillsRecyclerAdapter(billList) { data: BillData -> itemClicked(data) }
-                    } else {
-                        listText.text = resources.getString(R.string.no_bills)
-                        listImage.setImageDrawable(IconicsDrawable(requireContext())
-                                .icon(GoogleMaterial.Icon.gmd_insert_emoticon).sizeDp(24))
-                        listText.isVisible = true
-                        listImage.isVisible = true
-                        recycler_view.isVisible = false
-                    }
-                }
-            })
-
-        })
+        billViewModel.getAllBills().observe(this) { billList ->
+            if (billList.isNotEmpty()) {
+                listText.isVisible = false
+                listImage.isVisible = false
+                recycler_view.isVisible = true
+                recycler_view.adapter = BillsRecyclerAdapter(billList) { data: BillData -> itemClicked(data) }
+            } else {
+                listText.text = resources.getString(R.string.no_bills)
+                listImage.setImageDrawable(IconicsDrawable(requireContext())
+                        .icon(GoogleMaterial.Icon.gmd_insert_emoticon).sizeDp(24))
+                listText.isVisible = true
+                listImage.isVisible = true
+                recycler_view.isVisible = false
+            }
+        }
         billViewModel.isLoading.observe(this, Observer {
             swipeContainer.isRefreshing = it == true
         })

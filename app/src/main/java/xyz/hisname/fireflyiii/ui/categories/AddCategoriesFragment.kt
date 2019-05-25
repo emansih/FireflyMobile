@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_category.*
@@ -41,7 +42,7 @@ class AddCategoriesFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData() {
-        categoryViewModel.addCategory(name_edittext.getString()).observe(this, Observer {
+        categoryViewModel.addCategory(name_edittext.getString()).observe(this) {
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = it.getErrorMessage()
             if (errorMessage != null) {
@@ -52,7 +53,7 @@ class AddCategoriesFragment: BaseAddObjectFragment() {
                 toastSuccess(requireContext().getString(R.string.category_added))
                 unReveal(addCategoryFab)
             }
-        })
+        }
     }
 
     override fun handleBack() {

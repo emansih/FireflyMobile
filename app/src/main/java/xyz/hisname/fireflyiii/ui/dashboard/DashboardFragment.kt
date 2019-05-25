@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
@@ -59,16 +60,16 @@ class DashboardFragment: BaseFragment() {
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
         changeTheme()
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             getTransactionData(currencyData)
             setPieChart(currencyData)
             setNetWorth(currencyData)
-        })
+        }
         animateCard(statsCard, netEarningsCard, dailySummaryCard, recentTransactionCard, budgetCard)
-        currencyViewModel.apiResponse.observe(this, Observer {
+        currencyViewModel.apiResponse.observe(this){
             toastInfo(it)
-        })
+        }
         fab.display {
             fab.isClickable = false
             requireActivity().startActivity(Intent(requireContext(), AddTransactionActivity::class.java))
@@ -93,9 +94,9 @@ class DashboardFragment: BaseFragment() {
 
     private fun setNetWorth(currencyData: CurrencyAttributes?){
         val currencyCode = currencyData?.code ?: ""
-        accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
+        accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this) { money ->
             netWorthText.text = currencyData?.symbol + money
-        })
+        }
     }
 
     private fun getTransactionData(currencyData: CurrencyAttributes?){
@@ -125,10 +126,10 @@ class DashboardFragment: BaseFragment() {
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5), currencyCode),
                 transactionViewModel.getWithdrawalAmountWithCurrencyCode(
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode))).observe(this, Observer { transactionData ->
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode))).observe(this) { transactionData ->
             setNetIncome(currencyData?.symbol ?: "", transactionData.first)
             setAverage(currencyData?.symbol ?: "", currencyCode, transactionData.second)
-        })
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -247,11 +248,11 @@ class DashboardFragment: BaseFragment() {
             setTouchEnabled(true)
         }
         transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
-                DateTimeUtil.getTodayDate(), currencyCode).observe(this, Observer { transactionData ->
+                DateTimeUtil.getTodayDate(), currencyCode).observe(this){ transactionData ->
             thirtyDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(
                     transactionData.div(30), requireContext())
 
-        })
+        }
     }
 
     private fun setPieChart(currencyData: CurrencyAttributes?) {
@@ -259,7 +260,7 @@ class DashboardFragment: BaseFragment() {
         val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700),
                 ContextCompat.getColor(requireContext(), R.color.md_green_500))
         zipLiveData(budgetLimit.retrieveSpentBudget(),
-                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code ?: "")).observe(this, Observer { budget ->
+                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code ?: "")).observe(this) { budget ->
             budgetSpent = budget.first.toFloat()
             budgeted = budget.second.toFloat()
             val budgetLeftPercentage = (budgetSpent / budgeted) * 100
@@ -305,7 +306,7 @@ class DashboardFragment: BaseFragment() {
                 }
                 ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
             }
-        })
+        }
     }
 
     private fun changeTheme(){

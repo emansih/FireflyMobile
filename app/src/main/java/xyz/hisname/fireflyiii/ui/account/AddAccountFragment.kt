@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -107,22 +107,22 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     override fun setWidgets() {
         setAccordion()
-        currencyViewModel.currencyCode.observe(this, Observer {
+        currencyViewModel.currencyCode.observe(this) {
             currency = it
-        })
-        currencyViewModel.currencyDetails.observe(this, Observer {
+        }
+        currencyViewModel.currencyDetails.observe(this) {
             currency_edittext.setText(it)
-        })
+        }
         currency_edittext.setOnClickListener{
             val currencyListFragment = CurrencyListBottomSheet()
             currencyListFragment.show(requireFragmentManager(), "currencyList" )
         }
         if(accountId == 0L) {
-            currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+            currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
                 val currencyData = defaultCurrency[0].currencyAttributes
                 currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
                 currency = currencyData?.code ?: ""
-            })
+            }
         }
         if(accountType == "asset"){
             opening_balance_date_layout.isVisible = true
@@ -173,13 +173,13 @@ class AddAccountFragment: BaseAddObjectFragment() {
         includeInNetWorthText.setOnClickListener {
             includeInNetWorthCheck.performClick()
         }
-        accountViewModel.isLoading.observe(this, Observer { loader ->
+        accountViewModel.isLoading.observe(this) { loader ->
             if(loader){
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
-        })
+        }
     }
 
     override fun submitData() {
@@ -289,7 +289,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         accountViewModel.updateAccount(accountId,accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod).observe(this, Observer {
+                liabilityStartDate, interest, interestPeriod).observe(this){
             val error = it.getError()
             when {
                 error != null -> toastError(error.localizedMessage)
@@ -299,7 +299,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 }
                 else -> toastError(it.getErrorMessage())
             }
-        })
+        }
     }
 
     private fun addAccount(accountName: String, accountType: String,
@@ -310,7 +310,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         accountViewModel.addAccounts(accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod).observe(this, Observer {
+                liabilityStartDate, interest, interestPeriod).observe(this){
             val error = it.getError()
             if (error != null) {
                 if(error.localizedMessage.startsWith("Unable to resolve host")) {
@@ -323,12 +323,12 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 toastSuccess("Account saved")
                 handleBack()
             }
-        })
+        }
     }
 
     private fun updateData(){
         if(accountId != 0L){
-            accountViewModel.getAccountById(accountId).observe(this, Observer { accountData ->
+            accountViewModel.getAccountById(accountId).observe(this) { accountData ->
                 val accountAttributes = accountData[0].accountAttributes
                 description_edittext.setText(accountAttributes?.name)
                 currency_edittext.setText(accountAttributes?.currency_code + " (" + accountAttributes?.currency_symbol + " )")
@@ -372,7 +372,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 }
                 virtual_balance_edittext.setText(accountAttributes?.virtual_balance.toString())
                 note_edittext.setText(accountAttributes?.notes)
-            })
+            }
         } else {
             showHelpText()
         }
@@ -380,14 +380,16 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     private fun showHelpText(){
         queue = FancyShowCaseQueue()
-                .add(showCase(R.string.add_account_currency_help_text, "addAccountCurrencyCaseView", currency_layout))
+                .add(showCase(R.string.add_account_currency_help_text,
+                        "addAccountCurrencyCaseView", currency_layout))
         queue.show()
     }
 
     // This code is so nasty
     private fun showHiddenHelpText(){
         if(iban_layout.isVisible && expansionLayout.isExpanded) {
-            val ibanShow = showCase(R.string.iban_help_text, "ibanCaseView", iban_layout)
+            val ibanShow = showCase(R.string.iban_help_text,
+                    "ibanCaseView", iban_layout)
             ibanShow.show()
             ibanShow.dismissListener = object : DismissListener{
                 override fun onDismiss(id: String?) {

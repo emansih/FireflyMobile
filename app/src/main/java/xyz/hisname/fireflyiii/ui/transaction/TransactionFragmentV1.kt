@@ -7,7 +7,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -35,9 +35,9 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         super.onViewCreated(view, savedInstanceState)
         swipeContainer.isRefreshing = true
         transactionViewModel.getTransactionList(DateTimeUtil.getTodayDate(), DateTimeUtil.getStartOfMonth(6),
-                transactionType).observe(this, Observer {
+                transactionType).observe(this) {
             loadTransaction(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
-        })
+        }
         setDateTransaction()
         setTransactionCard()
     }
@@ -52,7 +52,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
                 .buildForFragment()
         val cardRecyclerView = requireActivity().findViewById<RecyclerView>(R.id.transaction_card_recyclerview)
         runLayoutAnimation(cardRecyclerView)
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { currencyData ->
+        currencyViewModel.getDefaultCurrency().observe(this) { currencyData ->
             val currencyName = currencyData[0].currencyAttributes?.code ?: ""
             val currencySymbol = currencyData[0].currencyAttributes?.symbol ?: ""
             zipLiveData(transactionViewModel.getTotalTransactionAmountAndFreqByDateAndCurrency(
@@ -71,7 +71,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
                             currencyName, transactionType, currencySymbol),
                     transactionViewModel.getTotalTransactionAmountAndFreqByDateAndCurrency(
                             DateTimeUtil.getStartOfMonth(5), DateTimeUtil.getEndOfMonth(5),
-                            currencyName, transactionType, currencySymbol)).observe(this, Observer { transactionData ->
+                            currencyName, transactionType, currencySymbol)).observe(this) { transactionData ->
                 val transactionArray = arrayListOf(transactionData.first, transactionData.second, transactionData.third,
                         transactionData.fourth, transactionData.fifth, transactionData.sixth)
                 cardRecyclerView.adapter = TransactionMonthRecyclerView(transactionArray){
@@ -80,8 +80,8 @@ class TransactionFragmentV1: BaseTransactionFragment() {
                     update(transactionArray)
                 }
 
-            })
-        })
+            }
+        }
     }
 
     private fun cardClicked(clicky: Int){
@@ -99,10 +99,10 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     private fun loadTransaction(startDate: String, endDate: String) {
         dataAdapter.clear()
-        transactionViewModel.getTransactionList(startDate, endDate, transactionType).observe(this, Observer {
+        transactionViewModel.getTransactionList(startDate, endDate, transactionType).observe(this) {
             dataAdapter = ArrayList(it)
             displayResults()
-        })
+        }
     }
 
     override fun setupFab() {
@@ -122,11 +122,11 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     private fun setDateTransaction(){
         val dateRangeVm = getViewModel(DateRangeViewModel::class.java)
-        zipLiveData(dateRangeVm.startDate, dateRangeVm.endDate).observe(this, Observer { dates ->
+        zipLiveData(dateRangeVm.startDate, dateRangeVm.endDate).observe(this) { dates ->
             if(dates.first.isNotBlank() && dates.second.isNotBlank()){
                 loadTransaction(dates.first, dates.second)
             }
-        })
+        }
     }
 
 

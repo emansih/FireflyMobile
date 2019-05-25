@@ -10,19 +10,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.observe
 import com.google.android.material.snackbar.Snackbar
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
-import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.BaseDetailModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
-import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
 import kotlin.collections.ArrayList
@@ -44,7 +39,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        piggyViewModel.getPiggyById(piggyId).observe(this, Observer {
+        piggyViewModel.getPiggyById(piggyId).observe(this) {
             piggyAttribute = it[0].piggyAttributes
             piggyName = piggyAttribute?.name
             currentAmount = piggyAttribute?.current_amount
@@ -52,7 +47,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
             currencyCode = piggyAttribute!!.currency_code
             setupWidgets()
             setupProgressBar()
-        })
+        }
     }
 
 
@@ -91,10 +86,9 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 .setMessage(resources.getString(R.string.delete_piggy_bank_message, piggyName))
                 .setPositiveButton(R.string.delete_permanently) { dialog, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    piggyViewModel.deletePiggyById(piggyId).observe(this, Observer {
-                        ProgressBar.animateView(requireActivity().findViewById<View>(R.id.progress_overlay),
-                                View.GONE, 0f, 200)
-                        if(it == true){
+                    piggyViewModel.deletePiggyById(piggyId).observe(this) {
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                        if(it){
                             requireFragmentManager().popBackStack()
                             toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyName))
                         } else {
@@ -105,7 +99,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                                     }
                                     .show()
                         }
-                    })
+                    }
                 }
                 .setNegativeButton(android.R.string.no){dialog, _ ->
                     dialog.dismiss()

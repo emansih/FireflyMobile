@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
@@ -16,8 +16,6 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.toastError
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -42,31 +40,27 @@ class CategoriesFragment: BaseFragment() {
     private fun displayView(){
         runLayoutAnimation(recycler_view)
         swipeContainer.isRefreshing = true
-        categoryViewModel.getAllCategory().observe(this, Observer { categoryData ->
-            categoryViewModel.isLoading.observe(this, Observer { loading ->
-                if (loading == false) {
-                    swipeContainer.isRefreshing = false
-                    if (categoryData.isNotEmpty()) {
-                        listText.isVisible = false
-                        listImage.isVisible = false
-                        recycler_view.isVisible = true
-                        recycler_view.adapter = CategoriesRecyclerAdapter(categoryData) { data: CategoryData ->  }
-                    } else {
-                        listText.text = "No category found"
-                        listText.isVisible = true
-                        listImage.isVisible = true
-                        listImage.setImageDrawable(IconicsDrawable(requireContext())
-                                .icon(FontAwesome.Icon.faw_chart_bar)
-                                .sizeDp(24))
-                        recycler_view.isVisible = false
-                    }
-                }
-            })
-        })
+        categoryViewModel.getAllCategory().observe(this) { categoryData ->
+            swipeContainer.isRefreshing = false
+            if (categoryData.isNotEmpty()) {
+                listText.isVisible = false
+                listImage.isVisible = false
+                recycler_view.isVisible = true
+                recycler_view.adapter = CategoriesRecyclerAdapter(categoryData) { data: CategoryData ->  }
+            } else {
+                listText.text = "No category found"
+                listText.isVisible = true
+                listImage.isVisible = true
+                listImage.setImageDrawable(IconicsDrawable(requireContext())
+                        .icon(FontAwesome.Icon.faw_chart_bar)
+                        .sizeDp(24))
+                recycler_view.isVisible = false
+            }
+        }
 
-        categoryViewModel.apiResponse.observe(this, Observer {
+        categoryViewModel.apiResponse.observe(this) {
             toastError(it)
-        })
+        }
     }
 
     private fun initFab(){

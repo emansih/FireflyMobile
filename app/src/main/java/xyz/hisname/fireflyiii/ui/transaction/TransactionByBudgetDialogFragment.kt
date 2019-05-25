@@ -9,7 +9,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
@@ -25,6 +25,7 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
 
     private val budgetName by lazy { arguments?.getString("budgetName") ?: "" }
     private lateinit var rtAdapter: TransactionRecyclerAdapter
+    private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.create(R.layout.fragment_dashboard_recent_transaction, container)
@@ -36,23 +37,23 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
         recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
         recentTransactionList.addItemDecoration(DividerItemDecoration(requireContext(),
                 DividerItemDecoration.VERTICAL))
-        getViewModel(TransactionsViewModel::class.java).getTransactionListByDateAndBudget(DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), budgetName).observe(this, Observer { transactionData ->
+        transactionViewModel.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfMonth(),
+                DateTimeUtil.getEndOfMonth(), budgetName).observe(this) { transactionData ->
             recentTransactionList.isVisible = true
             noTransactionText.isGone = true
             rtAdapter = TransactionRecyclerAdapter(transactionData){ data: TransactionData -> itemClicked(data) }
             recentTransactionList.adapter = rtAdapter
             rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
             rtAdapter.notifyDataSetChanged()
-        })
-        getViewModel(TransactionsViewModel::class.java).isLoading.observe(this, Observer {
+        }
+        transactionViewModel.isLoading.observe(this) {
             if(it == true){
                 transactionLoader.bringToFront()
                 transactionLoader.show()
             } else {
                 transactionLoader.hide()
             }
-        })
+        }
     }
 
     private fun itemClicked(data: TransactionData){

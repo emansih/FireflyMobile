@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -84,7 +84,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 submitData()
             } else {
                 tagsViewModel.updateTag(tagId, tag_edittext.getString(), date, description, latitude,
-                        longitude, zoomLevel).observe(this, Observer { apiResponse ->
+                        longitude, zoomLevel).observe(this) { apiResponse ->
                     val errorMessage = apiResponse.getErrorMessage()
                     when {
                         errorMessage != null -> toastError(errorMessage)
@@ -97,13 +97,13 @@ class AddTagsFragment: BaseAddObjectFragment() {
                             unReveal(dialog_add_tags_layout)
                         }
                     }
-                })
+                }
             }
         }
     }
 
     private fun updateData(){
-        tagsViewModel.getTagById(tagId).observe(this, Observer {
+        tagsViewModel.getTagById(tagId).observe(this) {
             val tagData = it[0].tagsAttributes
             tag_edittext.setText(tagData?.tag)
             date_edittext.setText(tagData?.date)
@@ -111,7 +111,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
             latitude_edittext.setText(tagData?.latitude)
             longitude_edittext.setText(tagData?.longitude)
             zoom_edittext.setText(tagData?.zoom_level)
-        })
+        }
     }
 
     override fun setWidgets(){
@@ -136,21 +136,21 @@ class AddTagsFragment: BaseAddObjectFragment() {
             }
             addTagFab.isInvisible = true
         }
-        mapsViewModel.latitude.observe(this, Observer {
+        mapsViewModel.latitude.observe(this) {
             if(it != "0.0"){
                 latitude_edittext.setText(it)
             }
-        })
-        mapsViewModel.longitude.observe(this, Observer {
+        }
+        mapsViewModel.longitude.observe(this) {
             if(it != "0.0"){
                 longitude_edittext.setText(it)
             }
-        })
-        mapsViewModel.zoomLevel.observe(this, Observer {
+        }
+        mapsViewModel.zoomLevel.observe(this) {
             if(it != "0.0"){
                 zoom_edittext.setText(it)
             }
-        })
+        }
         placeHolderToolbar.setOnClickListener {
             handleBack()
         }
@@ -183,7 +183,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(this, Observer {
+        tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(this) {
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = it.getErrorMessage()
             when {
@@ -197,7 +197,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                     unReveal(dialog_add_tags_layout)
                 }
             }
-        })
+        }
     }
 
     override fun handleBack() {

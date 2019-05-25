@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -93,7 +94,7 @@ abstract class BaseFragment: Fragment() {
     }
 
     private fun handleBackPress() {
-        globalViewModel.backPress.observe(this, Observer { backPressValue ->
+        globalViewModel.backPress.observe(this){ backPressValue ->
             if(backPressValue == true) {
                 scope.launch(Dispatchers.Main) {
                     handleBack()
@@ -101,7 +102,7 @@ abstract class BaseFragment: Fragment() {
                     globalViewModel.backPress.value = false
                 }
             }
-        })
+        }
     }
     abstract fun handleBack()
 }

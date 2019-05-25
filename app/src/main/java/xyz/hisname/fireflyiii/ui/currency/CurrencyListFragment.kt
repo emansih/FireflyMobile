@@ -8,9 +8,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
@@ -34,25 +32,24 @@ class CurrencyListFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         hideKeyboard()
         runLayoutAnimation(recycler_view)
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
         initFab()
         pullToRefresh()
         displayView()
-        currencyViewModel.isLoading.observe(this, Observer {
+        currencyViewModel.isLoading.observe(this) {
             swipeContainer.isRefreshing = it == true
-        })
+        }
     }
 
 
     private fun displayView(){
-        currencyViewModel.getCurrency().observe(this, Observer {currencyData ->
+        currencyViewModel.getCurrency().observe(this) {currencyData ->
             dataAdapter = ArrayList(currencyData)
             recycler_view.adapter = CurrencyRecyclerAdapter(dataAdapter) { data: CurrencyData ->
                 clickListener(data)
             }.apply {
                 update(dataAdapter)
             }
-        })
+        }
     }
 
     private fun clickListener(data: CurrencyData){

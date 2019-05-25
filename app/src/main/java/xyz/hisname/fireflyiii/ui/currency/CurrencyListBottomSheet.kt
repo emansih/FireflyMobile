@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -35,14 +35,14 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
         }
-        currencyViewModel.getEnabledCurrency().observe(this, Observer { currencyData ->
+        currencyViewModel.getEnabledCurrency().observe(this) { currencyData ->
             dataAdapter = ArrayList(currencyData)
             recycler_view.adapter = EnabledCurrencyRecyclerAdapter(currencyData) { data: CurrencyData ->
                 itemClicked(data)
             }.apply {
                 update(dataAdapter)
             }
-        })
+        }
     }
 
     private fun itemClicked(currencyData: CurrencyData){

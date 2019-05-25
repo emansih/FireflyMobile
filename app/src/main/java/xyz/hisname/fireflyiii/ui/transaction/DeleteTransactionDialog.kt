@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.work.Data
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -31,9 +31,9 @@ class DeleteTransactionDialog: BaseFragment() {
                         .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    transactionViewModel.deleteTransaction(transactionId).observe(this, Observer {
+                    transactionViewModel.deleteTransaction(transactionId).observe(this) {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                        if (it == true) {
+                        if (it) {
                             toastSuccess(resources.getString(R.string.transaction_deleted))
                             requireFragmentManager().popBackStack()
                         } else {
@@ -42,7 +42,7 @@ class DeleteTransactionDialog: BaseFragment() {
                                     "deleted in the background.",
                                     Toast.LENGTH_LONG)
                         }
-                    })
+                    }
                 }
                 .setNegativeButton("No") { _, _ ->
                     toastInfo("Transaction not deleted")

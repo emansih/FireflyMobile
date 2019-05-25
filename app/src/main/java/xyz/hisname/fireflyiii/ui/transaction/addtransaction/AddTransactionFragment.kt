@@ -19,7 +19,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
@@ -29,8 +29,6 @@ import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
-import me.toptas.fancyshowcase.FancyShowCaseView
-import me.toptas.fancyshowcase.FocusShape
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -158,7 +156,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
                 transactionDateTime, billName, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
-                transactionTags, budgetName).observe(this, Observer { transactionResponse->
+                transactionTags, budgetName).observe(this) { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -169,7 +167,7 @@ class AddTransactionFragment: BaseFragment() {
             } else if(transactionResponse.getError() != null) {
                 toastError(transactionResponse.getError()?.localizedMessage)
             }
-        })
+        }
     }
 
     private fun setIcons(){
@@ -245,41 +243,41 @@ class AddTransactionFragment: BaseFragment() {
             val catDialog = CategoriesDialog()
             catDialog.show(requireFragmentManager(), "categoryDialog")
         }
-        categoryViewModel.categoryName.observe(this, Observer {
+        categoryViewModel.categoryName.observe(this) {
             category_edittext.setText(it)
-        })
-        currencyViewModel.currencyCode.observe(this, Observer {
+        }
+        currencyViewModel.currencyCode.observe(this) {
             currency = it
-        })
-        currencyViewModel.currencyDetails.observe(this, Observer {
+        }
+        currencyViewModel.currencyDetails.observe(this) {
             currency_edittext.setText(it)
-        })
+        }
         currency_edittext.setOnClickListener{
             CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )
         }
         tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
         tags_chip.enableEditChipOnTouch(false, true)
-        tagsViewModel.getAllTags().observe(this, Observer {
+        tagsViewModel.getAllTags().observe(this) {
             it.forEachIndexed{ _, tagsData ->
                 tags.add(tagsData.tagsAttributes?.tag!!)
             }
             val tagsAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, tags)
             tags_chip.threshold = 1
             tags_chip.setAdapter(tagsAdapter)
-        })
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
+        }
+        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency = currencyData?.code.toString()
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
-        })
-        accountViewModel.isLoading.observe(this, Observer {
+        }
+        accountViewModel.isLoading.observe(this) {
             if(it == true){
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
-        })
-        accountViewModel.emptyAccount.observe(this, Observer {
+        }
+        accountViewModel.emptyAccount.observe(this) {
             if(it == true){
                 AlertDialog.Builder(requireContext())
                         .setTitle("No asset accounts found!")
@@ -292,26 +290,26 @@ class AddTransactionFragment: BaseFragment() {
                             }
                         }
                         .setNegativeButton("No"){ _,_ ->
-
+                            handleBack()
                         }
                         .setCancelable(false)
                         .show()
             }
-        })
+        }
         piggy_edittext.setOnClickListener {
             val piggyBankDialog = PiggyDialog()
             piggyBankDialog.show(requireFragmentManager(), "piggyDialog")
         }
-        piggyViewModel.piggyName.observe(this, Observer {
+        piggyViewModel.piggyName.observe(this) {
             piggy_edittext.setText(it)
-        })
+        }
         budget_edittext.setOnClickListener {
             val budgetDialog = BudgetSearchDialog()
             budgetDialog.show(requireFragmentManager(), "budgetDialog")
         }
-        budgetViewModel.budgetName.observe(this, Observer { name ->
+        budgetViewModel.budgetName.observe(this) { name ->
             budget_edittext.setText(name)
-        })
+        }
         expansionLayout.addListener { _, expanded ->
             if(expanded){
                 optionalLayout.isVisible = true
@@ -342,7 +340,7 @@ class AddTransactionFragment: BaseFragment() {
     private fun contextSwitch(){
         when {
             Objects.equals(transactionType, "Transfer") -> accountViewModel.getAssetAccounts()
-                    .observe(this, Observer { transferData ->
+                    .observe(this) { transferData ->
                         transferData.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
                         }
@@ -362,9 +360,9 @@ class AddTransactionFragment: BaseFragment() {
                         source_spinner.setSelection(sourcePosition)
                         val destinationPosition = spinnerAdapter.getPosition(destinationName)
                         destination_spinner.setSelection(destinationPosition)
-                    })
+                    }
             Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAssetAccounts())
-                    .observe(this , Observer {
+                    .observe(this ) {
                         // Revenue account, autocomplete
                         it.first.forEachIndexed { _, accountData ->
                             sourceAccounts.add(accountData.accountAttributes?.name!!)
@@ -387,10 +385,10 @@ class AddTransactionFragment: BaseFragment() {
                         source_textview.isVisible = false
                         val destinationPosition = spinnerAdapter.getPosition(destinationName)
                         destination_spinner.setSelection(destinationPosition)
-                    })
+                    }
             else -> {
                 zipLiveData(accountViewModel.getAssetAccounts(), accountViewModel.getExpenseAccounts())
-                        .observe(this, Observer {
+                        .observe(this) {
                             // Spinner for source account
                             it.first.forEachIndexed { _, accountData ->
                                 sourceAccounts.add(accountData.accountAttributes?.name!!)
@@ -415,8 +413,8 @@ class AddTransactionFragment: BaseFragment() {
                             source_spinner.setSelection(spinnerPosition)
                             val destinationPosition = spinnerAdapter.getPosition(destinationName)
                             destination_spinner.setSelection(destinationPosition)
-                        })
-                billViewModel.getAllBills().observe(this, Observer { billListing ->
+                        }
+                billViewModel.getAllBills().observe(this) { billListing ->
                     if(billListing.isNotEmpty()){
                         bill_layout.isVisible = true
                         billListing.forEachIndexed { _, billData ->
@@ -426,7 +424,7 @@ class AddTransactionFragment: BaseFragment() {
                         bill_edittext.threshold = 1
                         bill_edittext.setAdapter(adapter)
                     }
-                })
+                }
             }
         }
     }
@@ -440,7 +438,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transactionDateTime, piggyBank, billName,
                 transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags, budgetName).observe(this, Observer { transactionResponse ->
+                currency, categoryName, transactionTags, budgetName).observe(this) { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -505,20 +503,20 @@ class AddTransactionFragment: BaseFragment() {
                 toastOffline(getString(R.string.data_added_when_user_online, transactionType))
                 handleBack()
             }
-        })
+        }
     }
 
     private fun updateTransactionSetup(){
-        transactionViewModel.getTransactionById(transactionId).observe(this, Observer {
+        transactionViewModel.getTransactionById(transactionId).observe(this) {
             val transactionAttributes = it[0].transactionAttributes
             description_edittext.setText(transactionAttributes?.description)
             transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount
                     ?: 0.toDouble()).toString())
             budget_edittext.setText(transactionAttributes?.budget_name)
-            currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this, Observer { currencyData ->
+            currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this) { currencyData ->
                 val currencyAttributes = currencyData[0].currencyAttributes
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
-            })
+            }
             currency = transactionAttributes?.currency_code.toString()
             transaction_date_edittext.setText(transactionAttributes?.date.toString())
             bill_edittext.setText(transactionAttributes?.bill_name)
@@ -541,7 +539,7 @@ class AddTransactionFragment: BaseFragment() {
                     destinationName = transactionAttributes?.destination_name
                 }
             }
-        })
+        }
     }
 
     private fun openDocViewer(){

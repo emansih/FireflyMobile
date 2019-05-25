@@ -3,13 +3,12 @@ package xyz.hisname.fireflyiii.ui.piggybank
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.CheckBox
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
@@ -56,29 +55,29 @@ class ListPiggyFragment: BaseFragment() {
             recycler_view.isVisible = false
         }
 
-        piggyViewModel.isLoading.observe(this, Observer {
+        piggyViewModel.isLoading.observe(this) {
             swipeContainer.isRefreshing = it == true
-        })
+        }
 
-        piggyViewModel.apiResponse.observe(this, Observer {
+        piggyViewModel.apiResponse.observe(this) {
             toastError(it)
-        })
+        }
     }
 
     private fun displayAll(){
         dataAdapter.clear()
-        piggyViewModel.getAllPiggyBanks().observe(this, Observer { piggyBankData ->
+        piggyViewModel.getAllPiggyBanks().observe(this) { piggyBankData ->
             dataAdapter = ArrayList(piggyBankData)
             displayView()
-        })
+        }
     }
 
     private fun displayIncomplete(){
         dataAdapter.clear()
-        piggyViewModel.getNonCompletedPiggyBanks().observe(this, Observer { piggyBankData ->
+        piggyViewModel.getNonCompletedPiggyBanks().observe(this) { piggyBankData ->
             dataAdapter = ArrayList(piggyBankData)
             displayView()
-        })
+        }
     }
 
     private fun itemClicked(piggyData: PiggyData){

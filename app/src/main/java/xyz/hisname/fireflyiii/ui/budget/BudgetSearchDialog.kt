@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.dialog_search.*
@@ -35,14 +35,14 @@ class BudgetSearchDialog: BaseDialog() {
             adapter?.notifyDataSetChanged()
         }
         swipeContainer.isRefreshing = true
-        budgetViewModel.retrieveAllBudgetLimits().observe(this, Observer { budgetData ->
-            budgetViewModel.isLoading.observe(this, Observer { loading ->
-                if (loading == false) {
-                    swipeContainer.isRefreshing = false
-                    recycler_view.adapter = BudgetRecyclerAdapter(budgetData) { data: BudgetListData -> itemClicked(data) }
-                }
-            })
-        })
+        budgetViewModel.retrieveAllBudgetLimits().observe(this) { budgetData ->
+            recycler_view.adapter = BudgetRecyclerAdapter(budgetData) { data: BudgetListData -> itemClicked(data) }
+        }
+        budgetViewModel.isLoading.observe(this){ loading ->
+            if (loading == false) {
+                swipeContainer.isRefreshing = false
+            }
+        }
     }
 
     private fun itemClicked(budgetData: BudgetListData){
@@ -74,14 +74,14 @@ class BudgetSearchDialog: BaseDialog() {
 
     private fun filter(budgetName: String){
         dataAdapter.clear()
-        budgetViewModel.getBudgetByName(budgetName).observe(this, Observer { piggyData ->
+        budgetViewModel.getBudgetByName(budgetName).observe(this) { piggyData ->
             piggyData.forEachIndexed { _, catData ->
                 dataAdapter.add(catData)
             }
             budgetRecyclerAdapter = BudgetRecyclerAdapter(dataAdapter) { data: BudgetListData ->  itemClicked(data)}
             budgetRecyclerAdapter.notifyDataSetChanged()
             recycler_view.adapter = budgetRecyclerAdapter
-        })
+        }
     }
 
     override fun setIcons() {

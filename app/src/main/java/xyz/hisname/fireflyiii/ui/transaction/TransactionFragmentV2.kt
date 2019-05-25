@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.base_swipe_layout.*
@@ -37,10 +37,10 @@ class TransactionFragmentV2: BaseTransactionFragment(){
     private fun loadTransaction(){
         swipeContainer.isRefreshing = true
         dataAdapter.clear()
-        transactionViewModel.getTransactionList(currentDate, currentDate, transactionType).observe(this, Observer {
+        transactionViewModel.getTransactionList(currentDate, currentDate, transactionType).observe(this) {
             dataAdapter = ArrayList(it)
             displayResults()
-        })
+        }
     }
 
     override fun setupFab(){

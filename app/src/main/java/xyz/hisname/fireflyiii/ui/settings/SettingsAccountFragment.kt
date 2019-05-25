@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.util.Base64
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -83,13 +83,13 @@ class SettingsAccountFragment: BaseSettings() {
         val refreshToken = findPreference<Preference>("refresh_token") as Preference
         refreshToken.setOnPreferenceClickListener {
             toastInfo("Refreshing your token...")
-            authViewModel.getRefreshToken().observe(this, Observer { success ->
+            authViewModel.getRefreshToken().observe(this) { success ->
                 if(success){
                     toastSuccess("Token refresh success!")
                 } else {
                     toastError("There was an error refreshing your token")
                 }
-            })
+            }
             true
         }
         val certBolean = findPreference<SwitchPreference>("enable_cert_pinning") as SwitchPreference

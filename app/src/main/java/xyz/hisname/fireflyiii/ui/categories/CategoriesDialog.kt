@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
@@ -34,19 +34,15 @@ class CategoriesDialog: BaseDialog(){
         val dividerItemDecoration = DividerItemDecoration(recycler_view.context, LinearLayoutManager(requireContext()).orientation)
         recycler_view.addItemDecoration(dividerItemDecoration)
         swipeContainer.isRefreshing = true
-        categoryViewModel.getAllCategory().observe(this, Observer { categoryData ->
-            categoryViewModel.isLoading.observe(this, Observer { loading ->
-                if (loading == false) {
-                    swipeContainer.isRefreshing = false
-                    categoryData.forEachIndexed { _, catData ->
-                        initialAdapter.add(catData)
-                        dataAdapter.add(catData)
-                    }
-                    categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData -> itemClicked(data) }
-                    recycler_view.adapter = categoriesRecyclerAdapter
-                }
-            })
-        })
+        categoryViewModel.getAllCategory().observe(this) { categoryData ->
+            swipeContainer.isRefreshing = false
+            categoryData.forEachIndexed { _, catData ->
+                initialAdapter.add(catData)
+                dataAdapter.add(catData)
+            }
+            categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData -> itemClicked(data) }
+            recycler_view.adapter = categoriesRecyclerAdapter
+        }
     }
 
     private fun searchData(){
@@ -73,15 +69,14 @@ class CategoriesDialog: BaseDialog(){
 
     private fun filter(categoryName: String){
         dataAdapter.clear()
-        categoryViewModel.getCategoryByName(categoryName).observe(this, Observer { categoryData ->
+        categoryViewModel.getCategoryByName(categoryName).observe(this) { categoryData ->
             categoryData.forEachIndexed { _, catData ->
                 dataAdapter.add(catData)
             }
             categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData ->  itemClicked(data)}
             categoriesRecyclerAdapter.notifyDataSetChanged()
             recycler_view.adapter = categoriesRecyclerAdapter
-
-        })
+        }
     }
 
     private fun itemClicked(categoryData: CategoryData){

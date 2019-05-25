@@ -12,10 +12,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.observe
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -58,28 +58,28 @@ class LoginFragment: Fragment() {
                         .sizeDp(24),null, null, null)
         when {
             Objects.equals(argument, "LOGIN") -> {
-                baseUrlLiveData.observe(this, Observer {
+                baseUrlLiveData.observe(this) {
                     firefly_url_edittext.setText(it)
-                })
-                clientIdLiveData.observe(this, Observer {
+                }
+                clientIdLiveData.observe(this) {
                     firefly_id_edittext.setText(it)
-                })
-                secretKeyLiveData.observe(this, Observer {
+                }
+                secretKeyLiveData.observe(this) {
                     firefly_secret_edittext.setText(it)
-                })
+                }
                 getAccessCode()
             }
             Objects.equals(argument, "REFRESH_TOKEN") -> {
                 refreshToken()
             }
         }
-        authViewModel.isLoading.observe(this, Observer {
+        authViewModel.isLoading.observe(this) {
             if(it == true){
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
                 ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
             }
-        })
+        }
     }
 
     private fun getAccessCode(){
@@ -123,13 +123,13 @@ class LoginFragment: Fragment() {
     private fun refreshToken(){
         rootLayout.isVisible = false
         toastInfo(resources.getString(R.string.refreshing_token), Toast.LENGTH_LONG)
-        authViewModel.getRefreshToken().observe(this, Observer {
+        authViewModel.getRefreshToken().observe(this) {
             if(it == true){
                 startHomeIntent()
             } else {
                 toastError(resources.getString(R.string.issue_refreshing_token))
             }
-        })
+        }
     }
 
     private fun startHomeIntent(){
@@ -156,7 +156,7 @@ class LoginFragment: Fragment() {
                     secretKey = secretKeyLiveData.value ?: ""
                     clientId = clientIdLiveData.value ?: ""
                 }
-                authViewModel.getAccessToken(code).observe(this, Observer { isAuth ->
+                authViewModel.getAccessToken(code).observe(this) { isAuth ->
                     if(isAuth == true){
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
@@ -168,13 +168,13 @@ class LoginFragment: Fragment() {
                         }
                     } else {
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                        authViewModel.authFailedReason.observe(this, Observer { reason ->
+                        authViewModel.authFailedReason.observe(this) { reason ->
                             if(reason.isNotBlank()){
                                 toastError(reason)
                             }
-                        })
+                        }
                     }
-                })
+                }
             } else {
                 showDialog()
             }

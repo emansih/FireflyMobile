@@ -9,7 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -31,9 +31,9 @@ abstract class BaseTransactionFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        transactionViewModel.apiResponse.observe(this, Observer {
+        transactionViewModel.apiResponse.observe(this) {
             toastInfo(it)
-        })
+        }
         setupFab()
     }
 

@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
@@ -70,7 +70,7 @@ class TransactionDetailsFragment: BaseFragment() {
 
     private fun setTransactionInfo(){
         transactionList.clear()
-        transactionViewModel.getTransactionById(transactionId).observe(this, Observer {
+        transactionViewModel.getTransactionById(transactionId).observe(this) {
             val details = it[0].transactionAttributes
             val model = arrayListOf(DetailModel("Type", details?.transactionType),
                     DetailModel(resources.getString(R.string.description), details?.description),
@@ -97,12 +97,12 @@ class TransactionDetailsFragment: BaseFragment() {
             transaction_info.layoutManager = LinearLayoutManager(requireContext())
             transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             transaction_info.adapter = TransactionDetailsRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
-        })
+        }
     }
 
     private fun setMetaInfo(){
         metaDataList.clear()
-        transactionViewModel.getTransactionById(transactionId).observe(this, Observer {
+        transactionViewModel.getTransactionById(transactionId).observe(this) {
             val details = it[0].transactionAttributes
             transactionCategory = details?.category_name ?: ""
             transactionBudget = details?.budget_name ?: ""
@@ -136,7 +136,7 @@ class TransactionDetailsFragment: BaseFragment() {
             meta_information.layoutManager = LinearLayoutManager(requireContext())
             meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
-        })
+        }
     }
 
     private fun setMetaInfoClick(position: Int){
@@ -200,8 +200,8 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun downloadAttachment(journalId: Long){
-        transactionViewModel.getTransactionAttachment(transactionId, journalId).observe(this, Observer { attachment ->
-            transactionViewModel.isLoading.observe(this, Observer { loading ->
+        transactionViewModel.getTransactionAttachment(transactionId, journalId).observe(this) { attachment ->
+            transactionViewModel.isLoading.observe(this){ loading ->
                 if (!loading && attachment.isNotEmpty()) {
                     attachment_information_card.isVisible = true
                     attachmentDataAdapter = ArrayList(attachment)
@@ -212,8 +212,8 @@ class TransactionDetailsFragment: BaseFragment() {
                         setDownloadClickListener(data)
                     }
                 }
-            })
-        })
+            }
+        }
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData){
@@ -222,13 +222,13 @@ class TransactionDetailsFragment: BaseFragment() {
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
         } else {
             val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-            attachmentViewModel.downloadAttachment(attachmentData).observe(this, Observer { isDownloaded ->
-                attachmentViewModel.isLoading.observe(this, Observer { isLoading ->
+            attachmentViewModel.downloadAttachment(attachmentData).observe(this) { isDownloaded ->
+                attachmentViewModel.isLoading.observe(this) { isLoading ->
                     if (!isDownloaded && !isLoading) {
                         toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                     }
-                })
-            })
+                }
+            }
         }
     }
 

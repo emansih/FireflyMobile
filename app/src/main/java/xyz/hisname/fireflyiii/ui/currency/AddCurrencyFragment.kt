@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -29,7 +29,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_currency_layout)
         if(currencyId != 0L){
-            currencyViewModel.getCurrencyById(currencyId).observe(this, Observer {
+            currencyViewModel.getCurrencyById(currencyId).observe(this) {
                 val currencyAttributes = it[0].currencyAttributes
                 name_edittext.setText(currencyAttributes?.name)
                 decimal_places_edittext.setText(currencyAttributes?.decimal_places.toString())
@@ -41,7 +41,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                 if(currencyAttributes?.currencyDefault == true){
                     default_checkbox.isChecked = true
                 }
-            })
+            }
         }
         addCurrencyFab.setOnClickListener {
             hideKeyboard()
@@ -88,33 +88,31 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     private fun updateData(){
         currencyViewModel.updateCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(),
-                enabled_checkbox.isChecked, default_checkbox.isChecked)
-                .observe(this, Observer { response ->
-                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-                    val errorMessage = response.getErrorMessage()
-                    if (errorMessage != null) {
-                        toastError(errorMessage)
-                    } else if (response.getResponse() != null) {
-                        toastSuccess(resources.getString(R.string.currency_updated, name_edittext.getString()))
-                        unReveal(addCurrencyFab)
-                    }
-                })
+                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(this) { response ->
+            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+            val errorMessage = response.getErrorMessage()
+            if (errorMessage != null) {
+                toastError(errorMessage)
+            } else if (response.getResponse() != null) {
+                toastSuccess(resources.getString(R.string.currency_updated, name_edittext.getString()))
+                unReveal(addCurrencyFab)
+            }
+        }
     }
 
     override fun submitData(){
         currencyViewModel.addCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(),
-                enabled_checkbox.isChecked, default_checkbox.isChecked)
-                .observe(this, Observer { response ->
-                    ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-                    val errorMessage = response.getErrorMessage()
-                    if (errorMessage != null) {
-                        toastError(errorMessage)
-                    } else if (response.getResponse() != null) {
-                        toastSuccess(resources.getString(R.string.currency_created, name_edittext.getString()))
-                        unReveal(addCurrencyFab)
-                    }
-                })
+                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(this) { response ->
+            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
+            val errorMessage = response.getErrorMessage()
+            if (errorMessage != null) {
+                toastError(errorMessage)
+            } else if (response.getResponse() != null) {
+                toastSuccess(resources.getString(R.string.currency_created, name_edittext.getString()))
+                unReveal(addCurrencyFab)
+            }
+        }
     }
 
     override fun handleBack() {

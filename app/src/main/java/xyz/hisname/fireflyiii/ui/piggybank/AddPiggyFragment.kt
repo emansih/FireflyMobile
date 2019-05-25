@@ -14,7 +14,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
@@ -47,7 +47,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         showReveal(dialog_add_piggy_layout)
         piggyId = arguments?.getLong("piggyId") ?: 0
         if(piggyId != 0L){
-            piggyViewModel.getPiggyById(piggyId).observe(this, Observer { piggyData ->
+            piggyViewModel.getPiggyById(piggyId).observe(this) { piggyData ->
                 val piggyAttributes = piggyData[0].piggyAttributes
                 description_edittext.setText(piggyAttributes?.name)
                 target_amount_edittext.setText(piggyAttributes?.target_amount.toString())
@@ -55,12 +55,12 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 date_started_edittext.setText(piggyAttributes?.start_date)
                 date_target_edittext.setText(piggyAttributes?.target_date)
                 note_edittext.setText(piggyAttributes?.notes)
-                accountViewModel.getAccountById(piggyAttributes?.account_id!!).observe(this, Observer { accountData ->
+                accountViewModel.getAccountById(piggyAttributes?.account_id ?: 0L).observe(this) { accountData ->
                     val accountName = accountData[0].accountAttributes?.name
                     val spinnerPosition = accountAdapter.getPosition(accountName)
                     account_spinner.setSelection(spinnerPosition)
-                })
-            })
+                }
+            }
         }
         showHelpText()
     }
@@ -167,7 +167,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         date_started_edittext.setOnClickListener {
             DialogDarkMode().showCorrectDatePickerDialog(requireContext(), endDate, calendar)
         }
-        accountViewModel.getAssetAccounts().observe(this, Observer {
+        accountViewModel.getAssetAccounts().observe(this) {
             if(it.isNotEmpty()) {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
@@ -177,61 +177,61 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 account_spinner.adapter = accountAdapter
             }
-        })
+        }
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
     }
 
     override fun submitData(){
-        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
-            piggyViewModel.addPiggyBank(description_edittext.getString(), accountData[0].accountId.toString(),
-                    currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate)
-                    .observe(this, Observer {
-                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                        val errorMessage = it.getErrorMessage()
-                        if (errorMessage != null) {
-                            toastError(errorMessage)
-                        } else if (it.getError() != null) {
-                            if (it.getError()!!.localizedMessage.startsWith("Unable to resolve host")) {
-                                val piggyBroadcast = Intent(requireContext(), PiggyBankReceiver::class.java).apply {
-                                    action = "firefly.hisname.ADD_PIGGY_BANK"
-                                }
-                                val extras = bundleOf(
-                                        "name" to description_edittext.getString(),
-                                        "accountId" to accountData[0].accountId.toString(),
-                                        "targetAmount" to target_amount_edittext.getString(),
-                                        "currentAmount" to currentAmount,
-                                        "startDate" to startDate,
-                                        "endDate" to targetDate,
-                                        "notes" to notes
-                                )
-                                piggyBroadcast.putExtras(extras)
-                                requireActivity().sendBroadcast(piggyBroadcast)
-                                toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
-                                handleBack()
-                            } else {
-                                toastError("Error saving piggy bank")
-                            }
-                        } else if (it.getResponse() != null) {
-                            toastSuccess("Piggy bank saved")
-                            val bundle = bundleOf("piggyId" to it.getResponse()?.data?.piggyId)
-                            requireFragmentManager().commit {
-                                replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
-                                addToBackStack(null)
-                            }
-                            dialog_add_piggy_layout.isVisible = false
-                            fragmentContainer.isVisible = true
-
+        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this) { accountData ->
+            piggyViewModel.addPiggyBank(description_edittext.getString(),
+                    accountData[0].accountId.toString(), currentAmount, notes, startDate,
+                    target_amount_edittext.getString(), targetDate).observe(this) {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                val errorMessage = it.getErrorMessage()
+                val throwawableError = it.getError()
+                if (errorMessage != null) {
+                    toastError(errorMessage)
+                } else if (it.getError() != null) {
+                    if (throwawableError?.localizedMessage?.startsWith("Unable to resolve host") == true) {
+                        val piggyBroadcast = Intent(requireContext(), PiggyBankReceiver::class.java).apply {
+                            action = "firefly.hisname.ADD_PIGGY_BANK"
                         }
-                    })
-        })
+                        val extras = bundleOf(
+                                "name" to description_edittext.getString(),
+                                "accountId" to accountData[0].accountId.toString(),
+                                "targetAmount" to target_amount_edittext.getString(),
+                                "currentAmount" to currentAmount,
+                                "startDate" to startDate,
+                                "endDate" to targetDate,
+                                "notes" to notes
+                        )
+                        piggyBroadcast.putExtras(extras)
+                        requireActivity().sendBroadcast(piggyBroadcast)
+                        toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
+                        handleBack()
+                    } else {
+                        toastError("Error saving piggy bank")
+                    }
+                } else if (it.getResponse() != null) {
+                    toastSuccess("Piggy bank saved")
+                    val bundle = bundleOf("piggyId" to it.getResponse()?.data?.piggyId)
+                    requireFragmentManager().commit {
+                        replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
+                        addToBackStack(null)
+                    }
+                    dialog_add_piggy_layout.isVisible = false
+                    fragmentContainer.isVisible = true
+                }
+            }
+        }
     }
 
     private fun updatePiggyBank(){
-        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this, Observer { accountData ->
+        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this) { accountData ->
             piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), accountData[0].accountId.toString(),
-                    currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(this, Observer {
+                    currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(this) {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 if (it.getErrorMessage() != null) {
                     toastError(it.getErrorMessage())
@@ -246,8 +246,8 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                         addToBackStack(null)
                     }
                 }
-            })
-        })
+            }
+        }
     }
 
     override fun handleBack() {

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.preference.PreferenceFragmentCompat
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -24,11 +25,11 @@ abstract class BaseSettings: PreferenceFragmentCompat() {
         super.setDivider(ColorDrawable(Color.GRAY))
     }
     private fun handleBackPress() {
-        globalViewModel.backPress.observe(this, Observer { backPressValue ->
+        globalViewModel.backPress.observe(this) { backPressValue ->
             if(backPressValue == true) {
                 handleBack()
             }
-        })
+        }
     }
 
     abstract fun handleBack()

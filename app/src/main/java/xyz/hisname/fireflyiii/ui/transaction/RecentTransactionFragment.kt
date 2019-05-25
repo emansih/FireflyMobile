@@ -9,6 +9,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
@@ -42,7 +43,7 @@ class RecentTransactionFragment: BaseFragment() {
         recentTransactionList.addItemDecoration(DividerItemDecoration(recentTransactionList.context,
                 DividerItemDecoration.VERTICAL))
         transactionLoader.show()
-        transactionViewModel.getRecentTransaction(5).observe(this, Observer {
+        transactionViewModel.getRecentTransaction(5).observe(this) {
             dataAdapter = ArrayList(it)
             transactionLoader.hide()
             if (dataAdapter.size == 0) {
@@ -56,7 +57,7 @@ class RecentTransactionFragment: BaseFragment() {
                 rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
                 rtAdapter.notifyDataSetChanged()
             }
-        })
+        }
     }
 
     private fun itemClicked(data: TransactionData){

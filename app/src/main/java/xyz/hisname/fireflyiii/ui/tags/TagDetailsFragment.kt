@@ -10,7 +10,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -44,13 +44,13 @@ class TagDetailsFragment: BaseDetailFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(tagId != 0L) {
-            tagsViewModel.getTagById(tagId).observe(this, Observer { data ->
+            tagsViewModel.getTagById(tagId).observe(this) { data ->
                 setTagData(data)
-            })
+            }
         } else {
-            tagsViewModel.getTagByName(nameOfTagFromBundle).observe(this, Observer { data ->
+            tagsViewModel.getTagByName(nameOfTagFromBundle).observe(this) { data ->
                 setTagData(data)
-            })
+            }
         }
 
     }
@@ -117,7 +117,7 @@ class TagDetailsFragment: BaseDetailFragment() {
                 .setMessage(resources.getString(R.string.delete_tag_message, nameOfTag))
                 .setPositiveButton(R.string.delete_permanently){_, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    tagsViewModel.deleteTagByName(nameOfTag).observe(this@TagDetailsFragment, Observer { status ->
+                    tagsViewModel.deleteTagByName(nameOfTag).observe(this) { status ->
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if (status) {
                             requireFragmentManager().commit {
@@ -127,7 +127,7 @@ class TagDetailsFragment: BaseDetailFragment() {
                         } else {
                             toastError("There was an error deleting $nameOfTag", Toast.LENGTH_LONG)
                         }
-                    })
+                    }
                 }
                 .setNegativeButton(resources.getString(android.R.string.no)){ _, _ ->
                     toastInfo("Tag not deleted")

@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -54,10 +54,10 @@ class BudgetSummaryFragment: BaseFragment() {
             coloring.add(col)
         }
         budgetSummaryPieChart.isDrawHoleEnabled = false
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { currency ->
+        currencyViewModel.getDefaultCurrency().observe(this) { currency ->
             retrieveData(currency[0])
             setBudgetSummary(currency[0])
-        })
+        }
         setTheme()
     }
 
@@ -68,13 +68,13 @@ class BudgetSummaryFragment: BaseFragment() {
                 transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal")),
                 zipLiveData(budgetLimit.retrieveSpentBudget(),
-                        budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(this, Observer { fireflyData ->
+                        budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(this) { fireflyData ->
             if(fireflyData.first.second.isNotEmpty()) {
                 val pieEntryArray: ArrayList<PieEntry> = ArrayList(fireflyData.first.second.size)
                 fireflyData.first.second.forEachIndexed { _, uniqueBudget ->
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), currencyCode,
-                            "Withdrawal", uniqueBudget).observe(this, Observer { transactionAmount ->
+                            "Withdrawal", uniqueBudget).observe(this) { transactionAmount ->
                         val percentageCategory = transactionAmount.absoluteValue.roundToInt()
                                 .toDouble()
                                 .div(fireflyData.first.first.absoluteValue.roundToInt().toDouble())
@@ -92,11 +92,11 @@ class BudgetSummaryFragment: BaseFragment() {
                         pieDataSet.valueTextSize = 15f
                         budgetSummaryPieChart.data = PieData(pieDataSet)
                         budgetSummaryPieChart.invalidate()
-                    })
+                    }
                 }
             }
             setBudgetData(fireflyData.second, currencyData)
-        })
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -130,14 +130,15 @@ class BudgetSummaryFragment: BaseFragment() {
                 actualAmountValue.text = "--.--"
                 remainingAmountValue.text = "--.--"
                 transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal", pe.label).observe(this@BudgetSummaryFragment, Observer { value ->
+                        DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal",
+                        pe.label).observe(this@BudgetSummaryFragment) { value ->
                     budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + entry.value
                     actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
                             LocaleNumberParser.parseDecimal(value, requireContext())
                     remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
                             LocaleNumberParser.parseDecimal((entry.value - Math.abs(value)), requireContext())
 
-                })
+                }
                 showTransactionButton.setOnClickListener {
                     val transactionDialog  = TransactionByBudgetDialogFragment()
                     transactionDialog.arguments = bundleOf("budgetName" to pe.label)

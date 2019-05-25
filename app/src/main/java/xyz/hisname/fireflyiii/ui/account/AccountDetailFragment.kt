@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.account
 
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -11,7 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.animation.Easing
@@ -60,11 +59,11 @@ class AccountDetailFragment: BaseDetailFragment() {
         for (col in ColorTemplate.MATERIAL_COLORS) {
             coloring.add(col)
         }
-        currencyViewModel.getDefaultCurrency().observe(this, Observer { currencyData ->
+        currencyViewModel.getDefaultCurrency().observe(this) { currencyData ->
             if(currencyData.isNotEmpty()){
                 setLineChart(currencyData[0].currencyAttributes?.code ?: "", currencyData[0].currencyAttributes?.symbol ?: "")
             }
-        })
+        }
         setDarkMode()
         incomePieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
         budgetPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
@@ -72,7 +71,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     private fun setLineChart(currencyCode: String, currencySymbol: String){
-        accountViewModel.getAccountById(accountId).observe(this, Observer { accountData ->
+        accountViewModel.getAccountById(accountId).observe(this) { accountData ->
             accountType = accountData[0].accountAttributes?.type ?: ""
             if(accountData.isNotEmpty()){
                 zipLiveData(transactionViewModel.getTransactionsByAccountAndCurrencyCodeAndDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
@@ -92,73 +91,64 @@ class AccountDetailFragment: BaseDetailFragment() {
                                 currencyCode, accountData[0].accountAttributes!!.name),
                         transactionViewModel.getTransactionsByAccountAndCurrencyCodeAndDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                                currencyCode, accountData[0].accountAttributes!!.name)).observe(this, Observer { transactionData ->
-                    transactionViewModel.isLoading.observe(this, Observer { loader ->
-                        if(!loader){
-                            val firstEntry = accountData[0].accountAttributes?.current_balance?.toBigDecimal()?.plus(transactionData.first)
-                            val secondEntry = firstEntry?.plus(transactionData.second)
-                            val thirdEntry = secondEntry?.plus(transactionData.third)
-                            val fourthEntry = thirdEntry?.plus(transactionData.fourth)
-                            val fifthEntry = fourthEntry?.plus(transactionData.fifth)
-                            val sixthEntry = fifthEntry?.plus(transactionData.sixth)
-                            val lineChartEntries = arrayListOf(
-                                    Entry(0f,firstEntry?.toFloat() ?: 0f),
-                                    Entry(1f,secondEntry?.toFloat() ?: 0f),
-                                    Entry(2f,thirdEntry?.toFloat() ?: 0f),
-                                    Entry(3f,fourthEntry?.toFloat() ?: 0f),
-                                    Entry(4f,fifthEntry?.toFloat() ?: 0f),
-                                    Entry(5f,sixthEntry?.toFloat() ?: 0f)
-                            )
-                            val dataSet = LineDataSet(lineChartEntries, accountData[0].accountAttributes?.name)
-                            dataSet.apply {
-                                setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary))
-                                valueTextColor = Color.BLUE
-                                valueTextSize = 15f
-                            }
-                            val lineChartData = LineData(dataSet)
-                            if(isDarkMode()){
-                                transactionLineChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-                                transactionLineChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-                                transactionLineChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-                            }
-                            transactionLineChart.apply {
-                                xAxis.granularity = 1f
-                                xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
-                                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
-                                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2)),
-                                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3)),
-                                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4)),
-                                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5)),
-                                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6))))
-                                xAxis.setDrawLabels(true)
-                                xAxis.setDrawAxisLine(false)
-                                xAxis.setDrawGridLines(false)
-                                data = lineChartData
-                                axisRight.isEnabled = false
-                                description.isEnabled = false
-                                xAxis.position = XAxis.XAxisPosition.BOTTOM
-                                data.isHighlightEnabled = false
-                                setTouchEnabled(true)
-                                setPinchZoom(true)
-                                animateY(1000, Easing.EaseOutBack)
-                            }
-                        }
-                    })
-                })
+                                currencyCode, accountData[0].accountAttributes!!.name)).observe(this){ transactionData ->
+                    val firstEntry = accountData[0].accountAttributes?.current_balance?.toBigDecimal()?.plus(transactionData.first)
+                    val secondEntry = firstEntry?.plus(transactionData.second)
+                    val thirdEntry = secondEntry?.plus(transactionData.third)
+                    val fourthEntry = thirdEntry?.plus(transactionData.fourth)
+                    val fifthEntry = fourthEntry?.plus(transactionData.fifth)
+                    val sixthEntry = fifthEntry?.plus(transactionData.sixth)
+                    val lineChartEntries = arrayListOf(
+                            Entry(0f,firstEntry?.toFloat() ?: 0f),
+                            Entry(1f,secondEntry?.toFloat() ?: 0f),
+                            Entry(2f,thirdEntry?.toFloat() ?: 0f),
+                            Entry(3f,fourthEntry?.toFloat() ?: 0f),
+                            Entry(4f,fifthEntry?.toFloat() ?: 0f),
+                            Entry(5f,sixthEntry?.toFloat() ?: 0f)
+                    )
+                    val dataSet = LineDataSet(lineChartEntries, accountData[0].accountAttributes?.name)
+                    dataSet.apply {
+                        setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                        valueTextColor = Color.BLUE
+                        valueTextSize = 15f
+                    }
+                    val lineChartData = LineData(dataSet)
+
+                    transactionLineChart.apply {
+                        xAxis.granularity = 1f
+                        xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2)),
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3)),
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4)),
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5)),
+                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6))))
+                        xAxis.setDrawLabels(true)
+                        xAxis.setDrawAxisLine(false)
+                        xAxis.setDrawGridLines(false)
+                        data = lineChartData
+                        axisRight.isEnabled = false
+                        description.isEnabled = false
+                        xAxis.position = XAxis.XAxisPosition.BOTTOM
+                        data.isHighlightEnabled = false
+                        setTouchEnabled(true)
+                        setPinchZoom(true)
+                        animateY(1000, Easing.EaseOutBack)
+                    }
+                }
                 balanceHistoryCardText.text = resources.getString(R.string.account_chart_description,
                         accountData[0].accountAttributes?.name, DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                         DateTimeUtil.getTodayDate())
                 getAccountTransaction(accountData[0].accountAttributes?.name ?: "")
                 setExpensesByCategory(currencyCode, accountData[0].accountAttributes?.name ?: "", currencySymbol)
-
             }
-        })
+        }
     }
 
     private fun setExpensesByCategory(currencyCode: String, accountName: String, currencySymbol: String){
         zipLiveData(transactionViewModel.getTotalTransactionAmountByDateAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal"),transactionViewModel.getUniqueCategoryByDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal")).observe(this, Observer { transactionData ->
+                DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal")).observe(this){ transactionData ->
             if(transactionData.second.isNotEmpty()) {
                 setExpensesByBudget(currencyCode, accountName, currencySymbol, transactionData.first)
                 pieEntryArray = ArrayList(transactionData.second.size)
@@ -167,7 +157,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                     setIncomeByCategory(currencyCode, accountName, uniqueMeow, transactionData.first)
                     transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                             DateTimeUtil.getTodayDate(), currencyCode, accountName,
-                            "Withdrawal", uniqueMeow).observe(this, Observer { transactionAmount ->
+                            "Withdrawal", uniqueMeow).observe(this){ transactionAmount ->
                         val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(transactionData.first.absoluteValue.roundToInt().toDouble()).times(100)
                         if (uniqueMeow == "null" || uniqueMeow == null) {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category", transactionAmount))
@@ -180,11 +170,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                         pieDataSet.valueTextSize = 15f
                         categoryPieChart.data = PieData(pieDataSet)
                         categoryPieChart.invalidate()
-                    })
-                }
-                if(isDarkMode()){
-                    categoryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-                    categoryPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+                    }
                 }
                 val decimalFormat = DecimalFormat(".##")
                 categoryPieChart.apply {
@@ -206,18 +192,18 @@ class AccountDetailFragment: BaseDetailFragment() {
 
                 })
             }
-        })
+        }
     }
 
     private fun setExpensesByBudget(currencyCode: String, accountName: String, currencySymbol: String, totalAmount: Double){
         transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal").observe(this, Observer { transactionData ->
+                DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal").observe(this) { transactionData ->
             if(transactionData.isNotEmpty()){
                 pieEntryBudgetArray = ArrayList(transactionData.size)
                 transactionData.forEachIndexed { _, uniqueBudget ->
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                             DateTimeUtil.getTodayDate(), currencyCode, accountName,
-                            "Withdrawal", uniqueBudget).observe(this, Observer { transactionAmount ->
+                            "Withdrawal", uniqueBudget).observe(this) { transactionAmount ->
                         val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(totalAmount.absoluteValue.roundToInt().toDouble()).times(100)
                         if (uniqueBudget == "null" || uniqueBudget == null) {
                             pieEntryBudgetArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Budget", transactionAmount))
@@ -230,7 +216,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                         pieDataSetBudget.valueTextSize = 15f
                         budgetPieChart.data = PieData(pieDataSetBudget)
                         budgetPieChart.invalidate()
-                    })
+                    }
                 }
                 val decimalFormat = DecimalFormat(".##")
                 budgetPieChart.apply {
@@ -254,7 +240,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             } else {
                 budgetPieChart.invalidate()
             }
-        })
+        }
     }
 
     private fun setDarkMode(){
@@ -263,6 +249,11 @@ class AccountDetailFragment: BaseDetailFragment() {
             budgetPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             incomePieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             incomePieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            categoryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            categoryPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            transactionLineChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            transactionLineChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            transactionLineChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
         }
     }
 
@@ -270,7 +261,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                                     totalSum: Double){
         transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getTodayDate(), currencyCode, accountName,
-                "Deposit", categoryName).observe(this, Observer { transactionAmount ->
+                "Deposit", categoryName).observe(this) { transactionAmount ->
             val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(totalSum.absoluteValue.roundToInt().toDouble()).times(100)
             if (categoryName == "null" || categoryName == null) {
                 incomePieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category", transactionAmount))
@@ -283,7 +274,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             incomePieDataSet.valueTextSize = 15f
             incomePieChart.data = PieData(incomePieDataSet)
             incomePieChart.invalidate()
-        })
+        }
     }
 
     private fun getAccountTransaction(accountName: String){
@@ -291,13 +282,12 @@ class AccountDetailFragment: BaseDetailFragment() {
         accountTransactionList.addItemDecoration(DividerItemDecoration(requireContext(),
                 DividerItemDecoration.VERTICAL))
         transactionViewModel.getTransactionListByDateAndAccount(DateTimeUtil.getDaysBefore(
-                DateTimeUtil.getTodayDate(), 6), DateTimeUtil.getTodayDate(), accountName).observe(this,
-                Observer { transactionData ->
+                DateTimeUtil.getTodayDate(), 6), DateTimeUtil.getTodayDate(), accountName).observe(this){ transactionData ->
                     val rtAdapter = TransactionRecyclerAdapter(transactionData){ data: TransactionData -> itemClicked(data) }
                     accountTransactionList.adapter = rtAdapter
                     rtAdapter.apply { accountTransactionList.adapter as TransactionRecyclerAdapter }
                     rtAdapter.notifyDataSetChanged()
-        })
+        }
     }
 
     private fun itemClicked(data: TransactionData){
@@ -310,25 +300,25 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     override fun deleteItem() {
-        accountViewModel.isLoading.observe(this, Observer {
+        accountViewModel.isLoading.observe(this){
             if(it == true){
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
-        })
+        }
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_account_title, accountNameString))
                 .setMessage(resources.getString(R.string.delete_account_message, accountNameString))
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                    accountViewModel.deleteAccountById(accountId).observe(this, Observer {
+                    accountViewModel.deleteAccountById(accountId).observe(this) {
                         if(it == true){
                             requireFragmentManager().popBackStack()
                             toastSuccess("Account Deleted")
                         } else {
                             toastError("Account will be deleted later")
                         }
-                    })
+                    }
                 }
                 .setNegativeButton(android.R.string.no){dialog, _ ->
                     dialog.dismiss()

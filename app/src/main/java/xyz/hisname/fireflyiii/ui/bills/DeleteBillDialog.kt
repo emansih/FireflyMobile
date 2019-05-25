@@ -9,6 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import xyz.hisname.fireflyiii.R
@@ -32,7 +33,7 @@ class DeleteBillDialog: DialogFragment() {
                         .sizeDp(24)
                         .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
                 .setPositiveButton(R.string.delete_permanently){ _,_ ->
-                    billViewModel.deleteBillById(billId).observe(this, Observer {
+                    billViewModel.deleteBillById(billId).observe(this) {
                         if(it == true){
                             toastSuccess(resources.getString(R.string.bill_deleted, billDescription))
                             dialog?.dismiss()
@@ -43,7 +44,7 @@ class DeleteBillDialog: DialogFragment() {
                             toastError(resources.getString(R.string.issue_deleting, "bill"),
                                     Toast.LENGTH_LONG)
                         }
-                    })
+                    }
                 }
                 .setNegativeButton("No") { _, _ ->
                     toastInfo("Bill not deleted")

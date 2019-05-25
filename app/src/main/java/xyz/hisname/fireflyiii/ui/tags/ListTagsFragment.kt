@@ -15,7 +15,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.google.android.material.chip.Chip
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -41,18 +41,18 @@ class ListTagsFragment: BaseFragment() {
         baseSwipeLayout.isGone = true
         all_tags.setChipSpacing(16)
         displayView()
-        tagsViewModel.apiResponse.observe(this, Observer {
+        tagsViewModel.apiResponse.observe(this) {
             toastError(it)
-        })
+        }
         setFab()
         pullToRefresh()
     }
 
     private fun displayView(){
         swipe_tags.isRefreshing = true
-        tagsViewModel.getAllTags().observe(this, Observer { tags ->
+        tagsViewModel.getAllTags().observe(this) { tags ->
             all_tags.removeAllViewsInLayout()
-            tagsViewModel.isLoading.observe(this, Observer { isLoading ->
+            tagsViewModel.isLoading.observe(this) { isLoading ->
                 if(isLoading == false){
                     if(tags.isEmpty()){
                         listImage.isVisible = true
@@ -91,8 +91,8 @@ class ListTagsFragment: BaseFragment() {
                         }
                     }
                 }
-            })
-        })
+            }
+        }
     }
 
     private fun deleteTag(tagName: String){
@@ -100,7 +100,7 @@ class ListTagsFragment: BaseFragment() {
                 .setTitle(resources.getString(R.string.delete_tag_title, tagName))
                 .setMessage(resources.getString(R.string.delete_tag_message, tagName))
                 .setPositiveButton(R.string.delete_permanently){_, _ ->
-                    tagsViewModel.deleteTagByName(tagName).observe(this@ListTagsFragment, Observer { status ->
+                    tagsViewModel.deleteTagByName(tagName).observe(this) { status ->
                         if (status) {
                             requireFragmentManager().commit {
                                 replace(R.id.fragment_container, ListTagsFragment())
@@ -109,7 +109,7 @@ class ListTagsFragment: BaseFragment() {
                         } else {
                             toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
                         }
-                    })
+                    }
                 }
                 .setNegativeButton("No"){ _, _ ->
                     toastInfo("Tag not deleted")

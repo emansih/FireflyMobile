@@ -12,7 +12,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
@@ -49,7 +49,7 @@ class ListAccountFragment: BaseFragment() {
         swipeContainer.isRefreshing = accountViewModel.isLoading.value == true
         runLayoutAnimation(recycler_view)
         when (accountType) {
-            "asset" -> accountViewModel.getAssetAccounts().observe(this, Observer {
+            "asset" -> accountViewModel.getAssetAccounts().observe(this) {
                 if(it.isEmpty()){
                     recycler_view.isGone = true
                     noAccountImage.isVisible = true
@@ -62,8 +62,9 @@ class ListAccountFragment: BaseFragment() {
                     noAccountImage.isGone = true
                     recycler_view.isVisible = true
                     recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-                }            })
-            "expense" -> accountViewModel.getExpenseAccounts().observe(this, Observer {
+                }
+            }
+            "expense" -> accountViewModel.getExpenseAccounts().observe(this) {
                 if(it.isEmpty()){
                     recycler_view.isGone = true
                     noAccountImage.isVisible = true
@@ -76,7 +77,8 @@ class ListAccountFragment: BaseFragment() {
                     noAccountImage.isGone = true
                     recycler_view.isVisible = true
                     recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-                }            })
+                }
+            }
             "revenue" -> accountViewModel.getRevenueAccounts().observe(this, Observer {
                 if(it.isEmpty()){
                     recycler_view.isGone = true
@@ -91,7 +93,7 @@ class ListAccountFragment: BaseFragment() {
                     recycler_view.isVisible = true
                     recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
                 }            })
-            "liability" -> accountViewModel.getLiabilityAccounts().observe(this, Observer {
+            "liability" -> accountViewModel.getLiabilityAccounts().observe(this) {
                 if(it.isEmpty()){
                     recycler_view.isGone = true
                     noAccountImage.isVisible = true
@@ -105,14 +107,15 @@ class ListAccountFragment: BaseFragment() {
                     recycler_view.isVisible = true
                     recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
                 }
-            })
+            }
         }
-        accountViewModel.apiResponse.observe(this, Observer { errorMessage ->
+        accountViewModel.apiResponse.observe(this) { errorMessage ->
             if(errorMessage != null){
                 toastError(errorMessage)
             }
-        })
+        }
     }
+
 
     private fun itemClicked(data: AccountData){
         val bundle = bundleOf("accountId" to data.accountId)
