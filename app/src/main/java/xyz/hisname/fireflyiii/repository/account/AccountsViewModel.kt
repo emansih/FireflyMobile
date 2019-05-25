@@ -105,25 +105,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return accountValue
     }
 
-    fun getAssetAccounts(): LiveData<MutableList<AccountData>> {
-        loadRemoteData("asset")
-        return repository.assetAccount
-    }
-
-    fun getExpenseAccounts(): LiveData<MutableList<AccountData>> {
-        loadRemoteData("expense")
-        return repository.expenseAccount
-    }
-
-    fun getRevenueAccounts(): LiveData<MutableList<AccountData>> {
-        loadRemoteData("revenue")
-        return repository.revenueAccount
-    }
-
-    fun getLiabilityAccounts(): LiveData<MutableList<AccountData>> {
-        loadRemoteData("liability")
-        return repository.liabilityAccount
-    }
+    fun getAccountByType(accountType: String) = loadRemoteData(accountType)
 
     fun getAccountById(id: Long): LiveData<MutableList<AccountData>>{
         val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
@@ -280,11 +262,12 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     private fun deleteAccount(id: Long) = DeleteAccountWorker.deleteWorker(id)
 
-    private fun loadRemoteData(source: String){
+    private fun loadRemoteData(source: String): LiveData<MutableList<AccountData>> {
         isLoading.value = true
         apiResponse.value = null
-        val totalAccountList = arrayListOf<AccountData>()
-        genericService()?.create(AccountsService::class.java)?.getPaginatedAccountType(source, 1)?.enqueue(retrofitCallback({ response ->
+        var totalAccountList: MutableList<AccountData> = arrayListOf()
+        val data: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
+        accountsService?.getPaginatedAccountType(source, 1)?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
@@ -307,6 +290,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                             }
                         }
                     }
+                    data.postValue(totalAccountList)
                     isLoading.value = false
                 }
             } else {
@@ -316,13 +300,24 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
+                scope.launch(Dispatchers.IO){
+                    totalAccountList = repository.getAccountByType(source)
+                }.invokeOnCompletion {
+                    data.postValue(totalAccountList)
+                }
                 isLoading.value = false
             }
         })
         { throwable ->
-            isLoading.value = false
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+            scope.launch(Dispatchers.IO){
+                totalAccountList = repository.getAccountByType(source)
+            }.invokeOnCompletion {
+                data.postValue(totalAccountList)
+            }
+            isLoading.value = false
         })
+        return data
     }
 
 }

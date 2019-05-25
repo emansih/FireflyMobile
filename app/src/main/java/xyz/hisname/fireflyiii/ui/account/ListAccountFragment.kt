@@ -48,65 +48,41 @@ class ListAccountFragment: BaseFragment() {
     private fun displayView(){
         swipeContainer.isRefreshing = accountViewModel.isLoading.value == true
         runLayoutAnimation(recycler_view)
-        when (accountType) {
-            "asset" -> accountViewModel.getAssetAccounts().observe(this) {
-                if(it.isEmpty()){
-                    recycler_view.isGone = true
-                    noAccountImage.isVisible = true
-                    noAccountText.isVisible = true
-                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_money_bill))
-                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
-                } else {
-                    noAccountText.isGone = true
-                    noAccountImage.isGone = true
-                    recycler_view.isVisible = true
-                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
+        accountViewModel.getAccountByType(accountType).observe(this){ accountData ->
+            if(accountData.isEmpty()){
+                recycler_view.isGone = true
+                noAccountImage.isVisible = true
+                noAccountText.isVisible = true
+                when (accountType) {
+                    "asset" -> {
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                                .icon(FontAwesome.Icon.faw_money_bill))
+                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
+                    }
+                    "expense" -> {
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                                .icon(FontAwesome.Icon.faw_shopping_cart))
+                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
+                    }
+                    "revenue" -> {
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                                .icon(FontAwesome.Icon.faw_download))
+                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
+                    }
+                    "liability" -> {
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                                .icon(FontAwesome.Icon.faw_ticket_alt))
+                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
+                    }
                 }
-            }
-            "expense" -> accountViewModel.getExpenseAccounts().observe(this) {
-                if(it.isEmpty()){
-                    recycler_view.isGone = true
-                    noAccountImage.isVisible = true
-                    noAccountText.isVisible = true
-                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_shopping_cart))
-                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
-                } else {
-                    noAccountText.isGone = true
-                    noAccountImage.isGone = true
-                    recycler_view.isVisible = true
-                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-                }
-            }
-            "revenue" -> accountViewModel.getRevenueAccounts().observe(this, Observer {
-                if(it.isEmpty()){
-                    recycler_view.isGone = true
-                    noAccountImage.isVisible = true
-                    noAccountText.isVisible = true
-                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_download))
-                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
-                } else {
-                    noAccountText.isGone = true
-                    noAccountImage.isGone = true
-                    recycler_view.isVisible = true
-                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-                }            })
-            "liability" -> accountViewModel.getLiabilityAccounts().observe(this) {
-                if(it.isEmpty()){
-                    recycler_view.isGone = true
-                    noAccountImage.isVisible = true
-                    noAccountText.isVisible = true
-                    noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                            .icon(FontAwesome.Icon.faw_ticket_alt))
-                    noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
-                } else {
-                    noAccountText.isGone = true
-                    noAccountImage.isGone = true
-                    recycler_view.isVisible = true
-                    recycler_view.adapter = AccountRecyclerAdapter(it) { data: AccountData -> itemClicked(data) }
-                }
+                noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
+                        .icon(FontAwesome.Icon.faw_money_bill))
+                noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
+            } else {
+                noAccountText.isGone = true
+                noAccountImage.isGone = true
+                recycler_view.isVisible = true
+                recycler_view.adapter = AccountRecyclerAdapter(accountData) { data: AccountData -> itemClicked(data) }
             }
         }
         accountViewModel.apiResponse.observe(this) { errorMessage ->

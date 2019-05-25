@@ -167,7 +167,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         date_started_edittext.setOnClickListener {
             DialogDarkMode().showCorrectDatePickerDialog(requireContext(), endDate, calendar)
         }
-        accountViewModel.getAssetAccounts().observe(this) {
+        accountViewModel.getAccountByType("asset").observe(this) {
             if(it.isNotEmpty()) {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)

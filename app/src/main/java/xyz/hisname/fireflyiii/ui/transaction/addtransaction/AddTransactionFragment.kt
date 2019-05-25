@@ -339,7 +339,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun contextSwitch(){
         when {
-            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAssetAccounts()
+            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountByType("asset")
                     .observe(this) { transferData ->
                         transferData.forEachIndexed { _, accountData ->
                             accounts.add(accountData.accountAttributes?.name!!)
@@ -361,7 +361,7 @@ class AddTransactionFragment: BaseFragment() {
                         val destinationPosition = spinnerAdapter.getPosition(destinationName)
                         destination_spinner.setSelection(destinationPosition)
                     }
-            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getRevenueAccounts(), accountViewModel.getAssetAccounts())
+            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountByType("revenue"), accountViewModel.getAccountByType("asset"))
                     .observe(this ) {
                         // Revenue account, autocomplete
                         it.first.forEachIndexed { _, accountData ->
@@ -387,7 +387,7 @@ class AddTransactionFragment: BaseFragment() {
                         destination_spinner.setSelection(destinationPosition)
                     }
             else -> {
-                zipLiveData(accountViewModel.getAssetAccounts(), accountViewModel.getExpenseAccounts())
+                zipLiveData(accountViewModel.getAccountByType("asset"), accountViewModel.getAccountByType("expense"))
                         .observe(this) {
                             // Spinner for source account
                             it.first.forEachIndexed { _, accountData ->

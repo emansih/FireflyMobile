@@ -4,6 +4,8 @@ import androidx.annotation.WorkerThread
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 
+@Suppress("RedundantSuspendModifier")
+@WorkerThread
 class AccountRepository(private val accountDao: AccountsDataDao){
 
     val allAccounts = accountDao.getAllAccounts()
@@ -12,38 +14,20 @@ class AccountRepository(private val accountDao: AccountsDataDao){
     val revenueAccount = accountDao.getAccountByType("revenue")
     val liabilityAccount = accountDao.getAccountByType("liabilities")
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
     suspend fun insertAccount(account: AccountData){
         accountDao.insert(account)
     }
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun retrieveAccountById(accountId: Long): MutableList<AccountData>{
-        return accountDao.getAccountById(accountId)
-    }
+    suspend fun getAccountByType(accountType: String) = accountDao.getAccountByType(accountType)
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun deleteAccountById(accountId: Long): Int{
-        return accountDao.deleteAccountById(accountId)
-    }
+    suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
 
+    suspend fun deleteAccountById(accountId: Long) = accountDao.deleteAccountById(accountId)
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun retrieveAccountByName(accountName: String): MutableList<AccountData>{
-        return accountDao.getAccountByName(accountName)
-    }
+    suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun retrieveAccountWithCurrencyCodeAndNetworth(currencyCode: String): MutableList<AccountData>{
-        return accountDao.getAccountsWithNetworthAndCurrency(true, currencyCode)
-    }
+    suspend fun retrieveAccountWithCurrencyCodeAndNetworth(currencyCode: String) =
+            accountDao.getAccountsWithNetworthAndCurrency(true, currencyCode)
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
     suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)
 }
