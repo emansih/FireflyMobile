@@ -29,10 +29,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
-import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.DeviceUtil
-import xyz.hisname.fireflyiii.util.LocaleNumberParser
-import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
+import xyz.hisname.fireflyiii.util.*
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.roundToInt
 
@@ -41,15 +38,15 @@ import kotlin.math.roundToInt
 class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
-    private var depositSum = 0.toDouble()
-    private var withdrawSum = 0.toDouble()
-    private var transaction = 0.toDouble()
+    private var depositSum = 0.0
+    private var withdrawSum = 0.0
+    private var transaction = 0.0
     private var budgetSpent = 0f
     private var budgeted = 0f
-    private var month2Depot = 0.toDouble()
-    private var month3Depot = 0.toDouble()
-    private var month2With = 0.toDouble()
-    private var month3With = 0.toDouble()
+    private var month2Depot = 0.0
+    private var month3Depot = 0.0
+    private var month2With = 0.0
+    private var month3With = 0.0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -63,14 +60,12 @@ class DashboardFragment: BaseFragment() {
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
         changeTheme()
         currencyViewModel.getDefaultCurrency().observe(this, Observer { defaultCurrency ->
-            if (defaultCurrency.isNotEmpty()) {
-                val currencyData = defaultCurrency[0].currencyAttributes
-                setNetIncome(currencyData)
-                setPieChart(currencyData)
-                setNetWorth(currencyData)
-                setAverage(currencyData)
-            }
+            val currencyData = defaultCurrency[0].currencyAttributes
+            getTransactionData(currencyData)
+            setPieChart(currencyData)
+            setNetWorth(currencyData)
         })
+        animateCard(statsCard, netEarningsCard, dailySummaryCard, recentTransactionCard, budgetCard)
         currencyViewModel.apiResponse.observe(this, Observer {
             toastInfo(it)
         })
@@ -82,24 +77,30 @@ class DashboardFragment: BaseFragment() {
         requireFragmentManager().commit {
             replace(R.id.recentTransactionCard, RecentTransactionFragment())
         }
-        animateCard(statsCard, netEarningsCard, dailySummaryCard, recentTransactionCard, budgetCard)
+        budgetCard.setOnClickListener {
+            requireFragmentManager().commit {
+                replace(R.id.fragment_container, BudgetSummaryFragment())
+                addToBackStack(null)
+            }
+        }
+        budgetChart.setOnClickListener {
+            requireFragmentManager().commit {
+                replace(R.id.fragment_container, BudgetSummaryFragment())
+                addToBackStack(null)
+            }
+        }
     }
 
     private fun setNetWorth(currencyData: CurrencyAttributes?){
-        val currencyCode = currencyData?.code!!
+        val currencyCode = currencyData?.code ?: ""
         accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this, Observer { money ->
-            accountViewModel.isLoading.observe(this, Observer { load ->
-                if (load == false) {
-                    netWorthText.text = currencyData.symbol + " " + money
-                }
-            })
+            netWorthText.text = currencyData?.symbol + money
         })
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun setNetIncome(currencyData: CurrencyAttributes?){
-        val currencyCode = currencyData?.code!!
-        zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+    private fun getTransactionData(currencyData: CurrencyAttributes?){
+        val currencyCode = currencyData?.code ?: ""
+        zipLiveData(zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode), transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode), transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
                 DateTimeUtil.getEndOfMonth(1), currencyCode),
@@ -107,38 +108,61 @@ class DashboardFragment: BaseFragment() {
                         DateTimeUtil.getEndOfMonth(1), currencyCode), transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
                 DateTimeUtil.getEndOfMonth(2), currencyCode),
                 transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
-                        DateTimeUtil.getEndOfMonth(2), currencyCode)).observe(this, Observer { transactionData ->
+                        DateTimeUtil.getEndOfMonth(2), currencyCode)), zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
+                DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5), currencyCode),
+                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode))).observe(this, Observer { transactionData ->
+            setNetIncome(currencyData?.symbol ?: "", transactionData.first)
+            setAverage(currencyData?.symbol ?: "", currencyCode, transactionData.second)
+        })
+    }
 
+    @SuppressLint("SetTextI18n")
+    private fun setNetIncome(currencySymbol: String, transactionData: Sixple<Double,Double,Double,Double,Double,Double>){
             withdrawSum = transactionData.first
             depositSum = transactionData.second
             month2With = transactionData.third
             month2Depot = transactionData.fourth
             month3With = transactionData.fifth
             month3Depot = transactionData.sixth
-            currentExpense.text = currencyData.symbol + " " + withdrawSum.toString()
-            currentMonthIncome.text = currencyData.symbol + " " + depositSum.toString()
+            currentExpense.text = currencySymbol + withdrawSum.toString()
+            currentMonthIncome.text = currencySymbol + depositSum.toString()
             transaction = depositSum - withdrawSum
             if(Math.copySign(1.toDouble(), transaction) < 0){
                 currentNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            balanceText.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
-            currentNetIncome.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
+            balanceText.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
+            currentNetIncome.text = currencySymbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
             transaction = month2Depot - month2With
-            oneMonthBeforeExpense.text = currencyData.symbol + " " + month2With.toString()
-            oneMonthBeforeIncome.text = currencyData.symbol + " " + month2Depot.toString()
+            oneMonthBeforeExpense.text = currencySymbol + month2With.toString()
+            oneMonthBeforeIncome.text = currencySymbol + month2Depot.toString()
             if(Math.copySign(1.toDouble(), transaction) < 0){
                 oneMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            oneMonthBeforeNetIncome.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
+            oneMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
             transaction = month3Depot - month3With
-            twoMonthBeforeExpense.text = currencyData.symbol + " " + month3With.toString()
-            twoMonthBeforeIncome.text = currencyData.symbol + " " + month3Depot.toString()
+            twoMonthBeforeExpense.text = currencySymbol + month3With.toString()
+            twoMonthBeforeIncome.text = currencySymbol + month3Depot.toString()
             if(Math.copySign(1.toDouble(), transaction) < 0){
                 twoMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
             }
-            twoMonthBeforeNetIncome.text = currencyData.symbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
+            twoMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
             val withDrawalHistory = arrayListOf(
                     BarEntry(0f, month3With.toFloat()),
@@ -179,90 +203,63 @@ class DashboardFragment: BaseFragment() {
                 data.isHighlightEnabled = false
                 animateY(1000)
             }
-        })
     }
 
-    private fun setAverage(currencyData: CurrencyAttributes?){
-        val currencyCode = currencyData?.code!!
-        zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(
-                DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
-                DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2),
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3),
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4),
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5),
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode)).observe(this, Observer { transactionData ->
-            transactionViewModel.isLoading.observe(this, Observer { loader ->
-                if(loader == false) {
-                    val firstDay = transactionData.first
-                    val secondDay = transactionData.second
-                    val thirdDay = transactionData.third
-                    val fourthDay = transactionData.fourth
-                    val fifthDay = transactionData.fifth
-                    val sixthDay = transactionData.sixth
-                    val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).div(6)
-                    sixDaysAverage.text = currencyData.symbol + LocaleNumberParser.parseDecimal(sixDayAverage, requireContext())
-                    val expenseHistory = arrayListOf(
-                            BarEntry(0f, firstDay.toFloat()),
-                            BarEntry(1f, secondDay.toFloat()),
-                            BarEntry(2f, thirdDay.toFloat()),
-                            BarEntry(3f, fourthDay.toFloat()),
-                            BarEntry(4f, fifthDay.toFloat()),
-                            BarEntry(5f, sixthDay.toFloat())
-                    )
-                    val expenseSet = BarDataSet(expenseHistory, resources.getString(R.string.expense))
-                    expenseSet.apply {
-                        valueTextColor = Color.RED
-                        color = Color.RED
-                        valueTextSize = 15f
-                    }
-                    dailySummaryChart.apply {
-                        description.isEnabled = false
-                        isScaleXEnabled = false
-                        setDrawBarShadow(false)
-                        setDrawGridBackground(false)
-                        xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
-                                DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
-                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2))),
-                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3))),
-                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4))),
-                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5))),
-                                DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6)))))
-                        data = BarData(expenseSet)
-                        xAxis.position = XAxis.XAxisPosition.BOTTOM
-                        data.isHighlightEnabled = false
-                        animateY(1000)
-                        setTouchEnabled(true)
-                    }
-                }
-            })
-        })
+    private fun setAverage(currencySymbol: String, currencyCode: String, transactionData: Sixple<Double,Double,Double,Double,Double,Double>){
+        val firstDay = transactionData.first
+        val secondDay = transactionData.second
+        val thirdDay = transactionData.third
+        val fourthDay = transactionData.fourth
+        val fifthDay = transactionData.fifth
+        val sixthDay = transactionData.sixth
+        val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).div(6)
+        sixDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(sixDayAverage, requireContext())
+        val expenseHistory = arrayListOf(
+                BarEntry(0f, firstDay.toFloat()),
+                BarEntry(1f, secondDay.toFloat()),
+                BarEntry(2f, thirdDay.toFloat()),
+                BarEntry(3f, fourthDay.toFloat()),
+                BarEntry(4f, fifthDay.toFloat()),
+                BarEntry(5f, sixthDay.toFloat())
+        )
+        val expenseSet = BarDataSet(expenseHistory, resources.getString(R.string.expense))
+        expenseSet.apply {
+            valueTextColor = Color.RED
+            color = Color.RED
+            valueTextSize = 15f
+        }
+        dailySummaryChart.apply {
+            description.isEnabled = false
+            isScaleXEnabled = false
+            setDrawBarShadow(false)
+            setDrawGridBackground(false)
+            xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
+                    DateTimeUtil.getDayAndMonth(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(),1)),
+                    DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2))),
+                    DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3))),
+                    DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4))),
+                    DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5))),
+                    DateTimeUtil.getDayAndMonth((DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6)))))
+            data = BarData(expenseSet)
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
+            data.isHighlightEnabled = false
+            animateY(1000)
+            setTouchEnabled(true)
+        }
         transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
                 DateTimeUtil.getTodayDate(), currencyCode).observe(this, Observer { transactionData ->
-            transactionViewModel.isLoading.observe(this, Observer { loader ->
-                if(loader == false) {
-                    thirtyDaysAverage.text = currencyData.symbol + LocaleNumberParser.parseDecimal(
-                            transactionData.div(30), requireContext())
-                }
-            })
+            thirtyDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(
+                    transactionData.div(30), requireContext())
+
         })
     }
 
     private fun setPieChart(currencyData: CurrencyAttributes?) {
         monthText.text = DateTimeUtil.getCurrentMonth()
-        val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700), ContextCompat.getColor(requireContext(), R.color.md_green_500))
+        val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700),
+                ContextCompat.getColor(requireContext(), R.color.md_green_500))
         zipLiveData(budgetLimit.retrieveSpentBudget(),
-                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code!!)).observe(this, Observer { budget ->
+                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code ?: "")).observe(this, Observer { budget ->
             budgetSpent = budget.first.toFloat()
             budgeted = budget.second.toFloat()
             val budgetLeftPercentage = (budgetSpent / budgeted) * 100
@@ -277,8 +274,8 @@ class DashboardFragment: BaseFragment() {
                 valueTextSize = 15f
                 valueFormatter = MpAndroidPercentFormatter()
             }
-            budgetAmount.text = currencyData.symbol + " " + budgeted
-            spentAmount.text = currencyData.symbol + " " + budgetSpent
+            budgetAmount.text = currencyData?.symbol + budgeted
+            spentAmount.text = currencyData?.symbol + budgetSpent
             budgetChart.apply {
                 data = PieData(dataSet)
                 description.text = "Budget Percentage"
@@ -287,7 +284,7 @@ class DashboardFragment: BaseFragment() {
             }
             val progressDrawable = budgetProgress.progressDrawable.mutate()
 
-            leftToSpentText.text = currencyData.symbol + " " +
+            leftToSpentText.text = currencyData?.symbol +
                     LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
             if(!budgetLeftPercentage.isNaN()) {
                 when {
@@ -307,18 +304,6 @@ class DashboardFragment: BaseFragment() {
                 ObjectAnimator.ofInt(budgetProgress, "progress", budgetLeftPercentage.roundToInt()).start()
             }
         })
-        budgetCard.setOnClickListener {
-            requireFragmentManager().commit {
-                replace(R.id.fragment_container, BudgetSummaryFragment())
-                addToBackStack(null)
-            }
-        }
-        budgetChart.setOnClickListener {
-            requireFragmentManager().commit {
-                replace(R.id.fragment_container, BudgetSummaryFragment())
-                addToBackStack(null)
-            }
-        }
     }
 
     private fun changeTheme(){
@@ -350,7 +335,6 @@ class DashboardFragment: BaseFragment() {
                         if(frames == budgetCard){
                             val helpText = showCase(R.string.dashboard_balance_help_text,
                                     "balanceLayoutCaseView", balanceLayout)
-                            dashboardNested.smoothScrollTo(0, 0)
                             helpText.show()
                         }
                     }
