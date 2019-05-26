@@ -29,7 +29,8 @@ class AddTransactionActivity: BaseActivity() {
     }
 
     private fun setHelpText(){
-        showCase(R.string.transactions_create_switch_box, "bottomNavigationShowCase", transactionBottomView).show()
+        showCase(R.string.transactions_create_switch_box, "bottomNavigationShowCase",
+                transactionBottomView, false).show()
     }
 
     private fun setBottomNav(){

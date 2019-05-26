@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment as SupportFragment
 fun SupportFragment.showCase(@StringRes title: Int, showOnce: String, layout: View) =
         requireActivity().showCase(title, showOnce, layout)
 
-fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View): FancyShowCaseView{
+fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View,  fitWindow: Boolean = true): FancyShowCaseView{
     val enterAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_from_left)
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
     val showCaseView = FancyShowCaseView.Builder(this)
@@ -23,7 +23,7 @@ fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View): Fa
             .title(resources.getString(title))
             .enableAutoTextPosition()
             .showOnce(showOnce)
-            .fitSystemWindows(true)
+            .fitSystemWindows(fitWindow)
             .focusShape(FocusShape.ROUNDED_RECTANGLE)
             .enterAnimation(enterAnimation)
             .closeOnTouch(true)
