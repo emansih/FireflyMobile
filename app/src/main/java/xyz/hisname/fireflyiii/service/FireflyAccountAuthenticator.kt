@@ -1,14 +1,12 @@
 package xyz.hisname.fireflyiii.service
 
-import android.accounts.AbstractAccountAuthenticator
-import android.accounts.Account
-import android.accounts.AccountAuthenticatorResponse
-import android.accounts.AccountManager
+import android.accounts.*
 import android.accounts.AccountManager.KEY_BOOLEAN_RESULT
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 
 class FireflyAccountAuthenticator(private val context: Context): AbstractAccountAuthenticator(context) {
@@ -37,9 +35,17 @@ class FireflyAccountAuthenticator(private val context: Context): AbstractAccount
 
     override fun editProperties(response: AccountAuthenticatorResponse, accountType: String) = null
 
-    override fun addAccount(response: AccountAuthenticatorResponse, accountType: String,
-                            authTokenType: String, requiredFeatures: Array<String>, options: Bundle): Bundle {
-        val loginActivity = Intent(context, OnboardingActivity::class.java)
-        return bundleOf(AccountManager.KEY_INTENT to loginActivity)
+    @Throws(NetworkErrorException::class)
+    override fun addAccount(response: AccountAuthenticatorResponse, accountType: String, authTokenType: String?,
+                            requiredFeatures: Array<String>?, options: Bundle?): Bundle? {
+        val accountManager = context.getSystemService(Context.ACCOUNT_SERVICE) as AccountManager
+        val accounts = accountManager.getAccountsByType("OAUTH")
+        lateinit var activityToLaunch: Intent
+        activityToLaunch = if(accounts.isEmpty()){
+            Intent(context, OnboardingActivity::class.java)
+        } else {
+            Intent(context, HomeActivity::class.java)
+        }
+        return bundleOf(AccountManager.KEY_INTENT to activityToLaunch)
     }
 }
