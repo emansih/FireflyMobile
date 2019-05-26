@@ -18,7 +18,6 @@ fun SupportFragment.showCase(@StringRes title: Int, showOnce: String, layout: Vi
 fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View): FancyShowCaseView{
     val enterAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_from_left)
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-    layout.focusOnView()
     val showCaseView = FancyShowCaseView.Builder(this)
             .focusOn(layout)
             .title(resources.getString(title))
@@ -30,6 +29,9 @@ fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View): Fa
             .closeOnTouch(true)
     if(AppPref(sharedPref).nightModeEnabled){
         showCaseView.focusBorderColor(R.color.md_green_400)
+    }
+    if(!showCaseView.build().isShownBefore()){
+        layout.focusOnView()
     }
     return showCaseView.build()
 }
