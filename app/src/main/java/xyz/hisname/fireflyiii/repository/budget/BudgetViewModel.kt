@@ -186,7 +186,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         return currentMonthBudgetValue
     }
 
-    fun retrieveSpentBudget(): LiveData<String>{
+    fun retrieveSpentBudget(currencyCode: String): LiveData<String>{
         spentBudgetLoader.value = true
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
         budgetService?.getPaginatedSpentBudget(1, DateTimeUtil.getStartOfMonth(),
@@ -220,7 +220,9 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                                 currentMonthSpent = 0.toDouble()
                                 budgetListData.forEachIndexed { _, budgetData ->
                                     budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
-                                        currentMonthSpent += spent.amount
+                                        if(spent.currency_code == currencyCode){
+                                            currentMonthSpent += spent.amount
+                                        }
                                     }
                                 }
                                 spentBudgetLoader.postValue(false)
@@ -242,7 +244,9 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     currentMonthSpent = 0.toDouble()
                     budgetListData.forEachIndexed { _, budgetData ->
                         budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
-                            currentMonthSpent += spent.amount
+                            if(spent.currency_code == currencyCode){
+                                currentMonthSpent += spent.amount
+                            }
                         }
                     }
                     spentBudgetLoader.postValue(false)
@@ -257,7 +261,9 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 currentMonthSpent = 0.toDouble()
                 budgetListData.forEachIndexed { _, budgetData ->
                     budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
-                        currentMonthSpent += spent.amount
+                        if(spent.currency_code == currencyCode){
+                            currentMonthSpent += spent.amount
+                        }
                     }
                 }
                 currentMonthSpentValue.postValue(Math.abs(currentMonthSpent).toString())

@@ -240,9 +240,9 @@ class DashboardFragment: BaseFragment() {
             setTouchEnabled(true)
         }
         transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
-                DateTimeUtil.getTodayDate(), currencyCode).observe(this){ transactionData ->
+                DateTimeUtil.getTodayDate(), currencyCode).observe(this){ transaction ->
             thirtyDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(
-                    transactionData.div(30), requireContext())
+                    transaction.div(30), requireContext())
 
         }
     }
@@ -251,7 +251,7 @@ class DashboardFragment: BaseFragment() {
         monthText.text = DateTimeUtil.getCurrentMonth()
         val dataColor = arrayListOf(getCompatColor(R.color.md_red_700),
                 getCompatColor(R.color.md_green_500))
-        zipLiveData(budgetLimit.retrieveSpentBudget(),
+        zipLiveData(budgetLimit.retrieveSpentBudget(currencyData?.code ?: ""),
                 budgetLimit.retrieveCurrentMonthBudget(currencyData?.code ?: "")).observe(this) { budget ->
             budgetSpent = budget.first.toFloat()
             budgeted = budget.second.toFloat()

@@ -66,7 +66,7 @@ class BudgetSummaryFragment: BaseFragment() {
                 DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal"),
                 transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal")),
-                zipLiveData(budgetLimit.retrieveSpentBudget(),
+                zipLiveData(budgetLimit.retrieveSpentBudget(currencyData.currencyAttributes?.code ?: ""),
                         budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(this) { fireflyData ->
             if(fireflyData.first.second.isNotEmpty()) {
                 val pieEntryArray: ArrayList<PieEntry> = ArrayList(fireflyData.first.second.size)
