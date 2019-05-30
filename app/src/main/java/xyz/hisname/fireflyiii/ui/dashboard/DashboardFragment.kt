@@ -84,12 +84,6 @@ class DashboardFragment: BaseFragment() {
                 addToBackStack(null)
             }
         }
-        budgetChart.setOnClickListener {
-            requireFragmentManager().commit {
-                replace(R.id.fragment_container, BudgetSummaryFragment())
-                addToBackStack(null)
-            }
-        }
     }
 
     private fun setNetWorth(currencyData: CurrencyAttributes?){
@@ -279,11 +273,15 @@ class DashboardFragment: BaseFragment() {
             }
             budgetAmount.text = currencyData?.symbol + budgeted
             spentAmount.text = currencyData?.symbol + budgetSpent
-            budgetChart.apply {
+            budgetChart.setData {
                 data = PieData(dataSet)
                 description.text = "Budget Percentage"
-                highlightValue(null)
-                isDrawHoleEnabled = false
+                setOnClickListener {
+                    requireFragmentManager().commit {
+                        replace(R.id.fragment_container, BudgetSummaryFragment())
+                        addToBackStack(null)
+                    }
+                }
             }
             val progressDrawable = budgetProgress.progressDrawable.mutate()
 
@@ -322,8 +320,6 @@ class DashboardFragment: BaseFragment() {
             dailySummaryChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             dailySummaryChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             budgetExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
-            budgetChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            budgetChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
         }
     }
 

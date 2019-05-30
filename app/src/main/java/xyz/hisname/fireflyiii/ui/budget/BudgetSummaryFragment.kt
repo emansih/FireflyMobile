@@ -30,6 +30,7 @@ import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.extension.setData
 import xyz.hisname.fireflyiii.util.extension.zipLiveData
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -58,7 +59,6 @@ class BudgetSummaryFragment: BaseFragment() {
             retrieveData(currency[0])
             setBudgetSummary(currency[0])
         }
-        setTheme()
     }
 
     private fun retrieveData(currencyData: CurrencyData){
@@ -114,47 +114,42 @@ class BudgetSummaryFragment: BaseFragment() {
     @SuppressLint("SetTextI18n")
     private fun setBudgetSummary(currencyData: CurrencyData){
         val currencyCode = currencyData.currencyAttributes?.code ?: ""
-        budgetSummaryPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-            override fun onNothingSelected() {
-                budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgeted
-                actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgetSpent
-                remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
-                        LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
-                showTransactionButton.isGone = true
-            }
-
-            override fun onValueSelected(entry: Entry, high: Highlight) {
-                val pe = entry as PieEntry
-                showTransactionButton.isVisible = true
-                budgetAmountValue.text = "--.--"
-                actualAmountValue.text = "--.--"
-                remainingAmountValue.text = "--.--"
-                transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal",
-                        pe.label).observe(this@BudgetSummaryFragment) { value ->
-                    budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + entry.value
-                    actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
-                            LocaleNumberParser.parseDecimal(value, requireContext())
+        budgetSummaryPieChart.setData {
+            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+                override fun onNothingSelected() {
+                    budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgeted
+                    actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + budgetSpent
                     remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
-                            LocaleNumberParser.parseDecimal((entry.value - Math.abs(value)), requireContext())
-
+                            LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
+                    showTransactionButton.isGone = true
                 }
-                showTransactionButton.setOnClickListener {
-                    val transactionDialog  = TransactionByBudgetDialogFragment()
-                    transactionDialog.arguments = bundleOf("budgetName" to pe.label)
-                    transactionDialog.show(requireFragmentManager(), "transaction_budget_dialog")
-                }
-            }
-        })
-        budgetSummaryPieChart.description.isEnabled = false
-        budgetSummaryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
-        budgetDuration.text = DateTimeUtil.getDurationText()
-    }
 
-    private fun setTheme(){
-        if(isDarkMode()){
-            budgetSummaryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+                override fun onValueSelected(entry: Entry, high: Highlight) {
+                    val pe = entry as PieEntry
+                    showTransactionButton.isVisible = true
+                    budgetAmountValue.text = "--.--"
+                    actualAmountValue.text = "--.--"
+                    remainingAmountValue.text = "--.--"
+                    transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal",
+                            pe.label).observe(this@BudgetSummaryFragment) { value ->
+                        budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + entry.value
+                        actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
+                                LocaleNumberParser.parseDecimal(value, requireContext())
+                        remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
+                                LocaleNumberParser.parseDecimal((entry.value - Math.abs(value)), requireContext())
+
+                    }
+                    showTransactionButton.setOnClickListener {
+                        val transactionDialog = TransactionByBudgetDialogFragment()
+                        transactionDialog.arguments = bundleOf("budgetName" to pe.label)
+                        transactionDialog.show(requireFragmentManager(), "transaction_budget_dialog")
+                    }
+                }
+            })
         }
+        budgetSummaryPieChart.description.isEnabled = false
+        budgetDuration.text = DateTimeUtil.getDurationText()
     }
 
     override fun onAttach(context: Context){

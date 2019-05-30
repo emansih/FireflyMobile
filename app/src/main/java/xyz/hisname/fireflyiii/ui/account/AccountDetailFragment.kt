@@ -65,19 +65,15 @@ class AccountDetailFragment: BaseDetailFragment() {
             val accountName = accountData[0].accountAttributes?.name ?: ""
             val accountBalance = accountData[0].accountAttributes?.current_balance ?: 0.0
             currencyViewModel.getCurrencyByCode(currencyCode).observe(this){
-                setLineChart(currencyCode, currencySymbol,  accountName, accountBalance)
+                setLineChart(currencyCode, accountName, accountBalance)
                 getAccountTransaction(accountName)
                 setExpensesByCategory(currencyCode, accountName, currencySymbol)
             }
         }
-
         setDarkMode()
-        incomePieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
-        budgetPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
-        categoryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
     }
 
-    private fun setLineChart(currencyCode: String, currencySymbol: String, accountName: String, accountBalance: Double){
+    private fun setLineChart(currencyCode: String, accountName: String, accountBalance: Double){
         zipLiveData(transactionViewModel.getTransactionsByAccountAndCurrencyCodeAndDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
                 currencyCode, accountName),
@@ -171,22 +167,16 @@ class AccountDetailFragment: BaseDetailFragment() {
                     categoryPieChart.invalidate()
                 }
             }
-            categoryPieChart.apply {
+            categoryPieChart.setData {
                 description.text = currencySymbol + LocaleNumberParser.parseDecimal(transactionData.first, requireContext())
-                description.textSize = 15f
-                legend.form = Legend.LegendForm.CIRCLE
-                isDrawHoleEnabled = false
-                setUsePercentValues(true)
-                legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                setTransparentCircleAlpha(0)
+                setOnChartValueSelectedListener(object : OnChartValueSelectedListener{
+                    override fun onNothingSelected() {
+                    }
+                    override fun onValueSelected(e: Entry, h: Highlight) {
+                        toastInfo(currencySymbol + e.data)
+                    }
+                })
             }
-            categoryPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener{
-                override fun onNothingSelected() {
-                }
-                override fun onValueSelected(e: Entry, h: Highlight) {
-                    toastInfo(currencySymbol + e.data)
-                }
-            })
         }
     }
 
@@ -213,24 +203,17 @@ class AccountDetailFragment: BaseDetailFragment() {
                         budgetPieChart.invalidate()
                     }
                 }
-                budgetPieChart.apply {
+                budgetPieChart.setData {
                     description.text = currencySymbol + LocaleNumberParser.parseDecimal(totalAmount, requireContext())
-                    description.textSize = 15f
-                    legend.form = Legend.LegendForm.CIRCLE
-                    isDrawHoleEnabled = false
-                    setUsePercentValues(true)
-                    legend.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                    setTransparentCircleAlpha(0)
+                    setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+                        override fun onNothingSelected() {
+                        }
+
+                        override fun onValueSelected(e: Entry, h: Highlight) {
+                            toastInfo(currencySymbol + e.data)
+                        }
+                    })
                 }
-                budgetPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener{
-                    override fun onNothingSelected() {
-                    }
-
-                    override fun onValueSelected(e: Entry, h: Highlight) {
-                        toastInfo(currencySymbol + e.data)
-                    }
-
-                })
             } else {
                 budgetPieChart.invalidate()
             }
@@ -239,12 +222,6 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setDarkMode(){
         if(isDarkMode()){
-            budgetPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            budgetPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            incomePieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            incomePieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            categoryPieChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            categoryPieChart.description.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             transactionLineChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             transactionLineChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
             transactionLineChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
@@ -266,8 +243,9 @@ class AccountDetailFragment: BaseDetailFragment() {
             incomePieDataSet.valueFormatter = MpAndroidPercentFormatter()
             incomePieDataSet.colors = coloring
             incomePieDataSet.valueTextSize = 15f
-            incomePieChart.data = PieData(incomePieDataSet)
-            incomePieChart.invalidate()
+            incomePieChart.setData {
+                data = PieData(incomePieDataSet)
+            }
         }
     }
 
