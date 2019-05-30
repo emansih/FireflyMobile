@@ -34,6 +34,7 @@ import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.bindView
+import xyz.hisname.fireflyiii.util.extension.getGlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import kotlin.coroutines.CoroutineContext
 
@@ -54,7 +55,7 @@ abstract class BaseFragment: Fragment() {
     protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     protected val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
     protected val userApiVersion by lazy { getViewModel(UserInfoViewModel::class.java).userApiVersion() }
-    private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
+    private val globalViewModel by lazy { getGlobalViewModel(GlobalViewModel::class.java) }
     private var parentJob = Job()
     private val coroutineContext: CoroutineContext
         get() = parentJob + Dispatchers.Main
