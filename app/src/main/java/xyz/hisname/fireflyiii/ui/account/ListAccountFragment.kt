@@ -46,7 +46,7 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun displayView(){
-        swipeContainer.isRefreshing = accountViewModel.isLoading.value == true
+        swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
         accountViewModel.getAccountByType(accountType).observe(this){ accountData ->
             if(accountData.isEmpty()){
@@ -84,6 +84,7 @@ class ListAccountFragment: BaseFragment() {
                 recycler_view.isVisible = true
                 recycler_view.adapter = AccountRecyclerAdapter(accountData) { data: AccountData -> itemClicked(data) }
             }
+            swipeContainer.isRefreshing = false
         }
         accountViewModel.apiResponse.observe(this) { errorMessage ->
             if(errorMessage != null){
