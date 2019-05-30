@@ -8,9 +8,9 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.languagepack.LanguageChanger
 
 @SuppressLint("Registered")
@@ -48,7 +48,7 @@ open class BaseActivity: AppCompatActivity() {
         setTheme(R.style.AppTheme_Dark_DrawerTheme)
         delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.md_black_1000)
+            window.navigationBarColor = getCompatColor(R.color.md_black_1000)
         }
     }
 

@@ -163,22 +163,22 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 .sizeDp(24),null, null, null)
         description_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_audio_description)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_amber_800))
+                        .color(getCompatColor(R.color.md_amber_800))
                         .sizeDp(24),null, null, null)
         latitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_map)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_800))
+                        .color(getCompatColor(R.color.md_green_800))
                         .sizeDp(24),null, null, null)
         longitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_map)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_800))
+                        .color(getCompatColor(R.color.md_green_800))
                         .sizeDp(24),null, null, null)
         zoom_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_zoom_in)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                        .color(getCompatColor(R.color.md_black_1000))
                         .sizeDp(24),null, null, null)
         addTagFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                .color(getCompatColor(R.color.md_black_1000))
                 .sizeDp(24))
     }
 

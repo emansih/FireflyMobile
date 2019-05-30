@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
@@ -22,6 +21,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
+import xyz.hisname.fireflyiii.util.extension.getCompatDrawable
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class AboutFragment: MaterialAboutFragment() {
@@ -55,7 +55,7 @@ class AboutFragment: MaterialAboutFragment() {
     private fun createMaterialAboutList(): MaterialAboutList{
         val appCardBuilder = MaterialAboutCard.Builder()
         appCardBuilder.addItem(ConvenienceBuilder.createAppTitleItem(getString(R.string.app_name),
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank)))
+                getCompatDrawable(R.drawable.ic_piggy_bank)))
                 .addItem(ConvenienceBuilder.createVersionActionItem(requireContext(),
                         IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_phone).sizeDp(24),
                 resources.getString(R.string.mobile_version),false)).addItem(MaterialAboutActionItem.Builder()

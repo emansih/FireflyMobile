@@ -11,10 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -138,7 +136,7 @@ class DashboardFragment: BaseFragment() {
             currentMonthIncome.text = currencySymbol + depositSum.toString()
             transaction = depositSum - withdrawSum
             if(Math.copySign(1.toDouble(), transaction) < 0){
-                currentNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+                currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
             balanceText.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
             currentNetIncome.text = currencySymbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
@@ -147,7 +145,7 @@ class DashboardFragment: BaseFragment() {
             oneMonthBeforeExpense.text = currencySymbol + month2With.toString()
             oneMonthBeforeIncome.text = currencySymbol + month2Depot.toString()
             if(Math.copySign(1.toDouble(), transaction) < 0){
-                oneMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+                oneMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
             oneMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
@@ -155,7 +153,7 @@ class DashboardFragment: BaseFragment() {
             twoMonthBeforeExpense.text = currencySymbol + month3With.toString()
             twoMonthBeforeIncome.text = currencySymbol + month3Depot.toString()
             if(Math.copySign(1.toDouble(), transaction) < 0){
-                twoMonthBeforeNetIncome.setTextColor(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+                twoMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
             twoMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
@@ -251,8 +249,8 @@ class DashboardFragment: BaseFragment() {
 
     private fun setPieChart(currencyData: CurrencyAttributes?) {
         monthText.text = DateTimeUtil.getCurrentMonth()
-        val dataColor = arrayListOf(ContextCompat.getColor(requireContext(), R.color.md_red_700),
-                ContextCompat.getColor(requireContext(), R.color.md_green_500))
+        val dataColor = arrayListOf(getCompatColor(R.color.md_red_700),
+                getCompatColor(R.color.md_green_500))
         zipLiveData(budgetLimit.retrieveSpentBudget(),
                 budgetLimit.retrieveCurrentMonthBudget(currencyData?.code ?: "")).observe(this) { budget ->
             budgetSpent = budget.first.toFloat()
@@ -309,23 +307,23 @@ class DashboardFragment: BaseFragment() {
 
     private fun changeTheme(){
         if (isDarkMode()){
-            netEarningsExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
-            netEarningsChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            netEarningsChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            netEarningsChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            netEarningsChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            dailySummaryExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
-            dailySummaryChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            dailySummaryChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            dailySummaryChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            dailySummaryChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            budgetExtraInfoLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+            netEarningsExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
+            netEarningsChart.legend.textColor = getCompatColor(R.color.white)
+            netEarningsChart.axisLeft.textColor = getCompatColor(R.color.white)
+            netEarningsChart.axisRight.textColor = getCompatColor(R.color.white)
+            netEarningsChart.xAxis.textColor = getCompatColor(R.color.white)
+            dailySummaryExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
+            dailySummaryChart.legend.textColor = getCompatColor(R.color.white)
+            dailySummaryChart.axisLeft.textColor = getCompatColor(R.color.white)
+            dailySummaryChart.axisRight.textColor = getCompatColor(R.color.white)
+            dailySummaryChart.xAxis.textColor = getCompatColor(R.color.white)
+            budgetExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
         }
     }
 
     private fun animateCard(vararg frameLayout: FrameLayout){
         for(frames in frameLayout){
-            frames.translationY = DeviceUtil.getScreenHeight(requireContext()).toFloat()
+            frames.translationY = getScreenHeight().toFloat()
             frames.animate()
                     .translationY(0f)
                     .setInterpolator(DecelerateInterpolator(5f))

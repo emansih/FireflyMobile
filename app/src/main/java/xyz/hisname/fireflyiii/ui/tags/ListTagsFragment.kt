@@ -9,7 +9,6 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -70,7 +69,7 @@ class ListTagsFragment: BaseFragment() {
                             chipTags.apply {
                                 text = tagsData.tagsAttributes?.tag
                                 chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                                        .color(getCompatColor(R.color.md_green_400))
                                 isCloseIconVisible = true
                                 setOnCloseIconClickListener { close ->
                                     val tagName = (close as TextView).text.toString()

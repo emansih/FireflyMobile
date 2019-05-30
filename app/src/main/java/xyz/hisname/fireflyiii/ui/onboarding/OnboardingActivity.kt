@@ -17,7 +17,6 @@ import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
-import xyz.hisname.fireflyiii.util.DeviceUtil
 import java.util.*
 import xyz.hisname.fireflyiii.util.extension.*
 
@@ -69,7 +68,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
             }
         } else {
             piggyIcon.animate().apply {
-                translationY(-DeviceUtil.getScreenHeight(this@OnboardingActivity).toFloat() / 2 + 160F)
+                translationY(-getScreenHeight().toFloat() / 2 + 160F)
                 interpolator = FastOutSlowInInterpolator()
                 duration = 900
                 onAnimationEnd {

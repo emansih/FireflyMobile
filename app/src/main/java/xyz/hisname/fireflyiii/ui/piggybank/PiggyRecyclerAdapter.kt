@@ -4,13 +4,13 @@ import android.content.Context
 import android.graphics.PorterDuff
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
 class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private val clickListener:(PiggyData) -> Unit):
@@ -42,10 +42,10 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
             itemView.goal_save.text = piggyBankData?.currency_symbol + " " + piggyBankData?.target_amount
             itemView.currently_saved.text = piggyBankData?.currency_symbol + " " + piggyBankData?.current_amount.toString()
             if(piggyBankData!!.percentage <= 15){
-                itemView.goal_progress_bar.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_red_700),
+                itemView.goal_progress_bar.progressDrawable.setColorFilter(context.getCompatColor(R.color.md_red_700),
                         PorterDuff.Mode.SRC_IN)
             } else if(piggyBankData.percentage <= 50){
-                itemView.goal_progress_bar.progressDrawable.setColorFilter(ContextCompat.getColor(context,R.color.md_green_500),
+                itemView.goal_progress_bar.progressDrawable.setColorFilter(context.getCompatColor(R.color.md_green_500),
                         PorterDuff.Mode.SRC_IN)
             }
             itemView.goal_progress_bar.progress = piggyBankData.percentage

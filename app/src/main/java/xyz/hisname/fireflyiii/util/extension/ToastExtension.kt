@@ -1,9 +1,7 @@
 package xyz.hisname.fireflyiii.util.extension
 
 import android.content.Context
-import android.graphics.Color
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import es.dmoral.toasty.Toasty
@@ -31,8 +29,8 @@ fun SupportFragment.toastSuccess(message: String, duration: Int = Toast.LENGTH_S
 fun SupportFragment.toastOffline(message: String, duration: Int = Toast.LENGTH_SHORT) =
        Toasty.custom(requireActivity(), message, IconicsDrawable(requireContext())
         .icon(GoogleMaterial.Icon.gmd_cloud_off).sizeDp(24),
-               ContextCompat.getColor(requireContext(),R.color.darkBlue),
-               ContextCompat.getColor(requireContext(), R.color.white),
+               getCompatColor(R.color.darkBlue),
+               getCompatColor(R.color.white),
                duration, true, true).show()
 
 

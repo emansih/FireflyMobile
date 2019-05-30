@@ -3,8 +3,8 @@ package xyz.hisname.fireflyiii.ui.base
 import android.content.Context
 import android.util.AttributeSet
 import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 
 class BaseSwipeRefreshLayout@JvmOverloads constructor(
         context: Context,
@@ -21,7 +21,7 @@ class BaseSwipeRefreshLayout@JvmOverloads constructor(
                 android.R.color.holo_red_light)
         val colorRes = IntArray(colorScheme.size)
         for (i in colorScheme.indices) {
-            colorRes[i] = ContextCompat.getColor(context, colorScheme[i])
+            colorRes[i] = getCompatColor(colorScheme[i])
         }
         setColorSchemeColors(*colorRes)
     }

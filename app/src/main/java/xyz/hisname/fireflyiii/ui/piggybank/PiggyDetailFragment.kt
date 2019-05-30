@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.*
 import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
@@ -68,10 +67,10 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
         piggyList.addAll(piggy)
         if(percentage <= 15){
-            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
+            piggyBankProgressBar.progressDrawable.setColorFilter(getCompatColor(
                     R.color.md_red_700), PorterDuff.Mode.SRC_IN)
         } else if(percentage <= 50){
-            piggyBankProgressBar.progressDrawable.setColorFilter(ContextCompat.getColor(requireContext(),
+            piggyBankProgressBar.progressDrawable.setColorFilter(getCompatColor(
                     R.color.md_green_500), PorterDuff.Mode.SRC_IN)
         }
         amount.text = currentAmount.toString()

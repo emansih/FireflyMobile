@@ -40,7 +40,6 @@ import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.DialogDarkMode
-import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import java.util.*
@@ -173,11 +172,11 @@ class AddTransactionFragment: BaseFragment() {
     private fun setIcons(){
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                        .color(getCompatColor(R.color.md_green_400))
                         .sizeDp(24),null, null, null)
         transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_yellow_A700))
+                        .color(getCompatColor(R.color.md_yellow_A700))
                         .sizeDp(16),null, null, null)
         transaction_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
@@ -186,22 +185,22 @@ class AddTransactionFragment: BaseFragment() {
         source_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24),null, null, null)
         destination_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_bank_transfer),null, null, null)
+                getCompatDrawable(R.drawable.ic_bank_transfer),null, null, null)
         bill_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                        .color(getCompatColor(R.color.md_green_400))
                         .sizeDp(24),null, null, null)
         category_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_deep_purple_400))
+                        .color(getCompatColor(R.color.md_deep_purple_400))
                         .sizeDp(24),null, null, null)
         piggy_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
+                        .color(getCompatColor(R.color.md_pink_200))
                         .sizeDp(24),null, null, null)
         time_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_clock)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_red_400))
+                        .color(getCompatColor(R.color.md_red_400))
                         .sizeDp(24),null, null, null)
         tags_chip.chipTokenizer = SpanChipTokenizer(requireContext(), object : ChipCreator<ChipSpan> {
             override fun configureChip(chip: ChipSpan, chipConfiguration: ChipConfiguration) {
@@ -217,11 +216,11 @@ class AddTransactionFragment: BaseFragment() {
             }
         }, ChipSpan::class.java)
         addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_plus)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                .color(getCompatColor(R.color.md_black_1000))
                 .sizeDp(24))
         budget_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_gratipay)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_amber_300))
+                        .color(getCompatColor(R.color.md_amber_300))
                         .sizeDp(24),null, null, null)
     }
 
@@ -321,7 +320,7 @@ class AddTransactionFragment: BaseFragment() {
                 optionalLayout.isInvisible = true
             }
         }
-        placeHolderToolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.abc_ic_clear_material)
+        placeHolderToolbar.navigationIcon = getCompatDrawable(R.drawable.abc_ic_clear_material)
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }

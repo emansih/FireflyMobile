@@ -3,12 +3,12 @@ package xyz.hisname.fireflyiii.ui.transaction
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recent_transaction_list.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
 class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>, private val clickListener:(TransactionData) -> Unit):
@@ -37,7 +37,7 @@ class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>
            itemView.dateText.text = transactionAttributes.date.toString()
            if(transactionAttributes.amount.toString().startsWith("-")){
                // Negative value means it's a withdrawal
-               itemView.transactionAmountText.setTextColor(ContextCompat.getColor(context, R.color.md_red_500))
+               itemView.transactionAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
                itemView.transactionAmountText.text = "-" + transactionAttributes.currency_symbol + Math.abs(transactionAttributes.amount)
            } else {
                itemView.transactionAmountText.text = transactionAttributes.currency_symbol + transactionAttributes.amount.toString()

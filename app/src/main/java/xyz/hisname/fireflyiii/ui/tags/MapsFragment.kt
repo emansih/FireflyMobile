@@ -32,6 +32,7 @@ import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 import java.io.File
 
@@ -86,7 +87,7 @@ class MapsFragment: BaseFragment() {
         maps.setTileSource(TileSourceFactory.MAPNIK)
         startMarker.icon = IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_map_marker)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+                .color(getCompatColor(R.color.md_red_700))
                 .sizeDp(16)
         mapController.animateTo(groomLake)
         mapController.setZoom(15.0)
@@ -116,7 +117,7 @@ class MapsFragment: BaseFragment() {
     private fun setFab(){
         fab_map.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_my_location)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                .color(getCompatColor(R.color.md_black_1000))
                 .sizeDp(16))
         fab_map.setOnClickListener {
             if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)

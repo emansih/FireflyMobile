@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.ui.piggybank
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -15,10 +14,7 @@ import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.hideFab
-import xyz.hisname.fireflyiii.util.extension.toastError
+import xyz.hisname.fireflyiii.util.extension.*
 
 class ListPiggyFragment: BaseFragment() {
 
@@ -51,7 +47,7 @@ class ListPiggyFragment: BaseFragment() {
             listText.text = resources.getString(R.string.no_piggy_bank)
             listText.isVisible = true
             listImage.isVisible = true
-            listImage.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_piggy_bank))
+            listImage.setImageDrawable(getCompatDrawable(R.drawable.ic_piggy_bank))
             recycler_view.isVisible = false
         }
 

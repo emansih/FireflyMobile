@@ -7,9 +7,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
@@ -52,8 +50,9 @@ import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV1
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
-import xyz.hisname.fireflyiii.util.DeviceUtil
 import xyz.hisname.fireflyiii.util.KeyguardUtil
+import xyz.hisname.fireflyiii.util.extension.dpToPx
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 
@@ -144,7 +143,7 @@ class HomeActivity: BaseActivity(){
                 .build()
 
         val headerView = headerResult.headerBackgroundView
-        headerView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
+        headerView.setBackgroundColor(getCompatColor(R.color.colorPrimaryLight))
     }
 
 
@@ -181,42 +180,42 @@ class HomeActivity: BaseActivity(){
         val dashboard = PrimaryDrawerItem()
                 .withIdentifier(1)
                 .withName(R.string.dashboard)
-                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_deep_orange_500))
+                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                .withSelectedIconColor(getCompatColor(R.color.md_deep_orange_500))
                 .withIconTintingEnabled(true)
                 .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_dashboard).sizeDp(24))
         val account = ExpandableDrawerItem().withName(R.string.account)
                 .withIdentifier(2)
-                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_blue_A400))
+                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                .withSelectedIconColor(getCompatColor(R.color.md_blue_A400))
                 .withIconTintingEnabled(true)
                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_credit_card).sizeDp(24))
                 .withSelectable(false)
                 .withSubItems(
                         SecondaryDrawerItem().withName(R.string.asset_account)
                                 .withLevel(3)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_cyan_A400))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_cyan_A400))
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_money_bill).sizeDp(24))
                                 .withIdentifier(3),
                         SecondaryDrawerItem().withName(R.string.expense_account)
                                 .withLevel(3)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_yellow_400))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_yellow_400))
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_shopping_cart).sizeDp(24))
                                 .withIdentifier(4),
                         SecondaryDrawerItem().withName(R.string.revenue_account)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_black_1000))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_black_1000))
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_download).sizeDp(24))
                                 .withLevel(3)
                                 .withIdentifier(5),
                         SecondaryDrawerItem().withName(R.string.liability_account)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_deep_purple_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_deep_purple_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_ticket_alt).sizeDp(24))
                                 .withLevel(3)
@@ -228,15 +227,15 @@ class HomeActivity: BaseActivity(){
         val categories = PrimaryDrawerItem()
                 .withIdentifier(7)
                 .withName(R.string.categories)
-                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                .withSelectedIconColor(ContextCompat.getColor(this,R.color.material_blue_grey_800))
+                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                .withSelectedIconColor(getCompatColor(R.color.material_blue_grey_800))
                 .withIconTintingEnabled(true)
                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_chart_bar).sizeDp(24))
         val tags = PrimaryDrawerItem()
                 .withIdentifier(8)
                 .withName(R.string.tags)
-                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_green_400))
+                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                .withSelectedIconColor(getCompatColor(R.color.md_green_400))
                 .withIconTintingEnabled(true)
                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_tag).sizeDp(24))
         val reports = PrimaryDrawerItem()
@@ -250,21 +249,21 @@ class HomeActivity: BaseActivity(){
                 .withSubItems(
                         SecondaryDrawerItem().withName(R.string.withdrawal)
                                 .withLevel(3)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_blue_grey_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_blue_grey_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(R.drawable.ic_arrow_left)
                                 .withIdentifier(11),
                         SecondaryDrawerItem().withName(R.string.revenue_income_menu)
                                 .withLevel(3)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_grey_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_grey_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(R.drawable.ic_arrow_right)
                                 .withIdentifier(12),
                         SecondaryDrawerItem().withName(R.string.transfer)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_green_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_green_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
                                 .withLevel(3)
@@ -278,22 +277,22 @@ class HomeActivity: BaseActivity(){
                 .withSubItems(
                         SecondaryDrawerItem().withName(R.string.piggy_bank)
                                 .withLevel(4)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_red_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_red_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(R.drawable.ic_sort_descending)
                                 .withIdentifier(15),
                         SecondaryDrawerItem().withName(R.string.bill)
                                 .withLevel(4)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_amber_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_amber_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(R.drawable.ic_calendar_blank)
                                 .withIdentifier(16),
                         SecondaryDrawerItem().withName("Rules")
                                 .withLevel(4)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_brown_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_brown_500))
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_random).sizeDp(24))
                                 .withIdentifier(17)/*,
@@ -310,15 +309,15 @@ class HomeActivity: BaseActivity(){
                 .withSubItems(
                         SecondaryDrawerItem().withName(R.string.settings)
                                 .withLevel(4)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_teal_500))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_teal_500))
                                 .withIconTintingEnabled(true)
                                 .withIdentifier(19)
                                 .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_settings).sizeDp(24)),
                         SecondaryDrawerItem().withName(R.string.currency)
                                 .withLevel(4)
-                                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_pink_800))
+                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                                .withSelectedIconColor(getCompatColor(R.color.md_pink_800))
                                 .withIconTintingEnabled(true)
                                 .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_money_bill).sizeDp(24))
                                 .withIdentifier(22)
@@ -326,8 +325,8 @@ class HomeActivity: BaseActivity(){
         val about = PrimaryDrawerItem()
                 .withIdentifier(20)
                 .withName("About")
-                .withSelectedTextColor(ContextCompat.getColor(this,R.color.colorAccent))
-                .withSelectedIconColor(ContextCompat.getColor(this,R.color.md_pink_500))
+                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
+                .withSelectedIconColor(getCompatColor(R.color.md_pink_500))
                 .withIconTintingEnabled(true)
                 .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_perm_identity).sizeDp(24))
         result = DrawerBuilder()
@@ -428,9 +427,9 @@ class HomeActivity: BaseActivity(){
 
     // sick animation stolen from here: http://frogermcs.github.io/Instagram-with-Material-Design-concept-is-getting-real/
     private fun animateToolbar(){
-        val toolbarSize = DeviceUtil.dpToPx(56)
+        val toolbarSize = dpToPx(56)
         activity_appbar.translationY = -toolbarSize.toFloat()
-        activity_appbar.animate().translationY(0.toFloat()).setDuration(300).startDelay = 300
+        activity_appbar.animate().translationY(0f).setDuration(300).startDelay = 300
     }
 
     private fun changeFragment(fragment: Fragment){

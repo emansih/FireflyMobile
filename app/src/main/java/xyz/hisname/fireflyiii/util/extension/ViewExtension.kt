@@ -2,11 +2,15 @@ package xyz.hisname.fireflyiii.util.extension
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment as SupportFragment
 
 fun ViewGroup.inflate(layoutRes: Int, attachToRoot: Boolean = false): View {
@@ -45,3 +49,23 @@ fun <ViewT : View> SupportFragment.bindView(@IdRes idRes: Int): Lazy<ViewT> {
 }
 
 fun View.focusOnView() = this.parent.requestChildFocus(this, this)
+
+fun Context.getCompatColor(@ColorRes colorName: Int): Int{
+    return ContextCompat.getColor(this, colorName)
+}
+
+fun SupportFragment.getCompatColor(@ColorRes colorName: Int): Int{
+    return requireActivity().getCompatColor(colorName)
+}
+
+fun View.getCompatColor(@ColorRes colorName: Int): Int{
+    return context.getCompatColor(colorName)
+}
+
+fun Context.getCompatDrawable(@DrawableRes drawableName: Int): Drawable? {
+    return ContextCompat.getDrawable(this, drawableName)
+}
+
+fun SupportFragment.getCompatDrawable(@DrawableRes drawableName: Int): Drawable? {
+    return requireActivity().getCompatDrawable(drawableName)
+}

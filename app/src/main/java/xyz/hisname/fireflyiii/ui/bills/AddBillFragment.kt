@@ -8,9 +8,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -91,15 +89,15 @@ class AddBillFragment: BaseAddObjectFragment() {
     override fun setIcons(){
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                        .color(getCompatColor(R.color.md_green_400))
                         .sizeDp(24),null, null, null)
         min_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_yellow_A700))
+                        .color(getCompatColor(R.color.md_yellow_A700))
                         .sizeDp(16),null, null, null)
         max_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_yellow_A700))
+                        .color(getCompatColor(R.color.md_yellow_A700))
                         .sizeDp(16),null, null, null)
         bill_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
@@ -107,11 +105,11 @@ class AddBillFragment: BaseAddObjectFragment() {
                 .sizeDp(24),null, null, null)
         skip_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_sort_numeric_up)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                        .color(getCompatColor(R.color.md_black_1000))
                         .sizeDp(24),null, null, null)
-        addBillFab.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary_dark))
+        addBillFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
         addBillFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                .color(getCompatColor(R.color.md_black_1000))
                 .sizeDp(24))
         if(billId != 0L) {
             placeHolderToolbar.inflateMenu(R.menu.delete_menu)

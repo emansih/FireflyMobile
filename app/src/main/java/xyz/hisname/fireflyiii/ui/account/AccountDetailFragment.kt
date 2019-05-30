@@ -7,14 +7,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
@@ -108,7 +106,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             )
             val dataSet = LineDataSet(lineChartEntries, accountName)
             dataSet.apply {
-                setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                setCircleColor(getCompatColor(R.color.primary))
                 valueTextColor = Color.BLUE
                 valueTextSize = 15f
             }
@@ -222,9 +220,9 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setDarkMode(){
         if(isDarkMode()){
-            transactionLineChart.xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            transactionLineChart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
-            transactionLineChart.axisLeft.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            transactionLineChart.xAxis.textColor = getCompatColor(R.color.white)
+            transactionLineChart.legend.textColor =getCompatColor(R.color.white)
+            transactionLineChart.axisLeft.textColor = getCompatColor(R.color.white)
         }
     }
 

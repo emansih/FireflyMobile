@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -119,11 +118,11 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     override fun setIcons(){
         target_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                        .color(getCompatColor(R.color.md_green_400))
                         .sizeDp(24),null, null, null)
         current_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_400))
+                        .color(getCompatColor(R.color.md_green_400))
                         .sizeDp(24),null, null, null)
         date_started_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
@@ -133,9 +132,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 .icon(FontAwesome.Icon.faw_calendar)
                 .color(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
                 .sizeDp(24),null, null, null)
-        addPiggyFab.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary_dark))
+        addPiggyFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
         addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                .color(getCompatColor(R.color.md_black_1000))
                 .sizeDp(24))
     }
 

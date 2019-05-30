@@ -5,17 +5,12 @@ import android.animation.AnimatorListenerAdapter
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
-import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.util.animation.BakedBezierInterpolator
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -31,7 +26,7 @@ abstract class BaseDialog: DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogStyle)
+        setStyle(STYLE_NORMAL, R.style.FullScreenDialogStyle)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

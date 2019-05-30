@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.ui.currency
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.currency_list.view.*
@@ -11,6 +10,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.Flags
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
 class CurrencyRecyclerAdapter(private val items: MutableList<CurrencyData>, private val clickListener:(CurrencyData) -> Unit):
@@ -36,8 +36,8 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
                 itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             } else {
                 itemView.currencyName.text = currency?.name + " (" + currency?.code + ")" + " (Disabled)"
-                itemView.currencyName.setTextColor(ContextCompat.getColor(context, R.color.md_grey_400))
-                itemView.currencySymbol.setTextColor(ContextCompat.getColor(context, R.color.md_grey_400))
+                itemView.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
+                itemView.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
             }
             Glide.with(context)
                     .load(Flags.getFlagByIso(currency?.code!!))

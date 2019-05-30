@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
@@ -57,19 +56,19 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     override fun setIcons(){
         decimal_places_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_dot_circle)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_amber_500))
+                .color(getCompatColor(R.color.md_amber_500))
                 .sizeDp(24),null, null, null)
         symbol_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_euro_symbol)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_pink_800))
+                .color(getCompatColor(R.color.md_pink_800))
                 .sizeDp(24),null, null, null)
         code_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_code)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_deep_purple_400))
+                .color(getCompatColor(R.color.md_deep_purple_400))
                 .sizeDp(24),null, null, null)
-        addCurrencyFab.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary_dark))
+        addCurrencyFab.setBackgroundColor(getCompatColor( R.color.primary_dark))
         addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                .color(ContextCompat.getColor(requireContext(), R.color.md_black_1000))
+                .color(getCompatColor(R.color.md_black_1000))
                 .sizeDp(24))
     }
 

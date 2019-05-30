@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.observe
 import androidx.work.Data
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
@@ -12,6 +11,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
@@ -28,7 +28,7 @@ class DeleteTransactionDialog: BaseFragment() {
                 .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
                 .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
                         .sizeDp(24)
-                        .color(ContextCompat.getColor(requireContext(), R.color.md_green_600)))
+                        .color(getCompatColor(R.color.md_green_600)))
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
                     transactionViewModel.deleteTransaction(transactionId).observe(this) {

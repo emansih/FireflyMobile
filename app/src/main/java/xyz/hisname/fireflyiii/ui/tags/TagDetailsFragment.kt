@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -76,7 +75,7 @@ class TagDetailsFragment: BaseDetailFragment() {
             tagDetailsMap.overlays.add(startMarker)
             startMarker.icon = IconicsDrawable(requireContext())
                     .icon(FontAwesome.Icon.faw_map_marker)
-                    .color(ContextCompat.getColor(requireContext(), R.color.md_red_700))
+                    .color(getCompatColor(R.color.md_red_700))
                     .sizeDp(16)
             latitude_text.text = tagsAttributes.latitude
             longitude_text.text = tagsAttributes.longitude
