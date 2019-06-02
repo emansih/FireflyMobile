@@ -28,6 +28,7 @@ class OnboardingFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        hideKeyboard()
         onboarding_text.text = "Hang on..."
         ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
         RetrofitBuilder.destroyInstance()
