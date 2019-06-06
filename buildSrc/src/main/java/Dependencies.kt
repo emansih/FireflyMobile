@@ -8,7 +8,7 @@ object Dependencies{
     const val targetSdk = 28
     const val compileSdk = 28
     const val kotlinVersion = "1.3.31"
-    private const val retrofitVersion = "2.5.0"
+    private const val retrofitVersion = "2.6.0"
     private const val lifecycleVersion = "2.0.0"
     private const val lifecycleLivedataCoreVersion = "2.2.0-alpha01"
     private const val roomVersion = "2.0.0"

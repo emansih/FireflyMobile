@@ -34,6 +34,7 @@ class PiggyDialog: BaseDialog() {
         swipeContainer.isRefreshing = true
         piggyViewModel.getAllPiggyBanks().observe(this) { piggyBankData ->
             swipeContainer.isRefreshing = false
+            initialAdapter.addAll(piggyBankData)
             recycler_view.adapter = PiggyRecyclerAdapter(piggyBankData) { data: PiggyData -> itemClicked(data) }
         }
     }

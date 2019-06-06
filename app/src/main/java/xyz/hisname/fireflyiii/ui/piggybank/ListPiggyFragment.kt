@@ -36,6 +36,7 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun displayView(){
+        swipeContainer.isRefreshing = false
         if (dataAdapter.isNotEmpty()) {
             listText.isVisible = false
             listImage.isVisible = false
@@ -50,17 +51,10 @@ class ListPiggyFragment: BaseFragment() {
             listImage.setImageDrawable(getCompatDrawable(R.drawable.ic_piggy_bank))
             recycler_view.isVisible = false
         }
-
-        piggyViewModel.isLoading.observe(this) {
-            swipeContainer.isRefreshing = it == true
-        }
-
-        piggyViewModel.apiResponse.observe(this) {
-            toastError(it)
-        }
     }
 
     private fun displayAll(){
+        swipeContainer.isRefreshing = true
         dataAdapter.clear()
         piggyViewModel.getAllPiggyBanks().observe(this) { piggyBankData ->
             dataAdapter = ArrayList(piggyBankData)
@@ -69,6 +63,7 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun displayIncomplete(){
+        swipeContainer.isRefreshing = true
         dataAdapter.clear()
         piggyViewModel.getNonCompletedPiggyBanks().observe(this) { piggyBankData ->
             dataAdapter = ArrayList(piggyBankData)
