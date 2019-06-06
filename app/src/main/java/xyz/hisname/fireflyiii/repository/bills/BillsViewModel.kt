@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -53,11 +54,11 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     }
                 }
                 data.postValue(billData.toMutableList())
-                scope.launch(Dispatchers.IO){
+                viewModelScope.launch(Dispatchers.IO){
                     repository.deleteAllBills()
                 }.invokeOnCompletion {
-                    billData.forEachIndexed { _, billData ->
-                        scope.launch(Dispatchers.IO){
+                    viewModelScope.launch(Dispatchers.IO){
+                        billData.forEachIndexed { _, billData ->
                             repository.insertBill(billData)
                         }
                     }
@@ -69,7 +70,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     billData = repository.allBills()
                 }.invokeOnCompletion {
                     data.postValue(billData)
@@ -78,7 +79,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
             isLoading.value = false
         })
         { throwable ->
-            scope.async(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 billData = repository.allBills()
             }.invokeOnCompletion {
                 data.postValue(billData)
@@ -91,7 +92,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
     fun getBillById(billId: Long): LiveData<MutableList<BillData>>{
         val billLiveData: MutableLiveData<MutableList<BillData>> = MutableLiveData()
-        scope.async(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO){
             billData = repository.retrieveBillById(billId)
         }.invokeOnCompletion {
             billLiveData.postValue(billData)
@@ -104,7 +105,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         isLoading.value = true
         billsService?.deleteBillById(billId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     repository.deleteBillById(billId)
                 }.invokeOnCompletion {
                     isDeleted.postValue(true)
@@ -147,7 +148,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     }
                     val networkData = response.body()
                     if (networkData != null) {
-                        scope.launch(Dispatchers.IO) { repository.insertBill(networkData.data) }
+                        viewModelScope.launch(Dispatchers.IO) { repository.insertBill(networkData.data) }
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
                         apiLiveData.postValue(ApiResponses(errorMessage))
@@ -172,7 +173,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     }
                     val networkData = response.body()
                     if (networkData != null) {
-                        scope.launch(Dispatchers.IO) { repository.updateBill(networkData.data) }
+                        viewModelScope.launch(Dispatchers.IO) { repository.updateBill(networkData.data) }
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
                         apiLiveData.postValue(ApiResponses(errorBody))

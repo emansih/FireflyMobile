@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
@@ -40,7 +40,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                 val responseBody = response.body()
                 if(responseBody != null){
                     val networkData = responseBody.data
-                    scope.launch(Dispatchers.IO){
+                    viewModelScope.launch(Dispatchers.IO){
                         repository.deleteAllPiggyBank()
                     }.invokeOnCompletion {
                         piggyData.addAll(networkData)
@@ -54,7 +54,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                             }
                         }
                         piggyData.forEachIndexed{ _, pigData ->
-                            scope.launch(Dispatchers.IO) {
+                            viewModelScope.launch(Dispatchers.IO) {
                                 repository.insertPiggy(pigData)
                             }
                         }
@@ -68,7 +68,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     piggyData = repository.allPiggyBanks()
                 }.invokeOnCompletion {
                     data.postValue(piggyData)
@@ -77,7 +77,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
             isLoading.value = false
         })
         { throwable ->
-            scope.async(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 piggyData = repository.allPiggyBanks()
             }.invokeOnCompletion {
                 data.postValue(piggyData)
@@ -90,7 +90,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
     fun getPiggyById(piggyId: Long): LiveData<MutableList<PiggyData>>{
         val piggyData: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
         var data: MutableList<PiggyData> = arrayListOf()
-        scope.async(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO){
             data = repository.retrievePiggyById(piggyId)
         }.invokeOnCompletion {
             piggyData.postValue(data)
@@ -103,7 +103,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         isLoading.value = true
         piggyService?.deletePiggyBankById(piggyId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     repository.deletePiggyById(piggyId)
                 }.invokeOnCompletion {
                     isDeleted.postValue(true)
@@ -142,7 +142,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.insertPiggy(networkData.data) }
+                viewModelScope.launch(Dispatchers.IO) { repository.insertPiggy(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
@@ -177,7 +177,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.insertPiggy(networkData.data) }
+                viewModelScope.launch(Dispatchers.IO) { repository.insertPiggy(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
@@ -193,7 +193,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
     fun getPiggyByName(piggyBankName: String): LiveData<MutableList<PiggyData>>{
         var piggyData: MutableList<PiggyData> = arrayListOf()
         val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
-        scope.async(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             piggyData = repository.searchPiggyByName("%$piggyBankName%")
         }.invokeOnCompletion {
             data.postValue(piggyData)
@@ -208,7 +208,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
     fun getNonCompletedPiggyBanks(): LiveData<MutableList<PiggyData>>{
         var piggyData: MutableList<PiggyData> = arrayListOf()
         val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
-        scope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             piggyData = repository.getNonCompletedPiggyBanks()
         }.invokeOnCompletion {
             data.postValue(piggyData)

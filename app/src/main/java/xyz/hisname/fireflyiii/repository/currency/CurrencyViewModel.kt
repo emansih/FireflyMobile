@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.data.remote.api.CurrencyService
@@ -36,7 +37,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun getCurrencyById(currencyId: Long): LiveData<MutableList<CurrencyData>>{
         val currencyData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         var data: MutableList<CurrencyData> = arrayListOf()
-        scope.async(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO){
             data = repository.getCurrencyById(currencyId)
         }.invokeOnCompletion {
             currencyData.postValue(data)
@@ -69,15 +70,15 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             val networkData = response.body()
             if (networkData != null) {
                 var defaultCurrency: MutableList<CurrencyData> = arrayListOf()
-                scope.launch(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     defaultCurrency = repository.defaultCurrency()
                 }.invokeOnCompletion {
                     // This is needed otherwise we might get wrong default currency
                     if(defaultCurrency[0].currencyAttributes?.name == name &&
                             defaultCurrency[0].currencyAttributes?.currencyDefault != default){
-                        scope.launch(Dispatchers.IO) { repository.deleteDefaultCurrency() }
+                        viewModelScope.launch(Dispatchers.IO) { repository.deleteDefaultCurrency() }
                     }
-                    scope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
+                    viewModelScope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
                 }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
@@ -111,7 +112,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
+                viewModelScope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
@@ -125,7 +126,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
     fun getCurrencyByCode(currencyCode: String): LiveData<MutableList<CurrencyData>>{
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
-        scope.async(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO){
             currencyData = repository.getCurrencyByCode(currencyCode)
         }.invokeOnCompletion {
             currencyLiveData.postValue(currencyData)
@@ -163,19 +164,19 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                             }))
                         }
                     }
-                    scope.launch(Dispatchers.IO){
+                    viewModelScope.launch(Dispatchers.IO){
                         if(deleteDefaultCurrency){
                             repository.deleteDefaultCurrency()
                         } else {
                             repository.deleteAllCurrency()
                         }
                     }.invokeOnCompletion {
-                        scope.launch(Dispatchers.IO){
+                        viewModelScope.launch(Dispatchers.IO){
                             defaultCurrencyList.forEachIndexed { _, currencyData ->
                                 repository.insertCurrency(currencyData)
                             }
                         }.invokeOnCompletion {
-                            scope.launch(Dispatchers.IO){
+                            viewModelScope.launch(Dispatchers.IO){
                                 defaultCurrencyList = if(deleteDefaultCurrency){
                                     repository.defaultCurrency()
                                 } else {
@@ -196,7 +197,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.launch(Dispatchers.IO){
+                viewModelScope.launch(Dispatchers.IO){
                     defaultCurrencyList = if(deleteDefaultCurrency){
                         repository.defaultCurrency()
                     } else {
@@ -210,7 +211,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         { throwable ->
             isLoading.value = false
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-            scope.launch(Dispatchers.IO){
+            viewModelScope.launch(Dispatchers.IO){
                 defaultCurrencyList = if(deleteDefaultCurrency){
                     repository.defaultCurrency()
                 } else {

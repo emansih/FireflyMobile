@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.CategoryService
@@ -38,7 +38,7 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
                 val responseBody = response.body()
                 if(responseBody != null){
                     val networkData = responseBody.data
-                    scope.launch(Dispatchers.IO){
+                    viewModelScope.launch(Dispatchers.IO){
                         repository.deleteAllCategory()
                     }.invokeOnCompletion {
                         categoryData.addAll(networkData)
@@ -51,7 +51,7 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
                                 }))
                             }
                         }
-                        scope.launch(Dispatchers.IO){
+                        viewModelScope.launch(Dispatchers.IO){
                             categoryData.forEachIndexed { _, catData ->
                                 repository.insertCategory(catData)
                             }
@@ -66,7 +66,7 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     categoryData = repository.allCategory()
                 }.invokeOnCompletion {
                     data.postValue(categoryData)
@@ -75,7 +75,7 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
             isLoading.value = false
         })
         { throwable ->
-            scope.async(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 categoryData = repository.allCategory()
             }.invokeOnCompletion {
                 data.postValue(categoryData)
@@ -89,7 +89,7 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
     fun getCategoryByName(categoryName: String): LiveData<MutableList<CategoryData>>{
         var categoryData: MutableList<CategoryData> = arrayListOf()
         val data: MutableLiveData<MutableList<CategoryData>> = MutableLiveData()
-        scope.async(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             categoryData = repository.searchCategoryByName("%$categoryName%")
         }.invokeOnCompletion {
             data.postValue(categoryData)
@@ -117,7 +117,7 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.insertCategory(networkData.data) }
+                viewModelScope.launch(Dispatchers.IO) { repository.insertCategory(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.remote.api.AttachmentService
@@ -40,7 +41,7 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
             attachmentService?.downloadFile(fileDownloadUrl)?.enqueue(retrofitCallback({ downloadResponse ->
                 val fileResponse = downloadResponse.body()
                 if (fileResponse != null) {
-                    scope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(Dispatchers.IO) {
                         FileUtils.writeResponseToDisk(fileResponse, fileName)
                     }.invokeOnCompletion {
                         isDownloaded.postValue(true)

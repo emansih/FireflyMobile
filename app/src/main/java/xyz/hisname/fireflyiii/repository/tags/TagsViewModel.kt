@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -36,8 +37,10 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
         tagsService?.getAllTags()?.enqueue(retrofitCallback({ response ->
             if (response.isSuccessful) {
                 val networkData = response.body()?.data
-                networkData?.forEachIndexed { _, element ->
-                    scope.launch(Dispatchers.IO) { repository.insertTags(element) }
+                viewModelScope.launch(Dispatchers.IO){
+                    networkData?.forEachIndexed { _, element ->
+                        repository.insertTags(element)
+                    }
                 }
                 data.postValue(networkData?.toMutableList())
             } else {
@@ -47,7 +50,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     tagsData = repository.allTags()
                 }.invokeOnCompletion {
                     data.postValue(tagsData)
@@ -56,7 +59,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
             isLoading.value = false
         })
         { throwable ->
-            scope.async(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 tagsData = repository.allTags()
             }.invokeOnCompletion {
                 data.postValue(tagsData)
@@ -88,7 +91,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.insertTags(networkData.data) }
+                viewModelScope.launch(Dispatchers.IO) { repository.insertTags(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
@@ -122,7 +125,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
             }
             val networkData = response.body()
             if (networkData != null) {
-                scope.launch(Dispatchers.IO) { repository.insertTags(networkData.data) }
+                viewModelScope.launch(Dispatchers.IO) { repository.insertTags(networkData.data) }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
                 apiLiveData.postValue(ApiResponses(errorMessage))
@@ -140,7 +143,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
         isLoading.value = true
         tagsService?.deleteTagByName(tagName)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     repository.deleteTagByName(tagName)
                 }.invokeOnCompletion {
                     isDeleted.postValue(true)
@@ -158,7 +161,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
     fun getTagById(tagId: Long): LiveData<MutableList<TagsData>>{
         val tagData: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
         var data: MutableList<TagsData> = arrayListOf()
-        scope.async(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO){
             data = repository.retrieveTagById(tagId)
         }.invokeOnCompletion {
             tagData.postValue(data)
@@ -169,7 +172,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
     fun getTagByName(nameOfTag: String): LiveData<MutableList<TagsData>>{
         val tagData: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
         var data: MutableList<TagsData>? = arrayListOf()
-        scope.async(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO){
             data = repository.retrieveTagByName(nameOfTag)
         }.invokeOnCompletion {
             if(data == null){
@@ -177,7 +180,7 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
                     if (response.isSuccessful) {
                         val networkData = response.body()?.data
                         networkData?.forEachIndexed { _, element ->
-                            scope.launch(Dispatchers.IO) {
+                            viewModelScope.launch(Dispatchers.IO) {
                                 repository.insertTags(element)
                             }
                         }

@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.repository.budget
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -42,7 +43,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             val responseBody = response.body()
             if(responseBody != null) {
                 val networkData = responseBody.data
-                scope.launch(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     repository.deleteBudgetList()
                 }.invokeOnCompletion {
                     budgetListData.addAll(networkData)
@@ -55,8 +56,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                             }))
                         }
                     }
-                    budgetListData.forEachIndexed{ _, budgetData ->
-                        scope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(Dispatchers.IO){
+                        budgetListData.forEachIndexed { _, budgetData ->
                             repository.insertBudgetList(budgetData)
                         }
                     }
@@ -69,7 +70,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     budgetListData = repository.allBudgetList()
                 }.invokeOnCompletion {
                     data.postValue(budgetListData)
@@ -78,7 +79,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             isLoading.value = false
         })
         { throwable ->
-            scope.async(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 budgetListData = repository.allBudgetList()
             }.invokeOnCompletion {
                 data.postValue(budgetListData)
@@ -92,7 +93,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     fun getBudgetByName(budgetName: String): LiveData<MutableList<BudgetListData>>{
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
         val data: MutableLiveData<MutableList<BudgetListData>> = MutableLiveData()
-        scope.async(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             budgetListData = repository.searchBudgetByName("%$budgetName%")
         }.invokeOnCompletion {
             data.postValue(budgetListData)
@@ -111,17 +112,10 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
-                    scope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(Dispatchers.IO) {
                         repository.deleteAllBudget()
                     }.invokeOnCompletion {
-                        if (networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages) {
-                            networkData.budgetData.forEachIndexed { _, budgetData ->
-                                availableBudget.add(budgetData)
-                            }
-                        } else {
-                            networkData.budgetData.forEachIndexed { _, budgetData ->
-                                availableBudget.add(budgetData)
-                            }
+                        if (networkData.meta.pagination.current_page != networkData.meta.pagination.total_pages) {
                             for (pagination in 2..networkData.meta.pagination.total_pages) {
                                 budgetService?.getPaginatedBudget(pagination)?.enqueue(retrofitCallback({ respond ->
                                     respond.body()?.budgetData?.forEachIndexed { _, budgetList ->
@@ -130,12 +124,15 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                                 }))
                             }
                         }
-                        scope.launch(Dispatchers.IO){
+                        networkData.budgetData.forEachIndexed { _, budgetData ->
+                            availableBudget.add(budgetData)
+                        }
+                        viewModelScope.launch(Dispatchers.IO){
                             availableBudget.forEachIndexed { _, budgetData ->
                                 repository.insertBudget(budgetData)
                             }
                         }.invokeOnCompletion {
-                            scope.launch(Dispatchers.IO){
+                            viewModelScope.launch(Dispatchers.IO){
                                 currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
                                                 DateTimeUtil.getEndOfMonth(), currencyCode) != null){
                                     repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
@@ -156,7 +153,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.launch(Dispatchers.IO){
+                viewModelScope.launch(Dispatchers.IO){
                     currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
                                     DateTimeUtil.getEndOfMonth(), currencyCode) != null){
                         repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
@@ -170,7 +167,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             }
         })
         { throwable ->
-            scope.launch(Dispatchers.IO){
+            viewModelScope.launch(Dispatchers.IO){
                 currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
                                 DateTimeUtil.getEndOfMonth(), currencyCode) != null){
                     repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
@@ -196,10 +193,10 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 if (responseBody != null) {
                     val networkData = responseBody.data
                     budgetListData.addAll(networkData)
-                    scope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(Dispatchers.IO) {
                         repository.deleteBudgetList()
                     }.invokeOnCompletion {
-                        if (responseBody.meta.pagination.current_page > responseBody.meta.pagination.total_pages) {
+                        if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
                             for (pagination in 2..responseBody.meta.pagination.total_pages) {
                                 budgetService?.getPaginatedSpentBudget(pagination, DateTimeUtil.getStartOfMonth(),
                                         DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ respond ->
@@ -209,12 +206,12 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                                 }))
                             }
                         }
-                        scope.launch(Dispatchers.IO) {
+                        viewModelScope.launch(Dispatchers.IO) {
                             budgetListData.forEachIndexed { _, data ->
                                 repository.insertBudgetList(data)
                             }
                         }.invokeOnCompletion {
-                            scope.launch(Dispatchers.IO) {
+                            viewModelScope.launch(Dispatchers.IO) {
                                 budgetListData = repository.allBudgetList()
                             }.invokeOnCompletion {
                                 currentMonthSpent = 0.toDouble()
@@ -238,7 +235,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.launch(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     budgetListData = repository.allBudgetList()
                 }.invokeOnCompletion {
                     currentMonthSpent = 0.toDouble()
@@ -255,7 +252,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             }
         })
         { throwable ->
-            scope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
                 budgetListData = repository.allBudgetList()
             }.invokeOnCompletion {
                 currentMonthSpent = 0.toDouble()

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -45,21 +46,21 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                 if (networkData != null) {
                     if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages) {
                         networkData.data.forEachIndexed { _, accountData ->
-                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
+                            viewModelScope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
                         }
                     } else {
                         networkData.data.forEachIndexed { _, accountData ->
-                            scope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
+                            viewModelScope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
                         }
                         for (pagination in 2..networkData.meta.pagination.total_pages) {
                             accountsService?.getPaginatedAccountType("all", pagination)?.enqueue(retrofitCallback({ respond ->
                                 respond.body()?.data?.forEachIndexed { _, accountPagination ->
-                                    scope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
+                                    viewModelScope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
                                 }
                             }))
                         }
                     }
-                    scope.launch(Dispatchers.IO){
+                    viewModelScope.launch(Dispatchers.IO){
                         accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
                     }.invokeOnCompletion {
                         accountData?.forEachIndexed { _, accountData ->
@@ -76,7 +77,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.launch(Dispatchers.IO){
+                viewModelScope.launch(Dispatchers.IO){
                     accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
                 }.invokeOnCompletion {
                     accountData?.forEachIndexed { _, accountData ->
@@ -88,7 +89,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             }
         })
         { throwable ->
-            scope.launch(Dispatchers.IO){
+            viewModelScope.launch(Dispatchers.IO){
                 accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
             }.invokeOnCompletion {
                 accountData?.forEachIndexed { _, accountData ->
@@ -107,7 +108,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     fun getAccountById(id: Long): LiveData<MutableList<AccountData>>{
         val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
         var data: MutableList<AccountData> = arrayListOf()
-        scope.async(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             data = repository.retrieveAccountById(id)
         }.invokeOnCompletion {
             accountData.postValue(data)
@@ -120,7 +121,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         isLoading.value = true
         accountsService?.deleteAccountById(accountId)?.enqueue(retrofitCallback({ response ->
             if (response.code() == 204 || response.code() == 200) {
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     repository.deleteAccountById(accountId)
                 }.invokeOnCompletion {
                     isDeleted.postValue(true)
@@ -141,7 +142,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     fun getAccountByName(accountName: String): LiveData<MutableList<AccountData>>{
         val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
         var data: MutableList<AccountData> = arrayListOf()
-        scope.async(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             data = repository.retrieveAccountByName(accountName)
         }.invokeOnCompletion {
             accountData.postValue(data)
@@ -183,7 +184,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             }
             val networkResponse = response.body()?.data
             if (networkResponse != null) {
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     repository.insertAccount(networkResponse)
                 }.invokeOnCompletion {
                     apiLiveData.postValue(ApiResponses(response.body()))
@@ -239,7 +240,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             }
             val networkResponse = response.body()?.data
             if (networkResponse != null) {
-                scope.async(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
                     repository.insertAccount(networkResponse)
                 }.invokeOnCompletion {
                     apiLiveData.postValue(ApiResponses(response.body()))
@@ -278,10 +279,10 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                             }))
                         }
                     }
-                    scope.launch(Dispatchers.IO){
+                    viewModelScope.launch(Dispatchers.IO){
                         repository.deleteAccountByType(source)
                     }.invokeOnCompletion {
-                        scope.launch(Dispatchers.IO) {
+                        viewModelScope.launch(Dispatchers.IO) {
                             totalAccountList.forEachIndexed { _, accountData ->
                                 repository.insertAccount(accountData)
                             }
@@ -297,7 +298,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     apiResponse.postValue(gson.message)
                 }
-                scope.launch(Dispatchers.IO){
+                viewModelScope.launch(Dispatchers.IO){
                     totalAccountList = repository.getAccountByType(source)
                 }.invokeOnCompletion {
                     data.postValue(totalAccountList)
@@ -307,7 +308,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         })
         { throwable ->
             apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-            scope.launch(Dispatchers.IO){
+            viewModelScope.launch(Dispatchers.IO){
                 totalAccountList = repository.getAccountByType(source)
             }.invokeOnCompletion {
                 data.postValue(totalAccountList)
