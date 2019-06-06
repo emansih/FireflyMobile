@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
@@ -33,7 +32,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     init {
         val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
-        repository = TransactionRepository(transactionDataDao)
+        repository = TransactionRepository(transactionDataDao, transactionService)
     }
 
     fun getTransactionList(startDate: String?, endDate: String?, transactionType: String) = loadRemoteData(startDate, endDate, transactionType)
@@ -42,172 +41,33 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         isLoading.value = true
         var recentData: MutableList<TransactionData> = arrayListOf()
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        transactionService?.getAllTransactions("","", "all")?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                recentData = networkData?.data?.toMutableList() ?: arrayListOf()
-                viewModelScope.launch(Dispatchers.IO){
-                    networkData?.data?.forEachIndexed { _, transactionData ->
-                        repository.insertTransaction(transactionData)
-                    }
-                }.invokeOnCompletion {
-                    if(limit < networkData?.data?.size ?: 0){
-                        data.postValue(recentData.take(limit).toMutableList())
-                    } else {
-                        data.postValue(recentData)
-                    }
-                    isLoading.postValue(false)
-                }
-            } else {
-                viewModelScope.launch(Dispatchers.IO){
-                    recentData = repository.recentTransactions(limit)
-                }.invokeOnCompletion {
-                    data.postValue(recentData)
-                    isLoading.postValue(false)
-                }
-            }
-        })
-        { throwable ->
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-            viewModelScope.launch(Dispatchers.IO){
-                recentData = repository.recentTransactions(limit)
-            }.invokeOnCompletion {
-                data.postValue(recentData)
-                isLoading.postValue(false)
-            }
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            recentData = repository.recentTransactions(limit)
+        }.invokeOnCompletion {
+            data.postValue(recentData)
+        }
         return data
     }
 
     fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
-        isLoading.value = true
-        var withdrawData: Double = 0.toDouble()
+        var withdrawData = 0.0
         val data: MutableLiveData<Double> = MutableLiveData()
-        val transactionData: MutableList<TransactionData> = arrayListOf()
-        transactionService?.getPaginatedTransactions(startDate, endDate, "withdrawal", 1)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                if (networkData != null) {
-                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
-                        viewModelScope.launch(Dispatchers.IO){
-                            repository.deleteTransactionsByDate(startDate, endDate, "Withdrawal")
-                        }.invokeOnCompletion {
-                            transactionData.addAll(networkData.data)
-                            if(networkData.meta.pagination.total_pages > networkData.meta.pagination.current_page) {
-                                for(items in 2..networkData.meta.pagination.total_pages){
-                                    transactionService?.getPaginatedTransactions(startDate, endDate, "withdrawal", items)?.enqueue(retrofitCallback({ pagination ->
-                                        pagination.body()?.data?.forEachIndexed{ _, transData ->
-                                            transactionData.add(transData)
-                                        }
-                                    }))
-                                }
-                            }
-                            viewModelScope.launch(Dispatchers.IO){
-                                transactionData.forEachIndexed { _, transData ->
-                                    repository.insertTransaction(transData)
-                                }
-                            }.invokeOnCompletion {
-                                viewModelScope.launch(Dispatchers.IO) {
-                                    withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
-                                }.invokeOnCompletion {
-                                    data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
-                                    isLoading.postValue(false)
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
-                }.invokeOnCompletion {
-                    data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
-                    isLoading.postValue(false)
-                }
-
-            }
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
-            }.invokeOnCompletion {
-                data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
-                isLoading.postValue(false)
-            }
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
+        }.invokeOnCompletion {
+            data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
+        }
         return data
     }
 
     fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
-        isLoading.value = true
-        var depositData: Double = 0.toDouble()
+        var depositData = 0.0
         val data: MutableLiveData<Double> = MutableLiveData()
-        val transactionData: MutableList<TransactionData> = arrayListOf()
-        transactionService?.getPaginatedTransactions(startDate, endDate, "deposit", 1)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                if (networkData != null) {
-                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
-                        viewModelScope.launch(Dispatchers.IO){
-                            repository.deleteTransactionsByDate(startDate, endDate, "Deposit")
-                        }.invokeOnCompletion {
-                            transactionData.addAll(networkData.data)
-                            if(networkData.meta.pagination.total_pages > networkData.meta.pagination.current_page) {
-                                for(items in 2..networkData.meta.pagination.total_pages){
-                                    transactionService?.getPaginatedTransactions(startDate, endDate, "deposit", items)?.enqueue(retrofitCallback({ pagination ->
-                                        pagination.body()?.data?.forEachIndexed{ _, transData ->
-                                            transactionData.add(transData)
-                                        }
-                                    }))
-                                }
-                            }
-                            viewModelScope.launch(Dispatchers.IO){
-                                transactionData.forEachIndexed { _, transData ->
-                                    repository.insertTransaction(transData)
-                                }
-                            }.invokeOnCompletion {
-                                viewModelScope.launch(Dispatchers.IO) {
-                                    depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
-                                }.invokeOnCompletion {
-                                    data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
-                                    isLoading.postValue(false)
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
-                }.invokeOnCompletion {
-                    data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
-                    isLoading.postValue(false)
-                }
-
-            }
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
-            }.invokeOnCompletion {
-                data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
-                isLoading.postValue(false)
-            }
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
+        }.invokeOnCompletion {
+            data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
+        }
         return data
     }
 
@@ -215,18 +75,11 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
                                                                currencyCode: String,
                                                                accountName: String): LiveData<BigDecimal>{
-        isLoading.value = true
         var transactionAmount: BigDecimal = 0.toBigDecimal()
-        var transactionData: MutableList<TransactionData> = arrayListOf()
         val data: MutableLiveData<BigDecimal> = MutableLiveData()
-        loadRemoteData(startDate, endDate, "all")
         viewModelScope.launch(Dispatchers.IO){
-            transactionData = repository.getTransactionsByAccountAndCurrencyCodeAndDate(startDate, endDate, currencyCode, accountName)
+            transactionAmount = repository.getTransactionsByAccountAndCurrencyCodeAndDate(startDate, endDate, currencyCode, accountName)
         }.invokeOnCompletion {
-            isLoading.postValue(false)
-            transactionData.forEachIndexed { _, transactionData ->
-                transactionAmount = transactionAmount.add(transactionData.transactionAttributes?.amount?.toBigDecimal()?.abs())
-            }
             data.postValue(transactionAmount)
         }
         return data
@@ -234,42 +87,36 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     fun getUniqueCategoryByDate(startDate: String, endDate: String, currencyCode: String,
                                 sourceName: String, transactionType: String): MutableLiveData<MutableList<String>>{
-        isLoading.value = true
         var transactionData: MutableList<String> = arrayListOf()
         val data: MutableLiveData<MutableList<String>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionData = repository.getUniqueCategoryByDate(startDate, endDate, currencyCode, sourceName, transactionType)
         }.invokeOnCompletion {
             data.postValue(transactionData)
-            isLoading.postValue(false)
         }
         return data
     }
 
     fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
                               sourceName: String, transactionType: String): MutableLiveData<MutableList<String>>{
-        isLoading.value = true
         var transactionData: MutableList<String> = arrayListOf()
         val data: MutableLiveData<MutableList<String>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionData = repository.getUniqueBudgetByDate(startDate, endDate, currencyCode, sourceName, transactionType)
         }.invokeOnCompletion {
             data.postValue(transactionData)
-            isLoading.postValue(false)
         }
         return data
     }
 
     fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
                               transactionType: String): MutableLiveData<MutableList<String>>{
-        isLoading.value = true
         var transactionData: MutableList<String> = arrayListOf()
         val data: MutableLiveData<MutableList<String>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionData = repository.getUniqueBudgetByDate(startDate, endDate, currencyCode, transactionType)
         }.invokeOnCompletion {
             data.postValue(transactionData)
-            isLoading.postValue(false)
         }
         return data
     }
@@ -277,14 +124,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun getTotalTransactionAmountByDateAndCurrency(startDate: String, endDate: String,
                                              currencyCode: String, accountName: String,
                                                    transactionType: String): MutableLiveData<Double>{
-        isLoading.value = true
-        var transactionAmount: Double = 0.toDouble()
+        var transactionAmount = 0.0
         val data: MutableLiveData<Double> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionAmount = repository.getTotalTransactionType(startDate, endDate,
                     currencyCode, accountName, transactionType)
         }.invokeOnCompletion {
-            isLoading.postValue(false)
             data.postValue(transactionAmount)
         }
         return data
@@ -293,14 +138,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun getTotalTransactionAmountByDateAndCurrency(startDate: String, endDate: String,
                                                    currencyCode: String,
                                                    transactionType: String): MutableLiveData<Double>{
-        isLoading.value = true
         var transactionAmount = 0.0
         val data: MutableLiveData<Double> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionAmount = repository.getTotalTransactionType(startDate, endDate,
                     currencyCode, transactionType)
         }.invokeOnCompletion {
-            isLoading.postValue(false)
             data.postValue(transactionAmount)
         }
         return data
@@ -505,65 +348,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         var transactionData: MutableList<TransactionData> = arrayListOf()
         isLoading.value = true
         val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        transactionService?.getPaginatedTransactions(startDate, endDate, source, 1)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                if (networkData != null) {
-                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages){
-                        viewModelScope.launch(Dispatchers.IO){
-                            repository.deleteTransactionsByDate(startDate, endDate, source)
-                        }.invokeOnCompletion {
-                            transactionData.addAll(networkData.data)
-                            viewModelScope.launch(Dispatchers.IO) {
-                                networkData.data.forEachIndexed { _, transactionData ->
-                                    repository.insertTransaction(transactionData)
-                                }
-                            }
-                            data.postValue(transactionData.toMutableList())
-                            isLoading.postValue(false)
-                        }
-                    } else {
-                        transactionData.addAll(networkData.data)
-                        for(items in 2..networkData.meta.pagination.total_pages){
-                            transactionService?.getPaginatedTransactions(startDate, endDate, source, items)?.enqueue(retrofitCallback({ pagination ->
-                                pagination.body()?.data?.forEachIndexed{ _, transData ->
-                                    transactionData.add(transData)
-                                }
-                            }))
-                        }
-                        viewModelScope.launch(Dispatchers.IO) {
-                            networkData.data.forEachIndexed { _, transactionData ->
-                                repository.insertTransaction(transactionData)
-                            }
-                        }
-                        data.postValue(transactionData.toMutableList())
-                        isLoading.postValue(false)
-                    }
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    transactionData = repository.transactionList(startDate, endDate, source)
-                }.invokeOnCompletion {
-                    data.postValue(transactionData)
-                    isLoading.postValue(false)
-                }
-            }
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                transactionData = repository.transactionList(startDate, endDate, source)
-            }.invokeOnCompletion {
-                data.postValue(transactionData)
-                isLoading.postValue(false)
-            }
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            transactionData = repository.transactionList(startDate, endDate, source)
+        }.invokeOnCompletion {
+            data.postValue(transactionData)
+            isLoading.postValue(false)
+        }
         return data
     }
 

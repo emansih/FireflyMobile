@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.remote.api
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.TRANSACTION_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
@@ -10,21 +11,13 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessMo
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/transactions.html
 interface TransactionService {
 
-    /* Start date and end date is an optional query. Do not pass NULL into it, instead pass
-    an empty string to it.
-    */
     @GET(TRANSACTION_API_ENDPOINT)
-    fun getAllTransactions(@Query("start") startDate: String?,
+    suspend fun getPaginatedTransactions(@Query("start") startDate: String?,
                            @Query("end") endDate: String?,
-                           @Query("type") type: String): Call<TransactionModel>
-
-    @GET(TRANSACTION_API_ENDPOINT)
-    fun getPaginatedTransactions(@Query("start") startDate: String?,
-                           @Query("end") endDate: String?,
-                           @Query("type") type: String,@Query("page") page: Int): Call<TransactionModel>
+                           @Query("type") type: String,@Query("page") page: Int): Response<TransactionModel>
 
     @GET("$TRANSACTION_API_ENDPOINT/{id}")
-    fun getTransactionById(@Path("id") id: String)
+    suspend fun getTransactionById(@Path("id") id: Long): Response<TransactionModel>
 
     @DELETE("$TRANSACTION_API_ENDPOINT/{transactionId}")
     fun deleteTransactionById(@Path("transactionId") id: Long): Call<TransactionSuccessModel>

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import java.math.BigDecimal
 
 @Dao
 abstract class TransactionDataDao: BaseDao<TransactionData> {
@@ -28,11 +29,11 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
                                                               type: String, currencyCode: String): Double
 
     // This too is looong
-    @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) " +
+    @Query("SELECT sum(amount) FROM transactions WHERE (date BETWEEN :startDate AND :endDate) " +
             "AND currency_code = :currencyCode AND source_name = :accountName")
     abstract fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String?, endDate: String?,
                                                                 currencyCode: String,
-                                                                accountName: String): MutableList<TransactionData>
+                                                                accountName: String): BigDecimal
 
     @Query("SELECT sum(amount) as total FROM transactions WHERE (date BETWEEN :startDate AND " +
             ":endDate) AND currency_code =:currencyCode AND source_name =:accountName AND transactionType =:transactionType")
@@ -117,6 +118,9 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
 
     @Query("DELETE FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String): Int
+
+    @Query("DELETE FROM transactions WHERE (date BETWEEN :startDate AND :endDate)")
+    abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?): Int
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND source_name = :accountName")
     abstract fun getTransactionListByDateAndAccount(startDate: String, endDate: String, accountName: String): MutableList<TransactionData>
