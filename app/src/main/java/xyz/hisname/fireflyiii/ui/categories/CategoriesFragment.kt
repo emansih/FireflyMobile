@@ -57,10 +57,6 @@ class CategoriesFragment: BaseFragment() {
                 recycler_view.isVisible = false
             }
         }
-
-        categoryViewModel.apiResponse.observe(this) {
-            toastError(it)
-        }
     }
 
     private fun initFab(){

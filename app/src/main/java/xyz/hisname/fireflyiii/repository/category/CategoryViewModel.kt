@@ -15,7 +15,6 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategorySuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class CategoryViewModel(application: Application): BaseViewModel(application) {
@@ -26,63 +25,17 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
 
     init {
         val categoryDataDao = AppDatabase.getInstance(application).categoryDataDao()
-        repository = CategoryRepository(categoryDataDao)
+        repository = CategoryRepository(categoryDataDao, categoryService)
     }
 
     fun getAllCategory(): LiveData<MutableList<CategoryData>> {
-        isLoading.value = true
         var categoryData: MutableList<CategoryData> = arrayListOf()
         val data: MutableLiveData<MutableList<CategoryData>> = MutableLiveData()
-        categoryService?.getCategory()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val responseBody = response.body()
-                if(responseBody != null){
-                    val networkData = responseBody.data
-                    viewModelScope.launch(Dispatchers.IO){
-                        repository.deleteAllCategory()
-                    }.invokeOnCompletion {
-                        categoryData.addAll(networkData)
-                        if(responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
-                            for(items in 2..responseBody.meta.pagination.total_pages){
-                                categoryService?.getPaginatedCategory(items)?.enqueue(retrofitCallback({ pagination ->
-                                    pagination.body()?.data?.forEachIndexed{ _, catData ->
-                                        categoryData.add(catData)
-                                    }
-                                }))
-                            }
-                        }
-                        viewModelScope.launch(Dispatchers.IO){
-                            categoryData.forEachIndexed { _, catData ->
-                                repository.insertCategory(catData)
-                            }
-                        }
-                        data.postValue(categoryData.toMutableList())
-                    }
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    categoryData = repository.allCategory()
-                }.invokeOnCompletion {
-                    data.postValue(categoryData)
-                }
-            }
-            isLoading.value = false
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                categoryData = repository.allCategory()
-            }.invokeOnCompletion {
-                data.postValue(categoryData)
-            }
-            isLoading.value = false
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            categoryData = repository.allCategory()
+        }.invokeOnCompletion {
+            data.postValue(categoryData)
+        }
         return data
     }
 

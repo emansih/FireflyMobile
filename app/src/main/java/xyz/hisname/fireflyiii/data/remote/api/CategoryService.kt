@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.remote.api
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.CATEGORY_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.category.CategoryModel
@@ -14,7 +15,7 @@ interface CategoryService {
     fun getCategory(): Call<CategoryModel>
 
     @GET(CATEGORY_API_ENDPOINT)
-    fun getPaginatedCategory(@Query("page") page: Int): Call<CategoryModel>
+    suspend fun getPaginatedCategory(@Query("page") page: Int): Response<CategoryModel>
 
     @FormUrlEncoded
     @POST(CATEGORY_API_ENDPOINT)
