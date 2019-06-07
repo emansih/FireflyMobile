@@ -18,7 +18,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
-import xyz.hisname.fireflyiii.util.network.GithubClientCert
 import java.io.InputStream
 
 @GlideModule
@@ -35,7 +34,7 @@ class FireflyGlideModule: AppGlideModule() {
     }
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
-        val factory = OkHttpUrlLoader.Factory(GithubClientCert.getGithubSSLClient())
+        val factory = OkHttpUrlLoader.Factory()
         glide.registry.replace(GlideUrl::class.java, InputStream::class.java, factory)
     }
 
