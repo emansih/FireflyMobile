@@ -70,7 +70,7 @@ android {
     }
 
     aaptOptions {
-        ignoreAssetsPattern "TZDB.dat:NOTICE.txt"
+        ignoreAssetsPattern "NOTICE.txt"
     }
 	
     configurations {all*.exclude group: 'com.android.support'}

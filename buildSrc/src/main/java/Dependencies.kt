@@ -25,7 +25,7 @@ object Dependencies{
     private const val materialDrawerVersion = "6.1.2"
     private const val iconicsVersion = "3.2.5"
     private const val toastyVersion = "1.4.2"
-    private const val threeTenVersion = "1.2.0"
+    private const val threeTenVersion = "1.2.1"
     private const val chartVersion = "v3.1.0"
     private const val aboutLibVersion = "2.4.2"
     private const val glideVersion = "4.9.0"
