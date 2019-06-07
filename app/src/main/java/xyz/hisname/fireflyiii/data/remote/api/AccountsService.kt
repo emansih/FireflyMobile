@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.remote.api
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.ACCOUNTS_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
@@ -10,7 +11,8 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 interface AccountsService {
 
     @GET(ACCOUNTS_API_ENDPOINT)
-    fun getPaginatedAccountType(@Query("type") type: String, @Query("page") page: Int): Call<AccountsModel>
+    suspend fun getPaginatedAccountType(@Query("type") type: String,
+                                        @Query("page") page: Int): Response<AccountsModel>
 
     @FormUrlEncoded
     @POST(ACCOUNTS_API_ENDPOINT)

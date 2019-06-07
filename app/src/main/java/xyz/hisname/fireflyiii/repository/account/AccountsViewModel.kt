@@ -14,11 +14,11 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.util.network.NetworkErrors
+import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
-import java.text.DecimalFormat
+import kotlin.math.absoluteValue
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
 
@@ -29,81 +29,45 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     init {
         val accountDao = AppDatabase.getInstance(application).accountDataDao()
-        repository = AccountRepository(accountDao)
+        repository = AccountRepository(accountDao, accountsService)
     }
 
 
-    fun getAllAccounts() = loadRemoteData("all")
-
-    fun getAllAccountWithNetworthAndCurrency(currencyCode: String): LiveData<String>{
+    fun getAllAccounts(): LiveData<MutableList<AccountData>> {
         isLoading.value = true
-        val accountValue: MutableLiveData<String> = MutableLiveData()
-        val df = DecimalFormat("#.##")
-        var currentBalance = 0.toDouble()
-        accountsService?.getPaginatedAccountType("all", 1)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                if (networkData != null) {
-                    if(networkData.meta.pagination.current_page == networkData.meta.pagination.total_pages) {
-                        networkData.data.forEachIndexed { _, accountData ->
-                            viewModelScope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
-                        }
-                    } else {
-                        networkData.data.forEachIndexed { _, accountData ->
-                            viewModelScope.launch(Dispatchers.IO) { repository.insertAccount(accountData) }
-                        }
-                        for (pagination in 2..networkData.meta.pagination.total_pages) {
-                            accountsService?.getPaginatedAccountType("all", pagination)?.enqueue(retrofitCallback({ respond ->
-                                respond.body()?.data?.forEachIndexed { _, accountPagination ->
-                                    viewModelScope.launch(Dispatchers.IO) { repository.insertAccount(accountPagination) }
-                                }
-                            }))
-                        }
-                    }
-                    viewModelScope.launch(Dispatchers.IO){
-                        accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
-                    }.invokeOnCompletion {
-                        accountData?.forEachIndexed { _, accountData ->
-                            currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
-                        }
-                        accountValue.postValue(df.format(currentBalance).toString())
-                    }
-                    isLoading.value = false
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-                viewModelScope.launch(Dispatchers.IO){
-                    accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
-                }.invokeOnCompletion {
-                    accountData?.forEachIndexed { _, accountData ->
-                        currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
-                    }
-                    accountValue.postValue(df.format(currentBalance).toString())
-                }
-                isLoading.value = false
-            }
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO){
-                accountData = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
-            }.invokeOnCompletion {
-                accountData?.forEachIndexed { _, accountData ->
-                    currentBalance += accountData.accountAttributes?.current_balance ?: 0.toDouble()
-                }
-                accountValue.postValue(currentBalance.toString())
-            }
-            isLoading.value = false
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
+        var data: MutableList<AccountData> = arrayListOf()
+        viewModelScope.launch(Dispatchers.IO){
+            data = repository.getAccountByType("all")
+        }.invokeOnCompletion {
+            accountData.postValue(data)
+            isLoading.postValue(false)
+        }
+        return accountData
+    }
+
+    fun getAllAccountWithNetworthAndCurrency(currencyCode: String): LiveData<Double>{
+        isLoading.value = true
+        val accountValue: MutableLiveData<Double> = MutableLiveData()
+        var currentBalance = 0.0
+        viewModelScope.launch(Dispatchers.IO){
+            currentBalance = repository.retrieveAccountWithCurrencyCodeAndNetworth(currencyCode)
+        }.invokeOnCompletion {
+            accountValue.postValue(LocaleNumberParser.parseDecimal(currentBalance, getApplication()).absoluteValue)
+        }
         return accountValue
     }
 
-    fun getAccountByType(accountType: String) = loadRemoteData(accountType)
+    fun getAccountByType(accountType: String): LiveData<MutableList<AccountData>> {
+        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
+        var data: MutableList<AccountData> = arrayListOf()
+        viewModelScope.launch(Dispatchers.IO) {
+            data = repository.getAccountByType(accountType)
+        }.invokeOnCompletion {
+            accountData.postValue(data)
+        }
+        return accountData
+    }
 
     fun getAccountById(id: Long): LiveData<MutableList<AccountData>>{
         val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
@@ -259,63 +223,5 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     }
 
     private fun deleteAccount(id: Long) = DeleteAccountWorker.deleteWorker(id)
-
-    private fun loadRemoteData(source: String): LiveData<MutableList<AccountData>> {
-        isLoading.value = true
-        apiResponse.value = null
-        var totalAccountList: MutableList<AccountData> = arrayListOf()
-        val data: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
-        accountsService?.getPaginatedAccountType(source, 1)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()
-                if (networkData != null) {
-                    totalAccountList.addAll(networkData.data)
-                    if(networkData.meta.pagination.current_page > networkData.meta.pagination.total_pages) {
-                        for (pagination in 2..networkData.meta.pagination.total_pages) {
-                            genericService()?.create(AccountsService::class.java)?.getPaginatedAccountType(source, pagination)?.enqueue(retrofitCallback({ respond ->
-                                respond.body()?.data?.forEachIndexed { _, accountPagination ->
-                                    totalAccountList.add(accountPagination)
-                                }
-                            }))
-                        }
-                    }
-                    viewModelScope.launch(Dispatchers.IO){
-                        repository.deleteAccountByType(source)
-                    }.invokeOnCompletion {
-                        viewModelScope.launch(Dispatchers.IO) {
-                            totalAccountList.forEachIndexed { _, accountData ->
-                                repository.insertAccount(accountData)
-                            }
-                        }
-                    }
-                    data.postValue(totalAccountList)
-                    isLoading.value = false
-                }
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-                viewModelScope.launch(Dispatchers.IO){
-                    totalAccountList = repository.getAccountByType(source)
-                }.invokeOnCompletion {
-                    data.postValue(totalAccountList)
-                }
-                isLoading.value = false
-            }
-        })
-        { throwable ->
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-            viewModelScope.launch(Dispatchers.IO){
-                totalAccountList = repository.getAccountByType(source)
-            }.invokeOnCompletion {
-                data.postValue(totalAccountList)
-            }
-            isLoading.value = false
-        })
-        return data
-    }
 
 }
