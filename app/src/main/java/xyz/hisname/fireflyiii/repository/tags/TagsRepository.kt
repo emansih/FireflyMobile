@@ -1,10 +1,16 @@
 package xyz.hisname.fireflyiii.repository.tags
 
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TagsDataDao
+import xyz.hisname.fireflyiii.data.remote.api.TagsService
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
+import xyz.hisname.fireflyiii.repository.models.tags.TagsModel
 
-class TagsRepository(private val tagsDataDao: TagsDataDao) {
+class TagsRepository(private val tagsDataDao: TagsDataDao,
+                     private val tagsService: TagsService?) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -20,7 +26,40 @@ class TagsRepository(private val tagsDataDao: TagsDataDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun allTags() = tagsDataDao.getAllTags()
+    suspend fun allTags(): MutableList<TagsData>{
+        var networkCall: Response<TagsModel>? = null
+        val tagsData: MutableList<TagsData> = arrayListOf()
+        try {
+            runBlocking(Dispatchers.IO) {
+                networkCall = tagsService?.getPaginatedTags(1)
+                tagsData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
+            }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall?.isSuccessful != false) {
+                val pagination = responseBody.meta.pagination
+                if (pagination.total_pages != pagination.current_page) {
+                    runBlocking(Dispatchers.IO) {
+                        for (items in 2..pagination.total_pages) {
+                            tagsData.addAll(
+                                    tagsService?.getPaginatedTags(items)?.body()?.data?.toMutableList()
+                                            ?: arrayListOf()
+                            )
+                        }
+                    }
+                }
+                runBlocking(Dispatchers.IO) {
+                    tagsDataDao.deleteTags()
+                }
+                runBlocking(Dispatchers.IO) {
+                    tagsData.forEachIndexed { _, data ->
+                        insertTags(data)
+                    }
+                }
+            }
+        } catch (exception: Exception){ }
+
+        return tagsDataDao.getAllTags()
+    }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

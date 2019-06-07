@@ -1,8 +1,8 @@
 package xyz.hisname.fireflyiii.data.remote.api
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.TAGS_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.tags.TagsModel
 import xyz.hisname.fireflyiii.repository.models.tags.TagsSuccessModel
@@ -10,7 +10,7 @@ import xyz.hisname.fireflyiii.repository.models.tags.TagsSuccessModel
 interface TagsService {
 
     @GET(TAGS_API_ENDPOINT)
-    fun getAllTags(): Call<TagsModel>
+    suspend fun getPaginatedTags(@Query("page") page: Int): Response<TagsModel>
 
     @DELETE("$TAGS_API_ENDPOINT/{tagName}")
     fun deleteTagByName(@Path("tagName") tagName: String): Call<TagsModel>

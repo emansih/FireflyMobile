@@ -27,46 +27,19 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
 
     init {
         val tagsDataDao = AppDatabase.getInstance(application).tagsDataDao()
-        repository = TagsRepository(tagsDataDao)
+        repository = TagsRepository(tagsDataDao, tagsService)
     }
 
     fun getAllTags(): LiveData<MutableList<TagsData>> {
         isLoading.value = true
         var tagsData: MutableList<TagsData> = arrayListOf()
         val data: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
-        tagsService?.getAllTags()?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val networkData = response.body()?.data
-                viewModelScope.launch(Dispatchers.IO){
-                    networkData?.forEachIndexed { _, element ->
-                        repository.insertTags(element)
-                    }
-                }
-                data.postValue(networkData?.toMutableList())
-            } else {
-                val responseError = response.errorBody()
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    tagsData = repository.allTags()
-                }.invokeOnCompletion {
-                    data.postValue(tagsData)
-                }
-            }
-            isLoading.value = false
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                tagsData = repository.allTags()
-            }.invokeOnCompletion {
-                data.postValue(tagsData)
-            }
-            isLoading.value = false
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            tagsData = repository.allTags()
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            data.postValue(tagsData)
+        }
         return data
     }
 

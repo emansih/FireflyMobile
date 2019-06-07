@@ -18,4 +18,8 @@ abstract class TagsDataDao: BaseDao<TagsData>{
 
     @Query("SELECT * FROM tags WHERE tag = :nameOfTag")
     abstract fun getTagByName(nameOfTag: String): MutableList<TagsData>
+
+    @Query("DELETE FROM tags")
+    abstract fun deleteTags(): Int
+
 }
