@@ -14,7 +14,6 @@
     <string name="no_bills">Hurray! You have no bills</string>
     <string name="bill_amount">-%1$s %2$s</string>
     <string name="no_browser_installed">No application can handle this request. Please install a web browser</string>
-    <string name="target_date">Target Date: %1$s</string>
     <string name="user_did_it">You did it!</string>
     <string name="due_today">Due today</string>
     <string name="one_more_day_to_target">1 more day to your target!</string>

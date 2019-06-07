@@ -10,12 +10,15 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
@@ -30,6 +33,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     private var currencyCode: String = ""
     private var piggyList: MutableList<DetailModel> = ArrayList()
     private var piggyName: String? = ""
+    private var accountId: Long = 0L
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -42,8 +46,9 @@ class PiggyDetailFragment: BaseDetailFragment() {
             piggyAttribute = it[0].piggyAttributes
             piggyName = piggyAttribute?.name
             currentAmount = piggyAttribute?.current_amount
-            percentage = piggyAttribute!!.percentage
-            currencyCode = piggyAttribute!!.currency_code
+            percentage = piggyAttribute?.percentage ?: 0
+            currencyCode = piggyAttribute?.currency_code ?: ""
+            accountId = piggyAttribute?.account_id ?: 0L
             setupWidgets()
             setupProgressBar()
         }
@@ -54,7 +59,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
         val piggy = arrayListOf(
                 DetailModel(resources.getString(R.string.account), piggyAttribute?.account_name),
                 DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
-                DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
                 DetailModel(resources.getString(R.string.saved_so_far), piggyAttribute?.save_per_month.toString()),
                 DetailModel(resources.getString(R.string.left_to_save), piggyAttribute?.left_to_save.toString()),
                 DetailModel(resources.getString(R.string.start_date), piggyAttribute?.start_date),
@@ -64,7 +68,8 @@ class PiggyDetailFragment: BaseDetailFragment() {
                     DetailModel(resources.getString(R.string.target_date), piggyAttribute?.target_date)
                 }
         )
-
+        runLayoutAnimation(piggy_bank_details_recyclerview)
+        piggy_bank_details_recyclerview.adapter = PiggyDetailsRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
         piggyList.addAll(piggy)
         if(percentage <= 15){
             piggyBankProgressBar.progressDrawable.setColorFilter(getCompatColor(
@@ -77,6 +82,19 @@ class PiggyDetailFragment: BaseDetailFragment() {
         amountPercentage.text = percentage.toString() + "%"
         currencyCodeTextView.text = currencyCode
         piggyBankName.text = piggyName
+    }
+
+    private fun setClickListener(position: Int){
+        when(position){
+            0 -> {
+                requireFragmentManager().commit {
+                    replace(R.id.fragment_container, AccountDetailFragment().apply {
+                        arguments = bundleOf("accountId" to accountId)
+                    })
+                    addToBackStack(null)
+                }
+            }
+        }
     }
 
     override fun deleteItem() {

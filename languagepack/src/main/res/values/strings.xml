@@ -112,4 +112,5 @@
     <string name="opening_balance_help_text">Assets accounts may have an "opening balance", indicating the start of this account\'s history in Firefly III.</string>
     <string name="add_account_currency_help_text">Firefly III supports multiple currencies. Asset accounts have one main currency, which you must set here.</string>
     <string name="virtual_balance_help_text">It can sometimes help to give your account a virtual balance: an extra amount always added to or removed from the actual balance.</string>
+    <string name="target_date">Target Date</string>
 </resources>
