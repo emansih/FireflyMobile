@@ -25,16 +25,13 @@ open class BaseActivity: AppCompatActivity() {
 
     private fun setTheme(){
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM){
-            AppPref(sharedPref).nightModeEnabled = true
-        }
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             if(key == "night_mode"){
                 if(sharedPref(this).nightModeEnabled){
                     enableDarkMode()
                 } else {
                     setTheme(R.style.AppTheme)
-                    delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 }
             }
         }
@@ -46,7 +43,7 @@ open class BaseActivity: AppCompatActivity() {
 
     private fun enableDarkMode(){
         setTheme(R.style.AppTheme_Dark_DrawerTheme)
-        delegate.setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.navigationBarColor = getCompatColor(R.color.md_black_1000)
         }

@@ -80,9 +80,6 @@ class SettingsFragment: BaseSettings() {
 
     private fun setNightModeSection(){
         val nightModePref = findPreference<CheckBoxPreference>("night_mode") as CheckBoxPreference
-        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM){
-            nightModePref.isEnabled = false
-        }
         nightModePref.setOnPreferenceChangeListener { preference, newValue ->
             val nightMode = newValue as Boolean
             AppPref(sharedPref).nightModeEnabled = nightMode
