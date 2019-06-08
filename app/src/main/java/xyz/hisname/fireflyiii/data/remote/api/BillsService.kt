@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.remote.api
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.BILL_API_ENDPONT
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
@@ -11,10 +12,10 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 interface BillsService {
 
     @GET(BILL_API_ENDPONT)
-    fun getPaginatedBills(@Query("page") type: Int): Call<BillsModel>
+    suspend fun getPaginatedBills(@Query("page") type: Int): Response<BillsModel>
 
     @GET("$BILL_API_ENDPONT/{id}")
-    fun getBillById(@Path("id") id: String): Call<BillData>
+    suspend fun getBillById(@Path("id") id: Long): Response<BillsModel>
 
     @FormUrlEncoded
     @POST(BILL_API_ENDPONT)
@@ -26,7 +27,7 @@ interface BillsService {
     ): Call<BillSuccessModel>
 
     @DELETE("$BILL_API_ENDPONT/{id}")
-    fun deleteBillById(@Path("id") id: Long): Call<BillsModel>
+    suspend fun deleteBillById(@Path("id") id: Long): Response<BillsModel>
 
     @FormUrlEncoded
     @PUT("$BILL_API_ENDPONT/{id}")

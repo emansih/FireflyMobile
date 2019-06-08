@@ -2,56 +2,39 @@ package xyz.hisname.fireflyiii.workers.bill
 
 import android.content.Context
 import androidx.work.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.api.BillsService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
+import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class DeleteBillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
     private val billDatabase by lazy { AppDatabase.getInstance(context).billDataDao() }
-    private val channelName = "Bill"
     private val channelIcon = R.drawable.ic_calendar_blank
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val billId = inputData.getLong("billId", 0)
         var billAttribute: BillAttributes? = null
-        GlobalScope.launch(context = Dispatchers.Main) {
-            val result = async(Dispatchers.IO) {
-                billDatabase.getBillById(billId)
-            }.await()
-            billAttribute  = result[0].billAttributes
+        var networkResponse: Response<BillsModel>? = null
+        runBlocking(Dispatchers.IO) {
+            billAttribute = billDatabase.getBillById(billId)[0].billAttributes
+            networkResponse = genericService?.create(BillsService::class.java)?.deleteBillById(billId)
         }
-        genericService?.create(BillsService::class.java)?.deleteBillById(billId)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                GlobalScope.launch(Dispatchers.Main) {
-                    async(Dispatchers.IO) {
-                        billDatabase.deleteBillById(billId)
-                    }.await()
-                    Result.success()
-                    context.displayNotification(billAttribute?.name + "successfully deleted", context.getString(R.string.bill),
-                            Constants.BILL_CHANNEL, channelIcon)
-                }
-            } else {
-                Result.failure()
-                context.displayNotification("There was an issue deleting " + billAttribute?.name, context.getString(R.string.bill),
-                        Constants.BILL_CHANNEL, channelIcon)
-            }
-        })
-        { throwable ->
-            Result.failure()
-            context.displayNotification(throwable.localizedMessage, "Error deleting $channelName",
-                    Constants.BILL_CHANNEL, channelIcon)
-        })
 
+        if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
+            context.displayNotification(billAttribute?.name + "successfully deleted", context.getString(R.string.bill),
+                    Constants.BILL_CHANNEL, channelIcon)
+        } else {
+            Result.failure()
+            context.displayNotification("There was an issue deleting " + billAttribute?.name, context.getString(R.string.bill),
+                    Constants.BILL_CHANNEL, channelIcon)
+        }
         return Result.success()
     }
 

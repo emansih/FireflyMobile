@@ -3,13 +3,13 @@ package xyz.hisname.fireflyiii.workers
 import android.accounts.AccountManager
 import android.content.Context
 import android.preference.PreferenceManager
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
 
-abstract class BaseWorker(context: Context, workerParams: WorkerParameters): Worker(context, workerParams){
+abstract class BaseWorker(context: Context, workerParams: WorkerParameters): CoroutineWorker(context, workerParams){
 
     private val baseUrl by lazy { AppPref(sharedPref).baseUrl }
     private val accessToken by lazy { AuthenticatorManager(AccountManager.get(context)).accessToken }

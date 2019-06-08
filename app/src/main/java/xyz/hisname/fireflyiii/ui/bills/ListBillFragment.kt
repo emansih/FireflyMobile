@@ -9,7 +9,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
@@ -22,7 +21,6 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.hideFab
-import xyz.hisname.fireflyiii.util.extension.toastError
 
 class ListBillFragment: BaseFragment() {
 
@@ -41,8 +39,10 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun displayView(){
+        swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
         billViewModel.getAllBills().observe(this) { billList ->
+            swipeContainer.isRefreshing = false
             if (billList.isNotEmpty()) {
                 listText.isVisible = false
                 listImage.isVisible = false
@@ -57,12 +57,6 @@ class ListBillFragment: BaseFragment() {
                 recycler_view.isVisible = false
             }
         }
-        billViewModel.isLoading.observe(this, Observer {
-            swipeContainer.isRefreshing = it == true
-        })
-        billViewModel.apiResponse.observe(this, Observer {
-           toastError(it)
-        })
     }
 
     private fun itemClicked(billData: BillData){

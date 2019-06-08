@@ -5,10 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.BillsService
@@ -17,80 +15,28 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
-import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 
 class BillsViewModel(application: Application): BaseViewModel(application) {
 
-    val repository: BillRepository
+    private val repository: BillRepository
     private var billData: MutableList<BillData> = arrayListOf()
     private val billsService by lazy { genericService()?.create(BillsService::class.java) }
 
     init {
         val billDataDao = AppDatabase.getInstance(application).billDataDao()
-        repository = BillRepository(billDataDao)
+        repository = BillRepository(billDataDao, billsService)
     }
 
 
     fun getAllBills(): LiveData<MutableList<BillData>>{
-        isLoading.value = true
         var billData: MutableList<BillData> = arrayListOf()
         val data: MutableLiveData<MutableList<BillData>> = MutableLiveData()
-        billsService?.getPaginatedBills(1)?.enqueue(retrofitCallback({ response ->
-            val responseError = response.errorBody()
-            if (response.isSuccessful) {
-                val responseBody = response.body()
-                if(responseBody != null){
-                    billData.addAll(responseBody.data)
-                    if(responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
-                        for(items in 2..responseBody.meta.pagination.total_pages){
-                            billsService?.getPaginatedBills(items)?.enqueue(retrofitCallback({ pagination ->
-                                pagination.body()?.data?.forEachIndexed{ _, dataResponse ->
-                                    billData.add(dataResponse)
-                                }
-
-                            }))
-                        }
-                    }
-                }
-                data.postValue(billData.toMutableList())
-                viewModelScope.launch(Dispatchers.IO){
-                    repository.deleteAllBills()
-                }.invokeOnCompletion {
-                    viewModelScope.launch(Dispatchers.IO){
-                        billData.forEachIndexed { _, billData ->
-                            repository.insertBill(billData)
-                        }
-                    }
-                }
-            } else {
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(gson.message != null){
-                        apiResponse.postValue(gson.message)
-                    } else {
-                        apiResponse.postValue(errorBody)
-                    }
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    billData = repository.allBills()
-                }.invokeOnCompletion {
-                    data.postValue(billData)
-                }
-            }
-            isLoading.value = false
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                billData = repository.allBills()
-            }.invokeOnCompletion {
-                data.postValue(billData)
-            }
-            isLoading.value = false
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            billData = repository.allBills()
+        }.invokeOnCompletion {
+            data.postValue(billData)
+        }
         return data
     }
 
@@ -106,24 +52,18 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
     fun deleteBillById(billId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        var deletionStatus = false
         isLoading.value = true
-        billsService?.deleteBillById(billId)?.enqueue(retrofitCallback({ response ->
-            if (response.code() == 204 || response.code() == 200) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    repository.deleteBillById(billId)
-                }.invokeOnCompletion {
-                    isDeleted.postValue(true)
-                }
+        viewModelScope.launch(Dispatchers.IO){
+            deletionStatus = repository.deleteBillById(billId)
+        }.invokeOnCompletion {
+            if(deletionStatus){
+                isDeleted.postValue(true)
             } else {
                 isDeleted.postValue(false)
-                deleteBill(billId)
             }
-        })
-        { throwable ->
-            isDeleted.postValue(false)
-            deleteBill(billId)
-        })
-        isLoading.value = false
+            isLoading.postValue(false)
+        }
         return isDeleted
 
     }
@@ -177,7 +117,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     }
                     val networkData = response.body()
                     if (networkData != null) {
-                        viewModelScope.launch(Dispatchers.IO) { repository.updateBill(networkData.data) }
+                        viewModelScope.launch(Dispatchers.IO) { repository.insertBill(networkData.data) }
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
                         apiLiveData.postValue(ApiResponses(errorBody))
@@ -188,20 +128,5 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
-    private fun deleteBill(billId: Long){
-        val accountTag =
-                WorkManager.getInstance().getWorkInfosByTag("delete_bill_$billId").get()
-        if(accountTag == null || accountTag.size == 0) {
-            val accountData = Data.Builder()
-                    .putLong("billId", billId)
-                    .build()
-            val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteBillWorker::class.java)
-                    .setInputData(accountData)
-                    .addTag("delete_bill_$billId")
-                    .setConstraints(Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED).build())
-                    .build()
-            WorkManager.getInstance().enqueue(deleteAccountWork)
-        }
-    }
+
 }
