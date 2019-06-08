@@ -16,7 +16,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
     private val channelName = "Transactions"
     private val channelIcon = R.drawable.ic_refresh
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
        // val notif = NotificationUtils(context)
         val transactionType = inputData.getString("transactionType") ?: ""
         val transactionDescription = inputData.getString("description") ?: ""

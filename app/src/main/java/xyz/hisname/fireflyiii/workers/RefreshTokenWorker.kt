@@ -11,7 +11,7 @@ class RefreshTokenWorker(private val context: Context, workerParameters: WorkerP
 
     private val accManager by lazy { AuthenticatorManager(AccountManager.get(context)) }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val execution = service()?.execute()
         return if(execution != null){
             val responseBody = execution.body()

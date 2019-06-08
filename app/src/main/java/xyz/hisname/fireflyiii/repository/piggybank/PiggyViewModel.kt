@@ -5,10 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
@@ -18,7 +16,6 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
-import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
 
 class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
@@ -56,22 +53,18 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
     fun deletePiggyById(piggyId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
-        piggyService?.deletePiggyBankById(piggyId)?.enqueue(retrofitCallback({ response ->
-            if (response.code() == 204 || response.code() == 200) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    repository.deletePiggyById(piggyId)
-                }.invokeOnCompletion {
-                    isDeleted.postValue(true)
-                }
+        var isItDeleted = false
+        viewModelScope.launch(Dispatchers.IO) {
+            isItDeleted = repository.deletePiggyById(piggyId, true)
+        }.invokeOnCompletion {
+            if(isItDeleted) {
+                isDeleted.postValue(true)
             } else {
                 isDeleted.postValue(false)
-                deletePiggy(piggyId)
             }
-        })
-        { throwable ->
-            isDeleted.postValue(false)
-            deletePiggy(piggyId)
-        })
+            isLoading.postValue(false)
+
+        }
         return isDeleted
     }
 
@@ -171,20 +164,4 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         return data
     }
 
-    private fun deletePiggy(piggyId: Long){
-        val accountTag =
-                WorkManager.getInstance().getWorkInfosByTag("delete_piggy_$piggyId").get()
-        if(accountTag == null || accountTag.size == 0) {
-            val accountData = Data.Builder()
-                    .putLong("piggyId", piggyId)
-                    .build()
-            val deleteAccountWork = OneTimeWorkRequest.Builder(DeletePiggyWorker::class.java)
-                    .setInputData(accountData)
-                    .addTag("delete_piggy_$piggyId")
-                    .setConstraints(Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED).build())
-                    .build()
-            WorkManager.getInstance().enqueue(deleteAccountWork)
-        }
-    }
 }

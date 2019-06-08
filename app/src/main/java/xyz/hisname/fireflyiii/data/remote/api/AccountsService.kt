@@ -56,6 +56,6 @@ interface AccountsService {
                       @Field("interest_period") interestPeriod: String?): Call<AccountSuccessModel>
 
     @DELETE("$ACCOUNTS_API_ENDPOINT/{id}")
-    fun deleteAccountById(@Path("id") id: Long): Call<AccountsModel>
+    suspend fun deleteAccountById(@Path("id") id: Long): Response<AccountsModel>
 
 }

@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.repository.bills
 
-import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
@@ -75,7 +74,7 @@ class BillRepository(private val billDao: BillDataDao,
     }
 
 
-    suspend fun deleteBillById(billId: Long): Boolean{
+    suspend fun deleteBillById(billId: Long, shouldUserWorker: Boolean = false): Boolean{
         var networkStatus: Response<BillsModel>? = null
         runBlocking {
             networkStatus = billService?.deleteBillById(billId)
@@ -86,26 +85,10 @@ class BillRepository(private val billDao: BillDataDao,
             }
             true
         } else {
-            deleteBillWorker(billId)
+            if(shouldUserWorker){
+                DeleteBillWorker.initWorker(billId)
+            }
             false
-        }
-    }
-
-
-    private fun deleteBillWorker(billId: Long){
-        val accountTag =
-                WorkManager.getInstance().getWorkInfosByTag("delete_bill_$billId").get()
-        if(accountTag == null || accountTag.size == 0) {
-            val accountData = Data.Builder()
-                    .putLong("billId", billId)
-                    .build()
-            val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteBillWorker::class.java)
-                    .setInputData(accountData)
-                    .addTag("delete_bill_$billId")
-                    .setConstraints(Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED).build())
-                    .build()
-            WorkManager.getInstance().enqueue(deleteAccountWork)
         }
     }
 }

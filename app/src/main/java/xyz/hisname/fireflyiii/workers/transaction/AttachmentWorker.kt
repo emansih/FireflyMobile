@@ -37,7 +37,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         }
     }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val transactionId = inputData.getLong("transactionId", 0)
         val fileUri = inputData.getString("fileUri")?.toUri() ?: Uri.EMPTY
         val service = genericService?.create(AttachmentService::class.java)

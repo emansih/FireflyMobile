@@ -2,18 +2,15 @@ package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
 import androidx.work.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.api.AccountsService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class DeleteAccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
@@ -39,37 +36,25 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
         }
     }
 
-    override fun doWork(): Result {
-        val id = inputData.getLong("accountId", 0L)
+    override suspend fun doWork(): Result {
+        val accountId = inputData.getLong("accountId", 0L)
         var accountAttributes: AccountAttributes? = null
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = async(Dispatchers.IO) {
-                accountDatabase.getAccountById(id)
-            }.await()
-            accountAttributes = result[0].accountAttributes
+        var isDeleted = false
+        val accountService = genericService?.create(AccountsService::class.java)
+        val repository = AccountRepository(accountDatabase, accountService)
+        runBlocking(Dispatchers.IO) {
+            accountAttributes = repository.retrieveAccountById(accountId)[0].accountAttributes
+            isDeleted = repository.deleteAccountById(accountId)
         }
-        genericService?.create(AccountsService::class.java)?.deleteAccountById(id)?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                GlobalScope.launch(Dispatchers.Main) {
-                    async(Dispatchers.IO) {
-                        accountDatabase.deleteAccountById(id)
-                    }.await()
-                    Result.success()
-                    context.displayNotification(accountAttributes?.name + "successfully deleted", context.getString(R.string.account),
-                            Constants.ACCOUNT_CHANNEL, channelIcon)
-                }
-            } else {
-                Result.failure()
-                context.displayNotification("There was an issue deleting " + accountAttributes?.name, context.getString(R.string.account),
-                        Constants.ACCOUNT_CHANNEL, channelIcon)
-            }
-        })
-        { throwable ->
-            Result.failure()
-            context.displayNotification(throwable.localizedMessage, context.getString(R.string.account),
+        if(isDeleted){
+            Result.success()
+            context.displayNotification(accountAttributes?.name + "successfully deleted", context.getString(R.string.account),
                     Constants.ACCOUNT_CHANNEL, channelIcon)
-        })
-
+        } else {
+            Result.failure()
+            context.displayNotification("There was an issue deleting " + accountAttributes?.name, context.getString(R.string.account),
+                    Constants.ACCOUNT_CHANNEL, channelIcon)
+        }
         return Result.success()
     }
 

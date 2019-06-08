@@ -20,7 +20,7 @@ interface TransactionService {
     suspend fun getTransactionById(@Path("id") id: Long): Response<TransactionModel>
 
     @DELETE("$TRANSACTION_API_ENDPOINT/{transactionId}")
-    fun deleteTransactionById(@Path("transactionId") id: Long): Call<TransactionSuccessModel>
+    suspend fun deleteTransactionById(@Path("transactionId") transactionId: Long): Response<TransactionSuccessModel>
 
     @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)

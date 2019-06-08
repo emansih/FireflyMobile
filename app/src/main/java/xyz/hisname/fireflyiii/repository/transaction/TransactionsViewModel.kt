@@ -324,21 +324,17 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun deleteTransaction(transactionId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
-        transactionService?.deleteTransactionById(transactionId)?.enqueue(retrofitCallback({ response ->
-            if (response.code() == 204 || response.code() == 200) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    repository.deleteTransactionById(transactionId)
-                }.invokeOnCompletion {
-                    isDeleted.postValue(true)
-                }
-            }else {
+        var isItDeleted = false
+        viewModelScope.launch(Dispatchers.IO) {
+            isItDeleted = repository.deleteTransactionById(transactionId, true)
+        }.invokeOnCompletion {
+            if(isItDeleted) {
+                isDeleted.postValue(true)
+            } else {
                 isDeleted.postValue(false)
             }
-        })
-        { throwable ->
-            isDeleted.postValue(false)
-        })
-        isLoading.value = false
+            isLoading.postValue(false)
+        }
         return isDeleted
     }
 

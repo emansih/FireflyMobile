@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
+import androidx.work.Data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
@@ -7,7 +8,10 @@ import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
+import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
@@ -147,7 +151,23 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return transactionDao.getTransactionById(transactionId)
     }
 
-    suspend fun deleteTransactionById(transactionId: Long) = transactionDao.deleteTransactionById(transactionId)
+    suspend fun deleteTransactionById(transactionId: Long, shouldUseWorker: Boolean = false): Boolean {
+        var networkResponse: Response<TransactionSuccessModel>? = null
+        runBlocking(Dispatchers.IO){
+            networkResponse = transactionService?.deleteTransactionById(transactionId)
+        }
+        return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
+            runBlocking(Dispatchers.IO) {
+                transactionDao.deleteTransactionById(transactionId)
+            }
+            true
+        } else {
+            if(shouldUseWorker){
+                DeleteTransactionWorker.setupWorker(Data.Builder(),transactionId)
+            }
+            false
+        }
+    }
 
     suspend fun getTransactionListByDateAndAccount(startDate: String, endDate: String,
                                                    accountName: String): MutableList<TransactionData>{

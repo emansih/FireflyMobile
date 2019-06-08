@@ -16,7 +16,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
 
     private val channelIcon = R.drawable.ic_sort_descending
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
         val accountId = inputData.getString("accountId") ?: ""
         val targetAmount = inputData.getString("targetAmount") ?: ""

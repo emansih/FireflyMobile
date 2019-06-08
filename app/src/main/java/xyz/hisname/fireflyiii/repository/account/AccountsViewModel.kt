@@ -82,24 +82,19 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     fun deleteAccountById(accountId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        var isItDeleted = false
         isLoading.value = true
-        accountsService?.deleteAccountById(accountId)?.enqueue(retrofitCallback({ response ->
-            if (response.code() == 204 || response.code() == 200) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    repository.deleteAccountById(accountId)
-                }.invokeOnCompletion {
-                    isDeleted.postValue(true)
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            isItDeleted = repository.deleteAccountById(accountId, true)
+        }.invokeOnCompletion {
+            if(isItDeleted) {
+                isDeleted.postValue(true)
             } else {
                 isDeleted.postValue(false)
-                deleteAccount(accountId)
             }
-        })
-        { throwable ->
-            isDeleted.postValue(false)
-            deleteAccount(accountId)
-        })
-        isLoading.value = false
+            isLoading.postValue(false)
+
+        }
         return isDeleted
     }
 

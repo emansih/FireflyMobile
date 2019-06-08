@@ -13,7 +13,7 @@ interface PiggybankService {
     suspend fun getPaginatedPiggyBank(@Query("page") type: Int): Response<PiggyModel>
 
     @DELETE("$PIGGY_BANK_API_ENDPOINT/{id}")
-    fun deletePiggyBankById(@Path("id") id: Long): Call<PiggyModel>
+    suspend fun deletePiggyBankById(@Path("id") piggyId: Long): Response<PiggyModel>
 
     @GET("$PIGGY_BANK_API_ENDPOINT/{id}")
     fun getPiggyBankById(@Path("id") id: Long): Response<PiggyModel>

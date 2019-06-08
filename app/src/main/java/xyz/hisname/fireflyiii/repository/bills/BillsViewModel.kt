@@ -55,7 +55,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         var deletionStatus = false
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO){
-            deletionStatus = repository.deleteBillById(billId)
+            deletionStatus = repository.deleteBillById(billId, true)
         }.invokeOnCompletion {
             if(deletionStatus){
                 isDeleted.postValue(true)

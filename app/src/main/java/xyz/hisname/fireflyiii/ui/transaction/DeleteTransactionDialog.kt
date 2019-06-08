@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.observe
-import androidx.work.Data
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
 import xyz.hisname.fireflyiii.R
@@ -14,7 +13,6 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 import xyz.hisname.fireflyiii.util.extension.toastSuccess
-import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 
 class DeleteTransactionDialog: BaseFragment() {
 
@@ -37,7 +35,6 @@ class DeleteTransactionDialog: BaseFragment() {
                             toastSuccess(resources.getString(R.string.transaction_deleted))
                             requireFragmentManager().popBackStack()
                         } else {
-                            DeleteTransactionWorker.setupWorker(Data.Builder(), transactionId)
                             toastInfo("There was an issue deleting your transaction. It will be " +
                                     "deleted in the background.",
                                     Toast.LENGTH_LONG)

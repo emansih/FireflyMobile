@@ -50,7 +50,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         }
     }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
         val accountType = inputData.getString("type") ?: ""
         val currencyCode = inputData.getString("currencyCode") ?: ""

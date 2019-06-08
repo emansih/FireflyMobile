@@ -2,11 +2,13 @@ package xyz.hisname.fireflyiii.repository.account
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
 import xyz.hisname.fireflyiii.data.remote.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
+import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 
 @Suppress("RedundantSuspendModifier")
 class AccountRepository(private val accountDao: AccountsDataDao,
@@ -23,7 +25,23 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
 
-    suspend fun deleteAccountById(accountId: Long) = accountDao.deleteAccountById(accountId)
+    suspend fun deleteAccountById(accountId: Long, shouldUseWorker: Boolean = false): Boolean {
+        var networkResponse: Response<AccountsModel>? = null
+        runBlocking(Dispatchers.IO){
+            networkResponse = accountsService?.deleteAccountById(accountId)
+        }
+        return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
+            runBlocking(Dispatchers.IO) {
+                accountDao.deleteAccountById(accountId)
+            }
+            true
+        } else {
+            if(shouldUseWorker){
+                DeleteAccountWorker.deleteWorker(accountId)
+            }
+            false
+        }
+    }
 
     suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
 

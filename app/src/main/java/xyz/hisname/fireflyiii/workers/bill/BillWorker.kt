@@ -15,7 +15,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
 
     private val channelIcon = R.drawable.ic_calendar_blank
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
         val minAmount = inputData.getString("minAmount") ?: ""
         val maxAmount = inputData.getString("maxAmount") ?: ""

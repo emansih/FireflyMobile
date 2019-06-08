@@ -8,6 +8,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAttributes
+import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.workers.BaseWorker
 
@@ -18,32 +19,23 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
     private val transactionDatabase by lazy { AppDatabase.getInstance(context).transactionDataDao() }
 
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val transactionId = inputData.getLong("transactionId", 0)
         var transactionAttributes: TransactionAttributes? = null
-
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = withContext(Dispatchers.IO) {
-            transactionDatabase.getTransactionById(transactionId)
+        var isDeleted = false
+        val repository = TransactionRepository(transactionDatabase, genericService?.create(TransactionService::class.java))
+        runBlocking(Dispatchers.IO) {
+            transactionAttributes = repository.getTransactionById(transactionId)[0].transactionAttributes
+            isDeleted = repository.deleteTransactionById(transactionId)
         }
-            transactionAttributes = result[0].transactionAttributes
-        }
-        val service = genericService?.create(TransactionService::class.java)?.deleteTransactionById(transactionId)
-        val responseCode = service?.execute()?.code()
-        if(responseCode == 204 or 200){
-            GlobalScope.launch {
-                withContext(Dispatchers.IO){
-                    transactionDatabase.deleteTransactionById(transactionId)
-                }
-            }
+        if (isDeleted) {
             context.displayNotification(transactionAttributes?.description + " successfully deleted", channelName,
                     Constants.TRANSACTION_CHANNEL, channelIcon)
-            Result.success()
         } else {
+            Result.failure()
             context.displayNotification("There was issue deleting ${transactionAttributes?.description}",
                     "Failed to delete transaction",
-                Constants.TRANSACTION_CHANNEL, channelIcon)
-            Result.failure()
+                    Constants.TRANSACTION_CHANNEL, channelIcon)
         }
         return Result.success()
     }

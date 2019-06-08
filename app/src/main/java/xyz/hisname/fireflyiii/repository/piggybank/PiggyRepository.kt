@@ -7,6 +7,7 @@ import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
+import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
 
 @Suppress("RedundantSuspendModifier")
 class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyService: PiggybankService?) {
@@ -15,7 +16,23 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
 
     suspend fun retrievePiggyById(piggyId: Long) = piggyDao.getPiggyById(piggyId)
 
-    suspend fun deletePiggyById(piggyId: Long) = piggyDao.deletePiggyById(piggyId)
+    suspend fun deletePiggyById(piggyId: Long, shouldUseWorker: Boolean = false): Boolean {
+        var networkResponse: Response<PiggyModel>? = null
+        runBlocking(Dispatchers.IO){
+            networkResponse = piggyService?.deletePiggyBankById(piggyId)
+        }
+        return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
+            runBlocking(Dispatchers.IO) {
+                piggyDao.deletePiggyById(piggyId)
+            }
+            true
+        } else {
+            if(shouldUseWorker){
+                DeletePiggyWorker.initWorker(piggyId)
+            }
+            false
+        }
+    }
 
     suspend fun allPiggyBanks(): MutableList<PiggyData>{
         var piggyData: MutableList<PiggyData> = arrayListOf()
