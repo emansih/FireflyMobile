@@ -151,6 +151,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         var defaultCurrencyList: MutableList<CurrencyData> = arrayListOf()
         val data: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         currencyService?.getPaginatedCurrency(1)?.enqueue(retrofitCallback({ response ->
+            val responseError = response.errorBody()
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
@@ -191,11 +192,14 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                 isLoading.value = false
             } else {
                 isLoading.value = false
-                val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
+                    if(gson.message != null){
+                        apiResponse.postValue(gson.message)
+                    } else {
+                        apiResponse.postValue(errorBody)
+                    }
                 }
                 viewModelScope.launch(Dispatchers.IO){
                     defaultCurrencyList = if(deleteDefaultCurrency){

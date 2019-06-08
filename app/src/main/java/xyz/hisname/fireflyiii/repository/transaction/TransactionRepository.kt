@@ -26,7 +26,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
 
     suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<TransactionData>{
-        loadRemoteData(startDate, endDate, "all")
+        loadRemoteData(startDate, endDate, source)
         return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
             transactionDao.getTransactionList(source)
         } else {

@@ -38,6 +38,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         var billData: MutableList<BillData> = arrayListOf()
         val data: MutableLiveData<MutableList<BillData>> = MutableLiveData()
         billsService?.getPaginatedBills(1)?.enqueue(retrofitCallback({ response ->
+            val responseError = response.errorBody()
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if(responseBody != null){
@@ -64,11 +65,14 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     }
                 }
             } else {
-                val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
+                    if(gson.message != null){
+                        apiResponse.postValue(gson.message)
+                    } else {
+                        apiResponse.postValue(errorBody)
+                    }
                 }
                 viewModelScope.launch(Dispatchers.IO) {
                     billData = repository.allBills()

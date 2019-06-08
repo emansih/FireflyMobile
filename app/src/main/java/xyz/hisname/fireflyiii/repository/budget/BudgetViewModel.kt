@@ -40,6 +40,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
         val data: MutableLiveData<MutableList<BudgetListData>> = MutableLiveData()
         budgetService?.getPaginatedSpentBudget(1)?.enqueue(retrofitCallback({ response ->
+            val responseError = response.errorBody()
             val responseBody = response.body()
             if(responseBody != null) {
                 val networkData = responseBody.data
@@ -64,11 +65,14 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     data.postValue(budgetListData.toMutableList())
                 }
             } else {
-                val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
+                    if(gson.message != null){
+                        apiResponse.postValue(gson.message)
+                    } else {
+                        apiResponse.postValue(errorBody)
+                    }
                 }
                 viewModelScope.launch(Dispatchers.IO) {
                     budgetListData = repository.allBudgetList()
@@ -109,6 +113,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         val availableBudget: MutableList<BudgetData> = arrayListOf()
         var currencyMonthBud: BigDecimal? = 0.toBigDecimal()
         budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
+            val responseError = response.errorBody()
             if (response.isSuccessful) {
                 val networkData = response.body()
                 if (networkData != null) {
@@ -147,11 +152,14 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     }
                 }
             } else {
-                val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
+                    if(gson.message != null){
+                        apiResponse.postValue(gson.message)
+                    } else {
+                        apiResponse.postValue(errorBody)
+                    }
                 }
                 viewModelScope.launch(Dispatchers.IO){
                     currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
@@ -188,6 +196,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
         budgetService?.getPaginatedSpentBudget(1, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ response ->
+            val responseError = response.errorBody()
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
@@ -229,11 +238,14 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     }
                 }
             } else {
-                val responseError = response.errorBody()
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    apiResponse.postValue(gson.message)
+                    if(gson.message != null){
+                        apiResponse.postValue(gson.message)
+                    } else {
+                        apiResponse.postValue(errorBody)
+                    }
                 }
                 viewModelScope.launch(Dispatchers.IO) {
                     budgetListData = repository.allBudgetList()
