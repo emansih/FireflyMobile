@@ -18,6 +18,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
@@ -265,7 +266,7 @@ class DashboardFragment: BaseFragment() {
                 iconsOffset = MPPointF(0f, 40f)
                 colors = dataColor
                 valueTextSize = 15f
-                valueFormatter = MpAndroidPercentFormatter()
+                valueFormatter = PercentFormatter()
             }
             budgetAmount.text = currencyData?.symbol + budgeted
             spentAmount.text = currencyData?.symbol + budgetSpent

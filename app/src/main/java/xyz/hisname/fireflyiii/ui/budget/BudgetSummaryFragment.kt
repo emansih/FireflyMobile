@@ -14,6 +14,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
@@ -26,7 +27,6 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionByBudgetDialogFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
-import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.setData
@@ -86,7 +86,7 @@ class BudgetSummaryFragment: BaseFragment() {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueBudget, transactionAmount))
                         }
                         val pieDataSet = PieDataSet(pieEntryArray, "")
-                        pieDataSet.valueFormatter = MpAndroidPercentFormatter()
+                        pieDataSet.valueFormatter = PercentFormatter()
                         pieDataSet.colors = coloring
                         pieDataSet.valueTextSize = 15f
                         budgetSummaryPieChart.data = PieData(pieDataSet)

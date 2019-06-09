@@ -16,6 +16,7 @@ import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
@@ -28,7 +29,6 @@ import xyz.hisname.fireflyiii.ui.transaction.TransactionRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
-import xyz.hisname.fireflyiii.util.MpAndroidPercentFormatter
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -158,7 +158,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                         pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueMeow, transactionAmount))
                     }
                     pieDataSet = PieDataSet(pieEntryArray, "")
-                    pieDataSet.valueFormatter = MpAndroidPercentFormatter()
+                    pieDataSet.valueFormatter = PercentFormatter()
                     pieDataSet.colors = coloring
                     pieDataSet.valueTextSize = 15f
                     categoryPieChart.data = PieData(pieDataSet)
@@ -194,7 +194,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                             pieEntryBudgetArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueBudget, transactionAmount))
                         }
                         pieDataSetBudget = PieDataSet(pieEntryBudgetArray, "")
-                        pieDataSetBudget.valueFormatter = MpAndroidPercentFormatter()
+                        pieDataSetBudget.valueFormatter = PercentFormatter()
                         pieDataSetBudget.colors = coloring
                         pieDataSetBudget.valueTextSize = 15f
                         budgetPieChart.data = PieData(pieDataSetBudget)
@@ -238,7 +238,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 incomePieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), categoryName, transactionAmount))
             }
             incomePieDataSet = PieDataSet(incomePieEntryArray, "")
-            incomePieDataSet.valueFormatter = MpAndroidPercentFormatter()
+            incomePieDataSet.valueFormatter = PercentFormatter()
             incomePieDataSet.colors = coloring
             incomePieDataSet.valueTextSize = 15f
             incomePieChart.setData {
