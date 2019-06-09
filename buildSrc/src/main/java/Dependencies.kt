@@ -1,9 +1,5 @@
 object Dependencies{
 
-    /* Note: !!!DO NOT UPDATE any AndroidX libs!!! This includes Google's Material Design lib.
-    Only update to non rc / beta / alpha versions.
-    Currently AndroidX does not play well when enabling night mode and changing locale
-     */
     const val minSdk = 19
     const val targetSdk = 28
     const val compileSdk = 28

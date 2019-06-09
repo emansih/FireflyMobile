@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.base
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -12,6 +13,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.languagepack.LanguageChanger
+import java.util.*
 
 @SuppressLint("Registered")
 open class BaseActivity: AppCompatActivity() {
@@ -60,6 +62,23 @@ open class BaseActivity: AppCompatActivity() {
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LanguageChanger.init(newBase,
                 sharedPref(newBase).languagePref))
+    }
+
+    // 9 June 2019
+    // FIXME: Bug in changing of language. Therefore we need these hacks here
+    // Simplified and Traditional Chinese is broken if user uses _light mode_
+    override fun applyOverrideConfiguration(overrideConfiguration: Configuration) {
+        super.applyOverrideConfiguration(overrideConfiguration)
+        onConfigurationChanged(overrideConfiguration)
+    }
+
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val res = this.resources
+        val config = Configuration(res.configuration)
+        config.locale = Locale(sharedPref(this).languagePref)
+        res.updateConfiguration(config, res.displayMetrics)
     }
 
     protected fun sharedPref(context: Context): AppPref{

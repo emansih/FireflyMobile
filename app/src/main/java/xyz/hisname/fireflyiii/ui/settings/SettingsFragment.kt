@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
@@ -39,7 +40,7 @@ class SettingsFragment: BaseSettings() {
         languagePref.setOnPreferenceChangeListener { _, newValue ->
             AppPref(sharedPref).languagePref = newValue.toString()
             LanguageChanger.init(requireContext(), AppPref(sharedPref).languagePref)
-            requireActivity().recreate()
+            ActivityCompat.recreate(requireActivity())
             true
         }
         languagePref.icon = IconicsDrawable(requireContext())
