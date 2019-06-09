@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
@@ -27,11 +26,11 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun deleteAccountById(accountId: Long, shouldUseWorker: Boolean = false): Boolean {
         var networkResponse: Response<AccountsModel>? = null
-        runBlocking(Dispatchers.IO){
+        withContext(Dispatchers.IO){
             networkResponse = accountsService?.deleteAccountById(accountId)
         }
         return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
-            runBlocking(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 accountDao.deleteAccountById(accountId)
             }
             true
@@ -52,19 +51,21 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)
 
-    private fun loadRemoteData(accountType: String){
+    private suspend fun loadRemoteData(accountType: String){
         var networkCall: Response<AccountsModel>? = null
         val accountData: MutableList<AccountData> = arrayListOf()
         try {
-            runBlocking(Dispatchers.IO) {
-                networkCall = accountsService?.getPaginatedAccountType(accountType, 1)
+            withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
+                    networkCall = accountsService?.getPaginatedAccountType(accountType, 1)
+                }
                 accountData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
-                    runBlocking(Dispatchers.IO) {
+                    withContext(Dispatchers.IO) {
                         for (items in 2..pagination.total_pages) {
                             accountData.addAll(
                                     accountsService?.getPaginatedAccountType(accountType, items)?.body()?.data?.toMutableList() ?: arrayListOf()
@@ -72,10 +73,10 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                         }
                     }
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     deleteAccountByType(accountType)
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     accountData.forEachIndexed { _, data ->
                         accountDao.insert(data)
                     }

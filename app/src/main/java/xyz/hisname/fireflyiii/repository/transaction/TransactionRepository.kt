@@ -2,7 +2,7 @@ package xyz.hisname.fireflyiii.repository.transaction
 
 import androidx.work.Data
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.api.TransactionService
@@ -11,7 +11,6 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
-import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
@@ -135,13 +134,15 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         var networkCall: Response<TransactionModel>? = null
         val transactionData: MutableList<TransactionData> = arrayListOf()
         try {
-            runBlocking(Dispatchers.IO) {
-                networkCall = transactionService?.getTransactionById(transactionId)
+            withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
+                    networkCall = transactionService?.getTransactionById(transactionId)
+                }
                 transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     transactionData.forEachIndexed { _, data ->
                         transactionDao.insert(data)
                     }
@@ -153,11 +154,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     suspend fun deleteTransactionById(transactionId: Long, shouldUseWorker: Boolean = false): Boolean {
         var networkResponse: Response<TransactionSuccessModel>? = null
-        runBlocking(Dispatchers.IO){
+        withContext(Dispatchers.IO){
             networkResponse = transactionService?.deleteTransactionById(transactionId)
         }
         return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
-            runBlocking(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 transactionDao.deleteTransactionById(transactionId)
             }
             true
@@ -191,20 +192,22 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
-    private fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
+    private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
         var networkCall: Response<TransactionModel>? = null
         val transactionData: MutableList<TransactionData> = arrayListOf()
         try {
-            runBlocking(Dispatchers.IO) {
-                networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
-                        convertString(sourceName), 1)
+            withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
+                    networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+                            convertString(sourceName), 1)
+                }
                 transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
-                    runBlocking(Dispatchers.IO) {
+                    withContext(Dispatchers.IO) {
                         for (items in 2..pagination.total_pages) {
                             transactionData.addAll(
                                     transactionService?.getPaginatedTransactions(startDate, endDate,
@@ -213,10 +216,10 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                         }
                     }
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     deleteTransactionsByDate(startDate, endDate, sourceName)
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     transactionData.forEachIndexed { _, data ->
                         transactionDao.insert(data)
                     }

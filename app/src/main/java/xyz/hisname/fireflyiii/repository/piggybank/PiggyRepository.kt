@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.piggybank
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
@@ -18,7 +19,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
 
     suspend fun deletePiggyById(piggyId: Long, shouldUseWorker: Boolean = false): Boolean {
         var networkResponse: Response<PiggyModel>? = null
-        runBlocking(Dispatchers.IO){
+        withContext(Dispatchers.IO){
             networkResponse = piggyService?.deletePiggyBankById(piggyId)
         }
         return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
@@ -35,37 +36,35 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
     }
 
     suspend fun allPiggyBanks(): MutableList<PiggyData>{
-        var piggyData: MutableList<PiggyData> = arrayListOf()
+        val piggyData: MutableList<PiggyData> = arrayListOf()
         var networkCall: Response<PiggyModel>? = null
         try {
-            runBlocking(Dispatchers.IO) {
-                networkCall = piggyService?.getPaginatedPiggyBank(1)
+            withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO){
+                    networkCall = piggyService?.getPaginatedPiggyBank(1)
+                }
+                piggyData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
-            piggyData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
-                    runBlocking(Dispatchers.IO) {
+                    withContext(Dispatchers.IO) {
                         for (items in 2..pagination.total_pages) {
                             piggyData.addAll(piggyService?.getPaginatedPiggyBank(items)
                                     ?.body()?.data?.toMutableList() ?: arrayListOf())
                         }
                     }
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     piggyDao.deleteAllPiggyBank()
                 }
                 piggyData.forEachIndexed { _, piggyBankData ->
-                    piggyDao.insert(piggyBankData)
+                    insertPiggy(piggyBankData)
                 }
-            } else {
-                piggyData = piggyDao.getAllPiggy()
             }
-        } catch (exception: Exception){
-            piggyData = piggyDao.getAllPiggy()
-        }
-        return piggyData
+        } catch (exception: Exception) { }
+        return piggyDao.getAllPiggy()
     }
 
     suspend fun searchPiggyByName(piggyName: String) = piggyDao.searchPiggyName(piggyName)

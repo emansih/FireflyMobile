@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.repository.category
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.remote.api.CategoryService
@@ -26,19 +26,21 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
     suspend fun searchCategoryByName(categoryName: String) = categoryDao.searchCategory(categoryName)
 
 
-    private fun loadRemoteData(){
+    private suspend fun loadRemoteData(){
         var networkCall: Response<CategoryModel>? = null
         val categoryData: MutableList<CategoryData> = arrayListOf()
         try {
-            runBlocking(Dispatchers.IO) {
-                networkCall = categoryService?.getPaginatedCategory(1)
+            withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
+                    networkCall = categoryService?.getPaginatedCategory(1)
+                }
                 categoryData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
-                    runBlocking(Dispatchers.IO) {
+                    withContext(Dispatchers.IO) {
                         for (items in 2..pagination.total_pages) {
                             categoryData.addAll(
                                     categoryService?.getPaginatedCategory(items)
@@ -47,10 +49,10 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
                         }
                     }
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     categoryDao.deleteAllCategory()
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     categoryData.forEachIndexed { _, data ->
                         insertCategory(data)
                     }

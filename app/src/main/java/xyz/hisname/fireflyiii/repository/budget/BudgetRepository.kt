@@ -5,11 +5,8 @@ import xyz.hisname.fireflyiii.data.local.dao.BudgetDataDao
 import xyz.hisname.fireflyiii.data.local.dao.BudgetListDataDao
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
-import java.math.BigDecimal
 
 class BudgetRepository(private val budget: BudgetDataDao, private val budgetList: BudgetListDataDao) {
-
-    val allBudget = budget.getAllBudget()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

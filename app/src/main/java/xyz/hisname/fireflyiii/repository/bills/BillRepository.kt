@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.repository.bills
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.remote.api.BillsService
@@ -17,15 +17,17 @@ class BillRepository(private val billDao: BillDataDao,
         var networkCall: Response<BillsModel>? = null
         val billData: MutableList<BillData> = arrayListOf()
         try {
-            runBlocking(Dispatchers.IO) {
-                networkCall = billService?.getPaginatedBills(1)
+            withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
+                    networkCall = billService?.getPaginatedBills(1)
+                }
                 billData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
-                    runBlocking(Dispatchers.IO) {
+                    withContext(Dispatchers.IO) {
                         for (items in 2..pagination.total_pages) {
                             billData.addAll(
                                     billService?.getPaginatedBills(items)
@@ -34,10 +36,10 @@ class BillRepository(private val billDao: BillDataDao,
                         }
                     }
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     billDao.deleteAllBills()
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     billData.forEachIndexed { _, data ->
                         insertBill(data)
                     }
@@ -54,16 +56,18 @@ class BillRepository(private val billDao: BillDataDao,
         var networkCall: Response<BillsModel>? = null
         val billData: MutableList<BillData> = arrayListOf()
         try {
-            runBlocking(Dispatchers.IO) {
-                networkCall = billService?.getBillById(billId)
+            withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO){
+                    networkCall = billService?.getBillById(billId)
+                }
                 billData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     billDao.deleteBillById(billId)
                 }
-                runBlocking(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     billData.forEachIndexed { _, data ->
                         insertBill(data)
                     }
@@ -76,11 +80,11 @@ class BillRepository(private val billDao: BillDataDao,
 
     suspend fun deleteBillById(billId: Long, shouldUserWorker: Boolean = false): Boolean{
         var networkStatus: Response<BillsModel>? = null
-        runBlocking {
+        withContext(Dispatchers.IO) {
             networkStatus = billService?.deleteBillById(billId)
         }
         return if (networkStatus?.code() == 204 || networkStatus?.code() == 200){
-            runBlocking(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 billDao.deleteBillById(billId)
             }
             true
