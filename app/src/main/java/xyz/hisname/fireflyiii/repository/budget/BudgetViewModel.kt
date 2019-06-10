@@ -68,8 +68,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(gson.message != null){
-                        apiResponse.postValue(gson.message)
+                    if(gson == null){
+                        apiResponse.postValue("Error Loading Data")
                     } else {
                         apiResponse.postValue(errorBody)
                     }
@@ -155,8 +155,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(gson.message != null){
-                        apiResponse.postValue(gson.message)
+                    if(gson == null){
+                        apiResponse.postValue("Error Loading Data")
                     } else {
                         apiResponse.postValue(errorBody)
                     }
@@ -241,8 +241,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(gson.message != null){
-                        apiResponse.postValue(gson.message)
+                    if(gson == null){
+                        apiResponse.postValue("Error Loading Data")
                     } else {
                         apiResponse.postValue(errorBody)
                     }
