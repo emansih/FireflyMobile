@@ -32,20 +32,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         repository = AccountRepository(accountDao, accountsService)
     }
 
-
-    fun getAllAccounts(): LiveData<MutableList<AccountData>> {
-        isLoading.value = true
-        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
-        var data: MutableList<AccountData> = arrayListOf()
-        viewModelScope.launch(Dispatchers.IO){
-            data = repository.getAccountByType("all")
-        }.invokeOnCompletion {
-            accountData.postValue(data)
-            isLoading.postValue(false)
-        }
-        return accountData
-    }
-
     fun getAllAccountWithNetworthAndCurrency(currencyCode: String): LiveData<Double>{
         isLoading.value = true
         val accountValue: MutableLiveData<Double> = MutableLiveData()
