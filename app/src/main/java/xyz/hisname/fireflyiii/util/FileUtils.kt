@@ -27,7 +27,7 @@ class FileUtils {
 
     companion object {
 
-        fun getPathFromUri(context: Context, uri: Uri?): String? {
+        fun getPathFromUri(context: Context, uri: Uri): String? {
             val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
 
             // DocumentProvider
@@ -64,7 +64,7 @@ class FileUtils {
                     val split = docId.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     val type = split[0]
 
-                    var contentUri: Uri? = null
+                    lateinit var contentUri: Uri
                     when (type) {
                         "image" -> contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                         "video" -> contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
@@ -77,13 +77,13 @@ class FileUtils {
                     return getDataColumn(context, contentUri, selection, selectionArgs)
                 }// MediaProvider
                 // DownloadsProvider
-            } else if ("content".equals(uri?.scheme, ignoreCase = true)) {
+            } else if ("content".equals(uri.scheme, ignoreCase = true)) {
 
                 // Return the remote address
-                return if (uri.isGooglePhotosUri()) uri?.lastPathSegment else getDataColumn(context, uri, null, null)
+                return if (uri.isGooglePhotosUri()) uri.lastPathSegment else getDataColumn(context, uri, null, null)
 
-            } else if ("file".equals(uri?.scheme, ignoreCase = true)) {
-                return uri?.path
+            } else if ("file".equals(uri.scheme, ignoreCase = true)) {
+                return uri.path
             }// File
             // MediaStore (and general)
 
@@ -110,9 +110,8 @@ class FileUtils {
             return result
         }
 
-        fun getMimeType(context: Context, uri: Uri): String{
-            val mimeType: String?
-            mimeType = if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+        fun getMimeType(context: Context, uri: Uri): String?{
+            return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
                 context.contentResolver.getType(uri)
             } else {
                 val fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
@@ -120,7 +119,6 @@ class FileUtils {
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                         fileExtension.toLowerCase())
             }
-            return mimeType
         }
 
         fun writeResponseToDisk(body: ResponseBody, fileName: String): Boolean {
@@ -180,7 +178,7 @@ class FileUtils {
             return "com.android.providers.downloads.documents" == this?.authority
         }
 
-        private fun getDataColumn(context: Context, uri: Uri?, selection: String?,
+        private fun getDataColumn(context: Context, uri: Uri, selection: String?,
                                   selectionArgs: Array<String>?): String? {
             var cursor: Cursor? = null
             val column = "_data"

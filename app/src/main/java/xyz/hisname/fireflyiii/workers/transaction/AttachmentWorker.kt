@@ -22,7 +22,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
     private val channelIcon = R.drawable.ic_refresh
 
     companion object {
-        fun initWorker(fileUri: Uri, transactionId: Long){
+        fun initWorker(fileUri: Uri?, transactionId: Long){
             val dataBuilder = Data.Builder()
             val workBuilder = OneTimeWorkRequest
                     .Builder(AttachmentWorker::class.java)
@@ -43,7 +43,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         val service = genericService?.create(AttachmentService::class.java)
         val filePath = FileUtils.getPathFromUri(context, fileUri)
         val fileObject = File(filePath)
-        val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context, fileUri)), fileObject)
+        val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context, fileUri) ?: ""), fileObject)
         val fileName = FileUtils.getFileName(context, fileUri) ?: ""
         service?.storeAttachment(fileName, "Transaction", transactionId, fileName,
                 "File uploaded by " + BuildConfig.APPLICATION_ID)?.enqueue(retrofitCallback({ response ->

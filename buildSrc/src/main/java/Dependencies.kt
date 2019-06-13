@@ -1,8 +1,8 @@
 object Dependencies{
 
     const val minSdk = 19
-    const val targetSdk = 28
-    const val compileSdk = 28
+    const val targetSdk = 29
+    const val compileSdk = 29
     const val kotlinVersion = "1.3.31"
     private const val retrofitVersion = "2.6.0"
     private const val lifecycleVersion = "2.0.0"
