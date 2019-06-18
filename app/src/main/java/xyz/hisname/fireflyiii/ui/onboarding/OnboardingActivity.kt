@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.ui.onboarding
 import android.accounts.AccountManager
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit

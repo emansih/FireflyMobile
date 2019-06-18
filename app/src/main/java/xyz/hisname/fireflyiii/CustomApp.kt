@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii
 
 import android.content.Context
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import androidx.multidex.MultiDexApplication
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.acra.ACRA

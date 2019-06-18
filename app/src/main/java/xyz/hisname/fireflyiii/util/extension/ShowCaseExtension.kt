@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.util.extension
 
 import android.app.Activity
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.annotation.StringRes

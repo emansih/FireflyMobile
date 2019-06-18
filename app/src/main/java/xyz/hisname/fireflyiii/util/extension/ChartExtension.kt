@@ -1,6 +1,6 @@
 package xyz.hisname.fireflyiii.util.extension
 
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 import xyz.hisname.fireflyiii.R

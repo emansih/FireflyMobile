@@ -2,9 +2,9 @@ package xyz.hisname.fireflyiii.repository
 
 import android.accounts.AccountManager
 import android.app.Application
-import android.preference.PreferenceManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import retrofit2.Retrofit

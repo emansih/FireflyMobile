@@ -2,7 +2,7 @@ package xyz.hisname.fireflyiii.workers
 
 import android.accounts.AccountManager
 import android.content.Context
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager

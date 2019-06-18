@@ -4,8 +4,8 @@ import android.accounts.AccountManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.preference.PreferenceManager
 import androidx.work.*
+import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.workers.piggybank.PiggyBankWorker

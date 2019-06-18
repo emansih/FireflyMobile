@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import androidx.annotation.RequiresApi
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 

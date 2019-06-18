@@ -2,7 +2,7 @@ package xyz.hisname.fireflyiii.util
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import java.util.*
