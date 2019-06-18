@@ -229,12 +229,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun addTransaction(type: String, description: String,
-                       date: String, piggyBankName: String?, billName: String?, amount: String,
+                       date: String, piggyBankName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
                        category: String?, tags: String?, budgetName: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        transactionService?.addTransaction(convertString(type),description,date,piggyBankName,billName,
+        transactionService?.addTransaction(convertString(type),description,date,piggyBankName,
                 amount,sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
@@ -243,7 +243,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
                 errorBodyMessage = when {
                     gson.errors.transactions_currency != null -> "Currency Code Required"
-                    gson.errors.bill_name != null -> "Invalid Bill Name"
                     gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
                     gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
                     gson.errors.transactions_source_name != null -> "Invalid Source Account"
@@ -270,12 +269,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun updateTransaction(transactionId: Long, type: String, description: String,
-                       date: String, billName: String?, amount: String,
+                       date: String, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
                        category: String?, tags: String?, budgetName: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        transactionService?.updateTransaction(transactionId, convertString(type),description,date,billName,
+        transactionService?.updateTransaction(transactionId, convertString(type),description,date,
                 amount,sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
@@ -284,7 +283,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
                 errorBodyMessage = when {
                     gson.errors.transactions_currency != null -> "Currency Code Required"
-                    gson.errors.bill_name != null -> "Invalid Bill Name"
                     gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
                     gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
                     gson.errors.transactions_source_name != null -> "Invalid Source Account"

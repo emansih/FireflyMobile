@@ -20,9 +20,6 @@ abstract class BaseDialog: DialogFragment() {
 
     private val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
     private val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
-    protected val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    protected val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
-    protected val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

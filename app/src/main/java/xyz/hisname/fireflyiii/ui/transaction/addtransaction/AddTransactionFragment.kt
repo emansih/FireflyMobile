@@ -55,8 +55,6 @@ class AddTransactionFragment: BaseFragment() {
     private var sourceAccounts = ArrayList<String>()
     private var destinationAccounts = ArrayList<String>()
     private var piggyBankList = ArrayList<String>()
-    private val bill = ArrayList<String>()
-    private var billName: String? = ""
     private var piggyBank: String? = ""
     private var categoryName: String? = ""
     private var transactionTags: String? = ""
@@ -97,11 +95,6 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionFab.setOnClickListener {
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             hideKeyboard()
-            billName = if(bill_edittext.isBlank()){
-                null
-            } else {
-                bill_edittext.getString()
-            }
             piggyBank = if(piggy_edittext.isBlank()){
                 null
             } else {
@@ -153,7 +146,7 @@ class AddTransactionFragment: BaseFragment() {
             transaction_date_edittext.getString()
         }
         transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
-                transactionDateTime, billName, transaction_amount_edittext.getString(),
+                transactionDateTime, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
                 transactionTags, budgetName).observe(this) { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
@@ -186,10 +179,6 @@ class AddTransactionFragment: BaseFragment() {
                 .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24),null, null, null)
         destination_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 getCompatDrawable(R.drawable.ic_bank_transfer),null, null, null)
-        bill_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(getCompatColor(R.color.md_green_400))
-                        .sizeDp(24),null, null, null)
         category_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
                         .color(getCompatColor(R.color.md_deep_purple_400))
@@ -413,17 +402,6 @@ class AddTransactionFragment: BaseFragment() {
                             val destinationPosition = spinnerAdapter.getPosition(destinationName)
                             destination_spinner.setSelection(destinationPosition)
                         }
-                billViewModel.getAllBills().observe(this) { billListing ->
-                    if(billListing.isNotEmpty()){
-                        bill_layout.isVisible = true
-                        billListing.forEachIndexed { _, billData ->
-                            bill.add(billData.billAttributes?.name ?: "")
-                        }
-                        val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, bill)
-                        bill_edittext.threshold = 1
-                        bill_edittext.setAdapter(adapter)
-                    }
-                }
             }
         }
     }
@@ -435,8 +413,8 @@ class AddTransactionFragment: BaseFragment() {
             transaction_date_edittext.getString()
         }
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
-                transactionDateTime, piggyBank, billName,
-                transaction_amount_edittext.getString(), sourceAccount, destinationAccount,
+                transactionDateTime, piggyBank, transaction_amount_edittext.getString(),
+                sourceAccount, destinationAccount,
                 currency, categoryName, transactionTags, budgetName).observe(this) { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
@@ -491,7 +469,6 @@ class AddTransactionFragment: BaseFragment() {
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "sourceName" to sourceAccount,
-                                "billName" to billName,
                                 "category" to categoryName,
                                 "tags" to transactionTags
                         )
@@ -518,7 +495,6 @@ class AddTransactionFragment: BaseFragment() {
             }
             currency = transactionAttributes?.currency_code.toString()
             transaction_date_edittext.setText(transactionAttributes?.date.toString())
-            bill_edittext.setText(transactionAttributes?.bill_name)
             piggy_edittext.setText(transactionAttributes?.piggy_bank_name)
             category_edittext.setText(transactionAttributes?.category_name)
             if(transactionAttributes?.tags != null){

@@ -11,14 +11,17 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.dialog_search.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
 import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class PiggyDialog: BaseDialog() {
 
     private var dataAdapter = arrayListOf<PiggyData>()
     private var initialAdapter = arrayListOf<PiggyData>()
     private lateinit var piggyRecyclerAdapter: PiggyRecyclerAdapter
+    private val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

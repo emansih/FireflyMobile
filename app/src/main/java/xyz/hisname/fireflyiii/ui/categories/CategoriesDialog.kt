@@ -11,15 +11,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.dialog_search.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
 import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class CategoriesDialog: BaseDialog(){
 
     private var dataAdapter = arrayListOf<CategoryData>()
     private var initialAdapter = arrayListOf<CategoryData>()
     private lateinit var categoriesRecyclerAdapter: CategoriesRecyclerAdapter
+    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

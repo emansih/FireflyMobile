@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.dialog_search.*
@@ -20,8 +21,8 @@ class BudgetSearchDialog: BaseDialog() {
 
     private var dataAdapter = arrayListOf<BudgetListData>()
     private var initialAdapter = arrayListOf<BudgetListData>()
-    private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     private lateinit var budgetRecyclerAdapter: BudgetRecyclerAdapter
+    private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -32,6 +33,8 @@ class BudgetSearchDialog: BaseDialog() {
     private fun displayView(){
         recycler_view.apply {
             layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(DividerItemDecoration(requireContext(),
+                    LinearLayoutManager(requireContext()).orientation))
             adapter?.notifyDataSetChanged()
         }
         swipeContainer.isRefreshing = true

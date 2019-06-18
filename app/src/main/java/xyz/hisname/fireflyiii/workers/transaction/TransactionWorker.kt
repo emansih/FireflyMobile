@@ -37,7 +37,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val paymentDate = inputData.getString("paymentDate")
         val invoiceDate = inputData.getString("invoiceDate")
         genericService?.create(TransactionService::class.java)?.addTransaction(convertString(transactionType), transactionDescription, transactionDate, piggyBank,
-                billName, transactionAmount,sourceName, destinationName, transactionCurrency, category,
+                transactionAmount,sourceName, destinationName, transactionCurrency, category,
                 tags, budget, interestDate, bookDate, processDate, dueDate, paymentDate,
                 invoiceDate)?.enqueue(
                 retrofitCallback({ response ->
