@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
@@ -12,6 +14,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
+import xyz.hisname.fireflyiii.repository.models.category.CategoryFts
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
@@ -21,9 +24,9 @@ import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 
 @Database(entities = [PiggyData::class, BillData::class, AccountData::class, CurrencyData::class,
-    TransactionData::class, CategoryData::class, BudgetData::class, BudgetListData::class,
+    TransactionData::class, CategoryData::class, CategoryFts::class, BudgetData::class, BudgetListData::class,
     TagsData::class, AttachmentData::class],
-        version = 8,exportSchema = false)
+        version = 9,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
@@ -45,6 +48,12 @@ abstract class AppDatabase: RoomDatabase() {
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(context,
                         AppDatabase::class.java, Constants.DB_NAME)
+                        .addMigrations(object : Migration(8, 9){
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS `categoryFts` USING FTS4(`categoryId`, `name`, content=`category`)")
+                                database.execSQL("INSERT INTO categoryFts(categoryFts) VALUES ('rebuild')")
+                            }
+                        })
                         .fallbackToDestructiveMigration()
                         .build().also { INSTANCE = it }
             }

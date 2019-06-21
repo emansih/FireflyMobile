@@ -7,7 +7,7 @@ object Dependencies{
     private const val retrofitVersion = "2.6.0"
     private const val lifecycleVersion = "2.0.0"
     private const val lifecycleLivedataCoreVersion = "2.2.0-alpha01"
-    private const val roomVersion = "2.0.0"
+    private const val roomVersion = "2.1.0"
     private const val coroutineVersion = "1.2.1"
     private const val appCompatVersion = "1.1.0-beta01"
     private const val androidxFragmentVersion = "1.1.0-alpha04"

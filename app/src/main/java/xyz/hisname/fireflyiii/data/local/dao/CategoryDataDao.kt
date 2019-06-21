@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 
 
@@ -17,7 +18,8 @@ abstract class CategoryDataDao: BaseDao<CategoryData> {
     @Query("DELETE FROM category")
     abstract fun deleteAllCategory(): Int
 
-    @Query("SELECT * FROM category WHERE name LIKE :categoryName")
+    @Transaction
+    @Query("SELECT * FROM category JOIN categoryFts ON (category.categoryId = " +
+            "categoryFts.categoryId) WHERE categoryFts MATCH :categoryName")
     abstract fun searchCategory(categoryName: String): MutableList<CategoryData>
-
 }
