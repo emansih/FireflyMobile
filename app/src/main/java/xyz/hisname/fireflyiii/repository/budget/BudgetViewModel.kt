@@ -98,7 +98,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
         val data: MutableLiveData<MutableList<BudgetListData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            budgetListData = repository.searchBudgetByName("%$budgetName%")
+            budgetListData = repository.searchBudgetByName("$budgetName*")
         }.invokeOnCompletion {
             data.postValue(budgetListData)
         }

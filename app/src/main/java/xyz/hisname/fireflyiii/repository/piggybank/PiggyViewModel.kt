@@ -142,7 +142,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         var piggyData: MutableList<PiggyData> = arrayListOf()
         val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            piggyData = repository.searchPiggyByName("%$piggyBankName%")
+            piggyData = repository.searchPiggyByName("$piggyBankName*")
         }.invokeOnCompletion {
             data.postValue(piggyData)
         }

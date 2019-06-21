@@ -13,19 +13,21 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListFts
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryFts
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggyFts
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 
 
-@Database(entities = [PiggyData::class, BillData::class, AccountData::class, CurrencyData::class,
+@Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     TransactionData::class, CategoryData::class, CategoryFts::class, BudgetData::class, BudgetListData::class,
-    TagsData::class, AttachmentData::class],
+    BudgetListFts::class, TagsData::class, AttachmentData::class],
         version = 9,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
@@ -50,8 +52,15 @@ abstract class AppDatabase: RoomDatabase() {
                         AppDatabase::class.java, Constants.DB_NAME)
                         .addMigrations(object : Migration(8, 9){
                             override fun migrate(database: SupportSQLiteDatabase) {
+                                // Category
                                 database.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS `categoryFts` USING FTS4(`categoryId`, `name`, content=`category`)")
                                 database.execSQL("INSERT INTO categoryFts(categoryFts) VALUES ('rebuild')")
+                                // Budget
+                                database.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS `budgetListFts` USING FTS4(`budgetListId`, `name`, content=`budget_list`)")
+                                database.execSQL("INSERT INTO budgetListFts(budgetListFts) VALUES ('rebuild')")
+                                // Piggy Bank
+                                database.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS `piggyFts` USING FTS4(`piggyId`, `name`, content=`piggy`)")
+                                database.execSQL("INSERT INTO piggyFts(piggyFts) VALUES ('rebuild')")
                             }
                         })
                         .fallbackToDestructiveMigration()

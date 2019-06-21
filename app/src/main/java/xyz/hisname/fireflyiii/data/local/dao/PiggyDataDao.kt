@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 
 
@@ -20,7 +21,8 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
     @Query("DELETE FROM piggy")
     abstract fun deleteAllPiggyBank(): Int
 
-    @Query("SELECT * FROM piggy WHERE name LIKE :piggyName")
+    @Transaction
+    @Query("SELECT piggy.name FROM piggy JOIN piggyFts ON (piggy.piggyId = piggyFts.piggyId) WHERE piggyFts MATCH :piggyName")
     abstract fun searchPiggyName(piggyName: String): MutableList<PiggyData>
 
     @Query("SELECT * FROM piggy WHERE percentage != 100")
