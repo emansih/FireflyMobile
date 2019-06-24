@@ -25,7 +25,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -72,12 +72,12 @@ class SettingsAccountFragment: BaseSettings() {
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->
             preference.summary = newValue.toString()
             toastInfo("You should also change your access token", Toast.LENGTH_LONG)
-            RetrofitBuilder.destroyInstance()
+            FireflyClient.destroyInstance()
             true
         }
         accessTokenPref.setOnPreferenceChangeListener { preference, newValue  ->
             preference.summary = newValue.toString()
-            RetrofitBuilder.destroyInstance()
+            FireflyClient.destroyInstance()
             true
         }
         val refreshToken = findPreference<Preference>("refresh_token") as Preference
@@ -94,7 +94,7 @@ class SettingsAccountFragment: BaseSettings() {
         }
         val certBolean = findPreference<SwitchPreference>("enable_cert_pinning") as SwitchPreference
         certBolean.setOnPreferenceChangeListener { _, _ ->
-            RetrofitBuilder.destroyInstance()
+            FireflyClient.destroyInstance()
             true
         }
         val certValue = findPreference<Preference>("cert_value") as Preference
@@ -109,7 +109,7 @@ class SettingsAccountFragment: BaseSettings() {
                         .setPositiveButton("OK") { _, _ -> }
                         .show()
             }
-            RetrofitBuilder.destroyInstance()
+            FireflyClient.destroyInstance()
             true
         }
         val autoRefreshToken = findPreference<SwitchPreference>("auto_refresh_token") as SwitchPreference
@@ -151,7 +151,7 @@ class SettingsAccountFragment: BaseSettings() {
             }
             val loginActivity = Intent(requireActivity(), OnboardingActivity::class.java)
             startActivity(loginActivity)
-            RetrofitBuilder.destroyInstance()
+            FireflyClient.destroyInstance()
             requireActivity().finish()
             true
         }

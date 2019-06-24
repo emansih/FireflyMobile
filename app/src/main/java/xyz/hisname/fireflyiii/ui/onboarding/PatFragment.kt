@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.fragment_pat.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
@@ -57,7 +57,7 @@ class PatFragment: Fragment() {
                 }
             }  else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
-                RetrofitBuilder.destroyInstance()
+                FireflyClient.destroyInstance()
                 AuthenticatorManager(accountManager).destroyAccount()
                 fireflyUrl = firefly_url_edittext.getString()
                 AuthenticatorManager(accountManager).initializeAccount()

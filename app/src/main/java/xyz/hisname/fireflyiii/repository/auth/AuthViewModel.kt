@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
-import xyz.hisname.fireflyiii.data.remote.api.OAuthService
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
+import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.extension.isAscii
@@ -24,7 +24,7 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
             isAuthenticated.value = false
             authFailedReason.value = "Bearer Token contains invalid Characters!"
         } else {
-            val oAuthService = RetrofitBuilder.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
+            val oAuthService = FireflyClient.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
             oAuthService?.getAccessToken(code, accManager.clientId, accManager.secretKey, Constants.REDIRECT_URI,
                     "authorization_code")?.enqueue(retrofitCallback({ response ->
                 val authResponse = response.body()

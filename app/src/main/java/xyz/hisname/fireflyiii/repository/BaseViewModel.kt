@@ -10,7 +10,7 @@ import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 
 open class BaseViewModel(application: Application) : AndroidViewModel(application){
 
@@ -24,7 +24,7 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
         if(AppPref(sharedPref).enableCertPinning){
             cert = AppPref(sharedPref).certValue
         }
-        return RetrofitBuilder.getClient(AppPref(sharedPref).baseUrl,
+        return FireflyClient.getClient(AppPref(sharedPref).baseUrl,
                 accManager.accessToken, cert)
     }
 

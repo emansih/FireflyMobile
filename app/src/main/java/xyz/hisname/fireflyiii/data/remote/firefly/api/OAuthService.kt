@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.data.remote.api
+package xyz.hisname.fireflyiii.data.remote.firefly.api
 
 import retrofit2.Call
 import retrofit2.http.*

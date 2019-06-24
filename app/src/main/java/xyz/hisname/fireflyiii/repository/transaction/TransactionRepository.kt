@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
-import xyz.hisname.fireflyiii.data.remote.api.TransactionService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel

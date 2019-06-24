@@ -24,7 +24,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -84,7 +84,7 @@ class LoginFragment: Fragment() {
 
     private fun getAccessCode(){
         firefly_submit_button.setOnClickListener {
-            RetrofitBuilder.destroyInstance()
+            FireflyClient.destroyInstance()
             hideKeyboard()
             var fireflyUrl = firefly_url_edittext.getString()
             val fireflyId = firefly_id_edittext.getString()

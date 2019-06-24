@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
@@ -31,7 +31,7 @@ class OnboardingFragment: Fragment() {
         hideKeyboard()
         onboarding_text.text = "Hang on..."
         ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
-        RetrofitBuilder.destroyInstance()
+        FireflyClient.destroyInstance()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationUtils(requireContext()).setupChannels()

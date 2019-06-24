@@ -9,7 +9,7 @@ import okhttp3.RequestBody
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.remote.api.AttachmentService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.network.retrofitCallback

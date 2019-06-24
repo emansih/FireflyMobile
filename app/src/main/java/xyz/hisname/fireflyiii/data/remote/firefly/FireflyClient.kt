@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.data.remote
+package xyz.hisname.fireflyiii.data.remote.firefly
 
 import android.util.Base64
 import com.google.gson.*
@@ -13,7 +13,7 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-class RetrofitBuilder {
+class FireflyClient {
 
     companion object {
 
@@ -38,7 +38,7 @@ class RetrofitBuilder {
                         client.certificatePinner(certPinner)
                     } catch (exception: IllegalArgumentException){ }
                 }
-                synchronized(RetrofitBuilder::class.java){
+                synchronized(FireflyClient::class.java){
                     INSTANCE = Retrofit.Builder()
                             .baseUrl(generateUrl(baseUrl))
                             .client(client.build())
@@ -62,7 +62,7 @@ class RetrofitBuilder {
 
         fun getClient(baseUrl: String): Retrofit?{
             if(INSTANCE == null){
-                synchronized(RetrofitBuilder::class.java){
+                synchronized(FireflyClient::class.java){
                     INSTANCE = Retrofit.Builder()
                             .baseUrl(generateUrl(baseUrl))
                             .addConverterFactory(GsonConverterFactory.create())

@@ -4,8 +4,8 @@ import android.accounts.AccountManager
 import android.content.Context
 import androidx.work.*
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
-import xyz.hisname.fireflyiii.data.remote.api.OAuthService
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
+import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
 
 class RefreshTokenWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
@@ -21,7 +21,7 @@ class RefreshTokenWorker(private val context: Context, workerParameters: WorkerP
                     refreshToken = responseBody.refresh_token
                     tokenExpiry = responseBody.expires_in
                 }
-                RetrofitBuilder.destroyInstance()
+                FireflyClient.destroyInstance()
                 Result.success()
             } else {
                 Result.failure()

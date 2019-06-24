@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TagsDataDao
-import xyz.hisname.fireflyiii.data.remote.api.TagsService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.TagsService
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.models.tags.TagsModel
 

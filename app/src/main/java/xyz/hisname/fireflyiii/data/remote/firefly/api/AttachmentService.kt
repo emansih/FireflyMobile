@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.data.remote.api
+package xyz.hisname.fireflyiii.data.remote.firefly.api
 
 import okhttp3.RequestBody
 import okhttp3.ResponseBody

@@ -82,7 +82,6 @@ class HomeActivity: BaseActivity(){
             } else {
                 setup(savedInstanceState)
             }
-
         }
     }
 

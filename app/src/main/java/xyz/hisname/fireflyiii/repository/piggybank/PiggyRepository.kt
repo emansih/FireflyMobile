@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
-import xyz.hisname.fireflyiii.data.remote.api.PiggybankService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
 import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker

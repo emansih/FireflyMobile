@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.RetrofitBuilder
+import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
@@ -106,7 +106,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        RetrofitBuilder.destroyInstance()
+        FireflyClient.destroyInstance()
     }
 
     override fun onBackPressed() {

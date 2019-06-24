@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.repository.userinfo
 import android.app.Application
 import androidx.lifecycle.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.api.SystemInfoService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
