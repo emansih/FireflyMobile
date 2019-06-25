@@ -109,11 +109,9 @@ class MapsFragment: BaseFragment() {
             }
 
             override fun beforeTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {
-                location(charSequence.toString())
             }
 
             override fun onTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {
-                location(charSequence.toString())
             }
 
         })
