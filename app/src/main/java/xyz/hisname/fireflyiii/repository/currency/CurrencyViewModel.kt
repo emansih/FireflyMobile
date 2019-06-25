@@ -198,7 +198,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
                     if(gson == null){
                         apiResponse.postValue("Error Loading Data")
                     } else {
-                        apiResponse.postValue(errorBody)
+                        apiResponse.postValue(gson.message)
                     }
                 }
                 viewModelScope.launch(Dispatchers.IO){
