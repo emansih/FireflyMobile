@@ -55,6 +55,19 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return accountData
     }
 
+    fun getAccountNameByType(accountType: String): LiveData<MutableList<String>>{
+        val accountData: MutableLiveData<MutableList<String>> = MutableLiveData()
+        val data: MutableList<String> = arrayListOf()
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getAccountByType(accountType).forEachIndexed { _, accountInfo ->
+                data.add(accountInfo.accountAttributes?.name ?: "")
+            }
+        }.invokeOnCompletion {
+            accountData.postValue(data)
+        }
+        return accountData
+    }
+
     fun getAccountById(id: Long): LiveData<MutableList<AccountData>>{
         val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
         var data: MutableList<AccountData> = arrayListOf()

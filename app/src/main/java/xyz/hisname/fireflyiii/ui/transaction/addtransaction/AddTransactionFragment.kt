@@ -50,17 +50,14 @@ class AddTransactionFragment: BaseFragment() {
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionId by lazy { arguments?.getLong("transactionId") ?: 0 }
     private var currency = ""
-    private var accounts = ArrayList<String>()
     private var tags = ArrayList<String>()
-    private var sourceAccounts = ArrayList<String>()
-    private var destinationAccounts = ArrayList<String>()
     private var piggyBankList = ArrayList<String>()
     private var piggyBank: String? = ""
     private var categoryName: String? = ""
     private var transactionTags: String? = ""
     private var sourceAccount = ""
     private var destinationAccount = ""
-    private lateinit var spinnerAdapter: ArrayAdapter<Any>
+    private lateinit var spinnerAdapter: ArrayAdapter<String>
     private var sourceName: String? = ""
     private var destinationName: String? = ""
     private val calendar by lazy {  Calendar.getInstance() }
@@ -119,16 +116,16 @@ class AddTransactionFragment: BaseFragment() {
             }
             when {
                 Objects.equals("Withdrawal", transactionType) -> {
-                    sourceAccount = source_spinner.selectedItem.toString()
+                    sourceAccount = source_exposed_dropdown.getString()
                     destinationAccount = destination_edittext.getString()
                 }
                 Objects.equals("Transfer", transactionType) -> {
-                    sourceAccount = source_spinner.selectedItem.toString()
-                    destinationAccount = destination_spinner.selectedItem.toString()
+                    sourceAccount = source_exposed_dropdown.getString()
+                    destinationAccount = destination_exposed_dropdown.getString()
                 }
                 Objects.equals("Deposit", transactionType) -> {
                     sourceAccount = source_edittext.getString()
-                    destinationAccount = destination_spinner.selectedItem.toString()
+                    destinationAccount = destination_exposed_dropdown.getString()
                 }
             }
             if(transactionId != 0L){
@@ -327,81 +324,48 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun contextSwitch(){
         when {
-            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountByType("asset")
+            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountNameByType("asset")
                     .observe(this) { transferData ->
-                        transferData.forEachIndexed { _, accountData ->
-                            accounts.add(accountData.accountAttributes?.name!!)
-                        }
-                        val uniqueAccount = HashSet(accounts).toArray()
-                        spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
-                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        source_spinner.isVisible = true
-                        source_textview.isVisible = true
+                        source_exposed_menu.isVisible = true
                         source_layout.isGone = true
-                        source_spinner.adapter = spinnerAdapter
                         destination_layout.isGone = true
-                        destination_spinner.isVisible = true
-                        destination_textview.isVisible = true
-                        destination_spinner.adapter = spinnerAdapter
+                        destination_exposed_menu.isVisible = true
                         piggy_layout.isVisible = true
-                        val sourcePosition = spinnerAdapter.getPosition(sourceName)
-                        source_spinner.setSelection(sourcePosition)
+                        spinnerAdapter = ArrayAdapter(requireContext(),
+                                R.layout.cat_exposed_dropdown_popup_item, transferData)
                         val destinationPosition = spinnerAdapter.getPosition(destinationName)
-                        destination_spinner.setSelection(destinationPosition)
+                        destination_exposed_dropdown.setSelection(destinationPosition)
+                        source_exposed_dropdown.setAdapter(spinnerAdapter)
                     }
-            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountByType("revenue"), accountViewModel.getAccountByType("asset"))
-                    .observe(this ) {
-                        // Revenue account, autocomplete
-                        it.first.forEachIndexed { _, accountData ->
-                            sourceAccounts.add(accountData.accountAttributes?.name!!)
-                        }
-                        val uniqueSource = HashSet(sourceAccounts).toArray()
-                        // Asset account, spinner
-                        it.second.forEachIndexed { _, accountData ->
-                            destinationAccounts.add(accountData.accountAttributes?.name!!)
-                        }
-                        val uniqueDestination = HashSet(destinationAccounts).toArray()
-                        spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueDestination)
-                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        destination_spinner.adapter = spinnerAdapter
-                        destination_textview.isVisible = true
-                        destination_layout.isVisible = false
-                        val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueSource)
-                        source_edittext.threshold = 1
-                        source_edittext.setAdapter(autocompleteAdapter)
-                        source_spinner.isVisible = false
-                        source_textview.isVisible = false
-                        val destinationPosition = spinnerAdapter.getPosition(destinationName)
-                        destination_spinner.setSelection(destinationPosition)
-                    }
+            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
+                    accountViewModel.getAccountNameByType("asset")).observe(this ) {
+                // Asset account, spinner
+                spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.second)
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                destination_exposed_dropdown.setAdapter(spinnerAdapter)
+                destination_layout.isVisible = false
+                // Revenue account, autocomplete
+                val autocompleteAdapter = ArrayAdapter(requireContext(),
+                        R.layout.cat_exposed_dropdown_popup_item, it.first)
+                source_edittext.threshold = 1
+                source_edittext.setAdapter(autocompleteAdapter)
+                source_exposed_menu.isVisible = false
+            }
             else -> {
-                zipLiveData(accountViewModel.getAccountByType("asset"), accountViewModel.getAccountByType("expense"))
-                        .observe(this) {
-                            // Spinner for source account
-                            it.first.forEachIndexed { _, accountData ->
-                                sourceAccounts.add(accountData.accountAttributes?.name!!)
-                            }
-                            val uniqueSource = HashSet(sourceAccounts).toArray()
-                            spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueSource)
-                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                            source_layout.isVisible = false
-                            source_spinner.adapter = spinnerAdapter
-                            source_textview.isVisible = true
-                            // This is used for auto complete for destination account
-                            it.second.forEachIndexed { _, accountData ->
-                                destinationAccounts.add(accountData.accountAttributes?.name!!)
-                            }
-                            val uniqueDestination = HashSet(destinationAccounts).toArray()
-                            val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, uniqueDestination)
-                            destination_edittext.threshold = 1
-                            destination_edittext.setAdapter(autocompleteAdapter)
-                            destination_spinner.isVisible = false
-                            destination_textview.isVisible = false
-                            val spinnerPosition = spinnerAdapter.getPosition(sourceName)
-                            source_spinner.setSelection(spinnerPosition)
-                            val destinationPosition = spinnerAdapter.getPosition(destinationName)
-                            destination_spinner.setSelection(destinationPosition)
-                        }
+                zipLiveData(accountViewModel.getAccountNameByType("asset"),
+                        accountViewModel.getAccountNameByType("expense")).observe(this) { accountNames ->
+                    source_layout.isVisible = false
+                    destination_exposed_menu.isVisible = false
+                    // Spinner for source account
+                    spinnerAdapter = ArrayAdapter(requireContext(),
+                            R.layout.cat_exposed_dropdown_popup_item, accountNames.first)
+                    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    source_exposed_dropdown.setAdapter(spinnerAdapter)
+                    // This is used for auto complete for destination account
+                    val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, accountNames.second)
+                    destination_edittext.threshold = 1
+                    destination_edittext.setAdapter(autocompleteAdapter)
+                }
             }
         }
     }
