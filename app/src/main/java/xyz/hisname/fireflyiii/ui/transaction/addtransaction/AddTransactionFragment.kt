@@ -333,14 +333,14 @@ class AddTransactionFragment: BaseFragment() {
                         piggy_layout.isVisible = true
                         spinnerAdapter = ArrayAdapter(requireContext(),
                                 R.layout.cat_exposed_dropdown_popup_item, transferData)
-                        val destinationPosition = spinnerAdapter.getPosition(destinationName)
-                        destination_exposed_dropdown.setSelection(destinationPosition)
+                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        destination_exposed_dropdown.setAdapter(spinnerAdapter)
                         source_exposed_dropdown.setAdapter(spinnerAdapter)
                     }
             Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
                     accountViewModel.getAccountNameByType("asset")).observe(this ) {
                 // Asset account, spinner
-                spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it.second)
+                spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, it.second)
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)
                 destination_layout.isVisible = false
