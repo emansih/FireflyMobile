@@ -255,13 +255,6 @@ class AddTransactionFragment: BaseFragment() {
             currency = currencyData?.code.toString()
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
         }
-        accountViewModel.isLoading.observe(this) {
-            if(it == true){
-                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-            } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            }
-        }
         accountViewModel.emptyAccount.observe(this) {
             if(it == true){
                 AlertDialog.Builder(requireContext())
@@ -468,14 +461,18 @@ class AddTransactionFragment: BaseFragment() {
                 Objects.equals("Withdrawal", transactionType) -> {
                     destination_edittext.setText(transactionAttributes?.destination_name)
                     sourceName = transactionAttributes?.source_name
+                    source_exposed_dropdown.setText(sourceName)
                 }
                 Objects.equals("Transfer", transactionType) -> {
                     sourceName = transactionAttributes?.source_name
                     destinationName = transactionAttributes?.destination_name
+                    source_exposed_dropdown.setText(sourceName)
+                    destination_exposed_dropdown.setText(destinationName)
                 }
                 Objects.equals("Deposit", transactionType) -> {
                     source_edittext.setText(transactionAttributes?.source_name)
                     destinationName = transactionAttributes?.destination_name
+                    destination_exposed_dropdown.setText(destinationName)
                 }
             }
         }
