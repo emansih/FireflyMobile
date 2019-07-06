@@ -18,7 +18,6 @@ allprojects {
             content {
                 includeGroupByRegex("com.android.*")
                 includeGroupByRegex ("androidx.*")
-                includeGroup("android.arch.work")
                 includeGroup("com.google.android.material")
             }
         }
