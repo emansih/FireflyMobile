@@ -32,7 +32,6 @@ class AddBillFragment: BaseAddObjectFragment() {
     private var repeatFreq: String = ""
     private var currency = ""
     private val billId by lazy { arguments?.getLong("billId") ?: 0 }
-    private lateinit var freqAdapter: ArrayAdapter<String>
     private var billDescription: String? = ""
     private lateinit var queue: FancyShowCaseQueue
 
@@ -44,6 +43,10 @@ class AddBillFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_bill_layout)
+        val spinnerAdapter = ArrayAdapter(requireContext(),
+                R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        frequency_exposed_dropdown.setAdapter(spinnerAdapter)
         if(billId != 0L){
             billViewModel.getBillById(billId).observe(this) {
                 billAttribute = it[0].billAttributes
@@ -59,10 +62,8 @@ class AddBillFragment: BaseAddObjectFragment() {
                 bill_date_edittext.setText(billAttribute?.date)
                 skip_edittext.setText(billAttribute?.skip.toString())
                 notes_edittext.setText(billAttribute?.notes)
-                val spinnerPosition = freqAdapter.getPosition(
-                        billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase() +
-                                billAttribute?.repeat_freq?.substring(1))
-                frequency_spinner.setSelection(spinnerPosition)
+                frequency_exposed_dropdown.setText(billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase()
+                        + billAttribute?.repeat_freq?.substring(1))
             }
         }
         showHelpText()
@@ -132,13 +133,13 @@ class AddBillFragment: BaseAddObjectFragment() {
                         min_amount_layout))
                 .add(showCase(R.string.bills_create_skip_holder, "skipCaseView", skip_layout))
                 .add(showCase(R.string.bills_create_repeat_freq_holder,
-                        "freqCaseView", frequency_spinner))
+                        "freqCaseView", frequency_menu))
 
         queue.show()
     }
 
     override fun setWidgets(){
-        frequency_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        frequency_exposed_dropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>) {}
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedItem = parent.selectedItemId

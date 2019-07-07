@@ -184,16 +184,26 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/frequency_spinner"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/frequency_menu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:layout_marginStart="12dp"
-                android:entries="@array/repeat_frequency"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                app:errorEnabled="true"
+                app:helperTextEnabled="false"
                 app:layout_constraintStart_toStartOf="@+id/skip_layout"
                 app:layout_constraintEnd_toEndOf="@+id/skip_layout"
-                app:layout_constraintTop_toBottomOf="@+id/skip_layout" />
+                app:layout_constraintTop_toBottomOf="@+id/skip_layout">
+
+                <AutoCompleteTextView
+                    android:id="@+id/frequency_exposed_dropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Frequency"
+                    android:editable="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/notes_layout"
@@ -203,7 +213,7 @@
                 android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="@+id/bill_date_layout"
                 app:layout_constraintStart_toStartOf="@+id/bill_date_layout"
-                app:layout_constraintTop_toBottomOf="@+id/frequency_spinner">
+                app:layout_constraintTop_toBottomOf="@+id/frequency_menu">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/notes_edittext"
