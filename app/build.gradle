@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.akaita.android.easylauncher'
 apply plugin: "com.github.ben-manes.versions"
-apply from: "${rootDir}/scripts/ChangeApkName.gradle"
+apply plugin: 'org.owasp.dependencycheck'
 
 android {
     compileSdkVersion(Dependencies.compileSdk)
@@ -56,7 +56,7 @@ android {
             minifyEnabled false
             matchingFallbacks = ['debug']
         }
-        // This build type is no different from `release`.
+        // This build type is no different from `release` except that it run unit tests and change the apk name
         // It's created so that it is compatible with Fdroid build system
         githubRelease{
             minifyEnabled true
@@ -64,6 +64,11 @@ android {
             matchingFallbacks = ['release']
             signingConfig signingConfigs.githubRelease
             shrinkResources true
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "v${versionName}-firefly.apk"
+                }
+            }
         }
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
@@ -79,10 +84,8 @@ android {
 }
 
 afterEvaluate {
-    if(build.name.contains("github")) {
-        assembleGithubRelease.dependsOn test
-        assembleGithubRelease.finalizedBy(changeName)
-    }
+    assembleGithubRelease.dependsOn test
+    assembleGithubRelease.dependsOn tasks.dependencyCheckAnalyze
 }
 
 dependencies {
