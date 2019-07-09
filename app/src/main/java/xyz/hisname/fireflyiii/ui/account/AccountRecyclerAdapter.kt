@@ -30,9 +30,15 @@ class AccountRecyclerAdapter(private val items: MutableList<AccountData>, privat
         fun bind(data: AccountData, clickListener: (AccountData) -> Unit){
             val accountData = data.accountAttributes
             var currencySymbol = ""
+            if(accountData?.active != true){
+                itemView.accountNameText.setTextColor(context.getCompatColor(R.color.material_grey_600))
+                itemView.accountNameText.setTextColor(context.getCompatColor(R.color.material_grey_600))
+                itemView.accountNumberText.setTextColor(context.getCompatColor(R.color.material_grey_600))
+            }
             if(accountData?.currency_symbol != null){
                 currencySymbol = accountData.currency_symbol
             }
+            itemView.accountNumberText.text = accountData?.account_number
             itemView.accountNameText.text = accountData?.name
             val amount = accountData?.current_balance?.toBigDecimal()?.toPlainString()
             if(amount != null){

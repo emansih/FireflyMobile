@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
         android:id="@+id/accountNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,8 +17,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <TextView
+        android:id="@+id/accountNumberText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@+id/accountNameText"
+        app:layout_constraintTop_toBottomOf="@+id/accountNameText"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
+
+    <TextView
         android:id="@+id/accountAmountText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
