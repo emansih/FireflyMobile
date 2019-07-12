@@ -84,8 +84,10 @@ android {
 }
 
 afterEvaluate {
-    assembleGithubRelease.dependsOn test
-    assembleGithubRelease.dependsOn tasks.dependencyCheckAnalyze
+    if(name == "assembleGithubRelease"){
+        assembleGithubRelease.dependsOn test
+        assembleGithubRelease.dependsOn tasks.dependencyCheckAnalyze
+    }
 }
 
 dependencies {
