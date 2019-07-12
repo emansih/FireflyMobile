@@ -64,42 +64,37 @@ class PatFragment: Fragment() {
                 AppPref(sharedPref).baseUrl = fireflyUrl
                 AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString()
                 model.getAccountByType("asset").observe(this) { accountData ->
-                    model.isLoading.observe(this) { loading ->
-                        if(!loading){
-                            ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                            if(accountData.isNotEmpty()){
-                                AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
-                                val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
-                                layout.isVisible = false
-                                requireActivity().supportFragmentManager.beginTransaction()
-                                        .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                                        .add(R.id.bigger_fragment_container, OnboardingFragment())
-                                        .commit()
-                                toastSuccess(resources.getString(R.string.welcome))
-                            } else {
-                                AlertDialog.Builder(requireContext())
-                                        .setTitle("No asset accounts found!")
-                                        .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
-                                                "to add an asset account first? ")
-                                        .setPositiveButton("OK"){ _,_ ->
-                                            requireFragmentManager().commit {
-                                                replace(R.id.bigger_fragment_container, AddAccountFragment())
-                                                arguments = bundleOf("accountType" to "asset")
-                                            }
-                                        }
-                                        .setNegativeButton("No"){ _,_ ->
-                                            AppPref(sharedPref).clearPref()
-                                            AuthenticatorManager(accountManager).destroyAccount()
-                                            requireActivity().finish()
-                                        }
-                                        .setCancelable(false)
-                                        .show()
-                            }
-                        }
+                    ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
+                    if(accountData.isNotEmpty()){
+                        AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
+                        val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
+                        layout.isVisible = false
+                        requireActivity().supportFragmentManager.beginTransaction()
+                                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                                .add(R.id.bigger_fragment_container, OnboardingFragment())
+                                .commit()
+                        toastSuccess(resources.getString(R.string.welcome))
+                    } else {
+                        AlertDialog.Builder(requireContext())
+                                .setTitle("No asset accounts found!")
+                                .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
+                                        "to add an asset account first? ")
+                                .setPositiveButton("OK"){ _,_ ->
+                                    requireFragmentManager().commit {
+                                        replace(R.id.bigger_fragment_container, AddAccountFragment())
+                                        arguments = bundleOf("accountType" to "asset")
+                                    }
+                                }
+                                .setNegativeButton("No"){ _,_ ->
+                                    AppPref(sharedPref).clearPref()
+                                    AuthenticatorManager(accountManager).destroyAccount()
+                                    requireActivity().finish()
+                                }
+                                .setCancelable(false)
+                                .show()
                     }
                 }
             }
-
         }
     }
 }
