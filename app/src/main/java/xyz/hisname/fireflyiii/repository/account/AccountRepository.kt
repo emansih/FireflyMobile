@@ -13,6 +13,8 @@ import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 class AccountRepository(private val accountDao: AccountsDataDao,
                         private val accountsService: AccountsService?){
 
+    lateinit var apiResponse: String
+
     suspend fun insertAccount(account: AccountData){
         accountDao.insert(account)
     }
@@ -62,6 +64,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 accountData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             }
             val responseBody = networkCall?.body()
+            apiResponse = networkCall?.message() ?: ""
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {

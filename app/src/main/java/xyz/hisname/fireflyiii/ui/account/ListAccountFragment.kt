@@ -86,11 +86,6 @@ class ListAccountFragment: BaseFragment() {
             }
             swipeContainer.isRefreshing = false
         }
-        accountViewModel.apiResponse.observe(this) { errorMessage ->
-            if(errorMessage != null){
-                toastError(errorMessage)
-            }
-        }
     }
 
 

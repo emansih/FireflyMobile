@@ -11,6 +11,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
@@ -75,23 +76,30 @@ class PatFragment: Fragment() {
                                 .commit()
                         toastSuccess(resources.getString(R.string.welcome))
                     } else {
-                        AlertDialog.Builder(requireContext())
-                                .setTitle("No asset accounts found!")
-                                .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
-                                        "to add an asset account first? ")
-                                .setPositiveButton("OK"){ _,_ ->
-                                    requireFragmentManager().commit {
-                                        replace(R.id.bigger_fragment_container, AddAccountFragment())
-                                        arguments = bundleOf("accountType" to "asset")
-                                    }
-                                }
-                                .setNegativeButton("No"){ _,_ ->
-                                    AppPref(sharedPref).clearPref()
-                                    AuthenticatorManager(accountManager).destroyAccount()
-                                    requireActivity().finish()
-                                }
-                                .setCancelable(false)
-                                .show()
+                        model.apiResponse.observe(this){ response ->
+                            if(response.isNotEmpty()){
+                                toastError(response)
+                            } else {
+                                AlertDialog.Builder(requireContext())
+                                        .setTitle("No asset accounts found!")
+                                        .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
+                                                "to add an asset account first? ")
+                                        .setPositiveButton("OK"){ _,_ ->
+                                            requireFragmentManager().commit {
+                                                replace(R.id.bigger_fragment_container, AddAccountFragment())
+                                                arguments = bundleOf("accountType" to "asset")
+                                            }
+                                        }
+                                        .setNegativeButton("No"){ _,_ ->
+                                            AppPref(sharedPref).clearPref()
+                                            AuthenticatorManager(accountManager).destroyAccount()
+                                            requireActivity().finish()
+                                        }
+                                        .setCancelable(false)
+                                        .show()
+                            }
+                        }
+
                     }
                 }
             }

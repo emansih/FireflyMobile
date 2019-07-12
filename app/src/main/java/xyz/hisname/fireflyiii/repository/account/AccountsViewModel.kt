@@ -51,6 +51,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             data = repository.getAccountByType(accountType)
         }.invokeOnCompletion {
             accountData.postValue(data)
+            apiResponse.postValue(repository.apiResponse)
         }
         return accountData
     }
