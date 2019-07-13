@@ -19,6 +19,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -30,7 +31,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
 
     private var accounts = ArrayList<String>()
     private var piggyId: Long = 0
-    private lateinit var accountAdapter: ArrayAdapter<Any>
+    private lateinit var accountAdapter: ArrayAdapter<String>
     private var currentAmount: String? = null
     private var startDate: String? = null
     private var targetDate: String? = null
@@ -56,8 +57,10 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 note_edittext.setText(piggyAttributes?.notes)
                 accountViewModel.getAccountById(piggyAttributes?.account_id ?: 0L).observe(this) { accountData ->
                     val accountName = accountData[0].accountAttributes?.name
-                    val spinnerPosition = accountAdapter.getPosition(accountName)
-                    account_spinner.setSelection(spinnerPosition)
+                    accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
+                    accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    account_exposed_dropdown.setAdapter(accountAdapter)
+                    account_exposed_dropdown.setText(accountName)
                 }
             }
         }
@@ -171,10 +174,10 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
                 }
-                val uniqueAccount = HashSet(accounts).toArray()
-                accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, uniqueAccount)
+                accountAdapter = ArrayAdapter(requireContext(),
+                        R.layout.cat_exposed_dropdown_popup_item, accounts)
                 accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                account_spinner.adapter = accountAdapter
+                account_exposed_dropdown.setAdapter(accountAdapter)
             }
         }
         placeHolderToolbar.setNavigationOnClickListener {
@@ -183,7 +186,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this) { accountData ->
+        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(this) { accountData ->
             piggyViewModel.addPiggyBank(description_edittext.getString(),
                     accountData[0].accountId.toString(), currentAmount, notes, startDate,
                     target_amount_edittext.getString(), targetDate).observe(this) {
@@ -228,7 +231,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun updatePiggyBank(){
-        accountViewModel.getAccountByName(account_spinner.selectedItem.toString()).observe(this) { accountData ->
+        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(this) { accountData ->
             piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), accountData[0].accountId.toString(),
                     currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(this) {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)

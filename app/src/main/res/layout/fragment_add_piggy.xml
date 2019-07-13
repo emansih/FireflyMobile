@@ -92,24 +92,27 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/account_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="36dp"
-                android:text="Account to be linked"
-                app:layout_constraintTop_toBottomOf="@+id/target_amount_layout"
-                app:layout_constraintStart_toStartOf="@+id/target_amount_layout" />
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/account_spinner"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/account_menu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:popupBackground="@color/white"
-                app:layout_constraintTop_toBottomOf="@+id/account_textview"
+                android:layout_marginTop="24dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                app:errorEnabled="true"
+                app:helperTextEnabled="false"
                 app:layout_constraintStart_toStartOf="@+id/target_amount_layout"
-                app:layout_constraintEnd_toEndOf="@+id/target_amount_layout" />
+                app:layout_constraintEnd_toEndOf="@+id/target_amount_layout"
+                app:layout_constraintTop_toBottomOf="@+id/target_amount_layout">
+
+                <AutoCompleteTextView
+                    android:id="@+id/account_exposed_dropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Account to be linked"
+                    android:editable="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
 
             <com.github.florent37.expansionpanel.ExpansionHeader
                 android:id="@+id/expansionHeader"
@@ -119,7 +122,7 @@
                 app:expansion_headerIndicator="@id/headerIndicator"
                 app:expansion_layout="@id/expansionLayout"
                 app:expansion_toggleOnClick="true"
-                app:layout_constraintTop_toBottomOf="@+id/account_spinner"
+                app:layout_constraintTop_toBottomOf="@+id/account_menu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
