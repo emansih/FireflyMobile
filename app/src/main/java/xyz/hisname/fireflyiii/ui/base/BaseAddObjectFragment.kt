@@ -9,6 +9,7 @@ import android.view.ViewAnimationUtils
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import xyz.hisname.fireflyiii.util.animation.BakedBezierInterpolator
+import kotlin.math.max
 
 abstract class BaseAddObjectFragment: BaseFragment() {
 
@@ -24,7 +25,7 @@ abstract class BaseAddObjectFragment: BaseFragment() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             val x = rootView.width / 2
             val y = rootView.height / 2
-            val finalRadius = (Math.max(rootView.width, rootView.height) * 1.1).toFloat()
+            val finalRadius = (max(rootView.width, rootView.height) * 1.1).toFloat()
             val circularReveal= ViewAnimationUtils.createCircularReveal(
                     rootView, x, y,finalRadius, 0f)
             circularReveal.duration = 400

@@ -43,11 +43,8 @@ class AddBillFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_bill_layout)
-        val spinnerAdapter = ArrayAdapter(requireContext(),
-                R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        frequency_exposed_dropdown.setAdapter(spinnerAdapter)
         if(billId != 0L){
+            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             billViewModel.getBillById(billId).observe(this) {
                 billAttribute = it[0].billAttributes
                 description_edittext.setText(billAttribute?.name)
@@ -64,8 +61,19 @@ class AddBillFragment: BaseAddObjectFragment() {
                 notes_edittext.setText(billAttribute?.notes)
                 frequency_exposed_dropdown.setText(billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase()
                         + billAttribute?.repeat_freq?.substring(1))
+
+                // Weird bug where only 1 value will show in the array if I don't use this
+                val spinnerAdapter = ArrayAdapter(requireContext(),
+                        R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                frequency_exposed_dropdown.setAdapter(spinnerAdapter)
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         }
+        val spinnerAdapter = ArrayAdapter(requireContext(),
+                R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        frequency_exposed_dropdown.setAdapter(spinnerAdapter)
         showHelpText()
     }
 
@@ -138,19 +146,26 @@ class AddBillFragment: BaseAddObjectFragment() {
         queue.show()
     }
 
+    private fun getFreq(item: String): String {
+        return when (item) {
+            "Weekly" -> "weekly"
+            "Monthly" -> "monthly"
+            "Quarterly" -> "quarterly"
+            "Half-yearly" -> "half-year"
+            "Yearly" -> "yearly"
+            else -> ""
+        }
+    }
+
     override fun setWidgets(){
-        frequency_exposed_dropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedItem = parent.selectedItemId
-                repeatFreq = when (selectedItem) {
-                    0L -> "weekly"
-                    1L -> "monthly"
-                    2L -> "quarterly"
-                    3L -> "half-yearly"
-                    4L -> "yearly"
-                    else -> ""
-                }
+        frequency_exposed_dropdown.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            repeatFreq = when (position) {
+                0 -> "weekly"
+                1 -> "monthly"
+                2 -> "quarterly"
+                3 -> "half-year"
+                4 -> "yearly"
+                else -> ""
             }
         }
         val calendar = Calendar.getInstance()
@@ -221,8 +236,8 @@ class AddBillFragment: BaseAddObjectFragment() {
     private fun updateBill(){
         billViewModel.updateBill(billId, description_edittext.getString(),
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
-                bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
-                currency, notes).observe(this) { response ->
+                bill_date_edittext.getString(), getFreq(frequency_exposed_dropdown.getString()),
+                skip_edittext.getString(), "1", currency, notes).observe(this) { response ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             if (response.getErrorMessage() != null) {
                 toastError(response.getErrorMessage())
