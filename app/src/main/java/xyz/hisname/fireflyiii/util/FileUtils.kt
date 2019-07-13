@@ -237,6 +237,7 @@ fun Context.openFile(fileName: String): Boolean{
         fileIntent.setDataAndType(Uri.parse("${FileUtils().folderDirectory}/$fileName"),
                 FileUtils.getMimeType(this, "${FileUtils().folderDirectory}/$fileName".toUri()))
         val openFileIntent = Intent.createChooser(fileIntent, "Open File")
+        openFileIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         this.startActivity(openFileIntent)
         true
     } else {
