@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.View
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
@@ -13,6 +14,10 @@ abstract class BaseDetailFragment: BaseFragment(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         fab.isVisible = false
     }
 
