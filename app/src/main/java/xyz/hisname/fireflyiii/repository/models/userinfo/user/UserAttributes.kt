@@ -6,5 +6,5 @@ data class UserAttributes(
         val email: String,
         val blocked: Boolean,
         val blocked_code: Any,
-        val role: String
+        val role: String?
 )

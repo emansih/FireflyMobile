@@ -18,7 +18,9 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
             val userAttribute = response.body()?.userData?.userAttributes
             if (userAttribute != null) {
                 accManager.userEmail = userAttribute.email
-                AppPref(sharedPref).userRole = userAttribute.role
+                if(userAttribute.role != null){
+                    AppPref(sharedPref).userRole = userAttribute.role
+                }
                 apiOk.value = true
             } else {
                 apiOk.value = false
