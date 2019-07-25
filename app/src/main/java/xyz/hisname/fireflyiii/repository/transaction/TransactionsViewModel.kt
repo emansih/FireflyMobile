@@ -275,7 +275,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         transactionService?.updateTransaction(transactionId, convertString(type),description,date,
-                amount,sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
+                amount.replace(',', '.'),sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
             if (errorBody != null) {
