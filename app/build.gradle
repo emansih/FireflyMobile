@@ -142,6 +142,10 @@ dependencies {
     implementation Dependencies.accordionView
     implementation Dependencies.fancyshowcaseview
 
+    implementation Dependencies.markdownLib
+    implementation Dependencies.markdownStrikeThroughExtension
+    implementation Dependencies.markdownAutoLink
+
     // Project Lib
     api project(path: ":languagepack")
 

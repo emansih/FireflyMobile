@@ -36,6 +36,7 @@ object Dependencies{
     private const val accordionViewVersion = "1.2.2"
     private const val multiDexVersion = "2.0.1"
     private const val fancyshowcaseviewVersion = "1.1.5"
+    private const val markdownVersion = "0.13.0"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
@@ -79,4 +80,7 @@ object Dependencies{
     val accordionView = "com.github.florent37:expansionpanel:$accordionViewVersion"
     val multiDex = "androidx.multidex:multidex:$multiDexVersion"
     val fancyshowcaseview = "me.toptas.fancyshowcase:fancyshowcaseview:$fancyshowcaseviewVersion"
+    val markdownLib = "com.atlassian.commonmark:commonmark:$markdownVersion"
+    val markdownStrikeThroughExtension = "com.atlassian.commonmark:commonmark-ext-gfm-strikethrough:$markdownVersion"
+    val markdownAutoLink = "com.atlassian.commonmark:commonmark-ext-autolink:$markdownVersion"
 }

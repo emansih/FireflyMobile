@@ -220,6 +220,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="top"
+                    android:focusable="false"
                     android:inputType="textMultiLine"
                     android:drawablePadding="12dp"
                     android:hint="Notes(Optional)"
