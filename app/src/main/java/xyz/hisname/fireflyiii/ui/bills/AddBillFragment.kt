@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
+import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -16,7 +17,9 @@ import kotlinx.android.synthetic.main.fragment_add_bill.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.BillReceiver
+import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
@@ -34,6 +37,7 @@ class AddBillFragment: BaseAddObjectFragment() {
     private val billId by lazy { arguments?.getLong("billId") ?: 0 }
     private var billDescription: String? = ""
     private lateinit var queue: FancyShowCaseQueue
+    private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -75,6 +79,13 @@ class AddBillFragment: BaseAddObjectFragment() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         frequency_exposed_dropdown.setAdapter(spinnerAdapter)
         showHelpText()
+        notes_edittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(notes_edittext.getString())
+            requireFragmentManager().commit {
+                replace(R.id.bigger_fragment_container, MarkdownFragment())
+                addToBackStack(null)
+            }
+        }
     }
 
     override fun onStart() {
@@ -198,6 +209,10 @@ class AddBillFragment: BaseAddObjectFragment() {
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             currency = currencyData?.code.toString()
         }
+        markdownViewModel.markdownText.observe(this){ markdownText ->
+            notes_edittext.setText(markdownText)
+        }
+
     }
 
     override fun submitData(){
