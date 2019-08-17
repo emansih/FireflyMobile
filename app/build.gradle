@@ -117,6 +117,7 @@ dependencies {
     // Retrofit
     implementation Dependencies.retrofitLibs
     implementation Dependencies.retrofitGson
+    implementation("com.squareup.retrofit2:converter-scalars:2.6.0")
 
     // Coroutine
     implementation Dependencies.coroutineCore

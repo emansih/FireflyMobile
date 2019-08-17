@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient
 import org.threeten.bp.LocalDateTime
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import xyz.hisname.fireflyiii.util.LocalDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
@@ -42,6 +43,7 @@ class FireflyClient {
                     INSTANCE = Retrofit.Builder()
                             .baseUrl(generateUrl(baseUrl))
                             .client(client.build())
+                            .addConverterFactory(ScalarsConverterFactory.create())
                             .addConverterFactory(GsonConverterFactory.create(convertIso8601()))
                             .build()
                 }

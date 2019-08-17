@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
+import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
@@ -32,12 +33,14 @@ import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivi
 import xyz.hisname.fireflyiii.util.*
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.roundToInt
+import kotlin.math.withSign
 
 
 // TODO: Refactor this god class (7 Jan 2019)
 class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
+    private val summaryViewModel by lazy { getViewModel(SummaryViewModel::class.java) }
     private var depositSum = 0.0
     private var withdrawSum = 0.0
     private var transaction = 0.0
@@ -59,12 +62,31 @@ class DashboardFragment: BaseFragment() {
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
         changeTheme()
-        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
-            val currencyData = defaultCurrency[0].currencyAttributes
-            getTransactionData(currencyData)
-            setPieChart(currencyData)
-            setNetWorth(currencyData)
+        userApiVersion.observe(this){ apiVersion ->
+            currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
+                val currencyData = defaultCurrency[0].currencyAttributes
+
+                summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
+                        currencyData?.code ?: "", apiVersion)
+
+                summaryViewModel.networthValue.observe(this){ money ->
+                    netWorthText.text = currencyData?.symbol + money
+                }
+
+                summaryViewModel.leftToSpendValue.observe(this){ money ->
+                    leftToSpentText.text = currencyData?.symbol + money
+                }
+                setPieChart(currencyData)
+
+                if(Version(apiVersion).compareTo(Version("0.10.0")) == 1 ||
+                        Version(apiVersion) == Version("0.10.0")) {
+
+                } else {
+                    getTransactionData(currencyData)
+                }
+            }
         }
+
         animateCard(statsCard, netEarningsCard, dailySummaryCard, recentTransactionCard, budgetCard)
         currencyViewModel.apiResponse.observe(this){
             toastInfo(it)
@@ -82,13 +104,6 @@ class DashboardFragment: BaseFragment() {
                 replace(R.id.fragment_container, BudgetSummaryFragment())
                 addToBackStack(null)
             }
-        }
-    }
-
-    private fun setNetWorth(currencyData: CurrencyAttributes?){
-        val currencyCode = currencyData?.code ?: ""
-        accountViewModel.getAllAccountWithNetworthAndCurrency(currencyCode).observe(this) { money ->
-            netWorthText.text = currencyData?.symbol + money
         }
     }
 
@@ -136,7 +151,7 @@ class DashboardFragment: BaseFragment() {
             currentExpense.text = currencySymbol + withdrawSum.toString()
             currentMonthIncome.text = currencySymbol + depositSum.toString()
             transaction = depositSum - withdrawSum
-            if(Math.copySign(1.toDouble(), transaction) < 0){
+            if(1.0.withSign(transaction) < 0){
                 currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
             balanceText.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
@@ -145,7 +160,7 @@ class DashboardFragment: BaseFragment() {
             transaction = month2Depot - month2With
             oneMonthBeforeExpense.text = currencySymbol + month2With.toString()
             oneMonthBeforeIncome.text = currencySymbol + month2Depot.toString()
-            if(Math.copySign(1.toDouble(), transaction) < 0){
+            if(1.0.withSign(transaction) < 0){
                 oneMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
             oneMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
@@ -153,7 +168,7 @@ class DashboardFragment: BaseFragment() {
             transaction = month3Depot - month3With
             twoMonthBeforeExpense.text = currencySymbol + month3With.toString()
             twoMonthBeforeIncome.text = currencySymbol + month3Depot.toString()
-            if(Math.copySign(1.toDouble(), transaction) < 0){
+            if(1.0.withSign(transaction) < 0){
                 twoMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
             twoMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
@@ -281,9 +296,6 @@ class DashboardFragment: BaseFragment() {
                 }
             }
             val progressDrawable = budgetProgress.progressDrawable.mutate()
-
-            leftToSpentText.text = currencyData?.symbol +
-                    LocaleNumberParser.parseDecimal((budgeted - budgetSpent).toDouble(), requireContext())
             if(!budgetLeftPercentage.isNaN()) {
                 when {
                     budgetLeftPercentage.roundToInt() >= 80 -> {
