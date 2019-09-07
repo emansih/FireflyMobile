@@ -13,6 +13,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
 
     val networthValue: MutableLiveData<Double> = MutableLiveData()
     val leftToSpendValue: MutableLiveData<Double> = MutableLiveData()
+    val balanceValue: MutableLiveData<Double> = MutableLiveData()
 
     fun getBasicSummary(startDate: String, endDate: String, currencyCode: String){
             val simpleData = SimpleData(PreferenceManager.getDefaultSharedPreferences(getApplication()))
@@ -30,11 +31,17 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                             .getJSONObject("left-to-spend-in-$currencyCode")
                             .getDouble("monetary_value")
                     simpleData.leftToSpend = leftToSpend
+                    val balance = JSONObject(responseBody)
+                            .getJSONObject("balance-in-$currencyCode")
+                            .getDouble("monetary_value")
+                    simpleData.balance = balance
                     leftToSpendValue.postValue(leftToSpend)
                     networthValue.postValue(netWorth)
+                    balanceValue.postValue(balance)
                 } else {
-                    networthValue.postValue(simpleData.networthValue.toDouble())
-                    leftToSpendValue.postValue(simpleData.leftToSpend.toDouble())
+                    networthValue.postValue(simpleData.networthValue)
+                    leftToSpendValue.postValue(simpleData.leftToSpend)
+                    balanceValue.postValue(simpleData.balance)
                 }
             }))
 

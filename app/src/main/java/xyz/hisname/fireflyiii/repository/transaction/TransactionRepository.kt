@@ -240,7 +240,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 }
             }
         } catch (exception: Exception){
-            
+
         }
     }
 

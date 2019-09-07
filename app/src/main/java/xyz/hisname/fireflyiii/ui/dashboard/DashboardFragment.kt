@@ -74,6 +74,10 @@ class DashboardFragment: BaseFragment() {
             summaryViewModel.leftToSpendValue.observe(this){ money ->
                 leftToSpentText.text = currencyData?.symbol + money
             }
+            summaryViewModel.balanceValue.observe(this){ money ->
+                balanceText.text = currencyData?.symbol + money
+            }
+
             setPieChart(currencyData)
             getTransactionData(currencyData)
 
@@ -146,7 +150,6 @@ class DashboardFragment: BaseFragment() {
             if(1.0.withSign(transaction) < 0){
                 currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
-            balanceText.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
             currentNetIncome.text = currencySymbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
 
             transaction = month2Depot - month2With

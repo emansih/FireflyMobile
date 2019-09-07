@@ -15,4 +15,8 @@ class SimpleData(private val sharedPref: SharedPreferences) {
         get() = sharedPref.getDouble("leftToSpend", 0.0)
         set(value) = sharedPref.edit { putDouble("leftToSpend", value) }
 
+    var balance
+        get() = sharedPref.getDouble("balance", 0.0)
+        set(value) = sharedPref.edit { putDouble("balance", value) }
+
 }
