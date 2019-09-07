@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.extension.bindView
@@ -23,7 +24,7 @@ import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 abstract class BaseTransactionFragment: BaseFragment() {
 
-    protected var dataAdapter = arrayListOf<TransactionData>()
+    protected var dataAdapter = arrayListOf<Transactions>()
     protected lateinit var rtAdapter: TransactionRecyclerAdapter
     protected val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     protected val noTransactionText by bindView<TextView>(R.id.listText)
@@ -39,10 +40,10 @@ abstract class BaseTransactionFragment: BaseFragment() {
 
     abstract fun setupFab()
 
-    protected fun itemClicked(data: TransactionData){
+    protected fun itemClicked(data: Transactions){
         requireFragmentManager().commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionId" to data.transactionId)
+                arguments = bundleOf("transactionId" to data.transaction_journal_id)
             })
             addToBackStack(null)
         }
@@ -62,7 +63,7 @@ abstract class BaseTransactionFragment: BaseFragment() {
             noTransactionText.isGone = true
             noTransactionImage.isGone = true
             runLayoutAnimation(recycler_view)
-            rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
+            rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) }
             recycler_view.adapter = rtAdapter
         }
     }

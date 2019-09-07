@@ -62,29 +62,21 @@ class DashboardFragment: BaseFragment() {
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
         changeTheme()
-        userApiVersion.observe(this){ apiVersion ->
-            currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
-                val currencyData = defaultCurrency[0].currencyAttributes
+        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
+            val currencyData = defaultCurrency[0].currencyAttributes
+            summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
+                        currencyData?.code ?: "")
 
-                summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
-                        currencyData?.code ?: "", apiVersion)
-
-                summaryViewModel.networthValue.observe(this){ money ->
-                    netWorthText.text = currencyData?.symbol + money
-                }
-
-                summaryViewModel.leftToSpendValue.observe(this){ money ->
-                    leftToSpentText.text = currencyData?.symbol + money
-                }
-                setPieChart(currencyData)
-
-                if(Version(apiVersion).compareTo(Version("0.10.0")) == 1 ||
-                        Version(apiVersion) == Version("0.10.0")) {
-
-                } else {
-                    getTransactionData(currencyData)
-                }
+            summaryViewModel.networthValue.observe(this){ money ->
+                netWorthText.text = currencyData?.symbol + money
             }
+
+            summaryViewModel.leftToSpendValue.observe(this){ money ->
+                leftToSpentText.text = currencyData?.symbol + money
+            }
+            setPieChart(currencyData)
+            getTransactionData(currencyData)
+
         }
 
         animateCard(statsCard, netEarningsCard, dailySummaryCard, recentTransactionCard, budgetCard)

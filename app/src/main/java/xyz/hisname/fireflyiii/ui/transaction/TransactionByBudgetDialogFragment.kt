@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -41,7 +41,7 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
                 DateTimeUtil.getEndOfMonth(), budgetName).observe(this) { transactionData ->
             recentTransactionList.isVisible = true
             noTransactionText.isGone = true
-            rtAdapter = TransactionRecyclerAdapter(transactionData){ data: TransactionData -> itemClicked(data) }
+            rtAdapter = TransactionRecyclerAdapter(transactionData){ data -> itemClicked(data) }
             recentTransactionList.adapter = rtAdapter
             rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
             rtAdapter.notifyDataSetChanged()
@@ -56,11 +56,11 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
         }
     }
 
-    private fun itemClicked(data: TransactionData){
+    private fun itemClicked(data: Transactions){
         this.dismiss()
         requireFragmentManager().commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionId" to data.transactionId)
+                arguments = bundleOf("transactionId" to data.transaction_journal_id)
             })
             addToBackStack(null)
         }

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.extension.create
@@ -24,7 +24,7 @@ class RecentTransactionFragment: BaseFragment() {
     override fun handleBack() {
     }
 
-    private var dataAdapter = ArrayList<TransactionData>()
+    private var dataAdapter = ArrayList<Transactions>()
     private lateinit var rtAdapter: TransactionRecyclerAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -52,7 +52,7 @@ class RecentTransactionFragment: BaseFragment() {
             } else {
                 recentTransactionList.isVisible = true
                 noTransactionText.isGone = true
-                rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data: TransactionData -> itemClicked(data) }
+                rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) }
                 recentTransactionList.adapter = rtAdapter
                 rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
                 rtAdapter.notifyDataSetChanged()
@@ -60,10 +60,10 @@ class RecentTransactionFragment: BaseFragment() {
         }
     }
 
-    private fun itemClicked(data: TransactionData){
+    private fun itemClicked(data: Transactions){
         requireFragmentManager().commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionId" to data.transactionId)
+                arguments = bundleOf("transactionId" to data.transaction_journal_id)
             })
             addToBackStack(null)
         }

@@ -20,15 +20,17 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyFts
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAttributes
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 
 
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
-    TransactionData::class, CategoryData::class, CategoryFts::class, BudgetData::class, BudgetListData::class,
+    Transactions::class, CategoryData::class, CategoryFts::class, BudgetData::class, BudgetListData::class,
     BudgetListFts::class, TagsData::class, AttachmentData::class],
-        version = 9,exportSchema = false)
+        version = 10,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 

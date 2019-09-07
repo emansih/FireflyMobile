@@ -8,6 +8,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAttributes
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.workers.BaseWorker
@@ -21,11 +22,11 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
 
     override suspend fun doWork(): Result {
         val transactionId = inputData.getLong("transactionId", 0)
-        var transactionAttributes: TransactionAttributes? = null
+        var transactionAttributes: Transactions? = null
         var isDeleted = false
         val repository = TransactionRepository(transactionDatabase, genericService?.create(TransactionService::class.java))
         runBlocking(Dispatchers.IO) {
-            transactionAttributes = repository.getTransactionById(transactionId)[0].transactionAttributes
+            transactionAttributes = repository.getTransactionById(transactionId)[0]
             isDeleted = repository.deleteTransactionById(transactionId)
         }
         if (isDeleted) {

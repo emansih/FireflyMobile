@@ -23,6 +23,7 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.fragment_account_detail.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionRecyclerAdapter
@@ -253,17 +254,17 @@ class AccountDetailFragment: BaseDetailFragment() {
                 DividerItemDecoration.VERTICAL))
         transactionViewModel.getTransactionListByDateAndAccount(DateTimeUtil.getDaysBefore(
                 DateTimeUtil.getTodayDate(), 6), DateTimeUtil.getTodayDate(), accountName).observe(this){ transactionData ->
-                    val rtAdapter = TransactionRecyclerAdapter(transactionData){ data: TransactionData -> itemClicked(data) }
+                    val rtAdapter = TransactionRecyclerAdapter(transactionData){ data -> itemClicked(data) }
                     accountTransactionList.adapter = rtAdapter
                     rtAdapter.apply { accountTransactionList.adapter as TransactionRecyclerAdapter }
                     rtAdapter.notifyDataSetChanged()
         }
     }
 
-    private fun itemClicked(data: TransactionData){
+    private fun itemClicked(data: Transactions){
         requireFragmentManager().commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionId" to data.transactionId)
+                arguments = bundleOf("transactionId" to data.transaction_journal_id)
             })
             addToBackStack(null)
         }

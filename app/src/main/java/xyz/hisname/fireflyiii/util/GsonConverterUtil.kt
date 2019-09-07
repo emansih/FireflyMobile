@@ -7,6 +7,8 @@ import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneOffset
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.Spent
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAttributes
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import java.math.BigDecimal
 
 object GsonConverterUtil{
@@ -86,5 +88,19 @@ object GsonConverterUtil{
     @JvmStatic
     fun fromDouble(value: String): Double{
         return Gson().fromJson(value, Double::class.java)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toTransactionList(value: List<Transactions>): String{
+        val type = object : TypeToken<List<Transactions>>() {}.type
+        return Gson().toJson(value, type)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromTransactionList(value: String): List<Transactions>{
+        val type = object : TypeToken<List<Transactions>>() {}.type
+        return Gson().fromJson(value,type)
     }
 }

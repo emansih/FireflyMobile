@@ -441,10 +441,9 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun updateTransactionSetup(){
         transactionViewModel.getTransactionById(transactionId).observe(this) {
-            val transactionAttributes = it[0].transactionAttributes
+            val transactionAttributes = it[0]
             description_edittext.setText(transactionAttributes?.description)
-            transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount
-                    ?: 0.toDouble()).toString())
+            transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount).toString())
             budget_edittext.setText(transactionAttributes?.budget_name)
             currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this) { currencyData ->
                 val currencyAttributes = currencyData[0].currencyAttributes
@@ -452,7 +451,6 @@ class AddTransactionFragment: BaseFragment() {
             }
             currency = transactionAttributes?.currency_code.toString()
             transaction_date_edittext.setText(transactionAttributes?.date.toString())
-            piggy_edittext.setText(transactionAttributes?.piggy_bank_name)
             category_edittext.setText(transactionAttributes?.category_name)
             if(transactionAttributes?.tags != null){
                 tags_chip.setText(transactionAttributes.tags + ",")

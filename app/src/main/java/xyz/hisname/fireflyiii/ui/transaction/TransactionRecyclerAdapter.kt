@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recent_transaction_list.view.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>, private val clickListener:(TransactionData) -> Unit):
-        DiffUtilAdapter<TransactionData, TransactionRecyclerAdapter.RtAdapter>() {
+class TransactionRecyclerAdapter(private val items: MutableList<Transactions>, private val clickListener:(Transactions) -> Unit):
+        DiffUtilAdapter<Transactions, TransactionRecyclerAdapter.RtAdapter>() {
 
     private lateinit var context: Context
 
@@ -26,10 +26,9 @@ class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>
     override fun onBindViewHolder(holder: RtAdapter, position: Int)  = holder.bind(items[position], clickListener)
 
     inner class RtAdapter(view: View): RecyclerView.ViewHolder(view) {
-        fun bind(transactionData: TransactionData, clickListener: (TransactionData) -> Unit){
-           val transactionAttributes = transactionData.transactionAttributes
-           if(transactionAttributes?.description!!.length >= 25){
-               itemView.transactionNameText.text = transactionAttributes.description.substring(0,25) + "..."
+        fun bind(transactionAttributes: Transactions, clickListener: (Transactions) -> Unit){
+           if(transactionAttributes.description!!.length >= 25){
+               itemView.transactionNameText.text = transactionAttributes.description?.substring(0,25) + "..."
            } else {
                itemView.transactionNameText.text = transactionAttributes.description
            }
@@ -42,7 +41,7 @@ class TransactionRecyclerAdapter(private val items: MutableList<TransactionData>
            } else {
                itemView.transactionAmountText.text = transactionAttributes.currency_symbol + transactionAttributes.amount.toString()
            }
-            itemView.list_item.setOnClickListener {clickListener(transactionData)}
+            itemView.list_item.setOnClickListener {clickListener(transactionAttributes)}
        }
     }
 

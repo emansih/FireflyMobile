@@ -71,7 +71,7 @@ class TransactionDetailsFragment: BaseFragment() {
     private fun setTransactionInfo(){
         transactionList.clear()
         transactionViewModel.getTransactionById(transactionId).observe(this) {
-            val details = it[0].transactionAttributes
+            val details = it[0]
             val model = arrayListOf(DetailModel("Type", details?.transactionType),
                     DetailModel(resources.getString(R.string.description), details?.description),
                     DetailModel(resources.getString(R.string.source_account), details?.source_name),
@@ -88,11 +88,11 @@ class TransactionDetailsFragment: BaseFragment() {
                 transactionList.add(DetailModel(resources.getString(R.string.amount),details?.currency_symbol + details?.amount.toString()))
             }
             transactionDescription = details?.description ?: ""
-            sourceAccountId = details?.source_id?.toLong() ?: 0L
-            destinationAccountId = details?.destination_id?.toLong() ?: 0L
+            sourceAccountId = details?.source_id ?: 0L
+            destinationAccountId = details?.destination_id ?: 0L
             transactionInfo = details?.transactionType ?: ""
             transactionDate = details?.date.toString()
-            downloadAttachment(details?.journal_id ?: 0)
+            downloadAttachment(details?.transaction_journal_id ?: 0)
             transactionList.addAll(model)
             transaction_info.layoutManager = LinearLayoutManager(requireContext())
             transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
@@ -103,7 +103,7 @@ class TransactionDetailsFragment: BaseFragment() {
     private fun setMetaInfo(){
         metaDataList.clear()
         transactionViewModel.getTransactionById(transactionId).observe(this) {
-            val details = it[0].transactionAttributes
+            val details = it[0]
             transactionCategory = details?.category_name ?: ""
             transactionBudget = details?.budget_name ?: ""
             val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
@@ -112,8 +112,7 @@ class TransactionDetailsFragment: BaseFragment() {
             val tagsInTransaction = details?.tags
             if(tagsInTransaction != null){
                 transaction_tags.setChipSpacing(16)
-                val tagsArray = tagsInTransaction.split(",")
-                tagsArray.forEachIndexed { _, nameOfTag ->
+                tagsInTransaction.forEachIndexed { _, nameOfTag ->
                     chipTags = Chip(requireContext())
                     chipTags.apply {
                         text = nameOfTag

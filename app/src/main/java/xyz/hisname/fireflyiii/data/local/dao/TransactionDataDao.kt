@@ -3,24 +3,20 @@ package xyz.hisname.fireflyiii.data.local.dao
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import java.math.BigDecimal
 
 @Dao
-abstract class TransactionDataDao: BaseDao<TransactionData> {
+abstract class TransactionDataDao: BaseDao<Transactions> {
 
-    @Query("SELECT * FROM transactions")
-    abstract fun getTransaction(): LiveData<MutableList<TransactionData>>
-
-    @Query("SELECT * FROM transactions WHERE transactionType =:type")
-    abstract fun getTransactionList(type: String): MutableList<TransactionData>
+    @Query("SELECT * FROM transactions WHERE transactionType = :type")
+    abstract fun getTransactionList(type: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
-    abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<TransactionData>>
+    abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<Transactions>>
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
-    abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<TransactionData>
-
+    abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<Transactions>
 
     // That is a really loooooooong name
     @Query("SELECT sum(amount) FROM transactions WHERE (date BETWEEN :startDate AND :endDate)" +
@@ -93,7 +89,7 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
 
     @Query("SELECT sum(amount) as someValue FROM transactions WHERE (date BETWEEN :startDate " +
             "AND :endDate) AND currency_code = :currencyCode AND transactionType =:transactionType AND" +
-            " budget_name IS NULL")
+           " budget_name IS NULL")
     abstract fun getTransactionByDateAndNullBudgetAndCurrency(startDate: String, endDate: String,
                                                               currencyCode: String,
                                                               transactionType: String): Double
@@ -105,28 +101,28 @@ abstract class TransactionDataDao: BaseDao<TransactionData> {
                                                             currencyCode: String, sourceName: String, transactionType: String): Double
 
     @Query("SELECT * FROM transactions order by transactionId desc limit :limit")
-    abstract fun getRecentTransactions(limit: Int): MutableList<TransactionData>
+    abstract fun getRecentTransactions(limit: Int): MutableList<Transactions>
 
     @Query("SELECT * FROM transactions WHERE transactionType = :transactionType order by transactionId desc limit :limit")
-    abstract fun getRecentTransactions(limit: Int, transactionType: String): MutableList<TransactionData>
+    abstract fun getRecentTransactions(limit: Int, transactionType: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactions WHERE transactionId = :transactionId")
-    abstract fun getTransactionById(transactionId: Long): MutableList<TransactionData>
+    abstract fun getTransactionById(transactionId: Long): MutableList<Transactions>
 
     @Query("DELETE FROM transactions WHERE transactionId = :transactionId")
     abstract fun deleteTransactionById(transactionId: Long): Int
 
-    @Query("DELETE FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
+   @Query("DELETE FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String): Int
 
     @Query("DELETE FROM transactions WHERE (date BETWEEN :startDate AND :endDate)")
     abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?): Int
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND source_name = :accountName")
-    abstract fun getTransactionListByDateAndAccount(startDate: String, endDate: String, accountName: String): MutableList<TransactionData>
+    abstract fun getTransactionListByDateAndAccount(startDate: String, endDate: String, accountName: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactions WHERE (date BETWEEN :startDate AND :endDate) AND budget_name = :budgetName")
-    abstract fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): MutableList<TransactionData>
+    abstract fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): MutableList<Transactions>
 
     @Query("DELETE FROM transactions")
     abstract fun deleteTransaction(): Int

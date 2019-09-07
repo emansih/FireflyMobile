@@ -9,6 +9,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 import java.math.BigDecimal
@@ -18,17 +19,17 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                             private val transactionService: TransactionService?) {
 
     suspend fun insertTransaction(transaction: TransactionData){
-        transactionDao.insert(transaction)
+        //transactionDao.insert(transaction)
     }
 
     suspend fun allWithdrawalWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): Double {
         loadRemoteData(startDate, endDate, "Withdrawal")
         return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Withdrawal", currencyCode)
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "withdrawal", currencyCode)
     }
 
 
-    suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<TransactionData>{
+    suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<Transactions>{
         loadRemoteData(startDate, endDate, source)
         return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
             transactionDao.getTransactionList(source)
@@ -41,7 +42,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun allDepositWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): Double {
         loadRemoteData(startDate, endDate, "Deposit")
         return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "Deposit", currencyCode)
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "deposit", currencyCode)
     }
 
     suspend fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
@@ -125,12 +126,12 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
     }
 
-    suspend fun recentTransactions(limit: Int): MutableList<TransactionData>{
+    suspend fun recentTransactions(limit: Int): MutableList<Transactions>{
         loadRemoteData("", "", "all")
         return transactionDao.getRecentTransactions(limit)
     }
 
-    suspend fun getTransactionById(transactionId: Long): MutableList<TransactionData>{
+    suspend fun getTransactionById(transactionId: Long): MutableList<Transactions>{
         var networkCall: Response<TransactionModel>? = null
         val transactionData: MutableList<TransactionData> = arrayListOf()
         try {
@@ -144,7 +145,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 withContext(Dispatchers.IO) {
                     transactionData.forEachIndexed { _, data ->
-                        transactionDao.insert(data)
+                        transactionDao.insert(data.transactionAttributes?.transactions!![0])
                     }
                 }
             }
@@ -171,13 +172,13 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     suspend fun getTransactionListByDateAndAccount(startDate: String, endDate: String,
-                                                   accountName: String): MutableList<TransactionData>{
+                                                   accountName: String): MutableList<Transactions>{
         loadRemoteData(startDate, endDate, "all")
         return transactionDao.getTransactionListByDateAndAccount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountName)
     }
     suspend fun getTransactionListByDateAndBudget(startDate: String, endDate: String,
-                                                  budgetName: String): MutableList<TransactionData> {
+                                                  budgetName: String): MutableList<Transactions> {
         loadRemoteData(startDate, endDate, "all")
         return transactionDao.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), budgetName)
@@ -194,14 +195,21 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
         var networkCall: Response<TransactionModel>? = null
-        val transactionData: MutableList<TransactionData> = arrayListOf()
+        val transactionData: MutableList<Transactions> = arrayListOf()
         try {
             withContext(Dispatchers.IO) {
                 withContext(Dispatchers.IO) {
                     networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
                             convertString(sourceName), 1)
                 }
-                transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
+                networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
+                    if(transaction.transactionAttributes?.transactions?.size == 1){
+                        // Deposit / Withdrawal
+                        transactionDao.insert(transaction.transactionAttributes?.transactions!![0])
+                    } else {
+                        // Transfer
+                    }
+                }
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
@@ -209,10 +217,16 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 if (pagination.total_pages != pagination.current_page) {
                     withContext(Dispatchers.IO) {
                         for (items in 2..pagination.total_pages) {
-                            transactionData.addAll(
-                                    transactionService?.getPaginatedTransactions(startDate, endDate,
-                                            convertString(sourceName), items)?.body()?.data?.toMutableList() ?: arrayListOf()
-                            )
+                            val service = transactionService?.getPaginatedTransactions(startDate, endDate,
+                                    convertString(sourceName), items)?.body()?.data
+                            if(service?.size == 1){
+                                // Deposit / Withdrawal
+                                service.forEachIndexed { _, dataToBeAdded ->
+                                    transactionDao.insert(dataToBeAdded.transactionAttributes?.transactions!![0])
+                                }
+                            } else {
+                                // Transfer
+                            }
                         }
                     }
                 }
@@ -225,7 +239,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     }
                 }
             }
-        } catch (exception: Exception){ }
+        } catch (exception: Exception){
+            
+        }
     }
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()

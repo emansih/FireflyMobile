@@ -16,8 +16,8 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMonth
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
@@ -37,12 +37,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     fun getTransactionList(startDate: String?, endDate: String?, transactionType: String) = loadRemoteData(startDate, endDate, transactionType)
 
-    fun getRecentTransaction(limit: Int): LiveData<MutableList<TransactionData>>{
+    fun getRecentTransaction(limit: Int): LiveData<MutableList<Transactions>>{
         isLoading.value = true
-        var recentData: MutableList<TransactionData> = arrayListOf()
-        val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
+        var recentData: MutableList<Transactions> = arrayListOf()
+        val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            recentData = repository.recentTransactions(limit)
+            repository.recentTransactions(limit)
         }.invokeOnCompletion {
             data.postValue(recentData)
         }
@@ -217,9 +217,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun getTransactionListByDateAndAccount(startDate: String, endDate: String,
-                                            accountName: String): MutableLiveData<MutableList<TransactionData>>{
-        val transactionData: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        var data: MutableList<TransactionData> = arrayListOf()
+                                            accountName: String): MutableLiveData<MutableList<Transactions>>{
+        val transactionData: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
+        var data: MutableList<Transactions> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {
             data = repository.getTransactionListByDateAndAccount(startDate, endDate, accountName)
         }.invokeOnCompletion {
@@ -308,9 +308,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return apiResponse
     }
 
-    fun getTransactionById(transactionId: Long): LiveData<MutableList<TransactionData>>{
-        val transactionData: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        var data: MutableList<TransactionData> = arrayListOf()
+    fun getTransactionById(transactionId: Long): LiveData<MutableList<Transactions>>{
+        val transactionData: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
+        var data: MutableList<Transactions> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {
             data = repository.getTransactionById(transactionId)
         }.invokeOnCompletion {
@@ -338,10 +338,10 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
 
-    private fun loadRemoteData(startDate: String?, endDate: String?, source: String): LiveData<MutableList<TransactionData>>{
-        var transactionData: MutableList<TransactionData> = arrayListOf()
+    private fun loadRemoteData(startDate: String?, endDate: String?, source: String): LiveData<MutableList<Transactions>>{
+        var transactionData: MutableList<Transactions> = arrayListOf()
         isLoading.value = true
-        val data: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
+        val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionData = repository.transactionList(startDate, endDate, source)
         }.invokeOnCompletion {
@@ -394,9 +394,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): LiveData<MutableList<TransactionData>>{
-        val transactionData: MutableLiveData<MutableList<TransactionData>> = MutableLiveData()
-        var data: MutableList<TransactionData> = arrayListOf()
+    fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): LiveData<MutableList<Transactions>>{
+        val transactionData: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
+        var data: MutableList<Transactions> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {
             data = repository.getTransactionListByDateAndBudget(startDate, endDate, budgetName)
         }.invokeOnCompletion {

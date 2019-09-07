@@ -38,6 +38,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
         swipeContainer.isRefreshing = true
         dataAdapter.clear()
         transactionViewModel.getTransactionList(currentDate, currentDate, transactionType).observe(this) {
+            println("data: " + it)
             dataAdapter = ArrayList(it)
             displayResults()
         }

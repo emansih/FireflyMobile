@@ -8,7 +8,6 @@ data class TransactionData(
         @Ignore
         var type: String = "",
         @PrimaryKey(autoGenerate = false)
-        @SerializedName("id")
         var transactionId: Long? = null,
         @Embedded
         @SerializedName("attributes")
