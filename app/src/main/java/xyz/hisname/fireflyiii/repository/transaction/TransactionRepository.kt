@@ -203,12 +203,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                             convertString(sourceName), 1)
                 }
                 networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
-                    if(transaction.transactionAttributes?.transactions?.size == 1){
-                        // Deposit / Withdrawal
-                        transactionDao.insert(transaction.transactionAttributes?.transactions!![0])
-                    } else {
-                        // Transfer
-                    }
+                    transactionDao.insert(transaction.transactionAttributes?.transactions!![0])
                 }
             }
             val responseBody = networkCall?.body()
@@ -219,13 +214,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                         for (items in 2..pagination.total_pages) {
                             val service = transactionService?.getPaginatedTransactions(startDate, endDate,
                                     convertString(sourceName), items)?.body()?.data
-                            if(service?.size == 1){
-                                // Deposit / Withdrawal
-                                service.forEachIndexed { _, dataToBeAdded ->
-                                    transactionDao.insert(dataToBeAdded.transactionAttributes?.transactions!![0])
-                                }
-                            } else {
-                                // Transfer
+                            service?.forEachIndexed { _, dataToBeAdded ->
+                                transactionDao.insert(dataToBeAdded.transactionAttributes?.transactions!![0])
                             }
                         }
                     }
