@@ -31,6 +31,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -48,7 +49,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
-    private val transactionId by lazy { arguments?.getLong("transactionId") ?: 0 }
+    private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private var currency = ""
     private var tags = ArrayList<String>()
     private var piggyBankList = ArrayList<String>()
@@ -77,7 +78,7 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setIcons()
         setWidgets()
-        if(transactionId != 0L){
+        if(transactionJournalId != 0L){
             add_attachment_button.isVisible = true
             add_attachment_button.setOnClickListener {
                 openDocViewer()
@@ -128,7 +129,7 @@ class AddTransactionFragment: BaseFragment() {
                     destinationAccount = destination_exposed_dropdown.getString()
                 }
             }
-            if(transactionId != 0L){
+            if(transactionJournalId != 0L){
                 updateData()
             } else {
                 submitData()
@@ -142,7 +143,7 @@ class AddTransactionFragment: BaseFragment() {
         } else {
             transaction_date_edittext.getString()
         }
-        transactionViewModel.updateTransaction(transactionId,transactionType, description_edittext.getString(),
+        transactionViewModel.updateTransaction(transactionJournalId,transactionType, description_edittext.getString(),
                 transactionDateTime, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
                 transactionTags, budgetName).observe(this) { transactionResponse->
@@ -440,8 +441,8 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun updateTransactionSetup(){
-        transactionViewModel.getTransactionById(transactionId).observe(this) {
-            val transactionAttributes = it[0]
+        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(this) { transactionData ->
+            val transactionAttributes = transactionData[0]
             description_edittext.setText(transactionAttributes?.description)
             transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount).toString())
             budget_edittext.setText(transactionAttributes?.budget_name)
@@ -507,7 +508,7 @@ class AddTransactionFragment: BaseFragment() {
             if (requestCode == OPEN_REQUEST_CODE) {
                 if (resultData != null) {
                     val fileUri = resultData.data
-                    AttachmentWorker.initWorker(fileUri, transactionId)
+                    AttachmentWorker.initWorker(fileUri, transactionJournalId)
                     toastInfo("File will be uploaded in the background")
                 }
             }

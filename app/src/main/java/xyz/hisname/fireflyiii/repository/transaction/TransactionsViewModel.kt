@@ -15,9 +15,7 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMonth
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
+import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
@@ -35,14 +33,25 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         repository = TransactionRepository(transactionDataDao, transactionService)
     }
 
-    fun getTransactionList(startDate: String?, endDate: String?, transactionType: String) = loadRemoteData(startDate, endDate, transactionType)
+    fun getTransactionList(startDate: String?, endDate: String?, transactionType: String): LiveData<MutableList<Transactions>> {
+        var transactionData: MutableList<Transactions> = arrayListOf()
+        isLoading.value = true
+        val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            transactionData = repository.transactionList(startDate, endDate, transactionType)
+        }.invokeOnCompletion {
+            data.postValue(transactionData)
+            isLoading.postValue(false)
+        }
+        return data
+    }
 
     fun getRecentTransaction(limit: Int): LiveData<MutableList<Transactions>>{
         isLoading.value = true
         var recentData: MutableList<Transactions> = arrayListOf()
         val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            repository.recentTransactions(limit)
+            recentData = repository.recentTransactions(limit)
         }.invokeOnCompletion {
             data.postValue(recentData)
         }
@@ -255,7 +264,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             if (response.isSuccessful) {
                 viewModelScope.launch(Dispatchers.IO){
                     response.body()?.data?.forEachIndexed { _, transaction ->
-                        repository.insertTransaction(transaction)
+                        repository.insertTransaction(transaction.transactionAttributes?.transactions!![0])
+                        repository.insertTransaction(TransactionIndex(transaction.transactionId,
+                                transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
                     }
                 }
                 transaction.postValue(ApiResponses(response.body()))
@@ -268,62 +279,71 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return apiResponse
     }
 
-    fun updateTransaction(transactionId: Long, type: String, description: String,
+    fun updateTransaction(transactionJournalId: Long, type: String, description: String,
                        date: String, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
                        category: String?, tags: String?, budgetName: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        transactionService?.updateTransaction(transactionId, convertString(type),description,date,
-                amount.replace(',', '.'),sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
-            val errorBody = response.errorBody()
-            var errorBodyMessage = ""
-            if (errorBody != null) {
-                errorBodyMessage = String(errorBody.bytes())
-                val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
-                errorBodyMessage = when {
-                    gson.errors.transactions_currency != null -> "Currency Code Required"
-                    gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
-                    gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
-                    gson.errors.transactions_source_name != null -> "Invalid Source Account"
-                    gson.errors.transaction_destination_id != null -> gson.errors.transaction_destination_id[0]
-                    gson.errors.transaction_amount != null -> "Amount field is required"
-                    gson.errors.description != null -> "Description is required"
-                    else -> "Error occurred while saving transaction"
-                }
-            }
-            if (response.isSuccessful) {
-                viewModelScope.launch(Dispatchers.IO){
-                    response.body()?.data?.forEachIndexed { _, transaction ->
-                        repository.insertTransaction(transaction)
+        var transactionId = 0L
+        viewModelScope.launch(Dispatchers.IO){
+            transactionId = repository.getJournalIdFromTransactionId(transactionJournalId)
+        }.invokeOnCompletion {
+            transactionService?.updateTransaction(transactionId, convertString(type), description, date,
+                    amount.replace(',', '.'), sourceName, destinationName, currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
+                val errorBody = response.errorBody()
+                var errorBodyMessage = ""
+                if (errorBody != null) {
+                    errorBodyMessage = String(errorBody.bytes())
+                    val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                    errorBodyMessage = when {
+                        gson.errors.transactions_currency != null -> "Currency Code Required"
+                        gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
+                        gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
+                        gson.errors.transactions_source_name != null -> "Invalid Source Account"
+                        gson.errors.transaction_destination_id != null -> gson.errors.transaction_destination_id[0]
+                        gson.errors.transaction_amount != null -> "Amount field is required"
+                        gson.errors.description != null -> "Description is required"
+                        else -> "Error occurred while saving transaction"
                     }
                 }
-                transaction.postValue(ApiResponses(response.body()))
-            } else {
-                transaction.postValue(ApiResponses(errorBodyMessage))
-            }
-        })
-        { throwable -> transaction.value = ApiResponses(throwable) })
+                if (response.isSuccessful) {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        response.body()?.data?.forEachIndexed { _, transaction ->
+                            repository.insertTransaction(transaction.transactionAttributes?.transactions!![0])
+                            repository.insertTransaction(TransactionIndex(transaction.transactionId,
+                                    transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+
+                        }
+                    }
+                    transaction.postValue(ApiResponses(response.body()))
+                } else {
+                    transaction.postValue(ApiResponses(errorBodyMessage))
+                }
+            })
+            { throwable -> transaction.value = ApiResponses(throwable) })
+        }
         apiResponse.addSource(transaction) { apiResponse.value = it }
         return apiResponse
     }
 
-    fun getTransactionById(transactionId: Long): LiveData<MutableList<Transactions>>{
+    fun getTransactionByJournalId(transactionJournalId: Long): LiveData<MutableList<Transactions>>{
         val transactionData: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
         var data: MutableList<Transactions> = arrayListOf()
-        viewModelScope.launch(Dispatchers.IO) {
-            data = repository.getTransactionById(transactionId)
+        viewModelScope.launch(Dispatchers.IO){
+            data = repository.getTransactionByJournalId(transactionJournalId)
         }.invokeOnCompletion {
             transactionData.postValue(data)
         }
         return transactionData
     }
 
-    fun deleteTransaction(transactionId: Long): LiveData<Boolean>{
+    fun deleteTransaction(transactionJournalId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
+            val transactionId = repository.getJournalIdFromTransactionId(transactionJournalId)
             isItDeleted = repository.deleteTransactionById(transactionId, true)
         }.invokeOnCompletion {
             if(isItDeleted) {
@@ -338,59 +358,51 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
 
-    private fun loadRemoteData(startDate: String?, endDate: String?, source: String): LiveData<MutableList<Transactions>>{
-        var transactionData: MutableList<Transactions> = arrayListOf()
-        isLoading.value = true
-        val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            transactionData = repository.transactionList(startDate, endDate, source)
-        }.invokeOnCompletion {
-            data.postValue(transactionData)
-            isLoading.postValue(false)
-        }
-        return data
-    }
-
-    fun getTransactionAttachment(transactionId: Long, journalId: Long): MutableLiveData<MutableList<AttachmentData>>{
+    fun getTransactionAttachment(journalId: Long): MutableLiveData<MutableList<AttachmentData>>{
         isLoading.value = true
         val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao())
         val data: MutableLiveData<MutableList<AttachmentData>> = MutableLiveData()
         var attachmentData: MutableList<AttachmentData> = arrayListOf()
-        transactionService?.getTransactionAttachment(transactionId)?.enqueue(retrofitCallback({ response ->
-            if(response.isSuccessful){
-                response.body()?.data?.forEachIndexed { _, attachmentData ->
-                    viewModelScope.launch(Dispatchers.IO){
-                        attachmentRepository.insertAttachmentInfo(attachmentData)
+        var transactionId = 0L
+        viewModelScope.launch(Dispatchers.IO) {
+            transactionId = repository.getJournalIdFromTransactionId(journalId)
+        }.invokeOnCompletion {
+            transactionService?.getTransactionAttachment(transactionId)?.enqueue(retrofitCallback({ response ->
+                if (response.isSuccessful) {
+                    response.body()?.data?.forEachIndexed { _, attachmentData ->
+                        viewModelScope.launch(Dispatchers.IO) {
+                            attachmentRepository.insertAttachmentInfo(attachmentData)
+                        }
+                    }
+                    data.postValue(response.body()?.data)
+                    isLoading.value = false
+                } else {
+                    /** 7 March 2019
+                     * In an ideal world, we should be using foreign keys and relationship to
+                     * retrieve related attachments by transaction ID. but alas! the world we live in
+                     * isn't ideal, therefore we have to develop a hack.
+                     *
+                     * P.S. This was a bad database design mistake I made when I wrote this software. On
+                     * hindsight I should have looked at James Cole's design schema. But hindsight 10/10
+                     **/
+                    viewModelScope.launch(Dispatchers.IO) {
+                        attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
+                    }.invokeOnCompletion {
+                        isLoading.postValue(false)
+                        data.postValue(attachmentData)
                     }
                 }
-                data.postValue(response.body()?.data)
-                isLoading.value = false
-            } else {
-                /** 7 March 2019
-                 * In an ideal world, we should be using foreign keys and relationship to
-                 * retrieve related attachments by transaction ID. but alas! the world we live in
-                 * isn't ideal, therefore we have to develop a hack.
-                 *
-                 * P.S. This was a bad database design mistake I made when I wrote this software. On
-                 * hindsight I should have looked at James Cole's design schema. But hindsight 10/10
-                 **/
-                viewModelScope.launch(Dispatchers.IO){
+            })
+            { throwable ->
+                viewModelScope.launch(Dispatchers.IO) {
                     attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
                 }.invokeOnCompletion {
                     isLoading.postValue(false)
                     data.postValue(attachmentData)
                 }
-            }
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO){
-                attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
-            }.invokeOnCompletion {
-                isLoading.postValue(false)
-                data.postValue(attachmentData)
-            }
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+                apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+            })
+        }
         return data
     }
 

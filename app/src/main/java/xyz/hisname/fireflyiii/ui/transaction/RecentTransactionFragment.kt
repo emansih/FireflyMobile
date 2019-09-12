@@ -8,12 +8,12 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
@@ -63,7 +63,7 @@ class RecentTransactionFragment: BaseFragment() {
     private fun itemClicked(data: Transactions){
         requireFragmentManager().commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionId" to data.transaction_journal_id)
+                arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
             addToBackStack(null)
         }

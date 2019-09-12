@@ -17,7 +17,7 @@ import xyz.hisname.fireflyiii.util.extension.toastSuccess
 class DeleteTransactionDialog: BaseFragment() {
 
     private val transactionDescription by lazy { arguments?.getString("transactionDescription", "") ?: "" }
-    private val transactionId by lazy { arguments?.getLong("transactionId", 0) ?: 0L }
+    private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId", 0) ?: 0L }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ class DeleteTransactionDialog: BaseFragment() {
                         .color(getCompatColor(R.color.md_green_600)))
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    transactionViewModel.deleteTransaction(transactionId).observe(this) {
+                    transactionViewModel.deleteTransaction(transactionJournalId).observe(this) {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if (it) {
                             toastSuccess(resources.getString(R.string.transaction_deleted))

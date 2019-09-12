@@ -15,7 +15,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
@@ -43,7 +42,7 @@ abstract class BaseTransactionFragment: BaseFragment() {
     protected fun itemClicked(data: Transactions){
         requireFragmentManager().commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionId" to data.transaction_journal_id)
+                arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
             addToBackStack(null)
         }

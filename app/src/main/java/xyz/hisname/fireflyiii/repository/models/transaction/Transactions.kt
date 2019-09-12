@@ -5,9 +5,10 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import org.threeten.bp.LocalDateTime
 
-@Entity
+@Entity(tableName = "transactionTable")
 data class Transactions(
-        var transactionId: Long? = null,
+        @PrimaryKey(autoGenerate = false)
+        var transaction_journal_id: Long,
         var amount: Double,
         var bill_id: Long,
         var bill_name: String?,
@@ -59,8 +60,6 @@ data class Transactions(
         var source_name: String?,
         var source_type: String?,
         var tags: List<String>,
-        @PrimaryKey(autoGenerate = false)
-        var transaction_journal_id: Long,
         @SerializedName("type")
         var transactionType: String?,
         var user: Int

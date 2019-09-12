@@ -27,20 +27,22 @@ class TransactionRecyclerAdapter(private val items: MutableList<Transactions>, p
 
     inner class RtAdapter(view: View): RecyclerView.ViewHolder(view) {
         fun bind(transactionAttributes: Transactions, clickListener: (Transactions) -> Unit){
-           if(transactionAttributes.description!!.length >= 25){
-               itemView.transactionNameText.text = transactionAttributes.description?.substring(0,25) + "..."
-           } else {
-               itemView.transactionNameText.text = transactionAttributes.description
-           }
-           itemView.sourceNameText.text = transactionAttributes.source_name
-           itemView.dateText.text = transactionAttributes.date.toString()
-           if(transactionAttributes.amount.toString().startsWith("-")){
+            if(transactionAttributes.description!!.length >= 25){
+                itemView.transactionNameText.text = transactionAttributes.description?.substring(0,25) + "..."
+            } else {
+                itemView.transactionNameText.text = transactionAttributes.description
+            }
+            itemView.sourceNameText.text = transactionAttributes.source_name
+            itemView.dateText.text = transactionAttributes.date.toString()
+            if(transactionAttributes.amount.toString().startsWith("-")){
                // Negative value means it's a withdrawal
                itemView.transactionAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
-               itemView.transactionAmountText.text = "-" + transactionAttributes.currency_symbol + Math.abs(transactionAttributes.amount)
-           } else {
-               itemView.transactionAmountText.text = transactionAttributes.currency_symbol + transactionAttributes.amount.toString()
-           }
+               itemView.transactionAmountText.text = "-" + transactionAttributes.currency_symbol +
+                       Math.abs(transactionAttributes.amount)
+            } else {
+               itemView.transactionAmountText.text = transactionAttributes.currency_symbol +
+                       transactionAttributes.amount.toString()
+            }
             itemView.list_item.setOnClickListener {clickListener(transactionAttributes)}
        }
     }

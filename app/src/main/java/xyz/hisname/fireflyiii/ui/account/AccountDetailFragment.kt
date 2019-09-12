@@ -254,10 +254,11 @@ class AccountDetailFragment: BaseDetailFragment() {
                 DividerItemDecoration.VERTICAL))
         transactionViewModel.getTransactionListByDateAndAccount(DateTimeUtil.getDaysBefore(
                 DateTimeUtil.getTodayDate(), 6), DateTimeUtil.getTodayDate(), accountName).observe(this){ transactionData ->
-                    val rtAdapter = TransactionRecyclerAdapter(transactionData){ data -> itemClicked(data) }
-                    accountTransactionList.adapter = rtAdapter
-                    rtAdapter.apply { accountTransactionList.adapter as TransactionRecyclerAdapter }
-                    rtAdapter.notifyDataSetChanged()
+          // TODO: FIX ME
+            //  val rtAdapter = TransactionRecyclerAdapter(transactionData){ data -> itemClicked(data) }
+           // accountTransactionList.adapter = rtAdapter
+           // rtAdapter.apply { accountTransactionList.adapter as TransactionRecyclerAdapter }
+           // rtAdapter.notifyDataSetChanged()
         }
     }
 

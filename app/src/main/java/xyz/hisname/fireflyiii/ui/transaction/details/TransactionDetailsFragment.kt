@@ -22,6 +22,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
@@ -32,7 +33,7 @@ import kotlin.collections.ArrayList
 
 class TransactionDetailsFragment: BaseFragment() {
 
-    private val transactionId by lazy { arguments?.getLong("transactionId", 0) ?: 0 }
+    private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId", 0) ?: 0 }
     private var transactionList: MutableList<DetailModel> = ArrayList()
     private var metaDataList: MutableList<DetailModel> = arrayListOf()
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
@@ -58,8 +59,7 @@ class TransactionDetailsFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setTransactionInfo()
-        setMetaInfo()
+        retrieveData()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,74 +68,77 @@ class TransactionDetailsFragment: BaseFragment() {
         fab.isVisible = false
     }
 
-    private fun setTransactionInfo(){
-        transactionList.clear()
-        transactionViewModel.getTransactionById(transactionId).observe(this) {
-            val details = it[0]
-            val model = arrayListOf(DetailModel("Type", details?.transactionType),
-                    DetailModel(resources.getString(R.string.description), details?.description),
-                    DetailModel(resources.getString(R.string.source_account), details?.source_name),
-                    DetailModel(resources.getString(R.string.destination_account), details?.destination_name),
-                    DetailModel(resources.getString(R.string.date), details?.date.toString()))
-            if(details?.foreign_amount != null && details.foreign_currency_symbol != null){
-                transactionList.add(DetailModel(resources.getString(R.string.amount),
-                        details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol
-                + details.foreign_amount + ")"))
-                transactionAmount = details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol +
-                        details.foreign_amount + ")"
-            } else {
-                transactionAmount = details?.currency_symbol + details?.amount
-                transactionList.add(DetailModel(resources.getString(R.string.amount),details?.currency_symbol + details?.amount.toString()))
-            }
-            transactionDescription = details?.description ?: ""
-            sourceAccountId = details?.source_id ?: 0L
-            destinationAccountId = details?.destination_id ?: 0L
-            transactionInfo = details?.transactionType ?: ""
-            transactionDate = details?.date.toString()
-            downloadAttachment(details?.transaction_journal_id ?: 0)
-            transactionList.addAll(model)
-            transaction_info.layoutManager = LinearLayoutManager(requireContext())
-            transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            transaction_info.adapter = TransactionDetailsRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
+    private fun retrieveData(){
+        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(this){ transactionData ->
+            setTransactionInfo(transactionData)
+            setMetaInfo(transactionData)
         }
     }
 
-    private fun setMetaInfo(){
+    private fun setTransactionInfo(transactionData: MutableList<Transactions>){
+        transactionList.clear()
+        val details = transactionData[0]
+        val model = arrayListOf(DetailModel("Type", details?.transactionType),
+                DetailModel(resources.getString(R.string.description), details?.description),
+                DetailModel(resources.getString(R.string.source_account), details?.source_name),
+                DetailModel(resources.getString(R.string.destination_account), details?.destination_name),
+                DetailModel(resources.getString(R.string.date), details?.date.toString()))
+        if(details?.foreign_amount != null && details.foreign_currency_symbol != null){
+            transactionList.add(DetailModel(resources.getString(R.string.amount),
+                    details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol
+                            + details.foreign_amount + ")"))
+            transactionAmount = details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol +
+                    details.foreign_amount + ")"
+        } else {
+            transactionAmount = details?.currency_symbol + details?.amount
+            transactionList.add(DetailModel(resources.getString(R.string.amount),details?.currency_symbol + details?.amount.toString()))
+        }
+        transactionDescription = details?.description ?: ""
+        sourceAccountId = details?.source_id ?: 0L
+        destinationAccountId = details?.destination_id ?: 0L
+        transactionInfo = details?.transactionType ?: ""
+        transactionDate = details?.date.toString()
+        downloadAttachment(details?.transaction_journal_id ?: 0)
+        transactionList.addAll(model)
+        transaction_info.layoutManager = LinearLayoutManager(requireContext())
+        transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        transaction_info.adapter = TransactionDetailsRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
+    }
+
+    private fun setMetaInfo(transactionData: MutableList<Transactions>){
         metaDataList.clear()
-        transactionViewModel.getTransactionById(transactionId).observe(this) {
-            val details = it[0]
-            transactionCategory = details?.category_name ?: ""
-            transactionBudget = details?.budget_name ?: ""
-            val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
-                    details?.category_name), DetailModel(resources.getString(R.string.budget), details?.budget_name))
-            metaDataList.addAll(model)
-            val tagsInTransaction = details?.tags
-            if(tagsInTransaction != null){
-                transaction_tags.setChipSpacing(16)
-                tagsInTransaction.forEachIndexed { _, nameOfTag ->
-                    chipTags = Chip(requireContext())
-                    chipTags.apply {
-                        text = nameOfTag
-                        chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                                .color(getCompatColor(R.color.md_green_400))
-                        setOnClickListener {
-                            requireFragmentManager().commit {
-                                val tagDetails = TagDetailsFragment()
-                                tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
-                                        "revealY" to fab.height / 2, "tagName" to nameOfTag)
-                                addToBackStack(null)
-                                replace(R.id.fragment_container, tagDetails)
-                            }
+        val details = transactionData[0]
+        transactionCategory = details?.category_name ?: ""
+        transactionBudget = details?.budget_name ?: ""
+        val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
+                details?.category_name), DetailModel(resources.getString(R.string.budget), details?.budget_name))
+        metaDataList.addAll(model)
+        val tagsInTransaction = details?.tags
+        if(tagsInTransaction.isNotEmpty()){
+            transaction_tags.setChipSpacing(16)
+            tagsInTransaction.forEachIndexed { _, nameOfTag ->
+                chipTags = Chip(requireContext())
+                chipTags.apply {
+                    text = nameOfTag
+                    chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
+                            .color(getCompatColor(R.color.md_green_400))
+                    setOnClickListener {
+                        requireFragmentManager().commit {
+                            val tagDetails = TagDetailsFragment()
+                            tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
+                                    "revealY" to fab.height / 2, "tagName" to nameOfTag)
+                            addToBackStack(null)
+                            replace(R.id.fragment_container, tagDetails)
                         }
                     }
-                    transaction_tags.addView(chipTags)
                 }
-                transaction_tags_card.isVisible = true
+                transaction_tags.addView(chipTags)
             }
-            meta_information.layoutManager = LinearLayoutManager(requireContext())
-            meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
+            transaction_tags_card.isVisible = true
         }
+        meta_information.layoutManager = LinearLayoutManager(requireContext())
+        meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
     }
 
     private fun setMetaInfoClick(position: Int){
@@ -199,7 +202,7 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun downloadAttachment(journalId: Long){
-        transactionViewModel.getTransactionAttachment(transactionId, journalId).observe(this) { attachment ->
+        transactionViewModel.getTransactionAttachment(journalId).observe(this) { attachment ->
             transactionViewModel.isLoading.observe(this){ loading ->
                 if (!loading && attachment.isNotEmpty()) {
                     attachment_information_card.isVisible = true
@@ -266,13 +269,13 @@ class TransactionDetailsFragment: BaseFragment() {
         R.id.menu_item_delete -> consume {
             requireFragmentManager().commit {
                 add(DeleteTransactionDialog().apply {
-                    arguments = bundleOf("transactionId" to transactionId, "transactionDescription" to transactionDescription)
+                    arguments = bundleOf("transactionJournalId" to transactionJournalId, "transactionDescription" to transactionDescription)
                 }, "")
             }
         }
         R.id.menu_item_edit -> consume {
             val addTransaction = AddTransactionFragment().apply {
-                arguments = bundleOf("transactionId" to transactionId, "SHOULD_HIDE" to true,
+                arguments = bundleOf("transactionJournalId" to transactionJournalId, "SHOULD_HIDE" to true,
                         "transactionType" to transactionInfo)
             }
             fragmentContainer.isVisible = false
