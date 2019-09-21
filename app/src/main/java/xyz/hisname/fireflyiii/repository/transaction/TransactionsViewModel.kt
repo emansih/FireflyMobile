@@ -16,6 +16,7 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.*
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
@@ -263,10 +264,10 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             }
             if (response.isSuccessful) {
                 viewModelScope.launch(Dispatchers.IO){
-                    response.body()?.data?.forEachIndexed { _, transaction ->
-                        repository.insertTransaction(transaction.transactionAttributes?.transactions!![0])
-                        repository.insertTransaction(TransactionIndex(transaction.transactionId,
-                                transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+                    response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
+                        repository.insertTransaction(transaction)
+                        repository.insertTransaction(TransactionIndex(response.body()?.data?.transactionId,
+                                transaction.transaction_journal_id))
                     }
                 }
                 transaction.postValue(ApiResponses(response.body()))
@@ -309,11 +310,12 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 }
                 if (response.isSuccessful) {
                     viewModelScope.launch(Dispatchers.IO) {
-                        response.body()?.data?.forEachIndexed { _, transaction ->
-                            repository.insertTransaction(transaction.transactionAttributes?.transactions!![0])
-                            repository.insertTransaction(TransactionIndex(transaction.transactionId,
-                                    transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-
+                        viewModelScope.launch(Dispatchers.IO){
+                            response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
+                                repository.insertTransaction(transaction)
+                                repository.insertTransaction(TransactionIndex(response.body()?.data?.transactionId,
+                                        transaction.transaction_journal_id))
+                            }
                         }
                     }
                     transaction.postValue(ApiResponses(response.body()))
