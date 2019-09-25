@@ -78,27 +78,27 @@ class TransactionDetailsFragment: BaseFragment() {
     private fun setTransactionInfo(transactionData: MutableList<Transactions>){
         transactionList.clear()
         val details = transactionData[0]
-        val model = arrayListOf(DetailModel("Type", details?.transactionType),
-                DetailModel(resources.getString(R.string.description), details?.description),
-                DetailModel(resources.getString(R.string.source_account), details?.source_name),
-                DetailModel(resources.getString(R.string.destination_account), details?.destination_name),
-                DetailModel(resources.getString(R.string.date), details?.date.toString()))
-        if(details?.foreign_amount != null && details.foreign_currency_symbol != null){
+        val model = arrayListOf(DetailModel("Type", details.transactionType),
+                DetailModel(resources.getString(R.string.description), details.description),
+                DetailModel(resources.getString(R.string.source_account), details.source_name),
+                DetailModel(resources.getString(R.string.destination_account), details.destination_name),
+                DetailModel(resources.getString(R.string.date), details.date.toString()))
+        if(details.foreign_amount != null && details.foreign_currency_symbol != null){
             transactionList.add(DetailModel(resources.getString(R.string.amount),
                     details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol
                             + details.foreign_amount + ")"))
             transactionAmount = details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol +
                     details.foreign_amount + ")"
         } else {
-            transactionAmount = details?.currency_symbol + details?.amount
-            transactionList.add(DetailModel(resources.getString(R.string.amount),details?.currency_symbol + details?.amount.toString()))
+            transactionAmount = details.currency_symbol + details.amount
+            transactionList.add(DetailModel(resources.getString(R.string.amount),details.currency_symbol + details.amount.toString()))
         }
-        transactionDescription = details?.description ?: ""
-        sourceAccountId = details?.source_id ?: 0L
-        destinationAccountId = details?.destination_id ?: 0L
-        transactionInfo = details?.transactionType ?: ""
-        transactionDate = details?.date.toString()
-        downloadAttachment(details?.transaction_journal_id ?: 0)
+        transactionDescription = details.description ?: ""
+        sourceAccountId = details.source_id ?: 0L
+        destinationAccountId = details.destination_id
+        transactionInfo = details.transactionType ?: ""
+        transactionDate = details.date.toString()
+        downloadAttachment(details.transaction_journal_id)
         transactionList.addAll(model)
         transaction_info.layoutManager = LinearLayoutManager(requireContext())
         transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
@@ -108,12 +108,12 @@ class TransactionDetailsFragment: BaseFragment() {
     private fun setMetaInfo(transactionData: MutableList<Transactions>){
         metaDataList.clear()
         val details = transactionData[0]
-        transactionCategory = details?.category_name ?: ""
-        transactionBudget = details?.budget_name ?: ""
+        transactionCategory = details.category_name ?: ""
+        transactionBudget = details.budget_name ?: ""
         val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
-                details?.category_name), DetailModel(resources.getString(R.string.budget), details?.budget_name))
+                transactionCategory), DetailModel(resources.getString(R.string.budget), transactionBudget))
         metaDataList.addAll(model)
-        val tagsInTransaction = details?.tags
+        val tagsInTransaction = details.tags
         if(tagsInTransaction.isNotEmpty()){
             transaction_tags.setChipSpacing(16)
             tagsInTransaction.forEachIndexed { _, nameOfTag ->
