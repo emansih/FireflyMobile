@@ -105,6 +105,7 @@ dependencies {
     implementation Dependencies.androidxPref
     implementation Dependencies.androidxWork
     implementation Dependencies.multiDex
+    implementation Dependencies.swipeRefreshLayout
 
     // Lifecycle component
     implementation Dependencies.lifecycleLibs
