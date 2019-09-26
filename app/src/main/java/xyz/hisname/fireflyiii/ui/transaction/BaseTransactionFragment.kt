@@ -5,10 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
@@ -17,7 +15,6 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 
@@ -38,15 +35,7 @@ abstract class BaseTransactionFragment: BaseFragment() {
     }
 
     abstract fun setupFab()
-
-    protected fun itemClicked(data: Transactions){
-        requireFragmentManager().commit {
-            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
-                arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
-            })
-            addToBackStack(null)
-        }
-    }
+    abstract fun itemClicked(data: Transactions)
 
     protected fun displayResults(){
         swipeContainer.isRefreshing = false

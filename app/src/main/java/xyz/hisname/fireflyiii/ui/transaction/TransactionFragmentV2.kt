@@ -13,7 +13,9 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.collections.ArrayList
@@ -40,6 +42,16 @@ class TransactionFragmentV2: BaseTransactionFragment(){
         transactionViewModel.getTransactionList(currentDate, currentDate, transactionType).observe(this) {
             dataAdapter = ArrayList(it)
             displayResults()
+        }
+    }
+
+    override fun itemClicked(data: Transactions){
+        fragment_transaction_rootview.isVisible = false
+        requireFragmentManager().commit {
+            add(R.id.fragment_container, TransactionDetailsFragment().apply {
+                arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
+            })
+            addToBackStack(null)
         }
     }
 

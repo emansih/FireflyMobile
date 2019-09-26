@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -288,5 +290,14 @@ class TransactionDetailsFragment: BaseFragment() {
 
     override fun handleBack() {
         requireFragmentManager().popBackStack()
+        val v2Layout = requireActivity().findViewById<CoordinatorLayout>(R.id.fragment_transaction_rootview)
+        if(v2Layout != null){
+            v2Layout.isVisible = true
+            val mainToolbar = requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
+            mainToolbar.title = convertString(transactionInfo)
+        }
     }
+
+    private fun convertString(type: String) = type.substring(0,1).toUpperCase() + type.substring(1).toLowerCase()
+
 }

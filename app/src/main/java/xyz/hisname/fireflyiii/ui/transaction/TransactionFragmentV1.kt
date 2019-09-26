@@ -16,7 +16,9 @@ import com.mikepenz.materialdrawer.DrawerBuilder
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.DateRangeViewModel
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -129,6 +131,14 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         }
     }
 
+    override fun itemClicked(data: Transactions) {
+        requireFragmentManager().commit {
+            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
+                arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
+            })
+            addToBackStack(null)
+        }
+    }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
