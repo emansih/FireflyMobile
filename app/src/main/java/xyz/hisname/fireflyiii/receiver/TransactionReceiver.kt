@@ -39,19 +39,19 @@ class TransactionReceiver: BroadcastReceiver()  {
                     val depositData = transactionData.putString("destinationName",
                             intent.getStringExtra("destinationName"))
                             .putString("billName", intent.getStringExtra("billName"))
-                    transactionWork(depositData, "deposit")
+                    transactionWork(context, depositData, "deposit")
                 }
                 intent.action == "firefly.hisname.ADD_WITHDRAW" -> {
                     val withdrawData = transactionData.putString("sourceName",
                             intent.getStringExtra("sourceName"))
-                    transactionWork(withdrawData, "withdrawal")
+                    transactionWork(context, withdrawData, "withdrawal")
                 }
                 intent.action == "firefly.hisname.ADD_TRANSFER" -> {
                     val transferData = transactionData
                             .putString("sourceName", intent.getStringExtra("sourceName"))
                             .putString("destinationName", intent.getStringExtra("destinationName"))
                             .putString("piggyBankName", intent.getStringExtra("piggyBankName"))
-                    transactionWork(transferData, "transfer")
+                    transactionWork(context, transferData, "transfer")
                 }
                 else -> {
 
@@ -60,13 +60,13 @@ class TransactionReceiver: BroadcastReceiver()  {
         }
     }
 
-    private fun transactionWork(data: Data.Builder, type: String){
+    private fun transactionWork(context: Context, data: Data.Builder, type: String){
         val transactionWork = OneTimeWorkRequest.Builder(TransactionWorker::class.java)
                 .setInputData(data.putString("transactionType" ,type).build())
                 .setConstraints(Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build())
                 .build()
-        WorkManager.getInstance().enqueue(transactionWork)
+        WorkManager.getInstance(context).enqueue(transactionWork)
     }
 }

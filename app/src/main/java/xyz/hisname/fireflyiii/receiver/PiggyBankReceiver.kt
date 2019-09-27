@@ -35,7 +35,7 @@ class PiggyBankReceiver: BroadcastReceiver() {
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .build())
                         .build()
-                WorkManager.getInstance().enqueue(piggybankWork)
+                WorkManager.getInstance(context).enqueue(piggybankWork)
             } else {
                // Invalid Intent
             }

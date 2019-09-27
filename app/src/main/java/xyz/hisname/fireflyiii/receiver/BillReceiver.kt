@@ -36,7 +36,7 @@ class BillReceiver: BroadcastReceiver() {
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .build())
                         .build()
-                WorkManager.getInstance().enqueue(billWork)
+                WorkManager.getInstance(context).enqueue(billWork)
             } else {
                 // Invalid intent
             }
