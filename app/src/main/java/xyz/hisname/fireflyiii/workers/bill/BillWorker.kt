@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.workers.bill
 
 import android.content.Context
+import android.content.Intent
 import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
@@ -55,5 +56,27 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                     Result.failure()
                 })
         return Result.success()
+    }
+
+    companion object {
+        fun initWorker(context: Context, intent: Intent){
+            val billData = Data.Builder()
+                    .putString("name", intent.getStringExtra("name"))
+                    .putString("minAmount", intent.getStringExtra("minAmount"))
+                    .putString("maxAmount", intent.getStringExtra("maxAmount"))
+                    .putString("billDate", intent.getStringExtra("billDate"))
+                    .putString("repeatFreq", intent.getStringExtra("repeatFreq"))
+                    .putString("skip", intent.getStringExtra("skip"))
+                    .putString("currencyCode", intent.getStringExtra("currencyCode"))
+                    .putString("notes", intent.getStringExtra("notes"))
+                    .build()
+            val billWork = OneTimeWorkRequest.Builder(BillWorker::class.java)
+                    .setInputData(billData)
+                    .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build())
+                    .build()
+            WorkManager.getInstance(context).enqueue(billWork)
+        }
     }
 }

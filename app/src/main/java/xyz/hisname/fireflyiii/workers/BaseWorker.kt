@@ -4,6 +4,7 @@ import android.accounts.AccountManager
 import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref

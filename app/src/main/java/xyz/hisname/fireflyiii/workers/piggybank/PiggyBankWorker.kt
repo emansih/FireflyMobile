@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.workers.piggybank
 
 import android.content.Context
+import android.content.Intent
 import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
@@ -52,6 +53,27 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             Result.failure()
         })
         return Result.success()
+    }
+
+    companion object {
+        fun initWorker(context: Context, intent: Intent){
+            val piggyData = Data.Builder()
+                    .putString("name", intent.getStringExtra("name"))
+                    .putString("accountId", intent.getStringExtra("accountId"))
+                    .putString("targetAmount", intent.getStringExtra("targetAmount"))
+                    .putString("currentAmount", intent.getStringExtra("currentAmount"))
+                    .putString("startDate", intent.getStringExtra("startDate"))
+                    .putString("endDate", intent.getStringExtra("endDate"))
+                    .putString("notes", intent.getStringExtra("notes"))
+                    .build()
+            val piggyBankWork = OneTimeWorkRequest.Builder(PiggyBankWorker::class.java)
+                    .setInputData(piggyData)
+                    .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build())
+                    .build()
+            WorkManager.getInstance(context).enqueue(piggyBankWork)
+        }
     }
 
 }

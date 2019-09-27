@@ -39,34 +39,24 @@ class TransactionReceiver: BroadcastReceiver()  {
                     val depositData = transactionData.putString("destinationName",
                             intent.getStringExtra("destinationName"))
                             .putString("billName", intent.getStringExtra("billName"))
-                    transactionWork(context, depositData, "deposit")
+                    TransactionWorker.initWorker(context, depositData, "deposit")
                 }
                 intent.action == "firefly.hisname.ADD_WITHDRAW" -> {
                     val withdrawData = transactionData.putString("sourceName",
                             intent.getStringExtra("sourceName"))
-                    transactionWork(context, withdrawData, "withdrawal")
+                    TransactionWorker.initWorker(context, withdrawData, "withdrawal")
                 }
                 intent.action == "firefly.hisname.ADD_TRANSFER" -> {
                     val transferData = transactionData
                             .putString("sourceName", intent.getStringExtra("sourceName"))
                             .putString("destinationName", intent.getStringExtra("destinationName"))
                             .putString("piggyBankName", intent.getStringExtra("piggyBankName"))
-                    transactionWork(context, transferData, "transfer")
+                    TransactionWorker.initWorker(context, transferData, "transfer")
                 }
                 else -> {
 
                 }
             }
         }
-    }
-
-    private fun transactionWork(context: Context, data: Data.Builder, type: String){
-        val transactionWork = OneTimeWorkRequest.Builder(TransactionWorker::class.java)
-                .setInputData(data.putString("transactionType" ,type).build())
-                .setConstraints(Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .build())
-                .build()
-        WorkManager.getInstance(context).enqueue(transactionWork)
     }
 }

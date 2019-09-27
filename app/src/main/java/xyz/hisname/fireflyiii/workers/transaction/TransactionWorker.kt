@@ -78,4 +78,15 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
 
+    companion object {
+        fun initWorker(context: Context, data: Data.Builder, type: String) {
+            val transactionWork = OneTimeWorkRequest.Builder(TransactionWorker::class.java)
+                    .setInputData(data.putString("transactionType", type).build())
+                    .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build())
+                    .build()
+            WorkManager.getInstance(context).enqueue(transactionWork)
+        }
+    }
 }

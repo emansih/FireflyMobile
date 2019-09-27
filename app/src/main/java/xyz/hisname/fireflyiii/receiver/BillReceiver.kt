@@ -20,25 +20,7 @@ class BillReceiver: BroadcastReceiver() {
             notif.showNotSignedIn()
         } else {
             if(intent.action == "firefly.hisname.ADD_BILL"){
-                val billData = Data.Builder()
-                        .putString("name", intent.getStringExtra("name"))
-                        .putString("minAmount", intent.getStringExtra("minAmount"))
-                        .putString("maxAmount", intent.getStringExtra("maxAmount"))
-                        .putString("billDate", intent.getStringExtra("billDate"))
-                        .putString("repeatFreq", intent.getStringExtra("repeatFreq"))
-                        .putString("skip", intent.getStringExtra("skip"))
-                        .putString("currencyCode", intent.getStringExtra("currencyCode"))
-                        .putString("notes", intent.getStringExtra("notes"))
-                        .build()
-                val billWork = OneTimeWorkRequest.Builder(BillWorker::class.java)
-                        .setInputData(billData)
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .build())
-                        .build()
-                WorkManager.getInstance(context).enqueue(billWork)
-            } else {
-                // Invalid intent
+                BillWorker.initWorker(context, intent)
             }
         }
     }
