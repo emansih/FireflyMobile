@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
+import android.content.Intent
 import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
@@ -16,7 +17,31 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
     private val channelIcon = R.drawable.ic_euro_sign
 
     companion object {
-        fun initWorker(accountName: String, accountType: String,
+
+        fun initWorker(context: Context, intent: Intent){
+            val accountName = intent.getStringExtra("accountName") ?: ""
+            val accountType = intent.getStringExtra("accountType") ?: ""
+            val currencyCode = intent.getStringExtra("currencyCode")
+            val iban = intent.getStringExtra("iban")
+            val bic = intent.getStringExtra("bic")
+            val accountNumber = intent.getStringExtra("accountNumber")
+            val openingBalance = intent.getStringExtra("openingBalance")
+            val openingBalanceDate = intent.getStringExtra("openingBalanceDate")
+            val accountRole = intent.getStringExtra("accountRole")
+            val virtualBalance = intent.getStringExtra("virtualBalance")
+            val includeNetWorth = intent.getBooleanExtra("includeNetWorth", false)
+            val notes = intent.getStringExtra("notes")
+            val liabilityType = intent.getStringExtra("liabilityType")
+            val liabilityAmount = intent.getStringExtra("liabilityAmount")
+            val liabilityStartDate = intent.getStringExtra("liabilityStartDate")
+            val interest = intent.getStringExtra("interest")
+            val interestPeriod = intent.getStringExtra("interestPeriod")
+            initWorker(context, accountName, accountType, currencyCode, iban, bic, accountNumber, openingBalance,
+                    openingBalanceDate, accountRole, virtualBalance, includeNetWorth, notes,
+                    liabilityType, liabilityAmount, liabilityStartDate, interest, interestPeriod)
+        }
+
+        fun initWorker(context: Context, accountName: String, accountType: String,
                        currencyCode: String?, iban: String?, bic: String?, accountNumber: String?,
                        openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                        virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
@@ -46,7 +71,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build())
                     .build()
-            WorkManager.getInstance().enqueue(accountWork)
+            WorkManager.getInstance(context).enqueue(accountWork)
         }
     }
 
