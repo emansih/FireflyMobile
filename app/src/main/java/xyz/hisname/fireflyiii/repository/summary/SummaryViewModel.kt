@@ -23,18 +23,32 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     // so dirty I went to take a shower after writing this code
-                    val netWorth = JSONObject(responseBody)
-                            .getJSONObject("net-worth-in-$currencyCode")
-                            .getDouble("monetary_value")
+                    val netWorth = try {
+                        JSONObject(responseBody)
+                                .getJSONObject("net-worth-in-$currencyCode")
+                                .getDouble("monetary_value")
+                    } catch (exception: Exception){
+                        0.0
+                    }
                     simpleData.networthValue = netWorth
-                    val leftToSpend =  JSONObject(responseBody)
-                            .getJSONObject("left-to-spend-in-$currencyCode")
-                            .getDouble("monetary_value")
+                    val leftToSpend = try {
+                        JSONObject(responseBody)
+                                .getJSONObject("left-to-spend-in-$currencyCode")
+                                .getDouble("monetary_value")
+                    } catch (exception: Exception){
+                        0.0
+                    }
                     simpleData.leftToSpend = leftToSpend
-                    val balance = JSONObject(responseBody)
-                            .getJSONObject("balance-in-$currencyCode")
-                            .getDouble("monetary_value")
+
+                    val balance = try {
+                        JSONObject(responseBody)
+                                .getJSONObject("balance-in-$currencyCode")
+                                .getDouble("monetary_value")
+                    } catch(exception: Exception){
+                        0.0
+                    }
                     simpleData.balance = balance
+
                     leftToSpendValue.postValue(leftToSpend)
                     networthValue.postValue(netWorth)
                     balanceValue.postValue(balance)
