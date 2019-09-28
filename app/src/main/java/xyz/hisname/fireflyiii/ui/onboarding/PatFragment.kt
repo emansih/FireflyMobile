@@ -63,7 +63,7 @@ class PatFragment: Fragment() {
                 fireflyUrl = firefly_url_edittext.getString()
                 AuthenticatorManager(accountManager).initializeAccount()
                 AppPref(sharedPref).baseUrl = fireflyUrl
-                AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString()
+                AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString().trim()
                 model.getAccountByType("asset").observe(this) { accountData ->
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                     if(accountData.isNotEmpty()){
