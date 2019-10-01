@@ -103,4 +103,5 @@
     <string name="left_to_pay_per_day">Per dag:</string>
     <string name="bills_paid">Betaald:</string>
     <string name="bills_to_pay">Openstaande contracten</string>
+    <string name="edit">Wijzig</string>
 </resources>

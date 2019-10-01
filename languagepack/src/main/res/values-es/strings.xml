@@ -105,4 +105,5 @@
     <string name="bills_paid">Pagado:</string>
     <string name="bills_to_pay">Facturas por pagar</string>
     <string name="left_to_pay_per_day">Por dia:</string>
+    <string name="edit">Editar</string>
 </resources>

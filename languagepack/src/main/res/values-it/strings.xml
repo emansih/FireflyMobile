@@ -104,5 +104,7 @@
     <string name="bills_paid">"Pagati: "</string>
     <string name="bills_to_pay">Bollette da pagare</string>
     <string name="left_to_pay_per_day">Al giorno:</string>
+    <string name="piggy_bank_deleted">Salvadanaio eliminato %1$s</string>
+    <string name="edit">Modifica</string>
 
 </resources>
