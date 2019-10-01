@@ -154,7 +154,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:layout_marginStart="8dp"
-                        android:text="Bills To Pay"
+                        android:text="@string/bills_to_pay"
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@+id/billsIcon"
@@ -175,7 +175,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        android:text="Paid: "
+                        android:text="@string/bills_paid"
                         app:layout_constraintTop_toBottomOf="@+id/billsText"
                         app:layout_constraintStart_toStartOf="@+id/billsTextView" />
 
@@ -262,7 +262,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        android:text="Per day: "
+                        android:text="@string/left_to_pay_per_day"
                         app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
                         app:layout_constraintStart_toStartOf="@+id/leftToSpendAmountText" />
 

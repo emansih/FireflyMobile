@@ -100,4 +100,7 @@
     <string name="iban_help_text">Geef je rekeningen een geldige IBAN. Dat scheelt met importeren van data.</string>
     <string name="opening_balance_help_text">Betaalrekeningen kunnen een startsaldo hebben, waarmee het begin van deze rekening in Firefly III wordt aangegeven.</string>
     <string name="virtual_balance_help_text">Soms is het handig om je betaalrekening een virtueel saldo te geven: een extra bedrag dat altijd bij het daadwerkelijke saldo wordt opgeteld.</string>
+    <string name="left_to_pay_per_day">Per dag:</string>
+    <string name="bills_paid">Betaald:</string>
+    <string name="bills_to_pay">Openstaande contracten</string>
 </resources>

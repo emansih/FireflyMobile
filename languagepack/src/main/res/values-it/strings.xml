@@ -101,5 +101,8 @@
     <string name="iban_help_text">Dai ai tuoi conti un IBAN valido. Ciò potrebbe rendere molto facile l\\\'importazione dei dati in futuro.</string>
     <string name="opening_balance_help_text">I conti attività possono avere un \"saldo di apertura\", che indica l\\\'inizio della cronologia di questo conto in Firefly III.</string>
     <string name="virtual_balance_help_text">A volte può aiutare a fornire al tuo conto un saldo virtuale: un ulteriore importo sempre aggiunto o rimosso dal saldo effettivo.</string>
+    <string name="bills_paid">"Pagati: "</string>
+    <string name="bills_to_pay">Bollette da pagare</string>
+    <string name="left_to_pay_per_day">Al giorno:</string>
 
 </resources>

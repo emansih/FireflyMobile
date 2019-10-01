@@ -107,5 +107,8 @@
     <string name="iban_help_text">Geben Sie Ihren Konten eine gültige IBAN. Dies könnte einen Datenimport in Zukunft sehr einfach machen.</string>
     <string name="opening_balance_help_text">Bestandskonten können eine \"Eröffnungsbilanz\" haben, welche den Beginn des Verlaufs dieses Kontos in Firefly III angibt.</string>
     <string name="virtual_balance_help_text">Es kann manchmal helfen, Ihrem Konto ein virtuelles Gleichgewicht zu geben: eine zusätzliche Menge, die dem tatsächlichen Kontostand immer hinzugefügt oder daraus entfernt wird.</string>
+    <string name="bills_paid">"Bezahlt: "</string>
+    <string name="bills_to_pay">Unbezahlte Rechnungen</string>
+    <string name="left_to_pay_per_day">Pro Tag:</string>
 
 </resources>

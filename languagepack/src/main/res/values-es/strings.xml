@@ -102,4 +102,7 @@
     <string name="iban_help_text">Indica un IBAN válido en tus cuentas. Esto facilitará la importación de datos en el futuro.</string>
     <string name="virtual_balance_help_text">A veces puede ayudar el darle a tu cuenta un balance virtual: una cantidad extra que se añade o resta siempre del balance real.</string>
     <string name="opening_balance_help_text">Cuentas de ingreso deben tener un \"saldo de apertura\", indicando el inicio del historial de la cuenta en Firefly III.</string>
+    <string name="bills_paid">Pagado:</string>
+    <string name="bills_to_pay">Facturas por pagar</string>
+    <string name="left_to_pay_per_day">Por dia:</string>
 </resources>

@@ -100,4 +100,7 @@
     <string name="iban_help_text">给您的帐户一个有效的 IBAN，可使未来资料导入变得更容易。</string>
     <string name="opening_balance_help_text">资产帐户可能有一个 \"初始馀额\"，表示此帐户在 Firefly III 中的纪录开始。</string>
     <string name="virtual_balance_help_text">有时，它可以协助赋予你的帐户一个虚拟额度：一个总是增加至实际馀额中，或自其中删减的固定金额。</string>
+    <string name="bills_to_pay">待付帐单</string>
+    <string name="bills_paid">已付款:</string>
+    <string name="left_to_pay_per_day">每日:</string>
 </resources>

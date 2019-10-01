@@ -106,4 +106,7 @@
     <string name="iban_help_text">Задайте вашим счетам действующий IBAN. В будущем это может сделать импорт данных очень простым.</string>
     <string name="opening_balance_help_text">У счёта активов всегда есть «начальный баланс», показывающий, какая сумма была на этом счету, когда вы начали работать с ним в Firefly III.</string>
     <string name="virtual_balance_help_text">Иногда бывает удобно предоставить вашему счёту виртуальный баланс: дополнительная сумма, всегда добавленная или выведенная из фактического баланса.</string>
+    <string name="bills_paid">Оплачено:</string>
+    <string name="bills_to_pay">Счета к оплате</string>
+    <string name="left_to_pay_per_day">В день:</string>
 </resources>

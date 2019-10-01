@@ -109,4 +109,7 @@
     <string name="add_account_currency_help_text">Fireflly III 支援多種貨幣。資產帳戶有一種主要貨幣，須在此設定。</string>
     <string name="opening_balance_help_text">資產帳戶可以設定一個 \"初始餘額\"，表示此帳戶在 Firefly III 中開始時的紀錄。</string>
     <string name="virtual_balance_help_text">有時，您或會想給予帳戶一個虛擬額度：即在實際餘額之上加減一個定額。</string>
+    <string name="bills_paid">已付款:</string>
+    <string name="bills_to_pay">"待付帳單 "</string>
+    <string name="left_to_pay_per_day">"每日: "</string>
 </resources>
