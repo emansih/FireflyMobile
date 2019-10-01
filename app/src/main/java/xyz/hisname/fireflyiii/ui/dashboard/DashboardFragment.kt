@@ -20,6 +20,8 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.MPPointF
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
@@ -64,26 +66,14 @@ class DashboardFragment: BaseFragment() {
         changeTheme()
         currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
-            summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
-                        currencyData?.code ?: "")
-
-            summaryViewModel.networthValue.observe(this){ money ->
-                netWorthText.text = currencyData?.symbol + money
-            }
-
-            summaryViewModel.leftToSpendValue.observe(this){ money ->
-                leftToSpentText.text = currencyData?.symbol + money
-            }
-            summaryViewModel.balanceValue.observe(this){ money ->
-                balanceText.text = currencyData?.symbol + money
-            }
-
+            setSummary(currencyData?.code ?: "", currencyData?.symbol ?: "")
             setPieChart(currencyData)
             getTransactionData(currencyData)
 
         }
 
-        animateCard(statsCard, netEarningsCard, dailySummaryCard, recentTransactionCard, budgetCard)
+        animateCard(balanceCard, billsCard, netEarningsCard, dailySummaryCard,
+                leftToSpendCard, networthCard, recentTransactionCard, budgetCard)
         currencyViewModel.apiResponse.observe(this){
             toastInfo(it)
         }
@@ -101,6 +91,59 @@ class DashboardFragment: BaseFragment() {
                 addToBackStack(null)
             }
         }
+        setIcon()
+    }
+
+    private fun setSummary(currencyCode: String, currencySymbol: String){
+        summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
+                currencyCode)
+
+        summaryViewModel.networthValue.observe(this){ money ->
+             networthAmount.text = money
+        }
+
+        summaryViewModel.leftToSpendValue.observe(this){ money ->
+            leftToSpendAmountText.text = money
+        }
+        summaryViewModel.balanceValue.observe(this){ money ->
+            balanceText.text = money
+        }
+        summaryViewModel.earnedValue.observe(this){ money ->
+            balanceEarnedText.text = money + " + "
+        }
+        summaryViewModel.spentValue.observe(this){ money ->
+            balanceSpentText.text = money
+        }
+        summaryViewModel.billsToPay.observe(this){ money ->
+            billsText.text = money
+        }
+
+        summaryViewModel.billsPaid.observe(this){ money ->
+            billsPaidText.text = money
+        }
+
+        summaryViewModel.leftToSpendDay.observe(this){ money ->
+            leftToSpendAmount.text = money
+        }
+    }
+
+    private fun setIcon(){
+        balanceIcon.setImageDrawable(IconicsDrawable(requireContext())
+                .icon(FontAwesome.Icon.faw_balance_scale)
+                .color(getCompatColor(R.color.white))
+                .sizeDp(32))
+        billsIcon.setImageDrawable(IconicsDrawable(requireContext())
+                .icon(FontAwesome.Icon.faw_calendar)
+                .color(getCompatColor(R.color.white))
+                .sizeDp(32))
+        leftToSpendIcon.setImageDrawable(IconicsDrawable(requireContext())
+                .icon(FontAwesome.Icon.faw_money_bill)
+                .color(getCompatColor(R.color.white))
+                .sizeDp(32))
+        networthIcon.setImageDrawable(IconicsDrawable(requireContext())
+                .icon(FontAwesome.Icon.faw_chart_line)
+                .color(getCompatColor(R.color.white))
+                .sizeDp(32))
     }
 
     private fun getTransactionData(currencyData: CurrencyAttributes?){
