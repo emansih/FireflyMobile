@@ -102,7 +102,6 @@
     <string name="saved_so_far">Saved so far</string>
     <string name="left_to_save">Left to save</string>
     <string name="start_date">Start Date</string>
-    <string name="target_date_text">Target Date</string>
     <string name="category_added">Stored new category %1$s</string>
     <string name="budget_left">Left</string>
     <string name="expenses_without_budget">Expenses without budget</string>
