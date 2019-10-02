@@ -28,7 +28,7 @@ abstract class TransactionDataDao {
     @Query("SELECT transactionJournalId FROM transactionIndexTable WHERE transactionId = :transactionId")
     abstract fun getJournalIdFromTransactionId(transactionId: Long): Long
 
-    @Query("SELECT * FROM transactionIndexTable INNER JOIN transactionTable On transactionJournalId = :journalId")
+    @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
     abstract fun getTransactionByJournalId(journalId: Long): MutableList<Transactions>
 
     // That is a really loooooooong name
