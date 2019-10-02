@@ -139,8 +139,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     suspend fun getTransactionByJournalId(journalId: Long) = transactionDao.getTransactionByJournalId(journalId)
 
-    suspend fun getJournalIdFromTransactionId(journalId: Long) =
-            transactionDao.getJournalIdFromTransactionId(journalId)
+    suspend fun getTransactionIdFromJournalId(journalId: Long) =
+            transactionDao.getTransactionIdFromJournalId(journalId)
 
     suspend fun getTransactionById(transactionId: Long): MutableList<Transactions>{
         var networkCall: Response<TransactionModel>? = null
@@ -169,7 +169,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         } catch (exception: Exception){ }
         var transactionJournalId = 0L
         withContext(Dispatchers.IO){
-            transactionJournalId = transactionDao.getJournalIdFromTransactionId(transactionId)
+            transactionJournalId = transactionDao.getTransactionIdFromJournalId(transactionId)
         }
         return transactionDao.getTransactionFromJournalId(transactionJournalId)
     }
@@ -181,7 +181,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
         return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
             withContext(Dispatchers.IO) {
-                val journalId = transactionDao.getJournalIdFromTransactionId(transactionId)
+                val journalId = transactionDao.getTransactionIdFromJournalId(transactionId)
                 transactionDao.deleteTransactionByJournalId(journalId)
             }
             true

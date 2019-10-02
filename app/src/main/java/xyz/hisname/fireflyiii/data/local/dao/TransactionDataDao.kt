@@ -25,8 +25,8 @@ abstract class TransactionDataDao {
     abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<Transactions>
 
     // Takes transaction id as parameter and return transaction journal id
-    @Query("SELECT transactionJournalId FROM transactionIndexTable WHERE transactionId = :transactionId")
-    abstract fun getJournalIdFromTransactionId(transactionId: Long): Long
+    @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId = :journalId")
+    abstract fun getTransactionIdFromJournalId(journalId: Long): Long
 
     @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
     abstract fun getTransactionByJournalId(journalId: Long): MutableList<Transactions>

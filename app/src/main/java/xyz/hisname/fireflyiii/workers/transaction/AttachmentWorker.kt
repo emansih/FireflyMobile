@@ -51,7 +51,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         var transactionId = 0L
         withContext(Dispatchers.IO){
             val database = AppDatabase.getInstance(context).transactionDataDao()
-            transactionId = database.getJournalIdFromTransactionId(transactionJournalId)
+            transactionId = database.getTransactionIdFromJournalId(transactionJournalId)
         }
         service?.storeAttachment(fileName, "Transaction", transactionId, fileName,
                 "File uploaded by " + BuildConfig.APPLICATION_ID)?.enqueue(retrofitCallback({ response ->

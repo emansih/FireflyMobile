@@ -288,7 +288,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         var transactionId = 0L
         viewModelScope.launch(Dispatchers.IO){
-            transactionId = repository.getJournalIdFromTransactionId(transactionJournalId)
+            transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
         }.invokeOnCompletion {
             transactionService?.updateTransaction(transactionId, convertString(type), description, date,
                     amount.replace(',', '.'), sourceName, destinationName, currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
@@ -345,7 +345,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         isLoading.value = true
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
-            val transactionId = repository.getJournalIdFromTransactionId(transactionJournalId)
+            val transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
             isItDeleted = repository.deleteTransactionById(transactionId, true)
         }.invokeOnCompletion {
             if(isItDeleted) {
@@ -367,7 +367,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         var attachmentData: MutableList<AttachmentData> = arrayListOf()
         var transactionId = 0L
         viewModelScope.launch(Dispatchers.IO) {
-            transactionId = repository.getJournalIdFromTransactionId(journalId)
+            transactionId = repository.getTransactionIdFromJournalId(journalId)
         }.invokeOnCompletion {
             transactionService?.getTransactionAttachment(transactionId)?.enqueue(retrofitCallback({ response ->
                 if (response.isSuccessful) {
