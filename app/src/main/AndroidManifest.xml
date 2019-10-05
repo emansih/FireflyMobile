@@ -35,6 +35,16 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".ui.widgets.BalanceWidget">
+        <intent-filter>
+            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/balance_widget_info" />
+        </receiver>
+
         <activity
             android:name=".ui.HomeActivity"
             android:theme="@style/AppTheme">
@@ -52,6 +62,7 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan">
         </activity>
+        <activity android:name=".ui.widgets.ConfigurableWidgetActivity" />
 
         <receiver android:name=".receiver.TransactionReceiver"
             tools:ignore="ExportedReceiver">

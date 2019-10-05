@@ -65,12 +65,12 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     // 9 June 2019
-    // FIXME: Bug in changing of language. Therefore we need these hacks here
+    // FIXME: Bug in changing of language.
     // Simplified and Traditional Chinese is broken if user uses _light mode_
-    /*override fun applyOverrideConfiguration(overrideConfiguration: Configuration) {
+    override fun applyOverrideConfiguration(overrideConfiguration: Configuration) {
         super.applyOverrideConfiguration(overrideConfiguration)
         onConfigurationChanged(overrideConfiguration)
-    }*/
+    }
 
 
     override fun onConfigurationChanged(newConfig: Configuration) {

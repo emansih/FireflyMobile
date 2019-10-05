@@ -2,6 +2,8 @@ package xyz.hisname.fireflyiii.ui.dashboard
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -11,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import android.widget.RemoteViews
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
@@ -32,6 +35,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
+import xyz.hisname.fireflyiii.ui.widgets.BalanceWidget
 import xyz.hisname.fireflyiii.util.*
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.roundToInt
@@ -107,6 +111,12 @@ class DashboardFragment: BaseFragment() {
         }
         summaryViewModel.balanceValue.observe(this){ money ->
             balanceText.text = money
+            val balanceIntent = Intent(requireContext(), BalanceWidget::class.java)
+            balanceIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            val ids = AppWidgetManager.getInstance(requireContext())
+                    .getAppWidgetIds(ComponentName(requireContext(), BalanceWidget::class.java))
+            balanceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            requireActivity().sendBroadcast(balanceIntent)
         }
         summaryViewModel.earnedValue.observe(this){ money ->
             balanceEarnedText.text = money + " + "

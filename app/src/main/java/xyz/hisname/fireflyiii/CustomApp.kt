@@ -36,8 +36,8 @@ class CustomApp: MultiDexApplication() {
         }).start()
     }
 
-    override fun attachBaseContext(newBase: Context) {
+   /* override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LanguageChanger.init(newBase,
                 AppPref(PreferenceManager.getDefaultSharedPreferences(newBase)).languagePref))
-    }
+    }*/
 }
