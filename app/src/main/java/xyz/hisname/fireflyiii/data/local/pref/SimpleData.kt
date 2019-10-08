@@ -2,8 +2,6 @@ package xyz.hisname.fireflyiii.data.local.pref
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import xyz.hisname.fireflyiii.util.extension.getDouble
-import xyz.hisname.fireflyiii.util.extension.putDouble
 
 class SimpleData(private val sharedPref: SharedPreferences) {
 

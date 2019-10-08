@@ -5,14 +5,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.os.Bundle
 import android.widget.RemoteViews
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
-import com.mikepenz.iconics.IconicsDrawable
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.SimpleData
 
-class BalanceWidget: AppWidgetProvider() {
+class BillsToPayWidget: AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
@@ -21,30 +18,28 @@ class BalanceWidget: AppWidgetProvider() {
         }
     }
 
+    private fun simpleData(context: Context): SimpleData {
+        return SimpleData(PreferenceManager.getDefaultSharedPreferences(context))
+    }
+
     override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager,
                                            appWidgetId: Int, newOptions: Bundle?) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
         updateWidget(context, appWidgetManager, appWidgetId)
     }
 
-    private fun simpleData(context: Context): SimpleData{
-        return SimpleData(PreferenceManager.getDefaultSharedPreferences(context))
-    }
-
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        val remoteViews = RemoteViews(context.packageName, R.layout.balance_homescreen_widget)
-        remoteViews.setTextViewText(R.id.widgetText, context.getString(R.string.balance))
-        remoteViews.setTextViewText(R.id.widgetAmount, simpleData(context).balance)
-        remoteViews.setTextViewText(R.id.moreInfoAmount, simpleData(context).earned + " + "
-                + simpleData(context).spent)
+        val views = RemoteViews(context.packageName, R.layout.bills_homescreen_widget)
+        views.setTextViewText(R.id.widgetText, context.getString(R.string.bills_to_pay))
+        views.setTextViewText(R.id.widgetAmount, simpleData(context).unPaidBills)
+        views.setTextViewText(R.id.moreInfoAmount, simpleData(context).paidBills)
     }
 
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int){
-        val remoteViews = RemoteViews(context.packageName, R.layout.balance_homescreen_widget)
-        remoteViews.setTextViewText(R.id.widgetAmount, simpleData(context).balance)
-        remoteViews.setTextViewText(R.id.moreInfoAmount, simpleData(context).earned + " + "
-                + simpleData(context).spent)
-        appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+        val views = RemoteViews(context.packageName, R.layout.bills_homescreen_widget)
+        views.setTextViewText(R.id.widgetAmount, simpleData(context).unPaidBills)
+        views.setTextViewText(R.id.moreInfoAmount, simpleData(context).paidBills)
+        appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 }

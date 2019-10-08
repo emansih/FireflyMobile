@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
-import android.widget.RemoteViews
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
@@ -36,6 +35,9 @@ import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.ui.widgets.BalanceWidget
+import xyz.hisname.fireflyiii.ui.widgets.BillsToPayWidget
+import xyz.hisname.fireflyiii.ui.widgets.LeftToSpendWidget
+import xyz.hisname.fireflyiii.ui.widgets.NetWorthWidget
 import xyz.hisname.fireflyiii.util.*
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.roundToInt
@@ -70,7 +72,7 @@ class DashboardFragment: BaseFragment() {
         changeTheme()
         currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
-            setSummary(currencyData?.code ?: "", currencyData?.symbol ?: "")
+            setSummary(currencyData?.code ?: "")
             setPieChart(currencyData)
             getTransactionData(currencyData)
 
@@ -98,25 +100,22 @@ class DashboardFragment: BaseFragment() {
         setIcon()
     }
 
-    private fun setSummary(currencyCode: String, currencySymbol: String){
+    private fun setSummary(currencyCode: String){
         summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
                 currencyCode)
 
         summaryViewModel.networthValue.observe(this){ money ->
              networthAmount.text = money
+            updateHomeScreenWidget(NetWorthWidget::class.java)
         }
 
         summaryViewModel.leftToSpendValue.observe(this){ money ->
             leftToSpendAmountText.text = money
+            updateHomeScreenWidget(LeftToSpendWidget::class.java)
         }
         summaryViewModel.balanceValue.observe(this){ money ->
             balanceText.text = money
-            val balanceIntent = Intent(requireContext(), BalanceWidget::class.java)
-            balanceIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            val ids = AppWidgetManager.getInstance(requireContext())
-                    .getAppWidgetIds(ComponentName(requireContext(), BalanceWidget::class.java))
-            balanceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-            requireActivity().sendBroadcast(balanceIntent)
+            updateHomeScreenWidget(BalanceWidget::class.java)
         }
         summaryViewModel.earnedValue.observe(this){ money ->
             balanceEarnedText.text = money + " + "
@@ -126,6 +125,7 @@ class DashboardFragment: BaseFragment() {
         }
         summaryViewModel.billsToPay.observe(this){ money ->
             billsText.text = money
+            updateHomeScreenWidget(BillsToPayWidget::class.java)
         }
 
         summaryViewModel.billsPaid.observe(this){ money ->
@@ -135,6 +135,15 @@ class DashboardFragment: BaseFragment() {
         summaryViewModel.leftToSpendDay.observe(this){ money ->
             leftToSpendAmount.text = money
         }
+    }
+
+    private fun updateHomeScreenWidget(className: Class<*>){
+        val updateIntent = Intent(requireContext(), className)
+        updateIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        val ids = AppWidgetManager.getInstance(requireContext())
+                .getAppWidgetIds(ComponentName(requireContext(), className))
+        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        requireActivity().sendBroadcast(updateIntent)
     }
 
     private fun setIcon(){

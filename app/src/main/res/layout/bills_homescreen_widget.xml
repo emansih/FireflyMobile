@@ -1,0 +1,49 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/widgetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/bills_to_pay"
+        android:text="@string/bills_to_pay"
+        android:textColor="@color/md_black_1000"
+        android:textStyle="bold"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/widgetAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:textColor="@color/white"
+        android:layout_marginStart="8dp"
+        android:textSize="24sp"
+        android:layout_toEndOf="@+id/widgetText"
+        android:layout_alignTop="@+id/widgetText"/>
+
+    <TextView
+        android:id="@+id/paidText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/bills_paid"
+        android:text="@string/bills_paid"
+        android:textColor="@color/md_black_1000"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:layout_below="@+id/widgetText"
+        android:layout_alignStart="@+id/widgetText"/>
+
+    <TextView
+        android:id="@+id/moreInfoAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_marginStart="8dp"
+        android:textSize="24sp"
+        android:layout_alignTop="@+id/paidText"
+        android:layout_toEndOf="@+id/paidText" />
+
+</RelativeLayout>

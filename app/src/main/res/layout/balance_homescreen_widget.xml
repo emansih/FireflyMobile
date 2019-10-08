@@ -4,19 +4,19 @@
     android:padding="@dimen/widget_margin">
 
     <TextView
-        android:id="@+id/balanceWidgetText"
+        android:id="@+id/widgetText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         android:contentDescription="@string/balance"
         android:text="@string/balance"
-        android:textColor="#ffffff"
+        android:textColor="@color/md_black_1000"
         android:textSize="24sp"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/balanceWidgetAmount"
+        android:id="@+id/widgetAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -24,7 +24,18 @@
         android:textColor="#ffffff"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:layout_below="@+id/widgetText"/>
+
+    <TextView
+        android:id="@+id/moreInfoAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:textSize="24sp"
         android:layout_marginTop="4dp"
-        android:layout_below="@+id/balanceWidgetText"/>
+        android:layout_below="@+id/widgetAmount"/>
 
 </RelativeLayout>
