@@ -36,8 +36,6 @@ import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.ui.widgets.BalanceWidget
 import xyz.hisname.fireflyiii.ui.widgets.BillsToPayWidget
-import xyz.hisname.fireflyiii.ui.widgets.LeftToSpendWidget
-import xyz.hisname.fireflyiii.ui.widgets.NetWorthWidget
 import xyz.hisname.fireflyiii.util.*
 import xyz.hisname.fireflyiii.util.extension.*
 import kotlin.math.roundToInt
@@ -106,12 +104,10 @@ class DashboardFragment: BaseFragment() {
 
         summaryViewModel.networthValue.observe(this){ money ->
              networthAmount.text = money
-            updateHomeScreenWidget(NetWorthWidget::class.java)
         }
 
         summaryViewModel.leftToSpendValue.observe(this){ money ->
             leftToSpendAmountText.text = money
-            updateHomeScreenWidget(LeftToSpendWidget::class.java)
         }
         summaryViewModel.balanceValue.observe(this){ money ->
             balanceText.text = money
