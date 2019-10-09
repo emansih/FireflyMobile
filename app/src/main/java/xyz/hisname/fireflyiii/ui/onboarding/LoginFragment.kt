@@ -157,7 +157,7 @@ class LoginFragment: Fragment() {
                     clientId = clientIdLiveData.value ?: ""
                 }
                 authViewModel.getAccessToken(code).observe(this) { isAuth ->
-                    if(isAuth == true){
+                    if(isAuth){
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
                         toastSuccess(resources.getString(R.string.welcome))

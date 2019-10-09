@@ -25,13 +25,13 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
             authFailedReason.value = "Bearer Token contains invalid Characters!"
         } else {
             val oAuthService = FireflyClient.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
-            oAuthService?.getAccessToken(code, accManager.clientId, accManager.secretKey, Constants.REDIRECT_URI,
+            oAuthService?.getAccessToken(code.trim(), accManager.clientId, accManager.secretKey, Constants.REDIRECT_URI,
                     "authorization_code")?.enqueue(retrofitCallback({ response ->
                 val authResponse = response.body()
                 val errorBody = response.errorBody()
                 if (authResponse != null) {
-                    accManager.accessToken = authResponse.access_token
-                    accManager.refreshToken = authResponse.refresh_token
+                    accManager.accessToken = authResponse.access_token.trim()
+                    accManager.refreshToken = authResponse.refresh_token.trim()
                     accManager.tokenExpiry = authResponse.expires_in
                     accManager.authMethod = "oauth"
                     isAuthenticated.value = true
