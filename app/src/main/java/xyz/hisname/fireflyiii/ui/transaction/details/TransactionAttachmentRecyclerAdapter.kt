@@ -40,7 +40,7 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
                 itemView.attachment_name.text = fileName
             }
 
-            if(File("${FileUtils().folderDirectory}/$fileName").exists()){
+            if(File("${FileUtils().folderDirectory(context)}/$fileName").exists()){
                 Glide.with(context).load(IconicsDrawable(context)
                         .icon(GoogleMaterial.Icon.gmd_folder_open)
                         .sizeDp(12))

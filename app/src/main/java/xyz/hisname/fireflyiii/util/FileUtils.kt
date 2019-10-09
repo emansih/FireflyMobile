@@ -23,7 +23,9 @@ import java.security.NoSuchAlgorithmException
 // https://gist.github.com/micer/ae5de2984dbbdb386dd262782cfdb39c
 class FileUtils {
 
-    val folderDirectory by lazy { File(Environment.getExternalStorageDirectory(), "FireflyIIIMobile") }
+    fun folderDirectory(context: Context): File{
+        return File(context.getExternalFilesDir(null), "FireflyIIIMobile")
+    }
 
     companion object {
 
@@ -121,8 +123,8 @@ class FileUtils {
             }
         }
 
-        fun writeResponseToDisk(body: ResponseBody, fileName: String): Boolean {
-            if(!createDirIfNotExists()){
+        fun writeResponseToDisk(body: ResponseBody, fileName: String, context: Context): Boolean {
+            if(!createDirIfNotExists(context)){
                 return false
             }
             try {
@@ -133,7 +135,7 @@ class FileUtils {
                     val fileReader = ByteArray(4096)
                     var fileSizeDownloaded: Long = 0
                     inputStream = body.byteStream()
-                    outputStream = FileOutputStream("${FileUtils().folderDirectory}/$fileName")
+                    outputStream = FileOutputStream("${FileUtils().folderDirectory(context)}/$fileName")
                     while (true) {
                         val read = inputStream.read(fileReader)
                         if (read == -1) {
@@ -156,10 +158,10 @@ class FileUtils {
             }
         }
 
-        private fun createDirIfNotExists(): Boolean{
+        private fun createDirIfNotExists(context: Context): Boolean{
             var ret = true
-            if(!FileUtils().folderDirectory.exists()){
-                if(!FileUtils().folderDirectory.mkdir()){
+            if(!FileUtils().folderDirectory(context).exists()){
+                if(!FileUtils().folderDirectory(context).mkdir()){
                     ret = false
                 }
             }
@@ -231,11 +233,11 @@ fun File.checkMd5Hash(md5Hash: String): Boolean{
 }
 
 fun Context.openFile(fileName: String): Boolean{
-    val fileToOpen = File("${FileUtils().folderDirectory}/$fileName")
+    val fileToOpen = File("${FileUtils().folderDirectory(this)}/$fileName")
     return if(fileToOpen.exists() && !fileToOpen.isDirectory){
         val fileIntent = Intent(Intent.ACTION_VIEW)
-        fileIntent.setDataAndType(Uri.parse("${FileUtils().folderDirectory}/$fileName"),
-                FileUtils.getMimeType(this, "${FileUtils().folderDirectory}/$fileName".toUri()))
+        fileIntent.setDataAndType(Uri.parse("${FileUtils().folderDirectory(this)}/$fileName"),
+                FileUtils.getMimeType(this, "${FileUtils().folderDirectory(this)}/$fileName".toUri()))
         val openFileIntent = Intent.createChooser(fileIntent, "Open File")
         openFileIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         this.startActivity(openFileIntent)

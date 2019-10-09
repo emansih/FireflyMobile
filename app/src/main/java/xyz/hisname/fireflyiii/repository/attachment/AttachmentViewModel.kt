@@ -28,7 +28,7 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
         val fileDownloadUrl = attachmentData.attachmentAttributes?.download_uri
         val fileName = attachmentData.attachmentAttributes?.filename ?: ""
         isLoading.value = true
-        val fileToOpen = File("${FileUtils().folderDirectory}/$fileName")
+        val fileToOpen = File("${FileUtils().folderDirectory(getApplication())}/$fileName")
         // Check file integrity before opening
         if(fileToOpen.checkMd5Hash(attachmentData.attachmentAttributes?.md5 ?: "")){
             viewModelContext.openFile(fileName)
@@ -42,7 +42,7 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
                 val fileResponse = downloadResponse.body()
                 if (fileResponse != null) {
                     viewModelScope.launch(Dispatchers.IO) {
-                        FileUtils.writeResponseToDisk(fileResponse, fileName)
+                        FileUtils.writeResponseToDisk(fileResponse, fileName, getApplication())
                     }.invokeOnCompletion {
                         isDownloaded.postValue(true)
                         isLoading.postValue(false)
