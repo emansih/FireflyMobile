@@ -13,7 +13,7 @@ import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 class AccountRepository(private val accountDao: AccountsDataDao,
                         private val accountsService: AccountsService?){
 
-    lateinit var apiResponse: String
+    private lateinit var apiResponse: String
 
     suspend fun insertAccount(account: AccountData){
         accountDao.insert(account)

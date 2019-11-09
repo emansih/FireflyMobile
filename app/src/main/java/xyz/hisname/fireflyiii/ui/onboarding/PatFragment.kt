@@ -11,7 +11,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.mikepenz.google_material_typeface_library.GoogleMaterial

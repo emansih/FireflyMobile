@@ -43,9 +43,9 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         var data: MutableList<AccountData> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {
             data = repository.getAccountByType(accountType)
-        }.invokeOnCompletion {
+        }.invokeOnCompletion { accountError ->
             accountData.postValue(data)
-            apiResponse.postValue(repository.apiResponse)
+            apiResponse.postValue(accountError?.localizedMessage)
         }
         return accountData
     }
