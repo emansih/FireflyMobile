@@ -31,7 +31,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -44,7 +43,9 @@ import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import java.util.*
+import kotlin.math.abs
 
+// This code sucks :(
 class AddTransactionFragment: BaseFragment() {
 
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
@@ -64,6 +65,7 @@ class AddTransactionFragment: BaseFragment() {
     private val calendar by lazy {  Calendar.getInstance() }
     private var selectedTime = ""
     private var budgetName: String? = ""
+    private var transactionAmount = 0.0
 
     companion object {
         private const val OPEN_REQUEST_CODE  = 41
@@ -87,6 +89,7 @@ class AddTransactionFragment: BaseFragment() {
         }
         contextSwitch()
         setFab()
+        setCalculator()
     }
 
     private fun setFab(){
@@ -169,6 +172,10 @@ class AddTransactionFragment: BaseFragment() {
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
                         .color(getCompatColor(R.color.md_yellow_A700))
                         .sizeDp(16),null, null, null)
+        transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                null,null, IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calculator)
+                .color(getCompatColor(R.color.md_blue_grey_400))
+                .sizeDp(16), null)
         transaction_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
                 .color(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
@@ -209,6 +216,31 @@ class AddTransactionFragment: BaseFragment() {
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_gratipay)
                         .color(getCompatColor(R.color.md_amber_300))
                         .sizeDp(24),null, null, null)
+    }
+
+    private fun setCalculator(){
+        transaction_amount_edittext.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if(event.action == MotionEvent.ACTION_UP){
+                    if(event.x >= (transaction_amount_edittext.width -
+                                    transaction_amount_edittext.compoundDrawables[2].bounds.width())){
+                        transactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
+                            "0.0"
+                        } else {
+                            transaction_amount_edittext.getString()
+                        }
+                        val calculatorDialog = TransactionCalculatorDialog()
+                        calculatorDialog.show(requireFragmentManager(), "calculatorDialog")
+                        return true
+                    }
+                }
+                return false
+            }
+
+        })
+        transactionViewModel.transactionAmount.observe(this){ amount ->
+            transaction_amount_edittext.setText(amount)
+        }
     }
 
     private fun setWidgets(){
@@ -443,34 +475,34 @@ class AddTransactionFragment: BaseFragment() {
     private fun updateTransactionSetup(){
         transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(this) { transactionData ->
             val transactionAttributes = transactionData[0]
-            description_edittext.setText(transactionAttributes?.description)
-            transaction_amount_edittext.setText(Math.abs(transactionAttributes?.amount).toString())
-            budget_edittext.setText(transactionAttributes?.budget_name)
-            currencyViewModel.getCurrencyByCode(transactionAttributes?.currency_code.toString()).observe(this) { currencyData ->
+            description_edittext.setText(transactionAttributes.description)
+            transaction_amount_edittext.setText(abs(transactionAttributes.amount).toString())
+            budget_edittext.setText(transactionAttributes.budget_name)
+            currencyViewModel.getCurrencyByCode(transactionAttributes.currency_code).observe(this) { currencyData ->
                 val currencyAttributes = currencyData[0].currencyAttributes
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
             }
-            currency = transactionAttributes?.currency_code.toString()
-            transaction_date_edittext.setText(transactionAttributes?.date.toString())
-            category_edittext.setText(transactionAttributes?.category_name)
+            currency = transactionAttributes.currency_code.toString()
+            transaction_date_edittext.setText(transactionAttributes.date.toString())
+            category_edittext.setText(transactionAttributes.category_name)
             if(transactionAttributes?.tags != null){
                 tags_chip.setText(transactionAttributes.tags + ",")
             }
             when {
                 Objects.equals("Withdrawal", transactionType) -> {
-                    destination_edittext.setText(transactionAttributes?.destination_name)
-                    sourceName = transactionAttributes?.source_name
+                    destination_edittext.setText(transactionAttributes.destination_name)
+                    sourceName = transactionAttributes.source_name
                     source_exposed_dropdown.setText(sourceName)
                 }
                 Objects.equals("Transfer", transactionType) -> {
-                    sourceName = transactionAttributes?.source_name
-                    destinationName = transactionAttributes?.destination_name
+                    sourceName = transactionAttributes.source_name
+                    destinationName = transactionAttributes.destination_name
                     source_exposed_dropdown.setText(sourceName)
                     destination_exposed_dropdown.setText(destinationName)
                 }
                 Objects.equals("Deposit", transactionType) -> {
-                    source_edittext.setText(transactionAttributes?.source_name)
-                    destinationName = transactionAttributes?.destination_name
+                    source_edittext.setText(transactionAttributes.source_name)
+                    destinationName = transactionAttributes.destination_name
                     destination_exposed_dropdown.setText(destinationName)
                 }
             }

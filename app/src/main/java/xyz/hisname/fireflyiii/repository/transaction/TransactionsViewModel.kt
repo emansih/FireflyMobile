@@ -27,6 +27,7 @@ import kotlin.math.absoluteValue
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
     val repository: TransactionRepository
+    val transactionAmount: MutableLiveData<String> = MutableLiveData()
     private val transactionService by lazy { genericService()?.create(TransactionService::class.java) }
 
     init {

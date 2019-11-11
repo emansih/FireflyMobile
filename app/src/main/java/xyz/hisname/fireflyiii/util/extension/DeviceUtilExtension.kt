@@ -17,6 +17,18 @@ fun Activity.getScreenHeight(): Int{
     return size.y
 }
 
+fun Activity.getScreenWidth(): Int{
+    val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val display = windowManager.defaultDisplay
+    val size = Point()
+    display.getSize(size)
+    return size.x
+}
+
+fun SupportFragment.getScreenWidth(): Int{
+    return requireActivity().getScreenWidth()
+}
+
 fun SupportFragment.getScreenHeight(): Int{
     return requireActivity().getScreenHeight()
 }
