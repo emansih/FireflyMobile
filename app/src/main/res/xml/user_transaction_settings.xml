@@ -5,13 +5,21 @@
     <CheckBoxPreference
         app:key="persistent_notification"
         app:title="Persistent Notification"
-        app:summary="Add Transaction anytime anywhere">
+        app:summary="Add Transaction anytime anywhere"
+        app:iconSpaceReserved="false">
     </CheckBoxPreference>
 
     <CheckBoxPreference
         app:key="transactionListType"
         app:title="Toggle between List view or List view with calendar in Transaction"
-        app:summary="Check to use List view only">
+        app:summary="Check to use List view only"
+        app:iconSpaceReserved="false">
     </CheckBoxPreference>
 
+    <CheckBoxPreference
+        app:key="timeFormat"
+        app:title="Toggle between 24 hour or 12 hour"
+        app:summary="Check to use 24 hour time by default"
+        app:iconSpaceReserved="false">
+    </CheckBoxPreference>
 </PreferenceScreen>

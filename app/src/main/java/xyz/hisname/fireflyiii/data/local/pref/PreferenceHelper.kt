@@ -14,5 +14,6 @@ interface PreferenceHelper {
     var nightModeEnabled: Boolean
     var isKeyguardEnabled: Boolean
     var transactionListType: Boolean
+    var timeFormat: Boolean
     fun clearPref()
 }

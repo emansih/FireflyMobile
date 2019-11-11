@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import androidx.preference.PreferenceManager
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
