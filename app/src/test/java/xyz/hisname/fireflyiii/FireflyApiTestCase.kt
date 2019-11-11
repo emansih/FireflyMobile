@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -108,57 +109,71 @@ class FireflyApiTestCase {
 
     @Test
     fun testAccount(){
-        val auth = FireflyClient.getClient(FIREFLY_BASEURL)?.create(AccountsService::class.java)?.getPaginatedAccountType(
-                "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient(FIREFLY_BASEURL)?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                    "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithSlash(){
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
-                "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient("$FIREFLY_BASEURL/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                    "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithHttps(){
-        val auth = FireflyClient.getClient("https://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+        val auth = runBlocking {
+            FireflyClient.getClient("https://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithHttp(){
-        val auth = FireflyClient.getClient("http://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
-                "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient("http://$FIREFLY_BASEURL")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                    "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "http://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithPathInBaseUrl() {
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL/login")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+        val auth = runBlocking {
+            FireflyClient.getClient("$FIREFLY_BASEURL/login")?.create(AccountsService::class.java)?.getPaginatedAccountType(
                 "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithPathInBaseUrlAndSlash() {
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL/login/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
-                "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient("$FIREFLY_BASEURL/login/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                    "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
     @Test
     fun testAccountWithPathAndSlashAndPortInBaseUrl() {
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL:1234/login/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
-                "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient("$FIREFLY_BASEURL:1234/login/")?.create(AccountsService::class.java)?.getPaginatedAccountType(
+                    "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL:1234/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
@@ -188,42 +203,32 @@ class FireflyApiTestCase {
     }
 
     @Test
-    fun testTransactionWithPathInBaseUrl() {
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL/login")?.create(TransactionService::class.java)?.getAllTransactions(
-                "2019-01-01", "2019-12-12", "asset")
-        assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset")
-    }
-
-    @Test
-    fun testTransactionWithPathInBaseUrlAndSlash() {
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL/login/")?.create(TransactionService::class.java)?.getAllTransactions(
-                "2019-01-01", "2019-12-12", "asset")
-        assertEquals(auth?.request()?.url().toString(),
-                "https://$FIREFLY_BASEURL/login/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset")
-    }
-
-    @Test
     fun testPaginatedTransactionWithPathInBaseUrl() {
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL/login")?.create(TransactionService::class.java)?.getPaginatedTransactions(
-                "2019-01-01", "2019-12-12", "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient("$FIREFLY_BASEURL/login")?.create(TransactionService::class.java)?.getPaginatedTransactions(
+                    "2019-01-01", "2019-12-12", "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset&page=1")
     }
 
     @Test
     fun testPaginatedTransactionWithPathInBaseUrlAndSlash() {
-        val auth = FireflyClient.getClient("$FIREFLY_BASEURL/login/")?.create(TransactionService::class.java)?.getPaginatedTransactions(
-                "2019-01-01", "2019-12-12", "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient("$FIREFLY_BASEURL/login/")?.create(TransactionService::class.java)?.getPaginatedTransactions(
+                    "2019-01-01", "2019-12-12", "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset&page=1")
     }
 
     @Test
     fun testPaginatedTransaction() {
-        val auth = FireflyClient.getClient(FIREFLY_BASEURL)?.create(TransactionService::class.java)?.getPaginatedTransactions(
-                "2019-01-01", "2019-12-12", "asset", 1)
-        assertEquals(auth?.request()?.url().toString(),
+        val auth = runBlocking {
+            FireflyClient.getClient(FIREFLY_BASEURL)?.create(TransactionService::class.java)?.getPaginatedTransactions(
+                    "2019-01-01", "2019-12-12", "asset", 1)
+        }
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/${Constants.TRANSACTION_API_ENDPOINT}?start=2019-01-01&end=2019-12-12&type=asset&page=1")
     }
 }
