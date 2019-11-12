@@ -66,11 +66,13 @@ class ListTagsFragment: BaseFragment() {
                         listText.isGone = true
                         tags.forEachIndexed { _, tagsData ->
                             chipTags = Chip(requireContext())
+                            chipTags.chipBackgroundColor
                             chipTags.apply {
                                 text = tagsData.tagsAttributes?.tag
                                 chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
                                         .color(getCompatColor(R.color.md_green_400))
                                 isCloseIconVisible = true
+                                addColor()
                                 setOnCloseIconClickListener { close ->
                                     val tagName = (close as TextView).text.toString()
                                     deleteTag(tagName)
