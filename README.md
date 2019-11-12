@@ -8,9 +8,14 @@
 An unofficial Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 
 ### Disclaimer
-This software is using Firefly III APIs. It is under heavy development and should be considered alpha quality as it might work in unexpected ways. In order to use this app, you must first [setup](https://firefly-iii.readthedocs.io/en/latest/installation/server.html) a [Firefly III](https://firefly-iii.org/) instance. 
+This software is using Firefly III APIs. It is under heavy development and it might work in unexpected ways. In order to use this app, you must first [setup](https://firefly-iii.readthedocs.io/en/latest/installation/server.html) a [Firefly III](https://firefly-iii.org/) instance. 
 
 Other alternative include [this software](https://github.com/mconway/firefly-app/) written by mconway using Ionic framework. 
+
+### Authentication
+
+Check the [wiki page](https://github.com/emansih/FireflyMobile/wiki/Authentication) for more info
+
 
 ### Features
 
@@ -25,38 +30,10 @@ Other alternative include [this software](https://github.com/mconway/firefly-app
 
 ### Customization
 
-**Change the default oAuth callback URL**
+**Changing the default oAuth callback URL**
 
 1. Change `config.hostname` value in [`config.properties`](app/config.properties) to your desired value.
 
-
-**Certificate pinning**
-
-There are many write up on the internet with regards to certificate pinning. This project shall not go into details.
-<sup>[1](https://developer.android.com/training/articles/security-ssl)</sup> <sup>[2](https://medium.com/@appmattus/android-security-ssl-pinning-1db8acb6621e)</sup>
-<sup>[3](https://security.stackexchange.com/a/29990)</sup>
-
-A quote from [okhttp docs](http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html)
-
->Warning: Certificate Pinning is Dangerous!
-Pinning certificates limits your server team's abilities to update their TLS certificates. By pinning certificates, 
-you take on additional operational complexity and limit your ability to migrate between certificate authorities. Do not use certificate pinning without the blessing of your server's TLS administrator!
-
-If you are still brave, carry on reading. 
-
-To enable certificate pinning: 
-
-1. Run [`cert_pinning.sh`](scripts/cert_pinning.sh) 
-```bash
-$ ./cert.sh www.google.com
-/C=US/ST=California/L=Mountain View/O=Google LLC/CN=www.google.com
-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
-/C=US/O=Google Trust Services/CN=Google Internet Authority G3
-f8NnEFZxQ4ExFOhSN7EiFWtiudZQVD2oY60uauV/n78=
-```
-###### Script requires bash and openssl to run.
-
-2. Copy the sha256 value hash of the certificate's Subject Public Key Info to the app settings. 
 
 
 ### Running the Software
@@ -70,6 +47,9 @@ cd FireflyMobile
 ./gradlew clean installDebug
 ```
 
+Please note that `assembleGithubRelease` task requires you to have 3 system environment variables. They are 
+*FireflyKeystoreAlias*, *FireflyKeystoreFile* and *FireflyKeystorePassword*
+
 
 #### Pre-built APK
 
@@ -82,11 +62,6 @@ To get latest update notifications, add [this RSS feed](https://github.com/emans
 It's also available via F-Droid [here](https://f-droid.org/packages/xyz.hisname.fireflyiii/). I have also added my own FDroid repo for users with Privileged Extension. For more info, take a look at the [wiki](https://github.com/emansih/FireflyMobile/wiki/FDroid)
 
 If there is enough interest, I might upload it to Google Play Store.
-
-### Authentication
-
-Check the [wiki page](https://github.com/emansih/FireflyMobile/wiki/Authentication) for more info
-
 
 ### Screenshots
 
