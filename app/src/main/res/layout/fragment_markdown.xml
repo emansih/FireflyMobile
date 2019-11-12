@@ -109,17 +109,6 @@
                 android:scaleType="fitXY"
                 android:padding="5sp"
                 app:layout_constraintStart_toEndOf="@+id/strikeThroughMarkdown"
-                app:layout_constraintEnd_toStartOf="@+id/bulletMarkdown"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <ImageView
-                android:id="@+id/numberedListMarkdown"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:padding="5sp"
-                app:layout_constraintStart_toEndOf="@+id/quoteMarkdown"
-                app:layout_constraintEnd_toStartOf="@+id/bulletMarkdown"
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <ImageView
@@ -128,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:scaleType="fitXY"
                 android:padding="5sp"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/quoteMarkdown"
                 app:layout_constraintTop_toTopOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

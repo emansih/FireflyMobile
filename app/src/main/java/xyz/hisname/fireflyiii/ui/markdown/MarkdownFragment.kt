@@ -74,11 +74,8 @@ class MarkdownFragment: BaseFragment() {
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_list_bulleted)
                         .color(getCompatColor(R.color.md_black_1000))
                         .sizeDp(18))
-        numberedListMarkdown.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_list_numbered)
-                        .color(getCompatColor(R.color.md_black_1000))
-                        .sizeDp(18))
         editableText.setText(markdownViewModel.markdownText.value)
+        displayText.text = markdownViewModel.markdownText.value
         discardButton.setOnClickListener {
             handleBack()
         }
@@ -122,7 +119,7 @@ class MarkdownFragment: BaseFragment() {
             val markdownTextEnd = editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = "**$markdownSubString** "
-            editableText.text.replace(markdownTextStart, markdownTextEnd, markdownSubString)
+            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
             editableText.setSelection(result.length + markdownTextStart - 3)
         }
         italicMarkdown.setOnClickListener {
@@ -130,8 +127,8 @@ class MarkdownFragment: BaseFragment() {
             val markdownTextStart = editableText.selectionStart
             val markdownTextEnd = editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
-            val result = "_" + markdownSubString + "_"
-            editableText.text.replace(markdownTextStart, markdownTextEnd, markdownSubString)
+            val result = "_" + markdownSubString + "_ "
+            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
             editableText.setSelection(result.length + markdownTextStart - 2)
         }
         strikeThroughMarkdown.setOnClickListener {
@@ -140,7 +137,7 @@ class MarkdownFragment: BaseFragment() {
             val markdownTextEnd = editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = "~~$markdownSubString~~ "
-            editableText.text.replace(markdownTextStart, markdownTextEnd, markdownSubString)
+            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
             editableText.setSelection(result.length + markdownTextStart - 3)
         }
         quoteMarkdown.setOnClickListener {
@@ -148,13 +145,13 @@ class MarkdownFragment: BaseFragment() {
             val markdownTextStart = editableText.selectionStart
             val markdownTextEnd = editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
-            val markdown = if (hasNewLine(markdownText, markdownTextStart)) {
+            val result = if (hasNewLine(markdownText, markdownTextStart)) {
                 "> $markdownSubString"
             } else {
                 "\n> $markdownSubString"
             }
-            editableText.text.replace(markdownTextStart, markdownTextEnd, markdown)
-            editableText.setSelection(markdown.length + markdownTextStart)
+            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            editableText.setSelection(result.length + markdownTextStart)
         }
         bulletMarkdown.setOnClickListener {
             editableText.append("•")
