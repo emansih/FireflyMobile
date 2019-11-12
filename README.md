@@ -28,14 +28,6 @@ Check the [wiki page](https://github.com/emansih/FireflyMobile/wiki/Authenticati
 ✔ Reporting: Financial reports give you overview of your spending and income 
 
 
-### Customization
-
-**Changing the default oAuth callback URL**
-
-1. Change `config.hostname` value in [`config.properties`](app/config.properties) to your desired value.
-
-
-
 ### Running the Software
 
 #### Building
