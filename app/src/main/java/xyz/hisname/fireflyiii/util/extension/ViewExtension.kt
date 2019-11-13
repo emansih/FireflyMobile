@@ -76,6 +76,5 @@ fun SupportFragment.getCompatDrawable(@DrawableRes drawableName: Int): Drawable?
 
 fun Chip.addColor(){
     val tagsColor = arrayListOf(ColorTemplate.COLORFUL_COLORS, ColorTemplate.MATERIAL_COLORS, ColorTemplate.JOYFUL_COLORS)
-    val rnd = Random.Default
-    this.chipBackgroundColor = ColorStateList.valueOf(rnd.nextInt(tagsColor.size))
+    this.chipBackgroundColor = ColorStateList.valueOf(tagsColor.random()[1])
 }
