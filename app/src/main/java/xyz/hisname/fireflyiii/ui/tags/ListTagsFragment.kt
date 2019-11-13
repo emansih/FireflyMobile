@@ -66,7 +66,6 @@ class ListTagsFragment: BaseFragment() {
                         listText.isGone = true
                         tags.forEachIndexed { _, tagsData ->
                             chipTags = Chip(requireContext())
-                            chipTags.chipBackgroundColor
                             chipTags.apply {
                                 text = tagsData.tagsAttributes?.tag
                                 chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)

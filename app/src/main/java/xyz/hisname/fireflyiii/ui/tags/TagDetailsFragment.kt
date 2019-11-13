@@ -55,6 +55,8 @@ class TagDetailsFragment: BaseDetailFragment() {
     }
 
     private fun setTagData(tagData: MutableList<TagsData>){
+        tagName.chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
+                .color(getCompatColor(R.color.md_green_400))
         val tagsAttributes = tagData[0].tagsAttributes
         if(tagsAttributes?.tag != null){
             tagName.text = tagsAttributes.tag
