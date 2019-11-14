@@ -149,6 +149,7 @@ class LoginFragment: Fragment() {
         val uri = requireActivity().intent.data
         if(uri != null && uri.toString().startsWith(Constants.REDIRECT_URI)){
             ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
+            hideKeyboard()
             val code = uri.getQueryParameter("code")
             if(code != null && code.isNotBlank() && code.isNotEmpty()) {
                 accManager.initializeAccount()
