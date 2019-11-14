@@ -14,12 +14,14 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -121,23 +123,23 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     override fun setIcons(){
         target_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(getCompatColor(R.color.md_green_400))
+                        .colorInt(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         current_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(getCompatColor(R.color.md_green_400))
+                        .colorInt(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         date_started_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
-                .color(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
+                .color(colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190))))
                 .sizeDp(24),null, null, null)
         date_target_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
-                .color(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
+                .color(colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190))))
                 .sizeDp(24),null, null, null)
         addPiggyFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
         addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
-                .color(getCompatColor(R.color.md_black_1000))
+                .colorInt(R.color.md_black_1000)
                 .sizeDp(24))
     }
 

@@ -26,8 +26,11 @@ import com.hootsuite.nachos.chip.ChipCreator
 import com.hootsuite.nachos.chip.ChipSpan
 import com.hootsuite.nachos.terminator.ChipTerminatorHandler
 import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
@@ -166,19 +169,19 @@ class AddTransactionFragment: BaseFragment() {
     private fun setIcons(){
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(getCompatColor(R.color.md_green_400))
+                        .colorInt(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .color(getCompatColor(R.color.md_yellow_A700))
+                        .colorInt(R.color.md_yellow_A700)
                         .sizeDp(16),null, null, null)
         transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 null,null, IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calculator)
-                .color(getCompatColor(R.color.md_blue_grey_400))
+                .colorInt(R.color.md_blue_grey_400)
                 .sizeDp(16), null)
         transaction_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
-                .color(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
+                .color(colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190))))
                 .sizeDp(24),null, null, null)
         source_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24),null, null, null)
@@ -186,15 +189,15 @@ class AddTransactionFragment: BaseFragment() {
                 getCompatDrawable(R.drawable.ic_bank_transfer),null, null, null)
         category_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
-                        .color(getCompatColor(R.color.md_deep_purple_400))
+                        .colorInt(R.color.md_deep_purple_400)
                         .sizeDp(24),null, null, null)
         piggy_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
-                        .color(getCompatColor(R.color.md_pink_200))
+                        .colorInt(R.color.md_pink_200)
                         .sizeDp(24),null, null, null)
         time_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_clock)
-                        .color(getCompatColor(R.color.md_red_400))
+                        .colorInt(R.color.md_red_400)
                         .sizeDp(24),null, null, null)
         tags_chip.chipTokenizer = SpanChipTokenizer(requireContext(), object : ChipCreator<ChipSpan> {
             override fun configureChip(chip: ChipSpan, chipConfiguration: ChipConfiguration) {
@@ -210,11 +213,11 @@ class AddTransactionFragment: BaseFragment() {
             }
         }, ChipSpan::class.java)
         addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_plus)
-                .color(getCompatColor(R.color.md_black_1000))
+                .colorInt(R.color.md_black_1000)
                 .sizeDp(24))
         budget_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_gratipay)
-                        .color(getCompatColor(R.color.md_amber_300))
+                        .colorInt(R.color.md_amber_300)
                         .sizeDp(24),null, null, null)
     }
 

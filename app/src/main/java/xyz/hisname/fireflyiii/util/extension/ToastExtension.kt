@@ -2,8 +2,9 @@ package xyz.hisname.fireflyiii.util.extension
 
 import android.content.Context
 import android.widget.Toast
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.sizeDp
 import es.dmoral.toasty.Toasty
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.Fragment as SupportFragment

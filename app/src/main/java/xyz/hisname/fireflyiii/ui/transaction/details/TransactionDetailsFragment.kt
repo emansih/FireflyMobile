@@ -16,8 +16,9 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.colorInt
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import xyz.hisname.fireflyiii.R
@@ -123,7 +124,7 @@ class TransactionDetailsFragment: BaseFragment() {
                 chipTags.apply {
                     text = nameOfTag
                     chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                            .color(getCompatColor(R.color.md_green_400))
+                            .colorInt(R.color.md_green_400)
                     addColor()
                     setOnClickListener {
                         requireFragmentManager().commit {

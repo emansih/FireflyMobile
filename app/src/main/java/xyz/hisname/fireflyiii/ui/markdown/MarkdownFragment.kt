@@ -9,8 +9,10 @@ import android.view.*
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_markdown.*
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
@@ -44,35 +46,35 @@ class MarkdownFragment: BaseFragment() {
         toolbar.visibility = View.GONE
         discardButton.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_close)
-                        .color(getCompatColor(R.color.md_white_1000))
+                        .colorInt(R.color.md_white_1000)
                         .sizeDp(12),null, null, null)
         doneButton.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_done)
-                        .color(getCompatColor(R.color.md_white_1000))
+                        .colorInt(R.color.md_white_1000)
                         .sizeDp(12),null, null, null)
         boldMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_bold)
-                        .color(getCompatColor(R.color.md_black_1000))
+                        .colorInt(R.color.md_black_1000)
                         .sizeDp(18))
         italicMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_italic)
-                        .color(getCompatColor(R.color.md_black_1000))
+                        .colorInt(R.color.md_black_1000)
                         .sizeDp(18))
         hyperlinkMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_insert_link)
-                        .color(getCompatColor(R.color.md_black_1000))
+                        .colorInt(R.color.md_black_1000)
                         .sizeDp(18))
         strikeThroughMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_strikethrough)
-                        .color(getCompatColor(R.color.md_black_1000))
+                        .colorInt(R.color.md_black_1000)
                         .sizeDp(18))
         quoteMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_quote)
-                        .color(getCompatColor(R.color.md_black_1000))
+                        .colorInt(R.color.md_black_1000)
                         .sizeDp(18))
         bulletMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_list_bulleted)
-                        .color(getCompatColor(R.color.md_black_1000))
+                        .colorInt(R.color.md_black_1000)
                         .sizeDp(18))
         editableText.setText(markdownViewModel.markdownText.value)
         displayText.text = markdownViewModel.markdownText.value

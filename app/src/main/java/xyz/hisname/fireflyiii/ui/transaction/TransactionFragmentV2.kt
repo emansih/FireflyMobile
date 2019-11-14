@@ -8,8 +8,10 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import xyz.hisname.fireflyiii.R
@@ -81,7 +83,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
             }
             setImageDrawable(IconicsDrawable(requireContext())
                     .icon(GoogleMaterial.Icon.gmd_add)
-                    .color(ContextCompat.getColor(requireContext(), R.color.md_pink_200))
+                    .colorInt(R.color.md_pink_200)
                     .sizeDp(16))
         }
     }

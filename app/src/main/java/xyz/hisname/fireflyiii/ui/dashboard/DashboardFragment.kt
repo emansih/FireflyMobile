@@ -22,8 +22,10 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.MPPointF
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
@@ -145,19 +147,19 @@ class DashboardFragment: BaseFragment() {
     private fun setIcon(){
         balanceIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_balance_scale)
-                .color(getCompatColor(R.color.white))
+                .colorInt(R.color.white)
                 .sizeDp(32))
         billsIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
-                .color(getCompatColor(R.color.white))
+                .colorInt(R.color.white)
                 .sizeDp(32))
         leftToSpendIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_money_bill)
-                .color(getCompatColor(R.color.white))
+                .colorInt(R.color.white)
                 .sizeDp(32))
         networthIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_chart_line)
-                .color(getCompatColor(R.color.white))
+                .colorInt(R.color.white)
                 .sizeDp(32))
     }
 

@@ -16,8 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.observe
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.Constants

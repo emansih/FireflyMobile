@@ -11,8 +11,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_tag_details.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -56,7 +58,7 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     private fun setTagData(tagData: MutableList<TagsData>){
         tagName.chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                .color(getCompatColor(R.color.md_green_400))
+                .colorInt(R.color.md_green_400)
         val tagsAttributes = tagData[0].tagsAttributes
         if(tagsAttributes?.tag != null){
             tagName.text = tagsAttributes.tag
@@ -77,7 +79,7 @@ class TagDetailsFragment: BaseDetailFragment() {
             tagDetailsMap.overlays.add(startMarker)
             startMarker.icon = IconicsDrawable(requireContext())
                     .icon(FontAwesome.Icon.faw_map_marker)
-                    .color(getCompatColor(R.color.md_red_700))
+                    .colorInt(R.color.md_red_700)
                     .sizeDp(16)
             latitude_text.text = tagsAttributes.latitude
             longitude_text.text = tagsAttributes.longitude

@@ -8,9 +8,12 @@ import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.observe
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import com.mikepenz.iconics.IconicsColor
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.utils.colorInt
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import me.toptas.fancyshowcase.listener.DismissListener
@@ -49,47 +52,47 @@ class AddAccountFragment: BaseAddObjectFragment() {
     override fun setIcons() {
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .color(getCompatColor(R.color.md_green_400))
+                        .colorInt(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         start_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_hourglass_start)
-                        .color(getCompatColor(R.color.md_red_400))
+                        .colorInt(R.color.md_red_400)
                         .sizeDp(24),null, null, null)
         start_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calendar)
-                        .color(getCompatColor(R.color.md_blue_400))
+                        .colorInt(R.color.md_blue_400)
                         .sizeDp(24),null, null, null)
         interest_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_percent)
-                        .color(getCompatColor(R.color.md_amber_700))
+                        .colorInt(R.color.md_amber_700)
                         .sizeDp(24),null, null, null)
         iban_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_list_numbered)
-                        .color(getCompatColor(R.color.md_deep_orange_900))
+                        .colorInt(R.color.md_deep_orange_900)
                         .sizeDp(24),null, null, null)
         bic_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_transfer_within_a_station)
-                        .color(getCompatColor(R.color.md_deep_orange_400))
+                        .colorInt(R.color.md_deep_orange_400)
                         .sizeDp(24),null, null, null)
         account_number_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_confirmation_number)
-                        .color(getCompatColor(R.color.md_brown_600))
+                        .colorInt(R.color.md_brown_600)
                         .sizeDp(24),null, null, null)
         opening_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_open_with)
-                        .color(getCompatColor(R.color.md_red_A100))
+                        .colorInt(R.color.md_red_A100)
                         .sizeDp(24),null, null, null)
         opening_balance_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calendar)
-                        .color(getCompatColor(R.color.md_blue_400))
+                        .colorInt(R.color.md_blue_400)
                         .sizeDp(24),null, null, null)
         virtual_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_balance_scale)
-                        .color(getCompatColor(R.color.md_light_blue_A200))
+                        .colorInt(R.color.md_light_blue_A200)
                         .sizeDp(24),null, null, null)
         addAccountFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
         addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_credit_card)
-                .color(getCompatColor(R.color.md_black_1000))
+                .colorInt(R.color.md_black_1000)
                 .sizeDp(24))
     }
 

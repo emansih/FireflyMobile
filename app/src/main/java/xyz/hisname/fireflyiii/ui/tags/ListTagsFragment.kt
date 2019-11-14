@@ -16,8 +16,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.google.android.material.chip.Chip
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import kotlinx.android.synthetic.main.fragment_lists_tags.*
@@ -69,7 +71,7 @@ class ListTagsFragment: BaseFragment() {
                             chipTags.apply {
                                 text = tagsData.tagsAttributes?.tag
                                 chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                                        .color(getCompatColor(R.color.md_green_400))
+                                        .colorInt(R.color.md_green_400)
                                 isCloseIconVisible = true
                                 addColor()
                                 setOnCloseIconClickListener { close ->

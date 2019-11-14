@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.observe
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_currency.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
@@ -56,19 +58,19 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     override fun setIcons(){
         decimal_places_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_dot_circle)
-                .color(getCompatColor(R.color.md_amber_500))
+                .colorInt(R.color.md_amber_500)
                 .sizeDp(24),null, null, null)
         symbol_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_euro_symbol)
-                .color(getCompatColor(R.color.md_pink_800))
+                .colorInt(R.color.md_pink_800)
                 .sizeDp(24),null, null, null)
         code_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_code)
-                .color(getCompatColor(R.color.md_deep_purple_400))
+                .colorInt(R.color.md_deep_purple_400)
                 .sizeDp(24),null, null, null)
         addCurrencyFab.setBackgroundColor(getCompatColor( R.color.primary_dark))
         addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                .color(getCompatColor(R.color.md_black_1000))
+                .colorInt(R.color.md_black_1000)
                 .sizeDp(24))
     }
 

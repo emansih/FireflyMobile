@@ -23,9 +23,11 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -96,7 +98,7 @@ class MapsFragment: BaseFragment() {
         maps.setTileSource(TileSourceFactory.MAPNIK)
         startMarker.icon = IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_map_marker)
-                .color(getCompatColor(R.color.md_red_700))
+                .colorInt(R.color.md_red_700)
                 .sizeDp(16)
         mapController.animateTo(groomLake)
         mapController.setZoom(15.0)
@@ -164,7 +166,7 @@ class MapsFragment: BaseFragment() {
     private fun setFab(){
         fab_map.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_my_location)
-                .color(getCompatColor(R.color.md_black_1000))
+                .colorInt(R.color.md_black_1000)
                 .sizeDp(16))
         fab_map.setOnClickListener {
             if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)

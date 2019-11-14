@@ -9,8 +9,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R

@@ -11,8 +11,10 @@ import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.util.KeyguardUtil
@@ -106,9 +108,9 @@ class SettingsFragment: BaseSettings() {
 
     private fun IconicsDrawable.setIconColor(): Drawable{
         return if(nightMode){
-            this.color(getCompatColor(R.color.md_white_1000))
+            this.colorInt(R.color.md_white_1000)
         } else {
-            this.color(getCompatColor(R.color.md_black_1000))
+            this.colorInt(R.color.md_black_1000)
         }
     }
 

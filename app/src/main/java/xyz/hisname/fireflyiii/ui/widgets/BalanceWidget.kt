@@ -5,10 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.os.Bundle
 import android.widget.RemoteViews
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
-import com.mikepenz.fontawesome_typeface_library.FontAwesome
-import com.mikepenz.iconics.IconicsDrawable
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.SimpleData
 
