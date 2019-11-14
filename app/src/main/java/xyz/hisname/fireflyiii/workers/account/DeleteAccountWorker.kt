@@ -18,9 +18,9 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
     private val channelIcon = R.drawable.ic_euro_sign
 
     companion object {
-        fun deleteWorker(accountId: Long){
+        fun deleteWorker(accountId: Long, context: Context){
             val accountTag =
-                    WorkManager.getInstance().getWorkInfosByTag("delete_account_$accountId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_account_$accountId").get()
             if(accountTag == null || accountTag.size == 0) {
                 val accountData = Data.Builder()
                         .putLong("id", accountId)
@@ -31,7 +31,7 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED).build())
                         .build()
-                WorkManager.getInstance().enqueue(deleteAccountWork)
+                WorkManager.getInstance(context).enqueue(deleteAccountWork)
             }
         }
     }
@@ -44,9 +44,10 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
         val repository = AccountRepository(accountDatabase, accountService)
         runBlocking(Dispatchers.IO) {
             accountAttributes = repository.retrieveAccountById(accountId)[0].accountAttributes
-            isDeleted = repository.deleteAccountById(accountId)
+            isDeleted = repository.deleteAccountById(accountId, false, applicationContext)
         }
         if(isDeleted){
+            applicationContext
             Result.success()
             context.displayNotification(accountAttributes?.name + "successfully deleted", context.getString(R.string.account),
                     Constants.ACCOUNT_CHANNEL, channelIcon)

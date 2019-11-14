@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.bills
 
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
@@ -78,7 +79,7 @@ class BillRepository(private val billDao: BillDataDao,
     }
 
 
-    suspend fun deleteBillById(billId: Long, shouldUserWorker: Boolean = false): Boolean{
+    suspend fun deleteBillById(billId: Long, shouldUserWorker: Boolean = false, context: Context): Boolean{
         var networkStatus: Response<BillsModel>? = null
         withContext(Dispatchers.IO) {
             networkStatus = billService?.deleteBillById(billId)
@@ -90,7 +91,7 @@ class BillRepository(private val billDao: BillDataDao,
             true
         } else {
             if(shouldUserWorker){
-                DeleteBillWorker.initWorker(billId)
+                DeleteBillWorker.initWorker(billId, context)
             }
             false
         }

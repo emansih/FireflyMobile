@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.piggybank
 
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -17,7 +18,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
 
     suspend fun retrievePiggyById(piggyId: Long) = piggyDao.getPiggyById(piggyId)
 
-    suspend fun deletePiggyById(piggyId: Long, shouldUseWorker: Boolean = false): Boolean {
+    suspend fun deletePiggyById(piggyId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
         var networkResponse: Response<PiggyModel>? = null
         withContext(Dispatchers.IO){
             networkResponse = piggyService?.deletePiggyBankById(piggyId)
@@ -29,7 +30,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
             true
         } else {
             if(shouldUseWorker){
-                DeletePiggyWorker.initWorker(piggyId)
+                DeletePiggyWorker.initWorker(piggyId, context)
             }
             false
         }

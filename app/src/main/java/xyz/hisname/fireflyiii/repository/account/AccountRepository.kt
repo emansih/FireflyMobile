@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.account
 
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
@@ -26,7 +27,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
 
-    suspend fun deleteAccountById(accountId: Long, shouldUseWorker: Boolean = false): Boolean {
+    suspend fun deleteAccountById(accountId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
         var networkResponse: Response<AccountsModel>? = null
         withContext(Dispatchers.IO){
             networkResponse = accountsService?.deleteAccountById(accountId)
@@ -38,7 +39,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             true
         } else {
             if(shouldUseWorker){
-                DeleteAccountWorker.deleteWorker(accountId)
+                DeleteAccountWorker.deleteWorker(accountId, context)
             }
             false
         }

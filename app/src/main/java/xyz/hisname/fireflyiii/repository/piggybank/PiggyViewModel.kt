@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.piggybank
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -55,7 +56,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         isLoading.value = true
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
-            isItDeleted = repository.deletePiggyById(piggyId, true)
+            isItDeleted = repository.deletePiggyById(piggyId, true, getApplication() as Context)
         }.invokeOnCompletion {
             if(isItDeleted) {
                 isDeleted.postValue(true)

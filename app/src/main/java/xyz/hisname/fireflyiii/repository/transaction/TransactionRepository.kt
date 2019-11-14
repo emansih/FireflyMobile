@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
+import android.content.Context
 import androidx.work.Data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -174,7 +175,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return transactionDao.getTransactionFromJournalId(transactionJournalId)
     }
 
-    suspend fun deleteTransactionById(transactionId: Long, shouldUseWorker: Boolean = false): Boolean {
+    suspend fun deleteTransactionById(transactionId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
         var networkResponse: Response<TransactionSuccessModel>? = null
         withContext(Dispatchers.IO){
             networkResponse = transactionService?.deleteTransactionById(transactionId)
@@ -187,7 +188,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             true
         } else {
             if(shouldUseWorker){
-                DeleteTransactionWorker.setupWorker(Data.Builder(),transactionId)
+                DeleteTransactionWorker.setupWorker(Data.Builder(),transactionId, context)
             }
             false
         }

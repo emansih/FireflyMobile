@@ -27,7 +27,7 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
         val repository = TransactionRepository(transactionDatabase, genericService?.create(TransactionService::class.java))
         runBlocking(Dispatchers.IO) {
             transactionAttributes = repository.getTransactionById(transactionId)[0]
-            isDeleted = repository.deleteTransactionById(transactionId)
+            isDeleted = repository.deleteTransactionById(transactionId, false, applicationContext)
         }
         if (isDeleted) {
             context.displayNotification(transactionAttributes?.description + " successfully deleted", channelName,
@@ -42,14 +42,14 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
     }
 
     companion object {
-        fun setupWorker(data: Data.Builder, transactionId: Long){
+        fun setupWorker(data: Data.Builder, transactionId: Long, context: Context){
             val transactionWork = OneTimeWorkRequest.Builder(DeleteTransactionWorker::class.java)
                     .setInputData(data.putLong("transactionId" ,transactionId).build())
                     .setConstraints(Constraints.Builder()
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build())
                     .build()
-            WorkManager.getInstance().enqueue(transactionWork)
+            WorkManager.getInstance(context).enqueue(transactionWork)
         }
     }
 

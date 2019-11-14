@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.bills
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -55,7 +56,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         var deletionStatus = false
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO){
-            deletionStatus = repository.deleteBillById(billId, true)
+            deletionStatus = repository.deleteBillById(billId, true, getApplication() as Context)
         }.invokeOnCompletion {
             if(deletionStatus){
                 isDeleted.postValue(true)

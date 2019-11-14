@@ -19,9 +19,9 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
     private val channelIcon = R.drawable.ic_sort_descending
 
     companion object {
-        fun initWorker(piggyId: Long) {
+        fun initWorker(piggyId: Long, context: Context) {
             val accountTag =
-                    WorkManager.getInstance().getWorkInfosByTag("delete_piggy_$piggyId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_piggy_$piggyId").get()
             if (accountTag == null || accountTag.size == 0) {
                 val accountData = Data.Builder()
                         .putLong("piggyId", piggyId)
@@ -32,7 +32,7 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED).build())
                         .build()
-                WorkManager.getInstance().enqueue(deleteAccountWork)
+                WorkManager.getInstance(context).enqueue(deleteAccountWork)
             }
         }
     }
@@ -44,7 +44,7 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
         val repository = PiggyRepository(piggyDataBase, genericService?.create(PiggybankService::class.java))
         runBlocking {
             piggyAttribute = repository.retrievePiggyById(piggyId)[0].piggyAttributes
-            isDeleted = repository.deletePiggyById(piggyId)
+            isDeleted = repository.deletePiggyById(piggyId, false, applicationContext)
         }
         if (isDeleted) {
             context.displayNotification(piggyAttribute?.name + "successfully deleted", channelName,

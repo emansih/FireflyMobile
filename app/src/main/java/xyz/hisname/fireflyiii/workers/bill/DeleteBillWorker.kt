@@ -18,9 +18,9 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
     private val channelIcon = R.drawable.ic_calendar_blank
 
     companion object {
-        fun initWorker(billId: Long){
+        fun initWorker(billId: Long, context: Context){
             val accountTag =
-                    WorkManager.getInstance().getWorkInfosByTag("delete_bill_$billId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_bill_$billId").get()
             if(accountTag == null || accountTag.size == 0) {
                 val accountData = Data.Builder()
                         .putLong("billId", billId)
@@ -31,7 +31,7 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED).build())
                         .build()
-                WorkManager.getInstance().enqueue(deleteAccountWork)
+                WorkManager.getInstance(context).enqueue(deleteAccountWork)
             }
         }
     }
@@ -45,7 +45,7 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
 
         runBlocking(Dispatchers.IO) {
             billAttribute = repository.retrieveBillById(billId)[0].billAttributes
-            isDeleted = repository.deleteBillById(billId)
+            isDeleted = repository.deleteBillById(billId, false, applicationContext)
         }
         if (isDeleted) {
             context.displayNotification(billAttribute?.name + "successfully deleted", context.getString(R.string.bill),

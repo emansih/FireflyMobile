@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -347,7 +348,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
             val transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
-            isItDeleted = repository.deleteTransactionById(transactionId, true)
+            isItDeleted = repository.deleteTransactionById(transactionId, true, getApplication() as Context)
         }.invokeOnCompletion {
             if(isItDeleted) {
                 isDeleted.postValue(true)

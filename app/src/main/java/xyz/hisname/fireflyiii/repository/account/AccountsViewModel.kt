@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -79,7 +80,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         var isItDeleted = false
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            isItDeleted = repository.deleteAccountById(accountId, true)
+            isItDeleted = repository.deleteAccountById(accountId, true, getApplication() as Context)
         }.invokeOnCompletion {
             if(isItDeleted) {
                 isDeleted.postValue(true)
@@ -211,7 +212,4 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         return apiResponse
     }
-
-    private fun deleteAccount(id: Long) = DeleteAccountWorker.deleteWorker(id)
-
 }
