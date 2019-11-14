@@ -13,7 +13,6 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.languagepack.LanguageChanger
-import java.util.*
 
 @SuppressLint("Registered")
 open class BaseActivity: AppCompatActivity() {
@@ -64,21 +63,11 @@ open class BaseActivity: AppCompatActivity() {
                 sharedPref(newBase).languagePref))
     }
 
-    // 9 June 2019
-    // FIXME: Bug in changing of language.
-    // Simplified and Traditional Chinese is broken if user uses _light mode_
     override fun applyOverrideConfiguration(overrideConfiguration: Configuration) {
+        val uiMode = overrideConfiguration.uiMode
+        overrideConfiguration.setTo(baseContext.resources.configuration)
+        overrideConfiguration.uiMode = uiMode
         super.applyOverrideConfiguration(overrideConfiguration)
-        onConfigurationChanged(overrideConfiguration)
-    }
-
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        val res = this.resources
-        val config = Configuration(res.configuration)
-        config.locale = Locale(sharedPref(this).languagePref)
-        res.updateConfiguration(config, res.displayMetrics)
     }
 
     protected fun sharedPref(context: Context): AppPref{
