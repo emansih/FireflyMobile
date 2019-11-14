@@ -163,6 +163,6 @@ class SettingsAccountFragment: BaseSettings() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 }

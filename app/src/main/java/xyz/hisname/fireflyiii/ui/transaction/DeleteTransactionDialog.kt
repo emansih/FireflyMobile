@@ -35,7 +35,7 @@ class DeleteTransactionDialog: BaseFragment() {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if (it) {
                             toastSuccess(resources.getString(R.string.transaction_deleted))
-                            requireFragmentManager().popBackStack()
+                            requireParentFragment().parentFragmentManager.popBackStack()
                         } else {
                             toastInfo("There was an issue deleting your transaction. It will be " +
                                     "deleted in the background.",
@@ -50,6 +50,6 @@ class DeleteTransactionDialog: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 }

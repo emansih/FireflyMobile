@@ -103,6 +103,6 @@ class CurrencyListFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 }

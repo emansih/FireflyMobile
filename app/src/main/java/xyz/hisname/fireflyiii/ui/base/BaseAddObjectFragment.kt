@@ -34,7 +34,7 @@ abstract class BaseAddObjectFragment: BaseFragment() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     try {
-                        requireFragmentManager().popBackStack()
+                        requireParentFragment().parentFragmentManager.popBackStack()
                     } catch(illegal: IllegalStateException){
 
                     }
@@ -48,7 +48,7 @@ abstract class BaseAddObjectFragment: BaseFragment() {
             circularReveal.start()
         } else {
             try {
-                requireFragmentManager().popBackStack()
+                requireParentFragment().parentFragmentManager.popBackStack()
             } catch(illegal: IllegalStateException){
 
             }

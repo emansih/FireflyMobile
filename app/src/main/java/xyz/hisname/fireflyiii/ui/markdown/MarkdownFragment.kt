@@ -197,7 +197,7 @@ class MarkdownFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
         toolbar.visibility = View.VISIBLE
         hideKeyboard()
     }

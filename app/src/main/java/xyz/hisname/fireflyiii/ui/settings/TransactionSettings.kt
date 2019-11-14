@@ -39,6 +39,6 @@ class TransactionSettings: BaseSettings() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 }

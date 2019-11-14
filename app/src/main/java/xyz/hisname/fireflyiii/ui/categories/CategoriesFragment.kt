@@ -92,6 +92,6 @@ class CategoriesFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 }

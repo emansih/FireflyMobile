@@ -164,7 +164,7 @@ class BudgetSummaryFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 
 

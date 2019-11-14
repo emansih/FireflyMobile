@@ -268,7 +268,7 @@ class TransactionDetailsFragment: BaseFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         android.R.id.home -> consume {
-            requireFragmentManager().popBackStack()
+            requireParentFragment().parentFragmentManager.popBackStack()
         }
         R.id.menu_item_delete -> consume {
             requireFragmentManager().commit {
@@ -291,7 +291,7 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
         val v2Layout = requireActivity().findViewById<CoordinatorLayout>(R.id.fragment_transaction_rootview)
         if(v2Layout != null){
             v2Layout.isVisible = true

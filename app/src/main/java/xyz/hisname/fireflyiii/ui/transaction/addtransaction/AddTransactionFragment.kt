@@ -552,7 +552,7 @@ class AddTransactionFragment: BaseFragment() {
 
     override fun handleBack() {
         if(nastyHack){
-            requireFragmentManager().popBackStack()
+            requireParentFragment().parentFragmentManager.popBackStack()
             fragmentContainer.isVisible = true
             fragment_add_transaction_root.isVisible = false
             requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true

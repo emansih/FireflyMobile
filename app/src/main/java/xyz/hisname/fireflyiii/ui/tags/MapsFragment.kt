@@ -260,7 +260,7 @@ class MapsFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
         requireActivity().findViewById<FloatingActionButton>(R.id.addTagFab).isVisible = true
     }
 }

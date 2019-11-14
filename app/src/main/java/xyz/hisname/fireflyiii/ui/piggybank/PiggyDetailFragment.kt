@@ -106,7 +106,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                     piggyViewModel.deletePiggyById(piggyId).observe(this) {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if(it){
-                            requireFragmentManager().popBackStack()
+                            requireParentFragment().parentFragmentManager.popBackStack()
                             toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyName))
                         } else {
                             val parentLayout: View = requireActivity().findViewById(R.id.coordinatorlayout)
@@ -153,6 +153,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 }

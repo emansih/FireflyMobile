@@ -112,7 +112,7 @@ class AboutFragment: MaterialAboutFragment() {
     private fun handleBack() {
         globalViewModel.backPress.observe(this, Observer { backPressValue ->
             if(backPressValue == true) {
-                requireFragmentManager().popBackStack()
+                requireParentFragment().parentFragmentManager.popBackStack()
             }
         })
     }

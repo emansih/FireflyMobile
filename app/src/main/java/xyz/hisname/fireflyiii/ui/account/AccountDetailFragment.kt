@@ -283,7 +283,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     accountViewModel.deleteAccountById(accountId).observe(this) {
                         if(it == true){
-                            requireFragmentManager().popBackStack()
+                            requireParentFragment().parentFragmentManager.popBackStack()
                             toastSuccess("Account Deleted")
                         } else {
                             toastError("Account will be deleted later")
@@ -301,7 +301,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             deleteItem()
         }
         android.R.id.home -> consume {
-            requireFragmentManager().popBackStack()
+            requireParentFragment().parentFragmentManager.popBackStack()
         }
         R.id.menu_item_edit -> consume {
             requireFragmentManager().commit {
@@ -315,6 +315,6 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     override fun handleBack() {
-        requireFragmentManager().popBackStack()
+        requireParentFragment().parentFragmentManager.popBackStack()
     }
 }
