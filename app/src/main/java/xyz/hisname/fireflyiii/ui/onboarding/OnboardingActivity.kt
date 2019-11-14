@@ -3,11 +3,14 @@ package xyz.hisname.fireflyiii.ui.onboarding
 import android.accounts.AccountManager
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import com.mikepenz.fontawesome_typeface_library.FontAwesome
+import com.mikepenz.iconics.IconicsDrawable
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
@@ -31,6 +34,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
         setTheme(R.style.AppTheme_LoginTheme)
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
+        setHelp()
         val homeActivity = Intent(this, HomeActivity::class.java)
         if(intent.action == "xyz.hisname.fireflyiii.ADD_TRANSACTION"){
             homeActivity.putExtra("transaction", "transactionFragment")
@@ -77,6 +81,20 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
                         replace(R.id.fragment_container, AuthChooserFragment())
                     }
                 }
+            }
+        }
+    }
+
+    private fun setHelp(){
+        helpImage.setImageDrawable(IconicsDrawable(this)
+                .icon(FontAwesome.Icon.faw_question)
+                .sizeDp(20))
+        helpImage.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, "https://github.com/emansih/FireflyMobile/wiki/Authentication".toUri())
+            if (browserIntent.resolveActivity(packageManager) != null){
+                startActivity(browserIntent)
+            } else {
+                toastError(resources.getString(R.string.no_browser_installed))
             }
         }
     }
