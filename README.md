@@ -4,6 +4,14 @@
       alt="Get it on F-Droid"
       height="80">](https://f-droid.org/packages/xyz.hisname.fireflyiii/)
            
+               
+[<img src="https://img.shields.io/github/license/emansih/FireflyMobile.svg"
+      alt="GPLv3"
+      height="20"
+      width="102">](https://img.shields.io/github/license/emansih/FireflyMobile.svg) [<img src="http://img.shields.io/liberapay/patrons/hisname.svg?logo=liberapay"
+      alt="Liberapay">](https://liberapay.com/hisname/donate)
+
+
 
 An unofficial Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 
