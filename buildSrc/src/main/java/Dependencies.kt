@@ -18,7 +18,7 @@ object Dependencies{
     private const val androidxConstraintLayoutVersion = "1.1.3"
     private const val androidxPrefVersion = "1.1.0"
     private const val androidxWorkVersion = "2.2.0"
-    private const val materialDrawerVersion = "6.1.2"
+    private const val materialDrawerVersion = "8.0.0-a02"
     private const val iconicsVersion = "4.0.2"
     private const val toastyVersion = "1.4.2"
     private const val threeTenVersion = "1.2.1"

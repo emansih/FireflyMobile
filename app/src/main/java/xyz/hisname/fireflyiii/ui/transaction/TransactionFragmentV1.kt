@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.ui.transaction
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -12,9 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
-import com.mikepenz.materialdrawer.Drawer
-import com.mikepenz.materialdrawer.DrawerBuilder
 import kotlinx.android.synthetic.main.base_swipe_layout.*
+import kotlinx.android.synthetic.main.fragment_transaction_v1.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.DateRangeViewModel
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -26,7 +26,7 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class TransactionFragmentV1: BaseTransactionFragment() {
 
-    private lateinit var result: Drawer
+    private lateinit var result: ActionBarDrawerToggle
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -46,15 +46,11 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     private fun setTransactionCard(){
-        result = DrawerBuilder()
-                .withActivity(requireActivity())
-                .withDrawerGravity(Gravity.END)
-                .withDisplayBelowStatusBar(false)
-                .withActionBarDrawerToggle(false)
-                .withCustomView(View.inflate(requireContext(), R.layout.transaction_card_layout, null))
-                .buildForFragment()
-        val cardRecyclerView = requireActivity().findViewById<RecyclerView>(R.id.transaction_card_recyclerview)
-        runLayoutAnimation(cardRecyclerView)
+        result = ActionBarDrawerToggle(requireActivity(),
+                fragment_transaction_v1_root, requireActivity().findViewById(R.id.activity_toolbar),
+                com.mikepenz.materialdrawer.R.string.material_drawer_open,
+                com.mikepenz.materialdrawer.R.string.material_drawer_close)
+        runLayoutAnimation(slider.recyclerView)
         currencyViewModel.getDefaultCurrency().observe(this) { currencyData ->
             val currencyName = currencyData[0].currencyAttributes?.code ?: ""
             val currencySymbol = currencyData[0].currencyAttributes?.symbol ?: ""
@@ -77,7 +73,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
                             currencyName, transactionType, currencySymbol)).observe(this) { transactionData ->
                 val transactionArray = arrayListOf(transactionData.first, transactionData.second, transactionData.third,
                         transactionData.fourth, transactionData.fifth, transactionData.sixth)
-                cardRecyclerView.adapter = TransactionMonthRecyclerView(transactionArray){
+                slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){
                     data: Int -> cardClicked(data)
                 }.apply {
                     update(transactionArray)
@@ -88,7 +84,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     private fun cardClicked(clicky: Int){
-        result.closeDrawer()
+        fragment_transaction_v1_root.closeDrawer(slider)
         when(clicky){
             0 -> loadTransaction(DateTimeUtil.getTodayDate(), DateTimeUtil.getEndOfMonth())
             1 -> loadTransaction(DateTimeUtil.getStartOfMonth(1), DateTimeUtil.getEndOfMonth(1))
@@ -114,7 +110,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             addTransaction.arguments = bundleOf("revealX" to fab.width / 2,
                     "revealY" to fab.height / 2, "transactionType" to transactionType,
                     "SHOULD_HIDE" to true)
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, addTransaction)
                 addToBackStack(null)
             }
@@ -133,7 +129,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     override fun itemClicked(data: Transactions) {
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
@@ -156,14 +152,14 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
         R.id.menu_item_filter -> consume {
             val bottomSheetFragment = TransactionDateRangeBottomSheet()
-            bottomSheetFragment.show(requireFragmentManager(), "daterangefrag" )
+            bottomSheetFragment.show(parentFragmentManager, "daterangefrag" )
         }
         else -> super.onOptionsItemSelected(item)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        result.drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        fragment_transaction_v1_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 
     override fun onResume() {
