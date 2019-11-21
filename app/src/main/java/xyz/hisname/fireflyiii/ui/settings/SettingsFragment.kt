@@ -103,7 +103,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     override fun handleBack() {
-        requireParentFragment().parentFragmentManager.popBackStack()
+        parentFragmentManager.popBackStack()
     }
 
     private fun IconicsDrawable.setIconColor(): Drawable{

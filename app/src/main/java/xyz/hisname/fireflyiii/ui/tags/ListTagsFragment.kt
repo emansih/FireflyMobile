@@ -164,7 +164,7 @@ class ListTagsFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireParentFragment().parentFragmentManager.popBackStack()
+        parentFragmentManager.popBackStack()
     }
 
 }

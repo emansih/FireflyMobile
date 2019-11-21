@@ -106,6 +106,6 @@ class ListBillFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireParentFragment().parentFragmentManager.popBackStack()
+        parentFragmentManager.popBackStack()
     }
 }

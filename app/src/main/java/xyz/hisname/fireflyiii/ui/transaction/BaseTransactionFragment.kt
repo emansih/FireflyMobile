@@ -85,6 +85,6 @@ abstract class BaseTransactionFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        requireParentFragment().parentFragmentManager.popBackStack()
+        parentFragmentManager.popBackStack()
     }
 }
