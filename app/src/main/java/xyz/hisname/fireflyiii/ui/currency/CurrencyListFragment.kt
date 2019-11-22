@@ -53,7 +53,7 @@ class CurrencyListFragment: BaseFragment() {
     }
 
     private fun clickListener(data: CurrencyData){
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             replace(R.id.bigger_fragment_container, AddCurrencyFragment().apply {
                 arguments = bundleOf("currencyId" to data.currencyId)
             })
@@ -64,7 +64,7 @@ class CurrencyListFragment: BaseFragment() {
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddCurrencyFragment().apply {
                     arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
                 })

@@ -35,8 +35,8 @@ class DeleteBillDialog: DialogFragment() {
                         if(it == true){
                             toastSuccess(resources.getString(R.string.bill_deleted, billDescription))
                             dialog?.dismiss()
-                            requireFragmentManager().commit {
-                                remove(requireFragmentManager().findFragmentByTag("add_bill_dialog") ?: Fragment())
+                            parentFragmentManager.commit {
+                                remove(parentFragmentManager.findFragmentByTag("add_bill_dialog") ?: Fragment())
                             }
                         } else {
                             toastError(resources.getString(R.string.issue_deleting, "bill"),

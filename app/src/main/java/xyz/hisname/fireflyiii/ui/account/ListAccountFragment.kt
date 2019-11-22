@@ -89,7 +89,7 @@ class ListAccountFragment: BaseFragment() {
 
     private fun itemClicked(data: AccountData){
         val bundle = bundleOf("accountId" to data.accountId)
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             addToBackStack(null)
             replace(R.id.fragment_container, AccountDetailFragment().apply { arguments = bundle })
         }
@@ -105,7 +105,7 @@ class ListAccountFragment: BaseFragment() {
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddAccountFragment().apply{
                     arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to accountType)
                 })

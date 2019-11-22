@@ -88,11 +88,11 @@ class DashboardFragment: BaseFragment() {
             requireActivity().startActivity(Intent(requireContext(), AddTransactionActivity::class.java))
             fab.isClickable = true
         }
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             replace(R.id.recentTransactionCard, RecentTransactionFragment())
         }
         budgetCard.setOnClickListener {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.fragment_container, BudgetSummaryFragment())
                 addToBackStack(null)
             }
@@ -344,7 +344,7 @@ class DashboardFragment: BaseFragment() {
                 data = PieData(dataSet)
                 description.text = "Budget Percentage"
                 setOnClickListener {
-                    requireFragmentManager().commit {
+                    parentFragmentManager.commit {
                         replace(R.id.fragment_container, BudgetSummaryFragment())
                         addToBackStack(null)
                     }

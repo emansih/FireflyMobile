@@ -102,7 +102,7 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         R.id.menu_item_edit -> consume {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddTagsFragment().apply {
                     arguments = bundleOf("tagId" to tagId)
                 })
@@ -124,7 +124,7 @@ class TagDetailsFragment: BaseDetailFragment() {
                     tagsViewModel.deleteTagByName(nameOfTag).observe(this) { status ->
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if (status) {
-                            requireFragmentManager().commit {
+                            parentFragmentManager.commit {
                                 replace(R.id.fragment_container, ListTagsFragment())
                             }
                             toastSuccess(resources.getString(R.string.tag_deleted, nameOfTag))

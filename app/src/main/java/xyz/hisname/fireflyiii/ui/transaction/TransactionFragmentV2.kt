@@ -50,7 +50,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
 
     override fun itemClicked(data: Transactions){
         fragment_transaction_rootview.isVisible = false
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             add(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
@@ -74,7 +74,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
                 addTransaction.arguments = bundleOf("revealX" to addTransactionFab.width / 2,
                         "revealY" to addTransactionFab.height / 2, "transactionType" to transactionType,
                         "SHOULD_HIDE" to true)
-                requireFragmentManager().commit {
+                parentFragmentManager.commit {
                     replace(R.id.bigger_fragment_container, addTransaction)
                     addToBackStack(null)
                 }

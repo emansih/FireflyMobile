@@ -221,7 +221,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 } else if (it.getResponse() != null) {
                     toastSuccess("Piggy bank saved")
                     val bundle = bundleOf("piggyId" to it.getResponse()?.data?.piggyId)
-                    requireFragmentManager().commit {
+                    parentFragmentManager.commit {
                         replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
                         addToBackStack(null)
                     }
@@ -245,7 +245,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                     toastSuccess("Piggy bank updated")
                     handleBack()
                     val bundle = bundleOf("piggyId" to piggyId)
-                    requireFragmentManager().commit {
+                    parentFragmentManager.commit {
                         replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
                         addToBackStack(null)
                     }

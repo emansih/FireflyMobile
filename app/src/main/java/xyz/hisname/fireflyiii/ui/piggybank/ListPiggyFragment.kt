@@ -73,7 +73,7 @@ class ListPiggyFragment: BaseFragment() {
 
     private fun itemClicked(piggyData: PiggyData){
         val bundle = bundleOf("piggyId" to piggyData.piggyId)
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
             addToBackStack(null)
         }
@@ -93,7 +93,7 @@ class ListPiggyFragment: BaseFragment() {
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddPiggyFragment().apply {
                     arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
                 })

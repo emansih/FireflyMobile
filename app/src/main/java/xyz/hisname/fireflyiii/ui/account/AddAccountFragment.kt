@@ -116,7 +116,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         }
         currency_edittext.setOnClickListener{
             val currencyListFragment = CurrencyListBottomSheet()
-            currencyListFragment.show(requireFragmentManager(), "currencyList" )
+            currencyListFragment.show(parentFragmentManager, "currencyList" )
         }
         if(accountId == 0L) {
             currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->

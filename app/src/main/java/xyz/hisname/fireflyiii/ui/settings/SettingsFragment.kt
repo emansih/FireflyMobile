@@ -51,7 +51,7 @@ class SettingsFragment: BaseSettings() {
     private fun setAccountSection(){
         val accountOptions = findPreference<Preference>("account_options") as Preference
         accountOptions.setOnPreferenceClickListener {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 addToBackStack(null)
                 setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                 replace(R.id.fragment_container, SettingsAccountFragment())
@@ -66,7 +66,7 @@ class SettingsFragment: BaseSettings() {
     private fun setTransactionSection(){
         val transactionSettings = findPreference<Preference>("transaction_settings") as Preference
         transactionSettings.setOnPreferenceClickListener {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 addToBackStack(null)
                 setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                 replace(R.id.fragment_container, TransactionSettings())

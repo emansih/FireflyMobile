@@ -61,7 +61,7 @@ class RecentTransactionFragment: BaseFragment() {
     }
 
     private fun itemClicked(data: Transactions){
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })

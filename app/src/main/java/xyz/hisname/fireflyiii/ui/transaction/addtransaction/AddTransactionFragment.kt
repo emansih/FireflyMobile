@@ -234,7 +234,7 @@ class AddTransactionFragment: BaseFragment() {
                             transaction_amount_edittext.getString()
                         }
                         val calculatorDialog = TransactionCalculatorDialog()
-                        calculatorDialog.show(requireFragmentManager(), "calculatorDialog")
+                        calculatorDialog.show(parentFragmentManager, "calculatorDialog")
                         return true
                     }
                 }
@@ -263,7 +263,7 @@ class AddTransactionFragment: BaseFragment() {
         }
         category_edittext.setOnClickListener {
             val catDialog = CategoriesDialog()
-            catDialog.show(requireFragmentManager(), "categoryDialog")
+            catDialog.show(parentFragmentManager, "categoryDialog")
         }
         categoryViewModel.categoryName.observe(this) {
             category_edittext.setText(it)
@@ -275,7 +275,7 @@ class AddTransactionFragment: BaseFragment() {
             currency_edittext.setText(it)
         }
         currency_edittext.setOnClickListener{
-            CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )
+            CurrencyListBottomSheet().show(parentFragmentManager, "currencyList" )
         }
         tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
         tags_chip.enableEditChipOnTouch(false, true)
@@ -299,7 +299,7 @@ class AddTransactionFragment: BaseFragment() {
                         .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
                                 "to add an asset account first? ")
                         .setPositiveButton("OK"){ _,_ ->
-                            requireFragmentManager().commit {
+                            parentFragmentManager.commit {
                                 replace(R.id.bigger_fragment_container, AddAccountFragment())
                                 arguments = bundleOf("accountType" to "asset")
                             }
@@ -313,14 +313,14 @@ class AddTransactionFragment: BaseFragment() {
         }
         piggy_edittext.setOnClickListener {
             val piggyBankDialog = PiggyDialog()
-            piggyBankDialog.show(requireFragmentManager(), "piggyDialog")
+            piggyBankDialog.show(parentFragmentManager, "piggyDialog")
         }
         piggyViewModel.piggyName.observe(this) {
             piggy_edittext.setText(it)
         }
         budget_edittext.setOnClickListener {
             val budgetDialog = BudgetSearchDialog()
-            budgetDialog.show(requireFragmentManager(), "budgetDialog")
+            budgetDialog.show(parentFragmentManager, "budgetDialog")
         }
         budgetViewModel.budgetName.observe(this) { name ->
             budget_edittext.setText(name)

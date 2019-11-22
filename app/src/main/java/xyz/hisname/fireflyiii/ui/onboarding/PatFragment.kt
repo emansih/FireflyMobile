@@ -85,7 +85,7 @@ class PatFragment: Fragment() {
                                         .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
                                                 "to add an asset account first? ")
                                         .setPositiveButton("OK"){ _,_ ->
-                                            requireFragmentManager().commit {
+                                            parentFragmentManager.commit {
                                                 replace(R.id.bigger_fragment_container, AddAccountFragment())
                                                 arguments = bundleOf("accountType" to "asset")
                                             }

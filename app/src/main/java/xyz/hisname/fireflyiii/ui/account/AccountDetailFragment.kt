@@ -261,7 +261,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     private fun itemClicked(data: Transactions){
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionId" to data.transaction_journal_id)
             })
@@ -304,7 +304,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             parentFragmentManager.popBackStack()
         }
         R.id.menu_item_edit -> consume {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddAccountFragment().apply{
                     arguments = bundleOf("accountType" to accountType, "accountId" to accountId)
                 })

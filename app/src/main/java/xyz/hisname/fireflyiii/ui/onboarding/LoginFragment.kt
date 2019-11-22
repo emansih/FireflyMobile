@@ -164,7 +164,7 @@ class LoginFragment: Fragment() {
                         layout.isVisible = false
                         toastSuccess(resources.getString(R.string.welcome))
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                        requireFragmentManager().commit {
+                        parentFragmentManager.commit {
                             setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                             replace(R.id.bigger_fragment_container, OnboardingFragment())
                         }

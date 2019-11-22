@@ -126,7 +126,7 @@ class TransactionDetailsFragment: BaseFragment() {
                             .colorRes(R.color.md_green_400)
                     addColor()
                     setOnClickListener {
-                        requireFragmentManager().commit {
+                        parentFragmentManager.commit {
                             val tagDetails = TagDetailsFragment()
                             tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
                                     "revealY" to fab.height / 2, "tagName" to nameOfTag)
@@ -180,7 +180,7 @@ class TransactionDetailsFragment: BaseFragment() {
                        .show()
             }
             3 -> {
-                requireFragmentManager().commit {
+                parentFragmentManager.commit {
                     replace(R.id.fragment_container, AccountDetailFragment().apply {
                         arguments = bundleOf("accountId" to sourceAccountId)
                     })
@@ -188,7 +188,7 @@ class TransactionDetailsFragment: BaseFragment() {
                 }
             }
             4 -> {
-                requireFragmentManager().commit {
+                parentFragmentManager.commit {
                     replace(R.id.fragment_container, AccountDetailFragment().apply {
                         arguments = bundleOf("accountId" to destinationAccountId)
                     })
@@ -270,7 +270,7 @@ class TransactionDetailsFragment: BaseFragment() {
             parentFragmentManager.popBackStack()
         }
         R.id.menu_item_delete -> consume {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 add(DeleteTransactionDialog().apply {
                     arguments = bundleOf("transactionJournalId" to transactionJournalId, "transactionDescription" to transactionDescription)
                 }, "")
@@ -282,7 +282,7 @@ class TransactionDetailsFragment: BaseFragment() {
                         "transactionType" to transactionInfo)
             }
             fragmentContainer.isVisible = false
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, addTransaction)
             }
         }

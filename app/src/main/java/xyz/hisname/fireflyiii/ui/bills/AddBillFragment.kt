@@ -84,7 +84,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         showHelpText()
         notes_edittext.setOnClickListener {
             markdownViewModel.markdownText.postValue(notes_edittext.getString())
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, MarkdownFragment())
                 addToBackStack(null)
             }
@@ -140,7 +140,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                 if (item.itemId == R.id.menu_item_delete) {
                     val deleteBill = DeleteBillDialog()
                     deleteBill.arguments = bundleOf("billId" to billId, "billDescription" to billDescription)
-                    deleteBill.show(requireFragmentManager().beginTransaction(), "delete_bill_dialog")
+                    deleteBill.show(parentFragmentManager.beginTransaction(), "delete_bill_dialog")
                 }
                 true
             }
@@ -197,7 +197,7 @@ class AddBillFragment: BaseAddObjectFragment() {
             DialogDarkMode().showCorrectDatePickerDialog(requireContext(), startDate, calendar)
         }
         currency_edittext.setOnClickListener{
-            CurrencyListBottomSheet().show(requireFragmentManager(), "currencyList" )
+            CurrencyListBottomSheet().show(parentFragmentManager, "currencyList" )
         }
         currencyViewModel.currencyCode.observe(this) {
             currency = it

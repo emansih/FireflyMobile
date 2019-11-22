@@ -87,7 +87,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     private fun setClickListener(position: Int){
         when(position){
             0 -> {
-                requireFragmentManager().commit {
+                parentFragmentManager.commit {
                     replace(R.id.fragment_container, AccountDetailFragment().apply {
                         arguments = bundleOf("accountId" to accountId)
                     })
@@ -135,7 +135,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         R.id.menu_item_edit -> consume {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddPiggyFragment().apply {
                     arguments = bundleOf("piggyId" to piggyId)
                 })

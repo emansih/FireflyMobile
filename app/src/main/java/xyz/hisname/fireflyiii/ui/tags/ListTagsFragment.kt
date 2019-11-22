@@ -79,7 +79,7 @@ class ListTagsFragment: BaseFragment() {
                                     deleteTag(tagName)
                                 }
                                 setOnClickListener {
-                                    requireFragmentManager().commit {
+                                    parentFragmentManager.commit {
                                         val tagDetails = TagDetailsFragment()
                                         tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
                                                 "revealY" to fab.height / 2, "tagId" to tagsData.tagsId)
@@ -104,7 +104,7 @@ class ListTagsFragment: BaseFragment() {
                 .setPositiveButton(R.string.delete_permanently){_, _ ->
                     tagsViewModel.deleteTagByName(tagName).observe(this) { status ->
                         if (status) {
-                            requireFragmentManager().commit {
+                            parentFragmentManager.commit {
                                 replace(R.id.fragment_container, ListTagsFragment())
                             }
                             toastSuccess(resources.getString(R.string.tag_deleted, tagName))
@@ -123,7 +123,7 @@ class ListTagsFragment: BaseFragment() {
         fab.display {
             fab.isClickable = false
             baseLayout.isInvisible = true
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 val addTags = AddTagsFragment()
                 addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
                 addToBackStack(null)
@@ -135,7 +135,7 @@ class ListTagsFragment: BaseFragment() {
 
     private fun pullToRefresh(){
         swipe_tags.setOnRefreshListener {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 // This hack is so nasty!
                 replace(R.id.fragment_container, ListTagsFragment())
             }

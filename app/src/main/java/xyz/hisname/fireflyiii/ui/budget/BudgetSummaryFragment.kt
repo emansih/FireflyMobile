@@ -142,7 +142,7 @@ class BudgetSummaryFragment: BaseFragment() {
                     showTransactionButton.setOnClickListener {
                         val transactionDialog = TransactionByBudgetDialogFragment()
                         transactionDialog.arguments = bundleOf("budgetName" to pe.label)
-                        transactionDialog.show(requireFragmentManager(), "transaction_budget_dialog")
+                        transactionDialog.show(parentFragmentManager, "transaction_budget_dialog")
                     }
                 }
             })

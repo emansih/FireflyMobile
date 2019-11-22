@@ -95,7 +95,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                         errorMessage != null -> toastError(errorMessage)
                         apiResponse.getError() != null -> toastError("Error updating " + tag_edittext.getString())
                         apiResponse.getResponse() != null -> {
-                            requireFragmentManager().commit {
+                            parentFragmentManager.commit {
                                 replace(R.id.fragment_container, ListTagsFragment())
                             }
                             toastSuccess(resources.getString(R.string.tag_updated, tag_edittext.getString()))
@@ -135,7 +135,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
         }
         mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         mapTextview.setOnClickListener {
-            requireFragmentManager().commit {
+            parentFragmentManager.commit {
                 replace(R.id.dialog_add_tags_layout, MapsFragment())
                 addToBackStack(null)
             }
@@ -195,7 +195,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 errorMessage != null -> toastError(errorMessage)
                 it.getError() != null -> toastError("Error saving " + tag_edittext.getString())
                 it.getResponse() != null -> {
-                    requireFragmentManager().commit {
+                    parentFragmentManager.commit {
                         replace(R.id.fragment_container, ListTagsFragment())
                     }
                     toastSuccess(resources.getString(R.string.tag_created, tag_edittext.getString()))

@@ -59,7 +59,7 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
 
     private fun itemClicked(data: Transactions){
         this.dismiss()
-        requireFragmentManager().commit {
+        parentFragmentManager.commit {
             replace(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
