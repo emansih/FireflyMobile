@@ -8,12 +8,11 @@ import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.observe
-import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.colorRes
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import me.toptas.fancyshowcase.listener.DismissListener

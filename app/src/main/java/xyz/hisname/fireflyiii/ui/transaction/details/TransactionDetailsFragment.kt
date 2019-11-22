@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.colorRes
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import xyz.hisname.fireflyiii.R
@@ -32,7 +32,6 @@ import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
 import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.extension.*
-import kotlin.collections.ArrayList
 
 class TransactionDetailsFragment: BaseFragment() {
 

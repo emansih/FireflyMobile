@@ -30,6 +30,7 @@ import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
