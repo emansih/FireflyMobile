@@ -147,19 +147,19 @@ class DashboardFragment: BaseFragment() {
     private fun setIcon(){
         balanceIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_balance_scale)
-                .colorInt(R.color.white)
+                .colorRes(R.color.white)
                 .sizeDp(32))
         billsIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
-                .colorInt(R.color.white)
+                .colorRes(R.color.white)
                 .sizeDp(32))
         leftToSpendIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_money_bill)
-                .colorInt(R.color.white)
+                .colorRes(R.color.white)
                 .sizeDp(32))
         networthIcon.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_chart_line)
-                .colorInt(R.color.white)
+                .colorRes(R.color.white)
                 .sizeDp(32))
     }
 

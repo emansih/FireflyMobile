@@ -52,47 +52,47 @@ class AddAccountFragment: BaseAddObjectFragment() {
     override fun setIcons() {
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .colorInt(R.color.md_green_400)
+                        .colorRes(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         start_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_hourglass_start)
-                        .colorInt(R.color.md_red_400)
+                        .colorRes(R.color.md_red_400)
                         .sizeDp(24),null, null, null)
         start_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calendar)
-                        .colorInt(R.color.md_blue_400)
+                        .colorRes(R.color.md_blue_400)
                         .sizeDp(24),null, null, null)
         interest_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_percent)
-                        .colorInt(R.color.md_amber_700)
+                        .colorRes(R.color.md_amber_700)
                         .sizeDp(24),null, null, null)
         iban_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_list_numbered)
-                        .colorInt(R.color.md_deep_orange_900)
+                        .colorRes(R.color.md_deep_orange_900)
                         .sizeDp(24),null, null, null)
         bic_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_transfer_within_a_station)
-                        .colorInt(R.color.md_deep_orange_400)
+                        .colorRes(R.color.md_deep_orange_400)
                         .sizeDp(24),null, null, null)
         account_number_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_confirmation_number)
-                        .colorInt(R.color.md_brown_600)
+                        .colorRes(R.color.md_brown_600)
                         .sizeDp(24),null, null, null)
         opening_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_open_with)
-                        .colorInt(R.color.md_red_A100)
+                        .colorRes(R.color.md_red_A100)
                         .sizeDp(24),null, null, null)
         opening_balance_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calendar)
-                        .colorInt(R.color.md_blue_400)
+                        .colorRes(R.color.md_blue_400)
                         .sizeDp(24),null, null, null)
         virtual_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_balance_scale)
-                        .colorInt(R.color.md_light_blue_A200)
+                        .colorRes(R.color.md_light_blue_A200)
                         .sizeDp(24),null, null, null)
         addAccountFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
         addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_credit_card)
-                .colorInt(R.color.md_black_1000)
+                .colorRes(R.color.md_black_1000)
                 .sizeDp(24))
     }
 

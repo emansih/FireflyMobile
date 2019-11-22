@@ -29,7 +29,7 @@ class DeleteBillDialog: DialogFragment() {
                 .setMessage(resources.getString(R.string.delete_bill_message, billDescription))
                 .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
                         .sizeDp(24)
-                        .colorInt(R.color.md_green_600))
+                        .colorRes(R.color.md_green_600))
                 .setPositiveButton(R.string.delete_permanently){ _,_ ->
                     billViewModel.deleteBillById(billId).observe(this) {
                         if(it == true){

@@ -124,7 +124,7 @@ class TransactionDetailsFragment: BaseFragment() {
                 chipTags.apply {
                     text = nameOfTag
                     chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                            .colorInt(R.color.md_green_400)
+                            .colorRes(R.color.md_green_400)
                     addColor()
                     setOnClickListener {
                         requireFragmentManager().commit {

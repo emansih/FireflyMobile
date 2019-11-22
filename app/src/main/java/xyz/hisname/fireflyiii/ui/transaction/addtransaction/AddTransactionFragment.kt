@@ -169,15 +169,15 @@ class AddTransactionFragment: BaseFragment() {
     private fun setIcons(){
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .colorInt(R.color.md_green_400)
+                        .colorRes(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .colorInt(R.color.md_yellow_A700)
+                        .colorRes(R.color.md_yellow_A700)
                         .sizeDp(16),null, null, null)
         transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 null,null, IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calculator)
-                .colorInt(R.color.md_blue_grey_400)
+                .colorRes(R.color.md_blue_grey_400)
                 .sizeDp(16), null)
         transaction_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
@@ -189,15 +189,15 @@ class AddTransactionFragment: BaseFragment() {
                 getCompatDrawable(R.drawable.ic_bank_transfer),null, null, null)
         category_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
-                        .colorInt(R.color.md_deep_purple_400)
+                        .colorRes(R.color.md_deep_purple_400)
                         .sizeDp(24),null, null, null)
         piggy_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
-                        .colorInt(R.color.md_pink_200)
+                        .colorRes(R.color.md_pink_200)
                         .sizeDp(24),null, null, null)
         time_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_clock)
-                        .colorInt(R.color.md_red_400)
+                        .colorRes(R.color.md_red_400)
                         .sizeDp(24),null, null, null)
         tags_chip.chipTokenizer = SpanChipTokenizer(requireContext(), object : ChipCreator<ChipSpan> {
             override fun configureChip(chip: ChipSpan, chipConfiguration: ChipConfiguration) {
@@ -213,11 +213,11 @@ class AddTransactionFragment: BaseFragment() {
             }
         }, ChipSpan::class.java)
         addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_plus)
-                .colorInt(R.color.md_black_1000)
+                .colorRes(R.color.md_black_1000)
                 .sizeDp(24))
         budget_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_gratipay)
-                        .colorInt(R.color.md_amber_300)
+                        .colorRes(R.color.md_amber_300)
                         .sizeDp(24),null, null, null)
     }
 

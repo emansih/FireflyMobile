@@ -123,11 +123,11 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     override fun setIcons(){
         target_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .colorInt(R.color.md_green_400)
+                        .colorRes(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         current_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .colorInt(R.color.md_green_400)
+                        .colorRes(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         date_started_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
@@ -139,7 +139,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 .sizeDp(24),null, null, null)
         addPiggyFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
         addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
-                .colorInt(R.color.md_black_1000)
+                .colorRes(R.color.md_black_1000)
                 .sizeDp(24))
     }
 

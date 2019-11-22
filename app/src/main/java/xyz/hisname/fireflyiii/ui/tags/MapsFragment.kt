@@ -98,7 +98,7 @@ class MapsFragment: BaseFragment() {
         maps.setTileSource(TileSourceFactory.MAPNIK)
         startMarker.icon = IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_map_marker)
-                .colorInt(R.color.md_red_700)
+                .colorRes(R.color.md_red_700)
                 .sizeDp(16)
         mapController.animateTo(groomLake)
         mapController.setZoom(15.0)
@@ -166,7 +166,7 @@ class MapsFragment: BaseFragment() {
     private fun setFab(){
         fab_map.setImageDrawable(IconicsDrawable(requireContext())
                 .icon(GoogleMaterial.Icon.gmd_my_location)
-                .colorInt(R.color.md_black_1000)
+                .colorRes(R.color.md_black_1000)
                 .sizeDp(16))
         fab_map.setOnClickListener {
             if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)

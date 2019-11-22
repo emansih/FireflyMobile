@@ -83,7 +83,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
             }
             setImageDrawable(IconicsDrawable(requireContext())
                     .icon(GoogleMaterial.Icon.gmd_add)
-                    .colorInt(R.color.md_pink_200)
+                    .colorRes(R.color.md_pink_200)
                     .sizeDp(16))
         }
     }

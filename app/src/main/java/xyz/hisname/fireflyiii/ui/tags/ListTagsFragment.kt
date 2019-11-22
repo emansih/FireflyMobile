@@ -71,7 +71,7 @@ class ListTagsFragment: BaseFragment() {
                             chipTags.apply {
                                 text = tagsData.tagsAttributes?.tag
                                 chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                                        .colorInt(R.color.md_green_400)
+                                        .colorRes(R.color.md_green_400)
                                 isCloseIconVisible = true
                                 addColor()
                                 setOnCloseIconClickListener { close ->

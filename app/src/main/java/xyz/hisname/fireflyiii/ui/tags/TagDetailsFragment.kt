@@ -58,7 +58,7 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     private fun setTagData(tagData: MutableList<TagsData>){
         tagName.chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                .colorInt(R.color.md_green_400)
+                .colorRes(R.color.md_green_400)
         val tagsAttributes = tagData[0].tagsAttributes
         if(tagsAttributes?.tag != null){
             tagName.text = tagsAttributes.tag
@@ -79,7 +79,7 @@ class TagDetailsFragment: BaseDetailFragment() {
             tagDetailsMap.overlays.add(startMarker)
             startMarker.icon = IconicsDrawable(requireContext())
                     .icon(FontAwesome.Icon.faw_map_marker)
-                    .colorInt(R.color.md_red_700)
+                    .colorRes(R.color.md_red_700)
                     .sizeDp(16)
             latitude_text.text = tagsAttributes.latitude
             longitude_text.text = tagsAttributes.longitude

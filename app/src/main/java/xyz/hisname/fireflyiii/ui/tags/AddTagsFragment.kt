@@ -167,22 +167,22 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 .sizeDp(24),null, null, null)
         description_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_audio_description)
-                        .colorInt(R.color.md_amber_800)
+                        .colorRes(R.color.md_amber_800)
                         .sizeDp(24),null, null, null)
         latitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_map)
-                        .colorInt(R.color.md_green_800)
+                        .colorRes(R.color.md_green_800)
                         .sizeDp(24),null, null, null)
         longitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_map)
-                        .colorInt(R.color.md_green_800)
+                        .colorRes(R.color.md_green_800)
                         .sizeDp(24),null, null, null)
         zoom_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_zoom_in)
-                        .colorInt(R.color.md_black_1000)
+                        .colorRes(R.color.md_black_1000)
                         .sizeDp(24),null, null, null)
         addTagFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                .colorInt(R.color.md_black_1000)
+                .colorRes(R.color.md_black_1000)
                 .sizeDp(24))
     }
 
