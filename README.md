@@ -8,15 +8,15 @@
 [<img src="https://img.shields.io/github/license/emansih/FireflyMobile.svg"
       alt="GPLv3"
       height="20"
-      width="102">](https://img.shields.io/github/license/emansih/FireflyMobile.svg) [<img src="http://img.shields.io/liberapay/patrons/hisname.svg?logo=liberapay"
+      width="102">](https://img.shields.io/github/license/emansih/FireflyMobile.svg) 
+[<img src="http://img.shields.io/liberapay/patrons/hisname.svg?logo=liberapay"
       alt="Liberapay">](https://liberapay.com/hisname/donate)
-
-
-
-An unofficial Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
+[<img src="https://img.shields.io/github/release/emansih/FireflyMobile.svg">](https://github.com/emansih/FireflyMobile/releases/latest)
+            
+Firefly Mobile is an **unofficial** Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 
 ### Disclaimer
-This software is using Firefly III APIs. It is under heavy development and it might work in unexpected ways. In order to use this app, you must first [setup](https://firefly-iii.readthedocs.io/en/latest/installation/server.html) a [Firefly III](https://firefly-iii.org/) instance. 
+This software is using Firefly III APIs. It is under heavy development and it might work in unexpected ways. In order to use this app, you must first [setup](https://docs.firefly-iii.org/installation/self_hosted) a [Firefly III](https://firefly-iii.org/) instance. If you are not inclined to install, the [demo](https://demo.firefly-iii.org/login) works too. 
 
 Other alternative include [this software](https://github.com/mconway/firefly-app/) written by mconway using Ionic framework. 
 
@@ -73,23 +73,32 @@ If there is enough interest, I might upload it to Google Play Store.
 | :-: | :-: | :-: | :-: | :-: |
 | ![2](art/screenshot2.png) | ![6](art/screenshot6.png) | ![7](art/screenshot7.png) | ![8](art/screenshot8.png) | ![9](art/screenshot9.png)
 
-
 Thanks to [Screener - Better Screenshots](https://play.google.com/store/apps/details?id=de.toastcode.screener&hl=en) for the device frame!
 
+## Contributing
+
+### Reporting Bugs
+
+Found a bug? Before reporting it, check the [issue page](https://github.com/emansih/FireflyMobile/issues) to see if I am aware of it. If not, simply open up the [issue form](https://github.com/emansih/FireflyMobile/issues/new?template=ISSUE_TEMPLATE.md) and fill it up.
+
+### Contributing
+
+How do I join/contribute to Firefly Mobile? I am open to any kind of suggestions/feature request! Open an issue or drop me an email(Can be found on my Github profile). 
+
+### Contributors
+This project exists thanks to all the people who [contributed](https://github.com/emansih/FireflyMobile/graphs/contributors).
 Icons in this app are taken from:
 1. [Flaticon](https://www.flaticon.com/free-icon/piggy-bank-with-dollar-coin_21239)
 2. [Material Design Icons](https://materialdesignicons.com)
 3. [Android Iconics](https://github.com/mikepenz/Android-Iconics)
 4. App icon taken from Firefly III server(favicon). [Original source](https://www.kissclipart.com/dinero-no-png-clipart-service-751-05-jh4t51/download-clipart.html)
 
-### Known Limitations / bugs
-Heh... I left this to the last.
 
-Please see [this](https://github.com/emansih/FireflyMobile/projects/1) for updates. 
+
 
 ### License
 ```
-    Copyright (C) 2018 Daniel Quah(emansih)
+    Copyright (C) 2018 - 2019 Daniel Quah(emansih)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
