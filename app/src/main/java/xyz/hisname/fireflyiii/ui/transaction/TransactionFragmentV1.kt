@@ -1,15 +1,14 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
-import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
@@ -26,7 +25,10 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class TransactionFragmentV1: BaseTransactionFragment() {
 
-    private lateinit var result: ActionBarDrawerToggle
+    private val result by lazy { ActionBarDrawerToggle(requireActivity(),
+            fragment_transaction_v1_root, requireActivity().findViewById(R.id.activity_toolbar),
+            com.mikepenz.materialdrawer.R.string.material_drawer_open,
+            com.mikepenz.materialdrawer.R.string.material_drawer_close) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -46,10 +48,6 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     private fun setTransactionCard(){
-        result = ActionBarDrawerToggle(requireActivity(),
-                fragment_transaction_v1_root, requireActivity().findViewById(R.id.activity_toolbar),
-                com.mikepenz.materialdrawer.R.string.material_drawer_open,
-                com.mikepenz.materialdrawer.R.string.material_drawer_close)
         runLayoutAnimation(slider.recyclerView)
         currencyViewModel.getDefaultCurrency().observe(this) { currencyData ->
             val currencyName = currencyData[0].currencyAttributes?.code ?: ""
@@ -157,10 +155,11 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        fragment_transaction_v1_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        result.onConfigurationChanged(newConfig)
     }
+
 
     override fun onResume() {
         super.onResume()
