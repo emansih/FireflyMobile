@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -87,6 +88,7 @@ class HomeActivity: BaseActivity(){
                 keyguardUtil.initKeyguard()
             } else {
                 setup(savedInstanceState)
+                supportActionBar?.setHomeButtonEnabled(true)
             }
         }
     }
@@ -520,11 +522,16 @@ class HomeActivity: BaseActivity(){
             if(supportFragmentManager.backStackEntryCount >= 1){
                 // show back icon and lock nav drawer
                 activity_base_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                drawerToggle.isDrawerIndicatorEnabled = false
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
             } else {
                 activity_base_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
+                drawerToggle.isDrawerIndicatorEnabled = true
             }
+        }
+        drawerToggle.setToolbarNavigationClickListener {
+            onBackPressed()
         }
     }
 
