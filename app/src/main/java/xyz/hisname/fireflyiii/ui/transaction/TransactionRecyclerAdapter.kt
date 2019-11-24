@@ -3,8 +3,10 @@ package xyz.hisname.fireflyiii.ui.transaction
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.recent_transaction_list.view.*
 import org.threeten.bp.LocalDateTime
 import xyz.hisname.fireflyiii.R
@@ -12,6 +14,7 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.addColor
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
@@ -19,6 +22,7 @@ class TransactionRecyclerAdapter(private val items: MutableList<Transactions>, p
         DiffUtilAdapter<Transactions, TransactionRecyclerAdapter.RtAdapter>() {
 
     private lateinit var context: Context
+    private lateinit var chipTags: Chip
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RtAdapter {
         context = parent.context
@@ -47,6 +51,16 @@ class TransactionRecyclerAdapter(private val items: MutableList<Transactions>, p
             } else {
                itemView.transactionAmountText.text = transactionAttributes.currency_symbol +
                        transactionAttributes.amount.toString()
+            }
+            if(transactionAttributes.tags.isEmpty()){
+                itemView.transaction_tag_group.isGone = true
+            } else {
+                transactionAttributes.tags.forEachIndexed { _, tagsData ->
+                    chipTags = Chip(context)
+                    chipTags.text = tagsData
+                    chipTags.addColor()
+                }
+                itemView.transaction_tag_group.addView(chipTags)
             }
             itemView.list_item.setOnClickListener {clickListener(transactionAttributes)}
         }
