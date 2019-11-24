@@ -8,7 +8,6 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.recent_transaction_list.view.*
-import org.threeten.bp.LocalDateTime
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
