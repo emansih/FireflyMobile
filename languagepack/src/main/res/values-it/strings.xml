@@ -106,5 +106,6 @@
     <string name="left_to_pay_per_day">Al giorno:</string>
     <string name="piggy_bank_deleted">Salvadanaio eliminato %1$s</string>
     <string name="edit">Modifica</string>
+    <string name="add_transaction_shortcut">Crea nuova transazione</string>
 
 </resources>

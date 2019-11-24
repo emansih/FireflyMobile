@@ -76,7 +76,7 @@
     <string name="bills_create_skip_holder">Если оплата повторяется каждые 2 недели, в поле "Пропустить" укажите "1", чтобы пропустить каждую вторую неделю.</string>
     <string name="transactions_create_switch_box">Используйте эти кнопки для быстрого переключения типа транзакции, которую вы желаете сохранить.</string>
     <string name="transactions_create_transfer_ffInput_piggy_bank_id">Выберите копилку и свяжите этот перевод с вашими сбережениями.</string>
-    <string name="add_transaction_shortcut">Добавить запись</string>
+    <string name="add_transaction_shortcut">Создать новую транзакцию</string>
     <string name="name">Название</string>
     <string name="interest">Процентная ставка</string>
     <string name="include_in_net_worth">Включать в \"Мои сбережения\"</string>

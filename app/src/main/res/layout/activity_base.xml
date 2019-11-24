@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
-                android:text="Add Transaction"
+                android:text="@string/add_transaction_shortcut"
                 android:contentDescription="@string/appbar_scrolling_view_behavior"
                 android:visibility="gone"
                 android:layout_margin="16dp"

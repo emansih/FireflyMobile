@@ -112,4 +112,5 @@
     <string name="bills_paid">已付款:</string>
     <string name="bills_to_pay">"待付帳單 "</string>
     <string name="left_to_pay_per_day">"每日: "</string>
+    <string name="add_transaction_shortcut">建立新交易</string>
 </resources>

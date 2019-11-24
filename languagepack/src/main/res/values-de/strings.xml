@@ -110,5 +110,6 @@
     <string name="bills_paid">"Bezahlt: "</string>
     <string name="bills_to_pay">Unbezahlte Rechnungen</string>
     <string name="left_to_pay_per_day">Pro Tag:</string>
+    <string name="add_transaction_shortcut">Neue Buchung erstellen</string>
 
 </resources>
