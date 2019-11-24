@@ -104,4 +104,5 @@
     <string name="left_to_pay_per_day">Par jour:</string>
     <string name="edit">Modifier</string>
     <string name="add_transaction_shortcut">Crée une nouvelle transaction</string>
+    <string name="piggy_bank_deleted">Tirelire %1$s supprimée</string>
 </resources>

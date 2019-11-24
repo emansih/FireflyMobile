@@ -107,4 +107,5 @@
     <string name="left_to_pay_per_day">Por dia:</string>
     <string name="edit">Editar</string>
     <string name="add_transaction_shortcut">Crear una nueva transacción</string>
+    <string name="piggy_bank_deleted">Eliminar alcancía %1$s</string>
 </resources>

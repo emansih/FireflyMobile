@@ -105,4 +105,5 @@
     <string name="bills_to_pay">Openstaande contracten</string>
     <string name="edit">Wijzig</string>
     <string name="add_transaction_shortcut">Maak nieuwe transactie</string>
+    <string name="piggy_bank_deleted">Spaarpotje %1$s verwijderd</string>
 </resources>
