@@ -13,8 +13,6 @@ import java.util.*
 
 object DateTimeUtil {
 
-    private val epochSecondsInMillis by lazy { 86399.times(1000) }
-
     fun getCalToString(date: String): String{
         return Instant.ofEpochMilli(parseLong(date))
                 .atOffset(OffsetDateTime.now().offset)
@@ -29,9 +27,11 @@ object DateTimeUtil {
     }
 
 
+    // 1 Day has 86400 seconds. So 1 second before midnight is considered a previous day
+    // Start of day + 86400 - 1 
     fun getEndOfDayInCalendarToEpoch(calendarDate: String): String{
-        val endOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC).plus(epochSecondsInMillis)
-        val endOfDayMilli = endOfDay.times(1000)
+        val endOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        val endOfDayMilli = endOfDay.times(1000) + 86400 - 1
         return endOfDayMilli.toString()
     }
 
