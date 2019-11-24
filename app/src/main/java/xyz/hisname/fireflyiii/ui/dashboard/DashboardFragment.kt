@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.github.mikephil.charting.components.XAxis
@@ -22,6 +24,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.MPPointF
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
@@ -49,6 +52,8 @@ class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
     private val summaryViewModel by lazy { getViewModel(SummaryViewModel::class.java) }
+    private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+
     private var depositSum = 0.0
     private var withdrawSum = 0.0
     private var transaction = 0.0
@@ -83,11 +88,7 @@ class DashboardFragment: BaseFragment() {
         currencyViewModel.apiResponse.observe(this){
             toastInfo(it)
         }
-        fab.display {
-            fab.isClickable = false
-            requireActivity().startActivity(Intent(requireContext(), AddTransactionActivity::class.java))
-            fab.isClickable = true
-        }
+        setExtendedFab()
         parentFragmentManager.commit {
             replace(R.id.recentTransactionCard, RecentTransactionFragment())
         }
@@ -98,6 +99,22 @@ class DashboardFragment: BaseFragment() {
             }
         }
         setIcon()
+    }
+
+    private fun setExtendedFab(){
+        extendedFab.isVisible = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            dashboardNested.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                if (scrollY > oldScrollY) {
+                    extendedFab.shrink()
+                } else {
+                    extendedFab.extend()
+                }
+            }
+        }
+        extendedFab.setOnClickListener {
+            requireActivity().startActivity(Intent(requireContext(), AddTransactionActivity::class.java))
+        }
     }
 
     private fun setSummary(currencyCode: String){
@@ -407,6 +424,7 @@ class DashboardFragment: BaseFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
+        fab.isGone = true
     }
 
     override fun onResume() {
@@ -416,7 +434,7 @@ class DashboardFragment: BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun handleBack() {

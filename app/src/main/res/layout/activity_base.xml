@@ -49,6 +49,19 @@
                 android:layout_gravity="end|bottom"
                 app:backgroundTint="@color/colorAccent"/>
 
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/addTransactionExtended"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                android:text="Add Transaction"
+                android:contentDescription="@string/appbar_scrolling_view_behavior"
+                android:visibility="gone"
+                android:layout_margin="16dp"
+                android:layout_gravity="bottom|right|end"
+                app:backgroundTint="@color/md_orange_500"
+                app:icon="@android:drawable/ic_input_add" />
+
             <include layout="@layout/progress_overlay"/>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
