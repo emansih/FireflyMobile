@@ -5,16 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.observe
-import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import com.mikepenz.iconics.utils.sizeDp
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_add_category.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.extension.*
 
-class AddCategoriesFragment: BaseAddObjectFragment() {
+
+class AddCategoriesFragment: BottomSheetDialogFragment() {
+
+    private val progressLayout by bindView<View>(R.id.progress_overlay)
+    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -23,26 +25,28 @@ class AddCategoriesFragment: BaseAddObjectFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        showReveal(addCategoryContainer)
+        setWidgets()
     }
 
-    override fun setIcons() {
-        addCategoryFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar).sizeDp(24))
-    }
-
-    override fun setWidgets() {
-        placeHolderToolbar.setNavigationOnClickListener {
-            handleBack()
+    override fun onStart() {
+        super.onStart()
+        val addCatDialog = dialog
+        if (addCatDialog != null) {
+            val bottomSheet = addCatDialog.findViewById<View>(R.id.design_bottom_sheet)
+            bottomSheet.layoutParams.height = getScreenHeight().div(1.4.toInt())
         }
-        addCategoryFab.setOnClickListener {
+    }
+
+    private fun setWidgets(){
+        submitCategory.setOnClickListener {
             hideKeyboard()
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             submitData()
         }
     }
 
-    override fun submitData() {
-        categoryViewModel.addCategory(name_edittext.getString()).observe(this) {
+    private fun submitData(){
+        categoryViewModel.addCategory(category_name.getString()).observe(this) {
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = it.getErrorMessage()
             if (errorMessage != null) {
@@ -51,12 +55,8 @@ class AddCategoriesFragment: BaseAddObjectFragment() {
                 toastError(it.getError()?.localizedMessage)
             } else if (it.getResponse() != null) {
                 toastSuccess(requireContext().getString(R.string.category_added))
-                unReveal(addCategoryFab)
+                this.dismiss()
             }
         }
-    }
-
-    override fun handleBack() {
-        unReveal(addCategoryContainer)
     }
 }

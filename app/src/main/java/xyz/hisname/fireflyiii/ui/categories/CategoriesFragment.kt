@@ -63,12 +63,8 @@ class CategoriesFragment: BaseFragment() {
     private fun initFab(){
         fab.display {
             fab.isClickable = false
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, AddCategoriesFragment().apply {
-                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
-                })
-                addToBackStack(null)
-            }
+            val addCategoryFragment = AddCategoriesFragment()
+            addCategoryFragment.show(parentFragmentManager, "add_category_fragment")
             fab.isClickable = true
         }
         recycler_view.hideFab(fab)

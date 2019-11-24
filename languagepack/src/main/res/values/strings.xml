@@ -115,4 +115,6 @@
     <string name="bills_to_pay">Bills To Pay</string>
     <string name="bills_paid">Paid: </string>
     <string name="left_to_pay_per_day">Per day: </string>
+    <string name="new_category">New Category</string>
+    <string name="store_new_category">Store new category</string>
 </resources>
