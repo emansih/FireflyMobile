@@ -109,4 +109,9 @@
     <string name="bills_paid">Оплачено:</string>
     <string name="bills_to_pay">Счета к оплате</string>
     <string name="left_to_pay_per_day">В день:</string>
+    <string name="new_category">Новая категория</string>
+    <string name="store_new_category">Сохранить новую категорию</string>
+    <string name="asset_account_deleted">Основной счёт %1$s успешно удалён</string>
+    <string name="expense_account_deleted">Счёт расхода %1$s успешно удалён</string>
+    <string name="revenue_account_deleted">Счёт дохода %1$s успешно удалён</string>
 </resources>

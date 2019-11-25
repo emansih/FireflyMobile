@@ -117,4 +117,7 @@
     <string name="left_to_pay_per_day">Per day: </string>
     <string name="new_category">New Category</string>
     <string name="store_new_category">Store new category</string>
+    <string name="asset_account_deleted">Successfully deleted asset account %1$s</string>
+    <string name="expense_account_deleted">Successfully deleted expense account %1$s</string>
+    <string name="revenue_account_deleted">Successfully deleted revenue account %1$s</string>
 </resources>

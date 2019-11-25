@@ -281,12 +281,25 @@ class AccountDetailFragment: BaseDetailFragment() {
                 .setTitle(resources.getString(R.string.delete_account_title, accountNameString))
                 .setMessage(resources.getString(R.string.delete_account_message, accountNameString))
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                    accountViewModel.deleteAccountById(accountId).observe(this) {
-                        if(it == true){
+                    accountViewModel.deleteAccountById(accountId).observe(this) { isAccountDeleted ->
+                        if(isAccountDeleted){
                             parentFragmentManager.popBackStack()
-                            toastSuccess("Account Deleted")
+                            when (accountType) {
+                                "asset" -> {
+                                    toastSuccess(resources.getString(R.string.asset_account_deleted, accountNameString))
+                                }
+                                "expense" -> {
+                                    toastSuccess(resources.getString(R.string.expense_account_deleted, accountNameString))
+                                }
+                                "revenue" -> {
+                                    toastSuccess(resources.getString(R.string.revenue_account_deleted, accountNameString))
+                                }
+                                else -> {
+                                    toastSuccess("Account Deleted")
+                                }
+                            }
                         } else {
-                            toastError("Account will be deleted later")
+                            toastInfo("Account will be deleted later")
                         }
                     }
                 }

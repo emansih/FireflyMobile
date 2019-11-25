@@ -106,4 +106,11 @@
     <string name="edit">Wijzig</string>
     <string name="add_transaction_shortcut">Maak nieuwe transactie</string>
     <string name="piggy_bank_deleted">Spaarpotje %1$s verwijderd</string>
+    <string name="new_category">Nieuwe categorie</string>
+    <string name="budget">Budgetten</string>
+    <string name="store_new_category">Sla nieuwe categorie op</string>
+    <string name="asset_account_deleted">Betaalrekening %1$s is verwijderd</string>
+    <string name="expense_account_deleted">Crediteur %1$s is verwijderd</string>
+    <string name="revenue_account_deleted">Debiteur %1$s is verwijderd</string>
+
 </resources>

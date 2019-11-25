@@ -104,4 +104,10 @@
     <string name="bills_paid">已付款:</string>
     <string name="left_to_pay_per_day">每日:</string>
     <string name="add_transaction_shortcut">建立新交易</string>
+    <string name="new_category">新分类</string>
+    <string name="store_new_category">储存新分类</string>
+    <string name="asset_account_deleted">已成功删除资产帐户 %1$s</string>
+    <string name="expense_account_deleted">已成功删除支出帐户 %1$s</string>
+    <string name="revenue_account_deleted">已成功删除收入帐户 %1$s</string>
+
 </resources>

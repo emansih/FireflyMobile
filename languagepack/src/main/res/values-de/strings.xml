@@ -111,5 +111,10 @@
     <string name="bills_to_pay">Unbezahlte Rechnungen</string>
     <string name="left_to_pay_per_day">Pro Tag:</string>
     <string name="add_transaction_shortcut">Neue Buchung erstellen</string>
+    <string name="new_category">Neue Kategorie</string>
+    <string name="store_new_category">Speichere neue Kategorie</string>
+    <string name="asset_account_deleted">Bestandskonto %1$s erfolgreich gelöscht</string>
+    <string name="expense_account_deleted">Kreditor (Ausgabenkonto) %1$s erfolgreich gelöscht</string>
+    <string name="revenue_account_deleted">Schuldner %1$s erfolgreich gelöscht</string>
 
 </resources>

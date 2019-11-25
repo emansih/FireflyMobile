@@ -84,7 +84,6 @@
     <string name="saved_so_far">Mis de côté jusqu\'à présent</string>
     <string name="start_date">Date de début</string>
     <string name="target_date">Date cible</string>
-    <string name="tag_created">Tag %1$s a été créé !</string>
     <string name="tag_deleted">Tag %1$s supprimé</string>
     <string name="tag_updated">Mise à jour de la balise %1$s</string>
     <string name="currency_created">Devise %1$s créée</string>
@@ -105,4 +104,11 @@
     <string name="edit">Modifier</string>
     <string name="add_transaction_shortcut">Crée une nouvelle transaction</string>
     <string name="piggy_bank_deleted">Tirelire %1$s supprimée</string>
+    <string name="new_category">Nouvelle catégorie</string>
+    <string name="tag_created">Tag %1$s a été créé !</string>
+    <string name="store_new_category">Créer une nouvelle catégorie</string>
+    <string name="description">Descripción</string>
+    <string name="asset_account_deleted">Compte d’actif %1$s correctement supprimé</string>
+    <string name="expense_account_deleted">Compte de dépenses %1$s correctement supprimé</string>
+    <string name="revenue_account_deleted">Compte de recettes %1$s correctement supprimé</string>
 </resources>
