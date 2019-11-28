@@ -8,9 +8,11 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +28,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.colorInt
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_map.*
@@ -51,6 +52,7 @@ class MapsFragment: BaseFragment() {
     private val nominatimViewModel by lazy { getViewModel(NominatimViewModel::class.java) }
     private val mapController by lazy { maps.controller }
     private val groomLake by lazy { GeoPoint(37.276675, -115.798936) }
+    private var runnable: Runnable? = null
     private lateinit var startMarker: Marker
     private var longitude: Double = 0.0
     private var latitude: Double = 0.0
@@ -106,15 +108,30 @@ class MapsFragment: BaseFragment() {
     }
 
     private fun searchLocation(){
+        mapSearch.setOnKeyListener { v, keyCode, event ->
+            if(event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
+                location(mapSearch.text.toString())
+                hideKeyboard()
+            }
+            false
+        }
+        val handler = Handler()
         mapSearch.addTextChangedListener(object : TextWatcher{
             override fun afterTextChanged(editable: Editable) {
-                location(editable.toString())
+                runnable = Runnable {
+                    if(editable.isNotBlank()) {
+                        location(editable.toString())
+                        handler.removeCallbacks(runnable)
+                    }
+                }
+                handler.postDelayed(runnable, 2000)
             }
 
             override fun beforeTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {
             }
 
             override fun onTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {
+                handler.removeCallbacks(runnable)
             }
 
         })
@@ -131,15 +148,20 @@ class MapsFragment: BaseFragment() {
     }
 
     private fun location(query: String){
-        nominatimViewModel.getLocationFromQuery(query).observe(this@MapsFragment){ locationList ->
-            val displayName = arrayListOf<String>()
-            cloneLocationList = locationList
-            locationList.forEachIndexed { _, locationSearchModel ->
-                displayName.add(locationSearchModel.display_name)
+        zipLiveData(nominatimViewModel.getLocationFromQuery(query), nominatimViewModel.isLoading).observe(this){ data ->
+            if(!data.second){
+                if(data.first.isEmpty()){
+                    toastInfo("Location was not found")
+                } else {
+                    cloneLocationList = data.first
+                    val displayName = arrayListOf<String>()
+                    data.first.forEachIndexed { _, locationSearchModel ->
+                        displayName.add(locationSearchModel.display_name)
+                    }
+                    val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, displayName)
+                    mapSearch.setAdapter(adapter)
+                }
             }
-            val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, displayName)
-            mapSearch.threshold = 3
-            mapSearch.setAdapter(adapter)
         }
     }
 

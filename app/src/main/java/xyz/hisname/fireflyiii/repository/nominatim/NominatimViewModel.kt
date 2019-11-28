@@ -12,8 +12,10 @@ import xyz.hisname.fireflyiii.repository.models.nominatim.LocationSearchModel
 
 class NominatimViewModel: ViewModel() {
 
+    val isLoading: MutableLiveData<Boolean> = MutableLiveData()
 
     fun getLocationFromQuery(location: String): LiveData<List<LocationSearchModel>>{
+        isLoading.postValue(true)
         val client = NominatimClient.getClient()
         var locationResult: List<LocationSearchModel>? = null
         val data: MutableLiveData<List<LocationSearchModel>> = MutableLiveData()
@@ -21,6 +23,7 @@ class NominatimViewModel: ViewModel() {
             locationResult = client?.create(SearchService::class.java)?.searchLocation(location, "jsonv2")
         }.invokeOnCompletion {
             data.postValue(locationResult)
+            isLoading.postValue(false)
         }
         return data
     }
