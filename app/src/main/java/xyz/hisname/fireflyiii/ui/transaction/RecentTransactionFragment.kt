@@ -11,16 +11,21 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
+import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.create
 import java.util.*
 
 class RecentTransactionFragment: BaseFragment() {
+
+    private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+
+
     override fun handleBack() {
     }
 
@@ -67,5 +72,6 @@ class RecentTransactionFragment: BaseFragment() {
             })
             addToBackStack(null)
         }
+        extendedFab.isVisible = false
     }
 }
