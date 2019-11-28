@@ -222,6 +222,7 @@ class MapsFragment: BaseFragment() {
             mapController.setZoom(18.0)
             val startPoint = GeoPoint(location.latitude, location.longitude)
             mapController.animateTo(startPoint)
+            startMarker.position = startPoint
         }
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
