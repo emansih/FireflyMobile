@@ -54,7 +54,7 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
             } else if (it.getError() != null) {
                 toastError(it.getError()?.localizedMessage)
             } else if (it.getResponse() != null) {
-                toastSuccess(requireContext().getString(R.string.category_added))
+                toastSuccess(requireContext().getString(R.string.category_added, category_name.getString()))
                 this.dismiss()
             }
         }
