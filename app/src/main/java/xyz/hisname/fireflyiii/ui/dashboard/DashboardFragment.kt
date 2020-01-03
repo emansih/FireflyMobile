@@ -424,7 +424,6 @@ class DashboardFragment: BaseFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
-        fab.isGone = true
     }
 
     override fun onResume() {
