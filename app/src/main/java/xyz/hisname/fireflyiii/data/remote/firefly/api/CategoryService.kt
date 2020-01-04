@@ -12,9 +12,6 @@ import xyz.hisname.fireflyiii.repository.models.category.CategorySuccessModel
 interface CategoryService {
 
     @GET(CATEGORY_API_ENDPOINT)
-    fun getCategory(): Call<CategoryModel>
-
-    @GET(CATEGORY_API_ENDPOINT)
     suspend fun getPaginatedCategory(@Query("page") page: Int): Response<CategoryModel>
 
     @FormUrlEncoded

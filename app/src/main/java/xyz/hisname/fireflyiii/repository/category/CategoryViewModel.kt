@@ -1,10 +1,7 @@
 package xyz.hisname.fireflyiii.repository.category
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,11 +25,11 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
         repository = CategoryRepository(categoryDataDao, categoryService)
     }
 
-    fun getAllCategory(): LiveData<MutableList<CategoryData>> {
+    fun getPaginatedCategory(pageNumber: Int): LiveData<MutableList<CategoryData>>{
         var categoryData: MutableList<CategoryData> = arrayListOf()
         val data: MutableLiveData<MutableList<CategoryData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            categoryData = repository.allCategory()
+            categoryData = repository.loadPaginatedData(pageNumber)
         }.invokeOnCompletion {
             data.postValue(categoryData)
         }

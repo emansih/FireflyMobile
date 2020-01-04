@@ -9,14 +9,14 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 @Dao
 abstract class CategoryDataDao: BaseDao<CategoryData> {
 
-    @Query("SELECT * FROM category")
-    abstract fun getAllCategory(): MutableList<CategoryData>
-
     @Query("DELETE FROM category WHERE categoryId = :categoryId")
     abstract fun deleteCategoryById(categoryId: Long): Int
 
     @Query("DELETE FROM category")
     abstract fun deleteAllCategory(): Int
+
+    @Query("SELECT * FROM category order by categoryId desc limit :limitNumber")
+    abstract fun getPaginatedCategory(limitNumber: Int): MutableList<CategoryData>
 
     @Transaction
     @Query("SELECT * FROM category JOIN categoryFts ON (category.categoryId = " +

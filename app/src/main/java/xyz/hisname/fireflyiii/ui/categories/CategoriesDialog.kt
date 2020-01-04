@@ -8,12 +8,14 @@ import android.widget.SearchView
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.dialog_search.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
+import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
@@ -23,21 +25,31 @@ class CategoriesDialog: BaseDialog(){
     private var initialAdapter = arrayListOf<CategoryData>()
     private lateinit var categoriesRecyclerAdapter: CategoriesRecyclerAdapter
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
+    private lateinit var scrollListener: EndlessRecyclerViewScrollListener
+    private val linearLayout by lazy { LinearLayoutManager(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.dialog_search, container)
     }
 
-    private fun displayView(){
-        recycler_view.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter?.notifyDataSetChanged()
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setRecyclerView()
+    }
+
+    private fun setRecyclerView(){
         val dividerItemDecoration = DividerItemDecoration(recycler_view.context, LinearLayoutManager(requireContext()).orientation)
-        recycler_view.addItemDecoration(dividerItemDecoration)
+        recycler_view.apply {
+            layoutManager = linearLayout
+            adapter?.notifyDataSetChanged()
+            addItemDecoration(dividerItemDecoration)
+        }
+    }
+
+    private fun displayView(){
         swipeContainer.isRefreshing = true
-        categoryViewModel.getAllCategory().observe(this) { categoryData ->
+        categoryViewModel.getPaginatedCategory(1).observe(this) { categoryData ->
             swipeContainer.isRefreshing = false
             categoryData.forEachIndexed { _, catData ->
                 initialAdapter.add(catData)
@@ -46,6 +58,22 @@ class CategoriesDialog: BaseDialog(){
             categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData -> itemClicked(data) }
             recycler_view.adapter = categoriesRecyclerAdapter
         }
+        scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout){
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
+                // Don't load more when data is refreshing
+                if(!swipeContainer.isRefreshing) {
+                    swipeContainer.isRefreshing = true
+                    categoryViewModel.getPaginatedCategory(page + 1).observe(this@CategoriesDialog) { catList ->
+                        dataAdapter.clear()
+                        dataAdapter.addAll(catList)
+                        categoriesRecyclerAdapter.update(dataAdapter)
+                        categoriesRecyclerAdapter.notifyDataSetChanged()
+                        swipeContainer.isRefreshing = false
+                    }
+                }
+            }
+        }
+        recycler_view.addOnScrollListener(scrollListener)
     }
 
     private fun searchData(){
