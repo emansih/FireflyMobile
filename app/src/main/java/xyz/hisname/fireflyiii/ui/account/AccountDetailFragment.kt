@@ -42,7 +42,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private var pieDataSetBudget: PieDataSet = PieDataSet(pieEntryBudgetArray, "")
     private var incomePieEntryArray = arrayListOf<PieEntry>()
     private var incomePieDataSet = PieDataSet(incomePieEntryArray, "")
-    private lateinit var accountType: String
+    private val accountType  by lazy { arguments?.getString("accountType")  }
 
     private val coloring = arrayListOf<Int>()
 

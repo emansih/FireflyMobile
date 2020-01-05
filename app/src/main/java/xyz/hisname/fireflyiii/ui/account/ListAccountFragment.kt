@@ -88,7 +88,7 @@ class ListAccountFragment: BaseFragment() {
 
 
     private fun itemClicked(data: AccountData){
-        val bundle = bundleOf("accountId" to data.accountId)
+        val bundle = bundleOf("accountId" to data.accountId, "accountType" to accountType)
         parentFragmentManager.commit {
             addToBackStack(null)
             replace(R.id.fragment_container, AccountDetailFragment().apply { arguments = bundle })
