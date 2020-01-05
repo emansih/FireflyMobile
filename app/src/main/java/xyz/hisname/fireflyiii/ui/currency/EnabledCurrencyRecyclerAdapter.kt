@@ -33,7 +33,8 @@ class EnabledCurrencyRecyclerAdapter (private val items: MutableList<CurrencyDat
             itemView.currencySymbol.text = currency?.symbol.toString()
             itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             Glide.with(context)
-                    .load(Flags.getFlagByIso(currency!!.code))
+                    .load(Flags.getFlagByIso(currency?.code ?: ""))
+                    .error(R.drawable.unknown)
                     .into(itemView.flagImage)
 
             itemView.setOnClickListener {

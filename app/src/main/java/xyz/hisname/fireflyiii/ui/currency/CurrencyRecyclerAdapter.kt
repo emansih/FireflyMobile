@@ -32,15 +32,16 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
         fun bind(currencyData: CurrencyData, clickListener: (CurrencyData) -> Unit){
             val currency = currencyData.currencyAttributes
             itemView.currencySymbol.text = currency?.symbol.toString()
-            if(currency?.enabled!!){
-                itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
+            if(currency?.enabled == true){
+                itemView.currencyName.text = currency.name + " (" + currency.code + ")"
             } else {
                 itemView.currencyName.text = currency?.name + " (" + currency?.code + ")" + " (Disabled)"
                 itemView.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
                 itemView.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
             }
             Glide.with(context)
-                    .load(Flags.getFlagByIso(currency?.code!!))
+                    .load(Flags.getFlagByIso(currency?.code ?: ""))
+                    .error(R.drawable.unknown)
                     .into(itemView.flagImage)
             itemView.setOnClickListener {
                 clickListener(currencyData)

@@ -4,7 +4,7 @@ class Flags{
 
     companion object {
 
-        private const val COMMIT_HASH = "48e8b89a695bf375fce170c52bb9300d1d6bd2e5"
+        private const val COMMIT_HASH = "c7ad12c5678f71d2e2895b1bb02fa8fab80aaca1"
         private const val GITHUB_URL =
                 "https://raw.githubusercontent.com/transferwise/currency-flags/$COMMIT_HASH/src/flags/"
 
