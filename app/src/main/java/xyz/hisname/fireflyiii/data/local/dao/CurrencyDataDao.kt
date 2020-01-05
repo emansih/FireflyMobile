@@ -11,6 +11,9 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("SELECT * FROM currency ORDER BY name ASC")
     abstract fun getAllCurrency(): MutableList<CurrencyData>
 
+    @Query("SELECT * FROM currency ORDER BY name ASC LIMIT :currencyLimit")
+    abstract fun getPaginatedCurrency(currencyLimit: Int): MutableList<CurrencyData>
+
     @Query("DELETE FROM currency WHERE currencyId = :currencyId")
     abstract fun deleteCurrencyById(currencyId: Long): Int
 

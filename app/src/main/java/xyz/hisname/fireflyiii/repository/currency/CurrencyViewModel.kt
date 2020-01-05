@@ -28,11 +28,9 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
     init {
         val currencyDataDao = AppDatabase.getInstance(application).currencyDataDao()
-        repository = CurrencyRepository(currencyDataDao)
+        repository = CurrencyRepository(currencyDataDao, currencyService)
 
     }
-
-    fun getCurrency() = loadRemoteData()
 
     fun getCurrencyById(currencyId: Long): LiveData<MutableList<CurrencyData>>{
         val currencyData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
@@ -45,7 +43,18 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return currencyData
     }
 
-    fun getEnabledCurrency() = loadRemoteData()
+    fun getCurrency(pageNumber: Int): LiveData<MutableList<CurrencyData>>{
+        var currencyData: MutableList<CurrencyData> = arrayListOf()
+        isLoading.value = true
+        val data: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            currencyData = repository.getPaginatedCurrency(pageNumber)
+        }.invokeOnCompletion {
+            data.postValue(currencyData)
+            isLoading.postValue(false)
+        }
+        return data
+    }
 
 
     fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
@@ -135,8 +144,6 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun getDefaultCurrency() = loadRemoteData(true)
-
-
 
     fun setCurrencyCode(code: String?) {
         currencyCode.value = code

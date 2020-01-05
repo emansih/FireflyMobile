@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.remote.firefly.api
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.CURRENCY_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
@@ -9,6 +10,10 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/currency.html
 interface CurrencyService {
 
+    @GET(CURRENCY_API_ENDPOINT)
+    suspend fun getSuspendedPaginatedCurrency(@Query("page") page: Int): Response<CurrencyModel>
+
+    @Deprecated("Use suspend instead")
     @GET(CURRENCY_API_ENDPOINT)
     fun getPaginatedCurrency(@Query("page") page: Int): Call<CurrencyModel>
 
