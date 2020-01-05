@@ -114,7 +114,13 @@ abstract class TransactionDataDao {
                                                             currencyCode: String, sourceName: String, transactionType: String): Double
 
     @Query("SELECT * FROM transactionIndexTable order by transactionId desc limit :limit")
-    abstract fun getRecentTransactions(limit: Int): MutableList<TransactionIndex>
+    abstract fun getTransactionLimit(limit: Int): MutableList<TransactionIndex>
+
+    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType limit :limit")
+    abstract fun getTransactionLimitByDate(startDate: String, endDate: String, transactionType: String, limit: Int): MutableList<Transactions>
+
+    @Query("SELECT * FROM transactionTable WHERE transactionType = :transactionType limit :limit")
+    abstract fun getTransactionLimitByType(transactionType: String, limit: Int): MutableList<Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
     abstract fun getTransactionFromJournalId(journalId: Long): MutableList<Transactions>

@@ -3,9 +3,9 @@ package xyz.hisname.fireflyiii.repository.transaction
 import android.content.Context
 import androidx.work.Data
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.*
@@ -32,13 +32,24 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
 
-    suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<Transactions>{
+    suspend fun transactionList(startDate: String?, endDate: String?,source: String, pageNumber: Int): MutableList<Transactions>{
+        return if(startDate == null || endDate == null){
+            loadPaginatedData("", "", source, pageNumber)
+            transactionDao.getTransactionLimitByType(convertString(source), pageNumber * Constants.PAGE_SIZE)
+        } else {
+            loadPaginatedData(startDate, endDate, source, pageNumber)
+            transactionDao.getTransactionLimitByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(source), Constants.PAGE_SIZE)
+        }
+    }
+
+    suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<Transactions> {
         loadRemoteData(startDate, endDate, source)
-        return if(startDate.isNullOrBlank() || endDate.isNullOrBlank()){
+        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
             transactionDao.getTransactionList(convertString(source))
         } else {
             transactionDao.getTransactionList(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(source))
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(source))
         }
     }
 
@@ -132,7 +143,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun recentTransactions(limit: Int): MutableList<Transactions>{
         loadRemoteData("", "", "all")
         val listOfTransactions = arrayListOf<Transactions>()
-        transactionDao.getRecentTransactions(limit).forEachIndexed { _, transactionIndex ->
+        transactionDao.getTransactionLimit(limit).forEachIndexed { _, transactionIndex ->
             listOfTransactions.addAll(transactionDao.getTransactionFromJournalId(transactionIndex.transactionJournalId ?: 0L))
         }
         return listOfTransactions
@@ -213,6 +224,32 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         } else {
             transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
+        }
+    }
+
+    private suspend fun loadPaginatedData(startDate: String, endDate: String, sourceName: String, pageNumber: Int){
+        var networkCall: Response<TransactionModel>? = null
+        try {
+            withContext(Dispatchers.IO) {
+                networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+                        convertString(sourceName), pageNumber)
+            }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall?.isSuccessful != false) {
+                withContext(Dispatchers.IO){
+                    if(pageNumber == 1){
+                        transactionDao.deleteTransaction()
+                    }
+                    responseBody.data.forEachIndexed { _, data ->
+                        transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                        transactionDao.insert(TransactionIndex(data.transactionId,
+                                data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+
+                    }
+                }
+            }
+        } catch (exception: Exception){
+
         }
     }
 

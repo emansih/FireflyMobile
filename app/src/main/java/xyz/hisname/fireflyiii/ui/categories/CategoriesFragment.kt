@@ -30,7 +30,6 @@ class CategoriesFragment: BaseFragment() {
     private lateinit var scrollListener: EndlessRecyclerViewScrollListener
     private val catData by lazy { arrayListOf<CategoryData>() }
     private val catAdapter by lazy { CategoriesRecyclerAdapter(catData) { data: CategoryData -> }  }
-    private val linearLayout by lazy { LinearLayoutManager(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -42,7 +41,7 @@ class CategoriesFragment: BaseFragment() {
         displayView()
         initFab()
         pullToRefresh()
-        recycler_view.layoutManager = linearLayout
+        recycler_view.layoutManager = linearLayout()
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = catAdapter
     }
@@ -52,7 +51,7 @@ class CategoriesFragment: BaseFragment() {
         categoryViewModel.getPaginatedCategory(1).observe(this){ categoryList ->
             setList(categoryList)
         }
-        scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout){
+        scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout()){
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                 // Don't load more when data is refreshing
                 if(!swipeContainer.isRefreshing) {

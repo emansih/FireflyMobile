@@ -16,16 +16,18 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 abstract class BaseTransactionFragment: BaseFragment() {
 
     protected var dataAdapter = arrayListOf<Transactions>()
-    protected lateinit var rtAdapter: TransactionRecyclerAdapter
+    protected val rtAdapter by lazy { TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) } }
     protected val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     protected val noTransactionText by bindView<TextView>(R.id.listText)
     protected val noTransactionImage by bindView<ImageView>(R.id.listImage)
+    protected lateinit var scrollListener: EndlessRecyclerViewScrollListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -51,9 +53,6 @@ abstract class BaseTransactionFragment: BaseFragment() {
             recycler_view.isVisible = true
             noTransactionText.isGone = true
             noTransactionImage.isGone = true
-            runLayoutAnimation(recycler_view)
-            rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) }
-            recycler_view.adapter = rtAdapter
         }
     }
 

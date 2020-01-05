@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.repository.category
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
@@ -41,6 +42,6 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
             }
         } catch (exception: Exception){ }
-        return categoryDao.getPaginatedCategory(pageNumber * 20)
+        return categoryDao.getPaginatedCategory(pageNumber * Constants.PAGE_SIZE)
     }
 }

@@ -9,6 +9,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
@@ -20,6 +23,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
@@ -29,6 +33,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             fragment_transaction_v1_root, requireActivity().findViewById(R.id.activity_toolbar),
             com.mikepenz.materialdrawer.R.string.material_drawer_open,
             com.mikepenz.materialdrawer.R.string.material_drawer_close) }
+    private val layoutManager by lazy { LinearLayoutManager(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -39,12 +44,24 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         swipeContainer.isRefreshing = true
-        transactionViewModel.getTransactionList(DateTimeUtil.getTodayDate(), DateTimeUtil.getStartOfMonth(6),
-                transactionType).observe(this) {
-            loadTransaction(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+        setRecyclerView()
+        transactionViewModel.getTransactionList(null, null,
+                transactionType,1).observe(this) { transactionList ->
+            dataAdapter.clear()
+            dataAdapter.addAll(transactionList)
+            rtAdapter.update(transactionList)
+            rtAdapter.notifyDataSetChanged()
+            loadTransaction(null, null)
+            swipeContainer.isRefreshing = false
         }
         setDateTransaction()
         setTransactionCard()
+    }
+
+    private fun setRecyclerView(){
+        recycler_view.layoutManager = layoutManager
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recycler_view.adapter = rtAdapter
     }
 
     private fun setTransactionCard(){
@@ -94,12 +111,25 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         }
     }
 
-    private fun loadTransaction(startDate: String, endDate: String) {
-        dataAdapter.clear()
-        transactionViewModel.getTransactionList(startDate, endDate, transactionType).observe(this) {
-            dataAdapter = ArrayList(it)
-            displayResults()
+    private fun loadTransaction(startDate: String?, endDate: String?) {
+        swipeContainer.isRefreshing = true
+        displayResults()
+        scrollListener  = object : EndlessRecyclerViewScrollListener(layoutManager){
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
+                if(!swipeContainer.isRefreshing) {
+                    swipeContainer.isRefreshing = true
+                    transactionViewModel.getTransactionList(startDate, endDate, transactionType, page + 1).observe(this@TransactionFragmentV1) { transactionList ->
+                        dataAdapter.clear()
+                        dataAdapter.addAll(transactionList)
+                        rtAdapter.update(transactionList)
+                        rtAdapter.notifyDataSetChanged()
+                        displayResults()
+                        swipeContainer.isRefreshing = false
+                    }
+                }
+            }
         }
+        recycler_view.addOnScrollListener(scrollListener)
     }
 
     override fun setupFab() {

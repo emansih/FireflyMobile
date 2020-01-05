@@ -3,14 +3,15 @@ package xyz.hisname.fireflyiii.ui.transaction
 import android.os.Bundle
 import android.view.*
 import android.view.animation.OvershootInterpolator
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.colorInt
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.base_swipe_layout.*
@@ -20,12 +21,13 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.*
-import kotlin.collections.ArrayList
 
 class TransactionFragmentV2: BaseTransactionFragment(){
 
     private var currentDate = DateTimeUtil.getTodayDate()
+    private val layoutManager by lazy { LinearLayoutManager(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -34,18 +36,41 @@ class TransactionFragmentV2: BaseTransactionFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        runLayoutAnimation(recycler_view)
+        setRecyclerView()
         getDate()
         pullToRefresh()
     }
 
+    private fun setRecyclerView(){
+        recycler_view.layoutManager = layoutManager
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recycler_view.adapter = rtAdapter
+    }
+
     private fun loadTransaction(){
         swipeContainer.isRefreshing = true
-        dataAdapter.clear()
-        transactionViewModel.getTransactionList(currentDate, currentDate, transactionType).observe(this) {
-            dataAdapter = ArrayList(it)
+        transactionViewModel.getTransactionList(currentDate, currentDate, transactionType, 1).observe(this) { transList ->
+            dataAdapter.clear()
+            dataAdapter.addAll(transList)
+            rtAdapter.update(transList)
+            rtAdapter.notifyDataSetChanged()
             displayResults()
         }
+        scrollListener = object : EndlessRecyclerViewScrollListener(layoutManager){
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
+                if(!swipeContainer.isRefreshing) {
+                    swipeContainer.isRefreshing = true
+                    transactionViewModel.getTransactionList(currentDate, currentDate, transactionType, page + 1).observe(this@TransactionFragmentV2) { transactionList ->
+                        dataAdapter.clear()
+                        dataAdapter.addAll(transactionList)
+                        rtAdapter.update(transactionList)
+                        rtAdapter.notifyDataSetChanged()
+                        displayResults()
+                    }
+                }
+            }
+        }
+        recycler_view.addOnScrollListener(scrollListener)
     }
 
     override fun itemClicked(data: Transactions){
