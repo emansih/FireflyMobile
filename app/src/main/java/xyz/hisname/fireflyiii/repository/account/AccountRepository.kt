@@ -1,6 +1,9 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import android.content.Context
+import android.os.Build
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
@@ -9,16 +12,69 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
+import java.security.cert.CertPathValidatorException
 
 @Suppress("RedundantSuspendModifier")
 class AccountRepository(private val accountDao: AccountsDataDao,
                         private val accountsService: AccountsService?){
 
     private lateinit var apiResponse: String
+    val responseApi: MutableLiveData<String> = MutableLiveData()
+    val authStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     suspend fun insertAccount(account: AccountData){
         accountDao.insert(account)
     }
+
+    // !!!!This is only used for PAT authentication, do not use it anywhere else!!!!
+    /*
+    Returns true and empty string if auth succeeds
+    Returns false and exception string if auth fails
+    */
+    suspend fun authViaPat(): LiveData<Boolean>{
+        var networkCall: Response<AccountsModel>? = null
+        try {
+            withContext(Dispatchers.IO) {
+                networkCall = accountsService?.getPaginatedAccountType("asset", 1)
+            }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall?.isSuccessful != false) {
+                authStatus.value = true
+            } else {
+                authStatus.value = false
+                responseApi.value = "There was an issue communicating with your server"
+            }
+        } catch (exception: Exception) {
+            if (exception.cause is CertPathValidatorException) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.EXPIRED) {
+                        responseApi.value = "Your SSL certificate has expired"
+                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.ALGORITHM_CONSTRAINED) {
+                        responseApi.value = "The public key or the signature algorithm has been constrained"
+                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.INVALID_SIGNATURE) {
+                        responseApi.value = "Your SSL certificate has invalid signature"
+                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.NOT_YET_VALID) {
+                        responseApi.value = "Your SSL certificate is not yet valid"
+                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.REVOKED) {
+                        responseApi.value = "Your SSL certificate has been revoked"
+                    } else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            responseApi.value = "Are you using a self signed cert? Android P doesn't support it out of the box"
+                        } else {
+                            responseApi.value = exception.localizedMessage
+                        }
+                    }
+                } else {
+                    responseApi.value = exception.localizedMessage
+                }
+            } else {
+                responseApi.value = exception.localizedMessage
+            }
+            authStatus.value = false
+        }
+        return authStatus
+    }
+
 
     suspend fun getAccountByType(accountType: String): MutableList<AccountData>{
         loadRemoteData(accountType)

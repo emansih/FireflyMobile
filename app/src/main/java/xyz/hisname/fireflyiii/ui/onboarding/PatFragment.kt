@@ -5,12 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.mikepenz.iconics.IconicsDrawable
@@ -23,13 +20,12 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.util.extension.*
 
 class PatFragment: Fragment() {
 
     private val progressOverlay by bindView<View>(R.id.progress_overlay)
-    private val model by lazy { getViewModel(AccountsViewModel::class.java) }
+    private val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     private lateinit var fireflyUrl: String
     private val accountManager by lazy { AccountManager.get(requireContext()) }
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
@@ -64,9 +60,9 @@ class PatFragment: Fragment() {
                 AuthenticatorManager(accountManager).initializeAccount()
                 AppPref(sharedPref).baseUrl = fireflyUrl
                 AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString().trim()
-                model.getAccountByType("asset").observe(this) { accountData ->
+                accountViewModel.authViaPat().observe(this){ auth ->
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    if(accountData.isNotEmpty()){
+                    if(auth){
                         AuthenticatorManager(AccountManager.get(requireContext())).authMethod = "pat"
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
@@ -76,30 +72,9 @@ class PatFragment: Fragment() {
                                 .commit()
                         toastSuccess(resources.getString(R.string.welcome))
                     } else {
-                        model.apiResponse.observe(this){ response ->
-                            if(response.isNotEmpty()){
-                                toastError(response)
-                            } else {
-                                AlertDialog.Builder(requireContext())
-                                        .setTitle("No asset accounts found!")
-                                        .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
-                                                "to add an asset account first? ")
-                                        .setPositiveButton("OK"){ _,_ ->
-                                            parentFragmentManager.commit {
-                                                replace(R.id.bigger_fragment_container, AddAccountFragment())
-                                                arguments = bundleOf("accountType" to "asset")
-                                            }
-                                        }
-                                        .setNegativeButton("No"){ _,_ ->
-                                            AppPref(sharedPref).clearPref()
-                                            AuthenticatorManager(accountManager).destroyAccount()
-                                            requireActivity().finish()
-                                        }
-                                        .setCancelable(false)
-                                        .show()
-                            }
+                        accountViewModel.apiResponse.observe(this){ message ->
+                            toastError(message)
                         }
-
                     }
                 }
             }

@@ -6,26 +6,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import org.json.JSONObject
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.local.pref.SimpleData
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.SummaryService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.LocaleNumberParser
-import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
-import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
-import kotlin.math.absoluteValue
+
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
 
@@ -37,6 +29,17 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
     init {
         val accountDao = AppDatabase.getInstance(application).accountDataDao()
         repository = AccountRepository(accountDao, accountsService)
+    }
+
+    // !!!!This is only used for PAT authentication, do not use it anywhere else!!!!
+    fun authViaPat(): LiveData<Boolean>{
+        var authPat: LiveData<Boolean> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO) {
+            authPat = repository.authViaPat()
+        }.invokeOnCompletion {
+            apiResponse.postValue(repository.responseApi.value)
+        }
+        return authPat
     }
 
     fun getAccountByType(accountType: String): LiveData<MutableList<AccountData>> {
