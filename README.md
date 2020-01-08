@@ -79,7 +79,22 @@ Thanks to [Screener - Better Screenshots](https://play.google.com/store/apps/det
 
 ### Reporting Bugs
 
-Found a bug? Before reporting it, check the [issue page](https://github.com/emansih/FireflyMobile/issues) to see if I am aware of it. If not, simply open up the [issue form](https://github.com/emansih/FireflyMobile/issues/new?template=ISSUE_TEMPLATE.md) and fill it up.
+Found a bug? Before reporting it, check the [issue page](https://github.com/emansih/FireflyMobile/issues) to see if I am aware of it. If not, simply open up the [issue form](https://github.com/emansih/FireflyMobile/issues/new?template=ISSUE_TEMPLATE.md) and fill it up. Please attach a stacktrace together with the bug report. 
+
+
+^^^ On MIUI devices, please enable Autostart by going to Settings -> Apps -> Manage apps -> Firefly III Mobile -> Toggle Autostart
+
+Why is it needed? 
+
+XiaoMi blocks JobScheduler by default and [ACRA](https://github.com/ACRA/acra), our bug reporting system, uses [JobScheduler](https://github.com/ACRA/acra/issues/732) to open the email intent with attachment. 
+
+
+What can you as a user do about it? 
+
+1. Ask Google to add a test in the [CTS](https://source.android.com/compatibility/cts) and avoid these behaviours by the OEMs. 
+2. Ask XiaoMi to avoid this kind of breaking changes. 
+
+Please see this website for more info: https://dontkillmyapp.com/
 
 ### Contributing
 
