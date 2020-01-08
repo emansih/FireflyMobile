@@ -44,3 +44,6 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -keep public class * implements com.bumptech.glide.module.GlideModule
+
+# Don't obfuscate
+-optimizations !code/simplification/arithmetic,!field/
