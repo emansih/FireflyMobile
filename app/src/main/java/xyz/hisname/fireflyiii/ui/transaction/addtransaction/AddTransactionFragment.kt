@@ -354,7 +354,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun contextSwitch(){
         when {
-            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountNameByType("asset")
+            Objects.equals(transactionType, "transfer") -> accountViewModel.getAccountNameByType("asset")
                     .observe(this) { transferData ->
                         source_exposed_menu.isVisible = true
                         source_layout.isGone = true
@@ -367,7 +367,7 @@ class AddTransactionFragment: BaseFragment() {
                         destination_exposed_dropdown.setAdapter(spinnerAdapter)
                         source_exposed_dropdown.setAdapter(spinnerAdapter)
                     }
-            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
+            Objects.equals(transactionType, "deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
                     accountViewModel.getAccountNameByType("asset")).observe(this ) {
                 // Asset account, spinner
                 spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, it.second)
@@ -493,18 +493,18 @@ class AddTransactionFragment: BaseFragment() {
                 tags_chip.setText(transactionAttributes.tags + ",")
             }
             when {
-                Objects.equals("Withdrawal", transactionType) -> {
+                Objects.equals("withdrawal", transactionType) -> {
                     destination_edittext.setText(transactionAttributes.destination_name)
                     sourceName = transactionAttributes.source_name
                     source_exposed_dropdown.setText(sourceName)
                 }
-                Objects.equals("Transfer", transactionType) -> {
+                Objects.equals("transfer", transactionType) -> {
                     sourceName = transactionAttributes.source_name
                     destinationName = transactionAttributes.destination_name
                     source_exposed_dropdown.setText(sourceName)
                     destination_exposed_dropdown.setText(destinationName)
                 }
-                Objects.equals("Deposit", transactionType) -> {
+                Objects.equals("deposit", transactionType) -> {
                     source_edittext.setText(transactionAttributes.source_name)
                     destinationName = transactionAttributes.destination_name
                     destination_exposed_dropdown.setText(destinationName)
