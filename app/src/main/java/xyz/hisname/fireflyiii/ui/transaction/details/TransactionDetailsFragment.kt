@@ -284,6 +284,7 @@ class TransactionDetailsFragment: BaseFragment() {
             fragmentContainer.isVisible = false
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, addTransaction)
+                addToBackStack(null)
             }
         }
         else -> super.onOptionsItemSelected(item)
