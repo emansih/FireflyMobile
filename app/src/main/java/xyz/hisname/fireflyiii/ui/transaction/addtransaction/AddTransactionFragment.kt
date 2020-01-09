@@ -29,7 +29,6 @@ import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import com.mikepenz.iconics.utils.colorInt
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
@@ -69,12 +68,12 @@ class AddTransactionFragment: BaseFragment() {
     private val calendar by lazy {  Calendar.getInstance() }
     private var selectedTime = ""
     private var budgetName: String? = ""
-    private var transactionAmount = 0.0
 
     companion object {
         private const val OPEN_REQUEST_CODE  = 41
         private const val STORAGE_REQUEST_CODE = 1337
     }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_transaction, container)
@@ -82,6 +81,7 @@ class AddTransactionFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         setIcons()
         setWidgets()
         if(transactionJournalId != 0L){
@@ -123,15 +123,15 @@ class AddTransactionFragment: BaseFragment() {
                 budget_edittext.getString()
             }
             when {
-                Objects.equals("Withdrawal", transactionType) -> {
+                Objects.equals("withdrawal", transactionType) -> {
                     sourceAccount = source_exposed_dropdown.getString()
                     destinationAccount = destination_edittext.getString()
                 }
-                Objects.equals("Transfer", transactionType) -> {
+                Objects.equals("transfer", transactionType) -> {
                     sourceAccount = source_exposed_dropdown.getString()
                     destinationAccount = destination_exposed_dropdown.getString()
                 }
-                Objects.equals("Deposit", transactionType) -> {
+                Objects.equals("deposit", transactionType) -> {
                     sourceAccount = source_edittext.getString()
                     destinationAccount = destination_exposed_dropdown.getString()
                 }
@@ -366,6 +366,7 @@ class AddTransactionFragment: BaseFragment() {
                         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         destination_exposed_dropdown.setAdapter(spinnerAdapter)
                         source_exposed_dropdown.setAdapter(spinnerAdapter)
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     }
             Objects.equals(transactionType, "deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
                     accountViewModel.getAccountNameByType("asset")).observe(this ) {
@@ -380,6 +381,7 @@ class AddTransactionFragment: BaseFragment() {
                 source_edittext.threshold = 1
                 source_edittext.setAdapter(autocompleteAdapter)
                 source_exposed_menu.isVisible = false
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
             else -> {
                 zipLiveData(accountViewModel.getAccountNameByType("asset"),
@@ -395,6 +397,7 @@ class AddTransactionFragment: BaseFragment() {
                     val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, accountNames.second)
                     destination_edittext.threshold = 1
                     destination_edittext.setAdapter(autocompleteAdapter)
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 }
             }
         }
@@ -437,7 +440,7 @@ class AddTransactionFragment: BaseFragment() {
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
                     }
-                    Objects.equals("Deposit", transactionType) -> {
+                    Objects.equals("deposit", transactionType) -> {
                         val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
                             action = "firefly.hisname.ADD_DEPOSIT"
                         }
@@ -453,7 +456,7 @@ class AddTransactionFragment: BaseFragment() {
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
                     }
-                    Objects.equals("Withdrawal", transactionType) -> {
+                    Objects.equals("withdrawal", transactionType) -> {
                         val withdrawalBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
                             action = "firefly.hisname.ADD_WITHDRAW"
                         }
