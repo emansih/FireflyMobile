@@ -27,11 +27,11 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     }
 
     // !!!!This is only used for PAT authentication, do not use it anywhere else!!!!
-    /*
-    Returns true and empty string if auth succeeds
-    Returns false and exception string if auth fails
+    /**
+    * Returns true and empty string if auth succeeds
+    * Returns false and exception string if auth fails
     */
-    suspend fun authViaPat(): LiveData<Boolean>{
+    suspend fun authViaPat(): MutableLiveData<Boolean>{
         var networkCall: Response<AccountsModel>? = null
         try {
             withContext(Dispatchers.IO) {
@@ -39,38 +39,38 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
-                authStatus.value = true
+                authStatus.postValue(true)
             } else {
-                authStatus.value = false
-                responseApi.value = "There was an issue communicating with your server"
+                authStatus.postValue(false)
+                responseApi.setValue("There was an issue communicating with your server")
             }
         } catch (exception: Exception) {
             if (exception.cause is CertPathValidatorException) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.EXPIRED) {
-                        responseApi.value = "Your SSL certificate has expired"
+                        responseApi.postValue("Your SSL certificate has expired")
                     } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.ALGORITHM_CONSTRAINED) {
-                        responseApi.value = "The public key or the signature algorithm has been constrained"
+                        responseApi.postValue("The public key or the signature algorithm has been constrained")
                     } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.INVALID_SIGNATURE) {
-                        responseApi.value = "Your SSL certificate has invalid signature"
+                        responseApi.postValue("Your SSL certificate has invalid signature")
                     } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.NOT_YET_VALID) {
-                        responseApi.value = "Your SSL certificate is not yet valid"
+                        responseApi.postValue("Your SSL certificate is not yet valid")
                     } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.REVOKED) {
-                        responseApi.value = "Your SSL certificate has been revoked"
+                        responseApi.postValue("Your SSL certificate has been revoked")
                     } else {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            responseApi.value = "Are you using a self signed cert? Android P doesn't support it out of the box"
+                            responseApi.postValue("Are you using a self signed cert? Android P doesn't support it out of the box")
                         } else {
-                            responseApi.value = exception.localizedMessage
+                            responseApi.postValue(exception.localizedMessage)
                         }
                     }
                 } else {
-                    responseApi.value = exception.localizedMessage
+                    responseApi.postValue(exception.localizedMessage)
                 }
             } else {
-                responseApi.value = exception.localizedMessage
+                responseApi.postValue(exception.localizedMessage)
             }
-            authStatus.value = false
+            authStatus.postValue(false)
         }
         return authStatus
     }

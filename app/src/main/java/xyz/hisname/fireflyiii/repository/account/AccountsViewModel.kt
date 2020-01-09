@@ -33,13 +33,12 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     // !!!!This is only used for PAT authentication, do not use it anywhere else!!!!
     fun authViaPat(): LiveData<Boolean>{
-        var authPat: LiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            authPat = repository.authViaPat()
+            repository.authViaPat()
         }.invokeOnCompletion {
             apiResponse.postValue(repository.responseApi.value)
         }
-        return authPat
+        return repository.authStatus
     }
 
     fun getAccountByType(accountType: String): LiveData<MutableList<AccountData>> {
