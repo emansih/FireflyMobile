@@ -37,7 +37,7 @@ abstract class BaseDialog: DialogFragment() {
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
-    fun unReveal(rootView: View){
+    /*fun unReveal(rootView: View){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             val x= rootView.width / 2
             val y= rootView.height / 2
@@ -57,7 +57,7 @@ abstract class BaseDialog: DialogFragment() {
         } else {
             dialog?.dismiss()
         }
-    }
+    }*/
 
     fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
 

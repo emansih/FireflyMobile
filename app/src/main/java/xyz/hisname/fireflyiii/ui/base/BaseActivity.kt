@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -53,9 +52,7 @@ open class BaseActivity: AppCompatActivity() {
     private fun enableDarkMode(){
         setTheme(R.style.AppTheme_Dark_DrawerTheme)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.navigationBarColor = getCompatColor(R.color.md_black_1000)
-        }
+        window.navigationBarColor = getCompatColor(R.color.md_black_1000)
     }
 
     override fun attachBaseContext(newBase: Context) {

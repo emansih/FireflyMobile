@@ -19,11 +19,9 @@
 
 <transitionSet
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:transitionOrdering="together"
     android:duration="400"
-    android:interpolator="@android:interpolator/linear_out_slow_in"
-    tools:targetApi="lollipop">
+    android:interpolator="@android:interpolator/linear_out_slow_in">
 
     <slide android:slideEdge="top">
         <targets>

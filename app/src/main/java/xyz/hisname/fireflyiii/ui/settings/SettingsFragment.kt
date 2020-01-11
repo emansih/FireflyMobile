@@ -115,9 +115,6 @@ class SettingsFragment: BaseSettings() {
 
     private fun setPinCode(){
         val keyguardPref = findPreference<Preference>("keyguard") as Preference
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ){
-            keyguardPref.isVisible = false
-        }
         if(!KeyguardUtil(requireActivity()).isDeviceKeyguardEnabled()){
             keyguardPref.isSelectable = false
             keyguardPref.summary = "Please enable pin / password / biometrics in your device settings"

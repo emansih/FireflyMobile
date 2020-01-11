@@ -1,7 +1,5 @@
 package xyz.hisname.fireflyiii.util.animation
 
-import android.annotation.TargetApi
-import android.os.Build
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewTreeObserver
@@ -10,7 +8,6 @@ import androidx.core.view.isVisible
 
 class CircularReveal(private val revealView: View) {
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     fun showReveal(revealX: Int, revealY: Int, animation: BakedBezierInterpolator = BakedBezierInterpolator.FADE_IN_CURVE) {
         revealView.isInvisible = true
         val viewTreeObserver = revealView.viewTreeObserver

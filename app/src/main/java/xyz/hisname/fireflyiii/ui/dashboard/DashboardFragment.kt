@@ -7,7 +7,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -103,13 +102,11 @@ class DashboardFragment: BaseFragment() {
 
     private fun setExtendedFab(){
         extendedFab.isVisible = true
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            dashboardNested.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                if (scrollY > oldScrollY) {
-                    extendedFab.shrink()
-                } else {
-                    extendedFab.extend()
-                }
+        dashboardNested.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (scrollY > oldScrollY) {
+                extendedFab.shrink()
+            } else {
+                extendedFab.extend()
             }
         }
         extendedFab.setOnClickListener {

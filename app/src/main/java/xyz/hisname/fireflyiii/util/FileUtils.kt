@@ -30,10 +30,8 @@ class FileUtils {
     companion object {
 
         fun getPathFromUri(context: Context, uri: Uri): String? {
-            val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-
             // DocumentProvider
-            if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            if (DocumentsContract.isDocumentUri(context, uri)) {
                 // ExternalStorageProvider
                 if (uri.isExternalStorageDocument()) {
                     val docId = DocumentsContract.getDocumentId(uri)
