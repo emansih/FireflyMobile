@@ -115,6 +115,10 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setSummary(currencyCode: String){
+        balanceCard.layoutParams.width = (getScreenWidth() - 25) / 2
+        billsCard.layoutParams.width = (getScreenWidth() - 25) / 2
+        leftToSpendCard.layoutParams.width = (getScreenWidth() - 25) / 2
+        networthCard.layoutParams.width = (getScreenWidth() - 25) / 2
         summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
                 currencyCode)
 

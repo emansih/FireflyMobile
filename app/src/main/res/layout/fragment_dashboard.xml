@@ -16,353 +16,359 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/balanceCard"
+            <HorizontalScrollView
+                android:id="@+id/summaryHorizontalScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                card_view:targetApi="lollipop"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="8dp"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="false"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/balanceLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#00c0ef"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/balanceIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="12dp"
-                        app:layout_constraintStart_toStartOf="parent"
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/balanceCard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:stateListAnimator="@animator/lift_on_touch"
+                        card_view:targetApi="lollipop"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:cardUseCompatPadding="true"
+                        app:cardPreventCornerOverlap="false"
+                        app:cardCornerRadius="2dp"
+                        app:cardElevation="2dp"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintStart_toStartOf="parent">
 
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/balanceImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/rectangle"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/balanceIcon"/>
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/balanceLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#00c0ef"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/balanceTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/balance"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        app:layout_constraintStart_toEndOf="@+id/balanceIcon"
-                        app:layout_constraintTop_toBottomOf="@+id/balanceImageView" />
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/balanceIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="4dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/balanceText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        style="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:text="--.--"
-                        app:layout_constraintTop_toBottomOf="@+id/balanceTextView"
-                        app:layout_constraintStart_toStartOf="@+id/balanceTextView" />
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/balanceImageView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:srcCompat="@drawable/rectangle"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="@+id/balanceIcon"/>
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/balanceEarnedText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="--.--"
-                        app:layout_constraintTop_toBottomOf="@+id/balanceText"
-                        app:layout_constraintStart_toStartOf="@+id/balanceText" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/balanceTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="3dp"
+                                android:text="@string/balance"
+                                android:textStyle="bold"
+                                android:textColor="@color/white"
+                                app:layout_constraintStart_toEndOf="@+id/balanceIcon"
+                                app:layout_constraintTop_toBottomOf="@+id/balanceImageView" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/balanceSpentText"
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/balanceText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                style="@style/TextAppearance.MaterialComponents.Headline6"
+                                android:text="--.--"
+                                app:layout_constraintTop_toBottomOf="@+id/balanceTextView"
+                                app:layout_constraintStart_toStartOf="@+id/balanceTextView" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/balanceEarnedText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="--.--"
+                                app:layout_constraintTop_toBottomOf="@+id/balanceText"
+                                app:layout_constraintStart_toStartOf="@+id/balanceText" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/balanceSpentText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="--.--"
+                                app:layout_constraintTop_toBottomOf="@+id/balanceText"
+                                app:layout_constraintStart_toEndOf="@+id/balanceEarnedText" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/billsCard"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="--.--"
-                        app:layout_constraintTop_toBottomOf="@+id/balanceText"
-                        app:layout_constraintStart_toEndOf="@+id/balanceEarnedText" />
+                        android:layout_height="match_parent"
+                        android:stateListAnimator="@animator/lift_on_touch"
+                        card_view:targetApi="lollipop"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:layout_marginStart="2dp"
+                        app:cardUseCompatPadding="true"
+                        app:cardPreventCornerOverlap="false"
+                        app:cardCornerRadius="2dp"
+                        app:cardElevation="2dp"
+                        app:layout_constraintStart_toEndOf="@+id/balanceCard"
+                        app:layout_constraintTop_toTopOf="@+id/balanceCard">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/billsLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#39cccc"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/billsIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="4dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/billsImageView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:srcCompat="@drawable/rectangle"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="@+id/billsIcon"/>
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/billsTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="3dp"
+                                android:text="@string/bills_to_pay"
+                                android:textColor="@color/white"
+                                android:textStyle="bold"
+                                app:layout_constraintStart_toEndOf="@+id/billsIcon"
+                                app:layout_constraintTop_toBottomOf="@+id/billsImageView" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/billsText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="--.--"
+                                style="@style/TextAppearance.MaterialComponents.Headline6"
+                                app:layout_constraintTop_toBottomOf="@+id/billsTextView"
+                                app:layout_constraintStart_toStartOf="@+id/billsTextView" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/billsPaid"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="@string/bills_paid"
+                                app:layout_constraintTop_toBottomOf="@+id/billsText"
+                                app:layout_constraintStart_toStartOf="@+id/billsTextView" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/billsPaidText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="--.--"
+                                app:layout_constraintTop_toBottomOf="@+id/billsText"
+                                app:layout_constraintStart_toEndOf="@+id/billsPaid" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/leftToSpendCard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:stateListAnimator="@animator/lift_on_touch"
+                        card_view:targetApi="lollipop"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:layout_marginStart="2dp"
+                        app:cardUseCompatPadding="true"
+                        app:cardPreventCornerOverlap="false"
+                        app:cardCornerRadius="2dp"
+                        app:cardElevation="2dp"
+                        app:layout_constraintStart_toEndOf="@+id/billsCard"
+                        app:layout_constraintTop_toTopOf="@+id/balanceCard">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/leftToSpendLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#00ca6d"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/leftToSpendIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="4dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/leftToSpendImageView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:srcCompat="@drawable/rectangle"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="@+id/leftToSpendIcon"/>
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/leftToSpendTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="3dp"
+                                android:text="@string/left_to_spend"
+                                android:textColor="@color/white"
+                                android:textStyle="bold"
+                                app:layout_constraintStart_toEndOf="@+id/leftToSpendIcon"
+                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendImageView" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/leftToSpendAmountText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="--.--"
+                                style="@style/TextAppearance.MaterialComponents.Headline6"
+                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendTextView"
+                                app:layout_constraintStart_toStartOf="@+id/leftToSpendTextView" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/leftToSpendText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="@string/left_to_pay_per_day"
+                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
+                                app:layout_constraintStart_toStartOf="@+id/leftToSpendAmountText" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/leftToSpendAmount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="--.--"
+                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
+                                app:layout_constraintStart_toEndOf="@+id/leftToSpendText" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/networthCard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:stateListAnimator="@animator/lift_on_touch"
+                        card_view:targetApi="lollipop"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:layout_marginStart="2dp"
+                        app:cardUseCompatPadding="true"
+                        app:cardPreventCornerOverlap="false"
+                        app:cardCornerRadius="2dp"
+                        app:cardElevation="2dp"
+                        app:layout_constraintStart_toEndOf="@+id/leftToSpendCard"
+                        app:layout_constraintTop_toTopOf="@+id/balanceCard">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/networthLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#0089db"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/networthIcon"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="4dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"/>
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/networthImageView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:srcCompat="@drawable/rectangle"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="@+id/networthIcon"/>
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/networthTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginStart="3dp"
+                                android:text="@string/net_worth"
+                                android:textColor="@color/white"
+                                app:layout_constraintStart_toEndOf="@+id/networthIcon"
+                                app:layout_constraintTop_toBottomOf="@+id/networthImageView" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/networthAmount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                style="@style/TextAppearance.MaterialComponents.Headline6"
+                                android:text="--.--"
+                                app:layout_constraintTop_toBottomOf="@+id/networthTextView"
+                                app:layout_constraintStart_toStartOf="@+id/networthTextView" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/billsCard"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                card_view:targetApi="lollipop"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="8dp"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="false"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/balanceCard"
-                app:layout_constraintStart_toStartOf="@+id/balanceCard">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/billsLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#39cccc"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/billsIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="12dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/billsImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/rectangle"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/billsIcon"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/billsTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/bills_to_pay"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toEndOf="@+id/billsIcon"
-                        app:layout_constraintTop_toBottomOf="@+id/billsImageView" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/billsText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="--.--"
-                        style="@style/TextAppearance.MaterialComponents.Headline6"
-                        app:layout_constraintTop_toBottomOf="@+id/billsTextView"
-                        app:layout_constraintStart_toStartOf="@+id/billsTextView" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/billsPaid"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="@string/bills_paid"
-                        app:layout_constraintTop_toBottomOf="@+id/billsText"
-                        app:layout_constraintStart_toStartOf="@+id/billsTextView" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/billsPaidText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="--.--"
-                        app:layout_constraintTop_toBottomOf="@+id/billsText"
-                        app:layout_constraintStart_toEndOf="@+id/billsPaid" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/leftToSpendCard"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                card_view:targetApi="lollipop"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="8dp"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="false"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/billsCard"
-                app:layout_constraintStart_toStartOf="@+id/balanceCard">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/leftToSpendLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#00ca6d"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/leftToSpendIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="12dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/leftToSpendImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/rectangle"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/leftToSpendIcon"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/leftToSpendTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/left_to_spend"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toEndOf="@+id/leftToSpendIcon"
-                        app:layout_constraintTop_toBottomOf="@+id/leftToSpendImageView" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/leftToSpendAmountText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="--.--"
-                        style="@style/TextAppearance.MaterialComponents.Headline6"
-                        app:layout_constraintTop_toBottomOf="@+id/leftToSpendTextView"
-                        app:layout_constraintStart_toStartOf="@+id/leftToSpendTextView" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/leftToSpendText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="@string/left_to_pay_per_day"
-                        app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
-                        app:layout_constraintStart_toStartOf="@+id/leftToSpendAmountText" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/leftToSpendAmount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        android:text="--.--"
-                        app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
-                        app:layout_constraintStart_toEndOf="@+id/leftToSpendText" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/networthCard"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                card_view:targetApi="lollipop"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="8dp"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="false"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/leftToSpendCard"
-                app:layout_constraintStart_toStartOf="@+id/balanceCard">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/networthLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#0089db"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/networthIcon"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="12dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/networthImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/rectangle"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/networthIcon"/>
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/networthTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/net_worth"
-                        android:textColor="@color/white"
-                        app:layout_constraintStart_toEndOf="@+id/networthIcon"
-                        app:layout_constraintTop_toBottomOf="@+id/networthImageView" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/networthAmount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/white"
-                        style="@style/TextAppearance.MaterialComponents.Headline6"
-                        android:text="--.--"
-                        app:layout_constraintTop_toBottomOf="@+id/networthTextView"
-                        app:layout_constraintStart_toStartOf="@+id/networthTextView" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </HorizontalScrollView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/netEarningsCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="352dp"
                 android:stateListAnimator="@animator/lift_on_touch"
                 card_view:targetApi="lollipop"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:layout_marginTop="8dp"
                 app:cardUseCompatPadding="true"
                 app:cardPreventCornerOverlap="false"
                 app:cardCornerRadius="2dp"
                 app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/networthCard"
-                app:layout_constraintStart_toStartOf="@+id/balanceCard"
-                app:layout_constraintEnd_toEndOf="@+id/balanceCard">
+                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
+                app:layout_constraintTop_toBottomOf="@+id/summaryHorizontalScrollView">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -395,14 +401,14 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
 
-                       <TextView
-                           android:id="@+id/currentMonthTextView"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_marginTop="4dp"
-                           android:layout_marginEnd="48dp"
-                           app:layout_constraintTop_toTopOf="parent"
-                           app:layout_constraintEnd_toEndOf="parent"/>
+                        <TextView
+                            android:id="@+id/currentMonthTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="48dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"/>
 
                         <TextView
                             android:id="@+id/incomeTextView"
@@ -524,11 +530,8 @@
                             app:layout_constraintTop_toTopOf="@+id/netEarningsTextView"
                             app:layout_constraintStart_toStartOf="@+id/currentMonthTextView"/>
 
-
                     </androidx.constraintlayout.widget.ConstraintLayout>
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -546,8 +549,8 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="2dp"
                 app:layout_constraintTop_toBottomOf="@+id/netEarningsCard"
-                app:layout_constraintStart_toStartOf="@+id/netEarningsCard"
-                app:layout_constraintEnd_toEndOf="@+id/netEarningsCard">
+                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -626,8 +629,8 @@
                 android:layout_width="0dp"
                 android:layout_height="340dp"
                 app:layout_constraintTop_toBottomOf="@+id/dailySummaryCard"
-                app:layout_constraintStart_toStartOf="@+id/netEarningsCard"
-                app:layout_constraintEnd_toEndOf="@+id/netEarningsCard"/>
+                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/budgetCard"
@@ -644,8 +647,8 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="2dp"
                 app:layout_constraintTop_toBottomOf="@+id/recentTransactionCard"
-                app:layout_constraintStart_toStartOf="@+id/netEarningsCard"
-                app:layout_constraintEnd_toEndOf="@+id/netEarningsCard">
+                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
