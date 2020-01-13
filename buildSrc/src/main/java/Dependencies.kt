@@ -37,6 +37,7 @@ object Dependencies{
     private const val multiDexVersion = "2.0.1"
     private const val fancyshowcaseviewVersion = "1.2.1"
     private const val markdownVersion = "0.13.0"
+    private const val biometricVersion = "1.0.1"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
@@ -84,4 +85,5 @@ object Dependencies{
     val markdownLib = "com.atlassian.commonmark:commonmark:$markdownVersion"
     val markdownStrikeThroughExtension = "com.atlassian.commonmark:commonmark-ext-gfm-strikethrough:$markdownVersion"
     val markdownAutoLink = "com.atlassian.commonmark:commonmark-ext-autolink:$markdownVersion"
+    val biometricLib = "androidx.biometric:biometric:$biometricVersion"
 }

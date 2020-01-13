@@ -1,17 +1,16 @@
 package xyz.hisname.fireflyiii.ui
 
 import android.accounts.AccountManager
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
@@ -19,7 +18,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
-import com.mikepenz.iconics.IconicsColor
+import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
@@ -54,11 +53,11 @@ import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV1
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
-import xyz.hisname.fireflyiii.util.KeyguardUtil
-import xyz.hisname.fireflyiii.util.extension.dpToPx
-import xyz.hisname.fireflyiii.util.extension.getCompatColor
+import xyz.hisname.fireflyiii.util.biometric.AuthenticationResult
+import xyz.hisname.fireflyiii.util.biometric.Authenticator
+import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
+import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastError
 
 
 class HomeActivity: BaseActivity(){
@@ -72,8 +71,8 @@ class HomeActivity: BaseActivity(){
     private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
     private val keyguardUtil by lazy { KeyguardUtil(this) }
     private var instanceState: Bundle? = null
+    private lateinit var authenticator: Authenticator
 
-    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if(accountManager.authMethod.isBlank()|| sharedPref(this).baseUrl.isBlank()){
@@ -85,12 +84,41 @@ class HomeActivity: BaseActivity(){
             instanceState = savedInstanceState
             setContentView(R.layout.activity_base)
             if(keyguardUtil.isAppKeyguardEnabled()){
-                keyguardUtil.initKeyguard()
+                authenticator = Authenticator(this, ::handleResult)
+                authenticator.authenticate()
             } else {
                 setup(savedInstanceState)
                 supportActionBar?.setHomeButtonEnabled(true)
             }
         }
+    }
+
+    private fun handleResult(result: AuthenticationResult) {
+        when (result) {
+            is AuthenticationResult.Success -> setup(instanceState)
+            is AuthenticationResult.RecoverableError -> displaySnackbar(result.message)
+            is AuthenticationResult.UnrecoverableError -> {
+                if(result.code == BiometricPrompt.ERROR_NEGATIVE_BUTTON){
+                    toastInfo("Authentication cancelled")
+                } else {
+                    toastError(result.message.toString())
+                }
+                finish()
+            }
+            AuthenticationResult.Cancelled -> {
+                toastInfo("Cancel")
+                finish()
+            }
+            AuthenticationResult.Failure -> {}
+        }
+    }
+
+    private fun displaySnackbar(text: CharSequence) {
+        Snackbar.make(bigger_fragment_container, text, Snackbar.LENGTH_INDEFINITE)
+                .setAction("Retry") {
+                    authenticator.authenticate()
+                }
+                .show()
     }
 
     private fun setup(savedInstanceState: Bundle?){
@@ -549,14 +577,4 @@ class HomeActivity: BaseActivity(){
         super.onSaveInstanceState(slider?.saveInstanceState(outState) ?: outState)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(2804 == requestCode){
-            if(resultCode == RESULT_OK){
-                setup(instanceState)
-            } else {
-                toastError("Authentication fail")
-            }
-        }
-    }
 }

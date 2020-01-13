@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import androidx.preference.PreferenceManager
 import androidx.core.app.ActivityCompat
@@ -17,7 +16,7 @@ import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.util.KeyguardUtil
+import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
 import xyz.hisname.languagepack.LanguageChanger
 
 

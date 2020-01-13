@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.util
+package xyz.hisname.fireflyiii.util.biometric
 
 import android.app.Activity
 import android.app.KeyguardManager
@@ -7,13 +7,6 @@ import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 
 class KeyguardUtil(private val activity: Activity) {
-
-    fun initKeyguard(){
-        val keyguardManager  = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        val screenLockIntent = keyguardManager.createConfirmDeviceCredentialIntent("", "")
-        activity.startActivityForResult(screenLockIntent, 2804)
-    }
-
 
     fun isDeviceKeyguardEnabled(): Boolean{
         val keyguardManager  = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
