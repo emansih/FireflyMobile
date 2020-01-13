@@ -4,7 +4,7 @@ object Dependencies{
     const val targetSdk = 29
     const val compileSdk = 29
     const val kotlinVersion = "1.3.61"
-    private const val retrofitVersion = "2.6.2"
+    private const val retrofitVersion = "2.7.1"
     private const val lifecycleVersion = "2.2.0-rc02"
     private const val roomVersion = "2.2.3"
     private const val coroutineVersion = "1.3.3"
@@ -44,6 +44,7 @@ object Dependencies{
     val lifecyclerLiveDataCore = "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
     val retrofitLibs = "com.squareup.retrofit2:retrofit:$retrofitVersion"
     val retrofitGson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    val retrofitScalar = "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     val roomLibs = "androidx.room:room-runtime:$roomVersion"
     val roomCompiler = "androidx.room:room-compiler:$roomVersion"
     val coroutineCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
