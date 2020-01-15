@@ -13,6 +13,8 @@ import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.X509TrustManager
 
 class FireflyClient {
 
@@ -21,7 +23,8 @@ class FireflyClient {
         @Volatile private var INSTANCE: Retrofit? = null
         private lateinit var baseUrl: URL
 
-        fun getClient(baseUrl: String, accessToken: String, certPinValue: String): Retrofit?{
+        fun getClient(baseUrl: String, accessToken: String, certPinValue: String,
+                      trustManager: X509TrustManager?, sslSocketFactory: SSLSocketFactory?): Retrofit?{
             if(INSTANCE == null){
                 val client = OkHttpClient().newBuilder()
                         .addInterceptor(HeaderInterceptor(accessToken))
@@ -29,6 +32,10 @@ class FireflyClient {
                         .connectTimeout(1, TimeUnit.MINUTES)
                         .writeTimeout(1, TimeUnit.MINUTES)
                         .readTimeout(1, TimeUnit.MINUTES)
+                if(trustManager != null && sslSocketFactory != null) {
+                    client.sslSocketFactory(sslSocketFactory, trustManager)
+                    client.hostnameVerifier { hostname, session -> true }
+                }
                 if(!certPinValue.isBlank()){
                     try {
                         val certPinner = CertificatePinner.Builder()
@@ -51,17 +58,6 @@ class FireflyClient {
             return INSTANCE
         }
 
-        private fun convertIso8601(): Gson {
-            return GsonBuilder()
-                    .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeConverter())
-                    .enableComplexMapKeySerialization()
-                    .serializeNulls()
-                    .setPrettyPrinting()
-                    .setLenient()
-                    .setVersion(1.0)
-                    .create()
-        }
-
         fun getClient(baseUrl: String): Retrofit?{
             if(INSTANCE == null){
                 synchronized(FireflyClient::class.java){
@@ -72,6 +68,17 @@ class FireflyClient {
                 }
             }
             return INSTANCE
+        }
+
+        private fun convertIso8601(): Gson {
+            return GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeConverter())
+                    .enableComplexMapKeySerialization()
+                    .serializeNulls()
+                    .setPrettyPrinting()
+                    .setLenient()
+                    .setVersion(1.0)
+                    .create()
         }
 
         fun destroyInstance() {

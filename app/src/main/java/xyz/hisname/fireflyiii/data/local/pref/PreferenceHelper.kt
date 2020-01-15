@@ -15,5 +15,6 @@ interface PreferenceHelper {
     var isKeyguardEnabled: Boolean
     var transactionListType: Boolean
     var timeFormat: Boolean
+    var isCustomCa: Boolean
     fun clearPref()
 }

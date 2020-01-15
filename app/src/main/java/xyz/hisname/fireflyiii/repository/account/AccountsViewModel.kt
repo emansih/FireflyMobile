@@ -2,12 +2,14 @@ package xyz.hisname.fireflyiii.repository.account
 
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -15,8 +17,10 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
+import java.io.File
 
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
@@ -37,6 +41,22 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             repository.authViaPat()
         }.invokeOnCompletion {
             apiResponse.postValue(repository.responseApi.value)
+        }
+        return repository.authStatus
+    }
+
+    // !!!!This is only used for PAT authentication with custom CA, do not use it anywhere else!!!!
+    fun authViaPatWithCustomCa(pemFile: Uri): LiveData<Boolean>{
+        val filePath = FileUtils.getPathFromUri(getApplication(), pemFile)
+        val file = FileUtils.readFileContent(File(filePath))
+        if(file.isBlank()){
+            apiResponse.postValue("PEM file is empty")
+        } else {
+            viewModelScope.launch(Dispatchers.IO){
+                repository.authViaPat()
+            }.invokeOnCompletion {
+                apiResponse.postValue(repository.responseApi.value)
+            }
         }
         return repository.authStatus
     }

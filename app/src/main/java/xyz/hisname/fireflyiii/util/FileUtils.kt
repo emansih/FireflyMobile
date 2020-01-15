@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
@@ -28,6 +27,25 @@ class FileUtils {
     }
 
     companion object {
+
+        fun copyFile(sourceDestination: File, endDestination: File){
+            sourceDestination.copyTo(endDestination, true)
+        }
+
+        fun readFileContent(filePath: File): String{
+            val file = File(filePath.toString())
+            val fileContent  = StringBuilder()
+            try {
+                val br = BufferedReader(FileReader(file))
+                var line: String?
+                while (br.readLine().also { line = it } != null) {
+                    fileContent.append(line)
+                    fileContent.append('\n')
+                }
+                br.close()
+            } catch (e: IOException) { }
+            return fileContent.toString()
+        }
 
         fun getPathFromUri(context: Context, uri: Uri): String? {
             // DocumentProvider

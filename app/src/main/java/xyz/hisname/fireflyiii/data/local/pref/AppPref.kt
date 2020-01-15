@@ -57,5 +57,9 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("timeFormat", false)
         set(value) = sharedPref.edit{ putBoolean("timeFormat", value)}
 
+    override var isCustomCa: Boolean
+        get() = sharedPref.getBoolean("customCa", false)
+        set(value) = sharedPref.edit{ putBoolean("customCa", value)}
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }
