@@ -46,7 +46,11 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             }
         } catch (exception: Exception) {
             if(exception.cause is CertificateException){
-                responseApi.postValue(exception.cause?.cause?.message)
+                if(exception.cause?.cause?.message?.startsWith("Trust anchor for certificate") == true){
+                    responseApi.postValue("Are you using self signed cert?")
+                } else {
+                    responseApi.postValue(exception.cause?.cause?.message)
+                }
             } else {
                 responseApi.postValue(exception.cause?.message)
             }

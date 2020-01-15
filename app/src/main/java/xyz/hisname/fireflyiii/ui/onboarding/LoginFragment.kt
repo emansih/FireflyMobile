@@ -51,6 +51,7 @@ class LoginFragment: Fragment() {
     private var secretKeyLiveData: MutableLiveData<String> = MutableLiveData()
     private val accManager by lazy { AuthenticatorManager(AccountManager.get(requireContext())) }
     private val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(requireContext()) }
+    private lateinit var fileUri: Uri
 
     companion object {
         private const val OPEN_REQUEST_CODE  = 49
@@ -128,8 +129,7 @@ class LoginFragment: Fragment() {
             } else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 if(self_signed_checkbox.isChecked){
-                    FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(),
-                            (cert_path.text.toString()).toUri())),
+                    FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(), fileUri)),
                             ("file://" + requireContext().filesDir.path + "/user_custom.pem").toUri().toFile())
                 }
                 baseUrlLiveData.value = fireflyUrl
@@ -261,9 +261,9 @@ class LoginFragment: Fragment() {
         if(resultCode == Activity.RESULT_OK){
             if (requestCode == OPEN_REQUEST_CODE) {
                 if (resultData != null) {
-                    val fileUri = resultData.data
+                    fileUri = resultData.data?: Uri.EMPTY
                     cert_path.isVisible = true
-                    cert_path.text = FileUtils.getPathFromUri(requireContext(), fileUri ?: Uri.EMPTY)
+                    cert_path.text = FileUtils.getPathFromUri(requireContext(), fileUri)
                 }
             }
         }

@@ -5,8 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
@@ -25,7 +23,7 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
             isAuthenticated.value = false
             authFailedReason.value = "Bearer Token contains invalid Characters!"
         } else {
-            val oAuthService = FireflyClient.getClient(AppPref(sharedPref).baseUrl)?.create(OAuthService::class.java)
+            val oAuthService = genericService()?.create(OAuthService::class.java)
             oAuthService?.getAccessToken(code.trim(), accManager.clientId, accManager.secretKey, Constants.REDIRECT_URI,
                     "authorization_code")?.enqueue(retrofitCallback({ response ->
                 val authResponse = response.body()
@@ -53,7 +51,11 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
             })
             { throwable ->
                 if(throwable.cause is CertificateException){
-                    authFailedReason.value = throwable.cause?.cause?.message
+                    if(throwable.cause?.cause?.message?.startsWith("Trust anchor for certificate") == true){
+                        authFailedReason.value = "Are you using self signed cert?"
+                    } else {
+                        authFailedReason.value = throwable.cause?.cause?.message
+                    }
                 } else {
                     authFailedReason.value = throwable.localizedMessage
                 }

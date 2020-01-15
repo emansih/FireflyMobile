@@ -41,6 +41,7 @@ class PatFragment: Fragment() {
     private lateinit var fireflyUrl: String
     private val accountManager by lazy { AccountManager.get(requireContext()) }
     private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
+    private lateinit var fileUri: Uri
 
     companion object {
         private const val OPEN_REQUEST_CODE  = 42
@@ -76,8 +77,7 @@ class PatFragment: Fragment() {
                     fireflyUrl = firefly_url_edittext.getString()
                     AppPref(sharedPref).baseUrl = fireflyUrl
                     AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString().trim()
-                    FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(),
-                            (cert_path.text.toString()).toUri())),
+                    FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(), fileUri)),
                             ("file://" + requireContext().filesDir.path + "/user_custom.pem").toUri().toFile())
                     accountViewModel.authViaPatWithCustomCa(cert_path.text.toString().toUri()).observe(this){ auth ->
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
@@ -192,9 +192,9 @@ class PatFragment: Fragment() {
         if(resultCode == Activity.RESULT_OK){
             if (requestCode == OPEN_REQUEST_CODE) {
                 if (resultData != null) {
-                    val fileUri = resultData.data
+                    fileUri = resultData.data?: Uri.EMPTY
                     cert_path.isVisible = true
-                    cert_path.text = FileUtils.getPathFromUri(requireContext(), fileUri ?: Uri.EMPTY)
+                    cert_path.text = FileUtils.getPathFromUri(requireContext(), fileUri)
                 }
             }
         }
