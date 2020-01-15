@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.repository.account
 
 import android.content.Context
 import android.os.Build
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,6 +12,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 import java.security.cert.CertPathValidatorException
+import java.security.cert.CertificateException
 
 @Suppress("RedundantSuspendModifier")
 class AccountRepository(private val accountDao: AccountsDataDao,
@@ -45,30 +45,10 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 responseApi.setValue("There was an issue communicating with your server")
             }
         } catch (exception: Exception) {
-            if (exception.cause is CertPathValidatorException) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.EXPIRED) {
-                        responseApi.postValue("Your SSL certificate has expired")
-                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.ALGORITHM_CONSTRAINED) {
-                        responseApi.postValue("The public key or the signature algorithm has been constrained")
-                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.INVALID_SIGNATURE) {
-                        responseApi.postValue("Your SSL certificate has invalid signature")
-                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.NOT_YET_VALID) {
-                        responseApi.postValue("Your SSL certificate is not yet valid")
-                    } else if (CertPathValidatorException().reason == CertPathValidatorException.BasicReason.REVOKED) {
-                        responseApi.postValue("Your SSL certificate has been revoked")
-                    } else {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            responseApi.postValue("Are you using a self signed cert? Android P doesn't support it out of the box")
-                        } else {
-                            responseApi.postValue(exception.localizedMessage)
-                        }
-                    }
-                } else {
-                    responseApi.postValue(exception.localizedMessage)
-                }
+            if(exception.cause is CertificateException){
+                responseApi.postValue(exception.cause?.cause?.message)
             } else {
-                responseApi.postValue(exception.localizedMessage)
+                responseApi.postValue(exception.cause?.message)
             }
             authStatus.postValue(false)
         }

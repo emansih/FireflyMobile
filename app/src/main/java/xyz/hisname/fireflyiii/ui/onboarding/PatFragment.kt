@@ -90,11 +90,13 @@ class PatFragment: Fragment() {
                                     .add(R.id.bigger_fragment_container, OnboardingFragment())
                                     .commit()
                             toastSuccess(resources.getString(R.string.welcome))
+                        } else {
+                            accountViewModel.apiResponse.observe(this) { message ->
+                                if(message != null){
+                                    toastError(message)
+                                }
+                            }
                         }
-                    }
-                    accountViewModel.apiResponse.observe(this) { message ->
-                        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                        toastError(message)
                     }
                 } else {
                     signIn()
@@ -128,7 +130,10 @@ class PatFragment: Fragment() {
                 toastSuccess(resources.getString(R.string.welcome))
             } else {
                 accountViewModel.apiResponse.observe(this) { message ->
-                    toastError(message)
+                    if(message != null){
+                        toastError(message)
+                    }
+
                 }
             }
         }
