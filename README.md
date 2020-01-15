@@ -27,9 +27,9 @@ Check the [wiki page](https://github.com/emansih/FireflyMobile/wiki/Authenticati
 
 ### Features
 
-✔ Support Kitkat and up!
+✔ Support Marshmallow and up!
 
-✔ Offline: View offline data
+✔ Offline: View and submit offline data
 
 ✔ Automation: Add data non-interactively allowing powerful automation. Read the [wiki](https://github.com/emansih/FireflyMobile/wiki/Automation-via-Android-Intents) for more info.
 
