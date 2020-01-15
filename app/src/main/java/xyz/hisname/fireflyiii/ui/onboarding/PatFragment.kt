@@ -79,7 +79,6 @@ class PatFragment: Fragment() {
                     FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(),
                             (cert_path.text.toString()).toUri())),
                             ("file://" + requireContext().filesDir.path + "/user_custom.pem").toUri().toFile())
-                    println("token: " + AuthenticatorManager(accountManager).accessToken)
                     accountViewModel.authViaPatWithCustomCa(cert_path.text.toString().toUri()).observe(this){ auth ->
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         if(auth){
