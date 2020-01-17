@@ -35,7 +35,7 @@ internal class Authenticator(private val fragmentActivity: FragmentActivity,
 
     private val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Biometric Prompt")
-            .setNegativeButtonText("Cancel")
+            .setDeviceCredentialAllowed(true)
             .build()
 
     fun authenticate() {
