@@ -78,7 +78,7 @@ class PatFragment: Fragment() {
                     AppPref(sharedPref).baseUrl = fireflyUrl
                     AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString().trim()
                     FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(), fileUri)),
-                            ("file://" + requireContext().filesDir.path + "/user_custom.pem").toUri().toFile())
+                            File(requireContext().filesDir.path + "/user_custom.pem"))
                     accountViewModel.authViaPatWithCustomCa(cert_path.text.toString().toUri()).observe(this){ auth ->
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         if(auth){

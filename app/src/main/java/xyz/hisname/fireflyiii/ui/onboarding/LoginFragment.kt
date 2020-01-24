@@ -130,7 +130,7 @@ class LoginFragment: Fragment() {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 if(self_signed_checkbox.isChecked){
                     FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(), fileUri)),
-                            ("file://" + requireContext().filesDir.path + "/user_custom.pem").toUri().toFile())
+                            File(requireContext().filesDir.path + "/user_custom.pem"))
                 }
                 baseUrlLiveData.value = fireflyUrl
                 AppPref(sharedPref).baseUrl = fireflyUrl
