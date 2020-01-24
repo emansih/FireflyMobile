@@ -74,6 +74,10 @@ class DashboardFragment: BaseFragment() {
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
         changeTheme()
+        balanceCard.layoutParams.width = (getScreenWidth() - 425)
+        billsCard.layoutParams.width = (getScreenWidth() - 425)
+        leftToSpendCard.layoutParams.width = (getScreenWidth() - 425)
+        networthCard.layoutParams.width = (getScreenWidth() - 425)
         currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             setSummary(currencyData?.code ?: "")
@@ -115,10 +119,6 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setSummary(currencyCode: String){
-        balanceCard.layoutParams.width = (getScreenWidth() - 425)
-        billsCard.layoutParams.width = (getScreenWidth() - 425)
-        leftToSpendCard.layoutParams.width = (getScreenWidth() - 425)
-        networthCard.layoutParams.width = (getScreenWidth() - 425)
         summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
                 currencyCode)
 
