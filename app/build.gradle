@@ -32,12 +32,22 @@ android {
         buildConfigField("String", "HOSTNAME", hostName)
     }
 
+    afterEvaluate {
+        if(this.name.toLowerCase().contains("github")){
+            android.signingConfigs[configName].storeFile = file(System.getenv("FireflyKeystoreFile"))
+            android.signingConfigs[configName].storePassword = System.getenv("FireflyKeystorePassword")
+            android.signingConfigs[configName].keyAlias = System.getenv("FireflyKeystoreAlias")
+            android.signingConfigs[configName].keyPassword = System.getenv("FireflyKeystorePassword")
+            assembleGithubRelease.dependsOn test
+        }
+    }
     signingConfigs {
         githubRelease {
-            storeFile file(System.getenv("FireflyKeystoreFile"))
-            storePassword System.getenv("FireflyKeystorePassword")
-            keyAlias System.getenv("FireflyKeystoreAlias")
-            keyPassword System.getenv("FireflyKeystorePassword")
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+
+        release {
             v1SigningEnabled true
             v2SigningEnabled true
         }
@@ -82,13 +92,6 @@ android {
     }
 	
     configurations {all*.exclude group: 'com.android.support'}
-}
-
-afterEvaluate {
-    if(name == "assembleGithubRelease"){
-        assembleGithubRelease.dependsOn test
-        assembleGithubRelease.dependsOn tasks.dependencyCheckAnalyze
-    }
 }
 
 dependencies {
