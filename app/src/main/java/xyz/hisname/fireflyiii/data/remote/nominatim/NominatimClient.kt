@@ -44,5 +44,9 @@ class NominatimClient {
                     .create()
         }
 
+        fun destroyClient(){
+            INSTANCE = null
+        }
+
     }
 }

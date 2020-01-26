@@ -27,4 +27,9 @@ class NominatimViewModel: ViewModel() {
         }
         return data
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        NominatimClient.destroyClient()
+    }
 }
