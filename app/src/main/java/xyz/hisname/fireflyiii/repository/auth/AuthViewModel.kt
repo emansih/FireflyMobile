@@ -33,7 +33,7 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
             try {
                 viewModelScope.launch(Dispatchers.IO) {
                     networkCall = oAuthService?.getAccessToken(code.trim(), accManager.clientId,
-                            accManager.secretKey, Constants.REDIRECT_URI, "authorization_code")
+                            accManager.secretKey, Constants.REDIRECT_URI)
                 }.invokeOnCompletion {
                     val authResponse = networkCall?.body()
                     val errorBody = networkCall?.errorBody()

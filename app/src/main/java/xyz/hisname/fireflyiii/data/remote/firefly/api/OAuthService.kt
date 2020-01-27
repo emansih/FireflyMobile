@@ -12,7 +12,7 @@ interface OAuthService {
     @POST("$OAUTH_API_ENDPOINT/token")
     suspend fun getAccessToken(@Field("code") code: String, @Field("client_id") clientId: String?,
                        @Field("client_secret") clientSecret: String?, @Field("redirect_uri") redirectUri: String,
-                       @Field("grant_type") grantType: String?): Response<AuthModel>
+                       @Field("grant_type") grantType: String? = "authorization_code"): Response<AuthModel>
 
     @FormUrlEncoded
     @POST("$OAUTH_API_ENDPOINT/token")
