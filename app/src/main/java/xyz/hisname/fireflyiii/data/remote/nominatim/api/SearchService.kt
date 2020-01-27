@@ -8,5 +8,5 @@ interface SearchService {
 
     @POST("/search")
     suspend fun searchLocation(@Query("q")location: String,
-                       @Query("format")outputFormat: String): List<LocationSearchModel>
+                       @Query("format")outputFormat: String = "jsonv2"): List<LocationSearchModel>
 }

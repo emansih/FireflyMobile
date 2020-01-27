@@ -20,7 +20,7 @@ class NominatimViewModel: ViewModel() {
         var locationResult: List<LocationSearchModel>? = null
         val data: MutableLiveData<List<LocationSearchModel>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            locationResult = client?.create(SearchService::class.java)?.searchLocation(location, "jsonv2")
+            locationResult = client?.create(SearchService::class.java)?.searchLocation(location)
         }.invokeOnCompletion {
             data.postValue(locationResult)
             isLoading.postValue(false)
