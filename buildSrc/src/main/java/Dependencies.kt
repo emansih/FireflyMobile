@@ -45,6 +45,7 @@ object Dependencies{
     val retrofitLibs = "com.squareup.retrofit2:retrofit:$retrofitVersion"
     val retrofitGson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     val retrofitScalar = "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
+    val mockWebServer = "org.mock-server:mockserver-netty:5.8.1"
     val roomLibs = "androidx.room:room-runtime:$roomVersion"
     val roomCompiler = "androidx.room:room-compiler:$roomVersion"
     val coroutineCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"

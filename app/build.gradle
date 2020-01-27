@@ -90,7 +90,7 @@ android {
     aaptOptions {
         ignoreAssetsPattern "NOTICE.txt"
     }
-	
+
     configurations {all*.exclude group: 'com.android.support'}
 }
 
@@ -157,5 +157,6 @@ dependencies {
     api project(path: ":languagepack")
 
     testImplementation Dependencies.jUnit
+    testImplementation Dependencies.mockWebServer
     debugImplementation Dependencies.debugDb
 }

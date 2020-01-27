@@ -58,18 +58,6 @@ class FireflyClient {
             return INSTANCE
         }
 
-        fun getClient(baseUrl: String): Retrofit?{
-            if(INSTANCE == null){
-                synchronized(FireflyClient::class.java){
-                    INSTANCE = Retrofit.Builder()
-                            .baseUrl(generateUrl(baseUrl))
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .build()
-                }
-            }
-            return INSTANCE
-        }
-
         private fun convertIso8601(): Gson {
             return GsonBuilder()
                     .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeConverter())
