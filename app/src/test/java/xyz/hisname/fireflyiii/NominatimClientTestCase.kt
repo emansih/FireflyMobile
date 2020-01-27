@@ -1,8 +1,8 @@
 package xyz.hisname.fireflyiii
 
-import org.junit.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import xyz.hisname.fireflyiii.data.remote.nominatim.NominatimClient
@@ -18,7 +18,7 @@ class NominatimClientTestCase {
     @Test
     fun searchIstana(){
         val nom = runBlocking{
-            NominatimClient.getClient()?.create(SearchService::class.java)?.searchLocation("Istana", "jsonv2")
+            NominatimClient.getClient()?.create(SearchService::class.java)?.searchLocation("Istana")
         }
         assertTrue("list not empty", !nom.isNullOrEmpty())
         nom?.forEachIndexed { _, locationSearchModel ->
@@ -29,4 +29,14 @@ class NominatimClientTestCase {
             }
         }
     }
+
+    @Test
+    fun searchWithoutInput(){
+        val nom = runBlocking{
+            NominatimClient.getClient()?.create(SearchService::class.java)?.searchLocation("")
+        }
+        assertTrue("list is empty", nom.isNullOrEmpty())
+    }
+
+
 }
