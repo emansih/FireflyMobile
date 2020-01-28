@@ -123,7 +123,7 @@ open class DaoTest {
         tagsFactory.forEach {
             fireflyDatabase.tagsDataDao().insert(it)
         }
-        val retrievedCurrency = fireflyDatabase.tagsDataDao().getAllTags()
-        assertTrue(retrievedCurrency == tagsFactory.sortedWith(compareBy({ it.tagsId }, { it.tagsId })))
+        val retrievedTags = fireflyDatabase.tagsDataDao().getAllTags()
+        assertTrue(retrievedTags == tagsFactory.sortedWith(compareBy({ it.tagsId }, { it.tagsId })))
     }
 }
