@@ -45,7 +45,7 @@
     <string name="decimal_places">Chiffres après la virgule</string>
     <string name="delete_tag_message">Êtes-vous sûr de vouloir supprimer le tag %1$s?</string>
     <string name="delete_account_title">Supprimer le compte %1$s"</string>
-    <string name="delete_permanently">Elimina definitivamente</string>
+    <string name="delete_permanently">Supprimer définitivement</string>
     <string name="delete_transaction_title">\'Supprimer l\\\'opération ayant comme description %1$s"</string>
     <string name="delete_tag_title">Supprimer le tag %1$s"</string>
     <string name="delete_piggy_bank_title">Supprimer la tirelire %1$s</string>
@@ -107,7 +107,7 @@
     <string name="new_category">Nouvelle catégorie</string>
     <string name="tag_created">Tag %1$s a été créé !</string>
     <string name="store_new_category">Créer une nouvelle catégorie</string>
-    <string name="description">Descripción</string>
+    <string name="description">Description</string>
     <string name="asset_account_deleted">Compte d’actif %1$s correctement supprimé</string>
     <string name="expense_account_deleted">Compte de dépenses %1$s correctement supprimé</string>
     <string name="revenue_account_deleted">Compte de recettes %1$s correctement supprimé</string>
