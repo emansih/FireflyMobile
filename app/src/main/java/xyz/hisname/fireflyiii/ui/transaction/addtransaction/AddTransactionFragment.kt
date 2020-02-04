@@ -123,15 +123,15 @@ class AddTransactionFragment: BaseFragment() {
                 budget_edittext.getString()
             }
             when {
-                Objects.equals("withdrawal", transactionType) -> {
+                Objects.equals("Withdrawal", transactionType) -> {
                     sourceAccount = source_exposed_dropdown.getString()
                     destinationAccount = destination_edittext.getString()
                 }
-                Objects.equals("transfer", transactionType) -> {
+                Objects.equals("Transfer", transactionType) -> {
                     sourceAccount = source_exposed_dropdown.getString()
                     destinationAccount = destination_exposed_dropdown.getString()
                 }
-                Objects.equals("deposit", transactionType) -> {
+                Objects.equals("Deposit", transactionType) -> {
                     sourceAccount = source_edittext.getString()
                     destinationAccount = destination_exposed_dropdown.getString()
                 }
@@ -354,7 +354,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun contextSwitch(){
         when {
-            Objects.equals(transactionType, "transfer") -> accountViewModel.getAccountNameByType("asset")
+            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountNameByType("asset")
                     .observe(this) { transferData ->
                         source_exposed_menu.isVisible = true
                         source_layout.isGone = true
@@ -368,7 +368,7 @@ class AddTransactionFragment: BaseFragment() {
                         source_exposed_dropdown.setAdapter(spinnerAdapter)
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     }
-            Objects.equals(transactionType, "deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
+            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
                     accountViewModel.getAccountNameByType("asset")).observe(this ) {
                 // Asset account, spinner
                 spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, it.second)
@@ -422,7 +422,7 @@ class AddTransactionFragment: BaseFragment() {
                 toastError(errorMessage)
             } else if (transactionResponse.getError() != null) {
                 when {
-                    Objects.equals("transfers", transactionType) -> {
+                    Objects.equals("Transfers", transactionType) -> {
                         val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
                             action = "firefly.hisname.ADD_TRANSFER"
                         }
@@ -440,7 +440,7 @@ class AddTransactionFragment: BaseFragment() {
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
                     }
-                    Objects.equals("deposit", transactionType) -> {
+                    Objects.equals("Deposit", transactionType) -> {
                         val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
                             action = "firefly.hisname.ADD_DEPOSIT"
                         }
@@ -456,7 +456,7 @@ class AddTransactionFragment: BaseFragment() {
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
                     }
-                    Objects.equals("withdrawal", transactionType) -> {
+                    Objects.equals("Withdrawal", transactionType) -> {
                         val withdrawalBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
                             action = "firefly.hisname.ADD_WITHDRAW"
                         }
@@ -496,18 +496,18 @@ class AddTransactionFragment: BaseFragment() {
                 tags_chip.setText(transactionAttributes.tags + ",")
             }
             when {
-                Objects.equals("withdrawal", transactionType) -> {
+                Objects.equals("Withdrawal", transactionType) -> {
                     destination_edittext.setText(transactionAttributes.destination_name)
                     sourceName = transactionAttributes.source_name
                     source_exposed_dropdown.setText(sourceName)
                 }
-                Objects.equals("transfer", transactionType) -> {
+                Objects.equals("Transfer", transactionType) -> {
                     sourceName = transactionAttributes.source_name
                     destinationName = transactionAttributes.destination_name
                     source_exposed_dropdown.setText(sourceName)
                     destination_exposed_dropdown.setText(destinationName)
                 }
-                Objects.equals("deposit", transactionType) -> {
+                Objects.equals("Deposit", transactionType) -> {
                     source_edittext.setText(transactionAttributes.source_name)
                     destinationName = transactionAttributes.destination_name
                     destination_exposed_dropdown.setText(destinationName)
