@@ -24,10 +24,12 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
     private val oAuthService by lazy { genericService()?.create(OAuthService::class.java) }
 
     fun getAccessToken(code: String): LiveData<Boolean> {
-        authFailedReason.value = ""
+        authFailedReason.postValue("")
+        // Issue #46 on Github
+        // https://github.com/emansih/FireflyMobile/issues/46
         if (!code.isAscii()) {
-            isAuthenticated.value = false
-            authFailedReason.value = "Bearer Token contains invalid Characters!"
+            isAuthenticated.postValue(false)
+            authFailedReason.postValue("Bearer Token contains invalid Characters!")
         } else {
             var networkCall: Response<AuthModel>? = null
             try {
@@ -42,33 +44,33 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
                         accManager.refreshToken = authResponse.refresh_token.trim()
                         accManager.tokenExpiry = authResponse.expires_in
                         accManager.authMethod = "oauth"
-                        isAuthenticated.value = true
+                        isAuthenticated.postValue(true)
                     } else {
                         if (errorBody != null) {
                             try {
                                 val errorBodyMessage = String(errorBody.bytes())
                                 val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
-                                authFailedReason.value = gson.message
+                                authFailedReason.postValue(gson.message)
                             } catch (exception: Exception) {
-                                authFailedReason.value = "Authentication Failed"
+                                authFailedReason.postValue("Authentication Failed")
                             }
                         } else {
-                            authFailedReason.value = "Authentication Failed"
+                            authFailedReason.postValue("Authentication Failed")
                         }
-                        isAuthenticated.value = false
+                        isAuthenticated.postValue(false)
                     }
                 }
             } catch (throwable: Exception) {
                 if (throwable.cause is CertificateException) {
                     if (throwable.cause?.cause?.message?.startsWith("Trust anchor for certificate") == true) {
-                        authFailedReason.value = "Are you using self signed cert?"
+                        authFailedReason.postValue("Are you using self signed cert?")
                     } else {
-                        authFailedReason.value = throwable.cause?.cause?.message
+                        authFailedReason.postValue(throwable.cause?.cause?.message)
                     }
                 } else {
-                    authFailedReason.value = throwable.localizedMessage
+                    authFailedReason.postValue(throwable.localizedMessage)
                 }
-                isAuthenticated.value = false
+                isAuthenticated.postValue(false)
             }
         }
         return isAuthenticated
