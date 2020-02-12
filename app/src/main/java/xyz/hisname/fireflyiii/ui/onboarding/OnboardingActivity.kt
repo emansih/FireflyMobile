@@ -103,7 +103,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
     private fun installShortCut(): Boolean{
         if (Intent.ACTION_CREATE_SHORTCUT == intent.action) {
             val shortCutIntent = Intent(this, OnboardingActivity::class.java)
-            val iconResource = Intent.ShortcutIconResource.fromContext(this, R.drawable.app_icon)
+            val iconResource = Intent.ShortcutIconResource.fromContext(this, R.mipmap.ic_launcher)
             shortCutIntent.action = "xyz.hisname.fireflyiii.ADD_TRANSACTION"
             val newIntent = Intent()
             newIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortCutIntent)
