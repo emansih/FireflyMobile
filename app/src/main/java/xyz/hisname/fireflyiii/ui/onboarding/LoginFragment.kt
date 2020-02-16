@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import androidx.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -23,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.observe
+import androidx.preference.PreferenceManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
@@ -41,6 +40,7 @@ import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
 import java.io.File
 import java.util.*
+
 
 class LoginFragment: Fragment() {
 
@@ -193,16 +193,17 @@ class LoginFragment: Fragment() {
     // SAF == Storage Access Framework
     // SAF != Singapore Armed Forces
     private fun openSaf(){
-        toastInfo("Choose your PEM file", Toast.LENGTH_LONG)
+        toastInfo("Import your cert", Toast.LENGTH_LONG)
         if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
         } else {
-            val documentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                type = "application/x-pem-file"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
-            startActivityForResult(documentIntent, OPEN_REQUEST_CODE)
+            val mimeTypes = arrayOf("application/x-pem-file", "application/pkix-cert")
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = mimeTypes[0]
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+            startActivityForResult(Intent.createChooser(intent, "ChooseFile"), OPEN_REQUEST_CODE)
         }
     }
 
@@ -264,6 +265,8 @@ class LoginFragment: Fragment() {
                     fileUri = resultData.data?: Uri.EMPTY
                     cert_path.isVisible = true
                     cert_path.text = FileUtils.getPathFromUri(requireContext(), fileUri)
+                } else {
+                    self_signed_checkbox.isChecked = false
                 }
             }
         }
