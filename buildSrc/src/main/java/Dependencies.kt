@@ -12,7 +12,7 @@ object Dependencies{
     private const val androidxFragmentVersion = "1.2.0-rc04"
     private const val androidxAnnotationVersion = "1.1.0"
     private const val androidxRecyclerViewVersion = "1.1.0-rc01"
-    private const val materialDesignVersion = "1.2.0-alpha03"
+    private const val materialDesignVersion = "1.1.0"
     private const val swipeRefreshVersion = "1.1.0-alpha03"
     private const val androidxCoreVersion = "1.2.0-rc01"
     private const val androidxConstraintLayoutVersion = "1.1.3"
