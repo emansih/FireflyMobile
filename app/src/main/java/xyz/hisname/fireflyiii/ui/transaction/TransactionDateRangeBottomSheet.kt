@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.observe
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.android.synthetic.main.fragment_date_range.*
@@ -15,8 +16,10 @@ import xyz.hisname.fireflyiii.util.extension.isBlank
 
 class TransactionDateRangeBottomSheet: BottomSheetDialogFragment() {
 
-    private lateinit var startDateText: String
-    private lateinit var endDateText: String
+    private var startDateText: String? = null
+    private var endDateText: String? = null
+    private val dateRange by lazy { getViewModel(DateRangeViewModel::class.java) }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -25,7 +28,17 @@ class TransactionDateRangeBottomSheet: BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setTextField()
         setDate()
+    }
+
+    private fun setTextField(){
+        dateRange.startDate.observe(this){
+            startDateEditText.setText(it)
+        }
+        dateRange.endDate.observe(this){
+            endDateEditText.setText(it)
+        }
     }
 
     private fun setDate(){
@@ -47,7 +60,6 @@ class TransactionDateRangeBottomSheet: BottomSheetDialogFragment() {
             if(startDateEditText.isBlank() or endDateEditText.isBlank()){
                 onDestroy()
             } else {
-                val dateRange = getViewModel(DateRangeViewModel::class.java)
                 dateRange.startDate(startDateText)
                 dateRange.endDate(endDateText)
                 dismiss()

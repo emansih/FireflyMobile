@@ -34,6 +34,8 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             com.mikepenz.materialdrawer.R.string.material_drawer_open,
             com.mikepenz.materialdrawer.R.string.material_drawer_close) }
     private val layoutManager by lazy { LinearLayoutManager(requireContext()) }
+    private val dateRangeVm by lazy { getViewModel(DateRangeViewModel::class.java) }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -54,6 +56,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             loadTransaction(null, null)
             swipeContainer.isRefreshing = false
         }
+        pullToRefresh()
         setDateTransaction()
         setTransactionCard()
     }
@@ -114,6 +117,13 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     private fun loadTransaction(startDate: String?, endDate: String?) {
         swipeContainer.isRefreshing = true
         displayResults()
+        transactionViewModel.getTransactionList(startDate, endDate, transactionType, 1).observe(this){ transactions ->
+            dataAdapter.clear()
+            dataAdapter.addAll(transactions)
+            rtAdapter.update(transactions)
+            rtAdapter.notifyDataSetChanged()
+            swipeContainer.isRefreshing = false
+        }
         scrollListener  = object : EndlessRecyclerViewScrollListener(layoutManager){
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                 if(!swipeContainer.isRefreshing) {
@@ -148,11 +158,16 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     private fun setDateTransaction(){
-        val dateRangeVm = getViewModel(DateRangeViewModel::class.java)
         zipLiveData(dateRangeVm.startDate, dateRangeVm.endDate).observe(this) { dates ->
             if(dates.first.isNotBlank() && dates.second.isNotBlank()){
                 loadTransaction(dates.first, dates.second)
             }
+        }
+    }
+
+    private fun pullToRefresh(){
+        swipeContainer.setOnRefreshListener {
+            loadTransaction(dateRangeVm.startDate.value, dateRangeVm.endDate.value)
         }
     }
 
