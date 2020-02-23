@@ -79,7 +79,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
         val onboarding = Intent(this, OnboardingActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val onboardingIntent = NotificationCompat.Action(R.mipmap.ic_launcher,
+        val onboardingIntent = NotificationCompat.Action(R.drawable.app_icon,
                 "Click here to sign in",
                 PendingIntent.getActivity(this, 0, onboarding, PendingIntent.FLAG_CANCEL_CURRENT))
         val notificationBuilder = NotificationCompat.Builder(this, Constants.GENERAL_NOTIFICATION).apply {
