@@ -40,7 +40,7 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
         var categoryData: MutableList<CategoryData> = arrayListOf()
         val data: MutableLiveData<MutableList<CategoryData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            categoryData = repository.searchCategoryByName("$categoryName*")
+            categoryData = repository.searchCategoryByName("*$categoryName*")
         }.invokeOnCompletion {
             data.postValue(categoryData)
         }

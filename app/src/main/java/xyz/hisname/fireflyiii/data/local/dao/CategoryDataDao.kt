@@ -18,8 +18,6 @@ abstract class CategoryDataDao: BaseDao<CategoryData> {
     @Query("SELECT * FROM category order by categoryId desc limit :limitNumber")
     abstract fun getPaginatedCategory(limitNumber: Int): MutableList<CategoryData>
 
-    @Transaction
-    @Query("SELECT * FROM category JOIN categoryFts ON (category.categoryId = " +
-            "categoryFts.categoryId) WHERE categoryFts MATCH :categoryName")
+    @Query("SELECT * FROM category JOIN categoryFts ON category.categoryId == categoryFts.categoryId WHERE categoryFts MATCH :categoryName GROUP BY categoryFts.categoryId")
     abstract fun searchCategory(categoryName: String): MutableList<CategoryData>
 }

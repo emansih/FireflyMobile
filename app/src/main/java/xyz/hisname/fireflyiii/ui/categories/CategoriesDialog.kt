@@ -61,7 +61,7 @@ class CategoriesDialog: BaseDialog(){
         scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout){
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                 // Don't load more when data is refreshing
-                if(!swipeContainer.isRefreshing) {
+                if(!swipeContainer.isRefreshing && page != 1) {
                     swipeContainer.isRefreshing = true
                     categoryViewModel.getPaginatedCategory(page + 1).observe(this@CategoriesDialog) { catList ->
                         dataAdapter.clear()
@@ -101,9 +101,7 @@ class CategoriesDialog: BaseDialog(){
     private fun filter(categoryName: String){
         dataAdapter.clear()
         categoryViewModel.getCategoryByName(categoryName).observe(this) { categoryData ->
-            categoryData.forEachIndexed { _, catData ->
-                dataAdapter.add(catData)
-            }
+            dataAdapter.addAll(categoryData)
             categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData ->  itemClicked(data)}
             categoriesRecyclerAdapter.notifyDataSetChanged()
             recycler_view.adapter = categoriesRecyclerAdapter
