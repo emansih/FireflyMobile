@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -117,6 +118,12 @@ class CategoriesFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.categories)
+    }
+
+
+    override fun onDetach() {
+        super.onDetach()
+        fab.isGone = true
     }
 
     override fun handleBack() {
