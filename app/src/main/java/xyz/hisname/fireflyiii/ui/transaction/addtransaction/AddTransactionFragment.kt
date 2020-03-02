@@ -173,13 +173,9 @@ class AddTransactionFragment: BaseFragment() {
                         .colorRes(R.color.md_green_400)
                         .sizeDp(24),null, null, null)
         transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .colorRes(R.color.md_yellow_A700)
-                        .sizeDp(16),null, null, null)
-        transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                null,null, IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calculator)
+                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calculator)
                 .colorRes(R.color.md_blue_grey_400)
-                .sizeDp(16), null)
+                .sizeDp(16), null, null, null)
         transaction_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_calendar)
                 .color(colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190))))
@@ -188,10 +184,9 @@ class AddTransactionFragment: BaseFragment() {
                 .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24),null, null, null)
         destination_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 getCompatDrawable(R.drawable.ic_bank_transfer),null, null, null)
-        category_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
+        category_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
                         .colorRes(R.color.md_deep_purple_400)
-                        .sizeDp(24),null, null, null)
+                        .sizeDp(24), null, null, null)
         piggy_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
                         .colorRes(R.color.md_pink_200)
@@ -226,8 +221,7 @@ class AddTransactionFragment: BaseFragment() {
         transaction_amount_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if(event.action == MotionEvent.ACTION_UP){
-                    if(event.x >= (transaction_amount_edittext.width -
-                                    transaction_amount_edittext.compoundDrawables[2].bounds.width())){
+                    if(event.x <= transaction_amount_edittext.compoundDrawables[0].bounds.width() + 30){
                         transactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
                             "0.0"
                         } else {
@@ -261,10 +255,19 @@ class AddTransactionFragment: BaseFragment() {
         transaction_date_edittext.setOnClickListener {
             DialogDarkMode().showCorrectDatePickerDialog(requireContext(), transactionDate, calendar)
         }
-        category_edittext.setOnClickListener {
-            val catDialog = CategoriesDialog()
-            catDialog.show(parentFragmentManager, "categoryDialog")
-        }
+        category_edittext.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if(event.action == MotionEvent.ACTION_UP){
+                    category_edittext.compoundDrawables[0].bounds.width()
+                    if(event.x <= category_edittext.compoundDrawables[0].bounds.width() + 30){
+                        val catDialog = CategoriesDialog()
+                        catDialog.show(parentFragmentManager, "categoryDialog")
+                        return true
+                    }
+                }
+                return false
+            }
+        })
         categoryViewModel.categoryName.observe(this) {
             category_edittext.setText(it)
         }
@@ -318,10 +321,19 @@ class AddTransactionFragment: BaseFragment() {
         piggyViewModel.piggyName.observe(this) {
             piggy_edittext.setText(it)
         }
-        budget_edittext.setOnClickListener {
-            val budgetDialog = BudgetSearchDialog()
-            budgetDialog.show(parentFragmentManager, "budgetDialog")
-        }
+        budget_edittext.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if(event.action == MotionEvent.ACTION_UP){
+                    budget_edittext.compoundDrawables[0].bounds.width()
+                    if(event.x <= budget_edittext.compoundDrawables[0].bounds.width() + 30){
+                        val budgetDialog = BudgetSearchDialog()
+                        budgetDialog.show(parentFragmentManager, "budgetDialog")
+                        return true
+                    }
+                }
+                return false
+            }
+        })
         budgetViewModel.budgetName.observe(this) { name ->
             budget_edittext.setText(name)
         }

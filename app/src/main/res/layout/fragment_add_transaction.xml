@@ -344,7 +344,6 @@
                             android:layout_height="match_parent"
                             android:drawablePadding="12dp"
                             android:hint="@string/categories"
-                            android:focusable="false"
                             android:textSize="16sp"
                             style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -388,7 +387,6 @@
                             android:layout_height="match_parent"
                             android:drawablePadding="12dp"
                             android:hint="@string/budget"
-                            android:focusable="false"
                             android:textSize="16sp"
                             style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
                     </com.google.android.material.textfield.TextInputLayout>
