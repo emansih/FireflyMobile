@@ -169,6 +169,9 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setIcons(){
+        tags_layout.startIconDrawable = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tags)
+                .colorRes(R.color.md_blue_900)
+                .sizeDp(24)
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
                         .colorRes(R.color.md_green_400)
