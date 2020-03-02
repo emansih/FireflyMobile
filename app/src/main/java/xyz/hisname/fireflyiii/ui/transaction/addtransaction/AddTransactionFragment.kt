@@ -14,6 +14,7 @@ import android.view.*
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -182,8 +183,10 @@ class AddTransactionFragment: BaseFragment() {
                 .sizeDp(24),null, null, null)
         source_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
                 .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24),null, null, null)
+        val bankTransferIconColorWrap = DrawableCompat.wrap(getCompatDrawable(R.drawable.ic_bank_transfer)!!).mutate()
+        DrawableCompat.setTint(bankTransferIconColorWrap, Color.parseColor("#e67a15"))
         destination_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                getCompatDrawable(R.drawable.ic_bank_transfer),null, null, null)
+                bankTransferIconColorWrap,null, null, null)
         category_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
                         .colorRes(R.color.md_deep_purple_400)
                         .sizeDp(24), null, null, null)
