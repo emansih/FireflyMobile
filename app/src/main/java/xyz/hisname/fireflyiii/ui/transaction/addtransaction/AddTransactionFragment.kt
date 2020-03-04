@@ -514,21 +514,21 @@ class AddTransactionFragment: BaseFragment() {
                 tags_chip.setText(transactionAttributes.tags + ",")
             }
             when {
-                Objects.equals("Withdrawal", transactionType) -> {
+                Objects.equals("withdrawal", transactionType) -> {
                     destination_edittext.setText(transactionAttributes.destination_name)
                     sourceName = transactionAttributes.source_name
                     source_exposed_dropdown.setText(sourceName)
                 }
-                Objects.equals("Transfer", transactionType) -> {
+                Objects.equals("transfer", transactionType) -> {
                     sourceName = transactionAttributes.source_name
                     destinationName = transactionAttributes.destination_name
                     source_exposed_dropdown.setText(sourceName)
                     destination_exposed_dropdown.setText(destinationName)
                 }
-                Objects.equals("Deposit", transactionType) -> {
-                    source_edittext.setText(transactionAttributes.source_name)
+                Objects.equals("deposit", transactionType) -> {
+                    source_exposed_dropdown.setText(transactionAttributes.source_name)
                     destinationName = transactionAttributes.destination_name
-                    destination_exposed_dropdown.setText(destinationName)
+                    destination_edittext.setText(destinationName)
                 }
             }
         }
