@@ -286,6 +286,7 @@ class AddTransactionFragment: BaseFragment() {
         currency_edittext.setOnClickListener{
             CurrencyListBottomSheet().show(parentFragmentManager, "currencyList" )
         }
+        tags_chip.addChipTerminator('\n' ,ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL)
         tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
         tags_chip.enableEditChipOnTouch(false, true)
         tagsViewModel.getAllTags().observe(this) {
