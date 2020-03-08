@@ -17,4 +17,8 @@ abstract class BillDataDao: BaseDao<BillData>{
 
     @Query("DELETE FROM bills")
     abstract fun deleteAllBills(): Int
+
+    @Query("SELECT * FROM bills order by billId desc limit :limitNumber")
+    abstract fun getPaginatedBills(limitNumber: Int): MutableList<BillData>
+
 }

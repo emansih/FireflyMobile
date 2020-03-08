@@ -4,6 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
@@ -13,6 +14,30 @@ import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 @Suppress("RedundantSuspendModifier")
 class BillRepository(private val billDao: BillDataDao,
                      private val billService: BillsService?) {
+
+    suspend fun getPaginatedBills(pageNumber: Int): MutableList<BillData>{
+        var networkCall: Response<BillsModel>? = null
+        try {
+            withContext(Dispatchers.IO) {
+                networkCall = billService?.getPaginatedBills(pageNumber)
+            }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall?.isSuccessful == true) {
+                if(pageNumber == 1){
+                    withContext(Dispatchers.IO) {
+                        billDao.deleteAllBills()
+                    }
+                }
+                withContext(Dispatchers.IO) {
+                    responseBody.data.forEachIndexed { _, billData ->
+                        insertBill(billData)
+                    }
+                }
+
+            }
+        } catch (exception: Exception){ }
+        return billDao.getPaginatedBills(pageNumber * Constants.PAGE_SIZE)
+    }
 
     suspend fun allBills(): MutableList<BillData>{
         var networkCall: Response<BillsModel>? = null

@@ -10,6 +10,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
@@ -19,13 +22,17 @@ import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.hideFab
 
 class ListBillFragment: BaseFragment() {
 
-    private var dataAdapter = ArrayList<BillData>()
+    private var dataAdapter = arrayListOf<BillData>()
+    private lateinit var scrollListener: EndlessRecyclerViewScrollListener
+    private val billAdapter by lazy { BillsRecyclerAdapter(dataAdapter) { data: BillData -> itemClicked(data)}  }
+    private val linearLayoutManager by lazy { LinearLayoutManager(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -34,6 +41,9 @@ class ListBillFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        recycler_view.layoutManager = linearLayoutManager
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recycler_view.adapter = billAdapter
         displayView()
         pullToRefresh()
         initFab()
@@ -41,14 +51,15 @@ class ListBillFragment: BaseFragment() {
 
     private fun displayView(){
         swipeContainer.isRefreshing = true
-        runLayoutAnimation(recycler_view)
-        billViewModel.getAllBills().observe(this) { billList ->
+        billViewModel.getPaginatedBills(1).observe(this) { billList ->
             swipeContainer.isRefreshing = false
             if (billList.isNotEmpty()) {
                 listText.isVisible = false
                 listImage.isVisible = false
                 recycler_view.isVisible = true
-                recycler_view.adapter = BillsRecyclerAdapter(billList) { data: BillData -> itemClicked(data) }
+                dataAdapter.addAll(billList)
+                billAdapter.update(dataAdapter)
+                billAdapter.notifyDataSetChanged()
             } else {
                 listText.text = resources.getString(R.string.no_bills)
                 listImage.setImageDrawable(IconicsDrawable(requireContext())
@@ -58,6 +69,22 @@ class ListBillFragment: BaseFragment() {
                 recycler_view.isVisible = false
             }
         }
+        scrollListener = object : EndlessRecyclerViewScrollListener(linearLayoutManager){
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
+                // Don't load more when data is refreshing
+                if(!swipeContainer.isRefreshing) {
+                    swipeContainer.isRefreshing = true
+                    billViewModel.getPaginatedBills(page + 1).observe(this@ListBillFragment) { billList ->
+                        dataAdapter.clear()
+                        dataAdapter.addAll(billList)
+                        billAdapter.update(dataAdapter)
+                        billAdapter.notifyDataSetChanged()
+                        swipeContainer.isRefreshing = false
+                    }
+                }
+            }
+        }
+        recycler_view.addOnScrollListener(scrollListener)
     }
 
     private fun itemClicked(billData: BillData){
@@ -86,6 +113,7 @@ class ListBillFragment: BaseFragment() {
     private fun pullToRefresh(){
         swipeContainer.setOnRefreshListener {
             dataAdapter.clear()
+            scrollListener.resetState()
             displayView()
         }
     }
