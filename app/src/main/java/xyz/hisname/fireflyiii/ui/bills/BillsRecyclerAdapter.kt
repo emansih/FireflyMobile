@@ -33,21 +33,6 @@ class BillsRecyclerAdapter(private val items: MutableList<BillData>, private val
     inner class BillsHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(billData: BillData, clickListener: (BillData) -> Unit) = with(itemView) {
             val billResponse = billData.billAttributes
-            /*val date = billResponse?.date
-            val daysDiff = DateTimeUtil.getDaysDifference(date).toInt()
-            itemView.billDue.let {
-                when {
-                    daysDiff == 0 -> it.text = context.getString(R.string.bill_due_today)
-                    daysDiff == 1 -> it.text = context.getString(R.string.bill_due_tomorrow)
-                    daysDiff < 0 -> it.text = context.getString(R.string.bill_due_past, Math.abs(daysDiff))
-                    daysDiff == -1 -> it.text = context.getString(R.string.bill_due_yesterday)
-                    daysDiff >= 0 -> {
-                        itemView.billDue.setTextColor(ContextCompat.getColor(context, R.color.md_black_1000))
-                        it.text = context.getString(R.string.bill_due_future,
-                                DateTimeUtil.getDayOfWeek(date!!),date)
-                    }
-                }
-            }*/
             val billName = billResponse?.name
             if(billName != null){
                 if(billName.length >= 17){
@@ -65,6 +50,7 @@ class BillsRecyclerAdapter(private val items: MutableList<BillData>, private val
                 itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
 
             }
+            itemView.billNextDueDate.text = billResponse.next_expected_match
             itemView.billCard.setOnClickListener{clickListener(billData)}
         }
     }

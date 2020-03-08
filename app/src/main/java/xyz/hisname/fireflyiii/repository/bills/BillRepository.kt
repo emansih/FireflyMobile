@@ -15,11 +15,11 @@ import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 class BillRepository(private val billDao: BillDataDao,
                      private val billService: BillsService?) {
 
-    suspend fun getPaginatedBills(pageNumber: Int): MutableList<BillData>{
+    suspend fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): MutableList<BillData>{
         var networkCall: Response<BillsModel>? = null
         try {
             withContext(Dispatchers.IO) {
-                networkCall = billService?.getPaginatedBills(pageNumber)
+                networkCall = billService?.getPaginatedBills(pageNumber, startDate, endDate)
             }
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful == true) {
@@ -37,42 +37,6 @@ class BillRepository(private val billDao: BillDataDao,
             }
         } catch (exception: Exception){ }
         return billDao.getPaginatedBills(pageNumber * Constants.PAGE_SIZE)
-    }
-
-    suspend fun allBills(): MutableList<BillData>{
-        var networkCall: Response<BillsModel>? = null
-        val billData: MutableList<BillData> = arrayListOf()
-        try {
-            withContext(Dispatchers.IO) {
-                withContext(Dispatchers.IO) {
-                    networkCall = billService?.getPaginatedBills(1)
-                }
-                billData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
-            }
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall?.isSuccessful != false) {
-                val pagination = responseBody.meta.pagination
-                if (pagination.total_pages != pagination.current_page) {
-                    withContext(Dispatchers.IO) {
-                        for (items in 2..pagination.total_pages) {
-                            billData.addAll(
-                                    billService?.getPaginatedBills(items)
-                                                ?.body()?.data?.toMutableList() ?: arrayListOf()
-                            )
-                        }
-                    }
-                }
-                withContext(Dispatchers.IO) {
-                    billDao.deleteAllBills()
-                }
-                withContext(Dispatchers.IO) {
-                    billData.forEachIndexed { _, data ->
-                        insertBill(data)
-                    }
-                }
-            }
-        } catch (exception: Exception){ }
-        return billDao.getAllBill()
     }
 
     suspend fun insertBill(bill: BillData) = billDao.insert(bill)

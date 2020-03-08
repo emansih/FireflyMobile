@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
@@ -50,8 +51,9 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun displayView(){
+        val dateToRetrieve = DateTimeUtil.getTodayDate()
         swipeContainer.isRefreshing = true
-        billViewModel.getPaginatedBills(1).observe(this) { billList ->
+        billViewModel.getPaginatedBills(1, dateToRetrieve, dateToRetrieve).observe(this) { billList ->
             swipeContainer.isRefreshing = false
             if (billList.isNotEmpty()) {
                 listText.isVisible = false
@@ -74,7 +76,7 @@ class ListBillFragment: BaseFragment() {
                 // Don't load more when data is refreshing
                 if(!swipeContainer.isRefreshing) {
                     swipeContainer.isRefreshing = true
-                    billViewModel.getPaginatedBills(page + 1).observe(this@ListBillFragment) { billList ->
+                    billViewModel.getPaginatedBills(page + 1, dateToRetrieve, dateToRetrieve).observe(this@ListBillFragment) { billList ->
                         dataAdapter.clear()
                         dataAdapter.addAll(billList)
                         billAdapter.update(dataAdapter)

@@ -21,5 +21,6 @@ data class BillAttributes(
         val attachments_count: Int,
         val pay_dates: List<String>,
         val paid_dates: List<String>,
-        val notes: String?
+        val notes: String?,
+        val next_expected_match: String?
 )

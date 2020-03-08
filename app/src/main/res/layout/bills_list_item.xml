@@ -23,6 +23,7 @@
         app:cardCornerRadius="2dp"
         app:cardElevation="2dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,6 +36,9 @@
                 android:textSize="20sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
 
 
@@ -45,6 +49,14 @@
                 android:textSize="24sp"
                 android:textColor="@color/md_red_900"
                 app:layout_constraintTop_toBottomOf="@+id/billName"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/billNextDueDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                app:layout_constraintTop_toBottomOf="@+id/billAmount"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <androidx.appcompat.widget.AppCompatTextView

@@ -12,7 +12,9 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 interface BillsService {
 
     @GET(BILL_API_ENDPONT)
-    suspend fun getPaginatedBills(@Query("page") type: Int): Response<BillsModel>
+    suspend fun getPaginatedBills(@Query("page") type: Int,
+                                  @Query("start") startDate: String,
+                                  @Query("end") endDate: String): Response<BillsModel>
 
     @GET("$BILL_API_ENDPONT/{id}")
     suspend fun getBillById(@Path("id") id: Long): Response<BillsModel>

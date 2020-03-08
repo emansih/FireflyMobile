@@ -30,11 +30,11 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
     }
 
 
-    fun getPaginatedBills(pageNumber: Int): LiveData<MutableList<BillData>>{
+    fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): LiveData<MutableList<BillData>>{
         var billData: MutableList<BillData> = arrayListOf()
         val data: MutableLiveData<MutableList<BillData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            billData = repository.getPaginatedBills(pageNumber)
+            billData = repository.getPaginatedBills(pageNumber, startDate, endDate)
         }.invokeOnCompletion {
             data.postValue(billData)
         }
