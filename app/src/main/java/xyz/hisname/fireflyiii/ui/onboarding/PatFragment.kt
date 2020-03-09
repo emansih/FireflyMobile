@@ -79,6 +79,9 @@ class PatFragment: Fragment() {
                     AuthenticatorManager(accountManager).accessToken = firefly_access_edittext.getString().trim()
                     FileUtils.copyFile(File(FileUtils.getPathFromUri(requireContext(), fileUri)),
                             File(requireContext().filesDir.path + "/user_custom.pem"))
+                    if(tor_checkbox.isChecked){
+                        AppPref(sharedPref).userIsUsingTor = true
+                    }
                     accountViewModel.authViaPatWithCustomCa(cert_path.text.toString().toUri()).observe(this){ auth ->
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         if(auth){

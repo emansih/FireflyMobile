@@ -81,6 +81,23 @@
             app:layout_constraintTop_toBottomOf="@+id/self_signed_checkbox"
             app:layout_constraintStart_toStartOf="@+id/firefly_access_layout"/>
 
+        <TextView
+            android:id="@+id/tor_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check this for TOR"
+            app:layout_constraintTop_toTopOf="@+id/tor_checkbox"
+            app:layout_constraintBottom_toBottomOf="@+id/tor_checkbox"
+            app:layout_constraintStart_toStartOf="@+id/self_signed_text" />
+
+        <CheckBox
+            android:id="@+id/tor_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/self_signed_checkbox"
+            app:layout_constraintStart_toStartOf="@+id/self_signed_checkbox" />
+
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/fireflySignIn"
             android:layout_width="0dp"
@@ -90,7 +107,7 @@
             android:layout_marginTop="20dp"
             android:textColor="@color/white"
             android:background="@color/md_black_1000"
-            app:layout_constraintTop_toBottomOf="@+id/cert_path"
+            app:layout_constraintTop_toBottomOf="@+id/tor_text"
             app:layout_constraintStart_toStartOf="@+id/firefly_access_layout"
             app:layout_constraintEnd_toEndOf="@+id/firefly_access_layout" />
 

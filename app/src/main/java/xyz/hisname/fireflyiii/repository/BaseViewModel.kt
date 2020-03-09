@@ -36,10 +36,10 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
         }
         return if (AppPref(sharedPref).isCustomCa) {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
-                    accManager.accessToken, cert, trustManager, sslSocketFactory)
+                    accManager.accessToken, cert, trustManager, sslSocketFactory, AppPref(sharedPref).userIsUsingTor)
         } else {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
-                    accManager.accessToken, cert, null, null)
+                    accManager.accessToken, cert, null, null, AppPref(sharedPref).userIsUsingTor)
         }
 
     }
