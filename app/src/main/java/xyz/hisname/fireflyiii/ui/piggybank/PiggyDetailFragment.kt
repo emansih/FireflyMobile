@@ -10,10 +10,10 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
@@ -51,6 +51,16 @@ class PiggyDetailFragment: BaseDetailFragment() {
             accountId = piggyAttribute?.account_id ?: 0L
             setupWidgets()
             setupProgressBar()
+        }
+        // TODO: Remove this dirty hack. globalViewModel and scope should be private!
+        globalViewModel.backPress.observe(this){ backPressValue ->
+            if(backPressValue == true) {
+                scope.launch(Dispatchers.Main) {
+                    handleBack()
+                }.invokeOnCompletion {
+                    globalViewModel.backPress.value = false
+                }
+            }
         }
     }
 

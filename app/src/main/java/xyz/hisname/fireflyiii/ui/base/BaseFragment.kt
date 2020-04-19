@@ -53,11 +53,11 @@ abstract class BaseFragment: Fragment() {
     protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     protected val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
     protected val userApiVersion by lazy { getViewModel(UserInfoViewModel::class.java).userApiVersion() }
-    private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
+    protected  val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
     private var parentJob = Job()
     private val coroutineContext: CoroutineContext
         get() = parentJob + Dispatchers.Main
-    private val scope = CoroutineScope(coroutineContext)
+    protected  val scope = CoroutineScope(coroutineContext)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         requireActivity().findViewById<AppBarLayout>(R.id.activity_appbar)?.setExpanded(true,true)
