@@ -111,22 +111,6 @@
             app:layout_constraintTop_toBottomOf="@+id/self_signed_checkbox"
             app:layout_constraintStart_toStartOf="@+id/firefly_secret_layout"/>
 
-        <TextView
-            android:id="@+id/tor_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Check this for TOR"
-            app:layout_constraintTop_toTopOf="@+id/tor_checkbox"
-            app:layout_constraintBottom_toBottomOf="@+id/tor_checkbox"
-            app:layout_constraintStart_toStartOf="@+id/self_signed_text" />
-
-        <CheckBox
-            android:id="@+id/tor_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/self_signed_checkbox"
-            app:layout_constraintStart_toStartOf="@+id/self_signed_checkbox" />
-
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/firefly_submit_button"
             android:layout_width="0dp"

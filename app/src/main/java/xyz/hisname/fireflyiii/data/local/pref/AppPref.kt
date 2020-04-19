@@ -61,9 +61,5 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("customCa", false)
         set(value) = sharedPref.edit{ putBoolean("customCa", value)}
 
-    override var userIsUsingTor: Boolean
-        get() = sharedPref.getBoolean("isUserTor", false)
-        set(value) = sharedPref.edit{ putBoolean("isUserTor", value)}
-
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

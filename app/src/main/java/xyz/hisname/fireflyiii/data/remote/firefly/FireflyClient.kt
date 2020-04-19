@@ -10,9 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import xyz.hisname.fireflyiii.util.LocalDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
-import java.net.InetSocketAddress
 import java.net.MalformedURLException
-import java.net.Proxy
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLSocketFactory
@@ -26,7 +24,7 @@ class FireflyClient {
         private lateinit var baseUrl: URL
 
         fun getClient(baseUrl: String, accessToken: String, certPinValue: String,
-                      trustManager: X509TrustManager?, sslSocketFactory: SSLSocketFactory?, usingTor: Boolean = false): Retrofit?{
+                      trustManager: X509TrustManager?, sslSocketFactory: SSLSocketFactory?): Retrofit?{
             if(INSTANCE == null){
                 val client = OkHttpClient().newBuilder()
                         .addInterceptor(HeaderInterceptor(accessToken))
@@ -34,11 +32,6 @@ class FireflyClient {
                         .connectTimeout(1, TimeUnit.MINUTES)
                         .writeTimeout(1, TimeUnit.MINUTES)
                         .readTimeout(1, TimeUnit.MINUTES)
-                if(usingTor){
-                    val proxyAddr = InetSocketAddress("127.0.0.1", 9050)
-                    val proxyTor = Proxy(Proxy.Type.SOCKS, proxyAddr)
-                    client.proxy(proxyTor)
-                }
                 if(trustManager != null && sslSocketFactory != null) {
                     client.sslSocketFactory(sslSocketFactory, trustManager)
                     client.hostnameVerifier { hostname, session -> true }

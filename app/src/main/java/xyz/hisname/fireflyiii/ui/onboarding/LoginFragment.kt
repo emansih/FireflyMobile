@@ -142,9 +142,6 @@ class LoginFragment: Fragment() {
                 }
                 clientIdLiveData.value = fireflyId
                 secretKeyLiveData.value = fireflySecretKey
-                if(tor_checkbox.isChecked){
-                    AppPref(sharedPref).userIsUsingTor = true
-                }
                 val browserIntent = Intent(Intent.ACTION_VIEW, ("$fireflyUrl${Constants.OAUTH_API_ENDPOINT}" +
                         "/authorize?client_id=$fireflyId&redirect_uri=${Constants.REDIRECT_URI}" +
                         "&scope=&response_type=code&state=").toUri())

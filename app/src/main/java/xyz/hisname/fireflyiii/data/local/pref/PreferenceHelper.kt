@@ -16,6 +16,5 @@ interface PreferenceHelper {
     var transactionListType: Boolean
     var timeFormat: Boolean
     var isCustomCa: Boolean
-    var userIsUsingTor: Boolean
     fun clearPref()
 }
