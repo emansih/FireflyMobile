@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
@@ -21,6 +22,8 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
@@ -35,6 +38,8 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -42,10 +47,11 @@ import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.DialogDarkMode
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import java.util.*
 import kotlin.math.abs
 
@@ -55,6 +61,7 @@ class AddTransactionFragment: BaseFragment() {
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
+    private var fileUri: Uri? = null
     private var currency = ""
     private var tags = ArrayList<String>()
     private var piggyBankList = ArrayList<String>()
@@ -86,10 +93,6 @@ class AddTransactionFragment: BaseFragment() {
         setIcons()
         setWidgets()
         if(transactionJournalId != 0L){
-            add_attachment_button.isVisible = true
-            add_attachment_button.setOnClickListener {
-                openDocViewer()
-            }
             updateTransactionSetup()
         }
         contextSwitch()
@@ -154,7 +157,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.updateTransaction(transactionJournalId,transactionType, description_edittext.getString(),
                 transactionDateTime, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
-                transactionTags, budgetName).observe(this) { transactionResponse->
+                transactionTags, budgetName, fileUri).observe(this) { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -248,6 +251,9 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setWidgets(){
+        add_attachment_button.setOnClickListener {
+            openDocViewer()
+        }
         transaction_date_edittext.setText(DateTimeUtil.getTodayDate())
         val transactionDate = DatePickerDialog.OnDateSetListener {
             _, year, monthOfYear, dayOfMonth ->
@@ -431,7 +437,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transactionDateTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags, budgetName).observe(this) { transactionResponse ->
+                currency, categoryName, transactionTags, budgetName, fileUri).observe(this) { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -565,9 +571,17 @@ class AddTransactionFragment: BaseFragment() {
         if(resultCode == Activity.RESULT_OK){
             if (requestCode == OPEN_REQUEST_CODE) {
                 if (resultData != null) {
-                    val fileUri = resultData.data
-                    AttachmentWorker.initWorker(fileUri, transactionJournalId)
-                    toastInfo("File will be uploaded in the background")
+                    fileUri = resultData.data
+                    val attachmentDataAdapter = arrayListOf<AttachmentData>()
+                    attachment_information.isVisible = true
+                    attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                    attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                            "", "", FileUtils.getFileName(requireContext(), fileUri ?: Uri.EMPTY) ?: "",
+                            "", "" , "", 0, "", "", ""), 0, ""))
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData ->
+                    }
+
                 }
             }
         }

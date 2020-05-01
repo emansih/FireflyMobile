@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.transaction
 
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +23,7 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import java.math.BigDecimal
 import kotlin.math.absoluteValue
 
@@ -243,7 +245,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun addTransaction(type: String, description: String,
                        date: String, piggyBankName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?, budgetName: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
+                       category: String?, tags: String?, budgetName: String?, fileUri: Uri?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         transactionService?.addTransaction(convertString(type),description,date,piggyBankName,
@@ -265,11 +267,18 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 }
             }
             if (response.isSuccessful) {
+                var transactionJournalId = 0L
                 viewModelScope.launch(Dispatchers.IO){
                     response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
+                        transactionJournalId = response.body()?.data?.transactionId ?: 0
                         repository.insertTransaction(transaction)
                         repository.insertTransaction(TransactionIndex(response.body()?.data?.transactionId,
                                 transaction.transaction_journal_id))
+                    }
+                }.invokeOnCompletion {
+                    if(fileUri != null){
+                        println("view model::  " + transactionJournalId)
+                        AttachmentWorker.initWorker(fileUri, transactionJournalId, getApplication())
                     }
                 }
                 transaction.postValue(ApiResponses(response.body()))
@@ -285,7 +294,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun updateTransaction(transactionJournalId: Long, type: String, description: String,
                        date: String, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?, budgetName: String?): LiveData<ApiResponses<TransactionSuccessModel>>{
+                       category: String?, tags: String?, budgetName: String?, fileUri: Uri?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         var transactionId = 0L
@@ -318,6 +327,10 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                                 repository.insertTransaction(TransactionIndex(response.body()?.data?.transactionId,
                                         transaction.transaction_journal_id))
                             }
+                        }
+                    }.invokeOnCompletion {
+                        if(fileUri != null){
+                            AttachmentWorker.initWorker(fileUri, transactionJournalId, getApplication())
                         }
                     }
                     transaction.postValue(ApiResponses(response.body()))

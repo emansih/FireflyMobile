@@ -15,6 +15,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.FileUtils
+import xyz.hisname.fireflyiii.util.checkMd5Hash
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.io.File
@@ -25,7 +26,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
     private val channelIcon = R.drawable.ic_refresh
 
     companion object {
-        fun initWorker(fileUri: Uri?, transactionJournalId: Long){
+        fun initWorker(fileUri: Uri?, transactionJournalId: Long, context: Context){
             val dataBuilder = Data.Builder()
             val workBuilder = OneTimeWorkRequest
                     .Builder(AttachmentWorker::class.java)
@@ -36,7 +37,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build())
                     .build()
-            WorkManager.getInstance().enqueue(workBuilder)
+            WorkManager.getInstance(context).enqueue(workBuilder)
         }
     }
 
@@ -48,12 +49,13 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         val fileObject = File(filePath)
         val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context, fileUri) ?: ""), fileObject)
         val fileName = FileUtils.getFileName(context, fileUri) ?: ""
-        var transactionId = 0L
+        /*var transactionId = 0L
         withContext(Dispatchers.IO){
             val database = AppDatabase.getInstance(context).transactionDataDao()
             transactionId = database.getTransactionIdFromJournalId(transactionJournalId)
-        }
-        service?.storeAttachment(fileName, "Transaction", transactionId, fileName,
+        }*/
+        println("ATTACH::  " + transactionJournalId)
+        service?.storeAttachment(fileName, "Transaction", transactionJournalId, fileName,
                 "File uploaded by " + BuildConfig.APPLICATION_ID)?.enqueue(retrofitCallback({ response ->
             val responseBody = response.body()
             if (response.code() == 200 && responseBody != null) {

@@ -398,10 +398,20 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:text="Add Attachment"
-                        android:visibility="invisible"
                         app:layout_constraintStart_toStartOf="@+id/tags_layout"
                         app:layout_constraintEnd_toEndOf="@id/tags_layout"
                         app:layout_constraintTop_toBottomOf="@+id/budget_layout"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/attachment_information"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        android:layout_marginTop="12dp"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/add_attachment_button"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

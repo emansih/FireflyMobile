@@ -17,6 +17,7 @@ import xyz.hisname.fireflyiii.util.extension.inflate
 import java.io.File
 
 class TransactionAttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
+                                           private val shouldShowDownload: Boolean = true,
                                            private val clickListener:(AttachmentData) -> Unit):
         DiffUtilAdapter<AttachmentData, TransactionAttachmentRecyclerAdapter.AttachmentAdapter>() {
 
@@ -41,16 +42,18 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
                 itemView.attachment_name.text = fileName
             }
 
-            if(File("${FileUtils().folderDirectory(context)}/$fileName").exists()){
-                Glide.with(context).load(IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_folder_open)
-                        .sizeDp(12))
-                        .into(itemView.downloadButton)
-            } else {
-                Glide.with(context).load(IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_file_download)
-                        .sizeDp(12))
-                        .into(itemView.downloadButton)
+            if(shouldShowDownload) {
+                if (File("${FileUtils().folderDirectory(context)}/$fileName").exists()) {
+                    Glide.with(context).load(IconicsDrawable(context)
+                            .icon(GoogleMaterial.Icon.gmd_folder_open)
+                            .sizeDp(12))
+                            .into(itemView.downloadButton)
+                } else {
+                    Glide.with(context).load(IconicsDrawable(context)
+                            .icon(GoogleMaterial.Icon.gmd_file_download)
+                            .sizeDp(12))
+                            .into(itemView.downloadButton)
+                }
             }
             itemView.setOnClickListener { clickListener(attachmentData) }
         }

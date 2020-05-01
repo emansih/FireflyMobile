@@ -18,8 +18,8 @@ interface AttachmentService {
     @FormUrlEncoded
     @POST(ATTACHMENT_API_ENDPOINT)
     fun storeAttachment(@Field("filename") filename: String,
-                        @Field("model") model: String,
-                        @Field("model_id") modelId: Long,
+                        @Field("attachable_type") attachable_type: String,
+                        @Field("attachable_id") attachable_id: Long,
                         @Field("title") title: String,
                         @Field("notes") notes: String): Call<Attachment>
 
