@@ -49,13 +49,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         val fileObject = File(filePath)
         val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context, fileUri) ?: ""), fileObject)
         val fileName = FileUtils.getFileName(context, fileUri) ?: ""
-        /*var transactionId = 0L
-        withContext(Dispatchers.IO){
-            val database = AppDatabase.getInstance(context).transactionDataDao()
-            transactionId = database.getTransactionIdFromJournalId(transactionJournalId)
-        }*/
-        println("ATTACH::  " + transactionJournalId)
-        service?.storeAttachment(fileName, "Transaction", transactionJournalId, fileName,
+        service?.storeAttachment(fileName, "TransactionJournal", transactionJournalId, fileName,
                 "File uploaded by " + BuildConfig.APPLICATION_ID)?.enqueue(retrofitCallback({ response ->
             val responseBody = response.body()
             if (response.code() == 200 && responseBody != null) {

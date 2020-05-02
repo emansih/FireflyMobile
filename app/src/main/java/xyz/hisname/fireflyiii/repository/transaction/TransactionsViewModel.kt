@@ -277,7 +277,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                     }
                 }.invokeOnCompletion {
                     if(fileUri != null){
-                        println("view model::  " + transactionJournalId)
                         AttachmentWorker.initWorker(fileUri, transactionJournalId, getApplication())
                     }
                 }
