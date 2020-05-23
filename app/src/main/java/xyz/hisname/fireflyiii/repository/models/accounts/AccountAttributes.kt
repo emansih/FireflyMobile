@@ -21,7 +21,7 @@ data class AccountAttributes(
         val account_number: String?,
         val iban: String?,
         val bic: String?,
-        val virtual_balance: Int?,
+        val virtual_balance: Double?,
         val opening_balance: String?,
         val opening_balance_date: String?,
         val liability_type: String?,
