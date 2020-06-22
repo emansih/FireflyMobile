@@ -21,17 +21,17 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.utils.backgroundColorRes
-import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.*
+import com.mikepenz.materialdrawer.holder.ImageHolder
+import com.mikepenz.materialdrawer.holder.StringHolder
 import com.mikepenz.materialdrawer.model.ExpandableDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
+import com.mikepenz.materialdrawer.model.interfaces.*
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
-import com.mikepenz.materialdrawer.util.DrawerUIUtils
+import com.mikepenz.materialdrawer.util.getPlaceHolder
 import com.mikepenz.materialdrawer.widget.AccountHeaderView
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.Constants
@@ -158,20 +158,24 @@ class HomeActivity: BaseActivity(){
         supportFragmentManager.commit {
             replace(R.id.fragment_container, DashboardFragment(), "dash")
         }
-        globalFAB.setImageDrawable(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_add).sizeDp(24))
+        globalFAB.setImageDrawable(ImageHolder(IconicsDrawable(this, GoogleMaterial.Icon.gmd_add).apply {
+            sizeDp = 24
+        }).icon)
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
-        val profile = ProfileDrawerItem()
-                .withName(AuthenticatorManager(AccountManager.get(this)).userEmail)
-                .withNameShown(true)
-                .withEmail(sharedPref(this).userRole)
-                .withIcon(Constants.PROFILE_URL)
+        val profile = ProfileDrawerItem().apply {
+            nameText = AuthenticatorManager(AccountManager.get(this@HomeActivity)).userEmail
+            isNameShown = true
+            descriptionText = sharedPref(this@HomeActivity).userRole
+            iconUrl = Constants.PROFILE_URL
+        }
         headerResult = AccountHeaderView(this).apply {
             addProfile(profile,0)
             withSavedInstance(savedInstanceState)
         }
         headerResult.accountHeaderBackground.setBackgroundColor(getCompatColor(R.color.colorPrimaryLight))
+
     }
 
 
@@ -182,30 +186,26 @@ class HomeActivity: BaseActivity(){
             }
 
             override fun placeholder(ctx: Context): Drawable {
-                return DrawerUIUtils.getPlaceHolder(ctx)
+                return getPlaceHolder(ctx)
             }
 
             override fun placeholder(ctx: Context, tag: String?): Drawable {
                 return when (tag) {
-                    DrawerImageLoader.Tags.PROFILE.name -> DrawerUIUtils.getPlaceHolder(ctx)
-                    DrawerImageLoader.Tags.ACCOUNT_HEADER.name -> IconicsDrawable(ctx).iconText(" ")
-                            .backgroundColorRes(R.color.md_orange_500)
-                            .sizeDp(56)
-                    "customUrlItem" -> IconicsDrawable(ctx).iconText(" ")
-                            .backgroundColorRes(R.color.md_orange_500)
-                            .sizeDp(56)
+                    DrawerImageLoader.Tags.PROFILE.name -> getPlaceHolder(ctx)
+                    DrawerImageLoader.Tags.ACCOUNT_HEADER.name -> IconicsDrawable(ctx).apply {
+                        iconText = " "
+                        backgroundColorRes = R.color.md_orange_500
+                        sizeDp = 56
+                    }
+                    "customUrlItem" -> IconicsDrawable(ctx).apply {
+                        iconText = " "
+                        backgroundColorRes = R.color.md_orange_500
+                        sizeDp = 56
+                    }
                     else -> placeholder(ctx)
                 }
             }
 
-            @Deprecated("Remove this")
-            override fun set(imageView: ImageView, uri: Uri, placeholder: Drawable) {
-                Glide.with(imageView.context)
-                        .load(Constants.PROFILE_URL)
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop())
-                        .into(imageView)
-            }
 
             override fun set(imageView: ImageView, uri: Uri, placeholder: Drawable, tag: String?) {
                 Glide.with(imageView.context)
@@ -219,209 +219,271 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun setUpDrawer(savedInstanceState: Bundle?){
-        val dashboard = PrimaryDrawerItem()
-                .withIdentifier(1)
-                .withName(R.string.dashboard)
-                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                .withSelectedIcon(IconicsDrawable(this)
-                        .icon(GoogleMaterial.Icon.gmd_dashboard)
-                        .sizeDp(24)
-                        .colorRes(R.color.md_deep_orange_500))
-                .withIconTintingEnabled(true)
-                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_dashboard).sizeDp(24))
-        val account = ExpandableDrawerItem().withName(R.string.account)
-                .withIdentifier(2)
-                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                .withSelectedIcon(IconicsDrawable(this)
-                        .icon(FontAwesome.Icon.faw_credit_card)
-                        .sizeDp(24)
-                        .colorRes(R.color.md_blue_A400))
-                .withIconTintingEnabled(true)
-                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_credit_card).sizeDp(24))
-                .withSelectable(false)
-                .withSubItems(
-                        SecondaryDrawerItem().withName(R.string.asset_account)
-                                .withLevel(3)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_money_bill)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_cyan_A400))
-                                .withIconTintingEnabled(true)
-                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_money_bill).sizeDp(24))
-                                .withIdentifier(3),
-                        SecondaryDrawerItem().withName(R.string.expense_account)
-                                .withLevel(3)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_shopping_cart)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_yellow_400))
-                                .withIconTintingEnabled(true)
-                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_shopping_cart).sizeDp(24))
-                                .withIdentifier(4),
-                        SecondaryDrawerItem().withName(R.string.revenue_account)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_download)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_black_1000))
-                                .withIconTintingEnabled(true)
-                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_download).sizeDp(24))
-                                .withLevel(3)
-                                .withIdentifier(5),
-                        SecondaryDrawerItem().withName(R.string.liability_account)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_ticket_alt)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_deep_purple_500))
-                                .withIconTintingEnabled(true)
-                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_ticket_alt).sizeDp(24))
-                                .withLevel(3)
-                                .withIdentifier(21)
-                        )
-        val budgets = PrimaryDrawerItem()
-                .withIdentifier(6)
-                .withName("Budgets")
-        val categories = PrimaryDrawerItem()
-                .withIdentifier(7)
-                .withName(R.string.categories)
-                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                .withSelectedIcon(IconicsDrawable(this)
-                        .icon(FontAwesome.Icon.faw_chart_bar)
-                        .sizeDp(24)
-                        .colorRes(R.color.material_blue_grey_800))
-                .withIconTintingEnabled(true)
-                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_chart_bar).sizeDp(24))
-        val tags = PrimaryDrawerItem()
-                .withIdentifier(8)
-                .withName(R.string.tags)
-                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                .withSelectedIcon(IconicsDrawable(this)
-                        .icon(FontAwesome.Icon.faw_tag)
-                        .sizeDp(24)
-                        .colorRes(R.color.md_green_400))
-                .withIconTintingEnabled(true)
-                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_tag).sizeDp(24))
-        val reports = PrimaryDrawerItem()
-                .withIdentifier(9)
-                .withName("Reports")
-        val transactions = ExpandableDrawerItem().withName(R.string.transaction)
-                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_refresh).sizeDp(24))
-                .withIconTintingEnabled(true)
-                .withIdentifier(10)
-                .withSelectable(false)
-                .withSubItems(
-                        SecondaryDrawerItem().withName(R.string.withdrawal)
-                                .withLevel(3)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_arrow_left)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_blue_grey_500))
-                                .withIconTintingEnabled(true)
-                                .withIcon(R.drawable.ic_arrow_left)
-                                .withIdentifier(11),
-                        SecondaryDrawerItem().withName(R.string.revenue_income_menu)
-                                .withLevel(3)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_arrow_right)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_grey_500))
-                                .withIconTintingEnabled(true)
-                                .withIcon(R.drawable.ic_arrow_right)
-                                .withIdentifier(12),
-                        SecondaryDrawerItem().withName(R.string.transfer)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_exchange_alt)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_green_500))
-                                .withIconTintingEnabled(true)
-                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
-                                .withLevel(3)
-                                .withIdentifier(13)
-                )
-        val moneyManagement = ExpandableDrawerItem().withName(R.string.money_management)
-                .withIdentifier(14)
-                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_euro_symbol).sizeDp(24))
-                .withIconTintingEnabled(true)
-                .withSelectable(false)
-                .withSubItems(
-                        SecondaryDrawerItem().withName(R.string.piggy_bank)
-                                .withLevel(4)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_sort_down)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_red_500))
-                                .withIconTintingEnabled(true)
-                                .withIcon(R.drawable.ic_sort_descending)
-                                .withIdentifier(15),
-                        SecondaryDrawerItem().withName(R.string.bill)
-                                .withLevel(4)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_calendar)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_amber_500))
-                                .withIconTintingEnabled(true)
-                                .withIcon(R.drawable.ic_calendar_blank)
-                                .withIdentifier(16),
-                        SecondaryDrawerItem().withName("Rules")
-                                .withLevel(4)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_random)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_brown_500))
-                                .withIconTintingEnabled(true)
-                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_random).sizeDp(24))
-                                .withIdentifier(17)/*,
-                        SecondaryDrawerItem().withName("Recurring Transactions")
-                                .withLevel(4)
-                                .withIdentifier(18)*/
+        val dashboard = PrimaryDrawerItem().apply {
+            identifier = 1
+            nameRes = R.string.dashboard
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_dashboard).apply {
+                sizeDp = 24
+                colorRes = R.color.md_deep_orange_500
+            })
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_dashboard)
+                    .apply { sizeDp = 24 })
+            isIconTinted = true
+        }
 
-                )
-        val options = ExpandableDrawerItem().withName(R.string.options)
-                .withIdentifier(14)
-                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_settings).sizeDp(24))
-                .withSelectable(false)
-                .withIconTintingEnabled(true)
-                .withSubItems(
-                        SecondaryDrawerItem().withName(R.string.settings)
-                                .withLevel(4)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(GoogleMaterial.Icon.gmd_settings)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_teal_500))
-                                .withIconTintingEnabled(true)
-                                .withIdentifier(19)
-                                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_settings).sizeDp(24)),
-                        SecondaryDrawerItem().withName(R.string.currency)
-                                .withLevel(4)
-                                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                                .withSelectedIcon(IconicsDrawable(this)
-                                        .icon(FontAwesome.Icon.faw_money_bill)
-                                        .sizeDp(24)
-                                        .colorRes(R.color.md_pink_800))
-                                .withIconTintingEnabled(true)
-                                .withIcon(IconicsDrawable(this).icon(FontAwesome.Icon.faw_money_bill).sizeDp(24))
-                                .withIdentifier(22)
-                )
-        val about = PrimaryDrawerItem()
-                .withIdentifier(20)
-                .withName("About")
-                .withSelectedTextColor(getCompatColor(R.color.colorAccent))
-                .withSelectedIcon(IconicsDrawable(this)
-                        .icon(GoogleMaterial.Icon.gmd_perm_identity)
-                        .sizeDp(24)
-                        .colorRes(R.color.md_pink_500))
-                .withIconTintingEnabled(true)
-                .withIcon(IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_perm_identity).sizeDp(24))
+        val account = ExpandableDrawerItem().apply {
+            nameRes = R.string.account
+            identifier = 2
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity,FontAwesome.Icon.faw_credit_card).apply {
+                sizeDp = 24
+                colorRes = R.color.md_blue_A400
+            })
+            isIconTinted = true
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_credit_card).apply {
+                sizeDp = 24
+            })
+            isSelectable = false
+            subItems.apply {
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.asset_account
+                    level = 3
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_cyan_A400
+                    })
+                    icon =  ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 3
+                    isIconTinted = true
+                }
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.expense_account
+                    level = 3
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_shopping_cart).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_yellow_400
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_shopping_cart).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 4
+                    isIconTinted = true
+                }
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.revenue_account
+                    level = 3
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_download).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_black_1000
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_download).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 5
+                    isIconTinted = true
+                }
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.liability_account
+                    level = 3
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_ticket_alt).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_deep_purple_500
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_ticket_alt).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 21
+                    isIconTinted = true
+                }
+            }
+        }
+
+        val budgets = PrimaryDrawerItem().apply {
+            identifier = 6
+            name = StringHolder("Budgets")
+        }
+        val categories = PrimaryDrawerItem().apply {
+            identifier = 7
+            nameRes = R.string.categories
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_chart_bar).apply {
+                sizeDp = 24
+                colorRes = R.color.material_blue_grey_800
+            })
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_chart_bar).apply {
+                sizeDp = 24
+            })
+            isIconTinted = true
+        }
+
+        val tags = PrimaryDrawerItem().apply {
+            identifier = 8
+            nameRes = R.string.tags
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_tag).apply {
+                sizeDp = 24
+                colorRes = R.color.md_green_400
+            })
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_tag).apply {
+                sizeDp = 24
+            })
+            isIconTinted = true
+        }
+        val reported = PrimaryDrawerItem().apply {
+            identifier = 9
+            name = StringHolder("Reports")
+        }
+        val transactions = ExpandableDrawerItem().apply {
+            nameRes = R.string.transaction
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_refresh).apply {
+                sizeDp = 24
+            })
+            subItems.apply {
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.withdrawal
+                    level = 3
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_blue_grey_500
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
+                        sizeDp = 24
+                    })
+                    isIconTinted = true
+                    identifier = 11
+                }
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.revenue_income_menu
+                    level = 3
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_grey_500
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
+                        sizeDp = 24
+                    })
+                    isIconTinted = true
+                    identifier = 12
+                }
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.transfer
+                    level = 3
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_green_500
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
+                        sizeDp = 24
+                    })
+                    isIconTinted = true
+                    identifier = 13
+                }
+            }
+        }
+        val moneyManagement = ExpandableDrawerItem().apply {
+            nameRes = R.string.money_management
+            identifier = 14
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_euro_symbol).apply {
+                sizeDp = 24
+            })
+            isIconTinted = true
+            isSelectable = false
+            subItems.apply {
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.piggy_bank
+                    level = 4
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_red_500
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 15
+                }
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.bill
+                    level = 4
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_amber_500
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 16
+                }
+                SecondaryDrawerItem().apply {
+                    name = StringHolder("Rules")
+                    level = 4
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_brown_500
+                    })
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 17
+                }
+                // Deactiviated
+                /*SecondaryDrawerItem().apply {
+                    name = StringHolder("Recurring Transactions")
+                    level = 4
+                    identifier = 18
+                }*/
+
+            }
+        }
+        val options = ExpandableDrawerItem().apply {
+            nameRes = R.string.options
+            identifier = 14
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
+                sizeDp = 24
+            })
+            isSelectable = false
+            isIconTinted = true
+            subItems.apply {
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.settings
+                    level = 4
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_teal_500
+                    })
+                    isIconTinted = true
+                    identifier = 19
+                    icon =  ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
+                        sizeDp = 24
+                    })
+                }
+                SecondaryDrawerItem().apply {
+                    nameRes = R.string.currency
+                    level = 4
+                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
+                        sizeDp = 24
+                        colorRes = R.color.md_pink_800
+                    })
+                    isIconTinted = true
+                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
+                        sizeDp = 24
+                    })
+                    identifier = 22
+                }
+            }
+        }
+
+        val about = PrimaryDrawerItem().apply {
+            identifier = 20
+            nameRes = R.string.about
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_perm_identity).apply {
+                sizeDp = 24
+                colorRes = R.color_md_pink_500
+            })
+            isIconTinted = true
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_perm_identity).apply {
+                sizeDp = 24
+            })
+        }
+
         slider.apply {
             itemAdapter.add(dashboard, transactions, account, tags, categories, /* budgets, tags, reports,
                         */ moneyManagement, options, about)
