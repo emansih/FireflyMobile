@@ -35,8 +35,8 @@ class AddTransactionActivity: BaseActivity() {
 
     private fun setBottomNav(){
         if(sharedPref(this).nightModeEnabled) {
-            transactionBottomView.itemTextColor = ContextCompat.getColorStateList(this, R.color.white)
-            transactionBottomView.itemIconTintList = ContextCompat.getColorStateList(this, R.color.white)
+            transactionBottomView.itemTextColor = ContextCompat.getColorStateList(this, R.color.md_white_1000)
+            transactionBottomView.itemIconTintList = ContextCompat.getColorStateList(this, R.color.md_white_1000)
         }
         transactionBottomView.setOnNavigationItemSelectedListener{ item ->
             when(item.itemId){

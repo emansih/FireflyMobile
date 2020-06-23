@@ -95,11 +95,15 @@ class LoginFragment: Fragment() {
 
     private fun setWidget(){
         firefly_url_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_link)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_link
+                    sizeDp = 24
+                },null, null, null)
         firefly_secret_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_lock)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_lock
+                    sizeDp = 24
+                },null, null, null)
         self_signed_checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
             AppPref(sharedPref).isCustomCa = isChecked
             if(isChecked){

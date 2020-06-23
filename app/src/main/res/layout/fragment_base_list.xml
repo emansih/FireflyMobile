@@ -16,7 +16,7 @@
         android:layout_height="150dp"
         android:scaleType="fitXY"
         android:visibility="invisible"
-        android:tint="@color/md_grey_700"
+        app:tint="@color/md_grey_700"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/listText" />

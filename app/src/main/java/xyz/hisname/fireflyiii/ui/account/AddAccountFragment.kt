@@ -13,6 +13,7 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.sizePx
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import me.toptas.fancyshowcase.listener.DismissListener
@@ -50,49 +51,71 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     override fun setIcons() {
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .colorRes(R.color.md_green_400)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_money_bill
+                    colorRes = R.color.md_green_400
+                    sizeDp = 24
+                },null, null, null)
         start_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_hourglass_start)
-                        .colorRes(R.color.md_red_400)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_hourglass_start
+                    sizeDp = 24
+                    colorRes = R.color.md_red_400
+                },null, null, null)
         start_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calendar)
-                        .colorRes(R.color.md_blue_400)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_calendar
+                    colorRes = R.color.md_blue_400
+                    sizeDp = 24
+                },null, null, null)
         interest_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_percent)
-                        .colorRes(R.color.md_amber_700)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_percent
+                    colorRes = R.color.md_amber_700
+                    sizeDp = 24
+                },null, null, null)
         iban_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_list_numbered)
-                        .colorRes(R.color.md_deep_orange_900)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_format_list_numbered
+                    colorRes = R.color.md_deep_orange_900
+                    sizeDp = 24
+                },null, null, null)
         bic_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_transfer_within_a_station)
-                        .colorRes(R.color.md_deep_orange_400)
-                        .sizeDp(24),null, null, null)
+                            IconicsDrawable(requireContext()).apply {
+                                icon = GoogleMaterial.Icon.gmd_transfer_within_a_station
+                                colorRes = R.color.md_deep_orange_400
+                                sizeDp = 24
+                            },null, null, null)
         account_number_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_confirmation_number)
-                        .colorRes(R.color.md_brown_600)
-                        .sizeDp(24),null, null, null)
+                            IconicsDrawable(requireContext()).apply {
+                                icon = GoogleMaterial.Icon.gmd_confirmation_number
+                                colorRes = R.color.md_brown_600
+                                sizeDp = 24
+                            },null, null, null)
         opening_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_open_with)
-                        .colorRes(R.color.md_red_A100)
-                        .sizeDp(24),null, null, null)
+                            IconicsDrawable(requireContext()).apply {
+                                icon = GoogleMaterial.Icon.gmd_open_with
+                                colorRes = R.color.md_red_A100
+                                sizeDp = 24
+                            },null, null, null)
         opening_balance_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calendar)
-                        .colorRes(R.color.md_blue_400)
-                        .sizeDp(24),null, null, null)
+                            IconicsDrawable(requireContext()).apply {
+                                icon = FontAwesome.Icon.faw_calendar
+                                colorRes = R.color.md_blue_400
+                                sizeDp = 24
+                            },null, null, null)
         virtual_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_balance_scale)
-                        .colorRes(R.color.md_light_blue_A200)
-                        .sizeDp(24),null, null, null)
-        addAccountFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
-        addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_credit_card)
-                .colorRes(R.color.md_black_1000)
-                .sizeDp(24))
+                            IconicsDrawable(requireContext()).apply {
+                                icon = FontAwesome.Icon.faw_balance_scale
+                                colorRes = R.color.md_light_blue_A200
+                                sizeDp = 24
+                            },null, null, null)
+        addAccountFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
+        addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_credit_card
+            colorRes = R.color.md_black_1000
+            sizeDp = 24
+        })
     }
 
     private fun setAccordion(){

@@ -78,7 +78,7 @@
                                 android:layout_marginStart="3dp"
                                 android:text="@string/balance"
                                 android:textStyle="bold"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 app:layout_constraintStart_toEndOf="@+id/balanceIcon"
                                 app:layout_constraintTop_toBottomOf="@+id/balanceImageView" />
 
@@ -86,7 +86,7 @@
                                 android:id="@+id/balanceText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 style="@style/TextAppearance.MaterialComponents.Headline6"
                                 android:text="--.--"
                                 app:layout_constraintTop_toBottomOf="@+id/balanceTextView"
@@ -96,7 +96,7 @@
                                 android:id="@+id/balanceEarnedText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="--.--"
                                 app:layout_constraintTop_toBottomOf="@+id/balanceText"
                                 app:layout_constraintStart_toStartOf="@+id/balanceText" />
@@ -105,7 +105,7 @@
                                 android:id="@+id/balanceSpentText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="--.--"
                                 app:layout_constraintTop_toBottomOf="@+id/balanceText"
                                 app:layout_constraintStart_toEndOf="@+id/balanceEarnedText" />
@@ -162,7 +162,7 @@
                                 android:layout_marginTop="4dp"
                                 android:layout_marginStart="3dp"
                                 android:text="@string/bills_to_pay"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:textStyle="bold"
                                 app:layout_constraintStart_toEndOf="@+id/billsIcon"
                                 app:layout_constraintTop_toBottomOf="@+id/billsImageView" />
@@ -171,7 +171,7 @@
                                 android:id="@+id/billsText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="--.--"
                                 style="@style/TextAppearance.MaterialComponents.Headline6"
                                 app:layout_constraintTop_toBottomOf="@+id/billsTextView"
@@ -181,7 +181,7 @@
                                 android:id="@+id/billsPaid"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="@string/bills_paid"
                                 app:layout_constraintTop_toBottomOf="@+id/billsText"
                                 app:layout_constraintStart_toStartOf="@+id/billsTextView" />
@@ -190,7 +190,7 @@
                                 android:id="@+id/billsPaidText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="--.--"
                                 app:layout_constraintTop_toBottomOf="@+id/billsText"
                                 app:layout_constraintStart_toEndOf="@+id/billsPaid" />
@@ -247,7 +247,7 @@
                                 android:layout_marginTop="4dp"
                                 android:layout_marginStart="3dp"
                                 android:text="@string/left_to_spend"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:textStyle="bold"
                                 app:layout_constraintStart_toEndOf="@+id/leftToSpendIcon"
                                 app:layout_constraintTop_toBottomOf="@+id/leftToSpendImageView" />
@@ -256,7 +256,7 @@
                                 android:id="@+id/leftToSpendAmountText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="--.--"
                                 style="@style/TextAppearance.MaterialComponents.Headline6"
                                 app:layout_constraintTop_toBottomOf="@+id/leftToSpendTextView"
@@ -266,7 +266,7 @@
                                 android:id="@+id/leftToSpendText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="@string/left_to_pay_per_day"
                                 app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
                                 app:layout_constraintStart_toStartOf="@+id/leftToSpendAmountText" />
@@ -275,7 +275,7 @@
                                 android:id="@+id/leftToSpendAmount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 android:text="--.--"
                                 app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
                                 app:layout_constraintStart_toEndOf="@+id/leftToSpendText" />
@@ -332,7 +332,7 @@
                                 android:layout_marginTop="4dp"
                                 android:layout_marginStart="3dp"
                                 android:text="@string/net_worth"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 app:layout_constraintStart_toEndOf="@+id/networthIcon"
                                 app:layout_constraintTop_toBottomOf="@+id/networthImageView" />
 
@@ -340,7 +340,7 @@
                                 android:id="@+id/networthAmount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="@color/md_white_1000"
                                 style="@style/TextAppearance.MaterialComponents.Headline6"
                                 android:text="--.--"
                                 app:layout_constraintTop_toBottomOf="@+id/networthTextView"

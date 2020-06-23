@@ -3,7 +3,6 @@
     <color name="colorPrimary">#3c8dbc</color>
     <color name="colorPrimaryDark">#00608c</color>
     <color name="colorAccent">#73bdef</color>
-    <color name="white">#ffffff</color>
     <color name="immersive_bars">#99000000</color>
     <color name="darkBlue">#3F51B5</color>
 </resources>

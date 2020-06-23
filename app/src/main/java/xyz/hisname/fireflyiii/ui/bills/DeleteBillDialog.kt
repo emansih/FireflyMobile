@@ -27,12 +27,14 @@ class DeleteBillDialog: DialogFragment() {
         return AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_bill_message, billDescription))
                 .setMessage(resources.getString(R.string.delete_bill_message, billDescription))
-                .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
-                        .sizeDp(24)
-                        .colorRes(R.color.md_green_600))
+                .setIcon(IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_trash
+                    sizeDp = 24
+                    colorRes = R.color.md_green_600
+                })
                 .setPositiveButton(R.string.delete_permanently){ _,_ ->
-                    billViewModel.deleteBillById(billId).observe(this) {
-                        if(it == true){
+                    billViewModel.deleteBillById(billId).observe(this) { billDeleted ->
+                        if(billDeleted){
                             toastSuccess(resources.getString(R.string.bill_deleted, billDescription))
                             dialog?.dismiss()
                             parentFragmentManager.commit {

@@ -174,7 +174,7 @@ class HomeActivity: BaseActivity(){
             addProfile(profile,0)
             withSavedInstance(savedInstanceState)
         }
-        headerResult.accountHeaderBackground.setBackgroundColor(getCompatColor(R.color.colorPrimaryLight))
+        headerResult.accountHeaderBackground.setBackgroundColor(getCompatColor(R.color.colorAccent))
 
     }
 
@@ -476,7 +476,7 @@ class HomeActivity: BaseActivity(){
             nameRes = R.string.about
             selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_perm_identity).apply {
                 sizeDp = 24
-                colorRes = R.color_md_pink_500
+                colorRes = R.color.md_pink_500
             })
             isIconTinted = true
             icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_perm_identity).apply {

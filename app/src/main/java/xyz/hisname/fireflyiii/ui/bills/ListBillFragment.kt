@@ -64,8 +64,10 @@ class ListBillFragment: BaseFragment() {
                 billAdapter.notifyDataSetChanged()
             } else {
                 listText.text = resources.getString(R.string.no_bills)
-                listImage.setImageDrawable(IconicsDrawable(requireContext())
-                        .icon(GoogleMaterial.Icon.gmd_insert_emoticon).sizeDp(24))
+                listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_insert_emoticon
+                    sizeDp = 24
+                })
                 listText.isVisible = true
                 listImage.isVisible = true
                 recycler_view.isVisible = false

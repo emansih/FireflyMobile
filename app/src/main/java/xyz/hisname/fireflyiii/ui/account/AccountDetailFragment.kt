@@ -105,7 +105,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             )
             val dataSet = LineDataSet(lineChartEntries, accountName)
             dataSet.apply {
-                setCircleColor(getCompatColor(R.color.primary))
+                setCircleColor(getCompatColor(R.color.colorPrimary))
                 valueTextColor = Color.BLUE
                 valueTextSize = 15f
             }
@@ -219,9 +219,9 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setDarkMode(){
         if(isDarkMode()){
-            transactionLineChart.xAxis.textColor = getCompatColor(R.color.white)
-            transactionLineChart.legend.textColor =getCompatColor(R.color.white)
-            transactionLineChart.axisLeft.textColor = getCompatColor(R.color.white)
+            transactionLineChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
+            transactionLineChart.legend.textColor =getCompatColor(R.color.md_white_1000)
+            transactionLineChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
         }
     }
 

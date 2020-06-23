@@ -44,12 +44,14 @@ class FireflyGlideModule: AppGlideModule() {
             return RequestOptions()
                     .signature(ObjectKey(
                             System.currentTimeMillis() / (24 * 60 * 60 * 1000)))
-                    .placeholder(IconicsDrawable(context)
-                            .icon(GoogleMaterial.Icon.gmd_file_download)
-                            .sizeDp(24))
-                    .error(IconicsDrawable(context)
-                            .icon(GoogleMaterial.Icon.gmd_error)
-                            .sizeDp(24))
+                    .placeholder(IconicsDrawable(context).apply{
+                        icon = GoogleMaterial.Icon.gmd_file_download
+                        sizeDp = 24
+                    })
+                    .error(IconicsDrawable(context).apply{
+                        icon = GoogleMaterial.Icon.gmd_error
+                        sizeDp = 24
+                    })
                     .encodeFormat(Bitmap.CompressFormat.WEBP)
                     .encodeQuality(70)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)

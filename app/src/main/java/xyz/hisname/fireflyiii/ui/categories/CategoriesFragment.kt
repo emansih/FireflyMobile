@@ -83,9 +83,10 @@ class CategoriesFragment: BaseFragment() {
             listText.text = "No category found"
             listText.isVisible = true
             listImage.isVisible = true
-            listImage.setImageDrawable(IconicsDrawable(requireContext())
-                    .icon(FontAwesome.Icon.faw_chart_bar)
-                    .sizeDp(24))
+            listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                icon = FontAwesome.Icon.faw_chart_bar
+                sizeDp = 24
+            })
             recycler_view.isVisible = false
         }
     }

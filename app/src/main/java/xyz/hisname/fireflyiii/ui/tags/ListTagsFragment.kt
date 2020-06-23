@@ -58,9 +58,10 @@ class ListTagsFragment: BaseFragment() {
                     if(tags.isEmpty()){
                         listImage.isVisible = true
                         listText.isVisible = true
-                        listImage.setImageDrawable(IconicsDrawable(requireContext())
-                                .icon(FontAwesome.Icon.faw_tag)
-                                .sizeDp(24))
+                        listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                            icon = FontAwesome.Icon.faw_tag
+                            sizeDp = 24
+                        })
                         listText.text = "No Tags Found! Start tagging now?"
                         swipe_tags.isRefreshing = false
                     } else {
@@ -70,8 +71,10 @@ class ListTagsFragment: BaseFragment() {
                             chipTags = Chip(requireContext())
                             chipTags.apply {
                                 text = tagsData.tagsAttributes?.tag
-                                chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                                        .colorRes(R.color.md_green_400)
+                                chipIcon = IconicsDrawable(requireContext()).apply{
+                                    icon = FontAwesome.Icon.faw_tag
+                                    colorRes = R.color.md_green_400
+                                }
                                 isCloseIconVisible = true
                                 addColor()
                                 setOnCloseIconClickListener { close ->

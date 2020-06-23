@@ -107,10 +107,11 @@ class TransactionFragmentV2: BaseTransactionFragment(){
                 addTransactionFab.isVisible = false
                 fragmentContainer.isVisible = false
             }
-            setImageDrawable(IconicsDrawable(requireContext())
-                    .icon(GoogleMaterial.Icon.gmd_add)
-                    .colorRes(R.color.md_pink_200)
-                    .sizeDp(16))
+            setImageDrawable(IconicsDrawable(requireContext()).apply {
+                icon = GoogleMaterial.Icon.gmd_add
+                colorRes = R.color.md_pink_200
+                sizeDp = 16
+            })
         }
     }
 

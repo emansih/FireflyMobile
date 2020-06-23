@@ -45,37 +45,53 @@ class MarkdownFragment: BaseFragment() {
     private fun setWidget(){
         toolbar.visibility = View.GONE
         discardButton.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_close)
-                        .colorRes(R.color.md_white_1000)
-                        .sizeDp(12),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_close
+                    colorRes = R.color.md_white_1000
+                    sizeDp = 12
+                },null, null, null)
         doneButton.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_done)
-                        .colorRes(R.color.md_white_1000)
-                        .sizeDp(12),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_done
+                    colorRes = R.color.md_white_1000
+                    sizeDp =12
+                },null, null, null)
         boldMarkdown.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_bold)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(18))
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_format_bold
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 18
+                })
         italicMarkdown.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_italic)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(18))
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_format_italic
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 18
+                })
         hyperlinkMarkdown.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_insert_link)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(18))
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_insert_link
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 18
+                })
         strikeThroughMarkdown.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_strikethrough)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(18))
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_format_strikethrough
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 18
+                })
         quoteMarkdown.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_quote)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(18))
+                IconicsDrawable(requireContext()).apply {
+                    icon =GoogleMaterial.Icon.gmd_format_quote
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 18
+                })
         bulletMarkdown.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_format_list_bulleted)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(18))
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_format_list_bulleted
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 18
+                })
         editableText.setText(markdownViewModel.markdownText.value)
         displayText.text = markdownViewModel.markdownText.value
         discardButton.setOnClickListener {
@@ -161,13 +177,15 @@ class MarkdownFragment: BaseFragment() {
         hyperlinkMarkdown.setOnClickListener {
             val layoutView = layoutInflater.inflate(R.layout.dialog_hyperlink, null)
             val urlText = layoutView.findViewById<EditText>(R.id.linktextEditText)
-            urlText.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                    .icon(GoogleMaterial.Icon.gmd_format_underlined)
-                    .sizeDp(16),null, null, null)
+            urlText.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+                icon = GoogleMaterial.Icon.gmd_format_underlined
+                sizeDp = 16
+            },null, null, null)
             val url = layoutView.findViewById<EditText>(R.id.linkEditText)
-            url.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                    .icon(GoogleMaterial.Icon.gmd_insert_link)
-                    .sizeDp(16),null, null, null)
+            url.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+                icon = GoogleMaterial.Icon.gmd_insert_link
+                sizeDp = 16
+            },null, null, null)
             val alert = AlertDialog.Builder(requireContext())
             alert.apply {
                 setTitle("Insert Link")

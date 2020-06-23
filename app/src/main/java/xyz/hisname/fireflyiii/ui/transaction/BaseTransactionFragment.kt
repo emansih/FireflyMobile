@@ -47,8 +47,10 @@ abstract class BaseTransactionFragment: BaseFragment() {
             noTransactionText.isVisible = true
             noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
             noTransactionImage.isVisible = true
-            noTransactionImage.setImageDrawable(IconicsDrawable(requireContext())
-                    .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24))
+            noTransactionImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                icon = FontAwesome.Icon.faw_exchange_alt
+                sizeDp = 24
+            })
         } else {
             recycler_view.isVisible = true
             noTransactionText.isGone = true

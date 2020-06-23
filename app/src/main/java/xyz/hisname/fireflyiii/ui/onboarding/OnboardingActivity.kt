@@ -87,9 +87,10 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
     }
 
     private fun setHelp(){
-        helpImage.setImageDrawable(IconicsDrawable(this)
-                .icon(FontAwesome.Icon.faw_question)
-                .sizeDp(20))
+        helpImage.setImageDrawable(IconicsDrawable(this).apply {
+            icon = FontAwesome.Icon.faw_question
+            sizeDp = 20
+        })
         helpImage.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, "https://github.com/emansih/FireflyMobile/wiki/Authentication".toUri())
             if (browserIntent.resolveActivity(packageManager) != null){

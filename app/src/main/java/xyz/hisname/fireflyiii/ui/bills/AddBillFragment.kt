@@ -14,6 +14,7 @@ import androidx.lifecycle.observe
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_bill.*
@@ -111,29 +112,41 @@ class AddBillFragment: BaseAddObjectFragment() {
 
     override fun setIcons(){
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .colorRes(R.color.md_green_400)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_money_bill
+                    colorRes = R.color.md_green_400
+                    sizeDp = 24
+                },null, null, null)
         min_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .colorRes(R.color.md_yellow_A700)
-                        .sizeDp(16),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_dollar_sign
+                    colorRes = R.color.md_yellow_A700
+                    sizeDp = 16
+                },null, null, null)
         max_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_dollar_sign)
-                        .colorRes(R.color.md_yellow_A700)
-                        .sizeDp(16),null, null, null)
-        bill_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_calendar)
-                .color(colorList(ColorStateList.valueOf(rgb(18, 122, 190))))
-                .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_dollar_sign
+                    colorRes = R.color.md_yellow_A700
+                    sizeDp = 16
+                },null, null, null)
+        bill_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_calendar
+                    color = colorList(ColorStateList.valueOf(rgb(18, 122, 190)))
+                    sizeDp = 24
+                },null, null, null)
         skip_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_sort_numeric_up)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(24),null, null, null)
-        addBillFab.setBackgroundColor(getCompatColor(R.color.primary_dark))
-        addBillFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_save)
-                .colorRes(R.color.md_black_1000)
-                .sizeDp(24))
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_sort_numeric_up
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 24
+                },null, null, null)
+        addBillFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
+        addBillFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_save
+            colorRes = R.color.md_black_1000
+            sizeDp = 24
+        })
         if(billId != 0L) {
             placeHolderToolbar.inflateMenu(R.menu.delete_menu)
             placeHolderToolbar.setOnMenuItemClickListener { item ->
