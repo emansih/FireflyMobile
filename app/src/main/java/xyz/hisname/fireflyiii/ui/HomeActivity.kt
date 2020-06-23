@@ -555,7 +555,7 @@ class HomeActivity: BaseActivity(){
                         changeFragment(AboutFragment())
                     }
                     21L -> {
-                        val bundle = bundleOf("accountType" to "liability")
+                        val bundle = bundleOf("accountType" to "liabilities")
                         changeFragment(ListAccountFragment().apply { arguments = bundle })
                     }
                     22L -> {

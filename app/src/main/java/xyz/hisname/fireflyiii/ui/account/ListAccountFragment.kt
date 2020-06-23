@@ -67,7 +67,7 @@ class ListAccountFragment: BaseFragment() {
                                 .icon(FontAwesome.Icon.faw_download))
                         noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
                     }
-                    "liability" -> {
+                    "liabilities" -> {
                         noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
                                 .icon(FontAwesome.Icon.faw_ticket_alt))
                         noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
@@ -121,7 +121,7 @@ class ListAccountFragment: BaseFragment() {
             Objects.equals(accountType, "asset") -> resources.getString(R.string.asset_account)
             Objects.equals(accountType, "expense") -> resources.getString(R.string.expense_account)
             Objects.equals(accountType, "revenue") -> resources.getString(R.string.revenue_account)
-            Objects.equals(accountType, "liability") -> resources.getString(R.string.liability_account)
+            Objects.equals(accountType, "liabilities") -> resources.getString(R.string.liability_account)
             else -> "Accounts"
         }
     }
