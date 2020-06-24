@@ -27,18 +27,21 @@ object DateTimeUtil {
     }
 
 
-    // 1 Day has 86400 seconds. So 1 second before midnight is considered a previous day
-    // Start of day + 86400 - 1 
+     /*
+     1 Day has 86400 seconds. (86400000 milliseconds)
+     So 1 second before midnight is considered a previous day
+     Start of day + 86400 - 1
+     */
     fun getEndOfDayInCalendarToEpoch(calendarDate: String): String{
-        val endOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
-        val endOfDayMilli = endOfDay.times(1000) + 86400 - 1
+        val startOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        val endOfDayMilli = ((startOfDay + 86400) * 1000) - 1
         return endOfDayMilli.toString()
     }
 
 
     /*
-    Takes in end date in yyyy-MM-dd format
-    Output difference in *DAYS*
+     * Takes in end date in yyyy-MM-dd format
+     * Output difference in *DAYS*
      */
     fun getDaysDifference(date: String?): String {
         val todayDate = LocalDateTime.now().toLocalDate()
