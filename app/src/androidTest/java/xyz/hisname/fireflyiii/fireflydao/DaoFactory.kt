@@ -24,7 +24,7 @@ class DaoFactory {
                             "", "", "", randomBoolean(), randomAccountType(), "" ,
                             randomInt(), "", 0.0, "", "",
                             "", "", "", "", "",
-                            "", randomInt(), "" ,"", "", "",
+                            "", 0.0, "" ,"", "", "",
                             "","", "", randomBoolean()
                     )
             )
