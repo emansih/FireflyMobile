@@ -30,6 +30,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.*
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
 import com.mikepenz.materialdrawer.util.getPlaceHolder
 import com.mikepenz.materialdrawer.widget.AccountHeaderView
@@ -180,13 +181,9 @@ class HomeActivity: BaseActivity(){
 
 
     private fun setProfileImage(){
-        DrawerImageLoader.init(object : DrawerImageLoader.IDrawerImageLoader{
+        DrawerImageLoader.init(object : AbstractDrawerImageLoader() {
             override fun cancel(imageView: ImageView) {
                 Glide.with(imageView.context).clear(imageView)
-            }
-
-            override fun placeholder(ctx: Context): Drawable {
-                return getPlaceHolder(ctx)
             }
 
             override fun placeholder(ctx: Context, tag: String?): Drawable {
@@ -202,10 +199,9 @@ class HomeActivity: BaseActivity(){
                         backgroundColorRes = R.color.md_orange_500
                         sizeDp = 56
                     }
-                    else -> placeholder(ctx)
+                    else -> super.placeholder(ctx, tag)
                 }
             }
-
 
             override fun set(imageView: ImageView, uri: Uri, placeholder: Drawable, tag: String?) {
                 Glide.with(imageView.context)
@@ -243,7 +239,7 @@ class HomeActivity: BaseActivity(){
                 sizeDp = 24
             })
             isSelectable = false
-            subItems.apply {
+            withSubItems(
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.asset_account
                     level = 3
@@ -256,7 +252,7 @@ class HomeActivity: BaseActivity(){
                     })
                     identifier = 3
                     isIconTinted = true
-                }
+                },
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.expense_account
                     level = 3
@@ -269,7 +265,7 @@ class HomeActivity: BaseActivity(){
                     })
                     identifier = 4
                     isIconTinted = true
-                }
+                },
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.revenue_account
                     level = 3
@@ -282,7 +278,7 @@ class HomeActivity: BaseActivity(){
                     })
                     identifier = 5
                     isIconTinted = true
-                }
+                },
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.liability_account
                     level = 3
@@ -295,8 +291,7 @@ class HomeActivity: BaseActivity(){
                     })
                     identifier = 21
                     isIconTinted = true
-                }
-            }
+                })
         }
 
         val budgets = PrimaryDrawerItem().apply {
@@ -337,101 +332,87 @@ class HomeActivity: BaseActivity(){
             icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_refresh).apply {
                 sizeDp = 24
             })
-            subItems.apply {
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.withdrawal
-                    level = 3
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_blue_grey_500
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
-                        sizeDp = 24
-                    })
-                    isIconTinted = true
-                    identifier = 11
-                }
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.revenue_income_menu
-                    level = 3
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_grey_500
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
-                        sizeDp = 24
-                    })
-                    isIconTinted = true
-                    identifier = 12
-                }
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.transfer
-                    level = 3
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_green_500
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
-                        sizeDp = 24
-                    })
-                    isIconTinted = true
-                    identifier = 13
-                }
-            }
+            withSubItems(SecondaryDrawerItem().apply {
+                nameRes = R.string.withdrawal
+                level = 3
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_blue_grey_500
+                })
+                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
+                    sizeDp = 24
+                })
+                isIconTinted = true
+                identifier = 11
+            },SecondaryDrawerItem().apply {
+                nameRes = R.string.revenue_income_menu
+                level = 3
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_grey_500
+                })
+                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
+                    sizeDp = 24
+                })
+                isIconTinted = true
+                identifier = 12
+            }, SecondaryDrawerItem().apply {
+                nameRes = R.string.transfer
+                level = 3
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_green_500
+                })
+                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
+                    sizeDp = 24
+                })
+                isIconTinted = true
+                identifier = 13
+            })
         }
+        // TODO: Fix identifier numbering system
         val moneyManagement = ExpandableDrawerItem().apply {
             nameRes = R.string.money_management
-            identifier = 14
+            identifier = 999
             icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_euro_symbol).apply {
                 sizeDp = 24
             })
             isIconTinted = true
             isSelectable = false
-            subItems.apply {
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.piggy_bank
-                    level = 4
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_red_500
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
-                        sizeDp = 24
-                    })
-                    identifier = 15
-                }
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.bill
-                    level = 4
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_amber_500
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
-                        sizeDp = 24
-                    })
-                    identifier = 16
-                }
-                SecondaryDrawerItem().apply {
-                    name = StringHolder("Rules")
-                    level = 4
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_brown_500
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
-                        sizeDp = 24
-                    })
-                    identifier = 17
-                }
-                // Deactiviated
-                /*SecondaryDrawerItem().apply {
-                    name = StringHolder("Recurring Transactions")
-                    level = 4
-                    identifier = 18
-                }*/
-
-            }
+            withSubItems(SecondaryDrawerItem().apply {
+                nameRes = R.string.piggy_bank
+                level = 4
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_red_500
+                })
+                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
+                    sizeDp = 24
+                })
+                identifier = 15
+            }, SecondaryDrawerItem().apply {
+                nameRes = R.string.bill
+                level = 4
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_amber_500
+                })
+                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
+                    sizeDp = 24
+                })
+                identifier = 16
+            }, SecondaryDrawerItem().apply {
+                name = StringHolder("Rules")
+                level = 4
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_brown_500
+                })
+                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
+                    sizeDp = 24
+                })
+                identifier = 17
+            })
         }
         val options = ExpandableDrawerItem().apply {
             nameRes = R.string.options
@@ -441,34 +422,32 @@ class HomeActivity: BaseActivity(){
             })
             isSelectable = false
             isIconTinted = true
-            subItems.apply {
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.settings
-                    level = 4
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_teal_500
-                    })
-                    isIconTinted = true
-                    identifier = 19
-                    icon =  ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
-                        sizeDp = 24
-                    })
-                }
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.currency
-                    level = 4
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_pink_800
-                    })
-                    isIconTinted = true
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
-                        sizeDp = 24
-                    })
-                    identifier = 22
-                }
+            withSubItems(SecondaryDrawerItem().apply {
+                nameRes = R.string.settings
+                level = 4
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_teal_500
+                })
+                isIconTinted = true
+                identifier = 19
+                icon =  ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
+                    sizeDp = 24
+                })
+            }, SecondaryDrawerItem().apply {
+                nameRes = R.string.currency
+                level = 4
+                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
+                    sizeDp = 24
+                    colorRes = R.color.md_pink_800
+                })
+                isIconTinted = true
+                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
+                    sizeDp = 24
+                })
+                identifier = 22
             }
+            )
         }
 
         val about = PrimaryDrawerItem().apply {
@@ -567,7 +546,7 @@ class HomeActivity: BaseActivity(){
                 }
                 false
             }
-            withSavedInstance(savedInstanceState)
+            setSavedInstance(savedInstanceState)
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         drawerToggle.isDrawerIndicatorEnabled = true
