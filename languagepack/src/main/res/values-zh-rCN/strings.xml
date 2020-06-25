@@ -109,5 +109,7 @@
     <string name="asset_account_deleted">已成功删除资产帐户 %1$s</string>
     <string name="expense_account_deleted">已成功删除支出帐户 %1$s</string>
     <string name="revenue_account_deleted">已成功删除收入帐户 %1$s</string>
+    <string name="others">其余</string>
+    <string name="classification">分类</string>
 
 </resources>

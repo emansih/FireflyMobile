@@ -118,4 +118,6 @@
     <string name="asset_account_deleted">已成功刪除資產帳戶 %1$s</string>
     <string name="expense_account_deleted">已成功刪除支出帳戶 %1$s</string>
     <string name="revenue_account_deleted">已成功刪除收入帳戶 %1$s</string>
+    <string name="others">其他</string>
+    <string name="classification">分類</string>
 </resources>

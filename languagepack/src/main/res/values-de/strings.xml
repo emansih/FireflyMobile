@@ -116,5 +116,9 @@
     <string name="asset_account_deleted">Bestandskonto %1$s erfolgreich gelöscht</string>
     <string name="expense_account_deleted">Kreditor (Ausgabenkonto) %1$s erfolgreich gelöscht</string>
     <string name="revenue_account_deleted">Schuldner %1$s erfolgreich gelöscht</string>
+    <string name="financial_control">FINANZKONTROLLE</string>
+    <string name="accounting">BUCHHALTUNG</string>
+    <string name="others">WEITERE</string>
+    <string name="classification">Klassifizierung</string>
 
 </resources>

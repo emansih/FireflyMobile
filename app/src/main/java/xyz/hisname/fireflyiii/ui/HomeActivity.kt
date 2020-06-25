@@ -265,7 +265,7 @@ class HomeActivity: BaseActivity(){
         }
 
         val classification = ExpandableDrawerItem().apply {
-            name = StringHolder("Classification")
+            nameRes = R.string.classification
             isIconTinted = true
             isSelectable = false
             selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity,FontAwesome.Icon.faw_tag).apply {
@@ -377,10 +377,10 @@ class HomeActivity: BaseActivity(){
                 sizeDp = 24
             })
         }
-        val financialControlSectionHeader = SecondaryDrawerItem().apply { name = StringHolder("Financial Control") }
-        val accountingSectionHeader = SecondaryDrawerItem().apply { name = StringHolder("Accounting") }
-        val othersSectionHeader = SecondaryDrawerItem().apply { name = StringHolder("Others") }
-        
+        val financialControlSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.financial_control }
+        val accountingSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.accounting }
+        val othersSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.others }
+
         slider.apply {
             itemAdapter.add(dashboard, financialControlSectionHeader, bills, piggyBank, accountingSectionHeader,
                     transactions, othersSectionHeader, account, classification, options, about)

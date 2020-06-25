@@ -120,4 +120,8 @@
     <string name="asset_account_deleted">A conta de ativos %1$s foi deletada com sucesso</string>
     <string name="expense_account_deleted">A conta de despesas %1$s foi deletada com sucesso</string>
     <string name="revenue_account_deleted">A conta de receitas %1$s foi deletada com sucesso</string>
+    <string name="financial_control">CONTROLE FINANCEIRO</string>
+    <string name="accounting">CONTABILIDADE</string>
+    <string name="others">OUTROS</string>
+    <string name="classification">Classificação</string>
 </resources>

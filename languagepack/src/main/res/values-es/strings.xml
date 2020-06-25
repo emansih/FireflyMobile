@@ -113,4 +113,8 @@
     <string name="asset_account_deleted">Se ha eliminado exitosamente la cuenta de activos %1$s</string>
     <string name="expense_account_deleted">Exitosamente eliminado la cuenta de gastos %1$s</string>
     <string name="revenue_account_deleted">Exitosamente eliminado cuenta de ganacias %1$s</string>
+    <string name="financial_control">CONTROL FINANCIERO</string>
+    <string name="accounting">CONTABILIDAD</string>
+    <string name="others">OTROS</string>
+    <string name="classification">Clasificación</string>
 </resources>

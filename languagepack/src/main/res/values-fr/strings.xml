@@ -111,4 +111,7 @@
     <string name="asset_account_deleted">Compte d’actif %1$s correctement supprimé</string>
     <string name="expense_account_deleted">Compte de dépenses %1$s correctement supprimé</string>
     <string name="revenue_account_deleted">Compte de recettes %1$s correctement supprimé</string>
+    <string name="accounting">COMPTABILITÉ</string>
+    <string name="others">AUTRES</string>
+    <string name="financial_control">CONTRÔLE FINANCIER</string>
 </resources>

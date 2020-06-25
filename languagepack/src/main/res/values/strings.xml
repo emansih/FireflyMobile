@@ -120,4 +120,8 @@
     <string name="asset_account_deleted">Successfully deleted asset account %1$s</string>
     <string name="expense_account_deleted">Successfully deleted expense account %1$s</string>
     <string name="revenue_account_deleted">Successfully deleted revenue account %1$s</string>
+    <string name="accounting">ACCOUNTING</string>
+    <string name="financial_control">FINANCIAL CONTROL</string>
+    <string name="others">OTHERS</string>
+    <string name="classification">Classification</string>
 </resources>

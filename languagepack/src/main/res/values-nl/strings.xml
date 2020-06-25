@@ -112,5 +112,9 @@
     <string name="asset_account_deleted">Betaalrekening %1$s is verwijderd</string>
     <string name="expense_account_deleted">Crediteur %1$s is verwijderd</string>
     <string name="revenue_account_deleted">Debiteur %1$s is verwijderd</string>
+    <string name="financial_control">FINANCIEEL OVERZICHT</string>
+    <string name="others">OVERIGE</string>
+    <string name="accounting">BOEKHOUDEN</string>
+    <string name="classification">Indeling</string>
 
 </resources>

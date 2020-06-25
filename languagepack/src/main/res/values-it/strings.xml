@@ -112,5 +112,9 @@
     <string name="asset_account_deleted">Conto attività %1$s eliminato correttamente</string>
     <string name="expense_account_deleted">Conto uscite %1$s eliminato correttamente</string>
     <string name="revenue_account_deleted">Conto entrate %1$s eliminato correttamente</string>
+    <string name="financial_control">CONTROLLO FINANZIARIO</string>
+    <string name="accounting">CONTABILITÀ</string>
+    <string name="others">ALTRO</string>
+    <string name="classification">Classificazione</string>
 
 </resources>

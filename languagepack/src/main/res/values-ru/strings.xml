@@ -114,4 +114,6 @@
     <string name="asset_account_deleted">Основной счёт %1$s успешно удалён</string>
     <string name="expense_account_deleted">Счёт расхода %1$s успешно удалён</string>
     <string name="revenue_account_deleted">Счёт дохода %1$s успешно удалён</string>
+    <string name="others">ДРУГИЕ</string>
+    <string name="classification">Классификация</string>
 </resources>
