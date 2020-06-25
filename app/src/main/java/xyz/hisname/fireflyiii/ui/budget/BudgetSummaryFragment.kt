@@ -18,6 +18,7 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_budget_summary.*
 import xyz.hisname.fireflyiii.R
@@ -27,16 +28,15 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionByBudgetDialogFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
-import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.setData
-import xyz.hisname.fireflyiii.util.extension.zipLiveData
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 class BudgetSummaryFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
+    private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
     private val coloring = arrayListOf<Int>()
     private var budgetSpent = 0f
     private var budgeted = 0f
@@ -47,6 +47,7 @@ class BudgetSummaryFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        extendedFab.isGone = true
         for (col in ColorTemplate.COLORFUL_COLORS) {
             coloring.add(col)
         }
@@ -154,12 +155,14 @@ class BudgetSummaryFragment: BaseFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         fab.isGone = true
+        extendedFab.isGone = true
         activity?.activity_toolbar?.title = "Budget Summary"
     }
 
     override fun onResume() {
         super.onResume()
         fab.isGone = true
+        extendedFab.isGone = true
         activity?.activity_toolbar?.title = "Budget Summary"
     }
 
