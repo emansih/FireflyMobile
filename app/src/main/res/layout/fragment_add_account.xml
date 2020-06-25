@@ -414,6 +414,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="300dp"
                         android:gravity="top"
+                        android:focusable="false"
                         android:inputType="textMultiLine"
                         android:drawablePadding="12dp"
                         android:hint="@string/notes"

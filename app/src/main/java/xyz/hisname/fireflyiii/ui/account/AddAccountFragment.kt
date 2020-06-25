@@ -7,20 +7,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
-import com.mikepenz.iconics.utils.sizePx
 import kotlinx.android.synthetic.main.fragment_add_account.*
+import kotlinx.android.synthetic.main.fragment_add_account.currency_edittext
+import kotlinx.android.synthetic.main.fragment_add_account.currency_layout
+import kotlinx.android.synthetic.main.fragment_add_account.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_account.placeHolderToolbar
+import kotlinx.android.synthetic.main.fragment_add_bill.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import me.toptas.fancyshowcase.listener.DismissListener
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
@@ -29,6 +36,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     private val accountType: String by lazy { arguments?.getString("accountType") ?: "" }
     private val accountId: Long by lazy { arguments?.getLong("accountId") ?: 0L }
+    private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private var currency: String = ""
     private val calendar by lazy { Calendar.getInstance() }
     private lateinit var queue: FancyShowCaseQueue
@@ -203,6 +211,16 @@ class AddAccountFragment: BaseAddObjectFragment() {
             } else {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
+        }
+        note_edittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(note_edittext.getString())
+            parentFragmentManager.commit {
+                replace(R.id.bigger_fragment_container, MarkdownFragment())
+                addToBackStack(null)
+            }
+        }
+        markdownViewModel.markdownText.observe(this){ markdownText ->
+            note_edittext.setText(markdownText)
         }
     }
 
