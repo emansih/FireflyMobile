@@ -25,10 +25,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.*
 import com.mikepenz.materialdrawer.holder.ImageHolder
 import com.mikepenz.materialdrawer.holder.StringHolder
-import com.mikepenz.materialdrawer.model.ExpandableDrawerItem
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
+import com.mikepenz.materialdrawer.model.*
 import com.mikepenz.materialdrawer.model.interfaces.*
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
@@ -243,54 +240,22 @@ class HomeActivity: BaseActivity(){
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.asset_account
                     level = 3
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_cyan_A400
-                    })
-                    icon =  ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
-                        sizeDp = 24
-                    })
                     identifier = 3
-                    isIconTinted = true
                 },
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.expense_account
                     level = 3
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_shopping_cart).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_yellow_400
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_shopping_cart).apply {
-                        sizeDp = 24
-                    })
                     identifier = 4
-                    isIconTinted = true
                 },
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.revenue_account
                     level = 3
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_download).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_black_1000
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_download).apply {
-                        sizeDp = 24
-                    })
                     identifier = 5
-                    isIconTinted = true
                 },
                 SecondaryDrawerItem().apply {
                     nameRes = R.string.liability_account
                     level = 3
-                    selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_ticket_alt).apply {
-                        sizeDp = 24
-                        colorRes = R.color.md_deep_purple_500
-                    })
-                    icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_ticket_alt).apply {
-                        sizeDp = 24
-                    })
                     identifier = 21
-                    isIconTinted = true
                 })
         }
 
@@ -298,122 +263,87 @@ class HomeActivity: BaseActivity(){
             identifier = 6
             name = StringHolder("Budgets")
         }
-        val categories = PrimaryDrawerItem().apply {
-            identifier = 7
-            nameRes = R.string.categories
-            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_chart_bar).apply {
-                sizeDp = 24
-                colorRes = R.color.material_blue_grey_800
-            })
-            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_chart_bar).apply {
-                sizeDp = 24
-            })
-            isIconTinted = true
-        }
 
-        val tags = PrimaryDrawerItem().apply {
-            identifier = 8
-            nameRes = R.string.tags
-            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_tag).apply {
+        val classification = ExpandableDrawerItem().apply {
+            name = StringHolder("Classification")
+            isIconTinted = true
+            isSelectable = false
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity,FontAwesome.Icon.faw_tag).apply {
                 sizeDp = 24
-                colorRes = R.color.md_green_400
+                colorRes = R.color.md_blue_A400
             })
             icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_tag).apply {
                 sizeDp = 24
             })
-            isIconTinted = true
+            withSubItems(
+                    SecondaryDrawerItem().apply {
+                        identifier = 7
+                        nameRes = R.string.categories
+                        level = 3
+                    },
+                    SecondaryDrawerItem().apply {
+                        identifier = 8
+                        level = 3
+                        nameRes = R.string.tags
+                    }
+            )
         }
+
         val reported = PrimaryDrawerItem().apply {
             identifier = 9
             name = StringHolder("Reports")
         }
         val transactions = ExpandableDrawerItem().apply {
             nameRes = R.string.transaction
-            icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_refresh).apply {
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
                 sizeDp = 24
             })
             withSubItems(SecondaryDrawerItem().apply {
                 nameRes = R.string.withdrawal
                 level = 3
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_blue_grey_500
-                })
-                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_left).apply {
-                    sizeDp = 24
-                })
-                isIconTinted = true
                 identifier = 11
             },SecondaryDrawerItem().apply {
                 nameRes = R.string.revenue_income_menu
                 level = 3
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_grey_500
-                })
-                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_arrow_right).apply {
-                    sizeDp = 24
-                })
-                isIconTinted = true
                 identifier = 12
             }, SecondaryDrawerItem().apply {
                 nameRes = R.string.transfer
                 level = 3
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_green_500
-                })
-                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
-                    sizeDp = 24
-                })
-                isIconTinted = true
                 identifier = 13
             })
         }
-        // TODO: Fix identifier numbering system
-        val moneyManagement = ExpandableDrawerItem().apply {
-            nameRes = R.string.money_management
-            identifier = 999
-            icon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_euro_symbol).apply {
+
+        val piggyBank = PrimaryDrawerItem().apply {
+            nameRes = R.string.piggy_bank
+            level = 4
+            identifier = 15
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_bullseye).apply {
+                sizeDp = 24
+                colorRes = R.color.md_red_500
+            })
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_bullseye).apply {
                 sizeDp = 24
             })
-            isIconTinted = true
-            isSelectable = false
-            withSubItems(SecondaryDrawerItem().apply {
-                nameRes = R.string.piggy_bank
-                level = 4
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_red_500
-                })
-                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_sort_down).apply {
-                    sizeDp = 24
-                })
-                identifier = 15
-            }, SecondaryDrawerItem().apply {
-                nameRes = R.string.bill
-                level = 4
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_amber_500
-                })
-                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
-                    sizeDp = 24
-                })
-                identifier = 16
-            }, SecondaryDrawerItem().apply {
-                name = StringHolder("Rules")
-                level = 4
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_brown_500
-                })
-                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_random).apply {
-                    sizeDp = 24
-                })
-                identifier = 17
-            })
         }
+        val bills = PrimaryDrawerItem().apply {
+            nameRes = R.string.bill
+            level = 4
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
+                sizeDp = 24
+                colorRes = R.color.md_pink_800
+            })
+            isIconTinted = true
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
+                sizeDp = 24
+            })
+            identifier = 16
+        }
+        val rules = PrimaryDrawerItem().apply {
+            name = StringHolder("Rules")
+            level = 4
+            identifier = 17
+        }
+
         val options = ExpandableDrawerItem().apply {
             nameRes = R.string.options
             identifier = 14
@@ -425,26 +355,11 @@ class HomeActivity: BaseActivity(){
             withSubItems(SecondaryDrawerItem().apply {
                 nameRes = R.string.settings
                 level = 4
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_teal_500
-                })
-                isIconTinted = true
                 identifier = 19
-                icon =  ImageHolder(IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_settings).apply {
-                    sizeDp = 24
-                })
             }, SecondaryDrawerItem().apply {
                 nameRes = R.string.currency
                 level = 4
-                selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
-                    sizeDp = 24
-                    colorRes = R.color.md_pink_800
-                })
                 isIconTinted = true
-                icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_money_bill).apply {
-                    sizeDp = 24
-                })
                 identifier = 22
             }
             )
@@ -462,10 +377,13 @@ class HomeActivity: BaseActivity(){
                 sizeDp = 24
             })
         }
-
+        val financialControlSectionHeader = SecondaryDrawerItem().apply { name = StringHolder("Financial Control") }
+        val accountingSectionHeader = SecondaryDrawerItem().apply { name = StringHolder("Accounting") }
+        val othersSectionHeader = SecondaryDrawerItem().apply { name = StringHolder("Others") }
+        
         slider.apply {
-            itemAdapter.add(dashboard, transactions, account, tags, categories, /* budgets, tags, reports,
-                        */ moneyManagement, options, about)
+            itemAdapter.add(dashboard, financialControlSectionHeader, bills, piggyBank, accountingSectionHeader,
+                    transactions, othersSectionHeader, account, classification, options, about)
             accountHeader = headerResult
             onDrawerItemClickListener = { v: View?, drawerItem: IDrawerItem<*>, position: Int ->
                 when (drawerItem.identifier) {
