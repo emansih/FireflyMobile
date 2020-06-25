@@ -6,13 +6,13 @@ import androidx.lifecycle.*
 import xyz.hisname.fireflyiii.util.Sixple
 
 internal fun <T: ViewModel> Fragment.getViewModel(modelClass: Class<T>, viewModelFactory: ViewModelProvider.Factory? = null): T {
-    return viewModelFactory?.let { ViewModelProviders.of(requireActivity(), it).get(modelClass) } ?:
-    ViewModelProviders.of(requireActivity()).get(modelClass)
+    return viewModelFactory?.let { ViewModelProvider(requireActivity(), it).get(modelClass) } ?:
+    ViewModelProvider(requireActivity()).get(modelClass)
 }
 
 internal fun <T: ViewModel> AppCompatActivity.getViewModel(modelClass: Class<T>, viewModelFactory: ViewModelProvider.Factory? = null): T{
-    return viewModelFactory?.let { ViewModelProviders.of(this, it).get(modelClass) } ?:
-    ViewModelProviders.of(this).get(modelClass)
+    return viewModelFactory?.let { ViewModelProvider(this, it).get(modelClass) } ?:
+    ViewModelProvider(this).get(modelClass)
 }
 
 
