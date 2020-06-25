@@ -63,9 +63,9 @@ class BudgetSummaryFragment: BaseFragment() {
     private fun retrieveData(currencyData: CurrencyData){
         val currencyCode = currencyData.currencyAttributes?.code ?: ""
         zipLiveData(zipLiveData(transactionViewModel.getTotalTransactionAmountByDateAndCurrency(DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal"),
+                DateTimeUtil.getEndOfMonth(), currencyCode, "withdrawal"),
                 transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal")),
+                        DateTimeUtil.getEndOfMonth(), currencyCode, "withdrawal")),
                 zipLiveData(budgetLimit.retrieveSpentBudget(currencyData.currencyAttributes?.code ?: ""),
                         budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(this) { fireflyData ->
             if(fireflyData.first.second.isNotEmpty()) {
@@ -73,7 +73,7 @@ class BudgetSummaryFragment: BaseFragment() {
                 fireflyData.first.second.forEachIndexed { _, uniqueBudget ->
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), currencyCode,
-                            "Withdrawal", uniqueBudget).observe(this) { transactionAmount ->
+                            "withdrawal", uniqueBudget).observe(this) { transactionAmount ->
                         val percentageCategory = transactionAmount.absoluteValue.roundToInt()
                                 .toDouble()
                                 .div(fireflyData.first.first.absoluteValue.roundToInt().toDouble())
