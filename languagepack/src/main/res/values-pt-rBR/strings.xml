@@ -20,7 +20,7 @@
     <string name="skip">Pular</string>
     <string name="client_secret">Client Secret</string>
     <string name="options">Opções</string>
-    <string name="delete_bill_message">Tem certeza que deseja deletar a fatura 1$s ?</string>
+    <string name="delete_bill_message">Tem certeza que deseja deletar a fatura %1$s ?</string>
     <string name="delete_piggy_bank_message">Tem certeza que deseja deletar o cofrinho %1$s ?</string>
     <string name="destination_account">Conta de destino</string>
     <string name="expense_account">Contas de despesas</string>

@@ -182,9 +182,10 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        menu.findItem(R.id.menu_item_filter).icon = IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_filter)
-                .sizeDp(24)
+        menu.findItem(R.id.menu_item_filter).icon = IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_filter
+            sizeDp = 24
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

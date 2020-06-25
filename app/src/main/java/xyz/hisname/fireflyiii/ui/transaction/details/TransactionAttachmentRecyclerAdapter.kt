@@ -44,15 +44,15 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
 
             if(shouldShowDownload) {
                 if (File("${FileUtils().folderDirectory(context)}/$fileName").exists()) {
-                    Glide.with(context).load(IconicsDrawable(context)
-                            .icon(GoogleMaterial.Icon.gmd_folder_open)
-                            .sizeDp(12))
-                            .into(itemView.downloadButton)
+                    Glide.with(context).load(IconicsDrawable(context).apply {
+                        icon = GoogleMaterial.Icon.gmd_folder_open
+                        sizeDp = 12
+                    }).into(itemView.downloadButton)
                 } else {
-                    Glide.with(context).load(IconicsDrawable(context)
-                            .icon(GoogleMaterial.Icon.gmd_file_download)
-                            .sizeDp(12))
-                            .into(itemView.downloadButton)
+                    Glide.with(context).load(IconicsDrawable(context).apply {
+                        icon = GoogleMaterial.Icon.gmd_file_download
+                        sizeDp = 12
+                    }).into(itemView.downloadButton)
                 }
             }
             itemView.setOnClickListener { clickListener(attachmentData) }

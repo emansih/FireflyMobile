@@ -33,6 +33,7 @@ import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
@@ -172,58 +173,80 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setIcons(){
-        tags_layout.startIconDrawable = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tags)
-                .colorRes(R.color.md_blue_900)
-                .sizeDp(24)
+        tags_layout.startIconDrawable = IconicsDrawable(requireContext()).apply{
+            icon = FontAwesome.Icon.faw_tags
+            colorRes = R.color.md_blue_900
+            sizeDp = 24
+        }
         currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                        .colorRes(R.color.md_green_400)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_money_bill
+                    colorRes = R.color.md_green_400
+                    sizeDp = 24
+                },null, null, null)
         transaction_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_calculator)
-                .colorRes(R.color.md_blue_grey_400)
-                .sizeDp(16), null, null, null)
-        transaction_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_calendar)
-                .color(colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190))))
-                .sizeDp(24),null, null, null)
-        source_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_exchange_alt).sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_calculator
+                    colorRes = R.color.md_blue_grey_400
+                    sizeDp = 16
+                }, null, null, null)
+        transaction_date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_calendar
+            color = colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
+            sizeDp = 24
+        },null, null, null)
+        source_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_exchange_alt
+            sizeDp = 24
+        },null, null, null)
         val bankTransferIconColorWrap = DrawableCompat.wrap(getCompatDrawable(R.drawable.ic_bank_transfer)!!).mutate()
         DrawableCompat.setTint(bankTransferIconColorWrap, Color.parseColor("#e67a15"))
         destination_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 bankTransferIconColorWrap,null, null, null)
-        category_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_chart_bar)
-                        .colorRes(R.color.md_deep_purple_400)
-                        .sizeDp(24), null, null, null)
+        category_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply{
+            icon = FontAwesome.Icon.faw_chart_bar
+            colorRes = R.color.md_deep_purple_400
+            sizeDp = 24
+        }, null, null, null)
         piggy_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_piggy_bank)
-                        .colorRes(R.color.md_pink_200)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply{
+                    icon = FontAwesome.Icon.faw_piggy_bank
+                    colorRes = R.color.md_pink_200
+                    sizeDp = 24
+                },null, null, null)
         time_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_clock)
-                        .colorRes(R.color.md_red_400)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_clock
+                    colorRes = R.color.md_red_400
+                    sizeDp = 24
+                },null, null, null)
         tags_chip.chipTokenizer = SpanChipTokenizer(requireContext(), object : ChipCreator<ChipSpan> {
             override fun configureChip(chip: ChipSpan, chipConfiguration: ChipConfiguration) {
             }
 
             override fun createChip(context: Context, text: CharSequence, data: Any?): ChipSpan {
                 return ChipSpan(requireContext(), text,
-                        IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag).sizeDp(12), data)
+                        IconicsDrawable(requireContext()).apply {
+                            icon = FontAwesome.Icon.faw_tag
+                            sizeDp = 12
+                        }, data)
             }
 
             override fun createChip(context: Context, existingChip: ChipSpan): ChipSpan {
                 return ChipSpan(requireContext(), existingChip)
             }
         }, ChipSpan::class.java)
-        addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_plus)
-                .colorRes(R.color.md_black_1000)
-                .sizeDp(24))
+        addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).apply{
+            icon = FontAwesome.Icon.faw_plus
+            colorRes = R.color.md_black_1000
+            sizeDp = 24
+        })
         budget_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_gratipay)
-                        .colorRes(R.color.md_amber_300)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_gratipay
+                    colorRes = R.color.md_amber_300
+                    sizeDp = 24
+                },null, null, null)
     }
 
     private fun setCalculator(){

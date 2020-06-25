@@ -10,10 +10,10 @@ import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.colorRes
-import com.mikepenz.iconics.utils.sizeDp
+import com.mikepenz.iconics.utils.*
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
@@ -42,9 +42,11 @@ class SettingsFragment: BaseSettings() {
             ActivityCompat.recreate(requireActivity())
             true
         }
-        languagePref.icon = IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_language)
-                .sizeDp(24).setIconColor()
+        languagePref.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_language
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
     }
 
     private fun setAccountSection(){
@@ -57,9 +59,11 @@ class SettingsFragment: BaseSettings() {
             }
             true
         }
-        accountOptions.icon = IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_account_circle)
-                .sizeDp(24).setIconColor()
+        accountOptions.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_account_circle
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
     }
 
     private fun setTransactionSection(){
@@ -73,9 +77,11 @@ class SettingsFragment: BaseSettings() {
             true
         }
 
-        transactionSettings.icon = IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_notifications)
-                .sizeDp(24).setIconColor()
+        transactionSettings.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_notifications
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
     }
 
     private fun setNightModeSection(){
@@ -85,9 +91,11 @@ class SettingsFragment: BaseSettings() {
             AppPref(sharedPref).nightModeEnabled = nightMode
             true
         }
-        nightModePref.icon = IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_invert_colors)
-                .sizeDp(24).setIconColor()
+        nightModePref.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_invert_colors
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -104,11 +112,11 @@ class SettingsFragment: BaseSettings() {
         parentFragmentManager.popBackStack()
     }
 
-    private fun IconicsDrawable.setIconColor(): Drawable{
+    private fun setIconColor(): Int{
         return if(nightMode){
-            this.colorRes(R.color.md_white_1000)
+            R.color.md_white_1000
         } else {
-            this.colorRes(R.color.md_black_1000)
+            R.color.md_black_1000
         }
     }
 
@@ -118,8 +126,10 @@ class SettingsFragment: BaseSettings() {
             keyguardPref.isSelectable = false
             keyguardPref.summary = "Please enable pin / password / biometrics in your device settings"
         }
-        keyguardPref.icon = IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_lock)
-                .sizeDp(24).setIconColor()
+        keyguardPref.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_lock
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
     }
 }

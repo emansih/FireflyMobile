@@ -24,7 +24,7 @@
                 android:id="@+id/placeHolderToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/primary"
+                android:background="@color/colorPrimary"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:layout_collapseMode="none"
                 app:navigationIcon="@drawable/abc_ic_clear_material"

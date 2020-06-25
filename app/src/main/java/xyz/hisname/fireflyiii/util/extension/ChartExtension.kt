@@ -8,8 +8,8 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 
 fun PieChart.setData(data: PieChart.() -> Unit){
     if(AppPref(PreferenceManager.getDefaultSharedPreferences(this.context)).nightModeEnabled){
-        legend.textColor = getCompatColor(R.color.white)
-        description.textColor = getCompatColor(R.color.white)
+        legend.textColor = getCompatColor(R.color.md_white_1000)
+        description.textColor = getCompatColor(R.color.md_white_1000)
 
     }
     description.textSize = 15f

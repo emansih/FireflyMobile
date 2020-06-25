@@ -27,9 +27,11 @@ class DeleteTransactionDialog: BaseFragment() {
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_account_title, transactionDescription))
                 .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
-                .setIcon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_trash)
-                        .sizeDp(24)
-                        .colorRes(R.color.md_green_600))
+                .setIcon(IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_trash
+                    sizeDp = 24
+                    colorRes = R.color.md_green_600
+                })
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
                     transactionViewModel.deleteTransaction(transactionJournalId).observe(this) {

@@ -58,8 +58,10 @@ class TagDetailsFragment: BaseDetailFragment() {
     }
 
     private fun setTagData(tagData: MutableList<TagsData>){
-        tagName.chipIcon = IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                .colorRes(R.color.md_green_400)
+        tagName.chipIcon = IconicsDrawable(requireContext()).apply{
+            icon = FontAwesome.Icon.faw_tag
+            colorRes = R.color.md_green_400
+        }
         val tagsAttributes = tagData[0].tagsAttributes
         if(tagsAttributes?.tag != null){
             tagName.text = tagsAttributes.tag
@@ -78,10 +80,11 @@ class TagDetailsFragment: BaseDetailFragment() {
             tagDetailsMap.setMultiTouchControls(true)
             tagDetailsMap.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
             tagDetailsMap.overlays.add(startMarker)
-            startMarker.icon = IconicsDrawable(requireContext())
-                    .icon(FontAwesome.Icon.faw_map_marker)
-                    .colorRes(R.color.md_red_700)
-                    .sizeDp(16)
+            startMarker.icon = IconicsDrawable(requireContext()).apply{
+                icon = FontAwesome.Icon.faw_map_marker
+                colorRes = R.color.md_red_700
+                sizeDp = 16
+            }
             latitude_text.text = tagsAttributes.latitude
             longitude_text.text = tagsAttributes.longitude
             val userCoord = GeoPoint(tagsAttributes.latitude.toDouble(),

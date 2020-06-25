@@ -28,10 +28,10 @@ fun SupportFragment.toastSuccess(message: String, duration: Int = Toast.LENGTH_S
         requireActivity().toastSuccess(message, duration)
 
 fun SupportFragment.toastOffline(message: String, duration: Int = Toast.LENGTH_SHORT) =
-       Toasty.custom(requireActivity(), message, IconicsDrawable(requireContext())
-        .icon(GoogleMaterial.Icon.gmd_cloud_off).sizeDp(24),
-               getCompatColor(R.color.darkBlue),
-               getCompatColor(R.color.white),
+       Toasty.custom(requireActivity(), message, IconicsDrawable(requireContext()).apply {
+           icon = GoogleMaterial.Icon.gmd_cloud_off
+           sizeDp = 24
+       }, getCompatColor(R.color.darkBlue), getCompatColor(R.color.md_white_1000),
                duration, true, true).show()
 
 

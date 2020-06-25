@@ -53,28 +53,23 @@ class ListAccountFragment: BaseFragment() {
                 noAccountText.isVisible = true
                 when (accountType) {
                     "asset" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                                .icon(FontAwesome.Icon.faw_money_bill))
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill))
                         noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
                     }
                     "expense" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                                .icon(FontAwesome.Icon.faw_shopping_cart))
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_shopping_cart))
                         noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
                     }
                     "revenue" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                                .icon(FontAwesome.Icon.faw_download))
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_download))
                         noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
                     }
                     "liabilities" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                                .icon(FontAwesome.Icon.faw_ticket_alt))
+                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_ticket_alt))
                         noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
                     }
                 }
-                noAccountImage.setImageDrawable(IconicsDrawable(requireContext())
-                        .icon(FontAwesome.Icon.faw_money_bill))
+                noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill))
                 noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
             } else {
                 noAccountText.isGone = true

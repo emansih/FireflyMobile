@@ -8,17 +8,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
-import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.colorInt
+import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_tags.*
@@ -162,29 +160,40 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun setIcons(){
-        date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_calendar)
-                .color(colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190))))
-                .sizeDp(24),null, null, null)
+        date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_calendar
+            color = colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
+            sizeDp = 24
+        },null, null, null)
         description_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_audio_description)
-                        .colorRes(R.color.md_amber_800)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_audio_description
+                    colorRes = R.color.md_amber_800
+                    sizeDp =24
+                },null, null, null)
         latitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_map)
-                        .colorRes(R.color.md_green_800)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply{
+                    icon = GoogleMaterial.Icon.gmd_map
+                    colorRes = R.color.md_green_800
+                    sizeDp = 24
+                },null, null, null)
         longitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_map)
-                        .colorRes(R.color.md_green_800)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply{
+                    icon = GoogleMaterial.Icon.gmd_map
+                    colorRes = R.color.md_green_800
+                    sizeDp = 24
+                },null, null, null)
         zoom_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_zoom_in)
-                        .colorRes(R.color.md_black_1000)
-                        .sizeDp(24),null, null, null)
-        addTagFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_tag)
-                .colorRes(R.color.md_black_1000)
-                .sizeDp(24))
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_zoom_in
+                    colorRes = R.color.md_black_1000
+                    sizeDp = 24
+                },null, null, null)
+        addTagFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_tag
+            colorRes = R.color.md_black_1000
+            sizeDp = 24
+        })
     }
 
     override fun submitData(){

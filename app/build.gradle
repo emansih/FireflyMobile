@@ -138,6 +138,7 @@ dependencies {
     kapt Dependencies.glideCompiler
 
     implementation Dependencies.materialDrawer
+    implementation Dependencies.materialDrawerIconics
     implementation Dependencies.iconics
     implementation Dependencies.googleMaterialIcons
     implementation Dependencies.fontAwesome

@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.5.3")
+        classpath("com.android.tools.build:gradle:4.0.0")
         classpath(kotlin("gradle-plugin", Dependencies.kotlinVersion))
         classpath("com.akaita.android:easylauncher:1.3.1")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.20.0")

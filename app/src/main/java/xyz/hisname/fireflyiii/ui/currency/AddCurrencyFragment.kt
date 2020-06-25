@@ -56,22 +56,27 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     }
 
     override fun setIcons(){
-        decimal_places_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_dot_circle)
-                .colorRes(R.color.md_amber_500)
-                .sizeDp(24),null, null, null)
-        symbol_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_euro_symbol)
-                .colorRes(R.color.md_pink_800)
-                .sizeDp(24),null, null, null)
-        code_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext())
-                .icon(GoogleMaterial.Icon.gmd_code)
-                .colorRes(R.color.md_deep_purple_400)
-                .sizeDp(24),null, null, null)
-        addCurrencyFab.setBackgroundColor(getCompatColor( R.color.primary_dark))
-        addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_money_bill)
-                .colorRes(R.color.md_black_1000)
-                .sizeDp(24))
+        decimal_places_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_dot_circle
+            colorRes = R.color.md_amber_500
+            sizeDp = 24
+        },null, null, null)
+        symbol_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_euro_symbol
+            colorRes = R.color.md_pink_800
+            sizeDp = 24
+        },null, null, null)
+        code_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_code
+            colorRes = R.color.md_deep_purple_400
+            sizeDp = 24
+        },null, null, null)
+        addCurrencyFab.setBackgroundColor(getCompatColor( R.color.colorPrimaryDark))
+        addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_money_bill
+            colorRes = R.color.md_black_1000
+            sizeDp = 24
+        })
     }
 
     override fun setWidgets(){

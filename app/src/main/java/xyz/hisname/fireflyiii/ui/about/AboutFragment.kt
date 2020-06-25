@@ -58,16 +58,25 @@ class AboutFragment: MaterialAboutFragment() {
         appCardBuilder.addItem(ConvenienceBuilder.createAppTitleItem(getString(R.string.app_name),
                 getCompatDrawable(R.drawable.ic_piggy_bank)))
                 .addItem(ConvenienceBuilder.createVersionActionItem(requireContext(),
-                        IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_phone).sizeDp(24),
+                        IconicsDrawable(requireContext()).apply {
+                            icon = GoogleMaterial.Icon.gmd_phone
+                            sizeDp = 24
+                        },
                 resources.getString(R.string.mobile_version),false)).addItem(MaterialAboutActionItem.Builder()
                         .text(resources.getString(R.string.server_version))
                         .subText(serverVersion)
-                        .icon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_server).sizeDp(24))
+                        .icon(IconicsDrawable(requireContext()).apply{
+                            icon = FontAwesome.Icon.faw_server
+                            sizeDp = 24
+                        })
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text(resources.getString(R.string.api_version))
                         .subText(apiVersion)
-                        .icon(IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_globe).sizeDp(24))
+                        .icon(IconicsDrawable(requireContext()).apply {
+                            icon = FontAwesome.Icon.faw_globe
+                            sizeDp = 24
+                        })
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text(resources.getString(R.string.operating_system))
@@ -80,13 +89,19 @@ class AboutFragment: MaterialAboutFragment() {
         authorCardBuilder.addItem(MaterialAboutActionItem.Builder()
                 .text("Daniel Quah")
                 .subText("emansih")
-                .icon(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_perm_identity).sizeDp(24))
+                .icon(IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_perm_identity
+                    sizeDp = 24
+                })
                 .setOnClickAction {
                     requireContext().startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/emansih".toUri()))
                 }.build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text(resources.getString(R.string.view_on_github))
-                        .icon(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_link).sizeDp(24))
+                        .icon(IconicsDrawable(requireContext()).apply {
+                            icon = GoogleMaterial.Icon.gmd_link
+                            sizeDp = 24
+                        })
                         .setOnClickAction {
                             requireContext().startActivity(Intent(Intent.ACTION_VIEW, "https://github.com/emansih/FireflyMobile".toUri()))
                         }.build())
@@ -96,11 +111,11 @@ class AboutFragment: MaterialAboutFragment() {
     // Because why not?
     private fun setUserOsIcon(): Drawable?{
         return when {
-            userOs.toLowerCase().contains("windows") -> IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_windows)
-            userOs.toLowerCase().contains("linux") -> IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_linux)
+            userOs.toLowerCase().contains("windows") -> IconicsDrawable(requireContext(),FontAwesome.Icon.faw_windows)
+            userOs.toLowerCase().contains("linux") -> IconicsDrawable(requireContext(), FontAwesome.Icon.faw_linux)
             userOs.toLowerCase().contains("bsd") -> // yea... this is freebsd icon. sorry other BSDs
-                IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_freebsd)
-            else -> IconicsDrawable(requireContext()).icon(FontAwesome.Icon.faw_server)
+                IconicsDrawable(requireContext(), FontAwesome.Icon.faw_freebsd)
+            else -> IconicsDrawable(requireContext(), FontAwesome.Icon.faw_server)
         }
     }
 
@@ -110,7 +125,7 @@ class AboutFragment: MaterialAboutFragment() {
     }
 
     private fun handleBack() {
-        globalViewModel.backPress.observe(this, Observer { backPressValue ->
+        globalViewModel.backPress.observe(viewLifecycleOwner, Observer { backPressValue ->
             if(backPressValue == true) {
                 parentFragmentManager.popBackStack()
             }

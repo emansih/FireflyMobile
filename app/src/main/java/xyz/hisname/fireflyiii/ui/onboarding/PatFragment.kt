@@ -141,11 +141,15 @@ class PatFragment: Fragment() {
 
     private fun setWidgets(){
         firefly_url_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_link)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_link
+                    sizeDp = 24
+                },null, null, null)
         firefly_access_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_lock)
-                        .sizeDp(24),null, null, null)
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_lock
+                    sizeDp = 24
+                },null, null, null)
         self_signed_checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
             AppPref(sharedPref).isCustomCa = isChecked
             if(isChecked){

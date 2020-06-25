@@ -163,22 +163,26 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setIcon(){
-        balanceIcon.setImageDrawable(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_balance_scale)
-                .colorRes(R.color.white)
-                .sizeDp(32))
-        billsIcon.setImageDrawable(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_calendar)
-                .colorRes(R.color.white)
-                .sizeDp(32))
-        leftToSpendIcon.setImageDrawable(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_money_bill)
-                .colorRes(R.color.white)
-                .sizeDp(32))
-        networthIcon.setImageDrawable(IconicsDrawable(requireContext())
-                .icon(FontAwesome.Icon.faw_chart_line)
-                .colorRes(R.color.white)
-                .sizeDp(32))
+        balanceIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_balance_scale
+            colorRes = R.color.md_white_1000
+            sizeDp = 32
+        })
+        billsIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_calendar
+            colorRes =R.color.md_white_1000
+            sizeDp = 32
+        })
+        leftToSpendIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_money_bill
+            colorRes = R.color.md_white_1000
+            sizeDp = 32
+        })
+        networthIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = FontAwesome.Icon.faw_chart_line
+            colorRes = R.color.md_white_1000
+            sizeDp = 32
+        })
     }
 
     private fun getTransactionData(currencyData: CurrencyAttributes?){
@@ -392,15 +396,15 @@ class DashboardFragment: BaseFragment() {
     private fun changeTheme(){
         if (isDarkMode()){
             netEarningsExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
-            netEarningsChart.legend.textColor = getCompatColor(R.color.white)
-            netEarningsChart.axisLeft.textColor = getCompatColor(R.color.white)
-            netEarningsChart.axisRight.textColor = getCompatColor(R.color.white)
-            netEarningsChart.xAxis.textColor = getCompatColor(R.color.white)
+            netEarningsChart.legend.textColor = getCompatColor(R.color.md_white_1000)
+            netEarningsChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
+            netEarningsChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
+            netEarningsChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
             dailySummaryExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
-            dailySummaryChart.legend.textColor = getCompatColor(R.color.white)
-            dailySummaryChart.axisLeft.textColor = getCompatColor(R.color.white)
-            dailySummaryChart.axisRight.textColor = getCompatColor(R.color.white)
-            dailySummaryChart.xAxis.textColor = getCompatColor(R.color.white)
+            dailySummaryChart.legend.textColor = getCompatColor(R.color.md_white_1000)
+            dailySummaryChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
+            dailySummaryChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
+            dailySummaryChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
             budgetExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
         }
     }
