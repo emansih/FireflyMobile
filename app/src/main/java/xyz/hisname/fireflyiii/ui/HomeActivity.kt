@@ -315,7 +315,6 @@ class HomeActivity: BaseActivity(){
 
         val piggyBank = PrimaryDrawerItem().apply {
             nameRes = R.string.piggy_bank
-            level = 4
             identifier = 15
             selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_bullseye).apply {
                 sizeDp = 24
@@ -327,7 +326,6 @@ class HomeActivity: BaseActivity(){
         }
         val bills = PrimaryDrawerItem().apply {
             nameRes = R.string.bill
-            level = 4
             selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_calendar).apply {
                 sizeDp = 24
                 colorRes = R.color.md_pink_800
