@@ -15,7 +15,7 @@ class LanguageChanger(baseContext: Context): ContextWrapper(baseContext){
 
         private lateinit var locale: Locale
         private lateinit var config: Configuration
-        private val supportedLocale by lazy { arrayListOf("en", "de", "es", "fr", "it", "nl", "ru", "zh-rCN", "zh-rTW") }
+        private val supportedLocale by lazy { arrayListOf("en", "de", "es", "fr", "it", "nl", "ru", "zh-rCN", "zh-rTW", "pt-rBR") }
 
         // Code adapted from: https://stackoverflow.com/questions/40221711/android-context-getresources-updateconfiguration-deprecated
 
@@ -26,6 +26,7 @@ class LanguageChanger(baseContext: Context): ContextWrapper(baseContext){
                     language.isNullOrEmpty() -> Locale("en")
                     language == "zh-rCN" -> Locale("zh", "CN")
                     language == "zh-rTW" -> Locale("zh", "TW")
+                    language == "pt-rBR" -> Locale("pt", "BR")
                     else -> Locale(language)
                 }
             } else {

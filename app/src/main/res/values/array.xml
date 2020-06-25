@@ -32,6 +32,7 @@
         <item>Nederlands</item>
         <item>Español </item>
         <item>Русский</item>
+        <item>Português do Brasil</item>
     </string-array>
 
     <string-array name="language_values">
@@ -44,6 +45,7 @@
         <item>nl</item>
         <item>es</item>
         <item>ru</item>
+        <item>pt-rBR</item>
     </string-array>
 
 </resources>
