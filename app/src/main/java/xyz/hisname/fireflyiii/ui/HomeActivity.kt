@@ -298,6 +298,12 @@ class HomeActivity: BaseActivity(){
             icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
                 sizeDp = 24
             })
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_exchange_alt).apply {
+                sizeDp = 24
+                colorRes = R.color.md_amber_600
+            })
+            isIconTinted = true
+            isSelectable = false
             withSubItems(SecondaryDrawerItem().apply {
                 nameRes = R.string.withdrawal
                 level = 3
@@ -320,6 +326,7 @@ class HomeActivity: BaseActivity(){
                 sizeDp = 24
                 colorRes = R.color.md_red_500
             })
+            isIconTinted = true
             icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_bullseye).apply {
                 sizeDp = 24
             })
