@@ -6,6 +6,7 @@ import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.CURRENCY_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
+import xyz.hisname.fireflyiii.repository.models.currency.DefaultCurrencyModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/currency.html
 interface CurrencyService {
@@ -13,9 +14,8 @@ interface CurrencyService {
     @GET(CURRENCY_API_ENDPOINT)
     suspend fun getSuspendedPaginatedCurrency(@Query("page") page: Int): Response<CurrencyModel>
 
-    @Deprecated("Use suspend instead")
-    @GET(CURRENCY_API_ENDPOINT)
-    fun getPaginatedCurrency(@Query("page") page: Int): Call<CurrencyModel>
+    @GET("$CURRENCY_API_ENDPOINT/default")
+    suspend fun getDefaultCurrency(): Response<DefaultCurrencyModel>
 
     @GET("$CURRENCY_API_ENDPOINT/{id}")
     fun getCurrencyById(@Path("id") id: String)
