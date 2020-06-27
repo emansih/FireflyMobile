@@ -12,12 +12,7 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
-import okhttp3.ResponseBody
 import java.io.*
-import java.math.BigInteger
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-
 
 // https://gist.github.com/micer/ae5de2984dbbdb386dd262782cfdb39c
 class FileUtils {
@@ -137,51 +132,6 @@ class FileUtils {
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(
                         fileExtension.toLowerCase())
             }
-        }
-
-        fun writeResponseToDisk(body: ResponseBody, fileName: String, context: Context): Boolean {
-            if(!createDirIfNotExists(context)){
-                return false
-            }
-            try {
-                var inputStream: InputStream? = null
-                var outputStream: OutputStream? = null
-
-                try {
-                    val fileReader = ByteArray(4096)
-                    var fileSizeDownloaded: Long = 0
-                    inputStream = body.byteStream()
-                    outputStream = FileOutputStream("${FileUtils().folderDirectory(context)}/$fileName")
-                    while (true) {
-                        val read = inputStream.read(fileReader)
-                        if (read == -1) {
-                            break
-                        }
-                        outputStream.write(fileReader, 0, read)
-                        fileSizeDownloaded += read.toLong()
-                    }
-
-                    outputStream.flush()
-                    return true
-                } catch (e: IOException) {
-                    return false
-                } finally {
-                    inputStream?.close()
-                    outputStream?.close()
-                }
-            } catch (e: IOException) {
-                return false
-            }
-        }
-
-        private fun createDirIfNotExists(context: Context): Boolean{
-            var ret = true
-            if(!FileUtils().folderDirectory(context).exists()){
-                if(!FileUtils().folderDirectory(context).mkdir()){
-                    ret = false
-                }
-            }
-            return ret
         }
 
         private fun Uri?.isMediaDocument(): Boolean {
