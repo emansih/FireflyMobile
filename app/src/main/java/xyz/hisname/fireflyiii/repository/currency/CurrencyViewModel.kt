@@ -11,6 +11,7 @@ import retrofit2.Response
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
@@ -150,6 +151,14 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun getDefaultCurrency(): LiveData<MutableList<CurrencyData>>{
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         var currencyData: MutableList<CurrencyData> = arrayListOf()
+        genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.enqueue(retrofitCallback({ response ->
+            val systemData = response.body()?.systemData
+            if (systemData != null) {
+                AppPref(sharedPref).serverVersion = systemData.version
+                AppPref(sharedPref).remoteApiVersion = systemData.api_version
+            }
+        })
+        { throwable -> })
         val fireflyVersionNumber = AppPref(sharedPref).serverVersion
         var versionNumbering = try {
             Version(fireflyVersionNumber).compareTo(Version("5.3.0"))
