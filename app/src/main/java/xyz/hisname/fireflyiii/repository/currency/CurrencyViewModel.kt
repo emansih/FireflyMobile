@@ -151,7 +151,15 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         var currencyData: MutableList<CurrencyData> = arrayListOf()
         val fireflyVersionNumber = AppPref(sharedPref).serverVersion
-        val versionNumbering = Version(fireflyVersionNumber).compareTo(Version("5.3.0"))
+        var versionNumbering = try {
+            Version(fireflyVersionNumber).compareTo(Version("5.3.0"))
+        } catch (exception: Exception){
+            if(fireflyVersionNumber.contentEquals("5.3.0-alpha.1")){
+                -1
+            } else {
+                1
+            }
+        }
         viewModelScope.launch(Dispatchers.IO){
             if(versionNumbering == -1){
                 repository.loadAllData()
