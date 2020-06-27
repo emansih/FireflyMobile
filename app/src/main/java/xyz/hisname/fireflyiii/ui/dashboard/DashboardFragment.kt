@@ -13,6 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -376,15 +378,15 @@ class DashboardFragment: BaseFragment() {
             if(!budgetLeftPercentage.isNaN()) {
                 when {
                     budgetLeftPercentage.roundToInt() >= 80 -> {
-                        progressDrawable.setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN)
+                        progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.RED, BlendModeCompat.SRC_ATOP)
                         budgetProgress.progressDrawable = progressDrawable
                     }
                     budgetLeftPercentage.roundToInt() in 50..80 -> {
-                        progressDrawable.setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN)
+                        progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.YELLOW, BlendModeCompat.SRC_ATOP)
                         budgetProgress.progressDrawable = progressDrawable
                     }
                     else -> {
-                        progressDrawable.setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN)
+                        progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GREEN, BlendModeCompat.SRC_ATOP)
                         budgetProgress.progressDrawable = progressDrawable
                     }
                 }
