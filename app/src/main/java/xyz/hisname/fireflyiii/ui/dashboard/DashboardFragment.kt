@@ -360,13 +360,14 @@ class DashboardFragment: BaseFragment() {
                 iconsOffset = MPPointF(0f, 40f)
                 colors = dataColor
                 valueTextSize = 15f
-                valueFormatter = PercentFormatter()
+                valueFormatter = PercentFormatter(budgetChart)
             }
             budgetAmount.text = currencyData?.symbol + budgeted
             spentAmount.text = currencyData?.symbol + budgetSpent
             budgetChart.setData {
                 data = PieData(dataSet)
-                description.text = "Budget Percentage"
+                description.isEnabled = false
+                setUsePercentValues(true)
                 setOnClickListener {
                     parentFragmentManager.commit {
                         replace(R.id.fragment_container, BudgetSummaryFragment())
