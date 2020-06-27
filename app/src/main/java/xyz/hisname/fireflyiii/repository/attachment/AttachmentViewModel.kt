@@ -11,7 +11,6 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.util.FileUtils
-import xyz.hisname.fireflyiii.util.checkMd5Hash
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.util.openFile
@@ -29,36 +28,32 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
         val fileName = attachmentData.attachmentAttributes?.filename ?: ""
         isLoading.value = true
         val fileToOpen = File("${FileUtils().folderDirectory(getApplication())}/$fileName")
-        // Check file integrity before opening
-        if(fileToOpen.checkMd5Hash(attachmentData.attachmentAttributes?.md5 ?: "")){
-            viewModelContext.openFile(fileName)
-            isDownloaded.value = true
-            isLoading.value = false
-        } else {
-            if(fileToOpen.exists()){
-                fileToOpen.delete()
-            }
-            attachmentService?.downloadFile(fileDownloadUrl)?.enqueue(retrofitCallback({ downloadResponse ->
-                val fileResponse = downloadResponse.body()
-                if (fileResponse != null) {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        FileUtils.writeResponseToDisk(fileResponse, fileName, getApplication())
-                    }.invokeOnCompletion {
-                        isDownloaded.postValue(true)
-                        isLoading.postValue(false)
-                        viewModelContext.openFile(fileName)
-                    }
-                } else {
-                    isLoading.value = false
-                    isDownloaded.value = false
-                }
-            })
-            { throwable ->
-                isDownloaded.value = false
-                isLoading.value = false
-                apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-            })
+        viewModelContext.openFile(fileName)
+        isDownloaded.value = true
+        isLoading.value = false
+        if(fileToOpen.exists()){
+            fileToOpen.delete()
         }
+        attachmentService?.downloadFile(fileDownloadUrl)?.enqueue(retrofitCallback({ downloadResponse ->
+            val fileResponse = downloadResponse.body()
+            if (fileResponse != null) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    FileUtils.writeResponseToDisk(fileResponse, fileName, getApplication())
+                }.invokeOnCompletion {
+                    isDownloaded.postValue(true)
+                    isLoading.postValue(false)
+                    viewModelContext.openFile(fileName)
+                }
+            } else {
+                isLoading.value = false
+                isDownloaded.value = false
+            }
+        })
+        { throwable ->
+            isDownloaded.value = false
+            isLoading.value = false
+            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
+        })
         return isDownloaded
     }
 }

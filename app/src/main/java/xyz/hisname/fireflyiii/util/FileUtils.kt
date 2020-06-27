@@ -219,35 +219,6 @@ class FileUtils {
     }
 }
 
-// https://github.com/CyanogenMod/android_packages_apps_CMUpdater/blob/5ca1160572df1bab60e271e2f6cfde03d452ffa1/src/com/cyanogenmod/updater/utils/MD5.java
-fun File.checkMd5Hash(md5Hash: String): Boolean{
-    val digest = try {
-        MessageDigest.getInstance("MD5")
-    } catch (e: NoSuchAlgorithmException){
-        return false
-    }
-    val inputStream = try {
-        FileInputStream(this)
-    } catch (e: FileNotFoundException){
-        return false
-    }
-    val buffer = ByteArray(8192)
-    val read = 0
-    return try {
-        while((inputStream.read(buffer)) > 0){
-            digest.update(buffer, 0, read)
-        }
-        val md5sum = digest.digest()
-        val bigInt = BigInteger(1, md5sum)
-        val output = String.format("%32s", bigInt.toString(16)).replace(' ', '0')
-        output.equals(md5Hash,  ignoreCase = true)
-    } catch (e: IOException){
-        false
-    } finally {
-        inputStream.close()
-    }
-}
-
 fun Context.openFile(fileName: String): Boolean{
     val fileToOpen = File("${FileUtils().folderDirectory(this)}/$fileName")
     return if(fileToOpen.exists() && !fileToOpen.isDirectory){
