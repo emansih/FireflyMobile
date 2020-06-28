@@ -1,17 +1,12 @@
 package xyz.hisname.fireflyiii
 
-import android.content.Context
-import androidx.preference.PreferenceManager
 import androidx.multidex.MultiDexApplication
-import com.jakewharton.threetenabp.AndroidThreeTen
 import org.acra.ACRA
 import org.acra.ReportField
 import org.acra.annotation.AcraCore
 import org.acra.annotation.AcraMailSender
 import org.acra.data.StringFormat
 import org.acra.sender.EmailIntentSenderFactory
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.languagepack.LanguageChanger
 
 @AcraCore(reportFormat = StringFormat.KEY_VALUE_LIST,
         reportSenderFactoryClasses = [EmailIntentSenderFactory::class], buildConfigClass = BuildConfig::class,
@@ -29,15 +24,9 @@ class CustomApp: MultiDexApplication() {
 
     private fun newThread(){
         Thread(Runnable {
-            AndroidThreeTen.init(this)
             if(BuildConfig.DEBUG == false) {
                 ACRA.init(this)
             }
         }).start()
     }
-
-   /* override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LanguageChanger.init(newBase,
-                AppPref(PreferenceManager.getDefaultSharedPreferences(newBase)).languagePref))
-    }*/
 }

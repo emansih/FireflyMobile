@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.repository.models.transaction
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import org.threeten.bp.LocalDateTime
+import java.time.LocalDateTime
 
 @Entity(tableName = "transactionTable")
 data class Transactions(

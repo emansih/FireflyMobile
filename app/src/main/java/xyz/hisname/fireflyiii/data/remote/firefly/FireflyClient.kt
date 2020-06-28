@@ -4,7 +4,6 @@ import android.util.Base64
 import com.google.gson.*
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
-import org.threeten.bp.LocalDateTime
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -12,6 +11,7 @@ import xyz.hisname.fireflyiii.util.LocalDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
