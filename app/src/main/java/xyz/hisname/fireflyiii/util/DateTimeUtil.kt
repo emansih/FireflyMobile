@@ -6,9 +6,7 @@ import org.threeten.bp.format.TextStyle
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAdjusters.*
 import org.threeten.bp.temporal.WeekFields
-import org.threeten.bp.DateTimeUtils as ThreeTenBpUtils
 import java.lang.Long.parseLong
-import java.text.DateFormatSymbols
 import java.util.*
 
 object DateTimeUtil {
@@ -21,21 +19,21 @@ object DateTimeUtil {
     }
 
     fun getStartOfDayInCalendarToEpoch(calendarDate: String): String{
-        val startOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        val startOfDay = LocalDate.parse(calendarDate).atStartOfDay(ZoneId.of(ZoneId.systemDefault().id)).toEpochSecond()
         val startOfDayMilli = startOfDay.times(1000)
         return startOfDayMilli.toString()
     }
 
 
      /*
-     1 Day has 86400 seconds. (86400000 milliseconds)
-     So 1 second before midnight is considered a previous day
-     Start of day + 86400 - 1
+     * 1 Day has 86400 seconds. (86400000 milliseconds)
+     * So 1 second before midnight is considered a previous day
+     * Start of day + 86400 - 1
      */
     fun getEndOfDayInCalendarToEpoch(calendarDate: String): String{
-        val startOfDay = LocalDate.parse(calendarDate).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
-        val endOfDayMilli = ((startOfDay + 86400) * 1000) - 1
-        return endOfDayMilli.toString()
+         val startOfDay = LocalDate.parse(calendarDate).atStartOfDay(ZoneId.of(ZoneId.systemDefault().id)).toEpochSecond()
+         val endOfDayMilli = (startOfDay * 1000) + 86400000 - 1000
+         return endOfDayMilli.toString()
     }
 
 
