@@ -84,7 +84,7 @@ class DashboardFragment: BaseFragment() {
         billsCard.layoutParams.width = (getScreenWidth() - 425)
         leftToSpendCard.layoutParams.width = (getScreenWidth() - 425)
         networthCard.layoutParams.width = (getScreenWidth() - 425)
-        currencyVM.getDefaultCurrency().observe(this) { defaultCurrency ->
+        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             setSummary(currencyData?.code ?: "")
             setPieChart(currencyData)
