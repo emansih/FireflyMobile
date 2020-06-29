@@ -33,7 +33,8 @@ dependencies {
     implementation Dependencies.kotlinLib
     implementation Dependencies.appCompat
 
-    testImplementation Dependencies.jUnit
+    testImplementation Dependencies.jUnitApi
+    testRuntimeOnly Dependencies.junitEngine
     androidTestImplementation Dependencies.androidTest
     androidTestImplementation Dependencies.androidTestCore
     androidTestImplementation Dependencies.androidTestExt

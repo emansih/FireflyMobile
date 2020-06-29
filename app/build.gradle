@@ -162,7 +162,10 @@ dependencies {
     // Project Lib
     api project(path: ":languagepack")
 
-    testImplementation Dependencies.jUnit
+    testImplementation Dependencies.jUnitApi
+    testRuntimeOnly Dependencies.junitEngine
+    testImplementation Dependencies.jUnitParameter
+
     testImplementation Dependencies.mockWebServer
     androidTestImplementation Dependencies.testRunner
     androidTestUtil Dependencies.testOrchestrator
