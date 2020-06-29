@@ -20,12 +20,14 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.hideFab
 
 class ListBillFragment: BaseFragment() {
@@ -34,6 +36,7 @@ class ListBillFragment: BaseFragment() {
     private lateinit var scrollListener: EndlessRecyclerViewScrollListener
     private val billAdapter by lazy { BillsRecyclerAdapter(dataAdapter) { data: BillData -> itemClicked(data)}  }
     private val linearLayoutManager by lazy { LinearLayoutManager(requireContext()) }
+    private val billViewModel by lazy { getViewModel(BillsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

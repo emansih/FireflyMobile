@@ -24,6 +24,7 @@ import me.toptas.fancyshowcase.FancyShowCaseQueue
 import me.toptas.fancyshowcase.listener.DismissListener
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
@@ -40,6 +41,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private var currency: String = ""
     private val calendar by lazy { Calendar.getInstance() }
     private lateinit var queue: FancyShowCaseQueue
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

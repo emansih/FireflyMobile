@@ -14,13 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.hideFab
-import xyz.hisname.fireflyiii.util.extension.hideKeyboard
+import xyz.hisname.fireflyiii.util.extension.*
 
 class CurrencyListFragment: BaseFragment() {
 
@@ -29,6 +27,7 @@ class CurrencyListFragment: BaseFragment() {
         clickListener(data) }
     }
     private lateinit var scrollListener: EndlessRecyclerViewScrollListener
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

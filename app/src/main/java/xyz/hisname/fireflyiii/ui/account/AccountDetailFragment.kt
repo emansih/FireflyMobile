@@ -22,6 +22,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.fragment_account_detail.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
@@ -43,6 +44,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private var incomePieEntryArray = arrayListOf<PieEntry>()
     private var incomePieDataSet = PieDataSet(incomePieEntryArray, "")
     private val accountType  by lazy { arguments?.getString("accountType")  }
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
 
     private val coloring = arrayListOf<Int>()
 

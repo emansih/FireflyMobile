@@ -34,8 +34,10 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyAttributes
 import xyz.hisname.fireflyiii.repository.summary.SummaryViewModel
+import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.RecentTransactionFragment
@@ -51,9 +53,11 @@ import kotlin.math.withSign
 // TODO: Refactor this god class (7 Jan 2019)
 class DashboardFragment: BaseFragment() {
 
-    private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
-    private val summaryViewModel by lazy { getViewModel(SummaryViewModel::class.java) }
+    private val budgetLimit by lazy { getImprovedViewModel(BudgetViewModel::class.java) }
+    private val summaryViewModel by lazy { getImprovedViewModel(SummaryViewModel::class.java) }
     private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java)}
+    private val transactionVM by lazy { getImprovedViewModel(TransactionsViewModel::class.java) }
 
     private var depositSum = 0.0
     private var withdrawSum = 0.0
@@ -80,7 +84,7 @@ class DashboardFragment: BaseFragment() {
         billsCard.layoutParams.width = (getScreenWidth() - 425)
         leftToSpendCard.layoutParams.width = (getScreenWidth() - 425)
         networthCard.layoutParams.width = (getScreenWidth() - 425)
-        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
+        currencyVM.getDefaultCurrency().observe(this) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             setSummary(currencyData?.code ?: "")
             setPieChart(currencyData)
@@ -90,9 +94,6 @@ class DashboardFragment: BaseFragment() {
 
         animateCard(balanceCard, billsCard, netEarningsCard, dailySummaryCard,
                 leftToSpendCard, networthCard, recentTransactionCard, budgetCard)
-        currencyViewModel.apiResponse.observe(this){
-            toastInfo(it)
-        }
         setExtendedFab()
         parentFragmentManager.commit {
             replace(R.id.recentTransactionCard, RecentTransactionFragment())
@@ -189,30 +190,30 @@ class DashboardFragment: BaseFragment() {
 
     private fun getTransactionData(currencyData: CurrencyAttributes?){
         val currencyCode = currencyData?.code ?: ""
-        zipLiveData(zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), currencyCode), transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), currencyCode), transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
+        zipLiveData(zipLiveData(transactionVM.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+                DateTimeUtil.getEndOfMonth(), currencyCode), transactionVM.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
+                DateTimeUtil.getEndOfMonth(), currencyCode), transactionVM.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
                 DateTimeUtil.getEndOfMonth(1), currencyCode),
-                transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
-                        DateTimeUtil.getEndOfMonth(1), currencyCode), transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
+                transactionVM.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(1),
+                        DateTimeUtil.getEndOfMonth(1), currencyCode), transactionVM.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
                 DateTimeUtil.getEndOfMonth(2), currencyCode),
-                transactionViewModel.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
-                        DateTimeUtil.getEndOfMonth(2), currencyCode)), zipLiveData(transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                transactionVM.getDepositAmountWithCurrencyCode(DateTimeUtil.getStartOfMonth(2),
+                        DateTimeUtil.getEndOfMonth(2), currencyCode)), zipLiveData(transactionVM.getWithdrawalAmountWithCurrencyCode(
                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                transactionVM.getWithdrawalAmountWithCurrencyCode(
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 2), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                transactionVM.getWithdrawalAmountWithCurrencyCode(
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 3), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                transactionVM.getWithdrawalAmountWithCurrencyCode(
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 4), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                transactionVM.getWithdrawalAmountWithCurrencyCode(
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5), currencyCode),
-                transactionViewModel.getWithdrawalAmountWithCurrencyCode(
+                transactionVM.getWithdrawalAmountWithCurrencyCode(
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode))).observe(this) { transactionData ->
             setNetIncome(currencyData?.symbol ?: "", transactionData.first)
@@ -334,7 +335,7 @@ class DashboardFragment: BaseFragment() {
             animateY(1000)
             setTouchEnabled(true)
         }
-        transactionViewModel.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
+        transactionVM.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
                 DateTimeUtil.getTodayDate(), currencyCode).observe(this){ transaction ->
             thirtyDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(
                     transaction.div(30), requireContext())

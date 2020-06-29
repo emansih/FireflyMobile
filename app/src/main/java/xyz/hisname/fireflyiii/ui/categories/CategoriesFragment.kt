@@ -16,14 +16,13 @@ import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.extension.create
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
+import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
-import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.hideFab
+import xyz.hisname.fireflyiii.util.extension.*
 
 
 class CategoriesFragment: BaseFragment() {
@@ -31,6 +30,7 @@ class CategoriesFragment: BaseFragment() {
     private lateinit var scrollListener: EndlessRecyclerViewScrollListener
     private val catData by lazy { arrayListOf<CategoryData>() }
     private val catAdapter by lazy { CategoriesRecyclerAdapter(catData) { data: CategoryData -> }  }
+    private val categoryViewModel by lazy { getImprovedViewModel(CategoryViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

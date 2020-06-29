@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction_v1.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.DateRangeViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
@@ -35,6 +36,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             com.mikepenz.materialdrawer.R.string.material_drawer_close) }
     private val layoutManager by lazy { LinearLayoutManager(requireContext()) }
     private val dateRangeVm by lazy { getViewModel(DateRangeViewModel::class.java) }
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

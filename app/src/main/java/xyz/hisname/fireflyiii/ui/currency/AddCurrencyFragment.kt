@@ -13,6 +13,7 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_currency.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -20,6 +21,7 @@ import xyz.hisname.fireflyiii.util.extension.*
 class AddCurrencyFragment: BaseAddObjectFragment() {
 
     private val currencyId by lazy { arguments?.getLong("currencyId") ?: 0L }
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)

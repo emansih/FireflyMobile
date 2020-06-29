@@ -5,12 +5,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import xyz.hisname.fireflyiii.util.Sixple
 
+// Fragment's View Model should not hold references to activity unless necessary(communication between 2 fragments)
 internal fun <T: ViewModel> Fragment.getViewModel(modelClass: Class<T>, viewModelFactory: ViewModelProvider.Factory? = null): T {
     return viewModelFactory?.let { ViewModelProvider(requireActivity(), it).get(modelClass) } ?:
     ViewModelProvider(requireActivity()).get(modelClass)
 }
 
 internal fun <T: ViewModel> AppCompatActivity.getViewModel(modelClass: Class<T>, viewModelFactory: ViewModelProvider.Factory? = null): T{
+    return viewModelFactory?.let { ViewModelProvider(this, it).get(modelClass) } ?:
+    ViewModelProvider(this).get(modelClass)
+}
+
+internal fun <T: ViewModel> Fragment.getImprovedViewModel(modelClass: Class<T>, viewModelFactory: ViewModelProvider.Factory? = null): T {
     return viewModelFactory?.let { ViewModelProvider(this, it).get(modelClass) } ?:
     ViewModelProvider(this).get(modelClass)
 }

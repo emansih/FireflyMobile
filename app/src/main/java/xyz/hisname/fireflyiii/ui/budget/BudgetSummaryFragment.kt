@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_budget_summary.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionByBudgetDialogFragment
@@ -37,6 +38,7 @@ class BudgetSummaryFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
     private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
     private val coloring = arrayListOf<Int>()
     private var budgetSpent = 0f
     private var budgeted = 0f

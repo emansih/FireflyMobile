@@ -39,6 +39,9 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
+import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
+import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -62,6 +65,9 @@ class AddTransactionFragment: BaseFragment() {
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
+    private val budgetViewModel by lazy { getImprovedViewModel(BudgetViewModel::class.java) }
+    private val categoryViewModel by lazy { getImprovedViewModel(CategoryViewModel::class.java) }
     private var fileUri: Uri? = null
     private var currency = ""
     private var tags = ArrayList<String>()

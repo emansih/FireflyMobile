@@ -23,14 +23,9 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
-import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
-import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
-import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -43,16 +38,12 @@ abstract class BaseFragment: Fragment() {
     protected val fragmentContainer by bindView<FrameLayout>(R.id.fragment_container)
     protected val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
     protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
-    protected val billViewModel: BillsViewModel by lazy { getViewModel(BillsViewModel::class.java) }
-    protected val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
-    protected val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
+    // Remove viewModels
     protected val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     protected val piggyViewModel by lazy { getViewModel(PiggyViewModel::class.java) }
-    protected val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     protected val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     protected val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
-    protected val userApiVersion by lazy { getViewModel(UserInfoViewModel::class.java).userApiVersion() }
     protected  val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
     private var parentJob = Job()
     private val coroutineContext: CoroutineContext
