@@ -40,9 +40,10 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful != false) {
                 authStatus.postValue(true)
+                responseApi.postValue("success")
             } else {
                 authStatus.postValue(false)
-                responseApi.setValue("There was an issue communicating with your server")
+                responseApi.postValue("There was an issue communicating with your server")
             }
         } catch (exception: Exception) {
             if(exception.cause is CertificateException){

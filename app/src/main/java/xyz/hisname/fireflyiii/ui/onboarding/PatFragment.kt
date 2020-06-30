@@ -62,9 +62,9 @@ class PatFragment: Fragment() {
             } else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 patViewModel.authenticate(cert_path.text.toString().toUri(), firefly_access_edittext.getString(),
-                        firefly_url_edittext.getString()).observe(this) { auth ->
+                        firefly_url_edittext.getString()).observe(this) { message ->
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                    if (auth) {
+                    if (message.contentEquals("success")) {
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
                         requireActivity().supportFragmentManager.beginTransaction()
@@ -73,11 +73,7 @@ class PatFragment: Fragment() {
                                 .commit()
                         toastSuccess(resources.getString(R.string.welcome))
                     } else {
-                        patViewModel.apiResponse.observe(this) { message ->
-                            if (message != null) {
-                                toastError(message)
-                            }
-                        }
+                        toastError(message)
                     }
                 }
             }

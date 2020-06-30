@@ -22,11 +22,12 @@ class PatViewModel(application: Application): BaseViewModel(application) {
     private val applicationContext = getApplication<Application>()
     private val accountManager by lazy { AccountManager.get(applicationContext) }
     private val accountDao by lazy { AppDatabase.getInstance(applicationContext).accountDataDao() }
-    private val accountsService by lazy { genericService()?.create(AccountsService::class.java)  }
-    private val repository by lazy { AccountRepository(accountDao, accountsService) }
+    private var accountsService: AccountsService? = null
+    private lateinit var repository: AccountRepository
+
     fun getFilePath(fileUri: Uri?) = FileUtils.getPathFromUri(applicationContext, fileUri ?: Uri.EMPTY)
 
-    fun authenticate(fileUri: Uri?, accessToken: String, baseUrl: String): LiveData<Boolean> {
+    fun authenticate(fileUri: Uri?, accessToken: String, baseUrl: String): LiveData<String> {
         if(fileUri != null && fileUri.toString().isNotBlank()) {
             FileUtils.copyFile(File(FileUtils.getPathFromUri(applicationContext, fileUri)),
                     File(applicationContext.filesDir.path + "/user_custom.pem"))
@@ -37,23 +38,25 @@ class PatViewModel(application: Application): BaseViewModel(application) {
             }
         }
         authInit(accessToken, baseUrl)
+        repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){
             repository.authViaPat()
         }.invokeOnCompletion {
-            apiResponse.postValue(repository.responseApi.value)
             if(repository.authStatus.value == true){
                 AuthenticatorManager(accountManager).authMethod = "pat"
             }
         }
-        return repository.authStatus
+        return repository.responseApi
     }
 
     private fun authInit(accessToken: String, baseUrl: String){
         FireflyClient.destroyInstance()
+        accountsService = null
         AuthenticatorManager(accountManager).destroyAccount()
         AuthenticatorManager(accountManager).initializeAccount()
         AuthenticatorManager(accountManager).accessToken = accessToken.trim()
         AppPref(sharedPref).baseUrl = baseUrl
+        accountsService = genericService()?.create(AccountsService::class.java)
     }
 
 }
