@@ -15,7 +15,6 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.util.FileUtils
-import java.io.File
 
 class PatViewModel(application: Application): BaseViewModel(application) {
 
@@ -29,12 +28,10 @@ class PatViewModel(application: Application): BaseViewModel(application) {
 
     fun authenticate(fileUri: Uri?, accessToken: String, baseUrl: String): LiveData<String> {
         if(fileUri != null && fileUri.toString().isNotBlank()) {
-            FileUtils.copyFile(File(FileUtils.getPathFromUri(applicationContext, fileUri)),
-                    File(applicationContext.filesDir.path + "/user_custom.pem"))
-            val filePath = FileUtils.getPathFromUri(getApplication(), fileUri)
-            val file = FileUtils.readFileContent(File(filePath))
-            if (file.isBlank()) {
-                apiResponse.postValue("Certificate file is empty. Continuing anyway...")
+            try {
+                FileUtils.saveCaFile(fileUri, applicationContext)
+            } catch (e: Exception){
+                apiResponse.postValue(e.localizedMessage)
             }
         }
         authInit(accessToken, baseUrl)

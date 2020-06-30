@@ -11,6 +11,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import java.io.*
 
@@ -40,6 +41,23 @@ class FileUtils {
                 br.close()
             } catch (e: IOException) { }
             return fileContent.toString()
+        }
+
+        @Throws(IOException::class)
+        fun saveCaFile(fileUri: Uri, context: Context){
+            val filePath = ("file://$fileUri").toUri().toFile()
+            val fileDestination = "user_custom.pem"
+            if(readFileContent(filePath).isBlank()){
+                throw IOException("Your CA File is empty!")
+            }
+            val br = BufferedReader(FileReader(filePath))
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                context.openFileOutput(fileDestination, Context.MODE_PRIVATE).use {
+                    it.write(line?.toByteArray())
+                }
+            }
+            br.close()
         }
 
         fun getPathFromUri(context: Context, uri: Uri): String? {
