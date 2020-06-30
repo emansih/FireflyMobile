@@ -42,7 +42,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        piggyViewModel.getPiggyById(piggyId).observe(this) {
+        piggyViewModel.getPiggyById(piggyId).observe(viewLifecycleOwner) {
             piggyAttribute = it[0].piggyAttributes
             piggyName = piggyAttribute?.name
             currentAmount = piggyAttribute?.current_amount
@@ -53,7 +53,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
             setupProgressBar()
         }
         // TODO: Remove this dirty hack. globalViewModel and scope should be private!
-        globalViewModel.backPress.observe(this){ backPressValue ->
+        globalViewModel.backPress.observe(viewLifecycleOwner){ backPressValue ->
             if(backPressValue == true) {
                 scope.launch(Dispatchers.Main) {
                     handleBack()
@@ -113,7 +113,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 .setMessage(resources.getString(R.string.delete_piggy_bank_message, piggyName))
                 .setPositiveButton(R.string.delete_permanently) { dialog, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    piggyViewModel.deletePiggyById(piggyId).observe(this) {
+                    piggyViewModel.deletePiggyById(piggyId).observe(viewLifecycleOwner) {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if(it){
                             parentFragmentManager.popBackStack()

@@ -57,7 +57,7 @@ class BudgetSummaryFragment: BaseFragment() {
             coloring.add(col)
         }
         budgetSummaryPieChart.isDrawHoleEnabled = false
-        currencyViewModel.getDefaultCurrency().observe(this) { currency ->
+        currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { currency ->
             retrieveData(currency[0])
             setBudgetSummary(currency[0])
         }
@@ -70,13 +70,13 @@ class BudgetSummaryFragment: BaseFragment() {
                 transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), currencyCode, "withdrawal")),
                 zipLiveData(budgetLimit.retrieveSpentBudget(currencyData.currencyAttributes?.code ?: ""),
-                        budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(this) { fireflyData ->
+                        budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(viewLifecycleOwner) { fireflyData ->
             if(fireflyData.first.second.isNotEmpty()) {
                 val pieEntryArray: ArrayList<PieEntry> = ArrayList(fireflyData.first.second.size)
                 fireflyData.first.second.forEachIndexed { _, uniqueBudget ->
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), currencyCode,
-                            "withdrawal", uniqueBudget).observe(this) { transactionAmount ->
+                            "withdrawal", uniqueBudget).observe(viewLifecycleOwner) { transactionAmount ->
                         val percentageCategory = transactionAmount.absoluteValue.roundToInt()
                                 .toDouble()
                                 .div(fireflyData.first.first.absoluteValue.roundToInt().toDouble())

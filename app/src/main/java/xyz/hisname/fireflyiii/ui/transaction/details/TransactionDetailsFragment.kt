@@ -77,7 +77,7 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun retrieveData(){
-        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(this){ transactionData ->
+        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(viewLifecycleOwner){ transactionData ->
             setTransactionInfo(transactionData)
             setMetaInfo(transactionData)
         }
@@ -213,8 +213,8 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun downloadAttachment(journalId: Long){
-        transactionViewModel.getTransactionAttachment(journalId).observe(this) { attachment ->
-            transactionViewModel.isLoading.observe(this){ loading ->
+        transactionViewModel.getTransactionAttachment(journalId).observe(viewLifecycleOwner) { attachment ->
+            transactionViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
                 if (!loading && attachment.isNotEmpty()) {
                     attachment_information_card.isVisible = true
                     attachmentDataAdapter = ArrayList(attachment)
@@ -235,8 +235,8 @@ class TransactionDetailsFragment: BaseFragment() {
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
         } else {
             val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-            attachmentViewModel.downloadAttachment(attachmentData).observe(this) { isDownloaded ->
-                attachmentViewModel.isLoading.observe(this) { isLoading ->
+            attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { isDownloaded ->
+                attachmentViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
                     if (!isDownloaded && !isLoading) {
                         toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                     }
@@ -250,7 +250,7 @@ class TransactionDetailsFragment: BaseFragment() {
                 }
             }
 
-            attachmentViewModel.progressListener.observe(this){ loadingPercent ->
+            attachmentViewModel.progressListener.observe(viewLifecycleOwner){ loadingPercent ->
                 if(loadingPercent != 100){
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
                 } else {

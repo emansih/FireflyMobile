@@ -50,7 +50,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         swipeContainer.isRefreshing = true
         setRecyclerView()
         transactionViewModel.getTransactionList(null, null,
-                transactionType,1).observe(this) { transactionList ->
+                transactionType,1).observe(viewLifecycleOwner) { transactionList ->
             dataAdapter.clear()
             dataAdapter.addAll(transactionList)
             rtAdapter.update(transactionList)
@@ -71,7 +71,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     private fun setTransactionCard(){
         runLayoutAnimation(slider.recyclerView)
-        currencyViewModel.getDefaultCurrency().observe(this) { currencyData ->
+        currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { currencyData ->
             val currencyName = currencyData[0].currencyAttributes?.code ?: ""
             val currencySymbol = currencyData[0].currencyAttributes?.symbol ?: ""
             zipLiveData(transactionViewModel.getTotalTransactionAmountAndFreqByDateAndCurrency(
@@ -90,7 +90,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
                             currencyName, transactionType, currencySymbol),
                     transactionViewModel.getTotalTransactionAmountAndFreqByDateAndCurrency(
                             DateTimeUtil.getStartOfMonth(5), DateTimeUtil.getEndOfMonth(5),
-                            currencyName, transactionType, currencySymbol)).observe(this) { transactionData ->
+                            currencyName, transactionType, currencySymbol)).observe(viewLifecycleOwner) { transactionData ->
                 val transactionArray = arrayListOf(transactionData.first, transactionData.second, transactionData.third,
                         transactionData.fourth, transactionData.fifth, transactionData.sixth)
                 slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){
@@ -119,7 +119,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     private fun loadTransaction(startDate: String?, endDate: String?) {
         swipeContainer.isRefreshing = true
         displayResults()
-        transactionViewModel.getTransactionList(startDate, endDate, transactionType, 1).observe(this){ transactions ->
+        transactionViewModel.getTransactionList(startDate, endDate, transactionType, 1).observe(viewLifecycleOwner){ transactions ->
             dataAdapter.clear()
             dataAdapter.addAll(transactions)
             rtAdapter.update(transactions)
@@ -160,7 +160,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     private fun setDateTransaction(){
-        zipLiveData(dateRangeVm.startDate, dateRangeVm.endDate).observe(this) { dates ->
+        zipLiveData(dateRangeVm.startDate, dateRangeVm.endDate).observe(viewLifecycleOwner) { dates ->
             if(dates.first.isNotBlank() && dates.second.isNotBlank()){
                 loadTransaction(dates.first, dates.second)
             }

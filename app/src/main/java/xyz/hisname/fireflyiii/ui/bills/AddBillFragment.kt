@@ -57,14 +57,14 @@ class AddBillFragment: BaseAddObjectFragment() {
         showReveal(dialog_add_bill_layout)
         if(billId != 0L){
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-            billViewModel.getBillById(billId).observe(this) {
+            billViewModel.getBillById(billId).observe(viewLifecycleOwner) {
                 billAttribute = it[0].billAttributes
                 description_edittext.setText(billAttribute?.name)
                 billDescription = billAttribute?.name
                 min_amount_edittext.setText(billAttribute?.amount_min.toString())
                 max_amount_edittext.setText(billAttribute?.amount_max.toString())
                 currency = billAttribute?.currency_code ?: ""
-                currencyViewModel.getCurrencyByCode(currency).observe(this) { currencyList ->
+                currencyViewModel.getCurrencyByCode(currency).observe(viewLifecycleOwner) { currencyList ->
                     val currencyData = currencyList[0].currencyAttributes
                     currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
                 }
@@ -216,20 +216,20 @@ class AddBillFragment: BaseAddObjectFragment() {
         currency_edittext.setOnClickListener{
             CurrencyListBottomSheet().show(parentFragmentManager, "currencyList" )
         }
-        currencyViewModel.currencyCode.observe(this) {
+        currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
             currency = it
         }
 
-        currencyViewModel.currencyDetails.observe(this) {
+        currencyViewModel.currencyDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
         }
         placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
-        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
+        currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             currency = currencyData?.code.toString()
         }
-        markdownViewModel.markdownText.observe(this){ markdownText ->
+        markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
             notes_edittext.setText(markdownText)
         }
 
@@ -239,7 +239,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         billViewModel.addBill(description_edittext.getString(),
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
-                    currency, notes).observe(this) { response ->
+                    currency, notes).observe(viewLifecycleOwner) { response ->
                     ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     val errorMessage = response.getErrorMessage()
                     if (errorMessage != null) {
@@ -272,7 +272,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         billViewModel.updateBill(billId, description_edittext.getString(),
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), getFreq(frequency_exposed_dropdown.getString()),
-                skip_edittext.getString(), "1", currency, notes).observe(this) { response ->
+                skip_edittext.getString(), "1", currency, notes).observe(viewLifecycleOwner) { response ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             if (response.getErrorMessage() != null) {
                 toastError(response.getErrorMessage())

@@ -25,7 +25,7 @@ abstract class BaseSettings: PreferenceFragmentCompat() {
         super.setDivider(ColorDrawable(Color.GRAY))
     }
     private fun handleBackPress() {
-        globalViewModel.backPress.observe(this) { backPressValue ->
+        globalViewModel.backPress.observe(viewLifecycleOwner) { backPressValue ->
             if(backPressValue == true) {
                 handleBack()
             }

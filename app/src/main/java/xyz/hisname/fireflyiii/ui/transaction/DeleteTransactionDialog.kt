@@ -34,7 +34,7 @@ class DeleteTransactionDialog: BaseFragment() {
                 })
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    transactionViewModel.deleteTransaction(transactionJournalId).observe(this) {
+                    transactionViewModel.deleteTransaction(transactionJournalId).observe(viewLifecycleOwner) {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if (it) {
                             toastSuccess(resources.getString(R.string.transaction_deleted))

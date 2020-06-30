@@ -149,7 +149,7 @@ class MapsFragment: BaseFragment() {
     }
 
     private fun location(query: String){
-        zipLiveData(nominatimViewModel.getLocationFromQuery(query), nominatimViewModel.isLoading).observe(this){ data ->
+        zipLiveData(nominatimViewModel.getLocationFromQuery(query), nominatimViewModel.isLoading).observe(viewLifecycleOwner){ data ->
             if(!data.second){
                 if(data.first.isEmpty()){
                     toastInfo("Location was not found")

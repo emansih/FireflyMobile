@@ -46,11 +46,11 @@ class TagDetailsFragment: BaseDetailFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(tagId != 0L) {
-            tagsViewModel.getTagById(tagId).observe(this) { data ->
+            tagsViewModel.getTagById(tagId).observe(viewLifecycleOwner) { data ->
                 setTagData(data)
             }
         } else {
-            tagsViewModel.getTagByName(nameOfTagFromBundle).observe(this) { data ->
+            tagsViewModel.getTagByName(nameOfTagFromBundle).observe(viewLifecycleOwner) { data ->
                 setTagData(data)
             }
         }
@@ -124,7 +124,7 @@ class TagDetailsFragment: BaseDetailFragment() {
                 .setMessage(resources.getString(R.string.delete_tag_message, nameOfTag))
                 .setPositiveButton(R.string.delete_permanently){_, _ ->
                     ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    tagsViewModel.deleteTagByName(nameOfTag).observe(this) { status ->
+                    tagsViewModel.deleteTagByName(nameOfTag).observe(viewLifecycleOwner) { status ->
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if (status) {
                             parentFragmentManager.commit {

@@ -48,7 +48,7 @@ class RecentTransactionFragment: BaseFragment() {
         recentTransactionList.addItemDecoration(DividerItemDecoration(recentTransactionList.context,
                 DividerItemDecoration.VERTICAL))
         transactionLoader.show()
-        transactionViewModel.getRecentTransaction(5).observe(this) {
+        transactionViewModel.getRecentTransaction(5).observe(viewLifecycleOwner) {
             dataAdapter = ArrayList(it)
             transactionLoader.hide()
             if (dataAdapter.size == 0) {

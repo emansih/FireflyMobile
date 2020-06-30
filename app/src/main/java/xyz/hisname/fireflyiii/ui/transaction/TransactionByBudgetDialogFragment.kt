@@ -39,7 +39,7 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
         recentTransactionList.addItemDecoration(DividerItemDecoration(requireContext(),
                 DividerItemDecoration.VERTICAL))
         transactionViewModel.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), budgetName).observe(this) { transactionData ->
+                DateTimeUtil.getEndOfMonth(), budgetName).observe(viewLifecycleOwner) { transactionData ->
             recentTransactionList.isVisible = true
             noTransactionText.isGone = true
             rtAdapter = TransactionRecyclerAdapter(transactionData){ data -> itemClicked(data) }
@@ -47,7 +47,7 @@ class TransactionByBudgetDialogFragment: DialogFragment() {
             rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
             rtAdapter.notifyDataSetChanged()
         }
-        transactionViewModel.isLoading.observe(this) {
+        transactionViewModel.isLoading.observe(viewLifecycleOwner) {
             if(it == true){
                 transactionLoader.bringToFront()
                 transactionLoader.show()

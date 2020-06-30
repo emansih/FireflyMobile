@@ -58,12 +58,12 @@ class AccountDetailFragment: BaseDetailFragment() {
         for (col in ColorTemplate.MATERIAL_COLORS) {
             coloring.add(col)
         }
-        accountViewModel.getAccountById(accountId).observe(this){ accountData ->
+        accountViewModel.getAccountById(accountId).observe(viewLifecycleOwner){ accountData ->
             val currencyCode = accountData[0].accountAttributes?.currency_code ?: ""
             val currencySymbol = accountData[0].accountAttributes?.currency_symbol ?: ""
             val accountName = accountData[0].accountAttributes?.name ?: ""
             val accountBalance = accountData[0].accountAttributes?.current_balance ?: 0.0
-            currencyViewModel.getCurrencyByCode(currencyCode).observe(this){
+            currencyViewModel.getCurrencyByCode(currencyCode).observe(viewLifecycleOwner){
                 setLineChart(currencyCode, accountName, accountBalance)
                 getAccountTransaction(accountName)
                 setExpensesByCategory(currencyCode, accountName, currencySymbol)
@@ -90,7 +90,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                         currencyCode, accountName),
                 transactionViewModel.getTransactionsByAccountAndCurrencyCodeAndDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                        currencyCode, accountName)).observe(this) { transactionData ->
+                        currencyCode, accountName)).observe(viewLifecycleOwner) { transactionData ->
             val firstEntry = accountBalance.toBigDecimal().plus(transactionData.first)
             val secondEntry = firstEntry.plus(transactionData.second)
             val thirdEntry = secondEntry.plus(transactionData.third)
@@ -143,7 +143,7 @@ class AccountDetailFragment: BaseDetailFragment() {
         zipLiveData(transactionViewModel.getTotalTransactionAmountByDateAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal"),
                 transactionViewModel.getUniqueCategoryByDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                        DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal")).observe(this){ transactionData ->
+                        DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal")).observe(viewLifecycleOwner){ transactionData ->
             setExpensesByBudget(currencyCode, accountName, currencySymbol, transactionData.first)
             pieEntryArray = ArrayList(transactionData.second.size)
             incomePieEntryArray = ArrayList(transactionData.second.size)
@@ -151,7 +151,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 setIncomeByCategory(currencyCode, accountName, uniqueMeow, transactionData.first)
                 transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                         DateTimeUtil.getTodayDate(), currencyCode, accountName,
-                        "Withdrawal", uniqueMeow).observe(this){ transactionAmount ->
+                        "Withdrawal", uniqueMeow).observe(viewLifecycleOwner){ transactionAmount ->
                     val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(transactionData.first.absoluteValue.roundToInt().toDouble()).times(100)
                     if (uniqueMeow == "null" || uniqueMeow == null) {
                         pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category", transactionAmount))
@@ -181,13 +181,13 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setExpensesByBudget(currencyCode: String, accountName: String, currencySymbol: String, totalAmount: Double){
         transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal").observe(this) { transactionData ->
+                DateTimeUtil.getTodayDate(), currencyCode, accountName, "Withdrawal").observe(viewLifecycleOwner) { transactionData ->
             if(transactionData.isNotEmpty()){
                 pieEntryBudgetArray = ArrayList(transactionData.size)
                 transactionData.forEachIndexed { _, uniqueBudget ->
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                             DateTimeUtil.getTodayDate(), currencyCode, accountName,
-                            "Withdrawal", uniqueBudget).observe(this) { transactionAmount ->
+                            "Withdrawal", uniqueBudget).observe(viewLifecycleOwner) { transactionAmount ->
                         val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(totalAmount.absoluteValue.roundToInt().toDouble()).times(100)
                         if (uniqueBudget == "null" || uniqueBudget == null) {
                             pieEntryBudgetArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Budget", transactionAmount))
@@ -231,7 +231,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                                     totalSum: Double){
         transactionViewModel.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getTodayDate(), currencyCode, accountName,
-                "Deposit", categoryName).observe(this) { transactionAmount ->
+                "Deposit", categoryName).observe(viewLifecycleOwner) { transactionAmount ->
             val percentageCategory: Double = transactionAmount.absoluteValue.roundToInt().toDouble().div(totalSum.absoluteValue.roundToInt().toDouble()).times(100)
             if (categoryName == "null" || categoryName == null) {
                 incomePieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), "No Category", transactionAmount))
@@ -253,7 +253,7 @@ class AccountDetailFragment: BaseDetailFragment() {
         accountTransactionList.addItemDecoration(DividerItemDecoration(requireContext(),
                 DividerItemDecoration.VERTICAL))
         transactionViewModel.getTransactionListByDateAndAccount(DateTimeUtil.getDaysBefore(
-                DateTimeUtil.getTodayDate(), 6), DateTimeUtil.getTodayDate(), accountName).observe(this){ transactionData ->
+                DateTimeUtil.getTodayDate(), 6), DateTimeUtil.getTodayDate(), accountName).observe(viewLifecycleOwner){ transactionData ->
           // TODO: FIX ME
             //  val rtAdapter = TransactionRecyclerAdapter(transactionData){ data -> itemClicked(data) }
            // accountTransactionList.adapter = rtAdapter
@@ -272,7 +272,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     override fun deleteItem() {
-        accountViewModel.isLoading.observe(this){
+        accountViewModel.isLoading.observe(viewLifecycleOwner){
             if(it == true){
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
@@ -283,7 +283,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 .setTitle(resources.getString(R.string.delete_account_title, accountNameString))
                 .setMessage(resources.getString(R.string.delete_account_message, accountNameString))
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                    accountViewModel.deleteAccountById(accountId).observe(this) { isAccountDeleted ->
+                    accountViewModel.deleteAccountById(accountId).observe(viewLifecycleOwner) { isAccountDeleted ->
                         if(isAccountDeleted){
                             parentFragmentManager.popBackStack()
                             when (accountType) {

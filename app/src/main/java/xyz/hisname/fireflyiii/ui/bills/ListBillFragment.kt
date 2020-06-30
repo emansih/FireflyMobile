@@ -56,7 +56,7 @@ class ListBillFragment: BaseFragment() {
     private fun displayView(){
         val dateToRetrieve = DateTimeUtil.getTodayDate()
         swipeContainer.isRefreshing = true
-        billViewModel.getPaginatedBills(1, dateToRetrieve, dateToRetrieve).observe(this) { billList ->
+        billViewModel.getPaginatedBills(1, dateToRetrieve, dateToRetrieve).observe(viewLifecycleOwner) { billList ->
             swipeContainer.isRefreshing = false
             if (billList.isNotEmpty()) {
                 listText.isVisible = false

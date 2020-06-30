@@ -43,7 +43,7 @@ class OnboardingFragment: Fragment() {
         onboarding_text.text = "Retrieving your data..."
         ObjectAnimator.ofInt(onboarding_progress,"progress", 45).start()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
-        zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem()).observe(this) { multipleLiveData ->
+        zipLiveData(userInfoViewModel.getUser(),userInfoViewModel.userSystem()).observe(viewLifecycleOwner) { multipleLiveData ->
             ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
             onboarding_text.text = "Almost there!"
             if(multipleLiveData.first && multipleLiveData.second){

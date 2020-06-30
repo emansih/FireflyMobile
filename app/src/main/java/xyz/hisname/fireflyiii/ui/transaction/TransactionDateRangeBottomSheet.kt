@@ -33,10 +33,10 @@ class TransactionDateRangeBottomSheet: BottomSheetDialogFragment() {
     }
 
     private fun setTextField(){
-        dateRange.startDate.observe(this){
+        dateRange.startDate.observe(viewLifecycleOwner){
             startDateEditText.setText(it)
         }
-        dateRange.endDate.observe(this){
+        dateRange.endDate.observe(viewLifecycleOwner){
             endDateEditText.setText(it)
         }
     }

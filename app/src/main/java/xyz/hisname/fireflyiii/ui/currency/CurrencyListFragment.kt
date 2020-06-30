@@ -43,14 +43,14 @@ class CurrencyListFragment: BaseFragment() {
         initFab()
         pullToRefresh()
         displayView()
-        currencyViewModel.isLoading.observe(this) {
+        currencyViewModel.isLoading.observe(viewLifecycleOwner) {
             swipeContainer.isRefreshing = it == true
         }
     }
 
 
     private fun displayView(){
-        currencyViewModel.getCurrency(1).observe(this) { currencyData ->
+        currencyViewModel.getCurrency(1).observe(viewLifecycleOwner) { currencyData ->
             dataAdapter.addAll(currencyData)
             currencyAdapter.update(dataAdapter)
             currencyAdapter.notifyDataSetChanged()

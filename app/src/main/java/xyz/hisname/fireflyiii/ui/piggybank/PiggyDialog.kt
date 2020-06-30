@@ -35,7 +35,7 @@ class PiggyDialog: BaseDialog() {
             adapter?.notifyDataSetChanged()
         }
         swipeContainer.isRefreshing = true
-        piggyViewModel.getAllPiggyBanks().observe(this) { piggyBankData ->
+        piggyViewModel.getAllPiggyBanks().observe(viewLifecycleOwner) { piggyBankData ->
             swipeContainer.isRefreshing = false
             initialAdapter.addAll(piggyBankData)
             recycler_view.adapter = PiggyRecyclerAdapter(piggyBankData) { data: PiggyData -> itemClicked(data) }
@@ -66,7 +66,7 @@ class PiggyDialog: BaseDialog() {
 
     private fun filter(piggyName: String){
         dataAdapter.clear()
-        piggyViewModel.getPiggyByName(piggyName).observe(this) { piggyData ->
+        piggyViewModel.getPiggyByName(piggyName).observe(viewLifecycleOwner) { piggyData ->
             piggyData.forEachIndexed { _, catData ->
                 dataAdapter.add(catData)
             }

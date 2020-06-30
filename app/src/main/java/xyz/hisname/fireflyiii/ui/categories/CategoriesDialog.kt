@@ -49,7 +49,7 @@ class CategoriesDialog: BaseDialog(){
 
     private fun displayView(){
         swipeContainer.isRefreshing = true
-        categoryViewModel.getPaginatedCategory(1).observe(this) { categoryData ->
+        categoryViewModel.getPaginatedCategory(1).observe(viewLifecycleOwner) { categoryData ->
             swipeContainer.isRefreshing = false
             categoryData.forEachIndexed { _, catData ->
                 initialAdapter.add(catData)
@@ -100,7 +100,7 @@ class CategoriesDialog: BaseDialog(){
 
     private fun filter(categoryName: String){
         dataAdapter.clear()
-        categoryViewModel.getCategoryByName(categoryName).observe(this) { categoryData ->
+        categoryViewModel.getCategoryByName(categoryName).observe(viewLifecycleOwner) { categoryData ->
             dataAdapter.addAll(categoryData)
             categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData ->  itemClicked(data)}
             categoriesRecyclerAdapter.notifyDataSetChanged()

@@ -33,7 +33,7 @@ class DeleteBillDialog: DialogFragment() {
                     colorRes = R.color.md_green_600
                 })
                 .setPositiveButton(R.string.delete_permanently){ _,_ ->
-                    billViewModel.deleteBillById(billId).observe(this) { billDeleted ->
+                    billViewModel.deleteBillById(billId).observe(viewLifecycleOwner) { billDeleted ->
                         if(billDeleted){
                             toastSuccess(resources.getString(R.string.bill_deleted, billDescription))
                             dialog?.dismiss()

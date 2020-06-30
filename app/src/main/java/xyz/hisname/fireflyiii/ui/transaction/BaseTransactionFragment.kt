@@ -31,7 +31,7 @@ abstract class BaseTransactionFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        transactionViewModel.apiResponse.observe(this) {
+        transactionViewModel.apiResponse.observe(viewLifecycleOwner) {
             toastInfo(it)
         }
         setupFab()

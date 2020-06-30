@@ -84,7 +84,7 @@ class DashboardFragment: BaseFragment() {
         billsCard.layoutParams.width = (getScreenWidth() - 425)
         leftToSpendCard.layoutParams.width = (getScreenWidth() - 425)
         networthCard.layoutParams.width = (getScreenWidth() - 425)
-        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
+        currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             setSummary(currencyData?.code ?: "")
             setPieChart(currencyData)
@@ -125,33 +125,33 @@ class DashboardFragment: BaseFragment() {
         summaryViewModel.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
                 currencyCode)
 
-        summaryViewModel.networthValue.observe(this){ money ->
+        summaryViewModel.networthValue.observe(viewLifecycleOwner){ money ->
              networthAmount.text = money
         }
 
-        summaryViewModel.leftToSpendValue.observe(this){ money ->
+        summaryViewModel.leftToSpendValue.observe(viewLifecycleOwner){ money ->
             leftToSpendAmountText.text = money
         }
-        summaryViewModel.balanceValue.observe(this){ money ->
+        summaryViewModel.balanceValue.observe(viewLifecycleOwner){ money ->
             balanceText.text = money
             updateHomeScreenWidget(BalanceWidget::class.java)
         }
-        summaryViewModel.earnedValue.observe(this){ money ->
+        summaryViewModel.earnedValue.observe(viewLifecycleOwner){ money ->
             balanceEarnedText.text = money + " + "
         }
-        summaryViewModel.spentValue.observe(this){ money ->
+        summaryViewModel.spentValue.observe(viewLifecycleOwner){ money ->
             balanceSpentText.text = money
         }
-        summaryViewModel.billsToPay.observe(this){ money ->
+        summaryViewModel.billsToPay.observe(viewLifecycleOwner){ money ->
             billsText.text = money
             updateHomeScreenWidget(BillsToPayWidget::class.java)
         }
 
-        summaryViewModel.billsPaid.observe(this){ money ->
+        summaryViewModel.billsPaid.observe(viewLifecycleOwner){ money ->
             billsPaidText.text = money
         }
 
-        summaryViewModel.leftToSpendDay.observe(this){ money ->
+        summaryViewModel.leftToSpendDay.observe(viewLifecycleOwner){ money ->
             leftToSpendAmount.text = money
         }
     }
@@ -215,7 +215,7 @@ class DashboardFragment: BaseFragment() {
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 5), currencyCode),
                 transactionVM.getWithdrawalAmountWithCurrencyCode(
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
-                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode))).observe(this) { transactionData ->
+                        DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode))).observe(viewLifecycleOwner) { transactionData ->
             setNetIncome(currencyData?.symbol ?: "", transactionData.first)
             setAverage(currencyData?.symbol ?: "", currencyCode, transactionData.second)
         }
@@ -336,7 +336,7 @@ class DashboardFragment: BaseFragment() {
             setTouchEnabled(true)
         }
         transactionVM.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
-                DateTimeUtil.getTodayDate(), currencyCode).observe(this){ transaction ->
+                DateTimeUtil.getTodayDate(), currencyCode).observe(viewLifecycleOwner){ transaction ->
             thirtyDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(
                     transaction.div(30), requireContext())
 
@@ -348,7 +348,7 @@ class DashboardFragment: BaseFragment() {
         val dataColor = arrayListOf(getCompatColor(R.color.md_red_700),
                 getCompatColor(R.color.md_green_500))
         zipLiveData(budgetLimit.retrieveSpentBudget(currencyData?.code ?: ""),
-                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code ?: "")).observe(this) { budget ->
+                budgetLimit.retrieveCurrentMonthBudget(currencyData?.code ?: "")).observe(viewLifecycleOwner) { budget ->
             budgetSpent = budget.first.toFloat()
             budgeted = budget.second.toFloat()
             val budgetLeftPercentage = (budgetSpent / budgeted) * 100

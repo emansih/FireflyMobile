@@ -87,7 +87,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 submitData()
             } else {
                 tagsViewModel.updateTag(tagId, tag_edittext.getString(), date, description, latitude,
-                        longitude, zoomLevel).observe(this) { apiResponse ->
+                        longitude, zoomLevel).observe(viewLifecycleOwner) { apiResponse ->
                     val errorMessage = apiResponse.getErrorMessage()
                     when {
                         errorMessage != null -> toastError(errorMessage)
@@ -106,7 +106,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     private fun updateData(){
-        tagsViewModel.getTagById(tagId).observe(this) {
+        tagsViewModel.getTagById(tagId).observe(viewLifecycleOwner) {
             val tagData = it[0].tagsAttributes
             tag_edittext.setText(tagData?.tag)
             date_edittext.setText(tagData?.date)
@@ -139,17 +139,17 @@ class AddTagsFragment: BaseAddObjectFragment() {
             }
             addTagFab.isInvisible = true
         }
-        mapsViewModel.latitude.observe(this) {
+        mapsViewModel.latitude.observe(viewLifecycleOwner) {
             if(it != "0.0"){
                 latitude_edittext.setText(it)
             }
         }
-        mapsViewModel.longitude.observe(this) {
+        mapsViewModel.longitude.observe(viewLifecycleOwner) {
             if(it != "0.0"){
                 longitude_edittext.setText(it)
             }
         }
-        mapsViewModel.zoomLevel.observe(this) {
+        mapsViewModel.zoomLevel.observe(viewLifecycleOwner) {
             if(it != "0.0"){
                 zoom_edittext.setText(it)
             }
@@ -197,7 +197,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(this) {
+        tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(viewLifecycleOwner) {
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = it.getErrorMessage()
             when {

@@ -37,7 +37,7 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
         recycler_view.layoutManager = linearLayout
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
         recycler_view.adapter = currencyAdapter
-        currencyViewModel.getCurrency(1).observe(this) { currencyData ->
+        currencyViewModel.getCurrency(1).observe(viewLifecycleOwner) { currencyData ->
             dataAdapter.addAll(currencyData)
             currencyAdapter.update(currencyData)
             currencyAdapter.notifyDataSetChanged()

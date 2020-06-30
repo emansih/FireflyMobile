@@ -83,7 +83,7 @@ class SettingsAccountFragment: BaseSettings() {
         val refreshToken = findPreference<Preference>("refresh_token") as Preference
         refreshToken.setOnPreferenceClickListener {
             toastInfo("Refreshing your token...")
-            authViewModel.getRefreshToken().observe(this) { success ->
+            authViewModel.getRefreshToken().observe(viewLifecycleOwner) { success ->
                 if(success){
                     toastSuccess("Token refresh success!")
                 } else {

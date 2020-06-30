@@ -87,7 +87,7 @@ abstract class BaseFragment: Fragment() {
     }
 
     private fun handleBackPress() {
-        globalViewModel.backPress.observe(this){ backPressValue ->
+        globalViewModel.backPress.observe(viewLifecycleOwner){ backPressValue ->
             if(backPressValue == true) {
                 scope.launch(Dispatchers.Main) {
                     handleBack()

@@ -32,7 +32,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_currency_layout)
         if(currencyId != 0L){
-            currencyViewModel.getCurrencyById(currencyId).observe(this) {
+            currencyViewModel.getCurrencyById(currencyId).observe(viewLifecycleOwner) {
                 val currencyAttributes = it[0].currencyAttributes
                 name_edittext.setText(currencyAttributes?.name)
                 decimal_places_edittext.setText(currencyAttributes?.decimal_places.toString())
@@ -96,7 +96,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     private fun updateData(){
         currencyViewModel.updateCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(),
-                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(this) { response ->
+                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(viewLifecycleOwner) { response ->
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = response.getErrorMessage()
             if (errorMessage != null) {
@@ -111,7 +111,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     override fun submitData(){
         currencyViewModel.addCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(),
-                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(this) { response ->
+                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(viewLifecycleOwner) { response ->
             ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
             val errorMessage = response.getErrorMessage()
             if (errorMessage != null) {

@@ -42,7 +42,7 @@ class ListTagsFragment: BaseFragment() {
         baseSwipeLayout.isGone = true
         all_tags.setChipSpacing(16)
         displayView()
-        tagsViewModel.apiResponse.observe(this) {
+        tagsViewModel.apiResponse.observe(viewLifecycleOwner) {
             toastError(it)
         }
         setFab()
@@ -51,9 +51,9 @@ class ListTagsFragment: BaseFragment() {
 
     private fun displayView(){
         swipe_tags.isRefreshing = true
-        tagsViewModel.getAllTags().observe(this) { tags ->
+        tagsViewModel.getAllTags().observe(viewLifecycleOwner) { tags ->
             all_tags.removeAllViewsInLayout()
-            tagsViewModel.isLoading.observe(this) { isLoading ->
+            tagsViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
                 if(isLoading == false){
                     if(tags.isEmpty()){
                         listImage.isVisible = true
@@ -105,7 +105,7 @@ class ListTagsFragment: BaseFragment() {
                 .setTitle(resources.getString(R.string.delete_tag_title, tagName))
                 .setMessage(resources.getString(R.string.delete_tag_message, tagName))
                 .setPositiveButton(R.string.delete_permanently){_, _ ->
-                    tagsViewModel.deleteTagByName(tagName).observe(this) { status ->
+                    tagsViewModel.deleteTagByName(tagName).observe(viewLifecycleOwner) { status ->
                         if (status) {
                             parentFragmentManager.commit {
                                 replace(R.id.fragment_container, ListTagsFragment())

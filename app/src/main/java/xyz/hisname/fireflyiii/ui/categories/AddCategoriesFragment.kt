@@ -46,7 +46,7 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
     }
 
     private fun submitData(){
-        categoryViewModel.addCategory(category_name.getString()).observe(this) {
+        categoryViewModel.addCategory(category_name.getString()).observe(viewLifecycleOwner) {
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = it.getErrorMessage()
             if (errorMessage != null) {

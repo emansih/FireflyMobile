@@ -49,7 +49,7 @@ class CategoriesFragment: BaseFragment() {
 
     private fun displayView(){
         swipeContainer.isRefreshing = true
-        categoryViewModel.getPaginatedCategory(1).observe(this){ categoryList ->
+        categoryViewModel.getPaginatedCategory(1).observe(viewLifecycleOwner){ categoryList ->
             setList(categoryList)
         }
         scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout()){

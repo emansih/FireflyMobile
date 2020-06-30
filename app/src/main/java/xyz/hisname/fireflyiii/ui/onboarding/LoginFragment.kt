@@ -69,13 +69,13 @@ class LoginFragment: Fragment() {
         setWidget()
         when {
             Objects.equals(argument, "LOGIN") -> {
-                baseUrlLiveData.observe(this) {
+                baseUrlLiveData.observe(viewLifecycleOwner) {
                     firefly_url_edittext.setText(it)
                 }
-                clientIdLiveData.observe(this) {
+                clientIdLiveData.observe(viewLifecycleOwner) {
                     firefly_id_edittext.setText(it)
                 }
-                secretKeyLiveData.observe(this) {
+                secretKeyLiveData.observe(viewLifecycleOwner) {
                     firefly_secret_edittext.setText(it)
                 }
                 getAccessCode()
@@ -84,7 +84,7 @@ class LoginFragment: Fragment() {
                 refreshToken()
             }
         }
-        authViewModel.isLoading.observe(this) {
+        authViewModel.isLoading.observe(viewLifecycleOwner) {
             if(it == true){
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
@@ -161,7 +161,7 @@ class LoginFragment: Fragment() {
     private fun refreshToken(){
         rootLayout.isVisible = false
         toastInfo(resources.getString(R.string.refreshing_token), Toast.LENGTH_LONG)
-        authViewModel.getRefreshToken().observe(this) {
+        authViewModel.getRefreshToken().observe(viewLifecycleOwner) {
             if(it == true){
                 startHomeIntent()
             } else {
@@ -223,7 +223,7 @@ class LoginFragment: Fragment() {
                     secretKey = secretKeyLiveData.value ?: ""
                     clientId = clientIdLiveData.value ?: ""
                 }
-                authViewModel.getAccessToken(code).observe(this) { isAuth ->
+                authViewModel.getAccessToken(code).observe(viewLifecycleOwner) { isAuth ->
                     if(isAuth){
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)
                         layout.isVisible = false
@@ -235,7 +235,7 @@ class LoginFragment: Fragment() {
                         }
                     } else {
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
-                        authViewModel.authFailedReason.observe(this) { reason ->
+                        authViewModel.authFailedReason.observe(viewLifecycleOwner) { reason ->
                             if(reason.isNotBlank()){
                                 toastError(reason)
                             }

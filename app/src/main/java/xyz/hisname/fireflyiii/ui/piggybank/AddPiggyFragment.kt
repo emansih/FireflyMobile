@@ -50,7 +50,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         showReveal(dialog_add_piggy_layout)
         piggyId = arguments?.getLong("piggyId") ?: 0
         if(piggyId != 0L){
-            piggyViewModel.getPiggyById(piggyId).observe(this) { piggyData ->
+            piggyViewModel.getPiggyById(piggyId).observe(viewLifecycleOwner) { piggyData ->
                 val piggyAttributes = piggyData[0].piggyAttributes
                 description_edittext.setText(piggyAttributes?.name)
                 target_amount_edittext.setText(piggyAttributes?.target_amount.toString())
@@ -58,7 +58,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 date_started_edittext.setText(piggyAttributes?.start_date)
                 date_target_edittext.setText(piggyAttributes?.target_date)
                 note_edittext.setText(piggyAttributes?.notes)
-                accountViewModel.getAccountById(piggyAttributes?.account_id ?: 0L).observe(this) { accountData ->
+                accountViewModel.getAccountById(piggyAttributes?.account_id ?: 0L).observe(viewLifecycleOwner) { accountData ->
                     val accountName = accountData[0].accountAttributes?.name
                     accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
                     accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -180,7 +180,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         date_started_edittext.setOnClickListener {
             DialogDarkMode().showCorrectDatePickerDialog(requireContext(), endDate, calendar)
         }
-        accountViewModel.getAccountByType("asset").observe(this) {
+        accountViewModel.getAccountByType("asset").observe(viewLifecycleOwner) {
             if(it.isNotEmpty()) {
                 it.forEachIndexed { _, accountData ->
                     accounts.add(accountData.accountAttributes?.name!!)
@@ -197,10 +197,10 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(this) { accountData ->
+        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(viewLifecycleOwner) { accountData ->
             piggyViewModel.addPiggyBank(description_edittext.getString(),
                     accountData[0].accountId.toString(), currentAmount, notes, startDate,
-                    target_amount_edittext.getString(), targetDate).observe(this) {
+                    target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 val errorMessage = it.getErrorMessage()
                 val throwawableError = it.getError()
@@ -242,9 +242,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun updatePiggyBank(){
-        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(this) { accountData ->
+        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(viewLifecycleOwner) { accountData ->
             piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), accountData[0].accountId.toString(),
-                    currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(this) {
+                    currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 if (it.getErrorMessage() != null) {
                     toastError(it.getErrorMessage())

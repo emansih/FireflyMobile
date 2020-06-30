@@ -141,10 +141,10 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     override fun setWidgets() {
         setAccordion()
-        currencyViewModel.currencyCode.observe(this) {
+        currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
             currency = it
         }
-        currencyViewModel.currencyDetails.observe(this) {
+        currencyViewModel.currencyDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
         }
         currency_edittext.setOnClickListener{
@@ -152,7 +152,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
             currencyListFragment.show(parentFragmentManager, "currencyList" )
         }
         if(accountId == 0L) {
-            currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
+            currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
                 val currencyData = defaultCurrency[0].currencyAttributes
                 currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
                 currency = currencyData?.code ?: ""
@@ -207,7 +207,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         includeInNetWorthText.setOnClickListener {
             includeInNetWorthCheck.performClick()
         }
-        accountViewModel.isLoading.observe(this) { loader ->
+        accountViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
             if(loader){
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
@@ -221,7 +221,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 addToBackStack(null)
             }
         }
-        markdownViewModel.markdownText.observe(this){ markdownText ->
+        markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
             note_edittext.setText(markdownText)
         }
     }

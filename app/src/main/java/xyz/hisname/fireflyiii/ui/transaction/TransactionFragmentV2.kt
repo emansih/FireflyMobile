@@ -49,7 +49,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
 
     private fun loadTransaction(){
         swipeContainer.isRefreshing = true
-        transactionViewModel.getTransactionList(currentDate, currentDate, transactionType, 1).observe(this) { transList ->
+        transactionViewModel.getTransactionList(currentDate, currentDate, transactionType, 1).observe(viewLifecycleOwner) { transList ->
             dataAdapter.clear()
             dataAdapter.addAll(transList)
             rtAdapter.update(transList)

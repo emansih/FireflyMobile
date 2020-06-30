@@ -62,7 +62,7 @@ class PatFragment: Fragment() {
             } else {
                 ProgressBar.animateView(progressOverlay, View.VISIBLE, 0.4f, 200)
                 patViewModel.authenticate(cert_path.text.toString().toUri(), firefly_access_edittext.getString(),
-                        firefly_url_edittext.getString()).observe(this) { message ->
+                        firefly_url_edittext.getString()).observe(viewLifecycleOwner) { message ->
                     ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                     if (message.contentEquals("success")) {
                         val layout = requireActivity().findViewById<ConstraintLayout>(R.id.small_container)

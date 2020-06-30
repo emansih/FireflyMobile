@@ -46,7 +46,7 @@ class ListAccountFragment: BaseFragment() {
     private fun displayView(){
         swipeContainer.isRefreshing = true
         runLayoutAnimation(recycler_view)
-        accountViewModel.getAccountByType(accountType).observe(this){ accountData ->
+        accountViewModel.getAccountByType(accountType).observe(viewLifecycleOwner){ accountData ->
             if(accountData.isEmpty()){
                 recycler_view.isGone = true
                 noAccountImage.isVisible = true

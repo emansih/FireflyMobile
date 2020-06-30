@@ -56,7 +56,7 @@ class ListPiggyFragment: BaseFragment() {
     private fun displayAll(){
         swipeContainer.isRefreshing = true
         dataAdapter.clear()
-        piggyViewModel.getAllPiggyBanks().observe(this) { piggyBankData ->
+        piggyViewModel.getAllPiggyBanks().observe(viewLifecycleOwner) { piggyBankData ->
             dataAdapter = ArrayList(piggyBankData)
             displayView()
         }
@@ -65,7 +65,7 @@ class ListPiggyFragment: BaseFragment() {
     private fun displayIncomplete(){
         swipeContainer.isRefreshing = true
         dataAdapter.clear()
-        piggyViewModel.getNonCompletedPiggyBanks().observe(this) { piggyBankData ->
+        piggyViewModel.getNonCompletedPiggyBanks().observe(viewLifecycleOwner) { piggyBankData ->
             dataAdapter = ArrayList(piggyBankData)
             displayView()
         }

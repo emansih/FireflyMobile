@@ -38,10 +38,10 @@ class BudgetSearchDialog: BaseDialog() {
             adapter?.notifyDataSetChanged()
         }
         swipeContainer.isRefreshing = true
-        budgetViewModel.retrieveAllBudgetLimits().observe(this) { budgetData ->
+        budgetViewModel.retrieveAllBudgetLimits().observe(viewLifecycleOwner) { budgetData ->
             recycler_view.adapter = BudgetRecyclerAdapter(budgetData) { data: BudgetListData -> itemClicked(data) }
         }
-        budgetViewModel.isLoading.observe(this){ loading ->
+        budgetViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
             if (loading == false) {
                 swipeContainer.isRefreshing = false
             }
@@ -77,7 +77,7 @@ class BudgetSearchDialog: BaseDialog() {
 
     private fun filter(budgetName: String){
         dataAdapter.clear()
-        budgetViewModel.getBudgetByName(budgetName).observe(this) { piggyData ->
+        budgetViewModel.getBudgetByName(budgetName).observe(viewLifecycleOwner) { piggyData ->
             piggyData.forEachIndexed { _, catData ->
                 dataAdapter.add(catData)
             }

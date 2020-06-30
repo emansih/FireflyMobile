@@ -164,7 +164,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.updateTransaction(transactionJournalId,transactionType, description_edittext.getString(),
                 transactionDateTime, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
-                transactionTags, budgetName, fileUri).observe(this) { transactionResponse->
+                transactionTags, budgetName, fileUri).observe(viewLifecycleOwner) { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -274,7 +274,7 @@ class AddTransactionFragment: BaseFragment() {
             }
 
         })
-        transactionViewModel.transactionAmount.observe(this){ amount ->
+        transactionViewModel.transactionAmount.observe(viewLifecycleOwner){ amount ->
             transaction_amount_edittext.setText(amount)
         }
     }
@@ -309,13 +309,13 @@ class AddTransactionFragment: BaseFragment() {
                 return false
             }
         })
-        categoryViewModel.categoryName.observe(this) {
+        categoryViewModel.categoryName.observe(viewLifecycleOwner) {
             category_edittext.setText(it)
         }
-        currencyViewModel.currencyCode.observe(this) {
+        currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
             currency = it
         }
-        currencyViewModel.currencyDetails.observe(this) {
+        currencyViewModel.currencyDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
         }
         currency_edittext.setOnClickListener{
@@ -324,7 +324,7 @@ class AddTransactionFragment: BaseFragment() {
         tags_chip.addChipTerminator('\n' ,ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL)
         tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
         tags_chip.enableEditChipOnTouch(false, true)
-        tagsViewModel.getAllTags().observe(this) {
+        tagsViewModel.getAllTags().observe(viewLifecycleOwner) {
             it.forEachIndexed{ _, tagsData ->
                 tags.add(tagsData.tagsAttributes?.tag!!)
             }
@@ -332,12 +332,12 @@ class AddTransactionFragment: BaseFragment() {
             tags_chip.threshold = 1
             tags_chip.setAdapter(tagsAdapter)
         }
-        currencyViewModel.getDefaultCurrency().observe(this) { defaultCurrency ->
+        currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency = currencyData?.code.toString()
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
         }
-        accountViewModel.emptyAccount.observe(this) {
+        accountViewModel.emptyAccount.observe(viewLifecycleOwner) {
             if(it == true){
                 AlertDialog.Builder(requireContext())
                         .setTitle("No asset accounts found!")
@@ -360,7 +360,7 @@ class AddTransactionFragment: BaseFragment() {
             val piggyBankDialog = PiggyDialog()
             piggyBankDialog.show(parentFragmentManager, "piggyDialog")
         }
-        piggyViewModel.piggyName.observe(this) {
+        piggyViewModel.piggyName.observe(viewLifecycleOwner) {
             piggy_edittext.setText(it)
         }
         budget_edittext.setOnTouchListener(object : View.OnTouchListener{
@@ -376,7 +376,7 @@ class AddTransactionFragment: BaseFragment() {
                 return false
             }
         })
-        budgetViewModel.budgetName.observe(this) { name ->
+        budgetViewModel.budgetName.observe(viewLifecycleOwner) { name ->
             budget_edittext.setText(name)
         }
         expansionLayout.addListener { _, expanded ->
@@ -409,7 +409,7 @@ class AddTransactionFragment: BaseFragment() {
     private fun contextSwitch(){
         when {
             Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountNameByType("asset")
-                    .observe(this) { transferData ->
+                    .observe(viewLifecycleOwner) { transferData ->
                         source_exposed_menu.isVisible = true
                         source_layout.isGone = true
                         destination_layout.isGone = true
@@ -439,7 +439,7 @@ class AddTransactionFragment: BaseFragment() {
             }
             else -> {
                 zipLiveData(accountViewModel.getAccountNameByType("asset"),
-                        accountViewModel.getAccountNameByType("expense")).observe(this) { accountNames ->
+                        accountViewModel.getAccountNameByType("expense")).observe(viewLifecycleOwner) { accountNames ->
                     source_layout.isVisible = false
                     destination_exposed_menu.isVisible = false
                     // Spinner for source account
@@ -466,7 +466,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transactionDateTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags, budgetName, fileUri).observe(this) { transactionResponse ->
+                currency, categoryName, transactionTags, budgetName, fileUri).observe(viewLifecycleOwner) { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -534,12 +534,12 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun updateTransactionSetup(){
-        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(this) { transactionData ->
+        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(viewLifecycleOwner) { transactionData ->
             val transactionAttributes = transactionData[0]
             description_edittext.setText(transactionAttributes.description)
             transaction_amount_edittext.setText(abs(transactionAttributes.amount).toString())
             budget_edittext.setText(transactionAttributes.budget_name)
-            currencyViewModel.getCurrencyByCode(transactionAttributes.currency_code).observe(this) { currencyData ->
+            currencyViewModel.getCurrencyByCode(transactionAttributes.currency_code).observe(viewLifecycleOwner) { currencyData ->
                 val currencyAttributes = currencyData[0].currencyAttributes
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
             }
