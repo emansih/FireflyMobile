@@ -52,19 +52,6 @@ abstract class AppDatabase: RoomDatabase() {
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(context,
                         AppDatabase::class.java, Constants.DB_NAME)
-                        .addMigrations(object : Migration(8, 9){
-                            override fun migrate(database: SupportSQLiteDatabase) {
-                                // Category
-                                database.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS `categoryFts` USING FTS4(`categoryId`, `name`, content=`category`)")
-                                database.execSQL("INSERT INTO categoryFts(categoryFts) VALUES ('rebuild')")
-                                // Budget
-                                database.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS `budgetListFts` USING FTS4(`budgetListId`, `name`, content=`budget_list`)")
-                                database.execSQL("INSERT INTO budgetListFts(budgetListFts) VALUES ('rebuild')")
-                                // Piggy Bank
-                                database.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS `piggyFts` USING FTS4(`piggyId`, `name`, content=`piggy`)")
-                                database.execSQL("INSERT INTO piggyFts(piggyFts) VALUES ('rebuild')")
-                            }
-                        })
                         .fallbackToDestructiveMigration()
                         .build().also { INSTANCE = it }
             }
