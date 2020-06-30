@@ -52,8 +52,9 @@ class FileUtils {
             }
             val br = BufferedReader(FileReader(filePath))
             var line: String?
-            while (br.readLine().also { line = it } != null) {
-                context.openFileOutput(fileDestination, Context.MODE_PRIVATE).use {
+            context.deleteFile("user_custom.pem")
+            while (br.readLine().also { line = it + "\n" } != null) {
+                context.openFileOutput(fileDestination, Context.MODE_APPEND).use {
                     it.write(line?.toByteArray())
                 }
             }
