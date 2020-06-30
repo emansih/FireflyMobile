@@ -333,7 +333,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         accountViewModel.updateAccount(accountId,accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod).observe(this){
+                liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){
             val error = it.getError()
             when {
                 error != null -> toastError(error.localizedMessage)
@@ -354,7 +354,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         accountViewModel.addAccounts(accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod).observe(this){
+                liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){
             val error = it.getError()
             if (error != null) {
                 if(error.localizedMessage.startsWith("Unable to resolve host")) {
@@ -372,7 +372,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     private fun updateData(){
         if(accountId != 0L){
-            accountViewModel.getAccountById(accountId).observe(this) { accountData ->
+            accountViewModel.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
                 val accountAttributes = accountData[0].accountAttributes
                 description_edittext.setText(accountAttributes?.name)
                 currency_edittext.setText(accountAttributes?.currency_code + " (" + accountAttributes?.currency_symbol + " )")
@@ -432,37 +432,31 @@ class AddAccountFragment: BaseAddObjectFragment() {
     // This code is so nasty
     private fun showHiddenHelpText(){
         if(iban_layout.isVisible && expansionLayout.isExpanded) {
-            val ibanShow = showCase(R.string.iban_help_text,
-                    "ibanCaseView", iban_layout)
-            ibanShow.show()
-            ibanShow.dismissListener = object : DismissListener{
+            showCase(R.string.iban_help_text,
+                    "ibanCaseView", iban_layout, object : DismissListener {
                 override fun onDismiss(id: String?) {
                     if(opening_balance_layout.isVisible){
                         val openingBalanceShow = showCase(R.string.opening_balance_help_text,
-                                "openingBalanceCaseView", opening_balance_layout)
-                        openingBalanceShow.show()
-                        openingBalanceShow.dismissListener = object : DismissListener {
+                                "openingBalanceCaseView", opening_balance_layout, object : DismissListener{
                             override fun onDismiss(id: String?) {
                                 if(virtual_balance_layout.isVisible) {
                                     showCase(R.string.virtual_balance_help_text, "virtualBalanceCaseView",
                                             virtual_balance_layout).show()
                                 }
                             }
-
                             override fun onSkipped(id: String?) {
                             }
-
-                        }
+                        })
+                        openingBalanceShow.show()
                     }
                 }
 
                 override fun onSkipped(id: String?) {
                 }
-
-            }
+            })
         }
     }
-
+    
     override fun handleBack() {
         if(accountId == 0L) {
             unReveal(add_account_layout, true)

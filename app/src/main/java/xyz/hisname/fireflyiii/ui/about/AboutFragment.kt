@@ -47,12 +47,6 @@ class AboutFragment: MaterialAboutFragment() {
         handleBack()
     }
 
-    override fun getTheme() = if(AppPref(sharedPref).nightModeEnabled){
-        R.style.AppTheme_MaterialAboutActivity_Dark
-    } else {
-        R.style.AppTheme_MaterialAboutActivity_Light
-    }
-
     private fun createMaterialAboutList(): MaterialAboutList{
         val appCardBuilder = MaterialAboutCard.Builder()
         appCardBuilder.addItem(ConvenienceBuilder.createAppTitleItem(getString(R.string.app_name),

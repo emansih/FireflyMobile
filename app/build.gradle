@@ -112,7 +112,6 @@ dependencies {
     implementation Dependencies.androidxConstraintLayout
     implementation Dependencies.androidxPref
     implementation Dependencies.androidxWork
-    implementation Dependencies.multiDex
     implementation Dependencies.swipeRefreshLayout
     implementation Dependencies.biometricLib
 
