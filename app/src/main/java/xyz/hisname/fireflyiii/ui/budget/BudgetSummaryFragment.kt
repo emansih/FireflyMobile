@@ -134,7 +134,7 @@ class BudgetSummaryFragment: BaseFragment() {
                     remainingAmountValue.text = "--.--"
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), currencyCode, "Withdrawal",
-                            pe.label).observe(this@BudgetSummaryFragment) { value ->
+                            pe.label).observe(viewLifecycleOwner) { value ->
                         budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + entry.value
                         actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
                                 LocaleNumberParser.parseDecimal(value, requireContext())
