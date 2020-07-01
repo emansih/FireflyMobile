@@ -167,7 +167,7 @@
                 android:id="@+id/default_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Default"
+                android:text="@string/make_default_currency"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="12dp"
                 style="@style/TextAppearance.MaterialComponents.Headline6"

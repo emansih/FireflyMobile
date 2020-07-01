@@ -200,12 +200,12 @@ class MarkdownFragment: BaseFragment() {
             },null, null, null)
             val alert = AlertDialog.Builder(requireContext())
             alert.apply {
-                setTitle("Insert Link")
+                setTitle(R.string.insert_link)
                 setView(layoutView)
-                setPositiveButton("OK") { dialogInterface, which ->
+                setPositiveButton(android.R.string.ok) { dialogInterface, which ->
                     editableText.append("[" + urlText.getString() + "]" + "(" + url.getString() + ")")
                 }
-                setNegativeButton("Cancel"){ dialogInterface, which ->
+                setNegativeButton(android.R.string.cancel){ dialogInterface, which ->
 
                 }
                 show()

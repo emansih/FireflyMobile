@@ -124,4 +124,21 @@
     <string name="financial_control">FINANCIAL CONTROL</string>
     <string name="others">OTHERS</string>
     <string name="classification">Classification</string>
+    <string name="about">About</string>
+    <string name="view_on_github">View on Github</string>
+    <string name="author">Author</string>
+    <string name="required_field">Required Field</string>
+    <string name="frequency">Frequency</string>
+    <string name="updated_bill">Updated bill %1$s</string>
+    <string name="stored_new_bill">Stored new bill %1$s</string>
+    <string name="search">Search</string>
+    <string name="make_default_currency">Make default</string>
+    <string name="net_earnings">Net Earnings</string>
+    <string name="budget_summary">Budget Summary</string>
+    <string name="thirty_day_average">30 Days Average</string>
+    <string name="six_day_average">6 Days Average</string>
+    <string name="daily_summary">Daily Summary</string>
+    <string name="done">Done</string>
+    <string name="insert_link">Insert Link</string>
+    <string name="discard">Discard</string>
 </resources>

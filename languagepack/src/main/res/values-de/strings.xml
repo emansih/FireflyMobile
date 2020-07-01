@@ -120,5 +120,10 @@
     <string name="accounting">BUCHHALTUNG</string>
     <string name="others">WEITERE</string>
     <string name="classification">Klassifizierung</string>
+    <string name="done">Erledigt</string>
+    <string name="updated_bill">Rechnung %1$s aktualisiert</string>
+    <string name="stored_new_bill">Neue Rechnung %1$s gespeichert</string>
+    <string name="search">Suche</string>
+    <string name="make_default_currency">Als Standard festlegen</string>
 
 </resources>

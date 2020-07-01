@@ -120,4 +120,21 @@
     <string name="revenue_account_deleted">已成功刪除收入帳戶 %1$s</string>
     <string name="others">其他</string>
     <string name="classification">分類</string>
+    <string name="about">關於Firefly III</string>
+    <string name="view_on_github">在Github上查看</string>
+    <string name="author">軟體開發者</string>
+    <string name="required_field">必要</string>
+    <string name="net_earnings">淨收益</string>
+    <string name="done">完成</string>
+    <string name="frequency">頻率</string>
+    <string name="updated_bill">已更新帳單%1$s</string>
+    <string name="stored_new_bill">已儲存新帳單%1$s</string>
+    <string name="search">搜尋</string>
+    <string name="make_default_currency">設為預設</string>
+    <string name="discard">放棄更改</string>
+    <string name="insert_link">加外部網</string>
+    <string name="daily_summary">每日概要</string>
+    <string name="six_day_average">平均六天</string>
+    <string name="thirty_day_average">平均三十天</string>
+    <string name="budget_summary">預算概要</string>
 </resources>

@@ -393,7 +393,7 @@
                         android:id="@+id/virtual_balance_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="Virtual balance"
+                        android:hint="@string/virtual_balance"
                         android:inputType="numberDecimal"
                         android:drawablePadding="12dp"
                         android:textSize="16sp" />

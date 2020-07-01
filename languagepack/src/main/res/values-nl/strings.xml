@@ -116,5 +116,10 @@
     <string name="others">OVERIGE</string>
     <string name="accounting">BOEKHOUDEN</string>
     <string name="classification">Indeling</string>
+    <string name="done">Klaar</string>
+    <string name="updated_bill">Contract %1$s geüpdatet</string>
+    <string name="stored_new_bill">Nieuw contract %1$s opgeslagen</string>
+    <string name="search">Zoeken</string>
+    <string name="make_default_currency">Maak standaard</string>
 
 </resources>

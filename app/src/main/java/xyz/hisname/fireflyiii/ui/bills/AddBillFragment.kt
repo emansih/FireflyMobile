@@ -262,7 +262,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                         toastOffline(getString(R.string.data_added_when_user_online, "Bill"))
                         handleBack()
                     } else if (response.getResponse() != null) {
-                        toastSuccess("Bill saved")
+                        toastSuccess(getString(R.string.stored_new_bill, description_edittext.getString()))
                         handleBack()
                     }
                 }
@@ -279,7 +279,8 @@ class AddBillFragment: BaseAddObjectFragment() {
             } else if (response.getError() != null) {
                 toastError(response.getError()?.localizedMessage)
             } else if (response.getResponse() != null) {
-                toastSuccess("Bill updated")
+                val billName = response.getResponse()?.data?.billAttributes?.name
+                toastSuccess(getString(R.string.updated_bill, billName))
                 handleBack()
             }
         }

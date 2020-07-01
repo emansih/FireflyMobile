@@ -116,5 +116,10 @@
     <string name="accounting">CONTABILITÀ</string>
     <string name="others">ALTRO</string>
     <string name="classification">Classificazione</string>
+    <string name="done">Fatto</string>
+    <string name="updated_bill">Bolletta aggiornata %1$s</string>
+    <string name="stored_new_bill">Nuova bolletta memorizzata %1$s</string>
+    <string name="search">Cerca</string>
+    <string name="make_default_currency">Rendila predefinita</string>
 
 </resources>

@@ -1,32 +1,32 @@
 <resources>
 
     <string-array name="interest_period">
-        <item>Per day</item>
-        <item>Per month</item>
-        <item>Per year</item>
+        <item>Por dia</item>
+        <item>Por mês</item>
+        <item>Por ano</item>
     </string-array>
 
     <string-array name="repeat_frequency">
-        <item>Weekly</item>
-        <item>Monthly</item>
-        <item>Quarterly</item>
-        <item>Half-yearly</item>
-        <item>Yearly</item>
+        <item>semanal</item>
+        <item>mensal</item>
+        <item>trimestral</item>
+        <item>cada semestre</item>
+        <item>anual</item>
     </string-array>
 
 
     <string-array name="account_role">
-        <item>Default asset account</item>
-        <item>Shared asset account</item>
-        <item>Savings account</item>
-        <item>Credit card</item>
-        <item>Cash wallet</item>
+        <item>Conta padrão</item>
+        <item>Contas de ativos compartilhadas</item>
+        <item>Conta poupança</item>
+        <item>Cartão de crédito</item>
+        <item>Carteira de dinheiro</item>
     </string-array>
 
     <string-array name="liability_type">
-        <item>Debt</item>
-        <item>Loan</item>
-        <item>Mortgage</item>
+        <item>Dívida</item>
+        <item>Empréstimo</item>
+        <item>Hipoteca</item>
     </string-array>
 
 </resources>

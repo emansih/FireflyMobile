@@ -124,4 +124,9 @@
     <string name="accounting">CONTABILIDADE</string>
     <string name="others">OUTROS</string>
     <string name="classification">Classificação</string>
+    <string name="search">Pesquisa</string>
+    <string name="make_default_currency">Tornar padrão</string>
+    <string name="done">Concluído</string>
+    <string name="updated_bill">Fatura atualizada %1$s</string>
+    <string name="stored_new_bill">Nova fatura armazenada %1$s</string>
 </resources>

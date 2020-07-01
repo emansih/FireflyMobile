@@ -378,7 +378,7 @@
                         android:id="@+id/netEarningsText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Net Earnings"
+                        android:text="@string/net_earnings"
                         android:textStyle="bold"
                         android:layout_margin="8dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -433,7 +433,7 @@
                             android:id="@+id/netEarningsTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Net Earnings"
+                            android:text="@string/net_earnings"
                             android:layout_marginTop="8dp"
                             android:textStyle="bold"
                             app:layout_constraintTop_toBottomOf="@+id/expenseTextView"
@@ -562,7 +562,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:textStyle="bold"
-                        android:text="Daily Summary"
+                        android:text="@string/daily_summary"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -587,7 +587,7 @@
                             android:id="@+id/sixDaysAverageText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="6 Days Average"
+                            android:text="@string/six_day_average"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="4dp"
                             app:layout_constraintStart_toStartOf="parent"
@@ -597,7 +597,7 @@
                             android:id="@+id/thirtyDaysAverageText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="30 Days Average"
+                            android:text="@string/thirty_day_average"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="4dp"
                             app:layout_constraintStart_toStartOf="parent"
@@ -660,7 +660,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:textStyle="bold"
-                        android:text="Budget Summary"
+                        android:text="@string/budget_summary"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"/>
 

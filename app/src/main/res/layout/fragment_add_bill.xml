@@ -200,7 +200,7 @@
                     android:id="@+id/frequency_exposed_dropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Frequency"
+                    android:hint="@string/frequency"
                     android:editable="false" />
             </com.google.android.material.textfield.TextInputLayout>
 

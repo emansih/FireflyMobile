@@ -111,5 +111,22 @@
     <string name="revenue_account_deleted">已成功删除收入帐户 %1$s</string>
     <string name="others">其余</string>
     <string name="classification">分类</string>
+    <string name="about">关于Firefly III</string>
+    <string name="view_on_github">在Github上查看</string>
+    <string name="author">软件开发者</string>
+    <string name="required_field">必要</string>
+    <string name="net_earnings">每股净收益</string>
+    <string name="thirty_day_average">平均三十天</string>
+    <string name="six_day_average">平均六天</string>
+    <string name="done">完成</string>
+    <string name="updated_bill">已更新帐单%1$s</string>
+    <string name="stored_new_bill">已储存新帐单%1$s</string>
+    <string name="search">搜寻</string>
+    <string name="make_default_currency">设为预设</string>
+    <string name="daily_summary">每日概要</string>
+    <string name="budget_summary">预算概要</string>
+    <string name="insert_link">加外部网</string>
+    <string name="discard">放弃更改</string>
+    <string name="frequency">频率</string>
 
 </resources>

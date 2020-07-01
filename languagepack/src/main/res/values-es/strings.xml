@@ -117,4 +117,9 @@
     <string name="accounting">CONTABILIDAD</string>
     <string name="others">OTROS</string>
     <string name="classification">Clasificación</string>
+    <string name="done">Hecho</string>
+    <string name="search">Buscar</string>
+    <string name="updated_bill">Actualizar factura %1$s</string>
+    <string name="stored_new_bill">Factura %1$s creada</string>
+    <string name="make_default_currency">Establecer por defecto</string>
 </resources>
