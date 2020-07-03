@@ -4,6 +4,9 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.preference.PreferenceManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
@@ -16,9 +19,9 @@ abstract class BaseSettings: PreferenceFragmentCompat() {
     protected val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
     protected val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         handleBackPress()
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun setDivider(divider: Drawable) {
