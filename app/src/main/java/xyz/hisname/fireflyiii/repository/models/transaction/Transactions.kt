@@ -1,30 +1,11 @@
 package xyz.hisname.fireflyiii.repository.models.transaction
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
-import xyz.hisname.fireflyiii.repository.models.category.CategoryData
-import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import java.time.LocalDateTime
 
-@Entity(tableName = "transactionTable",
-        foreignKeys = arrayOf(ForeignKey(entity = CategoryData::class, parentColumns = arrayOf("categoryId"),
-                childColumns = arrayOf("category_id"),
-                onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE),
-                ForeignKey(entity = BillData::class, parentColumns = arrayOf("billId"),
-                childColumns = arrayOf("bill_id"),
-                onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE),
-                ForeignKey(entity = BudgetData::class, parentColumns = arrayOf("budgetId"),
-                        childColumns = arrayOf("budget_id"),
-                        onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE),
-                ForeignKey(entity = CurrencyData::class, parentColumns = arrayOf("currencyId"),
-                        childColumns = arrayOf("currency_id"),
-                        onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)
-        ))
-
+@Entity(tableName = "transactionTable")
 data class Transactions(
         @PrimaryKey(autoGenerate = false)
         var transaction_journal_id: Long,
