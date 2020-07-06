@@ -116,7 +116,7 @@ class SettingsAccountFragment: BaseSettings() {
         val refreshTokenInterval = findPreference<ListPreference>("refresh_token_interval") as ListPreference
         autoRefreshToken.setOnPreferenceChangeListener { _, newValue ->
             if(newValue == false){
-                WorkManager.getInstance().cancelAllWorkByTag("refresh_worker")
+                WorkManager.getInstance(requireContext()).cancelAllWorkByTag("refresh_worker")
             } else {
                 AlertDialog.Builder(requireContext())
                         .setTitle(R.string.warning)
@@ -139,7 +139,7 @@ class SettingsAccountFragment: BaseSettings() {
                             .setRequiresBatteryNotLow(true)
                             .build())
                     .build()
-            WorkManager.getInstance().enqueue(workBuilder)
+            WorkManager.getInstance(requireContext()).enqueue(workBuilder)
             true
         }
         val logout = findPreference<Preference>("logout") as Preference
