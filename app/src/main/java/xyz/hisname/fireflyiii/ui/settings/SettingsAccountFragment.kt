@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.observe
 import androidx.preference.EditTextPreference
@@ -71,7 +70,6 @@ class SettingsAccountFragment: BaseSettings() {
 
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->
             preference.summary = newValue.toString()
-            toastInfo("You should also change your access token", Toast.LENGTH_LONG)
             FireflyClient.destroyInstance()
             true
         }
@@ -92,11 +90,7 @@ class SettingsAccountFragment: BaseSettings() {
             }
             true
         }
-        val certBolean = findPreference<SwitchPreference>("enable_cert_pinning") as SwitchPreference
-        certBolean.setOnPreferenceChangeListener { _, _ ->
-            FireflyClient.destroyInstance()
-            true
-        }
+
         val certValue = findPreference<Preference>("cert_value") as Preference
         certValue.setOnPreferenceChangeListener{ _, newValue ->
             try {

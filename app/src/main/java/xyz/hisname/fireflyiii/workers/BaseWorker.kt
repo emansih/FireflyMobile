@@ -20,17 +20,10 @@ abstract class BaseWorker(context: Context, workerParams: WorkerParameters): Cor
 
     private val baseUrl by lazy { AppPref(sharedPref).baseUrl }
     private val accessToken by lazy { AuthenticatorManager(AccountManager.get(context)).accessToken }
-    val genericService by lazy { FireflyClient.getClient(baseUrl,accessToken, getPinValue(), getTrust(), getSslSocket()) }
+    val genericService by lazy { FireflyClient.getClient(baseUrl,accessToken, AppPref(sharedPref).certValue, getTrust(), getSslSocket()) }
     protected val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(context) }
     private val customCa by lazy { CustomCa(("file://" + context.filesDir.path + "/user_custom.pem").toUri().toFile()) }
 
-    private fun getPinValue(): String {
-        var cert = ""
-        if(AppPref(sharedPref).enableCertPinning) {
-            cert = AppPref(sharedPref).certValue
-        }
-        return cert
-    }
 
     private fun getTrust(): X509TrustManager?{
         return if(AppPref(sharedPref).isCustomCa){

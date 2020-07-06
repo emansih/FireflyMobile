@@ -31,9 +31,7 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
 
     protected fun genericService(): Retrofit? {
         var cert = ""
-        if (AppPref(sharedPref).enableCertPinning) {
-            cert = AppPref(sharedPref).certValue
-        }
+        cert = AppPref(sharedPref).certValue
         return if (AppPref(sharedPref).isCustomCa) {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
                     accManager.accessToken, cert, trustManager, sslSocketFactory)

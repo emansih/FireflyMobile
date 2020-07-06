@@ -33,10 +33,6 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getString("cert_value", "") ?: ""
         set(value) = sharedPref.edit { putString("cert_value", value) }
 
-    override var enableCertPinning
-        get() = sharedPref.getBoolean("enable_cert_pinning", false)
-        set(value) = sharedPref.edit{ putBoolean("enable_cert_pinning", value)}
-
     override var languagePref: String
         get() = sharedPref.getString("language_pref", "") ?: "en"
         set(value) = sharedPref.edit{ putString("language_pref", value)}

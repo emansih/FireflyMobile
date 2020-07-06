@@ -8,7 +8,6 @@ interface PreferenceHelper {
     var remoteApiVersion: String
     var serverVersion: String
     var userOs: String
-    var enableCertPinning: Boolean
     var certValue: String
     var languagePref: String
     var nightModeEnabled: Boolean

@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Preference
+        app:iconSpaceReserved="false"
         app:key="auth_method"
         app:title="Authentication Method">
     </Preference>
 
     <Preference
+        app:iconSpaceReserved="false"
         app:key="logout"
         app:title="Logout" />
 
     <EditTextPreference
+        app:iconSpaceReserved="false"
         app:key="fireflyUrl"
         app:title="Firefly URL">
     </EditTextPreference>
 
     <EditTextPreference
+        app:iconSpaceReserved="false"
         app:key="access_token"
         app:title="Access Token">
     </EditTextPreference>
 
-    <SwitchPreference
-        app:key="enable_cert_pinning"
-        app:title="Enable Certificate Pinning">
-    </SwitchPreference>
-
     <EditTextPreference
+        app:iconSpaceReserved="false"
         app:key="cert_value"
         app:title="Certificate Pinning Hash Value"
-        app:useSimpleSummaryProvider="true"
-        app:dependency="enable_cert_pinning">
+        app:summary="Leave blank to disable"
+        app:useSimpleSummaryProvider="true">
     </EditTextPreference>
 
     <Preference
+        app:iconSpaceReserved="false"
         app:key="refresh_token"
         app:title="Refresh Token"
         app:summary="Click here to refresh your token">
@@ -41,11 +41,13 @@
 
 
     <SwitchPreference
+        app:iconSpaceReserved="false"
         app:key="auto_refresh_token"
         app:title="Refresh token in interval">
     </SwitchPreference>
 
     <ListPreference
+        app:iconSpaceReserved="false"
         app:key="refresh_token_interval"
         app:title="Refresh Token Interval"
         app:useSimpleSummaryProvider="true"

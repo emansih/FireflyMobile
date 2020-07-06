@@ -12,6 +12,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
 import kotlinx.android.synthetic.main.activity_base.*
@@ -92,7 +93,7 @@ class SettingsFragment: BaseSettings() {
             true
         }
         nightModePref.icon = IconicsDrawable(requireContext()).apply {
-            icon = GoogleMaterial.Icon.gmd_invert_colors
+            icon = FontAwesome.Icon.faw_moon
             sizeDp = 24
             colorRes = setIconColor()
         }

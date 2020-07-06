@@ -19,10 +19,11 @@
 
     <CheckBoxPreference
         app:key="night_mode"
-        app:title="Enable Night Mode" />
+        app:title="Dark Mode" />
 
     <CheckBoxPreference
         app:key="keyguard"
-        app:title="Activate System's Keyguard on Launch" />
+        app:title="Security"
+        app:summary="Activate System's Keyguard on Launch"/>
 
 </PreferenceScreen>
