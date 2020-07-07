@@ -130,7 +130,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                 if(!swipeContainer.isRefreshing) {
                     swipeContainer.isRefreshing = true
-                    transactionViewModel.getTransactionList(startDate, endDate, transactionType, page + 1).observe(this@TransactionFragmentV1) { transactionList ->
+                    transactionViewModel.getTransactionList(startDate, endDate, transactionType, page + 1).observe(viewLifecycleOwner) { transactionList ->
                         dataAdapter.clear()
                         dataAdapter.addAll(transactionList)
                         rtAdapter.update(transactionList)
