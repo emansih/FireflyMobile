@@ -108,17 +108,19 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     billsToPay.postValue(unPaidBills)
                     billsPaid.postValue(paidBills)
                     leftToSpendDay.postValue(formattedText)
-                } else {
-                    networthValue.postValue(simpleData.networthValue)
-                    leftToSpendValue.postValue(simpleData.leftToSpend)
-                    balanceValue.postValue(simpleData.balance)
-                    earnedValue.postValue(simpleData.earned)
-                    spentValue.postValue(simpleData.spent)
-                    billsToPay.postValue(simpleData.unPaidBills)
-                    billsPaid.postValue(simpleData.paidBills)
-                    leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
                 }
-            }))
+            })
+            { throwable ->
+                networthValue.postValue(simpleData.networthValue)
+                leftToSpendValue.postValue(simpleData.leftToSpend)
+                balanceValue.postValue(simpleData.balance)
+                earnedValue.postValue(simpleData.earned)
+                spentValue.postValue(simpleData.spent)
+                billsToPay.postValue(simpleData.unPaidBills)
+                billsPaid.postValue(simpleData.paidBills)
+                leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
+            }
+            )
 
     }
 }

@@ -18,6 +18,7 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.userinfo.system.SystemInfoModel
 import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
@@ -151,25 +152,24 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun getDefaultCurrency(): LiveData<MutableList<CurrencyData>>{
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         var currencyData: MutableList<CurrencyData> = arrayListOf()
-        genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.enqueue(retrofitCallback({ response ->
-            val systemData = response.body()?.systemData
-            if (systemData != null) {
-                AppPref(sharedPref).serverVersion = systemData.version
-                AppPref(sharedPref).remoteApiVersion = systemData.api_version
-            }
-        })
-        { throwable -> })
-        val fireflyVersionNumber = AppPref(sharedPref).serverVersion
-        var versionNumbering = try {
-            Version(fireflyVersionNumber).compareTo(Version("5.3.0"))
-        } catch (exception: Exception){
-            if(fireflyVersionNumber.contentEquals("5.3.0-alpha.1")){
-                -1
-            } else {
-                1
-            }
-        }
+        var fireflyVersionNumber =  ""
+        var systemInfoModel: SystemInfoModel?
         viewModelScope.launch(Dispatchers.IO){
+            try {
+                systemInfoModel = genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.body()
+                fireflyVersionNumber = systemInfoModel?.systemData?.version ?: AppPref(sharedPref).serverVersion
+            } catch (exception: Exception){
+                fireflyVersionNumber = AppPref(sharedPref).serverVersion
+            }
+            val versionNumbering = try {
+                Version(fireflyVersionNumber).compareTo(Version("5.3.0"))
+            } catch (exception: Exception){
+                if(fireflyVersionNumber.contentEquals("5.3.0-alpha.1")){
+                    -1
+                } else {
+                    1
+                }
+            }
             if(versionNumbering == -1){
                 repository.loadAllData()
             } else {

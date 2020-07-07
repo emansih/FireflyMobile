@@ -10,6 +10,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
 import xyz.hisname.fireflyiii.repository.models.currency.DefaultCurrencyModel
+import java.lang.Exception
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
@@ -31,7 +32,11 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     suspend fun defaultCurrencyWithNetwork(){
         var networkCall: Response<DefaultCurrencyModel>? = null
         withContext(Dispatchers.IO) {
-            networkCall = currencyService?.getDefaultCurrency()
+            try {
+                networkCall = currencyService?.getDefaultCurrency()
+            } catch (exception: Exception){
+
+            }
         }
         val responseBody = networkCall?.body()
         if (responseBody != null && networkCall?.isSuccessful != false) {
@@ -53,25 +58,30 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         var networkCall: Response<CurrencyModel>? = null
         val defaultCurrencyList: MutableList<CurrencyData> = arrayListOf()
         withContext(Dispatchers.IO) {
-            networkCall = currencyService?.getSuspendedPaginatedCurrency(1)
-        }
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall?.isSuccessful != false) {
-            withContext(Dispatchers.IO){
-                defaultCurrencyList.addAll(responseBody.data)
-                if(responseBody.meta.pagination.total_pages > 1){
-                    for(pagination in 2..responseBody.meta.pagination.total_pages){
-                        val currencyCall = currencyService?.getSuspendedPaginatedCurrency(pagination)
-                        currencyCall?.body()?.data?.let { defaultCurrencyList.addAll(it) }
+            try {
+                networkCall = currencyService?.getSuspendedPaginatedCurrency(1)
+                val responseBody = networkCall?.body()
+                if (responseBody != null && networkCall?.isSuccessful != false) {
+                    withContext(Dispatchers.IO){
+                        defaultCurrencyList.addAll(responseBody.data)
+                        if(responseBody.meta.pagination.total_pages > 1){
+                            for(pagination in 2..responseBody.meta.pagination.total_pages){
+                                val currencyCall = currencyService?.getSuspendedPaginatedCurrency(pagination)
+                                currencyCall?.body()?.data?.let { defaultCurrencyList.addAll(it) }
+                            }
+                        }
+                        deleteDefaultCurrency()
+                        defaultCurrencyList.forEach {
+                            currencyDao.insert(it)
+
+                        }
                     }
                 }
-                deleteDefaultCurrency()
-                defaultCurrencyList.forEach {
-                    currencyDao.insert(it)
+            } catch (exception: Exception){
 
-                }
             }
         }
+
     }
 
     private suspend fun loadPaginatedData(pageNumber: Int){
