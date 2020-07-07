@@ -69,8 +69,6 @@ class ListAccountFragment: BaseFragment() {
                         noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
                     }
                 }
-                noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill))
-                noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
             } else {
                 noAccountText.isGone = true
                 noAccountImage.isGone = true
