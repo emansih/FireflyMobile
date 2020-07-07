@@ -236,27 +236,28 @@ class HomeActivity: BaseActivity(){
                 sizeDp = 24
             })
             isSelectable = false
-            withSubItems(
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.asset_account
-                    level = 3
-                    identifier = 3
-                },
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.expense_account
-                    level = 3
-                    identifier = 4
-                },
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.revenue_account
-                    level = 3
-                    identifier = 5
-                },
-                SecondaryDrawerItem().apply {
-                    nameRes = R.string.liability_account
-                    level = 3
-                    identifier = 21
-                })
+            subItems = mutableListOf(
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.asset_account
+                        level = 3
+                        identifier = 3
+                    },
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.expense_account
+                        level = 3
+                        identifier = 4
+                    },
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.revenue_account
+                        level = 3
+                        identifier = 5
+                    },
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.liability_account
+                        level = 3
+                        identifier = 21
+                    }
+            )
         }
 
         val budgets = PrimaryDrawerItem().apply {
@@ -275,7 +276,7 @@ class HomeActivity: BaseActivity(){
             icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_tag).apply {
                 sizeDp = 24
             })
-            withSubItems(
+            subItems = mutableListOf(
                     SecondaryDrawerItem().apply {
                         identifier = 7
                         nameRes = R.string.categories
@@ -304,19 +305,23 @@ class HomeActivity: BaseActivity(){
             })
             isIconTinted = true
             isSelectable = false
-            withSubItems(SecondaryDrawerItem().apply {
-                nameRes = R.string.withdrawal
-                level = 3
-                identifier = 11
-            },SecondaryDrawerItem().apply {
-                nameRes = R.string.revenue_income_menu
-                level = 3
-                identifier = 12
-            }, SecondaryDrawerItem().apply {
-                nameRes = R.string.transfer
-                level = 3
-                identifier = 13
-            })
+            subItems = mutableListOf(
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.withdrawal
+                        level = 3
+                        identifier = 11
+                    },
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.revenue_income_menu
+                        level = 3
+                        identifier = 12
+                    },
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.transfer
+                        level = 3
+                        identifier = 13
+                    }
+            )
         }
 
         val piggyBank = PrimaryDrawerItem().apply {
@@ -357,16 +362,18 @@ class HomeActivity: BaseActivity(){
             })
             isSelectable = false
             isIconTinted = true
-            withSubItems(SecondaryDrawerItem().apply {
-                nameRes = R.string.settings
-                level = 4
-                identifier = 19
-            }, SecondaryDrawerItem().apply {
-                nameRes = R.string.currency
-                level = 4
-                isIconTinted = true
-                identifier = 22
-            }
+            subItems = mutableListOf(
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.settings
+                        level = 4
+                        identifier = 19
+                    },
+                    SecondaryDrawerItem().apply {
+                        nameRes = R.string.currency
+                        level = 4
+                        isIconTinted = true
+                        identifier = 22
+                    }
             )
         }
 
