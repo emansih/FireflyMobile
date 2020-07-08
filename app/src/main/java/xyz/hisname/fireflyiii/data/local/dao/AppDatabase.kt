@@ -5,8 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
@@ -14,13 +12,13 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListFts
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.Spent
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryFts
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyFts
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.GsonConverterUtil
@@ -29,7 +27,7 @@ import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
-    BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class],
+    BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class, Spent::class],
         version = 15,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
@@ -44,6 +42,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun budgetListDataDao(): BudgetListDataDao
     abstract fun tagsDataDao(): TagsDataDao
     abstract fun attachmentDataDao(): AttachmentDataDao
+    abstract fun spentDataDao(): SpentDataDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

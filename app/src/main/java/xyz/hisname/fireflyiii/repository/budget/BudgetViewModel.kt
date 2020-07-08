@@ -22,16 +22,16 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
 
     val repository: BudgetRepository
     private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
-    private var currentMonthSpent = 0.toDouble()
     private var currentMonthBudgetValue: MutableLiveData<String> = MutableLiveData()
     private var currentMonthSpentValue: MutableLiveData<String> = MutableLiveData()
     val spentBudgetLoader: MutableLiveData<Boolean> = MutableLiveData()
     val budgetName =  MutableLiveData<String>()
+    private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
 
     init {
         val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
         val budgetListDao = AppDatabase.getInstance(application).budgetListDataDao()
-        repository = BudgetRepository(budgetDao, budgetListDao)
+        repository = BudgetRepository(budgetDao, budgetListDao, spentDao)
     }
 
     fun retrieveAllBudgetLimits(): LiveData<MutableList<BudgetListData>> {
@@ -57,7 +57,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                         }
                     }
                     viewModelScope.launch(Dispatchers.IO){
-                        budgetListData.forEachIndexed { _, budgetData ->
+                        budgetListData.forEach { budgetData ->
                             repository.insertBudgetList(budgetData)
                         }
                     }
@@ -193,9 +193,9 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     fun retrieveSpentBudget(currencyCode: String): LiveData<String>{
         spentBudgetLoader.value = true
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
+        var budgetSpent = 0.0
         budgetService?.getPaginatedSpentBudget(1, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ response ->
-            val responseError = response.errorBody()
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 if (responseBody != null) {
@@ -220,64 +220,23 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                             }
                         }.invokeOnCompletion {
                             viewModelScope.launch(Dispatchers.IO) {
-                                budgetListData = repository.allBudgetList()
+                                budgetSpent = repository.allActiveSpentList(currencyCode)
                             }.invokeOnCompletion {
-                                currentMonthSpent = 0.toDouble()
-                                budgetListData.forEachIndexed { _, budgetData ->
-                                    budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
-                                        if(spent.currency_code == currencyCode){
-                                            currentMonthSpent += spent.amount
-                                        }
-                                    }
-                                }
                                 spentBudgetLoader.postValue(false)
-                                currentMonthSpentValue.postValue(Math.abs(currentMonthSpent).toString())
+                                currentMonthSpentValue.postValue(budgetSpent.toString())
                             }
                         }
                     }
-                }
-            } else {
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(gson == null){
-                        apiResponse.postValue("Error Loading Data")
-                    } else {
-                        apiResponse.postValue(errorBody)
-                    }
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    budgetListData = repository.allBudgetList()
-                }.invokeOnCompletion {
-                    currentMonthSpent = 0.toDouble()
-                    budgetListData.forEachIndexed { _, budgetData ->
-                        budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
-                            if(spent.currency_code == currencyCode){
-                                currentMonthSpent += spent.amount
-                            }
-                        }
-                    }
-                    spentBudgetLoader.postValue(false)
-                    currentMonthSpentValue.postValue(Math.abs(currentMonthSpent).toString())
                 }
             }
         })
         { throwable ->
             viewModelScope.launch(Dispatchers.IO) {
-                budgetListData = repository.allBudgetList()
+                budgetSpent = repository.allActiveSpentList(currencyCode)
             }.invokeOnCompletion {
-                currentMonthSpent = 0.toDouble()
-                budgetListData.forEachIndexed { _, budgetData ->
-                    budgetData.budgetListAttributes?.spent?.forEachIndexed { _, spent ->
-                        if(spent.currency_code == currencyCode){
-                            currentMonthSpent += spent.amount
-                        }
-                    }
-                }
-                currentMonthSpentValue.postValue(Math.abs(currentMonthSpent).toString())
+                currentMonthSpentValue.postValue(budgetSpent.toString())
                 spentBudgetLoader.postValue(false)
             }
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
         })
         return currentMonthSpentValue
     }

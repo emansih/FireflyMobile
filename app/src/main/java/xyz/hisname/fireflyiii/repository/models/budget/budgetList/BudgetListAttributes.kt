@@ -1,13 +1,17 @@
 package xyz.hisname.fireflyiii.repository.models.budget.budgetList
 
 import androidx.room.Entity
+import androidx.room.Ignore
 
 @Entity
 data class BudgetListAttributes(
-        val active: Boolean?,
-        val created_at: String?,
-        val name: String,
-        val order: Int?,
-        val spent: List<Spent>?,
-        val updated_at: String?
-)
+        var active: Boolean?,
+        var created_at: String?,
+        var name: String,
+        var order: Int?,
+        @Ignore
+        var spent: List<Spent>?,
+        var updated_at: String?
+){
+        constructor() : this(true,"","",1,null,"")
+}
