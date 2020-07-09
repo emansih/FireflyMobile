@@ -18,8 +18,8 @@ interface BudgetService {
     fun getPaginatedBudget(@Query("page") page: Int): Call<BudgetModel>
 
     @GET(BUDGET_API_ENDPOINT)
-    fun getPaginatedSpentBudget(@Query("page") page: Int, @Query("start") start: String,
-                                @Query("end") end: String): Call<BudgetListModel>
+    suspend fun getPaginatedSpentBudget(@Query("page") page: Int, @Query("start") start: String,
+                                @Query("end") end: String): Response<BudgetListModel>
 
     @GET(BUDGET_API_ENDPOINT)
     suspend fun getPaginatedSpentBudget(@Query("page") page: Int): Response<BudgetListModel>

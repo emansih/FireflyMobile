@@ -23,8 +23,6 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     val repository: BudgetRepository
     private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
     private var currentMonthBudgetValue: MutableLiveData<String> = MutableLiveData()
-    private var currentMonthSpentValue: MutableLiveData<String> = MutableLiveData()
-    val spentBudgetLoader: MutableLiveData<Boolean> = MutableLiveData()
     val budgetName =  MutableLiveData<String>()
     private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
 
@@ -145,53 +143,14 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun retrieveSpentBudget(currencyCode: String): LiveData<String>{
-        spentBudgetLoader.value = true
-        var budgetListData: MutableList<BudgetListData> = arrayListOf()
         var budgetSpent = 0.0
-        budgetService?.getPaginatedSpentBudget(1, DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ response ->
-            if (response.isSuccessful) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    val networkData = responseBody.data
-                    budgetListData.addAll(networkData)
-                    viewModelScope.launch(Dispatchers.IO) {
-                        repository.deleteBudgetList()
-                    }.invokeOnCompletion {
-                        if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
-                            for (pagination in 2..responseBody.meta.pagination.total_pages) {
-                                budgetService?.getPaginatedSpentBudget(pagination, DateTimeUtil.getStartOfMonth(),
-                                        DateTimeUtil.getEndOfMonth())?.enqueue(retrofitCallback({ respond ->
-                                    respond.body()?.data?.forEachIndexed { _, budgetList ->
-                                        budgetListData.add(budgetList)
-                                    }
-                                }))
-                            }
-                        }
-                        viewModelScope.launch(Dispatchers.IO) {
-                            budgetListData.forEachIndexed { _, data ->
-                                repository.insertBudgetList(data)
-                            }
-                        }.invokeOnCompletion {
-                            viewModelScope.launch(Dispatchers.IO) {
-                                budgetSpent = repository.allActiveSpentList(currencyCode)
-                            }.invokeOnCompletion {
-                                spentBudgetLoader.postValue(false)
-                                currentMonthSpentValue.postValue(budgetSpent.toString())
-                            }
-                        }
-                    }
-                }
-            }
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                budgetSpent = repository.allActiveSpentList(currencyCode)
-            }.invokeOnCompletion {
-                currentMonthSpentValue.postValue(budgetSpent.toString())
-                spentBudgetLoader.postValue(false)
-            }
-        })
+        val currentMonthSpentValue: MutableLiveData<String> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO) {
+            budgetSpent = repository.allActiveSpentList(currencyCode, DateTimeUtil.getStartOfMonth(),
+                    DateTimeUtil.getEndOfMonth())
+        }.invokeOnCompletion {
+            currentMonthSpentValue.postValue(budgetSpent.toString())
+        }
         return currentMonthSpentValue
     }
 }

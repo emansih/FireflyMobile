@@ -67,7 +67,43 @@ class BudgetRepository(private val budget: BudgetDataDao,
         return budgetList.getAllBudgetList(pageNumber = pageNumber * Constants.PAGE_SIZE)
     }
 
-    suspend fun allActiveSpentList(currencyCode: String) = spentDao.getAllActiveBudgetList(currencyCode)
+    suspend fun allActiveSpentList(currencyCode: String, startDate: String, endDate: String): Double{
+        var networkCall: Response<BudgetListModel>?
+        val budgetListData: MutableList<BudgetListData> = arrayListOf()
+        try {
+            withContext(Dispatchers.IO) {
+                networkCall = budgetService?.getPaginatedSpentBudget(1, startDate, endDate)
+            }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall?.isSuccessful == true) {
+                budgetListData.addAll(responseBody.data)
+                if(responseBody.meta.pagination.current_page == 1){
+                    withContext(Dispatchers.IO) {
+                        deleteBudgetList()
+                    }
+                }
+                withContext(Dispatchers.IO) {
+                    if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
+                        for (pagination in 2..responseBody.meta.pagination.total_pages) {
+                            val repeatedCall = budgetService?.getPaginatedSpentBudget(pagination, startDate, endDate)
+                            val repeatedCallBody = repeatedCall?.body()
+                            if(repeatedCallBody != null){
+                                budgetListData.addAll(repeatedCallBody.data)
+                            }
+                        }
+                    }
+                }
+
+            }
+            withContext(Dispatchers.IO){
+                budgetListData.forEach { budgetList ->
+                    insertBudgetList(budgetList)
+                }
+            }
+        } catch (exception: Exception){ }
+
+        return spentDao.getAllActiveBudgetList(currencyCode)
+    }
 
     suspend fun deleteBudgetList() = budgetList.deleteAllBudgetList()
 
