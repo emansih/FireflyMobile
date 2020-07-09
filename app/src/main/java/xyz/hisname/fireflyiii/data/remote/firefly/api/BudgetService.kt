@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.remote.firefly.api
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 import xyz.hisname.fireflyiii.Constants.Companion.AVAILABLE_BUDGET_API_ENDPOINT
@@ -21,6 +22,6 @@ interface BudgetService {
                                 @Query("end") end: String): Call<BudgetListModel>
 
     @GET(BUDGET_API_ENDPOINT)
-    fun getPaginatedSpentBudget(@Query("page") page: Int): Call<BudgetListModel>
+    suspend fun getPaginatedSpentBudget(@Query("page") page: Int): Response<BudgetListModel>
 
 }

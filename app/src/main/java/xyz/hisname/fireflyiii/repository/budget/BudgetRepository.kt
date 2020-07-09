@@ -4,17 +4,22 @@ import androidx.annotation.WorkerThread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import retrofit2.Response
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.BudgetDataDao
 import xyz.hisname.fireflyiii.data.local.dao.BudgetListDataDao
 import xyz.hisname.fireflyiii.data.local.dao.SpentDataDao
+import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListModel
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
 class BudgetRepository(private val budget: BudgetDataDao,
                        private val budgetList: BudgetListDataDao,
-                       private val spentDao: SpentDataDao) {
+                       private val spentDao: SpentDataDao,
+                       private val budgetService: BudgetService? = null) {
 
     suspend fun insertBudget(budgetData: BudgetData){
         budget.insert(budgetData)
@@ -38,7 +43,29 @@ class BudgetRepository(private val budget: BudgetDataDao,
         }
     }
 
-    suspend fun allBudgetList() = budgetList.getAllBudgetList()
+    suspend fun allBudgetList(pageNumber: Int): MutableList<BudgetListData>{
+        var networkCall: Response<BudgetListModel>?
+        try {
+            withContext(Dispatchers.IO) {
+                networkCall = budgetService?.getPaginatedSpentBudget(pageNumber)
+            }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall?.isSuccessful == true) {
+                if(pageNumber == 1){
+                    withContext(Dispatchers.IO) {
+                        deleteBudgetList()
+                    }
+                }
+                withContext(Dispatchers.IO) {
+                    responseBody.data.forEachIndexed { _, budgetList ->
+                        insertBudgetList(budgetList)
+                    }
+                }
+
+            }
+        } catch (exception: Exception){ }
+        return budgetList.getAllBudgetList(pageNumber = pageNumber * Constants.PAGE_SIZE)
+    }
 
     suspend fun allActiveSpentList(currencyCode: String) = spentDao.getAllActiveBudgetList(currencyCode)
 

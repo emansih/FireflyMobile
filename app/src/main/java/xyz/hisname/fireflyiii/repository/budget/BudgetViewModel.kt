@@ -34,62 +34,16 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         repository = BudgetRepository(budgetDao, budgetListDao, spentDao)
     }
 
-    fun retrieveAllBudgetLimits(): LiveData<MutableList<BudgetListData>> {
+    fun retrieveAllBudgetLimits(pageNumber: Int): LiveData<MutableList<BudgetListData>> {
         isLoading.value = true
         var budgetListData: MutableList<BudgetListData> = arrayListOf()
         val data: MutableLiveData<MutableList<BudgetListData>> = MutableLiveData()
-        budgetService?.getPaginatedSpentBudget(1)?.enqueue(retrofitCallback({ response ->
-            val responseError = response.errorBody()
-            val responseBody = response.body()
-            if(responseBody != null) {
-                val networkData = responseBody.data
-                viewModelScope.launch(Dispatchers.IO) {
-                    repository.deleteBudgetList()
-                }.invokeOnCompletion {
-                    budgetListData.addAll(networkData)
-                    if (responseBody.meta.pagination.total_pages > responseBody.meta.pagination.current_page){
-                        for(items in 2..responseBody.meta.pagination.total_pages){
-                            budgetService?.getPaginatedSpentBudget(items)?.enqueue(retrofitCallback({ pagination ->
-                                pagination.body()?.data?.forEachIndexed{ _, pigData ->
-                                    budgetListData.add(pigData)
-                                }
-                            }))
-                        }
-                    }
-                    viewModelScope.launch(Dispatchers.IO){
-                        budgetListData.forEach { budgetData ->
-                            repository.insertBudgetList(budgetData)
-                        }
-                    }
-                    data.postValue(budgetListData.toMutableList())
-                }
-            } else {
-                if (responseError != null) {
-                    val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(gson == null){
-                        apiResponse.postValue("Error Loading Data")
-                    } else {
-                        apiResponse.postValue(errorBody)
-                    }
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    budgetListData = repository.allBudgetList()
-                }.invokeOnCompletion {
-                    data.postValue(budgetListData)
-                }
-            }
-            isLoading.value = false
-        })
-        { throwable ->
-            viewModelScope.launch(Dispatchers.IO) {
-                budgetListData = repository.allBudgetList()
-            }.invokeOnCompletion {
-                data.postValue(budgetListData)
-            }
-            isLoading.value = false
-            apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-        })
+        viewModelScope.launch(Dispatchers.IO){
+            budgetListData = repository.allBudgetList(pageNumber)
+        }.invokeOnCompletion {
+            isLoading.postValue(false)
+            data.postValue(budgetListData)
+        }
         return data
     }
 

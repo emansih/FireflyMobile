@@ -8,8 +8,8 @@ import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 @Dao
 abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
 
-    @Query("SELECT * FROM budget_list WHERE active = :budgetActive")
-    abstract fun getAllBudgetList(budgetActive: Int = 1): MutableList<BudgetListData>
+    @Query("SELECT name FROM budget_list WHERE active = :budgetActive ORDER BY budgetListId DESC LIMIT :pageNumber")
+    abstract fun getAllBudgetList(budgetActive: Int = 1, pageNumber: Int): MutableList<BudgetListData>
 
     @Query("DELETE FROM budget_list")
     abstract fun deleteAllBudgetList(): Int
