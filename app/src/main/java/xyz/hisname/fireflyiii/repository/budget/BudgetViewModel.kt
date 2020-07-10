@@ -29,7 +29,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
     init {
         val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
         val budgetListDao = AppDatabase.getInstance(application).budgetListDataDao()
-        repository = BudgetRepository(budgetDao, budgetListDao, spentDao)
+        repository = BudgetRepository(budgetDao, budgetListDao, spentDao, budgetService)
     }
 
     fun retrieveAllBudgetLimits(pageNumber: Int): LiveData<MutableList<BudgetListData>> {
