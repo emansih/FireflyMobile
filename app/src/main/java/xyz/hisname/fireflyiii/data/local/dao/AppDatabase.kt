@@ -13,6 +13,7 @@ import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListFts
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.Spent
+import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryFts
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
@@ -27,7 +28,7 @@ import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
-    BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class, Spent::class],
+    BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class, Spent::class, BudgetLimitData::class],
         version = 15,exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
@@ -43,6 +44,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun tagsDataDao(): TagsDataDao
     abstract fun attachmentDataDao(): AttachmentDataDao
     abstract fun spentDataDao(): SpentDataDao
+    abstract fun budgetLimitDao(): BudgetLimitDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

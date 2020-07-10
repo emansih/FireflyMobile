@@ -31,12 +31,13 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 class BudgetSummaryFragment: BaseFragment() {
 
-    private val budgetLimit by lazy { getViewModel(BudgetViewModel::class.java) }
+    private val budgetViewModel by lazy { getImprovedViewModel(BudgetViewModel::class.java) }
     private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
     private val coloring = arrayListOf<Int>()
@@ -69,8 +70,8 @@ class BudgetSummaryFragment: BaseFragment() {
                 DateTimeUtil.getEndOfMonth(), currencyCode, "withdrawal"),
                 transactionViewModel.getUniqueBudgetByDate(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), currencyCode, "withdrawal")),
-                zipLiveData(budgetLimit.retrieveSpentBudget(currencyData.currencyAttributes?.code ?: ""),
-                        budgetLimit.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(viewLifecycleOwner) { fireflyData ->
+                zipLiveData(budgetViewModel.retrieveSpentBudget(currencyData.currencyAttributes?.code ?: ""),
+                        budgetViewModel.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(viewLifecycleOwner) { fireflyData ->
             if(fireflyData.first.second.isNotEmpty()) {
                 val pieEntryArray: ArrayList<PieEntry> = ArrayList(fireflyData.first.second.size)
                 fireflyData.first.second.forEachIndexed { _, uniqueBudget ->
@@ -132,16 +133,21 @@ class BudgetSummaryFragment: BaseFragment() {
                     budgetAmountValue.text = "--.--"
                     actualAmountValue.text = "--.--"
                     remainingAmountValue.text = "--.--"
-                    transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), currencyCode, "withdrawal",
-                            pe.label).observe(viewLifecycleOwner) { value ->
-                        budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + entry.value
-                        actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
-                                LocaleNumberParser.parseDecimal(value, requireContext())
-                        remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " +
-                                LocaleNumberParser.parseDecimal((entry.value - Math.abs(value)), requireContext())
-
+                    zipLiveData(budgetViewModel.retrieveBudgetLimit(entry.label, currencyCode, DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth()), budgetViewModel.retrieveSpentBudgetById(entry.label, currencyCode)).observe(viewLifecycleOwner){ value ->
+                        val remainingValue = LocaleNumberParser.parseDecimal((value.first - abs(value.second.toDouble())), requireContext())
+                        budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + value.first
+                        actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + value.second
+                        remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " + remainingValue
+                        if(remainingValue.toString().contains("-")){
+                            remainingAmountValue.setTextColor(getCompatColor(R.color.md_red_A700))
+                            remainingBudgetText.setTextColor(getCompatColor(R.color.md_red_A700))
+                        } else {
+                            remainingAmountValue.setTextColor(getCompatColor(R.color.md_green_700))
+                            remainingBudgetText.setTextColor(getCompatColor(R.color.md_green_700))
+                        }
                     }
+
                     showTransactionButton.setOnClickListener {
                         val transactionDialog = TransactionByBudgetDialogFragment()
                         transactionDialog.arguments = bundleOf("budgetName" to pe.label)

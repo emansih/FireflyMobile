@@ -7,18 +7,23 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.BudgetDataDao
+import xyz.hisname.fireflyiii.data.local.dao.BudgetLimitDao
 import xyz.hisname.fireflyiii.data.local.dao.BudgetListDataDao
 import xyz.hisname.fireflyiii.data.local.dao.SpentDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListModel
+import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitModel
+import xyz.hisname.fireflyiii.util.DateTimeUtil
+import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
 class BudgetRepository(private val budget: BudgetDataDao,
                        private val budgetList: BudgetListDataDao,
                        private val spentDao: SpentDataDao,
+                       private val budgetLimitDao: BudgetLimitDao,
                        private val budgetService: BudgetService? = null) {
 
     suspend fun insertBudget(budgetData: BudgetData){
@@ -77,12 +82,10 @@ class BudgetRepository(private val budget: BudgetDataDao,
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall?.isSuccessful == true) {
                 budgetListData.addAll(responseBody.data)
-                if(responseBody.meta.pagination.current_page == 1){
-                    withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO){
+                    if(responseBody.meta.pagination.current_page == 1){
                         deleteBudgetList()
                     }
-                }
-                withContext(Dispatchers.IO) {
                     if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
                         for (pagination in 2..responseBody.meta.pagination.total_pages) {
                             val repeatedCall = budgetService?.getPaginatedSpentBudget(pagination, startDate, endDate)
@@ -92,20 +95,23 @@ class BudgetRepository(private val budget: BudgetDataDao,
                             }
                         }
                     }
-                }
 
-            }
-            withContext(Dispatchers.IO){
+                }
                 budgetListData.forEach { budgetList ->
                     insertBudgetList(budgetList)
                 }
             }
         } catch (exception: Exception){ }
-
         return spentDao.getAllActiveBudgetList(currencyCode)
     }
 
     suspend fun deleteBudgetList() = budgetList.deleteAllBudgetList()
+
+    suspend fun getBudgetListByIdAndCurrencyCode(budgetName: String, currencyCode: String): Double {
+        val budgetNameList = searchBudgetByName(budgetName)
+        val budgetId = budgetNameList[0].budgetListId ?: 0
+        return spentDao.getBudgetListByIdAndCurrencyCode(budgetId, currencyCode)
+    }
 
     suspend fun retrieveConstraintBudgetWithCurrency(startDate: String, endDate: String,
                                                      currencyCode: String) =
@@ -113,4 +119,23 @@ class BudgetRepository(private val budget: BudgetDataDao,
 
     suspend fun searchBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)
 
+    suspend fun getBudgetLimitByName(budgetName: String, currencyCode: String, startDate: String, endDate: String): Double{
+        val budgetNameList = searchBudgetByName(budgetName)
+        val budgetId = budgetNameList[0].budgetListId ?: 0
+        var networkCall: Response<BudgetLimitModel>?
+        try {
+            withContext(Dispatchers.IO){
+                networkCall = budgetService?.getBudgetLimit(budgetId, startDate,
+                        endDate)
+            }
+            val responseBody = networkCall?.body()
+            if(responseBody != null && networkCall?.isSuccessful == true){
+                budgetLimitDao.deleteAllBudgetLimit()
+                responseBody.budgetLimitData.forEach { limitData ->
+                    budgetLimitDao.insert(limitData)
+                }
+            }
+        } catch (exception: Exception){}
+        return budgetLimitDao.getBudgetLimitByIdAndCurrencyCode(budgetId, currencyCode)
+    }
 }

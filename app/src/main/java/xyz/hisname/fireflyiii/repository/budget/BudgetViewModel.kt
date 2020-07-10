@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -20,16 +21,17 @@ import java.math.BigDecimal
 
 class BudgetViewModel(application: Application): BaseViewModel(application) {
 
-    val repository: BudgetRepository
+    private val repository: BudgetRepository
     private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
     private var currentMonthBudgetValue: MutableLiveData<String> = MutableLiveData()
     val budgetName =  MutableLiveData<String>()
     private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
+    private val budgetLimitDao by lazy { AppDatabase.getInstance(application).budgetLimitDao() }
+    private val budgetDao by lazy { AppDatabase.getInstance(application).budgetDataDao() }
+    private val budgetListDao by lazy { AppDatabase.getInstance(application).budgetListDataDao() }
 
     init {
-        val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
-        val budgetListDao = AppDatabase.getInstance(application).budgetListDataDao()
-        repository = BudgetRepository(budgetDao, budgetListDao, spentDao, budgetService)
+        repository = BudgetRepository(budgetDao, budgetListDao, spentDao, budgetLimitDao, budgetService)
     }
 
     fun retrieveAllBudgetLimits(pageNumber: Int): LiveData<MutableList<BudgetListData>> {
@@ -152,5 +154,27 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             currentMonthSpentValue.postValue(budgetSpent.toString())
         }
         return currentMonthSpentValue
+    }
+
+    fun retrieveSpentBudgetById(budgetName: String, currencyCode: String): LiveData<String>{
+        var budgetSpent = 0.0
+        val currentMonthSpentValue: MutableLiveData<String> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO) {
+            budgetSpent = repository.getBudgetListByIdAndCurrencyCode(budgetName, currencyCode)
+        }.invokeOnCompletion {
+            currentMonthSpentValue.postValue(budgetSpent.toString())
+        }
+        return currentMonthSpentValue
+    }
+
+    fun retrieveBudgetLimit(budgetName: String, currencyCode: String, startOfMonth: String, endOfMonth: String): LiveData<Double>{
+        var budgetLimit = 0.0
+        val budgetLimitLiveData: MutableLiveData<Double> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            budgetLimit = repository.getBudgetLimitByName(budgetName, currencyCode, startOfMonth, endOfMonth)
+        }.invokeOnCompletion {
+            budgetLimitLiveData.postValue(budgetLimit)
+        }
+        return budgetLimitLiveData
     }
 }

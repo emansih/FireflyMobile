@@ -16,7 +16,7 @@
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/budgetSummaryPieChart"
                 android:layout_width="match_parent"
-                android:layout_height="280dp"
+                android:layout_height="300dp"
                 android:layout_marginTop="40dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -44,6 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/spent"
+                android:textColor="@color/md_red_A700"
                 app:layout_constraintTop_toBottomOf="@+id/budgetAmountText"
                 app:layout_constraintStart_toStartOf="@+id/budgetDuration"/>
 
@@ -67,6 +68,7 @@
                 android:id="@+id/actualAmountValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/md_red_A700"
                 app:layout_constraintStart_toStartOf="@+id/budgetAmountValue"
                 app:layout_constraintTop_toTopOf="@+id/actualBudgetText"
                 app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
