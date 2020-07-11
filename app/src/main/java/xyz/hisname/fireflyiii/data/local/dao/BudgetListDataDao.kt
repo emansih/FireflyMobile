@@ -17,5 +17,5 @@ abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
     @Transaction
     @Query("SELECT budget_list.name, budget_list.budgetListId FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId " +
             "= budgetListFts.budgetListId) WHERE budgetListFts MATCH :budgetName")
-    abstract fun searchBudgetName(budgetName: String): MutableList<BudgetListData>
+    abstract fun searchBudgetName(budgetName: String?): MutableList<BudgetListData>
 }
