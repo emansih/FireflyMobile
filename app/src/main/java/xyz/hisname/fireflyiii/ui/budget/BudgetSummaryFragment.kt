@@ -43,6 +43,7 @@ class BudgetSummaryFragment: BaseFragment() {
     private val coloring = arrayListOf<Int>()
     private var budgetSpent = 0f
     private var budgeted = 0f
+    private var noExpenses = 0.0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.create(R.layout.fragment_budget_summary, container)
@@ -74,7 +75,7 @@ class BudgetSummaryFragment: BaseFragment() {
                         budgetViewModel.retrieveCurrentMonthBudget(currencyData.currencyAttributes?.code ?: ""))).observe(viewLifecycleOwner) { fireflyData ->
             if(fireflyData.first.second.isNotEmpty()) {
                 val pieEntryArray: ArrayList<PieEntry> = ArrayList(fireflyData.first.second.size)
-                fireflyData.first.second.forEachIndexed { _, uniqueBudget ->
+                fireflyData.first.second.forEach {  uniqueBudget ->
                     transactionViewModel.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), currencyCode,
                             "withdrawal", uniqueBudget).observe(viewLifecycleOwner) { transactionAmount ->
@@ -82,10 +83,11 @@ class BudgetSummaryFragment: BaseFragment() {
                                 .toDouble()
                                 .div(fireflyData.first.first.absoluteValue.roundToInt().toDouble())
                                 .times(100)
-                        if (uniqueBudget == "null" || uniqueBudget == null) {
+                        if (uniqueBudget == null) {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(),
                                     requireContext().getString(R.string.expenses_without_budget),
                                     transactionAmount))
+                            noExpenses = transactionAmount
                         } else {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(), uniqueBudget, transactionAmount))
                         }
@@ -133,20 +135,32 @@ class BudgetSummaryFragment: BaseFragment() {
                     budgetAmountValue.text = "--.--"
                     actualAmountValue.text = "--.--"
                     remainingAmountValue.text = "--.--"
-                    zipLiveData(budgetViewModel.retrieveBudgetLimit(entry.label, currencyCode, DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth()), budgetViewModel.retrieveSpentBudgetById(entry.label, currencyCode)).observe(viewLifecycleOwner){ value ->
+                    val entryLabel = if(entry.label == requireContext().getString(R.string.expenses_without_budget)){
+                        null
+                    } else {
+                        entry.label
+                    }
+                    zipLiveData(budgetViewModel.retrieveBudgetLimit(entryLabel, currencyCode, DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth()), budgetViewModel.retrieveSpentBudgetById(entryLabel, currencyCode)).observe(viewLifecycleOwner) { value ->
                         val remainingValue = LocaleNumberParser.parseDecimal((value.first - abs(value.second.toDouble())), requireContext())
                         budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + value.first
                         actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + value.second
                         remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " + remainingValue
-                        if(remainingValue.toString().contains("-")){
-                            remainingAmountValue.setTextColor(getCompatColor(R.color.md_red_A700))
-                            remainingBudgetText.setTextColor(getCompatColor(R.color.md_red_A700))
+                        if(entryLabel != null) {
+                            if (remainingValue.toString().contains("-")) {
+                                remainingAmountValue.setTextColor(getCompatColor(R.color.md_red_A700))
+                                remainingBudgetText.setTextColor(getCompatColor(R.color.md_red_A700))
+                            } else {
+                                remainingAmountValue.setTextColor(getCompatColor(R.color.md_green_700))
+                                remainingBudgetText.setTextColor(getCompatColor(R.color.md_green_700))
+                            }
                         } else {
-                            remainingAmountValue.setTextColor(getCompatColor(R.color.md_green_700))
-                            remainingBudgetText.setTextColor(getCompatColor(R.color.md_green_700))
+                            budgetAmountValue.text = "--.--"
+                            actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + noExpenses.toString()
+                            remainingAmountValue.text = "--.--"
                         }
                     }
+
 
                     showTransactionButton.setOnClickListener {
                         val transactionDialog = TransactionByBudgetDialogFragment()
