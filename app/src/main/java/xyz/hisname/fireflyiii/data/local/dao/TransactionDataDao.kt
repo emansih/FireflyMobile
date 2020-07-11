@@ -68,7 +68,7 @@ abstract class TransactionDataDao {
     @Query("SELECT distinct budget_name FROM transactionTable WHERE (date BETWEEN :startDate AND " +
             ":endDate) AND currency_code = :currencyCode AND transactionType =:transactionType")
     abstract fun getUniqueBudgetByDate(startDate: String, endDate: String,
-                                       currencyCode: String, transactionType: String): MutableList<String>
+                                       currencyCode: String, transactionType: String): MutableList<String?>
 
     @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND" +
             " currency_code = :currencyCode AND source_name = :sourceName AND transactionType =:transactionType " +

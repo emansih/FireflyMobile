@@ -124,9 +124,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
-                              transactionType: String): MutableLiveData<MutableList<String>>{
-        var transactionData: MutableList<String> = arrayListOf()
-        val data: MutableLiveData<MutableList<String>> = MutableLiveData()
+                              transactionType: String): MutableLiveData<MutableList<String?>>{
+        var transactionData: MutableList<String?> = arrayListOf()
+        val data: MutableLiveData<MutableList<String?>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionData = repository.getUniqueBudgetByDate(startDate, endDate, currencyCode, transactionType)
         }.invokeOnCompletion {

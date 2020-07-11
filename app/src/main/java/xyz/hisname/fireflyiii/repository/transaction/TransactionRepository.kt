@@ -134,7 +134,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     suspend fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
-                                      transactionType: String): MutableList<String> {
+                                      transactionType: String): MutableList<String?> {
         loadRemoteData(startDate, endDate, "all")
         return transactionDao.getUniqueBudgetByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
