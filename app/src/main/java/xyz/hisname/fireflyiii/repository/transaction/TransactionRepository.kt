@@ -114,7 +114,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             transactionDao.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType, budgetName)
         } else {
-            transactionDao.getTransactionByDateAndNullBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+            transactionDao.getTransactionAmountByDateAndNullBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
         }
     }
@@ -212,10 +212,15 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountName)
     }
     suspend fun getTransactionListByDateAndBudget(startDate: String, endDate: String,
-                                                  budgetName: String): MutableList<Transactions> {
+                                                  budgetName: String?): MutableList<Transactions> {
         loadRemoteData(startDate, endDate, "all")
-        return transactionDao.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), budgetName)
+        return if(budgetName != null){
+            transactionDao.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), budgetName)
+        } else {
+            transactionDao.getTransactionByDateAndNullBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate))
+        }
     }
 
     private suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{

@@ -422,7 +422,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): LiveData<MutableList<Transactions>>{
+    fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String?): LiveData<MutableList<Transactions>>{
         val transactionData: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
         var data: MutableList<Transactions> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {

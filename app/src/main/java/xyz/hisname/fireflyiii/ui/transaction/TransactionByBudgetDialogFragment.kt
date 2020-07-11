@@ -24,7 +24,7 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class TransactionByBudgetDialogFragment: DialogFragment() {
 
-    private val budgetName by lazy { arguments?.getString("budgetName") ?: "" }
+    private val budgetName by lazy { arguments?.getString("budgetName") }
     private lateinit var rtAdapter: TransactionRecyclerAdapter
     private val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
 
