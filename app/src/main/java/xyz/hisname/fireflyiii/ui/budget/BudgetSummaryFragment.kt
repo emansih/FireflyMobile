@@ -156,7 +156,7 @@ class BudgetSummaryFragment: BaseFragment() {
                             }
                         } else {
                             budgetAmountValue.text = "--.--"
-                            actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + noExpenses.toString()
+                            actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + LocaleNumberParser.parseDecimal(noExpenses, requireContext())
                             remainingAmountValue.text = "--.--"
                         }
                     }
