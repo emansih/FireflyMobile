@@ -290,7 +290,9 @@ class TransactionDetailsFragment: BaseFragment() {
         R.id.menu_item_delete -> consume {
             parentFragmentManager.commit {
                 add(DeleteTransactionDialog().apply {
-                    arguments = bundleOf("transactionJournalId" to transactionJournalId, "transactionDescription" to transactionDescription)
+                    arguments = bundleOf("transactionJournalId" to transactionJournalId,
+                            "transactionDescription" to transactionDescription,
+                    "transactionInfo" to convertString(transactionInfo))
                 }, "")
             }
         }
