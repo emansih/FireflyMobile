@@ -48,7 +48,6 @@ object Dependencies{
     val roomLibs = "androidx.room:room-runtime:$roomVersion"
     val roomCompiler = "androidx.room:room-compiler:$roomVersion"
     val coroutineCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
-    val coroutineAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVersion"
     val appCompat = "androidx.appcompat:appcompat:$appCompatVersion"
     val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshVersion"
     val androidxFragment = "androidx.fragment:fragment-ktx:$androidxFragmentVersion"

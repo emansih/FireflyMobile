@@ -130,7 +130,6 @@ dependencies {
 
     // Coroutine
     implementation Dependencies.coroutineCore
-    implementation Dependencies.coroutineAndroid
 
     // Glide
     implementation Dependencies.glideLib
