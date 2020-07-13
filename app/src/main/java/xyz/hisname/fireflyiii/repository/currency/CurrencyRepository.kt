@@ -52,40 +52,8 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         return currencyDao.getPaginatedCurrency(pageNumber * Constants.PAGE_SIZE)
     }
 
-    // Issue: https://github.com/firefly-iii/firefly-iii/issues/3493
-    @Deprecated("Only use this if user's Firefly III version is less than or equal to 5.2.8")
-    suspend fun loadAllData(){
-        var networkCall: Response<CurrencyModel>? = null
-        val defaultCurrencyList: MutableList<CurrencyData> = arrayListOf()
-        withContext(Dispatchers.IO) {
-            try {
-                networkCall = currencyService?.getSuspendedPaginatedCurrency(1)
-                val responseBody = networkCall?.body()
-                if (responseBody != null && networkCall?.isSuccessful != false) {
-                    withContext(Dispatchers.IO){
-                        defaultCurrencyList.addAll(responseBody.data)
-                        if(responseBody.meta.pagination.total_pages > 1){
-                            for(pagination in 2..responseBody.meta.pagination.total_pages){
-                                val currencyCall = currencyService?.getSuspendedPaginatedCurrency(pagination)
-                                currencyCall?.body()?.data?.let { defaultCurrencyList.addAll(it) }
-                            }
-                        }
-                        deleteDefaultCurrency()
-                        defaultCurrencyList.forEach {
-                            currencyDao.insert(it)
-
-                        }
-                    }
-                }
-            } catch (exception: Exception){
-
-            }
-        }
-
-    }
-
     private suspend fun loadPaginatedData(pageNumber: Int){
-        var networkCall: Response<CurrencyModel>? = null
+        var networkCall: Response<CurrencyModel>?
         withContext(Dispatchers.IO) {
             networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)
         }

@@ -7,20 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import retrofit2.Response
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
-import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.repository.models.userinfo.system.SystemInfoModel
-import xyz.hisname.fireflyiii.util.Version
-import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class CurrencyViewModel(application: Application) : BaseViewModel(application) {
@@ -152,29 +145,8 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun getDefaultCurrency(): LiveData<MutableList<CurrencyData>>{
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         var currencyData: MutableList<CurrencyData> = arrayListOf()
-        var fireflyVersionNumber =  ""
-        var systemInfoModel: SystemInfoModel?
         viewModelScope.launch(Dispatchers.IO){
-            try {
-                systemInfoModel = genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.body()
-                fireflyVersionNumber = systemInfoModel?.systemData?.version ?: AppPref(sharedPref).serverVersion
-            } catch (exception: Exception){
-                fireflyVersionNumber = AppPref(sharedPref).serverVersion
-            }
-            val versionNumbering = try {
-                Version(fireflyVersionNumber).compareTo(Version("5.3.0"))
-            } catch (exception: Exception){
-                if(fireflyVersionNumber.contentEquals("5.3.0-alpha.1")){
-                    -1
-                } else {
-                    1
-                }
-            }
-            if(versionNumbering == -1){
-                repository.loadAllData()
-            } else {
-                repository.defaultCurrencyWithNetwork()
-            }
+            repository.defaultCurrencyWithNetwork()
             currencyData = repository.defaultCurrencyWithoutNetwork()
         }.invokeOnCompletion {
             currencyLiveData.postValue(currencyData)
