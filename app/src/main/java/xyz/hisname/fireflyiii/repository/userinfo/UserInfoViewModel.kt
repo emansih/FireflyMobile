@@ -46,12 +46,12 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
                 AppPref(sharedPref).serverVersion = systemData.version
                 AppPref(sharedPref).remoteApiVersion = systemData.api_version
                 AppPref(sharedPref).userOs = systemData.os
-                apiOk.value = true
+                apiOk.postValue(true)
             } else {
-                apiOk.value = false
+                apiOk.postValue(false)
             }
         }
-        isLoading.value = false
+        isLoading.postValue(false)
         return apiOk
     }
 
