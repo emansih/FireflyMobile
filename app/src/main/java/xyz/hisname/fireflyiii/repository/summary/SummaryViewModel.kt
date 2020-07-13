@@ -99,16 +99,35 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     }
                     val formattedText = leftToSpendPerDay.replace("Left to spend per day: ", "")
                     simpleData.leftToSpendPerDay = formattedText
+                    networthValue.postValue(simpleData.networthValue)
+                    leftToSpendValue.postValue(simpleData.leftToSpend)
+                    balanceValue.postValue(simpleData.balance)
+                    earnedValue.postValue(simpleData.earned)
+                    spentValue.postValue(simpleData.spent)
+                    billsToPay.postValue(simpleData.unPaidBills)
+                    billsPaid.postValue(simpleData.paidBills)
+                    leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
+                } else {
+                    networthValue.postValue(simpleData.networthValue)
+                    leftToSpendValue.postValue(simpleData.leftToSpend)
+                    balanceValue.postValue(simpleData.balance)
+                    earnedValue.postValue(simpleData.earned)
+                    spentValue.postValue(simpleData.spent)
+                    billsToPay.postValue(simpleData.unPaidBills)
+                    billsPaid.postValue(simpleData.paidBills)
+                    leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
                 }
             })
-            { throwable -> })
-        networthValue.postValue(simpleData.networthValue)
-        leftToSpendValue.postValue(simpleData.leftToSpend)
-        balanceValue.postValue(simpleData.balance)
-        earnedValue.postValue(simpleData.earned)
-        spentValue.postValue(simpleData.spent)
-        billsToPay.postValue(simpleData.unPaidBills)
-        billsPaid.postValue(simpleData.paidBills)
-        leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
+            { throwable ->
+                networthValue.postValue(simpleData.networthValue)
+                leftToSpendValue.postValue(simpleData.leftToSpend)
+                balanceValue.postValue(simpleData.balance)
+                earnedValue.postValue(simpleData.earned)
+                spentValue.postValue(simpleData.spent)
+                billsToPay.postValue(simpleData.unPaidBills)
+                billsPaid.postValue(simpleData.paidBills)
+                leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
+            })
+
     }
 }
