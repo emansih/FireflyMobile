@@ -3,6 +3,8 @@ package xyz.hisname.fireflyiii.ui.settings
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.preference.PreferenceManager
 import androidx.core.app.ActivityCompat
 import xyz.hisname.fireflyiii.R
@@ -123,7 +125,7 @@ class SettingsFragment: BaseSettings() {
 
     private fun setPinCode(){
         val keyguardPref = findPreference<Preference>("keyguard") as Preference
-        if(!KeyguardUtil(requireActivity()).isDeviceKeyguardEnabled()){
+        if(!KeyguardUtil(requireActivity()).isDeviceKeyguardEnabled() || BiometricManager.from(requireContext()).canAuthenticate() != BIOMETRIC_SUCCESS){
             keyguardPref.isSelectable = false
             keyguardPref.summary = "Please enable pin / password / biometrics in your device settings"
         }
