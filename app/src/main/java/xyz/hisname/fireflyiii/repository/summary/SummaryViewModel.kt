@@ -99,28 +99,16 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     }
                     val formattedText = leftToSpendPerDay.replace("Left to spend per day: ", "")
                     simpleData.leftToSpendPerDay = formattedText
-
-                    leftToSpendValue.postValue(leftToSpend)
-                    networthValue.postValue(netWorth)
-                    balanceValue.postValue(balance)
-                    earnedValue.postValue(earned)
-                    spentValue.postValue(spent)
-                    billsToPay.postValue(unPaidBills)
-                    billsPaid.postValue(paidBills)
-                    leftToSpendDay.postValue(formattedText)
                 }
             })
-            { throwable ->
-                networthValue.postValue(simpleData.networthValue)
-                leftToSpendValue.postValue(simpleData.leftToSpend)
-                balanceValue.postValue(simpleData.balance)
-                earnedValue.postValue(simpleData.earned)
-                spentValue.postValue(simpleData.spent)
-                billsToPay.postValue(simpleData.unPaidBills)
-                billsPaid.postValue(simpleData.paidBills)
-                leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
-            }
-            )
-
+            { throwable -> })
+        networthValue.postValue(simpleData.networthValue)
+        leftToSpendValue.postValue(simpleData.leftToSpend)
+        balanceValue.postValue(simpleData.balance)
+        earnedValue.postValue(simpleData.earned)
+        spentValue.postValue(simpleData.spent)
+        billsToPay.postValue(simpleData.unPaidBills)
+        billsPaid.postValue(simpleData.paidBills)
+        leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
     }
 }
