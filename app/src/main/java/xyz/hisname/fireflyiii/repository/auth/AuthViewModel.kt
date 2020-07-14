@@ -62,6 +62,7 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
                 }
             } catch (certificationException: CertificateException){
                 authFailedReason.postValue("Are you using self signed cert?")
+                isAuthenticated.postValue(false)
             } catch (throwable: Exception) {
                 authFailedReason.postValue(throwable.localizedMessage)
                 isAuthenticated.postValue(false)

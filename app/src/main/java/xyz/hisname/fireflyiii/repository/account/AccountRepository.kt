@@ -45,6 +45,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             }
         } catch (certificationException: CertificateException){
             responseApi.postValue("Are you using self signed cert?")
+            authStatus.postValue(false)
         } catch (exception: Exception) {
             responseApi.postValue(exception.cause?.message)
             authStatus.postValue(false)
