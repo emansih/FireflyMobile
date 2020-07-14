@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
@@ -53,6 +55,7 @@ abstract class AppDatabase: RoomDatabase() {
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(context,
                         AppDatabase::class.java, Constants.DB_NAME)
+                        .setQueryExecutor(Dispatchers.IO.asExecutor())
                         .fallbackToDestructiveMigration()
                         .build().also { INSTANCE = it }
             }
