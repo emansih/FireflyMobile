@@ -60,16 +60,10 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
                         isAuthenticated.postValue(false)
                     }
                 }
+            } catch (certificationException: CertificateException){
+                authFailedReason.postValue("Are you using self signed cert?")
             } catch (throwable: Exception) {
-                if (throwable.cause is CertificateException) {
-                    if (throwable.cause?.cause?.message?.startsWith("Trust anchor for certificate") == true) {
-                        authFailedReason.postValue("Are you using self signed cert?")
-                    } else {
-                        authFailedReason.postValue(throwable.cause?.cause?.message)
-                    }
-                } else {
-                    authFailedReason.postValue(throwable.localizedMessage)
-                }
+                authFailedReason.postValue(throwable.localizedMessage)
                 isAuthenticated.postValue(false)
             }
         }

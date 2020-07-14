@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import android.content.Context
-import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,7 +10,6 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
-import java.security.cert.CertPathValidatorException
 import java.security.cert.CertificateException
 
 @Suppress("RedundantSuspendModifier")
@@ -45,16 +43,10 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 authStatus.postValue(false)
                 responseApi.postValue("There was an issue communicating with your server")
             }
+        } catch (certificationException: CertificateException){
+            responseApi.postValue("Are you using self signed cert?")
         } catch (exception: Exception) {
-            if(exception.cause is CertificateException){
-                if(exception.cause?.cause?.message?.startsWith("Trust anchor for certificate") == true){
-                    responseApi.postValue("Are you using self signed cert?")
-                } else {
-                    responseApi.postValue(exception.cause?.cause?.message)
-                }
-            } else {
-                responseApi.postValue(exception.cause?.message)
-            }
+            responseApi.postValue(exception.cause?.message)
             authStatus.postValue(false)
         }
         return authStatus
