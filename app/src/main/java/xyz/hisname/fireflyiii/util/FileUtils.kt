@@ -43,16 +43,11 @@ class FileUtils {
             return fileContent.toString()
         }
 
-        @Throws(IOException::class)
         fun saveCaFile(fileUri: Uri, context: Context){
-            val filePath = ("file://$fileUri").toUri().toFile()
             val fileDestination = "user_custom.pem"
-            if(readFileContent(filePath).isBlank()){
-                throw IOException("Your CA File is empty!")
-            }
-            val br = BufferedReader(FileReader(filePath))
+            val br = BufferedReader(FileReader(getPathFromUri(context, fileUri)))
             var line: String?
-            context.deleteFile("user_custom.pem")
+            context.deleteFile(fileDestination)
             while (br.readLine().also { line = it + "\n" } != null) {
                 context.openFileOutput(fileDestination, Context.MODE_APPEND).use {
                     it.write(line?.toByteArray())

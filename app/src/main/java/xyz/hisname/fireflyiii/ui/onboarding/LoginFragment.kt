@@ -38,7 +38,6 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
-import java.io.File
 import java.util.*
 
 

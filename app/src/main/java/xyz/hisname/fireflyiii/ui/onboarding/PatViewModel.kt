@@ -28,11 +28,7 @@ class PatViewModel(application: Application): BaseViewModel(application) {
 
     fun authenticate(fileUri: Uri?, accessToken: String, baseUrl: String): LiveData<String> {
         if(fileUri != null && fileUri.toString().isNotBlank()) {
-            try {
-                FileUtils.saveCaFile(fileUri, applicationContext)
-            } catch (e: Exception){
-                apiResponse.postValue(e.localizedMessage)
-            }
+            FileUtils.saveCaFile(fileUri, applicationContext)
         }
         authInit(accessToken, baseUrl)
         repository = AccountRepository(accountDao, accountsService)
