@@ -1,0 +1,63 @@
+def Group(Closure closure) {
+    closure.delegate = dependencies
+    return closure
+}
+
+ext {
+
+    androidx = Group {
+        implementation Dependencies.appCompat
+        implementation Dependencies.androidxFragment
+        implementation Dependencies.androidxAnnotation
+        implementation Dependencies.androidxRecyclerView
+        implementation Dependencies.androidxCore
+        implementation Dependencies.androidxConstraintLayout
+        implementation Dependencies.androidxPref
+        implementation Dependencies.androidxWork
+        implementation Dependencies.swipeRefreshLayout
+        implementation Dependencies.biometricLib
+        // Lifecycle
+        implementation Dependencies.lifecycleLibs
+        implementation Dependencies.lifecyclerLiveDataCore
+        kapt Dependencies.lifecycleCompiler
+        // Room
+        implementation Dependencies.roomLibs
+        kapt Dependencies.roomCompiler
+        // Not really AndroidX
+        implementation Dependencies.materialDesign
+    }
+
+    network = Group {
+        implementation Dependencies.retrofitLibs
+        implementation Dependencies.retrofitGson
+        implementation Dependencies.retrofitScalar
+    }
+
+    kotlin = Group {
+        implementation Dependencies.kotlinLib
+        implementation Dependencies.coroutineCore
+    }
+
+    glide = Group {
+        implementation Dependencies.glideLib
+        implementation Dependencies.glideOkHttpExtension
+        kapt Dependencies.glideCompiler
+    }
+
+    markdown = Group {
+        implementation Dependencies.markdownLib
+        implementation Dependencies.markdownStrikeThroughExtension
+        implementation Dependencies.markdownAutoLink
+    }
+
+    testing = Group {
+        // junit
+        testImplementation Dependencies.jUnitApi
+        testRuntimeOnly Dependencies.junitEngine
+        testImplementation Dependencies.jUnitParameter
+
+        testImplementation Dependencies.mockWebServer
+        androidTestImplementation Dependencies.testRunner
+        androidTestUtil Dependencies.testOrchestrator
+    }
+}

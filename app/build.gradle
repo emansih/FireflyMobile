@@ -4,7 +4,6 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.akaita.android.easylauncher'
 apply plugin: "com.github.ben-manes.versions"
-apply plugin: 'org.owasp.dependencycheck'
 
 android {
     compileSdkVersion(Dependencies.compileSdk)
@@ -101,40 +100,14 @@ android {
 dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation Dependencies.kotlinLib
-    // Android support libs
-    implementation Dependencies.appCompat
-    implementation Dependencies.androidxFragment
-    implementation Dependencies.androidxAnnotation
-    implementation Dependencies.androidxRecyclerView
-    implementation Dependencies.materialDesign
-    implementation Dependencies.androidxCore
-    implementation Dependencies.androidxConstraintLayout
-    implementation Dependencies.androidxPref
-    implementation Dependencies.androidxWork
-    implementation Dependencies.swipeRefreshLayout
-    implementation Dependencies.biometricLib
 
-    // Lifecycle component
-    implementation Dependencies.lifecycleLibs
-    implementation Dependencies.lifecyclerLiveDataCore
-    kapt Dependencies.lifecycleCompiler
+    androidx()
+    network()
+    kotlin()
+    glide()
+    markdown()
 
-    // Room
-    implementation Dependencies.roomLibs
-    kapt Dependencies.roomCompiler
-    // Retrofit
-    implementation Dependencies.retrofitLibs
-    implementation Dependencies.retrofitGson
-    implementation Dependencies.retrofitScalar
-
-    // Coroutine
-    implementation Dependencies.coroutineCore
-
-    // Glide
-    implementation Dependencies.glideLib
-    implementation Dependencies.glideOkHttpExtension
-    kapt Dependencies.glideCompiler
+    testing()
 
     implementation Dependencies.materialDrawer
     implementation Dependencies.materialDrawerIconics
@@ -153,19 +126,8 @@ dependencies {
     implementation Dependencies.accordionView
     implementation Dependencies.fancyshowcaseview
 
-    implementation Dependencies.markdownLib
-    implementation Dependencies.markdownStrikeThroughExtension
-    implementation Dependencies.markdownAutoLink
-
     // Project Lib
     api project(path: ":languagepack")
 
-    testImplementation Dependencies.jUnitApi
-    testRuntimeOnly Dependencies.junitEngine
-    testImplementation Dependencies.jUnitParameter
-
-    testImplementation Dependencies.mockWebServer
-    androidTestImplementation Dependencies.testRunner
-    androidTestUtil Dependencies.testOrchestrator
     debugImplementation Dependencies.debugDb
 }

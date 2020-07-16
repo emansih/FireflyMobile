@@ -10,7 +10,6 @@ buildscript {
         classpath(kotlin("gradle-plugin", Dependencies.kotlinVersion))
         classpath("com.akaita.android:easylauncher:1.3.1")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.28.0")
-		classpath("org.owasp:dependency-check-gradle:5.1.0")
         classpath("de.mannodermaus.gradle.plugins:android-junit5:1.6.2.0")
     }
 }
@@ -30,6 +29,9 @@ allprojects {
             content{
                 includeGroup("com.github.florent37")
             }
+        }
+        dependencies{
+            apply("$rootDir/Version.gradle")
         }
     }
 }
