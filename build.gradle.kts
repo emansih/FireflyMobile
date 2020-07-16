@@ -31,7 +31,11 @@ allprojects {
             }
         }
         dependencies{
-            apply("$rootDir/Version.gradle")
+            apply("$rootDir/buildSrc/src/main/java/Version.gradle")
         }
     }
+}
+
+subprojects {
+    apply("$rootDir/buildSrc/src/main/java/DependencyReport.gradle")
 }
