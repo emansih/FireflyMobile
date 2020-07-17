@@ -14,6 +14,7 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.extension.isAscii
+import java.net.UnknownServiceException
 import java.security.cert.CertificateException
 
 class AuthViewModel(application: Application): BaseViewModel(application) {
@@ -32,40 +33,43 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
             authFailedReason.postValue("Bearer Token contains invalid Characters!")
         } else {
             var networkCall: Response<AuthModel>? = null
-            try {
-                viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
                     networkCall = oAuthService?.getAccessToken(code.trim(), accManager.clientId,
                             accManager.secretKey, Constants.REDIRECT_URI)
-                }.invokeOnCompletion {
-                    val authResponse = networkCall?.body()
-                    val errorBody = networkCall?.errorBody()
-                    if (authResponse != null && networkCall?.isSuccessful != false) {
-                        accManager.accessToken = authResponse.access_token.trim()
-                        accManager.refreshToken = authResponse.refresh_token.trim()
-                        accManager.tokenExpiry = authResponse.expires_in
-                        accManager.authMethod = "oauth"
-                        isAuthenticated.postValue(true)
-                    } else {
-                        if (errorBody != null) {
-                            try {
-                                val errorBodyMessage = String(errorBody.bytes())
-                                val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
-                                authFailedReason.postValue(gson.message)
-                            } catch (exception: Exception) {
-                                authFailedReason.postValue("Authentication Failed")
-                            }
-                        } else {
+                } catch (unknownService: UnknownServiceException){
+                    authFailedReason.postValue("Please use https instead")
+                    isAuthenticated.postValue(false)
+                } catch (certificationException: CertificateException){
+                    authFailedReason.postValue("Are you using self signed cert?")
+                    isAuthenticated.postValue(false)
+                } catch (throwable: Exception) {
+                    authFailedReason.postValue(throwable.localizedMessage)
+                    isAuthenticated.postValue(false)
+                }
+            }.invokeOnCompletion {
+                val authResponse = networkCall?.body()
+                val errorBody = networkCall?.errorBody()
+                if (authResponse != null && networkCall?.isSuccessful != false) {
+                    accManager.accessToken = authResponse.access_token.trim()
+                    accManager.refreshToken = authResponse.refresh_token.trim()
+                    accManager.tokenExpiry = authResponse.expires_in
+                    accManager.authMethod = "oauth"
+                    isAuthenticated.postValue(true)
+                } else {
+                    if (errorBody != null) {
+                        try {
+                            val errorBodyMessage = String(errorBody.bytes())
+                            val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                            authFailedReason.postValue(gson.message)
+                        } catch (exception: Exception) {
                             authFailedReason.postValue("Authentication Failed")
                         }
-                        isAuthenticated.postValue(false)
+                    } else {
+                        authFailedReason.postValue("Authentication Failed")
                     }
+                    isAuthenticated.postValue(false)
                 }
-            } catch (certificationException: CertificateException){
-                authFailedReason.postValue("Are you using self signed cert?")
-                isAuthenticated.postValue(false)
-            } catch (throwable: Exception) {
-                authFailedReason.postValue(throwable.localizedMessage)
-                isAuthenticated.postValue(false)
             }
         }
         return isAuthenticated

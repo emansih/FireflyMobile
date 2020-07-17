@@ -236,7 +236,7 @@ class LoginFragment: Fragment() {
                         ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
                         authViewModel.authFailedReason.observe(viewLifecycleOwner) { reason ->
                             if(reason.isNotBlank()){
-                                toastError(reason)
+                                toastError(reason, Toast.LENGTH_LONG)
                             }
                         }
                     }
