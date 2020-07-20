@@ -34,6 +34,7 @@ class SettingsFragment: BaseSettings() {
         setLanguagePref()
         setNightModeSection()
         setPinCode()
+        setThumbnail()
     }
 
     private fun setLanguagePref(){
@@ -96,6 +97,15 @@ class SettingsFragment: BaseSettings() {
         }
         nightModePref.icon = IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_moon
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
+    }
+
+    private fun setThumbnail(){
+        val thumbnailPref = findPreference<CheckBoxPreference>("currencyThumbnail") as CheckBoxPreference
+        thumbnailPref.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_attach_money
             sizeDp = 24
             colorRes = setIconColor()
         }

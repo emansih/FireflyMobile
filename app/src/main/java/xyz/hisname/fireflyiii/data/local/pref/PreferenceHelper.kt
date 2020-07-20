@@ -15,5 +15,6 @@ interface PreferenceHelper {
     var transactionListType: Boolean
     var timeFormat: Boolean
     var isCustomCa: Boolean
+    var isCurrencyThumbnailEnabled: Boolean
     fun clearPref()
 }

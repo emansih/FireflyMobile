@@ -3,10 +3,13 @@ package xyz.hisname.fireflyiii.ui.currency
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.currency_list.view.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.Flags
@@ -17,6 +20,9 @@ class CurrencyRecyclerAdapter(private val items: MutableList<CurrencyData>, priv
 DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
 
     private lateinit var context: Context
+    private val isThumbnailEnabled by lazy {
+        AppPref(PreferenceManager.getDefaultSharedPreferences(context)).isCurrencyThumbnailEnabled
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyHolder {
         context = parent.context
@@ -39,10 +45,13 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
                 itemView.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
                 itemView.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
             }
-            Glide.with(context)
-                    .load(Flags.getFlagByIso(currency?.code ?: ""))
-                    .error(R.drawable.unknown)
-                    .into(itemView.flagImage)
+            if(isThumbnailEnabled) {
+                itemView.flagImage.isVisible = true
+                Glide.with(context)
+                        .load(Flags.getFlagByIso(currency?.code ?: ""))
+                        .error(R.drawable.unknown)
+                        .into(itemView.flagImage)
+            }
             itemView.setOnClickListener {
                 clickListener(currencyData)
             }

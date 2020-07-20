@@ -26,4 +26,9 @@
         app:title="Security"
         app:summary="Activate System's Keyguard on Launch"/>
 
+    <CheckBoxPreference
+        app:key="currencyThumbnail"
+        app:title="Thumbnail"
+        app:summary="Show flags next to currency"/>
+
 </PreferenceScreen>

@@ -3,10 +3,13 @@ package xyz.hisname.fireflyiii.ui.currency
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.currency_list.view.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.Flags
@@ -16,6 +19,9 @@ class EnabledCurrencyRecyclerAdapter (private val items: MutableList<CurrencyDat
         DiffUtilAdapter<CurrencyData, EnabledCurrencyRecyclerAdapter.CurrencyHolder>() {
 
     private lateinit var context: Context
+    private val isThumbnailEnabled by lazy {
+        AppPref(PreferenceManager.getDefaultSharedPreferences(context)).isCurrencyThumbnailEnabled
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyHolder {
         context = parent.context
@@ -32,11 +38,13 @@ class EnabledCurrencyRecyclerAdapter (private val items: MutableList<CurrencyDat
             val currency = currencyData.currencyAttributes
             itemView.currencySymbol.text = currency?.symbol.toString()
             itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
-            Glide.with(context)
-                    .load(Flags.getFlagByIso(currency?.code ?: ""))
-                    .error(R.drawable.unknown)
-                    .into(itemView.flagImage)
-
+            if(isThumbnailEnabled) {
+                itemView.flagImage.isVisible = true
+                Glide.with(context)
+                        .load(Flags.getFlagByIso(currency?.code ?: ""))
+                        .error(R.drawable.unknown)
+                        .into(itemView.flagImage)
+            }
             itemView.setOnClickListener {
                 clickListener(currencyData)
             }

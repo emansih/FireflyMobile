@@ -57,5 +57,9 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("customCa", false)
         set(value) = sharedPref.edit{ putBoolean("customCa", value)}
 
+    override var isCurrencyThumbnailEnabled: Boolean
+        get() = sharedPref.getBoolean("currencyThumbnail", false)
+        set(value) = sharedPref.edit{ putBoolean("currencyThumbnail", value) }
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }
