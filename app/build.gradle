@@ -127,7 +127,7 @@ dependencies {
     implementation Dependencies.fancyshowcaseview
 
     // Project Lib
-    api project(path: ":languagepack")
+    implementation project(path: ":languagepack")
 
     debugImplementation Dependencies.debugDb
 }

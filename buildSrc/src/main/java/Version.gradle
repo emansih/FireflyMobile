@@ -8,7 +8,7 @@ ext {
     androidx = Group {
         implementation Dependencies.appCompat
         implementation Dependencies.androidxFragment
-        implementation Dependencies.androidxAnnotation
+        compileOnly Dependencies.androidxAnnotation
         implementation Dependencies.androidxRecyclerView
         implementation Dependencies.androidxCore
         implementation Dependencies.androidxConstraintLayout
@@ -19,7 +19,6 @@ ext {
         // Lifecycle
         implementation Dependencies.lifecycleLibs
         implementation Dependencies.lifecyclerLiveDataCore
-        kapt Dependencies.lifecycleCompiler
         // Room
         implementation Dependencies.roomLibs
         kapt Dependencies.roomCompiler
