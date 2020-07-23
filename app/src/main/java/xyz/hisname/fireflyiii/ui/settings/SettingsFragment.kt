@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
-import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
@@ -12,7 +12,6 @@ import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -35,6 +34,7 @@ class SettingsFragment: BaseSettings() {
         setNightModeSection()
         setPinCode()
         setThumbnail()
+        setTutorial()
     }
 
     private fun setLanguagePref(){
@@ -108,6 +108,23 @@ class SettingsFragment: BaseSettings() {
             icon = GoogleMaterial.Icon.gmd_attach_money
             sizeDp = 24
             colorRes = setIconColor()
+        }
+    }
+
+    private fun setTutorial(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val tutorialSetting = findPreference<Preference>("tutorial_setting") as Preference
+            tutorialSetting.isVisible = true
+            tutorialSetting.icon = IconicsDrawable(requireContext()).apply {
+                icon = FontAwesome.Icon.faw_university
+                sizeDp = 24
+                colorRes = setIconColor()
+            }
+            tutorialSetting.setOnPreferenceClickListener {
+                requireContext().deleteSharedPreferences("PrefShowCaseView")
+                requireActivity().recreate()
+                true
+            }
         }
     }
 

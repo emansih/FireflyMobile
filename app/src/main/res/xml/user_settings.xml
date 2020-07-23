@@ -31,4 +31,12 @@
         app:title="Thumbnail"
         app:summary="Show flags next to currency"/>
 
+    <Preference
+        app:isPreferenceVisible="false"
+        app:key="tutorial_setting"
+        app:iconSpaceReserved="false"
+        app:title="Tutorial"
+        app:summary="Click here to restart tutorial">
+    </Preference>
+
 </PreferenceScreen>
