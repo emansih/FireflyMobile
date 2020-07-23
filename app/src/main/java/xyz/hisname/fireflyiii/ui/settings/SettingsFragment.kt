@@ -122,7 +122,7 @@ class SettingsFragment: BaseSettings() {
             }
             tutorialSetting.setOnPreferenceClickListener {
                 requireContext().deleteSharedPreferences("PrefShowCaseView")
-                requireActivity().recreate()
+                ActivityCompat.recreate(requireActivity())
                 true
             }
         }
