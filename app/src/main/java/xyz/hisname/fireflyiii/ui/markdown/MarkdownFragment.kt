@@ -105,6 +105,8 @@ class MarkdownFragment: BaseFragment() {
             markdownViewModel.markdownText.postValue(editableText.getString())
             handleBack()
         }
+        discardButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
+        doneButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
     }
 
     private fun setIconColor(): Int{
