@@ -203,6 +203,7 @@ class AddTransactionFragment: BaseFragment() {
         },null, null, null)
         source_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_exchange_alt
+            colorRes = R.color.md_green_500
             sizeDp = 24
         },null, null, null)
         val bankTransferIconColorWrap = DrawableCompat.wrap(getCompatDrawable(R.drawable.ic_bank_transfer)!!).mutate()
