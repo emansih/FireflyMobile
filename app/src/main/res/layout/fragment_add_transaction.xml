@@ -80,6 +80,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <View
+                android:id="@+id/transaction_amount_placeholder_view"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="60dp"
+                app:layout_constraintStart_toStartOf="@+id/transaction_amount_layout"
+                app:layout_constraintBottom_toBottomOf="@+id/transaction_amount_layout"
+                app:layout_constraintTop_toTopOf="@+id/transaction_amount_layout" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/transaction_amount_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

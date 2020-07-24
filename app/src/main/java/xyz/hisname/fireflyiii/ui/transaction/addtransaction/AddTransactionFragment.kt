@@ -256,6 +256,19 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setCalculator(){
+        transaction_amount_placeholder_view.setOnTouchListener { v, event ->
+            if(event.action == MotionEvent.ACTION_UP){
+                transaction_amount_placeholder_view.performClick()
+                transactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
+                    "0.0"
+                } else {
+                    transaction_amount_edittext.getString()
+                }
+                val calculatorDialog = TransactionCalculatorDialog()
+                calculatorDialog.show(parentFragmentManager, "calculatorDialog")
+            }
+            false
+        }
         transaction_amount_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if(event.action == MotionEvent.ACTION_UP){
@@ -280,6 +293,7 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setWidgets(){
+        showCase(R.string.urge_users_to_click_icons, "transactionIcons", transaction_amount_placeholder_view).show()
         add_attachment_button.setOnClickListener {
             openDocViewer()
         }

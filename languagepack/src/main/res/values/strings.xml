@@ -141,4 +141,5 @@
     <string name="done">Done</string>
     <string name="insert_link">Insert Link</string>
     <string name="discard">Discard</string>
+    <string name="urge_users_to_click_icons">Some of these icons can be clicked too</string>
 </resources>
