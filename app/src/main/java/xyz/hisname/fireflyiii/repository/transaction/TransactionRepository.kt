@@ -233,72 +233,47 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     private suspend fun loadPaginatedData(startDate: String, endDate: String, sourceName: String, pageNumber: Int){
-        var networkCall: Response<TransactionModel>? = null
-        try {
-            withContext(Dispatchers.IO) {
-                networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
-                        convertString(sourceName), pageNumber)
+        val  networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+                convertString(sourceName), pageNumber)
+        val responseBody = networkCall?.body()
+        if (responseBody != null && networkCall.isSuccessful) {
+            if(pageNumber == 1){
+                transactionDao.deleteTransaction()
             }
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall?.isSuccessful != false) {
-                withContext(Dispatchers.IO){
-                    if(pageNumber == 1){
-                        transactionDao.deleteTransaction()
-                    }
-                    responseBody.data.forEachIndexed { _, data ->
-                        transactionDao.insert(data.transactionAttributes?.transactions!![0])
-                        transactionDao.insert(TransactionIndex(data.transactionId,
-                                data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+            responseBody.data.forEachIndexed { _, data ->
+                transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                transactionDao.insert(TransactionIndex(data.transactionId,
+                        data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
 
-                    }
-                }
             }
-        } catch (exception: Exception){
-
         }
     }
 
     private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
-        var networkCall: Response<TransactionModel>? = null
         val transactionData: MutableList<TransactionData> = arrayListOf()
-        try {
-            withContext(Dispatchers.IO) {
-                withContext(Dispatchers.IO) {
-                    networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
-                            convertString(sourceName), 1)
-                }
-                networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
-                    transactionData.add(transaction)
-                }
-            }
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall?.isSuccessful != false) {
-                val pagination = responseBody.meta.pagination
-                if (pagination.total_pages != pagination.current_page) {
-                    withContext(Dispatchers.IO) {
-                        for (items in 2..pagination.total_pages) {
-                            val service = transactionService?.getPaginatedTransactions(startDate, endDate,
-                                    convertString(sourceName), items)?.body()
-                            service?.data?.forEachIndexed { _, dataToBeAdded ->
-                                transactionData.add(dataToBeAdded)
-                            }
-                        }
-                    }
-                }
-                withContext(Dispatchers.IO) {
-                    deleteTransactionsByDate(startDate, endDate, sourceName)
-                }
-                withContext(Dispatchers.IO) {
-                    transactionData.forEachIndexed { _, data ->
-                        transactionDao.insert(data.transactionAttributes?.transactions!![0])
-                        transactionDao.insert(TransactionIndex(data.transactionId,
-                                data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-
+        val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+                convertString(sourceName), 1)
+        networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
+            transactionData.add(transaction)
+        }
+        val responseBody = networkCall?.body()
+        if (responseBody != null && networkCall.isSuccessful) {
+            val pagination = responseBody.meta.pagination
+            if (pagination.total_pages != pagination.current_page) {
+                for (items in 2..pagination.total_pages) {
+                    val service = transactionService?.getPaginatedTransactions(startDate, endDate,
+                            convertString(sourceName), items)?.body()
+                    service?.data?.forEachIndexed { _, dataToBeAdded ->
+                        transactionData.add(dataToBeAdded)
                     }
                 }
             }
-        } catch (exception: Exception){
-
+            deleteTransactionsByDate(startDate, endDate, sourceName)
+            transactionData.forEachIndexed { _, data ->
+                transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                transactionDao.insert(TransactionIndex(data.transactionId,
+                        data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+            }
         }
     }
 
