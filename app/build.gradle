@@ -57,10 +57,14 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            postprocessing {
+                removeUnusedCode true
+                removeUnusedResources true
+                obfuscate false
+                optimizeCode true
+                proguardFiles = ['proguard-rules.pro']
+            }
             matchingFallbacks = ['release']
-            shrinkResources true
         }
         debug {
             applicationIdSuffix '.debug'
@@ -71,11 +75,15 @@ android {
         // This build type is no different from `release` except that it run unit tests and change the apk name
         // It's created so that it is compatible with Fdroid build system
         githubRelease{
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            postprocessing {
+                removeUnusedCode true
+                removeUnusedResources true
+                obfuscate false
+                optimizeCode true
+                proguardFiles = ['proguard-rules.pro']
+            }
             matchingFallbacks = ['release']
             signingConfig signingConfigs.githubRelease
-            shrinkResources true
             applicationVariants.all { variant ->
                 variant.outputs.all {
                     outputFileName = "v${versionName}-firefly.apk"
