@@ -21,10 +21,14 @@ import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
+import kotlinx.android.synthetic.main.fragment_add_piggy.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_piggy.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
+import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
@@ -39,6 +43,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private var startDate: String? = null
     private var targetDate: String? = null
     private var notes: String? = null
+    private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -193,6 +198,16 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         }
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
+        }
+        note_edittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(note_edittext.getString())
+            parentFragmentManager.commit {
+                replace(R.id.bigger_fragment_container, MarkdownFragment())
+                addToBackStack(null)
+            }
+        }
+        markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
+            note_edittext.setText(markdownText)
         }
     }
 
