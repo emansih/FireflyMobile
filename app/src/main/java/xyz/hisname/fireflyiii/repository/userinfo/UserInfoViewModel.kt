@@ -35,7 +35,7 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
     }
 
     fun userSystem(): LiveData<Boolean> {
-        isLoading.value = true
+        isLoading.postValue(true)
         val apiOk: MutableLiveData<Boolean> = MutableLiveData()
         var systemInfoModel: SystemInfoModel?  = null
         viewModelScope.launch(Dispatchers.IO){

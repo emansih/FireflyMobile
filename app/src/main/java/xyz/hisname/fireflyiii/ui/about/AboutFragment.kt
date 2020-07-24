@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
@@ -22,6 +23,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.extension.getCompatDrawable
+import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class AboutFragment: MaterialAboutFragment() {
@@ -31,10 +33,11 @@ class AboutFragment: MaterialAboutFragment() {
     private val apiVersion by lazy { sharedPref.getString("api_version","") ?: ""}
     private val userOs by lazy { sharedPref.getString("user_os","") ?: ""}
     private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
+    private val serverInfoViewModel by lazy { getImprovedViewModel(UserInfoViewModel::class.java) }
 
     override fun onStart() {
         super.onStart()
-        getViewModel(UserInfoViewModel::class.java).userSystem()
+        retrieveData()
     }
 
     override fun getMaterialAboutList(context: Context): MaterialAboutList{
@@ -44,6 +47,14 @@ class AboutFragment: MaterialAboutFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleBack()
+    }
+
+    private fun retrieveData(){
+        serverInfoViewModel.userSystem().observe(this){ isSuccessful ->
+            if(isSuccessful){
+                refreshMaterialAboutList()
+            }
+        }
     }
 
     private fun createMaterialAboutList(): MaterialAboutList{
