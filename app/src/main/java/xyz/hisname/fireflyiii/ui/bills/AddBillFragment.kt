@@ -142,7 +142,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         skip_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_sort_numeric_up
-                    colorRes = R.color.md_black_1000
+                    colorRes = R.color.md_red_500
                     sizeDp = 24
                 },null, null, null)
         addBillFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
