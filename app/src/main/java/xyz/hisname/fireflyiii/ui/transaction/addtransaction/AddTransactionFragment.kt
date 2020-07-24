@@ -66,8 +66,8 @@ class AddTransactionFragment: BaseFragment() {
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
-    private val budgetViewModel by lazy { getImprovedViewModel(BudgetViewModel::class.java) }
-    private val categoryViewModel by lazy { getImprovedViewModel(CategoryViewModel::class.java) }
+    private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
+    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private var fileUri: Uri? = null
     private var currency = ""
     private var tags = ArrayList<String>()
