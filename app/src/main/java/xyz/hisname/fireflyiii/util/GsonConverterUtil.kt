@@ -6,9 +6,7 @@ import com.google.gson.reflect.TypeToken
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.Spent
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import java.math.BigDecimal
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.*
 
 object GsonConverterUtil{
 
@@ -67,14 +65,14 @@ object GsonConverterUtil{
 
     @TypeConverter
     @JvmStatic
-    fun fromTimestamp(value: Long?): LocalDateTime? {
-        return value?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneOffset.UTC) }
+    fun fromTimestamp(value: Long?): OffsetDateTime? {
+        return OffsetDateTime.ofInstant(Instant.ofEpochMilli(value ?: 0), ZoneId.systemDefault())
     }
 
     @TypeConverter
     @JvmStatic
-    fun dateToTimestamp(date: LocalDateTime?): Long? {
-        return date?.atZone(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
+    fun dateToTimestamp(date: OffsetDateTime?): Long? {
+        return date?.toInstant()?.toEpochMilli()
     }
 
     @TypeConverter

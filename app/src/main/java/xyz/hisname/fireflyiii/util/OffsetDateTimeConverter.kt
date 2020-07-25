@@ -2,7 +2,8 @@ package xyz.hisname.fireflyiii.util
 
 import com.google.gson.*
 import java.lang.reflect.Type
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 /*
@@ -28,19 +29,18 @@ import java.time.format.DateTimeFormatter
  * THE SOFTWARE.
  */
 
-
-// https://github.com/gkopff/gson-javatime-serialisers/blob/273d706fa32df31821177375d837b83151cfc67e/src/main/java/com/fatboyindustrial/gsonjavatime/LocalDateTimeConverter.java
-class LocalDateTimeConverter: JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
+//https://github.com/gkopff/gson-javatime-serialisers/blob/273d706fa32df31821177375d837b83151cfc67e/src/main/java/com/fatboyindustrial/gsonjavatime/OffsetDateTimeConverter.java
+class OffsetDateTimeConverter: JsonSerializer<OffsetDateTime>, JsonDeserializer<OffsetDateTime> {
 
     companion object {
         private val FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     }
 
-    override fun serialize(src: LocalDateTime, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+    override fun serialize(src: OffsetDateTime  , typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
         return JsonPrimitive(FORMATTER.format(src))
     }
 
-    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): LocalDateTime  {
-        return FORMATTER.parse(json?.asString, LocalDateTime::from)
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): OffsetDateTime  {
+        return FORMATTER.parse(json?.asString, OffsetDateTime::from)
     }
 }

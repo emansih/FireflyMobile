@@ -252,7 +252,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
         val transactionData: MutableList<TransactionData> = arrayListOf()
         val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
-                convertString(sourceName), 1)
+                    convertString(sourceName), 1)
         networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
             transactionData.add(transaction)
         }

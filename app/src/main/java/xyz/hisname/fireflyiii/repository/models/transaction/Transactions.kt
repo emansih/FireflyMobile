@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.repository.models.transaction
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 @Entity(tableName = "transactionTable")
 data class Transactions(
@@ -23,7 +23,7 @@ data class Transactions(
         var currency_id: Long,
         var currency_name: String,
         var currency_symbol: String,
-        var date: LocalDateTime,
+        var date: OffsetDateTime,
         var description: String?,
         var destination_iban: String?,
         var destination_id: Long,

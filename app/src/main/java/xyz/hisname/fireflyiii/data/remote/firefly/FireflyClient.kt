@@ -7,11 +7,11 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import xyz.hisname.fireflyiii.util.LocalDateTimeConverter
+import xyz.hisname.fireflyiii.util.OffsetDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
@@ -60,7 +60,7 @@ class FireflyClient {
 
         private fun convertIso8601(): Gson {
             return GsonBuilder()
-                    .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeConverter())
+                    .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeConverter())
                     .enableComplexMapKeySerialization()
                     .serializeNulls()
                     .setPrettyPrinting()

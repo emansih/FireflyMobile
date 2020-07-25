@@ -176,7 +176,7 @@ object DateTimeUtil {
 
     // Input LocalDateTime(yyyy-MM-dd T HH:mm)
     // Output String(yyyy-MM-dd @ HH:mm OR hh:mm)
-    fun convertLocalDateTime(timeToParse: LocalDateTime, shouldUse24HourFormat: Boolean): String {
+    fun convertLocalDateTime(timeToParse: OffsetDateTime, shouldUse24HourFormat: Boolean): String {
         val timeFormat = if (!shouldUse24HourFormat){
             timeToParse.format(DateTimeFormatter.ofPattern("hh:mm a"))
         } else {
