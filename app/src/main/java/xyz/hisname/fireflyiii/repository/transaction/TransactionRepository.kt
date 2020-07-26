@@ -2,8 +2,6 @@ package xyz.hisname.fireflyiii.repository.transaction
 
 import android.content.Context
 import androidx.work.Data
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
@@ -155,47 +153,31 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             transactionDao.getTransactionIdFromJournalId(journalId)
 
     suspend fun getTransactionById(transactionId: Long): MutableList<Transactions>{
-        var networkCall: Response<TransactionModel>? = null
         val transactionData: MutableList<TransactionData> = arrayListOf()
-        try {
-            withContext(Dispatchers.IO) {
-                withContext(Dispatchers.IO) {
-                    networkCall = transactionService?.getTransactionById(transactionId)
-                }
-                transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
-            }
-            networkCall?.body()?.data?.forEachIndexed { _, transaction ->
-                transactionDao.insert(TransactionIndex(transaction.transactionId,
-                        transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-            }
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall?.isSuccessful != false) {
-                withContext(Dispatchers.IO) {
-                    transactionData.forEachIndexed { _, data ->
-                        transactionDao.insert(data.transactionAttributes?.transactions!![0])
-                        transactionDao.insert(TransactionIndex(data.transactionId,
-                                data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-                    }
-                }
-            }
-        } catch (exception: Exception){ }
-        var transactionJournalId = 0L
-        withContext(Dispatchers.IO){
-            transactionJournalId = transactionDao.getTransactionIdFromJournalId(transactionId)
+        val networkCall = transactionService?.getTransactionById(transactionId)
+        transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
+        networkCall?.body()?.data?.forEachIndexed { _, transaction ->
+            transactionDao.insert(TransactionIndex(transaction.transactionId,
+                    transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
         }
+        val responseBody = networkCall?.body()
+        if (responseBody != null && networkCall.isSuccessful) {
+            transactionData.forEachIndexed { _, data ->
+                transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                transactionDao.insert(TransactionIndex(data.transactionId,
+                        data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+            }
+
+        }
+        val transactionJournalId = transactionDao.getTransactionIdFromJournalId(transactionId)
         return transactionDao.getTransactionFromJournalId(transactionJournalId)
     }
 
     suspend fun deleteTransactionById(transactionId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
-        var networkResponse: Response<TransactionSuccessModel>? = null
-        withContext(Dispatchers.IO){
-            networkResponse = transactionService?.deleteTransactionById(transactionId)
-        }
+        val networkResponse: Response<TransactionSuccessModel>? = transactionService?.deleteTransactionById(transactionId)
         return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
-            withContext(Dispatchers.IO) {
-                val journalId = transactionDao.getTransactionIdFromJournalId(transactionId)
-                transactionDao.deleteTransactionByJournalId(journalId)
-            }
+            val journalId = transactionDao.getTransactionIdFromJournalId(transactionId)
+            transactionDao.deleteTransactionByJournalId(journalId)
             true
         } else {
             if(shouldUseWorker){

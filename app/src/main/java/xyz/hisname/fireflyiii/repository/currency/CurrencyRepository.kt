@@ -1,16 +1,10 @@
 package xyz.hisname.fireflyiii.repository.currency
 
 import androidx.annotation.WorkerThread
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
-import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
-import xyz.hisname.fireflyiii.repository.models.currency.DefaultCurrencyModel
-import java.lang.Exception
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
@@ -30,16 +24,9 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     suspend fun defaultCurrencyWithoutNetwork() = currencyDao.getDefaultCurrency()
 
     suspend fun defaultCurrencyWithNetwork(){
-        var networkCall: Response<DefaultCurrencyModel>? = null
-        withContext(Dispatchers.IO) {
-            try {
-                networkCall = currencyService?.getDefaultCurrency()
-            } catch (exception: Exception){
-
-            }
-        }
+        val networkCall = currencyService?.getDefaultCurrency()
         val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall?.isSuccessful != false) {
+        if (responseBody != null && networkCall.isSuccessful) {
             deleteDefaultCurrency()
             insertCurrency(responseBody.data)
         }
@@ -53,22 +40,16 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     }
 
     private suspend fun loadPaginatedData(pageNumber: Int){
-        var networkCall: Response<CurrencyModel>?
-        withContext(Dispatchers.IO) {
-            networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)
-        }
+        val networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)
         val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall?.isSuccessful != false) {
-            withContext(Dispatchers.IO){
+        if (responseBody != null && networkCall.isSuccessful) {
                 if(pageNumber == 1){
                     deleteAllCurrency()
                 }
                 responseBody.data.forEachIndexed { _, data ->
                     currencyDao.insert(data)
-                }
+
             }
         }
     }
-
-
 }
