@@ -28,17 +28,20 @@ class BillRepository(private val billDao: BillDataDao,
     suspend fun insertBill(bill: BillData) = billDao.insert(bill)
 
 
+    // Since we are retrieving only 1 item, there is no array. We wrap a try catch to prevent crash ;p
     suspend fun retrieveBillById(billId: Long): MutableList<BillData>{
-        val billData: MutableList<BillData> = arrayListOf()
-        val networkCall = billService?.getBillById(billId)
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            billData.addAll(responseBody.data.toMutableList())
-            billDao.deleteBillById(billId)
-            billData.forEachIndexed { _, data ->
-                insertBill(data)
+        try {
+            val billData: MutableList<BillData> = arrayListOf()
+            val networkCall = billService?.getBillById(billId)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                billData.addAll(responseBody.data.toMutableList())
+                billDao.deleteBillById(billId)
+                billData.forEachIndexed { _, data ->
+                    insertBill(data)
+                }
             }
-        }
+        } catch (exception: Exception){ }
         return billDao.getBillById(billId)
     }
 
