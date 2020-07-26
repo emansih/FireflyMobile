@@ -224,7 +224,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     private suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{
-        return if(startDate == null || endDate == null){
+        return if(startDate == null || endDate == null || startDate.isBlank() || endDate.isBlank()){
             transactionDao.deleteTransaction()
         } else {
             transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
@@ -268,6 +268,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     }
                 }
             }
+
             deleteTransactionsByDate(startDate, endDate, sourceName)
             transactionData.forEachIndexed { _, data ->
                 transactionDao.insert(data.transactionAttributes?.transactions!![0])
