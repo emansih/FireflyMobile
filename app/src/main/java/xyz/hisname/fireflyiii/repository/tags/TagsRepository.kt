@@ -23,26 +23,28 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun allTags(): MutableList<TagsData>{
-        val tagsData: MutableList<TagsData> = arrayListOf()
-        val networkCall = tagsService?.getPaginatedTags(1)
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            tagsData.addAll(responseBody.data.toMutableList() )
-            val pagination = responseBody.meta.pagination
-            if (pagination.total_pages != pagination.current_page) {
-                for (items in 2..pagination.total_pages) {
-                    tagsData.addAll(
-                            tagsService?.getPaginatedTags(items)?.body()?.data?.toMutableList()
-                                    ?: arrayListOf()
-                    )
+        try {
+            val tagsData: MutableList<TagsData> = arrayListOf()
+            val networkCall = tagsService?.getPaginatedTags(1)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                tagsData.addAll(responseBody.data.toMutableList())
+                val pagination = responseBody.meta.pagination
+                if (pagination.total_pages != pagination.current_page) {
+                    for (items in 2..pagination.total_pages) {
+                        tagsData.addAll(
+                                tagsService?.getPaginatedTags(items)?.body()?.data?.toMutableList()
+                                        ?: arrayListOf()
+                        )
 
+                    }
+                }
+                tagsDataDao.deleteTags()
+                tagsData.forEachIndexed { _, data ->
+                    insertTags(data)
                 }
             }
-            tagsDataDao.deleteTags()
-            tagsData.forEachIndexed { _, data ->
-                insertTags(data)
-            }
-        }
+        } catch (exception: Exception){ }
         return tagsDataDao.getAllTags()
     }
 

@@ -18,16 +18,18 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
 
     suspend fun loadPaginatedData(pageNumber: Int): MutableList<CategoryData>{
-        val networkCall = categoryService?.getPaginatedCategory(pageNumber)
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            if(pageNumber == 1){
-                deleteAllCategory()
+        try {
+            val networkCall = categoryService?.getPaginatedCategory(pageNumber)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                if (pageNumber == 1) {
+                    deleteAllCategory()
+                }
+                responseBody.data.forEachIndexed { _, categoryData ->
+                    insertCategory(categoryData)
+                }
             }
-            responseBody.data.forEachIndexed { _, categoryData ->
-                insertCategory(categoryData)
-            }
-        }
+        } catch (exception: Exception){ }
         return categoryDao.getPaginatedCategory(pageNumber * Constants.PAGE_SIZE)
     }
 }

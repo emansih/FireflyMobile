@@ -24,12 +24,14 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     suspend fun defaultCurrencyWithoutNetwork() = currencyDao.getDefaultCurrency()
 
     suspend fun defaultCurrencyWithNetwork(){
-        val networkCall = currencyService?.getDefaultCurrency()
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            deleteDefaultCurrency()
-            insertCurrency(responseBody.data)
-        }
+        try {
+            val networkCall = currencyService?.getDefaultCurrency()
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                deleteDefaultCurrency()
+                insertCurrency(responseBody.data)
+            }
+        } catch (exception: Exception){ }
     }
 
     private suspend fun deleteAllCurrency() = currencyDao.deleteAllCurrency()
@@ -40,16 +42,18 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     }
 
     private suspend fun loadPaginatedData(pageNumber: Int){
-        val networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-                if(pageNumber == 1){
+        try {
+            val networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                if (pageNumber == 1) {
                     deleteAllCurrency()
                 }
                 responseBody.data.forEachIndexed { _, data ->
                     currencyDao.insert(data)
 
+                }
             }
-        }
+        } catch (exception: Exception){ }
     }
 }

@@ -153,22 +153,24 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             transactionDao.getTransactionIdFromJournalId(journalId)
 
     suspend fun getTransactionById(transactionId: Long): MutableList<Transactions>{
-        val transactionData: MutableList<TransactionData> = arrayListOf()
-        val networkCall = transactionService?.getTransactionById(transactionId)
-        transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
-        networkCall?.body()?.data?.forEachIndexed { _, transaction ->
-            transactionDao.insert(TransactionIndex(transaction.transactionId,
-                    transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-        }
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            transactionData.forEachIndexed { _, data ->
-                transactionDao.insert(data.transactionAttributes?.transactions!![0])
-                transactionDao.insert(TransactionIndex(data.transactionId,
-                        data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+        try {
+            val transactionData: MutableList<TransactionData> = arrayListOf()
+            val networkCall = transactionService?.getTransactionById(transactionId)
+            transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
+            networkCall?.body()?.data?.forEachIndexed { _, transaction ->
+                transactionDao.insert(TransactionIndex(transaction.transactionId,
+                        transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
             }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                transactionData.forEachIndexed { _, data ->
+                    transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                    transactionDao.insert(TransactionIndex(data.transactionId,
+                            data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+                }
 
-        }
+            }
+        } catch (exception: Exception) { }
         val transactionJournalId = transactionDao.getTransactionIdFromJournalId(transactionId)
         return transactionDao.getTransactionFromJournalId(transactionJournalId)
     }
@@ -215,49 +217,52 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     private suspend fun loadPaginatedData(startDate: String, endDate: String, sourceName: String, pageNumber: Int){
-        val  networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
-                convertString(sourceName), pageNumber)
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            if(pageNumber == 1){
-                transactionDao.deleteTransaction()
-            }
-            responseBody.data.forEachIndexed { _, data ->
-                transactionDao.insert(data.transactionAttributes?.transactions!![0])
-                transactionDao.insert(TransactionIndex(data.transactionId,
-                        data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+        try {
+            val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+                    convertString(sourceName), pageNumber)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                if (pageNumber == 1) {
+                    transactionDao.deleteTransaction()
+                }
+                responseBody.data.forEachIndexed { _, data ->
+                    transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                    transactionDao.insert(TransactionIndex(data.transactionId,
+                            data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
 
+                }
             }
-        }
+        } catch(exception: Exception){ }
     }
 
     private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
-        val transactionData: MutableList<TransactionData> = arrayListOf()
-        val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+        try {
+            val transactionData: MutableList<TransactionData> = arrayListOf()
+            val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
                     convertString(sourceName), 1)
-        networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
-            transactionData.add(transaction)
-        }
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            val pagination = responseBody.meta.pagination
-            if (pagination.total_pages != pagination.current_page) {
-                for (items in 2..pagination.total_pages) {
-                    val service = transactionService?.getPaginatedTransactions(startDate, endDate,
-                            convertString(sourceName), items)?.body()
-                    service?.data?.forEachIndexed { _, dataToBeAdded ->
-                        transactionData.add(dataToBeAdded)
+            networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
+                transactionData.add(transaction)
+            }
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                val pagination = responseBody.meta.pagination
+                if (pagination.total_pages != pagination.current_page) {
+                    for (items in 2..pagination.total_pages) {
+                        val service = transactionService?.getPaginatedTransactions(startDate, endDate,
+                                convertString(sourceName), items)?.body()
+                        service?.data?.forEachIndexed { _, dataToBeAdded ->
+                            transactionData.add(dataToBeAdded)
+                        }
                     }
+            }
+                deleteTransactionsByDate(startDate, endDate, sourceName)
+                transactionData.forEachIndexed { _, data ->
+                    transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                    transactionDao.insert(TransactionIndex(data.transactionId,
+                            data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
                 }
             }
-
-            deleteTransactionsByDate(startDate, endDate, sourceName)
-            transactionData.forEachIndexed { _, data ->
-                transactionDao.insert(data.transactionAttributes?.transactions!![0])
-                transactionDao.insert(TransactionIndex(data.transactionId,
-                        data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-            }
-        }
+        } catch(exception: Exception){ }
     }
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()

@@ -55,30 +55,30 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
 
     suspend fun deleteAccountById(accountId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
-        val networkResponse = accountsService?.deleteAccountById(accountId)
-        return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
-            accountDao.deleteAccountById(accountId)
-            true
-        } else {
-            if(shouldUseWorker){
-                DeleteAccountWorker.deleteWorker(accountId, context)
+        var isDeleted = false
+        try {
+            val networkResponse = accountsService?.deleteAccountById(accountId)
+            isDeleted = if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
+                accountDao.deleteAccountById(accountId)
+                true
+            } else {
+                if (shouldUseWorker) {
+                    DeleteAccountWorker.deleteWorker(accountId, context)
+                }
+                false
             }
-            false
-        }
+        } catch (exception: Exception){ }
+        return isDeleted
     }
 
     suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
-
-    suspend fun retrieveAccountWithCurrencyCodeAndNetworth(currencyCode: String): Double {
-        loadRemoteData("all")
-        return accountDao.getAccountsWithNetworthAndCurrency(currencyCode = currencyCode)
-    }
 
     private suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)
 
     private suspend fun loadRemoteData(accountType: String){
         val accountData: MutableList<AccountData> = arrayListOf()
-        val networkCall = accountsService?.getPaginatedAccountType(accountType, 1)
+        try {
+            val networkCall = accountsService?.getPaginatedAccountType(accountType, 1)
             accountData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
             val responseBody = networkCall?.body()
             apiResponse = networkCall?.message() ?: ""
@@ -87,7 +87,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 if (pagination.total_pages != pagination.current_page) {
                     for (items in 2..pagination.total_pages) {
                         accountData.addAll(
-                                accountsService?.getPaginatedAccountType(accountType, items)?.body()?.data?.toMutableList() ?: arrayListOf()
+                                accountsService?.getPaginatedAccountType(accountType, items)?.body()?.data?.toMutableList()
+                                        ?: arrayListOf()
                         )
                     }
                 }
@@ -96,5 +97,6 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                     accountDao.insert(data)
                 }
             }
+        } catch (exception: Exception){ }
     }
 }

@@ -39,7 +39,9 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
         val apiOk: MutableLiveData<Boolean> = MutableLiveData()
         var systemInfoModel: SystemInfoModel?  = null
         viewModelScope.launch(Dispatchers.IO){
-            systemInfoModel = genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.body()
+            try {
+                systemInfoModel = genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.body()
+            } catch (exception: Exception){ }
         }.invokeOnCompletion {
             val systemData = systemInfoModel?.systemData
             if (systemData != null) {

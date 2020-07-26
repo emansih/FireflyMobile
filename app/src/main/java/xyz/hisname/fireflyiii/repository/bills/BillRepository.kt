@@ -12,16 +12,18 @@ class BillRepository(private val billDao: BillDataDao,
                      private val billService: BillsService?) {
 
     suspend fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): MutableList<BillData>{
-        val networkCall = billService?.getPaginatedBills(pageNumber, startDate, endDate)
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            if(pageNumber == 1){
-                billDao.deleteAllBills()
+        try {
+            val networkCall = billService?.getPaginatedBills(pageNumber, startDate, endDate)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                if (pageNumber == 1) {
+                    billDao.deleteAllBills()
+                }
+                responseBody.data.forEachIndexed { _, billData ->
+                    insertBill(billData)
+                }
             }
-            responseBody.data.forEachIndexed { _, billData ->
-                insertBill(billData)
-            }
-        }
+        } catch (exception: Exception){ }
         return billDao.getPaginatedBills(pageNumber * Constants.PAGE_SIZE)
     }
 
@@ -47,8 +49,9 @@ class BillRepository(private val billDao: BillDataDao,
 
 
     suspend fun deleteBillById(billId: Long, shouldUserWorker: Boolean = false, context: Context): Boolean{
+        var isDeleted = false
         val networkStatus = billService?.deleteBillById(billId)
-        return if (networkStatus?.code() == 204 || networkStatus?.code() == 200){
+        isDeleted = if (networkStatus?.code() == 204 || networkStatus?.code() == 200){
             billDao.deleteBillById(billId)
             true
         } else {
@@ -57,5 +60,6 @@ class BillRepository(private val billDao: BillDataDao,
             }
             false
         }
+        return isDeleted
     }
 }
