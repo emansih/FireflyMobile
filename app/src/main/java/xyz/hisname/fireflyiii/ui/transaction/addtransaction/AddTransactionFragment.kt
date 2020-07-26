@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
 import android.Manifest
 import android.app.Activity
-import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -24,6 +23,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
@@ -53,7 +53,6 @@ import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
@@ -299,17 +298,13 @@ class AddTransactionFragment: BaseFragment() {
             openDocViewer()
         }
         transaction_date_edittext.setText(DateTimeUtil.getTodayDate())
-        val transactionDate = DatePickerDialog.OnDateSetListener {
-            _, year, monthOfYear, dayOfMonth ->
-            run {
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                transaction_date_edittext.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
-            }
-        }
         transaction_date_edittext.setOnClickListener {
-            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), transactionDate, calendar)
+            val materialDatePicker = MaterialDatePicker.Builder.datePicker()
+            val picker = materialDatePicker.build()
+            picker.show(parentFragmentManager, picker.toString())
+            picker.addOnPositiveButtonClickListener { time ->
+                transaction_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+            }
         }
         category_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -410,6 +405,16 @@ class AddTransactionFragment: BaseFragment() {
             handleBack()
         }
         time_edittext.setOnClickListener {
+            // Do not use this yet as there is a bug
+            // https://github.com/material-components/material-components-android/issues/1508
+            /*MaterialTimePicker().apply {
+                setTimeFormat(TimeFormat.CLOCK_24H)
+                setListener { materialTimePickerListener ->
+                    selectedTime = "${materialTimePickerListener.hour}:${materialTimePickerListener.minute}"
+                    time_edittext.setText(selectedTime)
+                }
+                show(parentFragmentManager, "timePickerDialog")
+            }*/
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
             val minute = calendar.get(Calendar.MINUTE)
             TimePickerDialog(requireContext(), TimePickerDialog.OnTimeSetListener {

@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.tags
 
-import android.app.DatePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Paint
@@ -12,6 +11,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
@@ -20,14 +20,17 @@ import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_tags.*
+import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_tags.expansionLayout
+import kotlinx.android.synthetic.main.fragment_add_tags.optionalLayout
+import kotlinx.android.synthetic.main.fragment_add_tags.placeHolderToolbar
+import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
-import java.util.*
 
 class AddTagsFragment: BaseAddObjectFragment() {
 
@@ -118,18 +121,13 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun setWidgets(){
-        val calendar = Calendar.getInstance()
-        val calendarDate = DatePickerDialog.OnDateSetListener {
-            _, year, monthOfYear, dayOfMonth ->
-            run {
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                date_edittext.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
-            }
-        }
         date_edittext.setOnClickListener {
-            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), calendarDate, calendar)
+            val materialDatePicker = MaterialDatePicker.Builder.datePicker()
+            val picker = materialDatePicker.build()
+            picker.show(parentFragmentManager, picker.toString())
+            picker.addOnPositiveButtonClickListener { time ->
+                transaction_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+            }
         }
         mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         mapTextview.setOnClickListener {

@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.bills
 
-import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color.rgb
@@ -11,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
@@ -30,9 +30,7 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
-import java.util.*
 
 class AddBillFragment: BaseAddObjectFragment() {
 
@@ -199,19 +197,13 @@ class AddBillFragment: BaseAddObjectFragment() {
                 else -> ""
             }
         }
-        val calendar = Calendar.getInstance()
-        val startDate = DatePickerDialog.OnDateSetListener {
-            _, year, monthOfYear, dayOfMonth ->
-            run {
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                bill_date_edittext.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
-            }
-        }
         bill_date_edittext.setOnClickListener {
-            hideKeyboard()
-            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), startDate, calendar)
+            val materialDatePicker = MaterialDatePicker.Builder.datePicker()
+            val picker = materialDatePicker.build()
+            picker.show(parentFragmentManager, picker.toString())
+            picker.addOnPositiveButtonClickListener { time ->
+                bill_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+            }
         }
         currency_edittext.setOnClickListener{
             CurrencyListBottomSheet().show(parentFragmentManager, "currencyList" )

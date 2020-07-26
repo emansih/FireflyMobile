@@ -14,6 +14,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
@@ -22,6 +23,8 @@ import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import kotlinx.android.synthetic.main.fragment_add_piggy.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_piggy.expansionLayout
+import kotlinx.android.synthetic.main.fragment_add_piggy.optionalLayout
 import kotlinx.android.synthetic.main.fragment_add_piggy.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
@@ -30,7 +33,6 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.DialogDarkMode
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
@@ -171,19 +173,20 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         }
 
         date_target_edittext.setOnClickListener {
-            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), startDate, calendar)
-        }
-        val endDate = DatePickerDialog.OnDateSetListener {
-            _, year, monthOfYear, dayOfMonth ->
-            run {
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                date_started_edittext.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
+            val materialDatePicker = MaterialDatePicker.Builder.datePicker()
+            val picker = materialDatePicker.build()
+            picker.show(parentFragmentManager, picker.toString())
+            picker.addOnPositiveButtonClickListener { time ->
+                date_target_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
         date_started_edittext.setOnClickListener {
-            DialogDarkMode().showCorrectDatePickerDialog(requireContext(), endDate, calendar)
+            val materialDatePicker = MaterialDatePicker.Builder.datePicker()
+            val picker = materialDatePicker.build()
+            picker.show(parentFragmentManager, picker.toString())
+            picker.addOnPositiveButtonClickListener { time ->
+                date_started_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+            }
         }
         accountViewModel.getAccountByType("asset").observe(viewLifecycleOwner) {
             if(it.isNotEmpty()) {
