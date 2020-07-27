@@ -13,6 +13,7 @@ import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
+import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 
 class TransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
@@ -40,6 +41,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val dueDate = inputData.getString("dueDate")
         val paymentDate = inputData.getString("paymentDate")
         val invoiceDate = inputData.getString("invoiceDate")
+        val transactionWorkManagerId = inputData.getInt("transactionWorkManagerId", 0)
         genericService?.create(TransactionService::class.java)?.addTransaction(convertString(transactionType), transactionDescription, transactionDate, piggyBank,
                 transactionAmount,sourceName, destinationName, transactionCurrency, category,
                 tags, budget, interestDate, bookDate, processDate, dueDate, paymentDate,
@@ -68,7 +70,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                                 error = gson.errors.transactions_source_name[0]
                             }
                         }
-                        WorkManager.getInstance(context).cancelAllWorkByTag("transactionWorker")
+                        WorkManager.getInstance(context).cancelAllWorkByTag(transactionWorkManagerId.toString())
                         context.displayNotification(error, "Error Adding $transactionType",
                                 Constants.TRANSACTION_CHANNEL, channelIcon)
                         Result.failure()
@@ -88,15 +90,21 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         fun initWorker(context: Context, data: Data.Builder, type: String) {
             val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
             val workManagerDelay = AppPref(sharedPref).workManagerDelay
+            val transactionWorkManagerId = ThreadLocalRandom.current().nextInt(0, 1000 + 1)
+            val additionalInfo = data.apply {
+                putString("transactionType", type)
+                putInt("transactionWorkManagerId", transactionWorkManagerId)
+            }
             val transactionWork = PeriodicWorkRequestBuilder<TransactionWorker>(Duration.ofMinutes(workManagerDelay))
-                    .setInputData(data.putString("transactionType", type).build())
+                    .setInputData(additionalInfo.build())
                     .setConstraints(Constraints.Builder()
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build())
                     .setBackoffCriteria(BackoffPolicy.LINEAR, workManagerDelay, TimeUnit.MINUTES)
-                    .addTag("transactionWorker")
+                    .addTag(transactionWorkManagerId.toString())
                     .build()
-            WorkManager.getInstance(context).enqueue(transactionWork)
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork("uniqueTransactionWorker",
+                    ExistingPeriodicWorkPolicy.REPLACE, transactionWork)
         }
     }
 }
