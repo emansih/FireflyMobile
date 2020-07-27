@@ -1,15 +1,19 @@
 package xyz.hisname.fireflyiii.workers.transaction
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.google.gson.Gson
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.BaseWorker
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 class TransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
@@ -47,6 +51,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     }
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if (response.isSuccessful) {
+                        WorkManager.getInstance(context).cancelAllWorkByTag("transactionWorker")
                         context.displayNotification("Transaction added successfully!", transactionType,
                                 Constants.TRANSACTION_CHANNEL, channelIcon)
                         Result.success()
@@ -63,15 +68,16 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                                 error = gson.errors.transactions_source_name[0]
                             }
                         }
+                        WorkManager.getInstance(context).cancelAllWorkByTag("transactionWorker")
                         context.displayNotification(error, "Error Adding $transactionType",
                                 Constants.TRANSACTION_CHANNEL, channelIcon)
                         Result.failure()
                     }
                 })
                 { throwable ->
-                    context.displayNotification(throwable.message.toString(),
-                            "Error Adding $transactionType", Constants.TRANSACTION_CHANNEL, channelIcon)
-                    Result.failure()
+                    /*context.displayNotification(throwable.message.toString(),
+                            "Error Adding $transactionType", Constants.TRANSACTION_CHANNEL, channelIcon)*/
+                    Result.retry()
                 })
         return Result.success()
     }
@@ -80,11 +86,15 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
 
     companion object {
         fun initWorker(context: Context, data: Data.Builder, type: String) {
-            val transactionWork = OneTimeWorkRequest.Builder(TransactionWorker::class.java)
+            val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
+            val workManagerDelay = AppPref(sharedPref).workManagerDelay
+            val transactionWork = PeriodicWorkRequestBuilder<TransactionWorker>(Duration.ofMinutes(workManagerDelay))
                     .setInputData(data.putString("transactionType", type).build())
                     .setConstraints(Constraints.Builder()
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build())
+                    .setBackoffCriteria(BackoffPolicy.LINEAR, workManagerDelay, TimeUnit.MINUTES)
+                    .addTag("transactionWorker")
                     .build()
             WorkManager.getInstance(context).enqueue(transactionWork)
         }

@@ -16,5 +16,6 @@ interface PreferenceHelper {
     var timeFormat: Boolean
     var isCustomCa: Boolean
     var isCurrencyThumbnailEnabled: Boolean
+    var workManagerDelay: Long
     fun clearPref()
 }
