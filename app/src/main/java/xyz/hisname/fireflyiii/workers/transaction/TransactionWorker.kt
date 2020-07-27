@@ -41,7 +41,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val dueDate = inputData.getString("dueDate")
         val paymentDate = inputData.getString("paymentDate")
         val invoiceDate = inputData.getString("invoiceDate")
-        val transactionWorkManagerId = inputData.getInt("transactionWorkManagerId", 0)
+        val transactionWorkManagerId = inputData.getString("transactionWorkManagerId")
         genericService?.create(TransactionService::class.java)?.addTransaction(convertString(transactionType), transactionDescription, transactionDate, piggyBank,
                 transactionAmount,sourceName, destinationName, transactionCurrency, category,
                 tags, budget, interestDate, bookDate, processDate, dueDate, paymentDate,
@@ -93,7 +93,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
             val transactionWorkManagerId = ThreadLocalRandom.current().nextInt(0, 1000 + 1)
             val additionalInfo = data.apply {
                 putString("transactionType", type)
-                putInt("transactionWorkManagerId", transactionWorkManagerId)
+                putString("transactionWorkManagerId", "transactionWorkManagerId-$transactionWorkManagerId")
             }
             val transactionWork = PeriodicWorkRequestBuilder<TransactionWorker>(Duration.ofMinutes(workManagerDelay))
                     .setInputData(additionalInfo.build())
@@ -101,10 +101,9 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build())
                     .setBackoffCriteria(BackoffPolicy.LINEAR, workManagerDelay, TimeUnit.MINUTES)
-                    .addTag(transactionWorkManagerId.toString())
+                    .addTag("transactionWorkManagerId-$transactionWorkManagerId")
                     .build()
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork("uniqueTransactionWorker",
-                    ExistingPeriodicWorkPolicy.REPLACE, transactionWork)
+            WorkManager.getInstance(context).enqueue(transactionWork)
         }
     }
 }
