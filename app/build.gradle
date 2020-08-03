@@ -137,5 +137,4 @@ dependencies {
     // Project Lib
     implementation project(path: ":languagepack")
 
-    debugImplementation Dependencies.debugDb
 }
