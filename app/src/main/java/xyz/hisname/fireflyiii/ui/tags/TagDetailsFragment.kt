@@ -39,7 +39,7 @@ class TagDetailsFragment: BaseDetailFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
-        fab.isGone = true
+        extendedFab.isGone = true
         return inflater.create(R.layout.fragment_tag_details, container)
     }
 
@@ -100,7 +100,7 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     override fun onStop() {
         super.onStop()
-        fab.isVisible = true
+        extendedFab.isVisible = true
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){

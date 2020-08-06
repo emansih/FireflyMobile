@@ -73,7 +73,7 @@ class TransactionDetailsFragment: BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        fab.isVisible = false
+        extendedFab.isVisible = false
     }
 
     private fun retrieveData(){
@@ -131,8 +131,8 @@ class TransactionDetailsFragment: BaseFragment() {
                     setOnClickListener {
                         parentFragmentManager.commit {
                             val tagDetails = TagDetailsFragment()
-                            tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
-                                    "revealY" to fab.height / 2, "tagName" to nameOfTag)
+                            tagDetails.arguments = bundleOf("revealX" to extendedFab.width / 2,
+                                    "revealY" to extendedFab.height / 2, "tagName" to nameOfTag)
                             addToBackStack(null)
                             replace(R.id.fragment_container, tagDetails)
                         }
@@ -279,7 +279,7 @@ class TransactionDetailsFragment: BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        fab.isVisible = false
+        extendedFab.isVisible = false
         activity?.activity_toolbar?.title = resources.getString(R.string.details)
     }
 

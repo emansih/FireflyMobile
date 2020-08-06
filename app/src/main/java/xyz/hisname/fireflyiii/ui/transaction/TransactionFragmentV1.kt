@@ -145,16 +145,16 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     override fun setupFab() {
-        fab.display {
+        extendedFab.display {
             val addTransaction = AddTransactionFragment()
-            addTransaction.arguments = bundleOf("revealX" to fab.width / 2,
-                    "revealY" to fab.height / 2, "transactionType" to transactionType,
+            addTransaction.arguments = bundleOf("revealX" to extendedFab.width / 2,
+                    "revealY" to extendedFab.height / 2, "transactionType" to transactionType,
                     "SHOULD_HIDE" to true)
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, addTransaction)
                 addToBackStack(null)
             }
-            fab.isGone = true
+            extendedFab.isGone = true
             fragmentContainer.isVisible = false
         }
     }
@@ -211,6 +211,6 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     override fun onResume() {
         super.onResume()
-        fab.isVisible = true
+        extendedFab.isVisible = true
     }
 }

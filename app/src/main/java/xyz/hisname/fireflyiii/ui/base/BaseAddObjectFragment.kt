@@ -15,7 +15,7 @@ abstract class BaseAddObjectFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fragmentContainer.isVisible = false
-        fab.isGone = true
+        extendedFab.isGone = true
         setIcons()
         setWidgets()
     }
@@ -39,7 +39,7 @@ abstract class BaseAddObjectFragment: BaseFragment() {
                 rootView.isVisible = false
                 fragmentContainer.isVisible = true
                 if(shouldShow) {
-                    fab.isVisible = true
+                    extendedFab.isVisible = true
                 }
             }
         })

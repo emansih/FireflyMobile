@@ -12,6 +12,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
 import com.bumptech.glide.Glide
@@ -156,9 +157,6 @@ class HomeActivity: BaseActivity(){
         supportFragmentManager.commit {
             replace(R.id.fragment_container, DashboardFragment(), "dash")
         }
-        globalFAB.setImageDrawable(ImageHolder(IconicsDrawable(this, GoogleMaterial.Icon.gmd_add).apply {
-            sizeDp = 24
-        }).icon)
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
@@ -491,6 +489,7 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun changeFragment(fragment: Fragment){
+        addTransactionExtended.isGone = true
         supportFragmentManager.commit {
             replace(R.id.fragment_container, fragment)
         }

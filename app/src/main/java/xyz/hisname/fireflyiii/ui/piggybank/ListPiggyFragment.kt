@@ -16,7 +16,7 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 
-class ListPiggyFragment: BaseFragment() {
+class ListPiggyFragment: BaseFragment(){
 
     private var dataAdapter = arrayListOf<PiggyData>()
     private var whichPiggy = true
@@ -29,10 +29,11 @@ class ListPiggyFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         runLayoutAnimation(recycler_view)
+        initFab()
         setHasOptionsMenu(true)
         displayAll()
         pullToRefresh()
-        initFab()
+        recycler_view.enableDragDrop(extendedFab)
     }
 
     private fun displayView(){
@@ -41,7 +42,9 @@ class ListPiggyFragment: BaseFragment() {
             listText.isVisible = false
             listImage.isVisible = false
             recycler_view.isVisible = true
-            recycler_view.adapter =  PiggyRecyclerAdapter(dataAdapter){ data: PiggyData -> itemClicked(data) }.apply {
+            recycler_view.adapter =  PiggyRecyclerAdapter(dataAdapter){ data: PiggyData ->
+                itemClicked(data)
+            }.apply {
                 update(dataAdapter)
             }
         } else {
@@ -77,6 +80,7 @@ class ListPiggyFragment: BaseFragment() {
             replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
             addToBackStack(null)
         }
+        extendedFab.isGone = true
     }
 
     private fun pullToRefresh(){
@@ -91,17 +95,16 @@ class ListPiggyFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.display {
-            fab.isClickable = false
+        extendedFab.display {
+            extendedFab.isClickable = false
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddPiggyFragment().apply {
-                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                    arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2)
                 })
                 addToBackStack(null)
             }
-            fab.isClickable = true
+            extendedFab.isClickable = true
         }
-        recycler_view.hideFab(fab)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -137,7 +140,7 @@ class ListPiggyFragment: BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun handleBack() {

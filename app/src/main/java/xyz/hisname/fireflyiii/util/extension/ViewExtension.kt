@@ -1,12 +1,18 @@
 package xyz.hisname.fireflyiii.util.extension
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
@@ -68,4 +74,15 @@ fun Context.getCompatDrawable(@DrawableRes drawableName: Int): Drawable? {
 
 fun SupportFragment.getCompatDrawable(@DrawableRes drawableName: Int): Drawable? {
     return requireActivity().getCompatDrawable(drawableName)
+}
+
+fun View.animateBackgroundStateChange(@ColorInt beforeColor: Int? = null, @ColorInt afterColor: Int): ValueAnimator {
+    val before = beforeColor ?: (background as? ColorDrawable)?.color ?: Color.TRANSPARENT
+    return ValueAnimator.ofObject(ArgbEvaluator(), before, afterColor).apply {
+        duration = 250
+        addUpdateListener {
+            this@animateBackgroundStateChange.backgroundTintList = ColorStateList.valueOf(it.animatedValue as Int)
+        }
+        start()
+    }
 }

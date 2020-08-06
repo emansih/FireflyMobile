@@ -21,6 +21,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
+import xyz.hisname.fireflyiii.util.extension.enableDragDrop
 import xyz.hisname.fireflyiii.util.extension.hideFab
 import java.util.*
 
@@ -41,6 +42,7 @@ class ListAccountFragment: BaseFragment() {
         displayView()
         pullToRefresh()
         initFab()
+        recycler_view.enableDragDrop(extendedFab)
     }
 
     private fun displayView(){
@@ -96,17 +98,16 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.display {
-            fab.isClickable = false
+        extendedFab.display {
+            extendedFab.isClickable = false
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddAccountFragment().apply{
-                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "accountType" to accountType)
+                    arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2, "accountType" to accountType)
                 })
                 addToBackStack(null)
             }
-            fab.isClickable = true
+            extendedFab.isClickable = true
         }
-        recycler_view.hideFab(fab)
     }
 
     private fun convertString(): String{
@@ -131,7 +132,7 @@ class ListAccountFragment: BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun handleBack() {

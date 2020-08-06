@@ -1,10 +1,15 @@
 package xyz.hisname.fireflyiii.util.extension
 
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import xyz.hisname.fireflyiii.R
 
 fun FloatingActionButton.display(
         clicky: View.() -> Unit
@@ -34,4 +39,41 @@ fun RecyclerView.hideFab(floatingActionButton: FloatingActionButton){
             super.onScrollStateChanged(recyclerView, newState)
         }
     })
+}
+
+fun ExtendedFloatingActionButton.display(clicky: View.() -> Unit){
+    isVisible = true
+    translationY = (6 * 56).toFloat()
+    animate().translationY(0f)
+            .setInterpolator(OvershootInterpolator(1f))
+            .setStartDelay(300)
+            .setDuration(400)
+            .start()
+    this.setOnClickListener(clicky)
+}
+
+fun ExtendedFloatingActionButton.animateChange(isAdd: Boolean){
+    val colorRemove = getCompatColor(R.color.md_red_600)
+    val colorAdd = getCompatColor(R.color.colorAccent)
+    val animationAddToDelete = this.context.getCompatDrawable(R.drawable.ic_delete_to_add) as AnimatedVectorDrawable
+    if(isAdd){
+        this.apply {
+            text = "Add"
+            icon = animationAddToDelete
+            animationAddToDelete.start()
+            animateBackgroundStateChange(colorRemove, colorAdd)
+            isClickable = true
+            isFocusable = true
+        }
+    } else {
+        this.apply {
+            text = "Remove"
+            icon = animationAddToDelete
+            animationAddToDelete.start()
+            animateBackgroundStateChange(colorAdd, colorRemove)
+            isClickable = false
+            isFocusable = false
+        }
+    }
+    TransitionManager.beginDelayedTransition(this.parent as ViewGroup)
 }

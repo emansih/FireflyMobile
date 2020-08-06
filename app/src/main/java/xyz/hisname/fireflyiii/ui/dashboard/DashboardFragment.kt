@@ -55,7 +55,7 @@ class DashboardFragment: BaseFragment() {
 
     private val budgetLimit by lazy { getImprovedViewModel(BudgetViewModel::class.java) }
     private val summaryViewModel by lazy { getImprovedViewModel(SummaryViewModel::class.java) }
-    private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+    private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java)}
     private val transactionVM by lazy { getImprovedViewModel(TransactionsViewModel::class.java) }
 
@@ -108,15 +108,15 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setExtendedFab(){
-        extendedFab.isVisible = true
+        transactionExtendedFab.isVisible = true
         dashboardNested.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (scrollY > oldScrollY) {
-                extendedFab.shrink()
+                transactionExtendedFab.shrink()
             } else {
-                extendedFab.extend()
+                transactionExtendedFab.extend()
             }
         }
-        extendedFab.setOnClickListener {
+        transactionExtendedFab.setOnClickListener {
             requireActivity().startActivity(Intent(requireContext(), AddTransactionActivity::class.java))
         }
     }

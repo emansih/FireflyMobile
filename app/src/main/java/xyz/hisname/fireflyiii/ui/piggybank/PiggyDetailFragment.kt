@@ -37,7 +37,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        fab.isInvisible = true
         return inflater.create(R.layout.fragment_piggy_detail,container)
     }
 

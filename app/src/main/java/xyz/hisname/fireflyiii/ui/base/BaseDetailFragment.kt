@@ -18,7 +18,7 @@ abstract class BaseDetailFragment: BaseFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fab.isVisible = false
+        extendedFab.isVisible = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -33,13 +33,13 @@ abstract class BaseDetailFragment: BaseFragment(){
 
     override fun onResume() {
         super.onResume()
-        fab.isVisible = false
+        extendedFab.isVisible = false
         activity?.activity_toolbar?.title = resources.getString(R.string.details)
     }
 
     override fun onStop() {
         super.onStop()
-        fab.isVisible = true
+        extendedFab.isVisible = true
     }
 
     abstract fun deleteItem()

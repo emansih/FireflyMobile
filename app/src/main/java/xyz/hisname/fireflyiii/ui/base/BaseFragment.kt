@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,7 +34,7 @@ import kotlin.coroutines.CoroutineContext
 abstract class BaseFragment: Fragment() {
 
     protected val progressLayout by bindView<View>(R.id.progress_overlay)
-    protected val fab by bindView<FloatingActionButton>(R.id.globalFAB)
+    protected val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.fab_action)
     protected val fragmentContainer by bindView<FrameLayout>(R.id.fragment_container)
     protected val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
     protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }

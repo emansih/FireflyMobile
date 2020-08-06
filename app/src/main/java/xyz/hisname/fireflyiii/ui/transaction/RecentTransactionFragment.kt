@@ -23,7 +23,7 @@ import java.util.*
 
 class RecentTransactionFragment: BaseFragment() {
 
-    private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+    private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
 
 
     override fun handleBack() {
@@ -72,6 +72,6 @@ class RecentTransactionFragment: BaseFragment() {
             })
             addToBackStack(null)
         }
-        extendedFab.isVisible = false
+        transactionExtendedFab.isVisible = false
     }
 }

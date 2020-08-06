@@ -38,7 +38,7 @@ import kotlin.math.roundToInt
 class BudgetSummaryFragment: BaseFragment() {
 
     private val budgetViewModel by lazy { getImprovedViewModel(BudgetViewModel::class.java) }
-    private val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+    private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
     private val coloring = arrayListOf<Int>()
     private var budgetSpent = 0f
@@ -51,7 +51,7 @@ class BudgetSummaryFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        extendedFab.isGone = true
+        transactionExtendedFab.isGone = true
         for (col in ColorTemplate.COLORFUL_COLORS) {
             coloring.add(col)
         }
@@ -176,14 +176,12 @@ class BudgetSummaryFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        fab.isGone = true
         extendedFab.isGone = true
         activity?.activity_toolbar?.title = "Budget Summary"
     }
 
     override fun onResume() {
         super.onResume()
-        fab.isGone = true
         extendedFab.isGone = true
         activity?.activity_toolbar?.title = "Budget Summary"
     }

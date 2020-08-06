@@ -59,7 +59,7 @@ class CurrencyListFragment: BaseFragment() {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                 // Don't load more when data is refreshing
                 if(!swipeContainer.isRefreshing) {
-                    currencyViewModel.getCurrency(page + 1).observe(this@CurrencyListFragment) { currencyList ->
+                    currencyViewModel.getCurrency(page + 1).observe(viewLifecycleOwner) { currencyList ->
                         dataAdapter.clear()
                         dataAdapter.addAll(currencyList)
                         currencyAdapter.update(currencyList)
@@ -81,17 +81,16 @@ class CurrencyListFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.display {
-            fab.isClickable = false
+        extendedFab.display {
+            extendedFab.isClickable = false
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddCurrencyFragment().apply {
-                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                    arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2)
                 })
                 addToBackStack(null)
             }
-            fab.isClickable = true
+            extendedFab.isClickable = true
         }
-        recycler_view.hideFab(fab)
     }
 
     private fun pullToRefresh(){
@@ -115,12 +114,12 @@ class CurrencyListFragment: BaseFragment() {
 
     override fun onStop() {
         super.onStop()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun onDetach() {
         super.onDetach()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun handleBack() {

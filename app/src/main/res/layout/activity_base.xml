@@ -38,16 +38,23 @@
                     android:elevation="4dp"
                     app:layout_scrollFlags="scroll|enterAlways|snap"/>
             </com.google.android.material.appbar.AppBarLayout>
-
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/globalFAB"
+            
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:contentDescription="@string/appbar_scrolling_view_behavior"
+                android:id="@+id/fab_action"
+                android:layout_gravity="center|bottom"
+                android:text="Add"
+                app:icon="@android:drawable/ic_input_add"
+                app:backgroundTint="@color/colorAccent"
+                android:textColor="@color/md_black_1000"
+                android:visibility="invisible"
                 android:layout_margin="16dp"
-                android:layout_gravity="end|bottom"
-                app:backgroundTint="@color/colorAccent"/>
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/addTransactionExtended"

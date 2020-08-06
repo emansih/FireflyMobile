@@ -25,10 +25,8 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.display
+import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.hideFab
 
 class ListBillFragment: BaseFragment() {
 
@@ -51,6 +49,7 @@ class ListBillFragment: BaseFragment() {
         displayView()
         pullToRefresh()
         initFab()
+        recycler_view.enableDragDrop(extendedFab)
     }
 
     private fun displayView(){
@@ -81,7 +80,7 @@ class ListBillFragment: BaseFragment() {
                 // Don't load more when data is refreshing
                 if(!swipeContainer.isRefreshing) {
                     swipeContainer.isRefreshing = true
-                    billViewModel.getPaginatedBills(page + 1, dateToRetrieve, dateToRetrieve).observe(this@ListBillFragment) { billList ->
+                    billViewModel.getPaginatedBills(page + 1, dateToRetrieve, dateToRetrieve).observe(viewLifecycleOwner) { billList ->
                         dataAdapter.clear()
                         dataAdapter.addAll(billList)
                         billAdapter.update(dataAdapter)
@@ -97,24 +96,23 @@ class ListBillFragment: BaseFragment() {
     private fun itemClicked(billData: BillData){
         parentFragmentManager.commit {
             replace(R.id.bigger_fragment_container, AddBillFragment().apply {
-                arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2, "billId" to billData.billId)
+                arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2, "billId" to billData.billId)
             })
             addToBackStack(null)
         }
     }
 
     private fun initFab(){
-        fab.display {
-            fab.isClickable = false
+        extendedFab.display {
+            extendedFab.isClickable = false
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, AddBillFragment().apply {
-                    arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                    arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2)
                 })
                 addToBackStack(null)
             }
-            fab.isClickable = true
+            extendedFab.isClickable = true
         }
-        recycler_view.hideFab(fab)
     }
 
     private fun pullToRefresh(){
@@ -137,7 +135,7 @@ class ListBillFragment: BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun handleBack() {

@@ -45,6 +45,7 @@ class CategoriesFragment: BaseFragment() {
         recycler_view.layoutManager = linearLayout()
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = catAdapter
+        recycler_view.enableDragDrop(extendedFab)
     }
 
     private fun displayView(){
@@ -57,7 +58,7 @@ class CategoriesFragment: BaseFragment() {
                 // Don't load more when data is refreshing
                 if(!swipeContainer.isRefreshing) {
                     swipeContainer.isRefreshing = true
-                    categoryViewModel.getPaginatedCategory(page + 1).observe(this@CategoriesFragment) { catList ->
+                    categoryViewModel.getPaginatedCategory(page + 1).observe(viewLifecycleOwner) { catList ->
                         catData.clear()
                         catData.addAll(catList)
                         catAdapter.update(catData)
@@ -92,13 +93,12 @@ class CategoriesFragment: BaseFragment() {
     }
 
     private fun initFab(){
-        fab.display {
-            fab.isClickable = false
+        extendedFab.display {
+            extendedFab.isClickable = false
             val addCategoryFragment = AddCategoriesFragment()
             addCategoryFragment.show(parentFragmentManager, "add_category_fragment")
-            fab.isClickable = true
+            extendedFab.isClickable = true
         }
-        recycler_view.hideFab(fab)
     }
 
     private fun pullToRefresh(){
@@ -124,7 +124,7 @@ class CategoriesFragment: BaseFragment() {
 
     override fun onDetach() {
         super.onDetach()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun handleBack() {

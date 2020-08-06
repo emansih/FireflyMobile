@@ -58,11 +58,6 @@ abstract class BaseTransactionFragment: BaseFragment() {
         }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        requireActivity().globalFAB.isGone = true
-    }
-
     override fun onResume() {
         super.onResume()
         val toolBarTitle = when {

@@ -79,8 +79,8 @@ class ListTagsFragment: BaseFragment() {
                                 setOnClickListener {
                                     parentFragmentManager.commit {
                                         val tagDetails = TagDetailsFragment()
-                                        tagDetails.arguments = bundleOf("revealX" to fab.width / 2,
-                                                "revealY" to fab.height / 2, "tagId" to tagsData.tagsId)
+                                        tagDetails.arguments = bundleOf("revealX" to extendedFab.width / 2,
+                                                "revealY" to extendedFab.height / 2, "tagId" to tagsData.tagsId)
                                         addToBackStack(null)
                                         replace(R.id.fragment_container, tagDetails)
                                     }
@@ -118,16 +118,16 @@ class ListTagsFragment: BaseFragment() {
     }
 
     private fun setFab(){
-        fab.display {
-            fab.isClickable = false
+        extendedFab.display {
+            extendedFab.isClickable = false
             baseLayout.isInvisible = true
             parentFragmentManager.commit {
                 val addTags = AddTagsFragment()
-                addTags.arguments = bundleOf("revealX" to fab.width / 2, "revealY" to fab.height / 2)
+                addTags.arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2)
                 addToBackStack(null)
                 replace(R.id.bigger_fragment_container, addTags)
             }
-            fab.isClickable = true
+            extendedFab.isClickable = true
         }
     }
 
@@ -147,13 +147,13 @@ class ListTagsFragment: BaseFragment() {
 
     override fun onStop() {
         super.onStop()
-        fab.isGone = true
+        extendedFab.isGone = true
         activity?.activity_toolbar?.title = resources.getString(R.string.tags)
     }
 
     override fun onDetach() {
         super.onDetach()
-        fab.isGone = true
+        extendedFab.isGone = true
     }
 
     override fun onResume() {
