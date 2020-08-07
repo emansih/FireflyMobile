@@ -45,7 +45,9 @@ class CategoriesFragment: BaseFragment() {
         recycler_view.layoutManager = linearLayout()
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = catAdapter
-        recycler_view.enableDragDrop(extendedFab)
+        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
+
+        }
     }
 
     private fun displayView(){

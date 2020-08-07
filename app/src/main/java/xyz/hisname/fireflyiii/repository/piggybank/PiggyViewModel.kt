@@ -2,12 +2,11 @@ package xyz.hisname.fireflyiii.repository.piggybank
 
 import android.app.Application
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
@@ -30,12 +29,15 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
     }
 
     fun getAllPiggyBanks(): LiveData<MutableList<PiggyData>> {
-        lateinit var piggyData: MutableList<PiggyData>
         val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            piggyData = repository.allPiggyBanks()
-        }.invokeOnCompletion {
-            data.postValue(piggyData)
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.allPiggyBanks().collectLatest {
+                    data.postValue(it)
+                }
+            }
+        } catch(exception: Exception){
+            println("Exception: " + exception.localizedMessage)
         }
         return data
     }
@@ -148,6 +150,25 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
             data.postValue(piggyData)
         }
         return data
+    }
+
+    fun deletePiggyByName(piggyBankName: String): LiveData<Boolean>{
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        isLoading.value = true
+        var isItDeleted = false
+        viewModelScope.launch(Dispatchers.IO) {
+            isItDeleted = repository.deletePiggyByName(piggyBankName, getApplication() as Context)
+        }.invokeOnCompletion {
+            if(isItDeleted) {
+                isDeleted.postValue(true)
+            } else {
+                isDeleted.postValue(false)
+            }
+            isLoading.postValue(false)
+
+        }
+        return isDeleted
+
     }
 
     fun postPiggyName(details: String?){

@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.data.local.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 
 
@@ -10,7 +11,7 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 abstract class PiggyDataDao: BaseDao<PiggyData>{
 
     @Query("SELECT * FROM piggy")
-    abstract fun getAllPiggy(): MutableList<PiggyData>
+    abstract fun getAllPiggy(): Flow<MutableList<PiggyData>>
 
     @Query("DELETE FROM piggy WHERE piggyId = :piggyId")
     abstract fun deletePiggyById(piggyId: Long): Int
@@ -27,5 +28,8 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
 
     @Query("SELECT * FROM piggy WHERE percentage != 100")
     abstract fun getNonCompletedPiggyBanks(): MutableList<PiggyData>
+
+    @Query("SELECT piggyId FROM piggy WHERE name = :piggyName")
+    abstract fun getPiggyIdFromName(piggyName: String): Long
 
 }

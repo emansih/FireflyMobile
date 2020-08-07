@@ -8,9 +8,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
+import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -33,7 +36,7 @@ class ListPiggyFragment: BaseFragment(){
         setHasOptionsMenu(true)
         displayAll()
         pullToRefresh()
-        recycler_view.enableDragDrop(extendedFab)
+        enableDragDrop()
     }
 
     private fun displayView(){
@@ -90,6 +93,29 @@ class ListPiggyFragment: BaseFragment(){
                 displayAll()
             } else {
                 displayIncomplete()
+            }
+        }
+    }
+
+    private fun enableDragDrop(){
+        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            if (viewHolder.itemView.piggyCard.isOverlapping(extendedFab)){
+                extendedFab.apply {
+                    text = "Drop to remove"
+                    icon = IconicsDrawable(requireContext(), GoogleMaterial.Icon.gmd_delete)
+                    isClickable = false
+                    isFocusable = false
+                }
+                if(!isCurrentlyActive){
+                    val piggyName = viewHolder.itemView.piggyName.text.toString()
+                    piggyViewModel.deletePiggyByName(piggyName).observe(viewLifecycleOwner){ isDeleted ->
+                        if(isDeleted){
+                            toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyName))
+                        } else {
+                            toastError("There was an error deleting $piggyName")
+                        }
+                    }
+                }
             }
         }
     }

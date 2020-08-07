@@ -22,7 +22,6 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.enableDragDrop
-import xyz.hisname.fireflyiii.util.extension.hideFab
 import java.util.*
 
 class ListAccountFragment: BaseFragment() {
@@ -42,7 +41,13 @@ class ListAccountFragment: BaseFragment() {
         displayView()
         pullToRefresh()
         initFab()
-        recycler_view.enableDragDrop(extendedFab)
+        enableDragAndDrop()
+    }
+
+    private fun enableDragAndDrop(){
+        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
+
+        }
     }
 
     private fun displayView(){

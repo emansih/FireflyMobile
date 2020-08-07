@@ -19,8 +19,10 @@ ext {
         // Lifecycle
         implementation Dependencies.lifecycleLibs
         implementation Dependencies.lifecyclerLiveDataCore
+        implementation Dependencies.lifeCycleExtension
         // Room
         implementation Dependencies.roomLibs
+        implementation Dependencies.roomExtension
         kapt Dependencies.roomCompiler
         // Not really AndroidX
         implementation Dependencies.materialDesign

@@ -72,7 +72,7 @@ abstract class BaseFragment: Fragment() {
             layoutAnimation = controller
             adapter?.notifyDataSetChanged()
             scheduleLayoutAnimation()
-            addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+         //   addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         }
         if(reverse){
             linearLayout().reverseLayout = true

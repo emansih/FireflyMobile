@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
@@ -85,4 +86,14 @@ fun View.animateBackgroundStateChange(@ColorInt beforeColor: Int? = null, @Color
         }
         start()
     }
+}
+
+fun View.isOverlapping(secondView: View): Boolean {
+    val firstPosition = IntArray(2)
+    val secondPosition = IntArray(2)
+    getLocationOnScreen(firstPosition)
+    secondView.getLocationOnScreen(secondPosition)
+    val rectFirstView = Rect(firstPosition[0], firstPosition[1], firstPosition[0] + measuredWidth, firstPosition[1] + measuredHeight)
+    val rectSecondView = Rect(secondPosition[0], secondPosition[1], secondPosition[0] + secondView.measuredWidth, secondPosition[1] + secondView.measuredHeight)
+    return rectFirstView.intersect(rectSecondView)
 }

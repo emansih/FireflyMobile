@@ -49,7 +49,9 @@ class ListBillFragment: BaseFragment() {
         displayView()
         pullToRefresh()
         initFab()
-        recycler_view.enableDragDrop(extendedFab)
+        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
+
+        }
     }
 
     private fun displayView(){

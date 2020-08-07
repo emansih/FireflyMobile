@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.repository.piggybank
 
 import android.content.Context
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
@@ -30,7 +32,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
         return isDeleted
     }
 
-    suspend fun allPiggyBanks(): MutableList<PiggyData>{
+    suspend fun allPiggyBanks(): Flow<MutableList<PiggyData>> {
         val piggyData: MutableList<PiggyData> = arrayListOf()
         try {
             val networkCall = piggyService?.getPaginatedPiggyBank(1)
@@ -50,11 +52,16 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
                 }
             }
         } catch (exception: Exception){ }
-        return piggyDao.getAllPiggy()
+        return piggyDao.getAllPiggy().distinctUntilChanged()
     }
 
     suspend fun searchPiggyByName(piggyName: String) = piggyDao.searchPiggyName(piggyName)
 
     suspend fun getNonCompletedPiggyBanks() = piggyDao.getNonCompletedPiggyBanks()
+
+    suspend fun deletePiggyByName(piggyName: String, context: Context): Boolean{
+        val piggyId = piggyDao.getPiggyIdFromName(piggyName)
+        return deletePiggyById(piggyId, false, context)
+    }
 
 }
