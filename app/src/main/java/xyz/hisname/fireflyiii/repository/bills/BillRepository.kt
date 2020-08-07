@@ -46,8 +46,9 @@ class BillRepository(private val billDao: BillDataDao,
         } catch (exception: Exception){ }
         return billDao.getBillById(billId)
     }
-
-
+    
+    suspend fun getBillByName(billName: String) = billDao.getBillByName(billName)
+    
     suspend fun deleteBillById(billId: Long, shouldUserWorker: Boolean = false, context: Context): Boolean{
         var isDeleted = false
         val networkStatus = billService?.deleteBillById(billId)

@@ -41,6 +41,22 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         return currencyDao.getPaginatedCurrency(pageNumber * Constants.PAGE_SIZE)
     }
 
+    suspend fun getCurrencyByName(currencyName: String) = currencyDao.getCurrencyByName(currencyName)
+
+    suspend fun deleteCurrencyById(currencyId: Long): Boolean{
+        var isDeleted = false
+        try {
+            val networkResponse = currencyService?.deleteCurrencyById(currencyId)
+            isDeleted = if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
+                currencyDao.deleteCurrencyById(currencyId)
+                true
+            } else {
+                false
+            }
+        } catch (exception: Exception){ }
+        return isDeleted
+    }
+
     private suspend fun loadPaginatedData(pageNumber: Int){
         try {
             val networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)

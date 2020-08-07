@@ -54,6 +54,13 @@ class CategoriesFragment: BaseFragment() {
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
                     val categoryName = viewHolder.itemView.categoryName.text.toString()
+                    categoryViewModel.deleteCategoryByName(categoryName).observe(viewLifecycleOwner){ isDeleted ->
+                        if(isDeleted){
+                            toastSuccess("$categoryName deleted")
+                        } else {
+                            toastError("There was an issue deleting $categoryName")
+                        }
+                    }
                 }
             }
         }

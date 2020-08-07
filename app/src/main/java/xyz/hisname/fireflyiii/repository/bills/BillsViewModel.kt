@@ -129,5 +129,22 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
+    fun deleteBillByName(billName: String): LiveData<Boolean>{
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        var isItDeleted = false
+        viewModelScope.launch(Dispatchers.IO) {
+            val billId = repository.getBillByName(billName)[0].billId ?: 0
+            isItDeleted = repository.deleteBillById(billId, true, getApplication() as Context)
+        }.invokeOnCompletion {
+            if(isItDeleted) {
+                isDeleted.postValue(true)
+            } else {
+                isDeleted.postValue(false)
+            }
+            isLoading.postValue(false)
+
+        }
+        return isDeleted
+    }
 
 }

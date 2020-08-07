@@ -205,4 +205,22 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         return apiResponse
     }
+
+    fun deleteAccountByName(accountName: String): LiveData<Boolean>{
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        var isItDeleted = false
+        viewModelScope.launch(Dispatchers.IO) {
+            val accountId = repository.retrieveAccountByName(accountName)[0].accountId ?: 0
+            isItDeleted = repository.deleteAccountById(accountId, true, getApplication() as Context)
+        }.invokeOnCompletion {
+            if(isItDeleted) {
+                isDeleted.postValue(true)
+            } else {
+                isDeleted.postValue(false)
+            }
+            isLoading.postValue(false)
+
+        }
+        return isDeleted
+    }
 }

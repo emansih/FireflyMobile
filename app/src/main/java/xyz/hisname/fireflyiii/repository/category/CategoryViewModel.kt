@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.category
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -78,5 +79,23 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
         })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         return apiResponse
+    }
+
+    fun deleteCategoryByName(categoryName: String): LiveData<Boolean> {
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        var isItDeleted = false
+        viewModelScope.launch(Dispatchers.IO) {
+            val categoryId = repository.searchCategoryByName(categoryName)[0].categoryId ?: 0
+            isItDeleted = repository.deleteCategoryById(categoryId)
+        }.invokeOnCompletion {
+            if(isItDeleted) {
+                isDeleted.postValue(true)
+            } else {
+                isDeleted.postValue(false)
+            }
+            isLoading.postValue(false)
+
+        }
+        return isDeleted
     }
 }

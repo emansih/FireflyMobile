@@ -21,4 +21,6 @@ abstract class BillDataDao: BaseDao<BillData>{
     @Query("SELECT * FROM bills order by billId desc limit :limitNumber")
     abstract fun getPaginatedBills(limitNumber: Int): MutableList<BillData>
 
+    @Query("SELECT * FROM bills WHERE name = :billName")
+    abstract fun getBillByName(billName: String): MutableList<BillData>
 }

@@ -49,6 +49,17 @@ class ListAccountFragment: BaseFragment() {
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
                     val accountName = viewHolder.itemView.accountNameText.text.toString()
+                    accountViewModel.deleteAccountByName(accountName).observe(viewLifecycleOwner){ isDeleted ->
+                        if(isDeleted){
+                            when (accountType){
+                                "asset" -> toastSuccess(resources.getString(R.string.asset_account_deleted, accountName))
+                                "expense" -> toastSuccess(resources.getString(R.string.expense_account_deleted, accountName))
+                                "revenue" -> toastSuccess(resources.getString(R.string.revenue_account_deleted, accountName))
+                            }
+                        } else {
+                            toastError("There was an error deleting $accountName")
+                        }
+                    }
                 }
             }
         }

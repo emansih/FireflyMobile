@@ -41,6 +41,6 @@ interface CurrencyService {
 
 
     @DELETE("$CURRENCY_API_ENDPOINT/{id}")
-    fun deleteCurrencyById(@Path("id") id: String)
+    fun deleteCurrencyById(@Path("id") id: Long): Response<CurrencyModel>
 
 }

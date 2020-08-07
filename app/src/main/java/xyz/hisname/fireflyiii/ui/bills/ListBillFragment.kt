@@ -59,7 +59,13 @@ class ListBillFragment: BaseFragment() {
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
                     val billName = viewHolder.itemView.billName.text.toString()
-
+                    billViewModel.deleteBillByName(billName).observe(viewLifecycleOwner){ isDeleted ->
+                        if(isDeleted){
+                            toastSuccess(resources.getString(R.string.bill_deleted, billName))
+                        } else {
+                            toastError("There was an error deleting $billName")
+                        }
+                    }
                 }
             }
         }

@@ -34,4 +34,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
 
     @Query("DELETE FROM currency")
     abstract fun deleteAllCurrency(): Int
+
+    @Query("SELECT * FROM currency WHERE name =:currencyName")
+    abstract fun getCurrencyByName(currencyName: String): CurrencyData
 }

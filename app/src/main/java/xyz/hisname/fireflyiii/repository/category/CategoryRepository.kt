@@ -4,6 +4,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
+import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 
 @Suppress("RedundantSuspendModifier")
 class CategoryRepository(private val categoryDao: CategoryDataDao,
@@ -16,6 +17,19 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
     suspend fun searchCategoryByName(categoryName: String) = categoryDao.searchCategory(categoryName)
 
+    suspend fun deleteCategoryById(categoryId: Long): Boolean{
+        var isDeleted = false
+        try {
+            val networkResponse = categoryService?.deleteCategoryById(categoryId)
+            isDeleted = if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
+                categoryDao.deleteCategoryById(categoryId)
+                true
+            } else {
+                false
+            }
+        } catch (exception: Exception){ }
+        return isDeleted
+    }
 
     suspend fun loadPaginatedData(pageNumber: Int): MutableList<CategoryData>{
         try {
