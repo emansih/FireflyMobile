@@ -3,14 +3,10 @@ package xyz.hisname.fireflyiii.util.extension
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.graphics.Canvas
-import android.view.View
 import android.view.ViewPropertyAnimator
-import android.view.animation.Animation
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 
 inline fun ViewPropertyAnimator.onAnimationEnd(crossinline continuation: (Animator) -> Unit) {
     setListener(object : AnimatorListenerAdapter() {
@@ -20,16 +16,9 @@ inline fun ViewPropertyAnimator.onAnimationEnd(crossinline continuation: (Animat
     })
 }
 
-fun Animation.onAnimationEnd(onAnimationEnd: () -> Unit) {
-    setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationRepeat(p0: Animation) {}
-        override fun onAnimationEnd(p0: Animation) {onAnimationEnd()}
-        override fun onAnimationStart(p0: Animation) {}
-    })
-}
-
-fun RecyclerView.enableDragDrop(fab: ExtendedFloatingActionButton, onChildDraw: (viewHolder: RecyclerView.ViewHolder,
-                                                                                 isCurrentlyActive: Boolean) -> Unit){
+inline fun RecyclerView.enableDragDrop(fab: ExtendedFloatingActionButton,
+                                       crossinline onChildDraw: (viewHolder: RecyclerView.ViewHolder,
+                                                                 isCurrentlyActive: Boolean) -> Unit){
     val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or
             ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0){
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = true
