@@ -18,6 +18,7 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
+import kotlinx.android.synthetic.main.bills_list_item.view.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
@@ -49,8 +50,18 @@ class ListBillFragment: BaseFragment() {
         displayView()
         pullToRefresh()
         initFab()
-        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
+        enableDragDrop()
+    }
 
+    private fun enableDragDrop(){
+        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            if (viewHolder.itemView.billCard.isOverlapping(extendedFab)){
+                extendedFab.dropToRemove()
+                if(!isCurrentlyActive){
+                    val billName = viewHolder.itemView.billName.text.toString()
+
+                }
+            }
         }
     }
 

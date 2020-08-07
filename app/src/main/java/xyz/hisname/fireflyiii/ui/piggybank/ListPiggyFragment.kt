@@ -100,12 +100,7 @@ class ListPiggyFragment: BaseFragment(){
     private fun enableDragDrop(){
         recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
             if (viewHolder.itemView.piggyCard.isOverlapping(extendedFab)){
-                extendedFab.apply {
-                    text = "Drop to remove"
-                    icon = IconicsDrawable(requireContext(), GoogleMaterial.Icon.gmd_delete)
-                    isClickable = false
-                    isFocusable = false
-                }
+                extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
                     val piggyName = viewHolder.itemView.piggyName.text.toString()
                     piggyViewModel.deletePiggyByName(piggyName).observe(viewLifecycleOwner){ isDeleted ->

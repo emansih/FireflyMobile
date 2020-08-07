@@ -14,14 +14,13 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import kotlinx.android.synthetic.main.account_list_item.view.*
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.display
-import xyz.hisname.fireflyiii.util.extension.enableDragDrop
+import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
 class ListAccountFragment: BaseFragment() {
@@ -45,8 +44,13 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun enableDragAndDrop(){
-        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
-
+        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            if (viewHolder.itemView.accountList.isOverlapping(extendedFab)){
+                extendedFab.dropToRemove()
+                if(!isCurrentlyActive){
+                    val accountName = viewHolder.itemView.accountNameText.text.toString()
+                }
+            }
         }
     }
 

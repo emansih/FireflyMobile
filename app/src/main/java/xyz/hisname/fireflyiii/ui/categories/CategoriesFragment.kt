@@ -9,7 +9,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
@@ -20,6 +19,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
+import kotlinx.android.synthetic.main.category_list_item.view.*
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.*
@@ -45,8 +45,17 @@ class CategoriesFragment: BaseFragment() {
         recycler_view.layoutManager = linearLayout()
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = catAdapter
-        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
+        enableDragAndDrop()
+    }
 
+    private fun enableDragAndDrop(){
+        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            if (viewHolder.itemView.categoryName.isOverlapping(extendedFab)){
+                extendedFab.dropToRemove()
+                if(!isCurrentlyActive){
+                    val categoryName = viewHolder.itemView.categoryName.text.toString()
+                }
+            }
         }
     }
 

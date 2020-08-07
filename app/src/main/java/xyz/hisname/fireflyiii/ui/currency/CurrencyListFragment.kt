@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
+import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
@@ -46,8 +47,26 @@ class CurrencyListFragment: BaseFragment() {
         currencyViewModel.isLoading.observe(viewLifecycleOwner) {
             swipeContainer.isRefreshing = it == true
         }
+        enableDragDrop()
     }
 
+    private fun enableDragDrop(){
+        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            if (viewHolder.itemView.piggyCard.isOverlapping(extendedFab)){
+                extendedFab.dropToRemove()
+                if(!isCurrentlyActive){
+                    val piggyName = viewHolder.itemView.piggyName.text.toString()
+                    piggyViewModel.deletePiggyByName(piggyName).observe(viewLifecycleOwner){ isDeleted ->
+                        if(isDeleted){
+                            toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyName))
+                        } else {
+                            toastError("There was an error deleting $piggyName")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private fun displayView(){
         currencyViewModel.getCurrency(1).observe(viewLifecycleOwner) { currencyData ->

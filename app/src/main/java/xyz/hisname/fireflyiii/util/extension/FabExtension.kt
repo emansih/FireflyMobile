@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import xyz.hisname.fireflyiii.R
 
 fun FloatingActionButton.display(
@@ -76,4 +78,13 @@ fun ExtendedFloatingActionButton.animateChange(isAdd: Boolean){
         }
     }
     TransitionManager.beginDelayedTransition(this.parent as ViewGroup)
+}
+
+fun ExtendedFloatingActionButton.dropToRemove(){
+    this.apply {
+        text = "Drop to remove"
+        icon = IconicsDrawable(this.context, GoogleMaterial.Icon.gmd_delete)
+        isClickable = false
+        isFocusable = false
+    }
 }
