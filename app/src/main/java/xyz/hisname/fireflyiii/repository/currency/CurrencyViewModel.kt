@@ -44,7 +44,6 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun getCurrency(pageNumber: Int): LiveData<MutableList<CurrencyData>>{
-        isLoading.value = true
         val data: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             repository.getPaginatedCurrency(pageNumber).collectLatest {

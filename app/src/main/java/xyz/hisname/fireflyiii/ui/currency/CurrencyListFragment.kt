@@ -44,9 +44,6 @@ class CurrencyListFragment: BaseFragment() {
         initFab()
         pullToRefresh()
         displayView()
-        currencyViewModel.isLoading.observe(viewLifecycleOwner) {
-            swipeContainer.isRefreshing = it == true
-        }
         enableDragDrop()
     }
 
@@ -70,19 +67,23 @@ class CurrencyListFragment: BaseFragment() {
     }
 
     private fun displayView(){
+        swipeContainer.isRefreshing = true
         currencyViewModel.getCurrency(1).observe(viewLifecycleOwner) { currencyData ->
             dataAdapter.addAll(currencyData)
             currencyAdapter.update(dataAdapter)
+            swipeContainer.isRefreshing = false
             currencyAdapter.notifyDataSetChanged()
         }
         scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout()){
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                 // Don't load more when data is refreshing
                 if(!swipeContainer.isRefreshing) {
+                    swipeContainer.isRefreshing = true
                     currencyViewModel.getCurrency(page + 1).observe(viewLifecycleOwner) { currencyList ->
                         dataAdapter.clear()
                         dataAdapter.addAll(currencyList)
                         currencyAdapter.update(currencyList)
+                        swipeContainer.isRefreshing = false
                         currencyAdapter.notifyDataSetChanged()
                     }
                 }
