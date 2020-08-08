@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 
 @Dao
@@ -19,8 +20,8 @@ abstract class BillDataDao: BaseDao<BillData>{
     abstract fun deleteAllBills(): Int
 
     @Query("SELECT * FROM bills order by billId desc limit :limitNumber")
-    abstract fun getPaginatedBills(limitNumber: Int): MutableList<BillData>
+    abstract fun getPaginatedBills(limitNumber: Int): Flow<MutableList<BillData>>
 
     @Query("SELECT * FROM bills WHERE name = :billName")
-    abstract fun getBillByName(billName: String): MutableList<BillData>
+    abstract fun getBillByName(billName: String): BillData
 }

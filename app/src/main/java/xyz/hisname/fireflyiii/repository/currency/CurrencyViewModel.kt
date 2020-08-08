@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -43,14 +44,12 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     }
 
     fun getCurrency(pageNumber: Int): LiveData<MutableList<CurrencyData>>{
-        var currencyData: MutableList<CurrencyData> = arrayListOf()
         isLoading.value = true
         val data: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            currencyData = repository.getPaginatedCurrency(pageNumber)
-        }.invokeOnCompletion {
-            data.postValue(currencyData)
-            isLoading.postValue(false)
+            repository.getPaginatedCurrency(pageNumber).collectLatest {
+                data.postValue(it)
+            }
         }
         return data
     }

@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.currency
 
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
@@ -36,7 +37,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     private suspend fun deleteAllCurrency() = currencyDao.deleteAllCurrency()
 
-    suspend fun getPaginatedCurrency(pageNumber: Int): MutableList<CurrencyData>{
+    suspend fun getPaginatedCurrency(pageNumber: Int): Flow<MutableList<CurrencyData>> {
         loadPaginatedData(pageNumber)
         return currencyDao.getPaginatedCurrency(pageNumber * Constants.PAGE_SIZE)
     }

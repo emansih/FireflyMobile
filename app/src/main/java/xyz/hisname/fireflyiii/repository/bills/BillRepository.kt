@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.bills
 
 import android.content.Context
+import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
@@ -11,7 +12,7 @@ import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 class BillRepository(private val billDao: BillDataDao,
                      private val billService: BillsService?) {
 
-    suspend fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): MutableList<BillData>{
+    suspend fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): Flow<MutableList<BillData>> {
         try {
             val networkCall = billService?.getPaginatedBills(pageNumber, startDate, endDate)
             val responseBody = networkCall?.body()

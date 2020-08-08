@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
@@ -31,12 +32,11 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
 
     fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): LiveData<MutableList<BillData>>{
-        var billData: MutableList<BillData> = arrayListOf()
         val data: MutableLiveData<MutableList<BillData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            billData = repository.getPaginatedBills(pageNumber, startDate, endDate)
-        }.invokeOnCompletion {
-            data.postValue(billData)
+            repository.getPaginatedBills(pageNumber, startDate, endDate).collectLatest {
+                data.postValue(it)
+            }
         }
         return data
     }
@@ -133,7 +133,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
-            val billId = repository.getBillByName(billName)[0].billId ?: 0
+            val billId = repository.getBillByName(billName).billId ?: 0
             isItDeleted = repository.deleteBillById(billId, true, getApplication() as Context)
         }.invokeOnCompletion {
             if(isItDeleted) {

@@ -30,14 +30,10 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
     fun getAllPiggyBanks(): LiveData<MutableList<PiggyData>> {
         val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
-                repository.allPiggyBanks().collectLatest {
-                    data.postValue(it)
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.allPiggyBanks().collectLatest {
+                data.postValue(it)
             }
-        } catch(exception: Exception){
-            println("Exception: " + exception.localizedMessage)
         }
         return data
     }

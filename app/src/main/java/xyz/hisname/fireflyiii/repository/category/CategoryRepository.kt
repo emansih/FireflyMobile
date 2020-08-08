@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.category
 
+import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
@@ -31,7 +32,7 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
         return isDeleted
     }
 
-    suspend fun loadPaginatedData(pageNumber: Int): MutableList<CategoryData>{
+    suspend fun loadPaginatedData(pageNumber: Int): Flow<MutableList<CategoryData>> {
         try {
             val networkCall = categoryService?.getPaginatedCategory(pageNumber)
             val responseBody = networkCall?.body()

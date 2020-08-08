@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
@@ -27,12 +28,11 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun getPaginatedCategory(pageNumber: Int): LiveData<MutableList<CategoryData>>{
-        var categoryData: MutableList<CategoryData> = arrayListOf()
         val data: MutableLiveData<MutableList<CategoryData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            categoryData = repository.loadPaginatedData(pageNumber)
-        }.invokeOnCompletion {
-            data.postValue(categoryData)
+            repository.loadPaginatedData(pageNumber).collectLatest {
+                data.postValue(it)
+            }
         }
         return data
     }

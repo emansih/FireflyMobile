@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
@@ -39,13 +40,13 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun getTransactionList(startDate: String?, endDate: String?, transactionType: String, pageNumber: Int): LiveData<MutableList<Transactions>> {
-        var transactionData: MutableList<Transactions> = arrayListOf()
         isLoading.value = true
         val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            transactionData = repository.transactionList(startDate, endDate, transactionType, pageNumber)
+            repository.transactionList(startDate, endDate, transactionType, pageNumber).collectLatest { transactions ->
+                data.postValue(transactions)
+            }
         }.invokeOnCompletion {
-            data.postValue(transactionData)
             isLoading.postValue(false)
         }
         return data

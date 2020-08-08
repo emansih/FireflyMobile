@@ -55,6 +55,7 @@ class ListAccountFragment: BaseFragment() {
                                 "asset" -> toastSuccess(resources.getString(R.string.asset_account_deleted, accountName))
                                 "expense" -> toastSuccess(resources.getString(R.string.expense_account_deleted, accountName))
                                 "revenue" -> toastSuccess(resources.getString(R.string.revenue_account_deleted, accountName))
+                                "liability" -> toastSuccess("Successfully deleted liability account")
                             }
                         } else {
                             toastError("There was an error deleting $accountName")

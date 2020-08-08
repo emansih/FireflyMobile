@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 
 @Dao
@@ -11,7 +12,7 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     abstract fun getAccountByName(accountName: String): MutableList<AccountData>
 
     @Query("SELECT * FROM accounts WHERE type =:accountType")
-    abstract fun getAccountByType(accountType: String): MutableList<AccountData>
+    abstract fun getAccountByType(accountType: String): Flow<MutableList<AccountData>>
 
     @Query("SELECT * FROM accounts WHERE accountId =:accountId")
     abstract fun getAccountById(accountId: Long): MutableList<AccountData>

@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
@@ -34,11 +35,11 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     fun getAccountByType(accountType: String): LiveData<MutableList<AccountData>> {
         val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
-        var data: MutableList<AccountData> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {
-            data = repository.getAccountByType(accountType)
+            repository.getAccountByType(accountType).collectLatest {
+                accountData.postValue(it)
+            }
         }.invokeOnCompletion { accountError ->
-            accountData.postValue(data)
             apiResponse.postValue(accountError?.localizedMessage)
         }
         return accountData
@@ -48,11 +49,12 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         val accountData: MutableLiveData<MutableList<String>> = MutableLiveData()
         val data: MutableList<String> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getAccountByType(accountType).forEachIndexed { _, accountInfo ->
-                data.add(accountInfo.accountAttributes?.name ?: "")
+            repository.getAccountByType(accountType).collectLatest { accountInfo ->
+                accountInfo.forEach { accountData ->
+                    data.add(accountData.accountAttributes?.name ?: "")
+                }
+                accountData.postValue(data)
             }
-        }.invokeOnCompletion {
-            accountData.postValue(data)
         }
         return accountData
     }
