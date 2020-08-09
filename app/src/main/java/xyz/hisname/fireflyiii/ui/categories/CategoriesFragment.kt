@@ -95,6 +95,7 @@ class CategoriesFragment: BaseFragment() {
             listText.isVisible = false
             listImage.isVisible = false
             recycler_view.isVisible = true
+            catData.clear()
             catData.addAll(categoryData)
             catAdapter.update(catData)
             catAdapter.notifyDataSetChanged()
