@@ -49,17 +49,16 @@ class CurrencyListFragment: BaseFragment() {
 
     private fun enableDragDrop(){
         recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-            if (viewHolder.itemView.currencyList.isOverlapping(extendedFab)){
+            if (viewHolder.itemView.currencyList.isOverlapping(extendedFab)) {
                 extendedFab.dropToRemove()
-                if(!isCurrentlyActive){
-                    val currencyName = viewHolder.itemView.currencyName.text.toString()
-                    currencyViewModel.deleteCurrencyByName(currencyName).observe(viewLifecycleOwner){ isDeleted ->
-                        if(isDeleted){
+                if (!isCurrentlyActive) {
+                    val currencyName = viewHolder.itemView.fakeCurrencyName.text.toString()
+                    currencyViewModel.deleteCurrencyByName(currencyName).observe(viewLifecycleOwner) { isDeleted ->
+                        if (isDeleted) {
                             toastSuccess("$currencyName deleted")
                         } else {
                             toastError("There was an issue deleting $currencyName")
                         }
-
                     }
                 }
             }
@@ -69,6 +68,7 @@ class CurrencyListFragment: BaseFragment() {
     private fun displayView(){
         swipeContainer.isRefreshing = true
         currencyViewModel.getCurrency(1).observe(viewLifecycleOwner) { currencyData ->
+            dataAdapter.clear()
             dataAdapter.addAll(currencyData)
             currencyAdapter.update(dataAdapter)
             swipeContainer.isRefreshing = false

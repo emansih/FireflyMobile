@@ -42,14 +42,13 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         return currencyDao.getPaginatedCurrency(pageNumber * Constants.PAGE_SIZE)
     }
 
-    suspend fun getCurrencyByName(currencyName: String) = currencyDao.getCurrencyByName(currencyName)
-
-    suspend fun deleteCurrencyById(currencyId: Long): Boolean{
+    suspend fun deleteCurrencyByName(currencyName: String): Boolean{
         var isDeleted = false
+        val currencyCode = currencyDao.getCurrencyByName(currencyName).currencyAttributes?.code ?: ""
         try {
-            val networkResponse = currencyService?.deleteCurrencyById(currencyId)
+            val networkResponse = currencyService?.deleteCurrencyById(currencyCode)
             isDeleted = if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
-                currencyDao.deleteCurrencyById(currencyId)
+                currencyDao.deleteCurrencyByCode(currencyCode)
                 true
             } else {
                 false

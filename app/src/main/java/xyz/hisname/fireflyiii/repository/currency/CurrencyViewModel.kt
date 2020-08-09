@@ -53,20 +53,17 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return data
     }
 
-    fun deleteCurrencyByName(currencyName: String): LiveData<Boolean> {
+    fun deleteCurrencyByName(currencyCode: String): LiveData<Boolean> {
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
-            val currencyId = repository.getCurrencyByName(currencyName).currencyId ?: 0
-            isItDeleted = repository.deleteCurrencyById(currencyId)
+            isItDeleted = repository.deleteCurrencyByName(currencyCode)
         }.invokeOnCompletion {
-            if(isItDeleted) {
+            if (isItDeleted) {
                 isDeleted.postValue(true)
             } else {
                 isDeleted.postValue(false)
             }
-            isLoading.postValue(false)
-
         }
         return isDeleted
     }
@@ -150,7 +147,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun getCurrencyByCode(currencyCode: String): LiveData<MutableList<CurrencyData>>{
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            currencyData = repository.getCurrencyByCode(currencyCode)
+            repository.getCurrencyByCode(currencyCode)  
         }.invokeOnCompletion {
             currencyLiveData.postValue(currencyData)
         }

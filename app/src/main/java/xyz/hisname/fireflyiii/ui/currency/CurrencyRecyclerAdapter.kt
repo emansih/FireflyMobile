@@ -38,6 +38,7 @@ DiffUtilAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(){
         fun bind(currencyData: CurrencyData, clickListener: (CurrencyData) -> Unit){
             val currency = currencyData.currencyAttributes
             itemView.currencySymbol.text = currency?.symbol.toString()
+            itemView.fakeCurrencyName.text = currency?.name
             if(currency?.enabled == true){
                 itemView.currencyName.text = currency.name + " (" + currency.code + ")"
             } else {

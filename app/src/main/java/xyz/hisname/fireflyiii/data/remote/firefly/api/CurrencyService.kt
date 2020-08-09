@@ -40,7 +40,7 @@ interface CurrencyService {
                        @Field("default") default: Boolean): Call<CurrencySuccessModel>
 
 
-    @DELETE("$CURRENCY_API_ENDPOINT/{id}")
-    fun deleteCurrencyById(@Path("id") id: Long): Response<CurrencyModel>
+    @DELETE("$CURRENCY_API_ENDPOINT/{currencyCode}")
+    suspend fun deleteCurrencyById(@Path("currencyCode") currencyCode: String): Response<CurrencyModel>
 
 }
