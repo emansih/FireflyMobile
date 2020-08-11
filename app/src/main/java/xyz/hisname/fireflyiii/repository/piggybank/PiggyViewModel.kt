@@ -54,7 +54,7 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
         isLoading.value = true
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
-            isItDeleted = repository.deletePiggyById(piggyId, true, getApplication() as Context)
+            isItDeleted = repository.deletePiggyById(piggyId)
         }.invokeOnCompletion {
             if(isItDeleted) {
                 isDeleted.postValue(true)
@@ -150,18 +150,24 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
 
     fun deletePiggyByName(piggyBankName: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        isLoading.value = true
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
-            isItDeleted = repository.deletePiggyByName(piggyBankName, getApplication() as Context)
-        }.invokeOnCompletion {
-            if(isItDeleted) {
-                isDeleted.postValue(true)
-            } else {
-                isDeleted.postValue(false)
+            val piggyId = repository.getPiggyById(piggyBankName)
+            if(piggyId != 0L){
+                isItDeleted = repository.deletePiggyById(piggyId)
             }
-            isLoading.postValue(false)
-
+        }.invokeOnCompletion {
+            // Since onDraw() is being called multiple times, we check if the piggy bank exists locally in the DB.
+            if(!isItDeleted){
+                viewModelScope.launch(Dispatchers.IO){
+                    val piggyBank = repository.searchPiggyByName(piggyBankName)
+                    if(piggyBank.isEmpty()){
+                        isDeleted.postValue(false)
+                    }
+                }
+            } else {
+                isDeleted.postValue(true)
+            }
         }
         return isDeleted
 
@@ -172,12 +178,11 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
     }
 
     fun getNonCompletedPiggyBanks(): LiveData<MutableList<PiggyData>>{
-        var piggyData: MutableList<PiggyData> = arrayListOf()
         val data: MutableLiveData<MutableList<PiggyData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            piggyData = repository.getNonCompletedPiggyBanks()
-        }.invokeOnCompletion {
-            data.postValue(piggyData)
+            repository.getNonCompletedPiggyBanks().collectLatest {
+                data.postValue(it)
+            }
         }
         return data
     }

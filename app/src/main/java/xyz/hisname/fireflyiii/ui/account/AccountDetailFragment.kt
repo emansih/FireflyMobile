@@ -300,8 +300,6 @@ class AccountDetailFragment: BaseDetailFragment() {
                                     toastSuccess("Account Deleted")
                                 }
                             }
-                        } else {
-                            toastInfo("Account will be deleted later")
                         }
                     }
                 }

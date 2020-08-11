@@ -27,7 +27,7 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
     abstract fun searchPiggyName(piggyName: String): MutableList<PiggyData>
 
     @Query("SELECT * FROM piggy WHERE percentage != 100")
-    abstract fun getNonCompletedPiggyBanks(): MutableList<PiggyData>
+    abstract fun getNonCompletedPiggyBanks(): Flow<MutableList<PiggyData>>
 
     @Query("SELECT piggyId FROM piggy WHERE name = :piggyName")
     abstract fun getPiggyIdFromName(piggyName: String): Long

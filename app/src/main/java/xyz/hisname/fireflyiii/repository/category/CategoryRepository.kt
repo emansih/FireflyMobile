@@ -22,11 +22,9 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
         var isDeleted = false
         try {
             val networkResponse = categoryService?.deleteCategoryById(categoryId)
-            isDeleted = if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
+            if(networkResponse?.code() == 204){
                 categoryDao.deleteCategoryById(categoryId)
-                true
-            } else {
-                false
+                isDeleted = true
             }
         } catch (exception: Exception){ }
         return isDeleted

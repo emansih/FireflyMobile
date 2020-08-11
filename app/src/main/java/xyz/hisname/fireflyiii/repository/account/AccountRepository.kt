@@ -55,18 +55,13 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
 
-    suspend fun deleteAccountById(accountId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
+    suspend fun deleteAccountById(accountId: Long): Boolean {
         var isDeleted = false
         try {
             val networkResponse = accountsService?.deleteAccountById(accountId)
-            isDeleted = if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
+            if(networkResponse?.code() == 204){
                 accountDao.deleteAccountById(accountId)
-                true
-            } else {
-                if (shouldUseWorker) {
-                    DeleteAccountWorker.deleteWorker(accountId, context)
-                }
-                false
+                isDeleted = true
             }
         } catch (exception: Exception){ }
         return isDeleted

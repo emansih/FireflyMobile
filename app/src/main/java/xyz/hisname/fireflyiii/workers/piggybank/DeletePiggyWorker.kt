@@ -44,7 +44,7 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
         val repository = PiggyRepository(piggyDataBase, genericService?.create(PiggybankService::class.java))
         runBlocking {
             piggyAttribute = repository.retrievePiggyById(piggyId)[0].piggyAttributes
-            isDeleted = repository.deletePiggyById(piggyId, false, applicationContext)
+            isDeleted = repository.deletePiggyById(piggyId)
         }
         if (isDeleted) {
             context.displayNotification(piggyAttribute?.name + "successfully deleted", channelName,

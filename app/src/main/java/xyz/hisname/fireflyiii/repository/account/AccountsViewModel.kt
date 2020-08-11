@@ -75,7 +75,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         var isItDeleted = false
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            isItDeleted = repository.deleteAccountById(accountId, true, getApplication() as Context)
+            isItDeleted = repository.deleteAccountById(accountId)
         }.invokeOnCompletion {
             if(isItDeleted) {
                 isDeleted.postValue(true)
@@ -213,15 +213,21 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
             val accountId = repository.retrieveAccountByName(accountName)[0].accountId ?: 0
-            isItDeleted = repository.deleteAccountById(accountId, true, getApplication() as Context)
-        }.invokeOnCompletion {
-            if(isItDeleted) {
-                isDeleted.postValue(true)
-            } else {
-                isDeleted.postValue(false)
+            if(accountId != 0L){
+                isItDeleted = repository.deleteAccountById(accountId)
             }
-            isLoading.postValue(false)
-
+        }.invokeOnCompletion {
+            // Since onDraw() is being called multiple times, we check if the account exists locally in the DB.
+            if(!isItDeleted){
+                viewModelScope.launch(Dispatchers.IO){
+                    val account = repository.retrieveAccountByName(accountName)
+                    if(account.isNotEmpty()){
+                        isDeleted.postValue(false)
+                    }
+                }
+            } else {
+                isDeleted.postValue(true)
+            }
         }
         return isDeleted
     }

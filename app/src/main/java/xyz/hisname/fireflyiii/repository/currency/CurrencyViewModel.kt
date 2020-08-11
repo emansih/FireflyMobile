@@ -1,10 +1,7 @@
 package xyz.hisname.fireflyiii.repository.currency
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -56,13 +53,19 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun deleteCurrencyByName(currencyCode: String): LiveData<Boolean> {
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         var isItDeleted = false
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO){
             isItDeleted = repository.deleteCurrencyByName(currencyCode)
         }.invokeOnCompletion {
-            if (isItDeleted) {
-                isDeleted.postValue(true)
+            // Since onDraw() is being called multiple times, we check if the currency exists locally in the DB.
+            if(!isItDeleted){
+                viewModelScope.launch(Dispatchers.IO){
+                    val currency = repository.getCurrencyCode(currencyCode)
+                    if(currency != null){
+                        isDeleted.postValue(false)
+                    }
+                }
             } else {
-                isDeleted.postValue(false)
+                isDeleted.postValue(true)
             }
         }
         return isDeleted

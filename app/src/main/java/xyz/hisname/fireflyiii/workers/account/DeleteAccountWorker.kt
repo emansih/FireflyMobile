@@ -44,7 +44,7 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
         val repository = AccountRepository(accountDatabase, accountService)
         runBlocking(Dispatchers.IO) {
             accountAttributes = repository.retrieveAccountById(accountId)[0].accountAttributes
-            isDeleted = repository.deleteAccountById(accountId, false, applicationContext)
+            isDeleted = repository.deleteAccountById(accountId)
         }
         if(isDeleted){
             applicationContext

@@ -1,12 +1,10 @@
 package xyz.hisname.fireflyiii.repository.piggybank
 
-import android.content.Context
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
-import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
 
 @Suppress("RedundantSuspendModifier")
 class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyService: PiggybankService?) {
@@ -15,18 +13,13 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
 
     suspend fun retrievePiggyById(piggyId: Long) = piggyDao.getPiggyById(piggyId)
 
-    suspend fun deletePiggyById(piggyId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
+    suspend fun deletePiggyById(piggyId: Long): Boolean {
         var isDeleted = false
         try {
             val networkResponse = piggyService?.deletePiggyBankById(piggyId)
-            isDeleted = if (networkResponse?.code() == 204 || networkResponse?.code() == 200) {
+            if(networkResponse?.code() == 204){
                 piggyDao.deletePiggyById(piggyId)
-                true
-            } else {
-                if (shouldUseWorker) {
-                    DeletePiggyWorker.initWorker(piggyId, context)
-                }
-                false
+                isDeleted = true
             }
         } catch (exception: Exception){ }
         return isDeleted
@@ -57,11 +50,8 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
 
     suspend fun searchPiggyByName(piggyName: String) = piggyDao.searchPiggyName(piggyName)
 
-    suspend fun getNonCompletedPiggyBanks() = piggyDao.getNonCompletedPiggyBanks()
+    suspend fun getNonCompletedPiggyBanks() = piggyDao.getNonCompletedPiggyBanks().distinctUntilChanged()
 
-    suspend fun deletePiggyByName(piggyName: String, context: Context): Boolean{
-        val piggyId = piggyDao.getPiggyIdFromName(piggyName)
-        return deletePiggyById(piggyId, false, context)
-    }
+    suspend fun getPiggyById(piggyName: String) =  piggyDao.getPiggyIdFromName(piggyName)
 
 }

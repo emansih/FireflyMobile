@@ -50,17 +50,12 @@ class BillRepository(private val billDao: BillDataDao,
     
     suspend fun getBillByName(billName: String) = billDao.getBillByName(billName)
     
-    suspend fun deleteBillById(billId: Long, shouldUserWorker: Boolean = false, context: Context): Boolean{
+    suspend fun deleteBillById(billId: Long): Boolean{
         var isDeleted = false
         val networkStatus = billService?.deleteBillById(billId)
-        isDeleted = if (networkStatus?.code() == 204 || networkStatus?.code() == 200){
+        if (networkStatus?.code() == 204){
             billDao.deleteBillById(billId)
-            true
-        } else {
-            if(shouldUserWorker){
-                DeleteBillWorker.initWorker(billId, context)
-            }
-            false
+            isDeleted = true
         }
         return isDeleted
     }

@@ -45,7 +45,7 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
 
         runBlocking(Dispatchers.IO) {
             billAttribute = repository.retrieveBillById(billId)[0].billAttributes
-            isDeleted = repository.deleteBillById(billId, false, applicationContext)
+            isDeleted = repository.deleteBillById(billId)
         }
         if (isDeleted) {
             context.displayNotification(billAttribute?.name + "successfully deleted", context.getString(R.string.bill),

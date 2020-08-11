@@ -86,15 +86,21 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
             val categoryId = repository.searchCategoryByName(categoryName)[0].categoryId ?: 0
-            isItDeleted = repository.deleteCategoryById(categoryId)
-        }.invokeOnCompletion {
-            if(isItDeleted) {
-                isDeleted.postValue(true)
-            } else {
-                isDeleted.postValue(false)
+            if(categoryId != 0L){
+                isItDeleted = repository.deleteCategoryById(categoryId)
             }
-            isLoading.postValue(false)
-
+        }.invokeOnCompletion {
+            // Since onDraw() is being called multiple times, we check if the category exists locally in the DB.
+            if(!isItDeleted){
+                viewModelScope.launch(Dispatchers.IO){
+                    val category = repository.searchCategoryByName(categoryName)
+                    if(category.isNotEmpty()){
+                        isDeleted.postValue(false)
+                    }
+                }
+            } else {
+                isDeleted.postValue(true)
+            }
         }
         return isDeleted
     }

@@ -56,7 +56,7 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         var deletionStatus = false
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO){
-            deletionStatus = repository.deleteBillById(billId, true, getApplication() as Context)
+            deletionStatus = repository.deleteBillById(billId)
         }.invokeOnCompletion {
             if(deletionStatus){
                 isDeleted.postValue(true)
@@ -134,15 +134,21 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         var isItDeleted = false
         viewModelScope.launch(Dispatchers.IO) {
             val billId = repository.getBillByName(billName).billId ?: 0
-            isItDeleted = repository.deleteBillById(billId, true, getApplication() as Context)
-        }.invokeOnCompletion {
-            if(isItDeleted) {
-                isDeleted.postValue(true)
-            } else {
-                isDeleted.postValue(false)
+            if(billId != 0L){
+                isItDeleted = repository.deleteBillById(billId)
             }
-            isLoading.postValue(false)
-
+        }.invokeOnCompletion {
+            // Since onDraw() is being called multiple times, we check if the bill exists locally in the DB.
+            if(!isItDeleted){
+                viewModelScope.launch(Dispatchers.IO){
+                    val bill = repository.getBillByName(billName)
+                    if(bill != null){
+                        isDeleted.postValue(false)
+                    }
+                }
+            } else {
+                isDeleted.postValue(true)
+            }
         }
         return isDeleted
     }
