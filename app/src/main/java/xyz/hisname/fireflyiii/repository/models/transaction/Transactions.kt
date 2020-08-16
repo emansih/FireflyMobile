@@ -22,7 +22,7 @@ data class Transactions(
         var currency_name: String,
         var currency_symbol: String,
         var date: OffsetDateTime,
-        var description: String?,
+        var description: String,
         var destination_iban: String?,
         var destination_id: Long,
         var destination_name: String,

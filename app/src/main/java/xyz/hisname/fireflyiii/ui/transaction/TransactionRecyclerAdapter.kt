@@ -33,10 +33,19 @@ class TransactionRecyclerAdapter(private val items: MutableList<Transactions>, p
     inner class RtAdapter(view: View): RecyclerView.ViewHolder(view) {
         fun bind(transactionAttributes: Transactions, clickListener: (Transactions) -> Unit){
             val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).timeFormat
-            if(transactionAttributes.description!!.length >= 25){
-                itemView.transactionNameText.text = transactionAttributes.description?.substring(0,25) + "..."
+            val transactionDescription = transactionAttributes.description
+            if(transactionDescription.length >= 25){
+                if(transactionAttributes.isPending){
+                    itemView.transactionNameText.text = transactionDescription.substring(0,25) + "..." + " (Pending)"
+                } else {
+                    itemView.transactionNameText.text = transactionDescription.substring(0,25) + "..."
+                }
             } else {
-                itemView.transactionNameText.text = transactionAttributes.description
+                if(transactionAttributes.isPending) {
+                    itemView.transactionNameText.text = transactionDescription + " (Pending)"
+                } else {
+                    itemView.transactionNameText.text = transactionDescription
+                }
             }
             itemView.sourceNameText.text = transactionAttributes.source_name
             itemView.dateText.text = DateTimeUtil.convertLocalDateTime(transactionAttributes.date , timePreference)
