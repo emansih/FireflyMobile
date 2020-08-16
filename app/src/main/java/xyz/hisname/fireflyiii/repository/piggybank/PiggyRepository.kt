@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
 class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyService: PiggybankService?) {
@@ -13,16 +14,35 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
 
     suspend fun retrievePiggyById(piggyId: Long) = piggyDao.getPiggyById(piggyId)
 
-    suspend fun deletePiggyById(piggyId: Long): Boolean {
-        var isDeleted = false
+    suspend fun deletePiggyById(piggyId: Long): Int {
         try {
             val networkResponse = piggyService?.deletePiggyBankById(piggyId)
-            if(networkResponse?.code() == 204){
-                piggyDao.deletePiggyById(piggyId)
-                isDeleted = true
+            when (networkResponse?.code()) {
+                204 -> {
+                    piggyDao.deletePiggyById(piggyId)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                         *   now in inconsistent state. This use case is unlikely to happen unless user
+                         *   deletes their token from the web interface without updating the mobile client
+                         */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    piggyDao.deletePiggyById(piggyId)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
             }
-        } catch (exception: Exception){ }
-        return isDeleted
+        } catch (exception: Exception){
+            // User is offline.
+            piggyDao.deletePiggyById(piggyId)
+            return HttpConstants.FAILED
+        }
     }
 
     suspend fun allPiggyBanks(): Flow<MutableList<PiggyData>> {
@@ -45,7 +65,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
                 }
             }
         } catch (exception: Exception){ }
-        return piggyDao.getAllPiggy().distinctUntilChanged()
+        return piggyDao.getAllPiggy()
     }
 
     suspend fun searchPiggyByName(piggyName: String) = piggyDao.searchPiggyName(piggyName)
