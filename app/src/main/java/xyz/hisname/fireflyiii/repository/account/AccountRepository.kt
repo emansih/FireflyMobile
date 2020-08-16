@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.account
 
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
@@ -49,7 +50,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun getAccountByType(accountType: String): Flow<MutableList<AccountData>> {
         loadRemoteData(accountType)
-        return accountDao.getAccountByType(accountType)
+        return accountDao.getAccountByType(accountType).distinctUntilChanged()
     }
 
     suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
