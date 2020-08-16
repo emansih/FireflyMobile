@@ -56,8 +56,8 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
 
         }
 
-        fun cancelWorker(billId: Long, context: Context){
-            WorkManager.getInstance(context).cancelAllWorkByTag("delete_periodic_transaction_$billId")
+        fun cancelWorker(transactionId: Long, context: Context){
+            WorkManager.getInstance(context).cancelAllWorkByTag("delete_periodic_transaction_$transactionId")
         }
     }
 

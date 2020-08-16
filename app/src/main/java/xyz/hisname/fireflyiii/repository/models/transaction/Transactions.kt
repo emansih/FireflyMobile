@@ -10,8 +10,6 @@ data class Transactions(
         @PrimaryKey(autoGenerate = false)
         var transaction_journal_id: Long,
         var amount: Double,
-        var bill_id: Long,
-        var bill_name: String?,
         var book_date: String?,
         var budget_id: Long,
         var budget_name: String?,
@@ -62,5 +60,6 @@ data class Transactions(
         var tags: List<String>,
         @SerializedName("type")
         var transactionType: String?,
-        var user: Int
+        var user: Int,
+        var isPending: Boolean
 )
