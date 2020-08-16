@@ -1,55 +1,63 @@
 package xyz.hisname.fireflyiii.workers.transaction
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import androidx.work.*
-import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.Constants
-import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAttributes
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
-import xyz.hisname.fireflyiii.ui.notifications.displayNotification
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 class DeleteTransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val channelName = "Transactions"
-    private val channelIcon = R.drawable.ic_refresh
     private val transactionDatabase by lazy { AppDatabase.getInstance(context).transactionDataDao() }
-
 
     override suspend fun doWork(): Result {
         val transactionId = inputData.getLong("transactionId", 0)
-        var transactionAttributes: Transactions? = null
-        var isDeleted = false
         val repository = TransactionRepository(transactionDatabase, genericService?.create(TransactionService::class.java))
-        runBlocking(Dispatchers.IO) {
-            transactionAttributes = repository.getTransactionById(transactionId)[0]
-            isDeleted = repository.deleteTransactionById(transactionId, false, applicationContext)
+        return when (repository.deleteTransactionById(transactionId)) {
+            HttpConstants.NO_CONTENT_SUCCESS -> {
+                cancelWorker(transactionId, context)
+                Result.success()
+            }
+            HttpConstants.FAILED -> {
+                Result.retry()
+            }
+            else -> {
+                Result.failure()
+            }
         }
-        if (isDeleted) {
-            context.displayNotification(transactionAttributes?.description + " successfully deleted", channelName,
-                    Constants.TRANSACTION_CHANNEL, channelIcon)
-        } else {
-            Result.failure()
-            context.displayNotification("There was issue deleting ${transactionAttributes?.description}",
-                    "Failed to delete transaction",
-                    Constants.TRANSACTION_CHANNEL, channelIcon)
-        }
-        return Result.success()
     }
 
+
     companion object {
-        fun setupWorker(data: Data.Builder, transactionId: Long, context: Context){
-            val transactionWork = OneTimeWorkRequest.Builder(DeleteTransactionWorker::class.java)
-                    .setInputData(data.putLong("transactionId" ,transactionId).build())
-                    .setConstraints(Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build())
-                    .build()
-            WorkManager.getInstance(context).enqueue(transactionWork)
+        fun setupWorker(transactionId: Long, context: Context){
+            val transactionTag =
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_transaction_$transactionId").get()
+            if (transactionTag == null || transactionTag.size == 0) {
+                val transactionData = Data.Builder()
+                        .putLong("transactionId", transactionId)
+                        .build()
+                val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
+                val transactionWork = PeriodicWorkRequestBuilder<DeleteTransactionWorker>(Duration.ofMinutes(delay))
+                        .setInputData(transactionData)
+                        .setConstraints(Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiresBatteryNotLow(true)
+                                .build())
+                        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+                        .build()
+                WorkManager.getInstance(context).enqueue(transactionWork)
+            }
+
+        }
+
+        fun cancelWorker(billId: Long, context: Context){
+            WorkManager.getInstance(context).cancelAllWorkByTag("delete_periodic_transaction_$billId")
         }
     }
 

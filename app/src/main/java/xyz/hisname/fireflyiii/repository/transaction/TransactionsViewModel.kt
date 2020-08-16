@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
 import android.app.Application
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -22,9 +21,11 @@ import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
+import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 import java.math.BigDecimal
 import kotlin.math.absoluteValue
 
@@ -358,15 +359,25 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun deleteTransaction(transactionJournalId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
-        var isItDeleted = false
+        var isItDeleted = 0
+        var transactionId = 0L
         viewModelScope.launch(Dispatchers.IO) {
-            val transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
-            isItDeleted = repository.deleteTransactionById(transactionId, true, getApplication() as Context)
+            transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
+            if(transactionId != 0L){
+                isItDeleted = repository.deleteTransactionById(transactionId)
+            }
         }.invokeOnCompletion {
-            if(isItDeleted) {
-                isDeleted.postValue(true)
-            } else {
-                isDeleted.postValue(false)
+            when (isItDeleted) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteTransactionWorker.setupWorker(transactionId, getApplication())
+                }
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
             }
             isLoading.postValue(false)
         }

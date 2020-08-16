@@ -1,7 +1,5 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
-import android.content.Context
-import androidx.work.Data
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
@@ -9,7 +7,7 @@ import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
@@ -176,17 +174,33 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return transactionDao.getTransactionFromJournalId(transactionJournalId)
     }
 
-    suspend fun deleteTransactionById(transactionId: Long, shouldUseWorker: Boolean = false, context: Context): Boolean {
-        val networkResponse: Response<TransactionSuccessModel>? = transactionService?.deleteTransactionById(transactionId)
-        return if (networkResponse?.code() == 204 || networkResponse?.code() == 200){
-            val journalId = transactionDao.getTransactionIdFromJournalId(transactionId)
-            transactionDao.deleteTransactionByJournalId(journalId)
-            true
-        } else {
-            if(shouldUseWorker){
-                DeleteTransactionWorker.setupWorker(Data.Builder(),transactionId, context)
+    suspend fun deleteTransactionById(transactionId: Long): Int {
+        try {
+            val networkResponse: Response<TransactionSuccessModel>? = transactionService?.deleteTransactionById(transactionId)
+            when(networkResponse?.code()) {
+                204 -> {
+                    transactionDao.deleteTransactionByJournalId(transactionId)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                     *   now in inconsistent state. This use case is unlikely to happen unless user
+                     *   deletes their token from the web interface without updating the mobile client
+                     */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    transactionDao.deleteTransactionByJournalId(transactionId)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
             }
-            false
+        } catch (exception: Exception) {
+            transactionDao.deleteTransactionByJournalId(transactionId)
+            return HttpConstants.FAILED
         }
     }
 
