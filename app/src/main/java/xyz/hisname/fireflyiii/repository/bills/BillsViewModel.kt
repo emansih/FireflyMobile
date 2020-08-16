@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.bills
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +16,9 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 
 class BillsViewModel(application: Application): BaseViewModel(application) {
 
@@ -53,15 +54,22 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
     fun deleteBillById(billId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var deletionStatus = false
+        var isItDeleted = 0
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO){
-            deletionStatus = repository.deleteBillById(billId)
+            isItDeleted = repository.deleteBillById(billId)
         }.invokeOnCompletion {
-            if(deletionStatus){
-                isDeleted.postValue(true)
-            } else {
-                isDeleted.postValue(false)
+            when (isItDeleted) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteBillWorker.initPeriodicWorker(billId, getApplication())
+                }
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
             }
             isLoading.postValue(false)
         }
@@ -131,23 +139,26 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
 
     fun deleteBillByName(billName: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = false
+        var isItDeleted = 0
+        var billId: Long = 0
         viewModelScope.launch(Dispatchers.IO) {
-            val billId = repository.getBillByName(billName).billId ?: 0
-            if(billId != 0L){
+            billId = repository.getBillByName(billName)[0].billId ?: 0
+            if (billId != 0L) {
                 isItDeleted = repository.deleteBillById(billId)
             }
         }.invokeOnCompletion {
             // Since onDraw() is being called multiple times, we check if the bill exists locally in the DB.
-            if(!isItDeleted){
-                viewModelScope.launch(Dispatchers.IO){
-                    val bill = repository.getBillByName(billName)
-                    if(bill != null){
-                        isDeleted.postValue(false)
-                    }
+            when (isItDeleted) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteBillWorker.initPeriodicWorker(billId, getApplication())
                 }
-            } else {
-                isDeleted.postValue(true)
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
             }
         }
         return isDeleted

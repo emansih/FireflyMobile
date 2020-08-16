@@ -6,6 +6,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
@@ -44,17 +45,35 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     suspend fun getCurrencyCode(currencyName: String) = currencyDao.getCurrencyByName(currencyName)
 
-    suspend fun deleteCurrencyByName(currencyName: String): Boolean {
-        var isDeleted = false
-        val currencyCode = currencyDao.getCurrencyByName(currencyName).currencyAttributes?.code ?: ""
+    suspend fun deleteCurrencyByName(currencyName: String): Int {
+        val currencyCode = currencyDao.getCurrencyByName(currencyName)[0].currencyAttributes?.code ?: ""
         try {
-            val networkResponse = currencyService?.deleteCurrencyById(currencyCode)
-            if(networkResponse?.code() == 204){
-                currencyDao.deleteCurrencyByCode(currencyCode)
-                isDeleted = true
+            val networkResponse = currencyService?.deleteCurrencyByCode(currencyCode)
+            when (networkResponse?.code()) {
+                204 -> {
+                    currencyDao.deleteCurrencyByCode(currencyCode)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                     *   now in inconsistent state. This use case is unlikely to happen unless user
+                     *   deletes their token from the web interface without updating the mobile client
+                     */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    currencyDao.deleteCurrencyByCode(currencyCode)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
             }
-        } catch (exception: Exception){ }
-        return isDeleted
+        } catch (exception: Exception){
+            currencyDao.deleteCurrencyByCode(currencyCode)
+            return HttpConstants.FAILED
+        }
     }
 
     private suspend fun loadPaginatedData(pageNumber: Int){

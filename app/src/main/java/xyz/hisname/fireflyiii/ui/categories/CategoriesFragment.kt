@@ -58,7 +58,7 @@ class CategoriesFragment: BaseFragment() {
                         if(isDeleted){
                             toastSuccess("$categoryName deleted")
                         } else {
-                            toastError("There was an issue deleting $categoryName")
+                            toastOffline("$categoryName will be deleted later")
                         }
                     }
                 }

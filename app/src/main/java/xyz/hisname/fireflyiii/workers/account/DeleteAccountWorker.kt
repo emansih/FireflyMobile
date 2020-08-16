@@ -1,62 +1,64 @@
 package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import androidx.work.*
-import kotlinx.coroutines.*
-import xyz.hisname.fireflyiii.Constants
-import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
-import xyz.hisname.fireflyiii.ui.notifications.displayNotification
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 class DeleteAccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
     private val accountDatabase by lazy { AppDatabase.getInstance(context).accountDataDao() }
-    private val channelIcon = R.drawable.ic_euro_sign
 
     companion object {
-        fun deleteWorker(accountId: Long, context: Context){
+        fun initPeriodicWorker(accountId: Long, context: Context){
             val accountTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("delete_account_$accountId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_account_$accountId").get()
             if(accountTag == null || accountTag.size == 0) {
                 val accountData = Data.Builder()
-                        .putLong("id", accountId)
+                        .putLong("accountId", accountId)
                         .build()
-                val deleteAccountWork = OneTimeWorkRequest.Builder(DeleteAccountWorker::class.java)
+                val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
+                val deleteAccountWork = PeriodicWorkRequestBuilder<DeleteAccountWorker>(Duration.ofMinutes(delay))
                         .setInputData(accountData)
-                        .addTag("delete_account_$accountId")
+                        .addTag("delete_periodic_account_$accountId")
                         .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED).build())
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiresBatteryNotLow(true)
+                                .build())
+                        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                         .build()
                 WorkManager.getInstance(context).enqueue(deleteAccountWork)
             }
+        }
+
+        fun cancelWorker(accountId: Long, context: Context){
+            WorkManager.getInstance(context).cancelAllWorkByTag("delete_periodic_account_$accountId")
         }
     }
 
     override suspend fun doWork(): Result {
         val accountId = inputData.getLong("accountId", 0L)
-        var accountAttributes: AccountAttributes? = null
-        var isDeleted = false
         val accountService = genericService?.create(AccountsService::class.java)
         val repository = AccountRepository(accountDatabase, accountService)
-        runBlocking(Dispatchers.IO) {
-            accountAttributes = repository.retrieveAccountById(accountId)[0].accountAttributes
-            isDeleted = repository.deleteAccountById(accountId)
+        return when(repository.deleteAccountById(accountId)){
+            HttpConstants.NO_CONTENT_SUCCESS -> {
+                cancelWorker(accountId, context)
+                Result.success()
+            }
+            HttpConstants.FAILED -> {
+                Result.retry()
+            }
+            else -> {
+                Result.failure()
+            }
         }
-        if(isDeleted){
-            applicationContext
-            Result.success()
-            context.displayNotification(accountAttributes?.name + "successfully deleted", context.getString(R.string.account),
-                    Constants.ACCOUNT_CHANNEL, channelIcon)
-        } else {
-            Result.failure()
-            context.displayNotification("There was an issue deleting " + accountAttributes?.name, context.getString(R.string.account),
-                    Constants.ACCOUNT_CHANNEL, channelIcon)
-        }
-        return Result.success()
     }
 
 

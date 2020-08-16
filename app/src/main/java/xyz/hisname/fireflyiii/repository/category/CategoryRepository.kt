@@ -5,7 +5,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
-import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
 class CategoryRepository(private val categoryDao: CategoryDataDao,
@@ -18,16 +18,34 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
     suspend fun searchCategoryByName(categoryName: String) = categoryDao.searchCategory(categoryName)
 
-    suspend fun deleteCategoryById(categoryId: Long): Boolean{
-        var isDeleted = false
+    suspend fun deleteCategoryById(categoryId: Long): Int{
         try {
             val networkResponse = categoryService?.deleteCategoryById(categoryId)
-            if(networkResponse?.code() == 204){
-                categoryDao.deleteCategoryById(categoryId)
-                isDeleted = true
+            when(networkResponse?.code()) {
+                204 -> {
+                    categoryDao.deleteCategoryById(categoryId)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                     *   now in inconsistent state. This use case is unlikely to happen unless user
+                     *   deletes their token from the web interface without updating the mobile client
+                     */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    categoryDao.deleteCategoryById(categoryId)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
             }
-        } catch (exception: Exception){ }
-        return isDeleted
+        } catch (exception: Exception){
+            categoryDao.deleteCategoryById(categoryId)
+            return HttpConstants.FAILED
+        }
     }
 
     suspend fun loadPaginatedData(pageNumber: Int): Flow<MutableList<CategoryData>> {

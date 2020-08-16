@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.category
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +13,9 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategorySuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import xyz.hisname.fireflyiii.workers.DeleteCategoryWorker
 
 class CategoryViewModel(application: Application): BaseViewModel(application) {
 
@@ -83,23 +84,26 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
 
     fun deleteCategoryByName(categoryName: String): LiveData<Boolean> {
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = false
+        var isItDeleted = 0
+        var categoryId = 0L
         viewModelScope.launch(Dispatchers.IO) {
-            val categoryId = repository.searchCategoryByName(categoryName)[0].categoryId ?: 0
+            categoryId = repository.searchCategoryByName(categoryName)[0].categoryId ?: 0
             if(categoryId != 0L){
                 isItDeleted = repository.deleteCategoryById(categoryId)
             }
         }.invokeOnCompletion {
             // Since onDraw() is being called multiple times, we check if the category exists locally in the DB.
-            if(!isItDeleted){
-                viewModelScope.launch(Dispatchers.IO){
-                    val category = repository.searchCategoryByName(categoryName)
-                    if(category.isNotEmpty()){
-                        isDeleted.postValue(false)
-                    }
+            when (isItDeleted) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteCategoryWorker.initPeriodicWorker(categoryId, getApplication())
                 }
-            } else {
-                isDeleted.postValue(true)
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
             }
         }
         return isDeleted

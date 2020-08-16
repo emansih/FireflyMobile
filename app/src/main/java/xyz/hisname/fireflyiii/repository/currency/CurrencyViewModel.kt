@@ -12,7 +12,9 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
 
 class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
@@ -52,21 +54,28 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
     fun deleteCurrencyByName(currencyCode: String): LiveData<Boolean> {
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = false
+        var isItDeleted = 0
+        var currencyId: Long = 0
         viewModelScope.launch(Dispatchers.IO){
-            isItDeleted = repository.deleteCurrencyByName(currencyCode)
+            currencyId = repository.getCurrencyByCode(currencyCode)[0].currencyId ?: 0
+            if(currencyId != 0L){
+                isItDeleted = repository.deleteCurrencyByName(currencyCode)
+            }
         }.invokeOnCompletion {
             // Since onDraw() is being called multiple times, we check if the currency exists locally in the DB.
-            if(!isItDeleted){
-                viewModelScope.launch(Dispatchers.IO){
-                    val currency = repository.getCurrencyCode(currencyCode)
-                    if(currency != null){
-                        isDeleted.postValue(false)
-                    }
+            when (isItDeleted) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteCurrencyWorker.initPeriodicWorker(currencyId, getApplication())
                 }
-            } else {
-                isDeleted.postValue(true)
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
             }
+
         }
         return isDeleted
     }

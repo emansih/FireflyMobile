@@ -58,7 +58,7 @@ class ListAccountFragment: BaseFragment() {
                                 "liability" -> toastSuccess("Successfully deleted liability account")
                             }
                         } else {
-                            toastError("There was an error deleting $accountName")
+                            toastOffline("$accountName will be deleted later...")
                         }
                     }
                 }

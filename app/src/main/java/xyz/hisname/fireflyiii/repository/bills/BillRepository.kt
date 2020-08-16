@@ -1,12 +1,12 @@
 package xyz.hisname.fireflyiii.repository.bills
 
-import android.content.Context
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
+import xyz.hisname.fireflyiii.util.network.HttpConstants
+import java.net.UnknownHostException
 
 @Suppress("RedundantSuspendModifier")
 class BillRepository(private val billDao: BillDataDao,
@@ -50,13 +50,33 @@ class BillRepository(private val billDao: BillDataDao,
     
     suspend fun getBillByName(billName: String) = billDao.getBillByName(billName)
     
-    suspend fun deleteBillById(billId: Long): Boolean{
-        var isDeleted = false
-        val networkStatus = billService?.deleteBillById(billId)
-        if (networkStatus?.code() == 204){
+    suspend fun deleteBillById(billId: Long): Int{
+        try {
+            val networkResponse = billService?.deleteBillById(billId)
+            when (networkResponse?.code()) {
+                204 -> {
+                    billDao.deleteBillById(billId)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                     *   now in inconsistent state. This use case is unlikely to happen unless user
+                     *   deletes their token from the web interface without updating the mobile client
+                     */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    billDao.deleteBillById(billId)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
+            }
+        } catch (exception: UnknownHostException){
             billDao.deleteBillById(billId)
-            isDeleted = true
+            return HttpConstants.FAILED
         }
-        return isDeleted
     }
 }

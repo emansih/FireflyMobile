@@ -57,7 +57,7 @@ class CurrencyListFragment: BaseFragment() {
                         if (isDeleted) {
                             toastSuccess("$currencyName deleted")
                         } else {
-                            toastError("There was an issue deleting $currencyName")
+                            toastOffline("$currencyName will be deleted later...")
                         }
                     }
                 }

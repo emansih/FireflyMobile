@@ -63,7 +63,7 @@ class ListBillFragment: BaseFragment() {
                         if(isDeleted){
                             toastSuccess(resources.getString(R.string.bill_deleted, billName))
                         } else {
-                            toastError("There was an error deleting $billName")
+                            toastOffline("$billName will be deleted later...")
                         }
                     }
                 }

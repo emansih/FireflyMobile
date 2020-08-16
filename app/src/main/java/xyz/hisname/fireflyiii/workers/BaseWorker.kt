@@ -24,7 +24,6 @@ abstract class BaseWorker(context: Context, workerParams: WorkerParameters): Cor
     protected val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(context) }
     private val customCa by lazy { CustomCa(("file://" + context.filesDir.path + "/user_custom.pem").toUri().toFile()) }
 
-
     private fun getTrust(): X509TrustManager?{
         return if(AppPref(sharedPref).isCustomCa){
             customCa.getCustomTrust()

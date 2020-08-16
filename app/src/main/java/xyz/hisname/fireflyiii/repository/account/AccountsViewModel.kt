@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,8 +16,10 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
+import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 
 
 class AccountsViewModel(application: Application): BaseViewModel(application){
@@ -72,15 +73,22 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     fun deleteAccountById(accountId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = false
+        var isItDeleted = 0
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             isItDeleted = repository.deleteAccountById(accountId)
         }.invokeOnCompletion {
-            if(isItDeleted) {
-                isDeleted.postValue(true)
-            } else {
-                isDeleted.postValue(false)
+            when (isItDeleted) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteAccountWorker.initPeriodicWorker(accountId, getApplication())
+                }
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
             }
             isLoading.postValue(false)
 
@@ -210,23 +218,26 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
     fun deleteAccountByName(accountName: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = false
+        var isItDeleted = 0
+        var accountId = 0L
         viewModelScope.launch(Dispatchers.IO) {
-            val accountId = repository.retrieveAccountByName(accountName)[0].accountId ?: 0
+            accountId = repository.retrieveAccountByName(accountName)[0].accountId ?: 0
             if(accountId != 0L){
                 isItDeleted = repository.deleteAccountById(accountId)
             }
         }.invokeOnCompletion {
             // Since onDraw() is being called multiple times, we check if the account exists locally in the DB.
-            if(!isItDeleted){
-                viewModelScope.launch(Dispatchers.IO){
-                    val account = repository.retrieveAccountByName(accountName)
-                    if(account.isNotEmpty()){
-                        isDeleted.postValue(false)
-                    }
+            when (isItDeleted) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteAccountWorker.initPeriodicWorker(accountId, getApplication())
                 }
-            } else {
-                isDeleted.postValue(true)
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
             }
         }
         return isDeleted

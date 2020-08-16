@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.repository.piggybank
 
 import android.app.Application
 import androidx.lifecycle.*
-import androidx.room.Delete
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest

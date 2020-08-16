@@ -1,12 +1,11 @@
 package xyz.hisname.fireflyiii.repository.account
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
-import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.security.cert.CertificateException
 
 @Suppress("RedundantSuspendModifier")
@@ -55,16 +54,34 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
 
-    suspend fun deleteAccountById(accountId: Long): Boolean {
-        var isDeleted = false
+    suspend fun deleteAccountById(accountId: Long): Int {
         try {
             val networkResponse = accountsService?.deleteAccountById(accountId)
-            if(networkResponse?.code() == 204){
-                accountDao.deleteAccountById(accountId)
-                isDeleted = true
+            when (networkResponse?.code()) {
+                204 -> {
+                    accountDao.deleteAccountById(accountId)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                     *   now in inconsistent state. This use case is unlikely to happen unless user
+                     *   deletes their token from the web interface without updating the mobile client
+                     */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    accountDao.deleteAccountById(accountId)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
             }
-        } catch (exception: Exception){ }
-        return isDeleted
+        } catch (exception: Exception){
+            accountDao.deleteAccountById(accountId)
+            return HttpConstants.FAILED
+        }
     }
 
     suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
