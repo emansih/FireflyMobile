@@ -33,7 +33,10 @@ class DeleteCategoryWorker(private val context: Context, workerParameters: Worke
                                 .build())
                         .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                         .build()
-                WorkManager.getInstance(context).enqueue(deleteCategoryWork)
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                        "delete_periodic_category_$categoryId",
+                        ExistingPeriodicWorkPolicy.REPLACE,
+                        deleteCategoryWork)
             }
         }
 
