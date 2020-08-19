@@ -443,7 +443,7 @@ class AddTransactionFragment: BaseFragment() {
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     }
             Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
-                    accountViewModel.getAccountNameByType("asset")).observe(this ) {
+                    accountViewModel.getAccountNameByType("asset")).observe(viewLifecycleOwner ) {
                 // Asset account, spinner
                 spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, it.second)
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -563,8 +563,8 @@ class AddTransactionFragment: BaseFragment() {
                 val currencyAttributes = currencyData[0].currencyAttributes
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
             }
-            currency = transactionAttributes.currency_code.toString()
-            transaction_date_edittext.setText(transactionAttributes.date.toString())
+            currency = transactionAttributes.currency_code
+            transaction_date_edittext.setText(DateTimeUtil.convertIso8601ToHumanDate(transactionAttributes.date))
             category_edittext.setText(transactionAttributes.category_name)
             if(transactionAttributes?.tags != null){
                 tags_chip.setText(transactionAttributes.tags + ",")

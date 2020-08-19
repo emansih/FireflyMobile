@@ -186,4 +186,12 @@ object DateTimeUtil {
                 timeFormat
     }
 
+    fun convertIso8601ToHumanDate(timeToParse: OffsetDateTime): String {
+        val month = if ((timeToParse.monthValue + 1 ) < 10){
+             "0"+ (timeToParse.monthValue + 1)
+        } else {
+            timeToParse.monthValue.toString()
+        }
+        return timeToParse.year.toString() + "-" + month + "-" + timeToParse.dayOfMonth
+    }
 }
