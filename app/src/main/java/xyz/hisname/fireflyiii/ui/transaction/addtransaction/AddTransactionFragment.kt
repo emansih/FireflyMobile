@@ -566,7 +566,7 @@ class AddTransactionFragment: BaseFragment() {
             currency = transactionAttributes.currency_code
             transaction_date_edittext.setText(DateTimeUtil.convertIso8601ToHumanDate(transactionAttributes.date))
             category_edittext.setText(transactionAttributes.category_name)
-            if(transactionAttributes?.tags != null){
+            if(transactionAttributes.tags.isNotEmpty()){
                 tags_chip.setText(transactionAttributes.tags + ",")
             }
             when {
