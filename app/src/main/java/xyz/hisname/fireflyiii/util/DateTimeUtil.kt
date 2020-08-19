@@ -195,7 +195,9 @@ object DateTimeUtil {
         return timeToParse.year.toString() + "-" + month + "-" + timeToParse.dayOfMonth
     }
 
-    fun convertIso8601ToHumanTime(timeToParse: OffsetDateTime): String {
-        return "${timeToParse.hour}:${timeToParse.minute}"
-    }
+    fun convertIso8601ToHumanTime(timeToParse: OffsetDateTime) = "${timeToParse.hour}:${timeToParse.minute}"
+
+
+    fun mergeDateTimeToIso8601(date: String, time: String) =  date + "T" + time + ZonedDateTime.now().offset
+
 }

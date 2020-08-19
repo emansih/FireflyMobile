@@ -479,7 +479,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun submitData() {
         val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
-            transaction_date_edittext.getString() + " " + selectedTime
+            DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
         } else {
             transaction_date_edittext.getString()
         }
