@@ -159,7 +159,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     fun getCurrencyByCode(currencyCode: String): LiveData<MutableList<CurrencyData>>{
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            repository.getCurrencyByCode(currencyCode)  
+            currencyData = repository.getCurrencyByCode(currencyCode)
         }.invokeOnCompletion {
             currencyLiveData.postValue(currencyData)
         }
