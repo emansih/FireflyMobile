@@ -194,4 +194,8 @@ object DateTimeUtil {
         }
         return timeToParse.year.toString() + "-" + month + "-" + timeToParse.dayOfMonth
     }
+
+    fun convertIso8601ToHumanTime(timeToParse: OffsetDateTime): String {
+        return "${timeToParse.hour}:${timeToParse.minute}"
+    }
 }
