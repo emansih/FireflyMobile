@@ -62,7 +62,7 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         set(value) = sharedPref.edit{ putBoolean("currencyThumbnail", value) }
 
     override var workManagerDelay: Long
-        get() = sharedPref.getLong("workManagerDelay", 10)
+        get() = sharedPref.getLong("workManagerDelay", 20)
         set(value) = sharedPref.edit{ putLong("workManagerDelay", value) }
 
     override fun clearPref() = sharedPref.edit().clear().apply()
