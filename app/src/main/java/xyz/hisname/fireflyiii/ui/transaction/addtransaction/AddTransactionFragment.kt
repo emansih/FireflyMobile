@@ -568,7 +568,7 @@ class AddTransactionFragment: BaseFragment() {
             category_edittext.setText(transactionAttributes.category_name)
             time_edittext.setText(DateTimeUtil.convertIso8601ToHumanTime(transactionAttributes.date))
             if(transactionAttributes.tags.isNotEmpty()){
-                tags_chip.setText(transactionAttributes.tags + ",")
+                tags_chip.setText(transactionAttributes.tags)
             }
             when {
                 Objects.equals("withdrawal", transactionType) -> {
