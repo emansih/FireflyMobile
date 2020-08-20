@@ -94,7 +94,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                                 .setRequiresBatteryNotLow(true)
                                 .build())
                         .setBackoffCriteria(BackoffPolicy.LINEAR, 20, TimeUnit.MINUTES)
-                        .addTag("add_periodic_transaction_-$transactionWorkManagerId")
+                        .addTag("add_periodic_transaction_$transactionWorkManagerId")
                         .build()
                 WorkManager.getInstance(context).enqueue(transactionWork)
             }
