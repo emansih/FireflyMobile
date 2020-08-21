@@ -36,12 +36,14 @@ class TransactionRecyclerAdapter(private val items: MutableList<Transactions>, p
             val transactionDescription = transactionAttributes.description
             if(transactionDescription.length >= 25){
                 if(transactionAttributes.isPending){
+                    itemView.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
                     itemView.transactionNameText.text = transactionDescription.substring(0,25) + "..." + " (Pending)"
                 } else {
                     itemView.transactionNameText.text = transactionDescription.substring(0,25) + "..."
                 }
             } else {
                 if(transactionAttributes.isPending) {
+                    itemView.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
                     itemView.transactionNameText.text = transactionDescription + " (Pending)"
                 } else {
                     itemView.transactionNameText.text = transactionDescription
