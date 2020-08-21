@@ -35,6 +35,7 @@ class SettingsFragment: BaseSettings() {
         setPinCode()
         setThumbnail()
         setTutorial()
+        setDeveloperOption()
     }
 
     private fun setLanguagePref(){
@@ -125,6 +126,23 @@ class SettingsFragment: BaseSettings() {
                 ActivityCompat.recreate(requireActivity())
                 true
             }
+        }
+    }
+
+    private fun setDeveloperOption(){
+        val developerSettings = findPreference<Preference>("developer_options") as Preference
+        developerSettings.setOnPreferenceClickListener {
+            parentFragmentManager.commit {
+                addToBackStack(null)
+                setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                replace(R.id.fragment_container, DeveloperSettings())
+            }
+            true
+        }
+        developerSettings.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_developer_mode
+            sizeDp = 24
+            colorRes = setIconColor()
         }
     }
 

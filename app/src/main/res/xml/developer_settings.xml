@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:iconSpaceReserved="false"
+        app:key="workManagerDelay"
+        app:title="Worker Delay"
+        app:summary="Default value is 15 mins. Any value lower than 15 will be ignored.">
+    </EditTextPreference>
+
+    <CheckBoxPreference
+        app:iconSpaceReserved="false"
+        app:key="workManagerLowBattery"
+        app:title="Battery"
+        app:defaultValue="true"
+        app:summary="Requires Battery Not Low"/>
+
+</PreferenceScreen>

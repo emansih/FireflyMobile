@@ -17,5 +17,6 @@ interface PreferenceHelper {
     var isCustomCa: Boolean
     var isCurrencyThumbnailEnabled: Boolean
     var workManagerDelay: Long
+    var workManagerLowBattery: Boolean
     fun clearPref()
 }

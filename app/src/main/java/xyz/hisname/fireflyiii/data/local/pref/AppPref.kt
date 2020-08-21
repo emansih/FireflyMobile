@@ -73,5 +73,9 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         }
         set(value) = sharedPref.edit{ putLong("workManagerDelay", value) }
 
+    override var workManagerLowBattery: Boolean
+        get() = sharedPref.getBoolean("workManagerLowBattery", true)
+        set(value) = sharedPref.edit{ putBoolean("workManagerLowBattery", value) }
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

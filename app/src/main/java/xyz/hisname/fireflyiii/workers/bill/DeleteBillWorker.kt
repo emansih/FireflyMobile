@@ -25,12 +25,13 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
                         .putLong("billId", billId)
                         .build()
                 val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
+                val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
                 val deleteBillWork = PeriodicWorkRequestBuilder<DeleteBillWorker>(Duration.ofMinutes(delay))
                         .setInputData(accountData)
                         .addTag("delete_bill_periodic_$billId")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .setRequiresBatteryNotLow(true)
+                                .setRequiresBatteryNotLow(battery)
                                 .build())
                         .build()
                 WorkManager.getInstance(context).enqueue(deleteBillWork)

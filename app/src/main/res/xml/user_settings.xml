@@ -32,6 +32,10 @@
         app:summary="Show flags next to currency"/>
 
     <Preference
+        app:key="developer_options"
+        app:title="Developer Options" />
+
+    <Preference
         app:isPreferenceVisible="false"
         app:key="tutorial_setting"
         app:iconSpaceReserved="false"

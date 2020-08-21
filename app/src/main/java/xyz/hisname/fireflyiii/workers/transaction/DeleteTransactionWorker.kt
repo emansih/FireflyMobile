@@ -43,11 +43,12 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
                         .putLong("transactionId", transactionId)
                         .build()
                 val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
+                val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
                 val transactionWork = PeriodicWorkRequestBuilder<DeleteTransactionWorker>(Duration.ofMinutes(delay))
                         .setInputData(transactionData)
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .setRequiresBatteryNotLow(true)
+                                .setRequiresBatteryNotLow(battery)
                                 .build())
                         .build()
                 WorkManager.getInstance(context).enqueue(transactionWork)

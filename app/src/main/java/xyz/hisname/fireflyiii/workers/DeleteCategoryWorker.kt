@@ -24,12 +24,13 @@ class DeleteCategoryWorker(private val context: Context, workerParameters: Worke
                         .putLong("categoryId", categoryId)
                         .build()
                 val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
+                val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
                 val deleteCategoryWork = PeriodicWorkRequestBuilder<DeleteCurrencyWorker>(Duration.ofMinutes(delay))
                         .setInputData(categoryData)
                         .addTag("delete_periodic_category_$categoryId")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .setRequiresBatteryNotLow(true)
+                                .setRequiresBatteryNotLow(battery)
                                 .build())
                         .build()
                 WorkManager.getInstance(context).enqueue(deleteCategoryWork)
