@@ -302,7 +302,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         viewModelScope.launch(Dispatchers.IO){
             transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
         }.invokeOnCompletion {
-            println("update: " + date)
             transactionService?.updateTransaction(transactionId, convertString(type), description, date,
                     amount.replace(',', '.'), sourceName, destinationName, currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
                 val errorBody = response.errorBody()
