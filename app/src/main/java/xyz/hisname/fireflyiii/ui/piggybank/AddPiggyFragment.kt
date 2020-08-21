@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -27,13 +26,13 @@ import kotlinx.android.synthetic.main.fragment_add_piggy.expansionLayout
 import kotlinx.android.synthetic.main.fragment_add_piggy.optionalLayout
 import kotlinx.android.synthetic.main.fragment_add_piggy.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.receiver.PiggyBankReceiver
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.workers.piggybank.PiggyBankWorker
 import java.util.*
 
 class AddPiggyFragment: BaseAddObjectFragment() {
@@ -226,20 +225,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                     toastError(errorMessage)
                 } else if (it.getError() != null) {
                     if (throwawableError?.localizedMessage?.startsWith("Unable to resolve host") == true) {
-                        val piggyBroadcast = Intent(requireContext(), PiggyBankReceiver::class.java).apply {
-                            action = "firefly.hisname.ADD_PIGGY_BANK"
-                        }
-                        val extras = bundleOf(
-                                "name" to description_edittext.getString(),
-                                "accountId" to accountData[0].accountId.toString(),
-                                "targetAmount" to target_amount_edittext.getString(),
-                                "currentAmount" to currentAmount,
-                                "startDate" to startDate,
-                                "endDate" to targetDate,
-                                "notes" to notes
-                        )
-                        piggyBroadcast.putExtras(extras)
-                        requireActivity().sendBroadcast(piggyBroadcast)
+                        PiggyBankWorker.initWorker(requireContext(), description_edittext.getString(),
+                                accountData[0].accountId.toString(), target_amount_edittext.getString(), currentAmount,
+                                startDate, targetDate, notes)
                         toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
                         handleBack()
                     } else {

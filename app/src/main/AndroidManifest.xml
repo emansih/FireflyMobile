@@ -76,22 +76,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.BillReceiver"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="firefly.hisname.ADD_BILL"/>
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".receiver.PiggyBankReceiver"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="firefly.hisname.ADD_PIGGY_BANK" />
-            </intent-filter>
-        </receiver>
-
         <receiver android:name=".GenericReceiver">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />

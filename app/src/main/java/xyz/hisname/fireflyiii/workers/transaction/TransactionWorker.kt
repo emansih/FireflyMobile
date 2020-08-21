@@ -44,7 +44,6 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     }
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if (response.isSuccessful) {
-                        WorkManager.getInstance(context).cancelAllWorkByTag(transactionWorkManagerId.toString())
                         context.displayNotification("Transaction added successfully!", transactionType,
                                 Constants.TRANSACTION_CHANNEL, channelIcon)
                         cancelWorker(transactionWorkManagerId, context)

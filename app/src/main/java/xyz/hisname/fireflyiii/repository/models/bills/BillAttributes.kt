@@ -8,7 +8,7 @@ data class BillAttributes(
         val updated_at: String,
         val created_at: String,
         var name: String,
-        val currency_id: Int,
+        val currency_id: Long,
         val currency_code: String,
         val currency_symbol: String,
         val currency_decimal_places: Int,

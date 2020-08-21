@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.bills
 
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color.rgb
 import android.os.Bundle
@@ -20,7 +19,6 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_bill.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.receiver.BillReceiver
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
@@ -31,6 +29,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.workers.bill.BillWorker
 
 class AddBillFragment: BaseAddObjectFragment() {
 
@@ -237,20 +236,10 @@ class AddBillFragment: BaseAddObjectFragment() {
                     if (errorMessage != null) {
                         toastError(errorMessage)
                     } else if (response.getError() != null) {
-                        val billBroadcast = Intent(requireContext(), BillReceiver::class.java).apply {
-                            action = "firefly.hisname.ADD_BILL"
-                        }
-                        val extras = bundleOf(
-                                "name" to description_edittext.getString(),
-                                "minAmount" to min_amount_edittext.getString(),
-                                "maxAmount" to max_amount_edittext.getString(),
-                                "billDate" to bill_date_edittext.getString(),
-                                "repeatFreq" to repeatFreq,
-                                "skip" to skip_edittext.getString(),
-                                "currencyCode" to currency,
-                                "notes" to notes)
-                        billBroadcast.putExtras(extras)
-                        requireActivity().sendBroadcast(billBroadcast)
+                        BillWorker.initWorker(requireContext(), description_edittext.getString(),
+                                min_amount_edittext.getString(), max_amount_edittext.getString(),
+                                bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(),
+                                currency, notes)
                         toastOffline(getString(R.string.data_added_when_user_online, "Bill"))
                         handleBack()
                     } else if (response.getResponse() != null) {
