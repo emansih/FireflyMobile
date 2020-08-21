@@ -11,7 +11,6 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import java.io.*
 
@@ -43,18 +42,22 @@ class FileUtils {
             return fileContent.toString()
         }
 
-        fun saveCaFile(fileUri: Uri, context: Context){
+        fun saveCaFile(fileUri: Uri, context: Context) {
+            var count: Int
+            val data = ByteArray(4096)
             val fileDestination = "user_custom.pem"
-            val br = BufferedReader(FileReader(getPathFromUri(context, fileUri)))
-            var line: String?
+            val inputStream = context.contentResolver.openInputStream(fileUri)
             context.deleteFile(fileDestination)
-            while (br.readLine().also { line = it + "\n" } != null) {
-                context.openFileOutput(fileDestination, Context.MODE_APPEND).use {
-                    it.write(line?.toByteArray())
-                }
+            val bufferredInputStream = BufferedInputStream(inputStream, 8192)
+            val output = FileOutputStream(context.filesDir.toString() + "/user_custom.pem")
+            while (bufferredInputStream.read(data).also { count = it } != -1) {
+                output.write(data, 0, count)
             }
-            br.close()
+            output.flush()
+            output.close()
+            bufferredInputStream.close()
         }
+
 
         fun getPathFromUri(context: Context, uri: Uri): String? {
             // DocumentProvider
