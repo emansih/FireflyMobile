@@ -37,15 +37,16 @@ interface TransactionService {
 
     @FormUrlEncoded
     @PUT("$TRANSACTION_API_ENDPOINT/{transactionId}")
-    fun updateTransaction(@Path("transactionId") transactionId: Long, @Field("type") type: String,
-                          @Field("description") description: String,
-                          @Field("date") date: String,
+    fun updateTransaction(@Path("transactionId") transactionId: Long,
+                          @Field("transactions[0][type]") type: String,
+                          @Field("transactions[0][description]") description: String,
+                          @Field("transactions[0][date]") date: String,
                           @Field("transactions[0][amount]") amount: String,
                           @Field("transactions[0][source_name]") sourceName: String?,
                           @Field("transactions[0][destination_name]") destinationName: String?,
                           @Field("transactions[0][currency_code]") currency: String,
                           @Field("transactions[0][category_name]") category: String?,
-                          @Field("tags") tags: String?,
+                          @Field("transactions[0][tags]") tags: String?,
                           @Field("transactions[0][budget_name]") budgetName: String?): Call<TransactionSuccessModel>
 
     @GET("$TRANSACTION_API_ENDPOINT/{id}/attachments")

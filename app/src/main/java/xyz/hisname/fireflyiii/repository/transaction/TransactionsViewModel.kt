@@ -250,7 +250,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                        category: String?, tags: String?, budgetName: String?, fileUri: Uri?): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        transactionService?.addTransaction(convertString(type),description,date,piggyBankName,
+        transactionService?.addTransaction(convertString(type),description, date ,piggyBankName,
                 amount.replace(',', '.'),sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
@@ -302,6 +302,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         viewModelScope.launch(Dispatchers.IO){
             transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
         }.invokeOnCompletion {
+            println("update: " + date)
             transactionService?.updateTransaction(transactionId, convertString(type), description, date,
                     amount.replace(',', '.'), sourceName, destinationName, currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
                 val errorBody = response.errorBody()
