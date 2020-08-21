@@ -3,6 +3,10 @@ package xyz.hisname.fireflyiii.fireflydao
 import androidx.room.Room
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -14,9 +18,11 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 open class DaoTest {
 
     private lateinit var fireflyDatabase: AppDatabase
+    private lateinit var globalScope: GlobalScope
 
     @Before
     fun initDb(){
+        globalScope = GlobalScope
         fireflyDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().context,
                 AppDatabase::class.java).build()
     }
@@ -31,11 +37,21 @@ open class DaoTest {
         val accountFactory = DaoFactory.makeAccount()
         fireflyDatabase.accountDataDao().insert(accountFactory)
         fireflyDatabase.accountDataDao().deleteAccountByType("asset")
-        assertTrue("no asset", fireflyDatabase.accountDataDao().getAccountByType("asset").isEmpty())
         fireflyDatabase.accountDataDao().deleteAccountByType("revenue")
-        assertTrue("no revenue", fireflyDatabase.accountDataDao().getAccountByType("revenue").isEmpty())
         fireflyDatabase.accountDataDao().deleteAccountByType("expenses")
-        assertTrue("no expenses", fireflyDatabase.accountDataDao().getAccountByType("expenses").isEmpty())
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.accountDataDao().getAccountByType("asset").collect { asset ->
+                    assertTrue("no asset", asset.isEmpty())
+                }
+                fireflyDatabase.accountDataDao().getAccountByType("revenue").collect { revenue ->
+                    assertTrue("no revenue", revenue.isEmpty())
+                }
+                fireflyDatabase.accountDataDao().getAccountByType("expenses").collect{ expenses ->
+                    assertTrue("no expenses", expenses.isEmpty())
+                }
+            }
+        }
     }
 
     @Test
@@ -44,12 +60,19 @@ open class DaoTest {
         accountFactory.forEach {
             fireflyDatabase.accountDataDao().insert(it)
         }
-        val assetAccount = fireflyDatabase.accountDataDao().getAccountByType("asset")
-        val revenueAccount = fireflyDatabase.accountDataDao().getAccountByType("revenue")
-        val expenseAccount = fireflyDatabase.accountDataDao().getAccountByType("expense")
-        assertTrue(assetAccount == accountFactory.sortedWith(compareBy({ it.accountId }, { it.accountId })))
-        assertTrue(revenueAccount == accountFactory.sortedWith(compareBy({ it.accountId }, { it.accountId })))
-        assertTrue(expenseAccount == accountFactory.sortedWith(compareBy({ it.accountId }, { it.accountId })))
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.accountDataDao().getAccountByType("asset").collect { assetAccount ->
+                    assertTrue(assetAccount == accountFactory.sortedWith(compareBy({ it.accountId }, { it.accountId })))
+                }
+                fireflyDatabase.accountDataDao().getAccountByType("revenue").collect { revenueAccount ->
+                    assertTrue(revenueAccount == accountFactory.sortedWith(compareBy({ it.accountId }, { it.accountId })))
+                }
+                fireflyDatabase.accountDataDao().getAccountByType("expense").collect { expenseAccount ->
+                    assertTrue(expenseAccount == accountFactory.sortedWith(compareBy({ it.accountId }, { it.accountId })))
+                }
+            }
+        }
     }
 
     @Test
@@ -57,14 +80,26 @@ open class DaoTest {
         val currencyFactory = DaoFactory.makeCounterfeitCurrency()
         fireflyDatabase.currencyDataDao().insert(currencyFactory)
         fireflyDatabase.currencyDataDao().deleteAllCurrency()
-        assertTrue("table is empty", fireflyDatabase.currencyDataDao().getPaginatedCurrency(1).isEmpty())
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.currencyDataDao().getPaginatedCurrency(1).collect { currency ->
+                    assertTrue("table is empty", currency.isEmpty())
+                }
+            }
+        }
     }
 
     @Test
     fun insertCurrencyData(){
         val currencyFactory = DaoFactory.makeCounterfeitCurrency()
         fireflyDatabase.currencyDataDao().insert(currencyFactory)
-        assertTrue("table not empty" , fireflyDatabase.currencyDataDao().getPaginatedCurrency(1).isNotEmpty())
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.currencyDataDao().getPaginatedCurrency(1).collect { currency ->
+                    assertTrue("table not empty" ,currency.isNotEmpty())
+                }
+            }
+        }
     }
 
     @Test
@@ -73,8 +108,13 @@ open class DaoTest {
         currencyFactory.forEach {
             fireflyDatabase.currencyDataDao().insert(it)
         }
-        val retrievedCurrency = fireflyDatabase.currencyDataDao().getPaginatedCurrency(5)
-        assertTrue(retrievedCurrency == currencyFactory.sortedWith(compareBy({ it.currencyId }, { it.currencyId })))
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.currencyDataDao().getPaginatedCurrency(5).collect { retrievedCurrency ->
+                    assertTrue(retrievedCurrency == currencyFactory.sortedWith(compareBy({ it.currencyId }, { it.currencyId })))
+                }
+            }
+        }
     }
 
     @Test
@@ -82,14 +122,26 @@ open class DaoTest {
         val categoryFactory = DaoFactory.makeCategory()
         fireflyDatabase.categoryDataDao().insert(categoryFactory)
         fireflyDatabase.categoryDataDao().deleteAllCategory()
-        assertTrue("table is empty", fireflyDatabase.categoryDataDao().getPaginatedCategory(1).isEmpty())
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.categoryDataDao().getPaginatedCategory(1).collect { category ->
+                    assertTrue("table is empty", category.isEmpty())
+                }
+            }
+        }
     }
 
     @Test
     fun insertCategoryData(){
         val categoryFactory = DaoFactory.makeCategory()
         fireflyDatabase.categoryDataDao().insert(categoryFactory)
-        assertTrue("table not empty" , fireflyDatabase.categoryDataDao().getPaginatedCategory(1).isNotEmpty())
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.categoryDataDao().getPaginatedCategory(1).collect { category ->
+                    assertTrue("table is empty", category.isEmpty())
+                }
+            }
+        }
     }
 
     @Test
@@ -98,8 +150,13 @@ open class DaoTest {
         categoryFactory.forEach {
             fireflyDatabase.categoryDataDao().insert(it)
         }
-        val retrievedCategory = fireflyDatabase.categoryDataDao().getPaginatedCategory(5)
-        assertTrue(retrievedCategory == categoryFactory.sortedWith(compareBy({ it.categoryId }, { it.categoryId })))
+        runBlocking {
+            globalScope.launch {
+                fireflyDatabase.categoryDataDao().getPaginatedCategory(5).collect { retrievedCategory ->
+                    assertTrue(retrievedCategory == categoryFactory.sortedWith(compareBy({ it.categoryId }, { it.categoryId })))
+                }
+            }
+        }
     }
 
     @Test
