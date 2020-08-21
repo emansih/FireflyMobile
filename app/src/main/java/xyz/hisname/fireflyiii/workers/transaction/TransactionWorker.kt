@@ -12,11 +12,11 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 class TransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
@@ -48,6 +48,14 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                         context.displayNotification("Transaction added successfully!", transactionType,
                                 Constants.TRANSACTION_CHANNEL, channelIcon)
                         cancelWorker(transactionWorkManagerId, context)
+                        response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
+                            runBlocking(Dispatchers.IO) {
+                                val transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
+                                transactionDatabase.insert(transaction)
+                                transactionDatabase.insert(TransactionIndex(response.body()?.data?.transactionId,
+                                        transaction.transaction_journal_id))
+                            }
+                        }
                         Result.success()
                     } else {
                         var error = ""
