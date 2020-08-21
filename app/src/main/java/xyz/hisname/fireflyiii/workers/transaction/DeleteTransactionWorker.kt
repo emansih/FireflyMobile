@@ -49,12 +49,8 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .setRequiresBatteryNotLow(true)
                                 .build())
-                        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                         .build()
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                        "delete_periodic_transaction_$transactionId",
-                        ExistingPeriodicWorkPolicy.REPLACE,
-                        transactionWork)
+                WorkManager.getInstance(context).enqueue(transactionWork)
             }
 
         }

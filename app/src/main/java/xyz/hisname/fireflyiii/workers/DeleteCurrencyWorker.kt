@@ -30,12 +30,8 @@ class DeleteCurrencyWorker(private val context: Context, workerParameters: Worke
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .setRequiresBatteryNotLow(true)
                                 .build())
-                        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                         .build()
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                        "delete_currency_periodic$currencyId",
-                        ExistingPeriodicWorkPolicy.REPLACE,
-                        deleteCurrencyWork)
+                WorkManager.getInstance(context).enqueue(deleteCurrencyWork)
             }
         }
     }

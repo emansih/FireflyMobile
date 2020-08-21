@@ -31,13 +31,9 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .setRequiresBatteryNotLow(true)
                                 .build())
-                        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                         .addTag("delete_periodic_piggy_$piggyId")
                         .build()
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                        "delete_periodic_piggy_$piggyId",
-                        ExistingPeriodicWorkPolicy.REPLACE,
-                        deletePiggyWork)
+                WorkManager.getInstance(context).enqueue(deletePiggyWork)
             }
         }
 

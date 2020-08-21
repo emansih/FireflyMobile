@@ -32,12 +32,8 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .setRequiresBatteryNotLow(true)
                                 .build())
-                        .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
                         .build()
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                        "delete_periodic_account_$accountId",
-                        ExistingPeriodicWorkPolicy.REPLACE,
-                        deleteAccountWork)
+                WorkManager.getInstance(context).enqueue(deleteAccountWork)
             }
         }
 
