@@ -51,6 +51,7 @@ import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
+import xyz.hisname.fireflyiii.ui.tasker.TransactionPluginViewModel
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
@@ -62,6 +63,7 @@ import kotlin.math.abs
 class AddTransactionFragment: BaseFragment() {
 
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
+    private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
@@ -149,9 +151,35 @@ class AddTransactionFragment: BaseFragment() {
             if(transactionJournalId != 0L){
                 updateData()
             } else {
-                submitData()
+                if(isTasker){
+                    taskerPlugin()
+                } else {
+                    submitData()
+                }
+
             }
         }
+    }
+
+    private fun taskerPlugin(){
+        val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
+            DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
+        } else {
+            transaction_date_edittext.getString()
+        }
+        val viewModel = getViewModel(TransactionPluginViewModel::class.java)
+        viewModel.transactionType.postValue(transactionType)
+        viewModel.transactionDescription.postValue(description_edittext.getString())
+        viewModel.transactionDateTime.postValue(transactionDateTime)
+        viewModel.transactionPiggyBank.postValue(piggyBank)
+        viewModel.transactionSourceAccount.postValue(sourceAccount)
+        viewModel.transactionDestinationAccount.postValue(destinationAccount)
+        viewModel.transactionCurrency.postValue(currency)
+        viewModel.transactionTags.postValue(transactionTags)
+        viewModel.transactionBudget.postValue(budgetName)
+        viewModel.transactionCategory.postValue(categoryName)
+        viewModel.fileUri.postValue(fileUri)
+        viewModel.removeFragment.postValue(true)
     }
 
     private fun updateData(){

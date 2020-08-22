@@ -134,6 +134,8 @@ dependencies {
     implementation Dependencies.accordionView
     implementation Dependencies.fancyshowcaseview
 
+    implementation Dependencies.taskerPluginLib
+
     // Project Lib
     implementation project(path: ":languagepack")
 

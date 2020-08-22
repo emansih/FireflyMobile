@@ -90,6 +90,24 @@
                 android:resource="@xml/authenticator" />
         </service>
 
+        <activity android:name=".ui.tasker.TransactionPluginActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"/>
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".receiver.PluginReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING"/>
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".service.TransactionTilesService"
             android:icon="@drawable/ic_refresh"
@@ -99,6 +117,7 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
         </service>
+
 
     </application>
 
