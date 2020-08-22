@@ -520,7 +520,12 @@ class AddTransactionFragment: BaseFragment() {
             TimePickerDialog(requireContext(), TimePickerDialog.OnTimeSetListener {
                 _, selectedHour, selectedMin ->
                 // We don't have to be really accurate down to seconds.
-                selectedTime = "$selectedHour:$selectedMin"
+                val min = if(selectedMin < 10){
+                    "0$selectedMin"
+                } else {
+                    selectedMin.toString()
+                }
+                selectedTime = "$selectedHour:$min"
                 time_edittext.setText(selectedTime)
             },hour, minute, true).show()
         }

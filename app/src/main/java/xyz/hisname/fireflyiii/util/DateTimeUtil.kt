@@ -210,12 +210,24 @@ object DateTimeUtil {
         }
     }
 
-    fun convertIso8601ToHumanTime(timeToParse: OffsetDateTime) = "${timeToParse.hour}:${timeToParse.minute}"
+    fun convertIso8601ToHumanTime(timeToParse: OffsetDateTime): String{
+        val min = if(timeToParse.minute < 10){
+            "0${timeToParse.minute}"
+        } else {
+            timeToParse.minute.toString()
+        }
+        return "${timeToParse.hour}:${min}"
+    }
 
     fun convertIso8601ToHumanTime(timeToParse: String?): String{
         return try {
             val dateTime = OffsetDateTime.parse(timeToParse)
-            "${dateTime.hour}:${dateTime.minute}"
+            val min = if(dateTime.minute < 10){
+                "0${dateTime.minute}"
+            } else {
+                (dateTime.minute).toString()
+            }
+            "${dateTime.hour}:${min}"
         } catch (exception: DateTimeParseException){
             ""
         }
