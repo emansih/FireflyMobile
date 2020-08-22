@@ -32,7 +32,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val repeatFreq = inputData.getString("repeatFreq") ?: ""
         val skip = inputData.getString("skip") ?: ""
         val currencyCode = inputData.getString("currencyCode") ?: ""
-        val notes = inputData.getString("notes") ?: ""
+        val notes = inputData.getString("notes")
         val billWorkManagerId = inputData.getLong("billWorkManagerId", 0)
         genericService?.create(BillsService::class.java)?.createBill(name, minAmount,
                 maxAmount, billDate, repeatFreq, skip,"1", currencyCode, notes)?.enqueue(
