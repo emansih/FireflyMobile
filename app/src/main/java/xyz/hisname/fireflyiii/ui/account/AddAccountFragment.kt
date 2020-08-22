@@ -31,6 +31,7 @@ import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.workers.account.AccountWorker
 import java.util.*
 
 class AddAccountFragment: BaseAddObjectFragment() {
@@ -180,7 +181,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
             accountRoleSpinner.isVisible = true
             currency_layout.isVisible = true
         }
-        if(accountType == "liability"){
+        if(accountType == "liabilities"){
             currency_layout.isVisible = true
             liabilityTypeSpinner.isVisible = true
             start_amount_layout.isVisible = true
@@ -359,6 +360,10 @@ class AddAccountFragment: BaseAddObjectFragment() {
             if (error != null) {
                 if(error.localizedMessage.startsWith("Unable to resolve host")) {
                     toastOffline(getString(R.string.data_added_when_user_online, "Account"))
+                    AccountWorker.initWorker(requireContext(),
+                            accountName, accountType, currencyCode, iban, bic, accountNumber,
+                            openingBalance, openingBalanceDate, accountRole, virtualBalance, includeInNetWorth,
+                            notes, liabilityType, liabilityAmount, liabilityStartDate, interest, interestPeriod)
                     handleBack()
                 } else {
                     toastError(error.localizedMessage)
