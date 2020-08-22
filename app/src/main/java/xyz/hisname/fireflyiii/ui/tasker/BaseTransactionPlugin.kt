@@ -1,144 +1,114 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
 import android.os.Bundle
-import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.fragment.app.commit
+import androidx.core.view.isGone
 import androidx.lifecycle.observe
-import androidx.preference.PreferenceManager
 import com.twofortyfouram.locale.sdk.client.ui.activity.AbstractAppCompatPluginActivity
 import kotlinx.android.synthetic.main.activity_add_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 
-class TransactionPluginActivity: AbstractAppCompatPluginActivity() {
+abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
 
-    private val bundle by lazy { Bundle() }
-    private val resultBlurb by lazy { StringBuilder().append("The following will be ran: ") }
-    private val viewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
+    protected val bundle by lazy { Bundle() }
+    protected val resultBlurb by lazy { StringBuilder().append("The following will be ran: ") }
+    protected val viewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
+
+    abstract fun navigateFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_transaction)
-        hideKeyboard()
-        setBottomNav()
+        transactionBottomView.isGone = true
         observeText()
-        when (bundle.getString("transactionType")) {
-            "Withdrawal" -> transactionBottomView.selectedItemId = R.id.action_withdraw
-            "Deposit" -> transactionBottomView.selectedItemId = R.id.action_deposit
-            "Transfer" -> transactionBottomView.selectedItemId = R.id.action_transfer
-            else -> transactionBottomView.selectedItemId = R.id.action_withdraw
-        }
+        navigateFragment()
     }
 
     private fun observeText(){
         viewModel.transactionType.observe(this){ type ->
             if (type.isNotBlank()){
                 resultBlurb.append("\n Transaction Type: $type")
+                bundle.putString("transactionType", type)
             }
         }
 
         viewModel.transactionDescription.observe(this){ description ->
             if (description.isNotBlank()){
                 resultBlurb.append("\n Transaction description: $description")
+                bundle.putString("transactionDescription", description)
+            }
+        }
+
+        viewModel.transactionAmount.observe(this){ amount ->
+            if (amount.isNotBlank()){
+                resultBlurb.append("\n Amount: $amount")
+                bundle.putString("transactionAmount", amount)
             }
         }
 
         viewModel.transactionDateTime.observe(this){ dateTime ->
             if (dateTime.isNotBlank()){
                 resultBlurb.append("\n Date Time: $dateTime")
+                bundle.putString("transactionDateTime", dateTime)
             }
         }
 
         viewModel.transactionPiggyBank.observe(this){ piggyBank ->
             if (piggyBank != null && piggyBank.isNotBlank()){
                 resultBlurb.append("\n Piggy Bank: $piggyBank")
+                bundle.putString("transactionPiggyBank", piggyBank)
             }
         }
 
         viewModel.transactionSourceAccount.observe(this){ sourceAccount ->
             if (sourceAccount.isNotBlank()){
                 resultBlurb.append("\n Source Account: $sourceAccount")
+                bundle.putString("transactionSourceAccount", sourceAccount)
             }
         }
 
         viewModel.transactionDestinationAccount.observe(this){ destinationAccount ->
             if (destinationAccount.isNotBlank()){
                 resultBlurb.append("\n Destination Account: $destinationAccount")
+                bundle.putString("transactionDestinationAccount", destinationAccount)
             }
         }
 
         viewModel.transactionCurrency.observe(this){ currency ->
             if (currency.isNotBlank()){
                 resultBlurb.append("\n Currency Code: $currency")
+                bundle.putString("transactionCurrency", currency)
             }
         }
 
         viewModel.transactionTags.observe(this){ tags ->
             if (tags != null && tags.isNotBlank()){
                 resultBlurb.append("\n Tags: $tags")
+                bundle.putString("transactionTags", tags)
             }
         }
 
         viewModel.transactionBudget.observe(this){ budget ->
             if (budget != null && budget.isNotBlank()){
                 resultBlurb.append("\n Budget: $budget")
+                bundle.putString("transactionBudget", budget)
             }
         }
 
         viewModel.transactionCategory.observe(this){ category ->
             if (category != null && category.isNotBlank()){
                 resultBlurb.append("\n Category: $category")
+                bundle.putString("transactionCategory", category)
             }
         }
 
         viewModel.fileUri.observe(this){ uri ->
             if(uri != null){
                 resultBlurb.append("\n File to be uploaded: $uri")
+                bundle.putString("fileUri", uri.toString())
             }
         }
-    }
 
-    private fun setBottomNav(){
-        val nightMode = AppPref(PreferenceManager.getDefaultSharedPreferences(this)).nightModeEnabled
-        if(nightMode) {
-            transactionBottomView.itemTextColor = ContextCompat.getColorStateList(this, R.color.md_white_1000)
-            transactionBottomView.itemIconTintList = ContextCompat.getColorStateList(this, R.color.md_white_1000)
-        }
-        val addTransactionFragment = AddTransactionFragment()
-        transactionBottomView.setOnNavigationItemSelectedListener{ item ->
-            when(item.itemId){
-                R.id.action_withdraw -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.addTransactionFrame, addTransactionFragment.apply {
-                            arguments = bundleOf("transactionType" to "Withdrawal", "isTasker" to true)
-                        })
-                    }
-                    true
-                }
-                R.id.action_deposit -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.addTransactionFrame, addTransactionFragment.apply {
-                            arguments = bundleOf("transactionType" to "Deposit", "isTasker" to true)
-                        })
-                    }
-                    true
-                }
-                R.id.action_transfer -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.addTransactionFrame, addTransactionFragment.apply {
-                            arguments = bundleOf("transactionType" to "Transfer", "isTasker" to true)
-                        })
-                    }
-                    true
-                } else -> {
-                true
-            }
-            }
-        }
         viewModel.removeFragment.observe(this){ shouldRemove ->
             if(shouldRemove){
                 onBackPressed()
@@ -147,6 +117,7 @@ class TransactionPluginActivity: AbstractAppCompatPluginActivity() {
     }
 
     override fun onPostCreateWithPreviousResult(bundle: Bundle, string: String) {
+        viewModel.transactionBundle.postValue(bundle)
     }
 
     override fun getResultBlurb(bundle: Bundle): String {

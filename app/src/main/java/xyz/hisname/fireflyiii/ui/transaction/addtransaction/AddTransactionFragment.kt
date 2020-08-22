@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -62,13 +63,15 @@ import kotlin.math.abs
 // This code sucks :(
 class AddTransactionFragment: BaseFragment() {
 
-    private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
+    //private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
+    private lateinit var transactionType: String
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
     private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
+    private val pluginViewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
     private var fileUri: Uri? = null
     private var currency = ""
     private var tags = ArrayList<String>()
@@ -98,14 +101,83 @@ class AddTransactionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+        transactionType = arguments?.getString("transactionType") ?: ""
         setIcons()
         setWidgets()
         if(transactionJournalId != 0L){
             updateTransactionSetup()
         }
         contextSwitch()
+        if(isTasker){
+            setTaskerBundle()
+        }
         setFab()
         setCalculator()
+    }
+
+    private fun setTaskerBundle(){
+        pluginViewModel.transactionBundle.observe(viewLifecycleOwner){ bundle ->
+            if(bundle != null){
+                val transactionTypeBundle = bundle.getString("transactionType") ?: ""
+                transactionType = transactionTypeBundle
+
+                val transactionDescription = bundle.getString("transactionDescription")
+                description_edittext.setText(transactionDescription)
+
+                val transactionAmount = bundle.getString("transactionAmount")
+                transaction_amount_edittext.setText(transactionAmount)
+
+                val transactionDateTime = bundle.getString("transactionDateTime")
+                transaction_date_edittext.setText(DateTimeUtil.convertIso8601ToHumanDate(transactionDateTime))
+                time_edittext.setText(DateTimeUtil.convertIso8601ToHumanTime(transactionDateTime))
+
+                if(piggy_layout.isVisible){
+                    val transactionPiggyBank = bundle.getString("transactionPiggyBank")
+                    piggy_edittext.setText(transactionPiggyBank)
+                }
+
+                val transactionSourceAccount = bundle.getString("transactionSourceAccount")
+                if(source_exposed_menu.isVisible){
+                    source_exposed_dropdown.setText(transactionSourceAccount)
+                } else {
+                    source_edittext.setText(transactionSourceAccount)
+                }
+
+                val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
+                if(destination_exposed_menu.isVisible){
+                    destination_exposed_dropdown.setText(transactionDestinationAccount)
+                } else {
+                    destination_edittext.setText(transactionDestinationAccount)
+                }
+
+                val transactionCurrency = bundle.getString("transactionCurrency")
+                currency_edittext.setText(transactionCurrency)
+
+                val transactionTags = bundle.getString("transactionTags")
+                tags_chip.setText(transactionTags)
+
+                val transactionBudget = bundle.getString("transactionBudget")
+                budget_edittext.setText(transactionBudget)
+
+                val transactionCategory = bundle.getString("transactionCategory")
+                category_edittext.setText(transactionCategory)
+
+                val fileUri = bundle.getString("fileUri")
+                if(fileUri != null){
+                    val attachmentDataAdapter = arrayListOf<AttachmentData>()
+                    attachment_information.isVisible = true
+                    attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                    attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                            "", "", FileUtils.getFileName(requireContext(), fileUri.toUri()) ?: "",
+                            "", "" , "", 0, "", "", ""), 0, ""))
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+                            false) { data: AttachmentData ->
+                    }
+                }
+
+            }
+        }
     }
 
     private fun setFab(){
@@ -167,19 +239,19 @@ class AddTransactionFragment: BaseFragment() {
         } else {
             transaction_date_edittext.getString()
         }
-        val viewModel = getViewModel(TransactionPluginViewModel::class.java)
-        viewModel.transactionType.postValue(transactionType)
-        viewModel.transactionDescription.postValue(description_edittext.getString())
-        viewModel.transactionDateTime.postValue(transactionDateTime)
-        viewModel.transactionPiggyBank.postValue(piggyBank)
-        viewModel.transactionSourceAccount.postValue(sourceAccount)
-        viewModel.transactionDestinationAccount.postValue(destinationAccount)
-        viewModel.transactionCurrency.postValue(currency)
-        viewModel.transactionTags.postValue(transactionTags)
-        viewModel.transactionBudget.postValue(budgetName)
-        viewModel.transactionCategory.postValue(categoryName)
-        viewModel.fileUri.postValue(fileUri)
-        viewModel.removeFragment.postValue(true)
+        pluginViewModel.transactionType.postValue(transactionType)
+        pluginViewModel.transactionDescription.postValue(description_edittext.getString())
+        pluginViewModel.transactionAmount.postValue(transaction_amount_edittext.getString())
+        pluginViewModel.transactionDateTime.postValue(transactionDateTime)
+        pluginViewModel.transactionPiggyBank.postValue(piggyBank)
+        pluginViewModel.transactionSourceAccount.postValue(sourceAccount)
+        pluginViewModel.transactionDestinationAccount.postValue(destinationAccount)
+        pluginViewModel.transactionCurrency.postValue(currency)
+        pluginViewModel.transactionTags.postValue(transactionTags)
+        pluginViewModel.transactionBudget.postValue(budgetName)
+        pluginViewModel.transactionCategory.postValue(categoryName)
+        pluginViewModel.fileUri.postValue(fileUri)
+        pluginViewModel.removeFragment.postValue(true)
     }
 
     private fun updateData(){

@@ -90,9 +90,27 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <activity android:name=".ui.tasker.TransactionPluginActivity"
+        <activity android:name=".ui.tasker.TransactionWithdrawalPlugin"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="@string/withdrawal"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.tasker.TransactionDepositPlugin"
+            android:exported="true"
+            android:label="@string/deposit"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.tasker.TransactionTransferPlugin"
+            android:exported="true"
+            android:label="@string/transfer"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"/>

@@ -7,6 +7,7 @@ import java.time.temporal.TemporalAdjusters.*
 import java.time.temporal.WeekFields
 import java.lang.Long.parseLong
 import java.time.*
+import java.time.format.DateTimeParseException
 import java.util.*
 
 object DateTimeUtil {
@@ -195,7 +196,30 @@ object DateTimeUtil {
         return timeToParse.year.toString() + "-" + month + "-" + timeToParse.dayOfMonth
     }
 
+    fun convertIso8601ToHumanDate(timeToParse: String?): String? {
+        return try {
+            val dateTime = OffsetDateTime.parse(timeToParse)
+            val month = if ((dateTime.monthValue + 1 ) < 10){
+                "0"+ (dateTime.monthValue + 1)
+            } else {
+                dateTime.monthValue.toString()
+            }
+            dateTime.year.toString() + "-" + month + "-" + dateTime.dayOfMonth
+        } catch(exception: DateTimeParseException){
+            timeToParse
+        }
+    }
+
     fun convertIso8601ToHumanTime(timeToParse: OffsetDateTime) = "${timeToParse.hour}:${timeToParse.minute}"
+
+    fun convertIso8601ToHumanTime(timeToParse: String?): String{
+        return try {
+            val dateTime = OffsetDateTime.parse(timeToParse)
+            "${dateTime.hour}:${dateTime.minute}"
+        } catch (exception: DateTimeParseException){
+            ""
+        }
+    }
 
 
     fun mergeDateTimeToIso8601(date: String, time: String) =  date + "T" + time + ZonedDateTime.now().offset
