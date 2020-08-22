@@ -27,4 +27,8 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
 
     @Query("DELETE FROM accounts WHERE type =:accountType")
     abstract fun deleteAccountByType(accountType: String): Int
+
+    @Query("DELETE FROM accounts WHERE type =:accountType AND name =:accountName")
+    abstract fun deleteAccountByTypeAndName(accountType: String, accountName: String): Int
+
 }

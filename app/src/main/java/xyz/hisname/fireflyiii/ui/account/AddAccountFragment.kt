@@ -360,10 +360,6 @@ class AddAccountFragment: BaseAddObjectFragment() {
             if (error != null) {
                 if(error.localizedMessage.startsWith("Unable to resolve host")) {
                     toastOffline(getString(R.string.data_added_when_user_online, "Account"))
-                    AccountWorker.initWorker(requireContext(),
-                            accountName, accountType, currencyCode, iban, bic, accountNumber,
-                            openingBalance, openingBalanceDate, accountRole, virtualBalance, includeInNetWorth,
-                            notes, liabilityType, liabilityAmount, liabilityStartDate, interest, interestPeriod)
                     handleBack()
                 } else {
                     toastError(error.localizedMessage)

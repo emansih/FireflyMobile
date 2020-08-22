@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
-import android.content.Intent
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.google.gson.Gson
@@ -32,7 +31,6 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                        openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                        virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                        liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?){
-            val accountWorkManagerId = ThreadLocalRandom.current().nextLong()
             val accountData = Data.Builder()
                     .putString("name", accountName)
                     .putString("type", accountType)
@@ -51,48 +49,51 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     .putString("liabilityStartDate", liabilityStartDate)
                     .putString("interest", interest)
                     .putString("interestPeriod", interestPeriod)
-                    .putLong("accountWorkManagerId", accountWorkManagerId)
                     .build()
             val accountTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_account_$accountWorkManagerId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag(
+                            "add_periodic_account_$accountName" + "_" + accountType).get()
             if(accountTag == null || accountTag.size == 0){
                 val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
                 val workManagerDelay = AppPref(sharedPref).workManagerDelay
                 val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
-                val piggyWork = PeriodicWorkRequestBuilder<AccountWorker>(Duration.ofMinutes(workManagerDelay))
+                val accountWork = PeriodicWorkRequestBuilder<AccountWorker>(Duration.ofMinutes(workManagerDelay))
                         .setInputData(accountData)
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(NetworkType.CONNECTED)
                                 .setRequiresBatteryNotLow(battery)
                                 .build())
-                        .addTag("add_periodic_account_$accountWorkManagerId")
+                        .addTag("add_periodic_account_$accountName" + "_" + accountType)
                         .build()
-                WorkManager.getInstance(context).enqueue(piggyWork)
-                runBlocking(Dispatchers.IO){
+                WorkManager.getInstance(context).enqueue(accountWork)
+                runBlocking(Dispatchers.IO) {
                     val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
                     val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
                     val currencyData =
-                            currencyDatabase.getCurrencyByCode(currencyCode ?: "")[0]
+                                currencyDatabase.getCurrencyByCode(currencyCode ?: "")[0]
                     val currencySymbol = currencyData.currencyAttributes?.symbol
                     val currencyId = currencyData.currencyId
+                    val fakeAccountId = ThreadLocalRandom.current().nextLong()
                     accountDatabase.insert(AccountData(
-                           "", accountWorkManagerId, AccountAttributes(
-                            "","","", true,
+                            "", fakeAccountId, AccountAttributes(
+                            "","", accountName, true,
                             accountType, accountRole, currencyId, currencyCode, 0.0,
                             currencySymbol, "", notes, "", "", accountNumber,
-                            iban, bic, virtualBalance?.toDouble(), openingBalance, openingBalanceDate, liabilityType,
+                            iban, bic, 0.0,
+                            openingBalance, openingBalanceDate, liabilityType,
                             liabilityAmount, liabilityStartDate, interest, interestPeriod, includeInNetWorth)
                     ))
                 }
             }
         }
 
-        fun cancelWorker(fakeAccountId: Long, context: Context){
+        fun cancelWorker(accountName: String, accountType: String, context: Context){
             runBlocking(Dispatchers.IO) {
                 val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
-                accountDatabase.deleteAccountById(fakeAccountId)
+                accountDatabase.deleteAccountByTypeAndName(accountType, accountName)
+                accountDatabase
             }
-            WorkManager.getInstance(context).cancelAllWorkByTag("add_periodic_account_$fakeAccountId")
+            WorkManager.getInstance(context).cancelAllWorkByTag("add_periodic_account_$accountName" + "_" + accountType)
         }
 
     }
@@ -102,21 +103,19 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val accountType = inputData.getString("type") ?: ""
         val currencyCode = inputData.getString("currencyCode") ?: ""
         val includeNetWorth = inputData.getBoolean("includeNetWorth",false)
-        val accountRole = inputData.getString("accountRole") ?: ""
-        val liabilityType = inputData.getString("liabilityType") ?: ""
-        val liabilityAmount = inputData.getString("liabilityAmount") ?: ""
-        val liabilityStartDate = inputData.getString("liabilityStartDate") ?: ""
-        val interest = inputData.getString("interest") ?: ""
-        val interestPeriod = inputData.getString("interestPeriod") ?: ""
-        val accountNumber = inputData.getString("accountNumber") ?: ""
-        val iBanString = inputData.getString("iban") ?: ""
-        val bicString = inputData.getString("bic") ?: ""
-        val openingBalance = inputData.getString("openingBalance") ?: ""
-        val openingBalanceDate = inputData.getString("openingBalanceDate") ?: ""
-        val virtualBalance = inputData.getString("virtualBalance") ?: ""
-        val notes = inputData.getString("notes") ?: ""
-        val accountWorkManagerId = inputData.getLong("accountWorkManagerId", 0)
-
+        val accountRole = inputData.getString("accountRole")
+        val liabilityType = inputData.getString("liabilityType")
+        val liabilityAmount = inputData.getString("liabilityAmount")
+        val liabilityStartDate = inputData.getString("liabilityStartDate")
+        val interest = inputData.getString("interest")
+        val interestPeriod = inputData.getString("interestPeriod")
+        val accountNumber = inputData.getString("accountNumber")
+        val iBanString = inputData.getString("iban")
+        val bicString = inputData.getString("bic")
+        val openingBalance = inputData.getString("openingBalance")
+        val openingBalanceDate = inputData.getString("openingBalanceDate")
+        val virtualBalance = inputData.getString("virtualBalance")
+        val notes = inputData.getString("notes")
         genericService?.create(AccountsService::class.java)?.addAccount(name, accountType, currencyCode,
                 iBanString, bicString, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeNetWorth, notes, liabilityType, liabilityAmount,
@@ -132,7 +131,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     if (response.isSuccessful && responseBody != null) {
                         context.displayNotification("$name was added successfully!", "Account Added",
                                 Constants.ACCOUNT_CHANNEL, channelIcon)
-                        cancelWorker(accountWorkManagerId, context)
+                        cancelWorker(name,accountType, context)
                         runBlocking(Dispatchers.IO){
                             val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
                             accountDatabase.insert(responseBody.data)
@@ -146,7 +145,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                             gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
                             else -> "Error saving account"
                         }
-                        cancelWorker(accountWorkManagerId, context)
+                        cancelWorker(name,accountType, context)
                         context.displayNotification(error, "There was an error adding $name",
                                 Constants.ACCOUNT_CHANNEL, channelIcon)
                         Result.failure()

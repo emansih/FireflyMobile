@@ -152,11 +152,11 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             isLoading.value = false
         })
         { throwable ->
-            apiLiveData.postValue(ApiResponses(throwable))
             AccountWorker.initWorker(getApplication(),
                     accountName, accountType, currencyCode, iban, bic, accountNumber,
                     openingBalance, openingBalanceDate, accountRole, virtualBalance, includeInNetWorth,
                     notes, liabilityType, liabilityAmount, liabilityStartDate, interest, interestPeriod)
+            apiLiveData.postValue(ApiResponses(throwable))
             isLoading.value = false
         })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
