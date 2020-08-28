@@ -137,4 +137,5 @@
     <string name="six_day_average">平均六天</string>
     <string name="thirty_day_average">平均三十天</string>
     <string name="budget_summary">預算概要</string>
+    <string name="currency_deleted">%1$s 貨幣已刪除</string>
 </resources>

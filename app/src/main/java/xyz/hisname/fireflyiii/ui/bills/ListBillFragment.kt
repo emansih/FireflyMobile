@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -63,7 +64,7 @@ class ListBillFragment: BaseFragment() {
                         if(isDeleted){
                             toastSuccess(resources.getString(R.string.bill_deleted, billName))
                         } else {
-                            toastOffline("$billName will be deleted later...")
+                            toastOffline(resources.getString(R.string.data_will_be_deleted_later, billName), Toast.LENGTH_LONG)
                         }
                     }
                 }

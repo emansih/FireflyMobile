@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.piggybank
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -105,7 +106,7 @@ class ListPiggyFragment: BaseFragment(){
                         if(isDeleted){
                             toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyName))
                         } else {
-                            toastOffline("$piggyName will be deleted later...")
+                            toastOffline(resources.getString(R.string.data_will_be_deleted_later, piggyName), Toast.LENGTH_LONG)
                         }
                     }
                 }

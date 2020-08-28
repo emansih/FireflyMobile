@@ -121,5 +121,6 @@
     <string name="stored_new_bill">Nuova bolletta memorizzata %1$s</string>
     <string name="search">Cerca</string>
     <string name="make_default_currency">Rendila predefinita</string>
+    <string name="currency_deleted">Valuta %1$s elimina</string>
 
 </resources>

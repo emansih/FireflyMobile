@@ -128,5 +128,6 @@
     <string name="insert_link">加外部网</string>
     <string name="discard">放弃更改</string>
     <string name="frequency">频率</string>
+    <string name="currency_deleted">%1$s 货币已删除</string>
 
 </resources>

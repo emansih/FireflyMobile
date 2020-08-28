@@ -121,5 +121,6 @@
     <string name="stored_new_bill">Nieuw contract %1$s opgeslagen</string>
     <string name="search">Zoeken</string>
     <string name="make_default_currency">Maak standaard</string>
+    <string name="currency_deleted">Valuta %1$s verwijderd</string>
 
 </resources>

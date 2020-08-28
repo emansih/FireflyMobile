@@ -129,4 +129,5 @@
     <string name="done">Concluído</string>
     <string name="updated_bill">Fatura atualizada %1$s</string>
     <string name="stored_new_bill">Nova fatura armazenada %1$s</string>
+    <string name="currency_deleted">Moeda %1$s excluída</string>
 </resources>

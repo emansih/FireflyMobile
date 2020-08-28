@@ -122,4 +122,5 @@
     <string name="updated_bill">Actualizar factura %1$s</string>
     <string name="stored_new_bill">Factura %1$s creada</string>
     <string name="make_default_currency">Establecer por defecto</string>
+    <string name="currency_deleted">Moneda %1$s eliminada</string>
 </resources>

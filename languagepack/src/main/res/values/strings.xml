@@ -120,6 +120,7 @@
     <string name="asset_account_deleted">Successfully deleted asset account %1$s</string>
     <string name="expense_account_deleted">Successfully deleted expense account %1$s</string>
     <string name="revenue_account_deleted">Successfully deleted revenue account %1$s</string>
+    <string name="liability_account_deleted">Successfully deleted liability account %1$s</string>
     <string name="accounting">ACCOUNTING</string>
     <string name="financial_control">FINANCIAL CONTROL</string>
     <string name="others">OTHERS</string>
@@ -142,4 +143,7 @@
     <string name="insert_link">Insert Link</string>
     <string name="discard">Discard</string>
     <string name="urge_users_to_click_icons">Some of these icons can be clicked too</string>
+    <string name="data_will_be_deleted_later">%1$s will be deleted later…</string>
+    <string name="currency_deleted">Currency %1$s deleted</string>
+    <string name="data_added_when_user_online">%1$s will be added when you are back online</string>
 </resources>

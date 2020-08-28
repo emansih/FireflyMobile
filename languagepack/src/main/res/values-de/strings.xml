@@ -125,5 +125,6 @@
     <string name="stored_new_bill">Neue Rechnung %1$s gespeichert</string>
     <string name="search">Suche</string>
     <string name="make_default_currency">Als Standard festlegen</string>
+    <string name="currency_deleted">Währung %1$s gelöscht</string>
 
 </resources>

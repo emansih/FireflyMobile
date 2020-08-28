@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
@@ -55,9 +56,9 @@ class CurrencyListFragment: BaseFragment() {
                     val currencyName = viewHolder.itemView.fakeCurrencyName.text.toString()
                     currencyViewModel.deleteCurrencyByName(currencyName).observe(viewLifecycleOwner) { isDeleted ->
                         if (isDeleted) {
-                            toastSuccess("$currencyName deleted")
+                            toastSuccess(resources.getString(R.string.currency_deleted, currencyName))
                         } else {
-                            toastOffline("$currencyName will be deleted later...")
+                            toastOffline(resources.getString(R.string.data_will_be_deleted_later, currencyName), Toast.LENGTH_LONG)
                         }
                     }
                 }

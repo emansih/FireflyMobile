@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -55,10 +56,10 @@ class ListAccountFragment: BaseFragment() {
                                 "asset" -> toastSuccess(resources.getString(R.string.asset_account_deleted, accountName))
                                 "expense" -> toastSuccess(resources.getString(R.string.expense_account_deleted, accountName))
                                 "revenue" -> toastSuccess(resources.getString(R.string.revenue_account_deleted, accountName))
-                                "liability" -> toastSuccess("Successfully deleted liability account")
+                                "liability" -> toastSuccess(resources.getString(R.string.liability_account_deleted, accountName))
                             }
                         } else {
-                            toastOffline("$accountName will be deleted later...")
+                            toastOffline(resources.getString(R.string.data_will_be_deleted_later, accountName), Toast.LENGTH_LONG)
                         }
                     }
                 }

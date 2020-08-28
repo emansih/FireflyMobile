@@ -121,4 +121,5 @@
     <string name="stored_new_bill">Новый счёт к оплате %1$s сохранён</string>
     <string name="search">Поиск</string>
     <string name="make_default_currency">Сделать основной</string>
+    <string name="currency_deleted">Валюта %1$s удалена</string>
 </resources>
