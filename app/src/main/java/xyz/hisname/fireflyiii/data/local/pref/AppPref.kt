@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.data.local.pref
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import androidx.work.NetworkType
 
 class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
 
@@ -76,6 +77,24 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
     override var workManagerLowBattery: Boolean
         get() = sharedPref.getBoolean("workManagerLowBattery", true)
         set(value) = sharedPref.edit{ putBoolean("workManagerLowBattery", value) }
+
+    override var workManagerNetworkType: NetworkType
+        get() = toNetworkType(sharedPref.getString("workManagerType", NetworkType.CONNECTED.toString()) ?: "")
+        set(value) = sharedPref.edit{
+            putString("workManagerType", value.toString())
+        }
+
+    override var workManagerRequireCharging: Boolean
+        get() = sharedPref.getBoolean("workManagerCharging", false)
+        set(value) = sharedPref.edit{ putBoolean("workManagerCharging", value) }
+
+    private fun toNetworkType(networkType: String): NetworkType {
+        return try {
+            enumValueOf(networkType)
+        } catch (ex: Exception) {
+            NetworkType.CONNECTED
+        }
+    }
 
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

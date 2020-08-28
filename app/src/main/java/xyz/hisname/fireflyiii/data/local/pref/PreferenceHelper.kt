@@ -1,5 +1,7 @@
 package xyz.hisname.fireflyiii.data.local.pref
 
+import androidx.work.NetworkType
+
 interface PreferenceHelper {
 
     var baseUrl: String
@@ -18,5 +20,7 @@ interface PreferenceHelper {
     var isCurrencyThumbnailEnabled: Boolean
     var workManagerDelay: Long
     var workManagerLowBattery: Boolean
+    var workManagerNetworkType: NetworkType
+    var workManagerRequireCharging: Boolean
     fun clearPref()
 }

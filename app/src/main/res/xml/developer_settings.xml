@@ -4,7 +4,8 @@
     <EditTextPreference
         app:iconSpaceReserved="false"
         app:key="workManagerDelay"
-        app:title="Worker Delay"
+        app:title="Worker Delay(mins)"
+        app:defaultValue="15"
         app:summary="Default value is 15 mins. Any value lower than 15 will be ignored.">
     </EditTextPreference>
 
@@ -13,6 +14,22 @@
         app:key="workManagerLowBattery"
         app:title="Battery"
         app:defaultValue="true"
-        app:summary="Requires Battery Not Low"/>
+        app:summary="Requires battery not low"/>
+
+    <CheckBoxPreference
+        app:iconSpaceReserved="false"
+        app:key="workManagerCharging"
+        app:title="Charging"
+        app:defaultValue="false"
+        app:summary="Requires device to be charging"/>
+
+    <ListPreference
+        app:iconSpaceReserved="false"
+        app:key="workManagerType"
+        app:entries="@array/networkType"
+        app:useSimpleSummaryProvider="true"
+        app:entryValues="@array/networkType_values"
+        app:title="Network Constraints"
+        app:summary="Requires device to be in certain network conditions"/>
 
 </PreferenceScreen>

@@ -22,7 +22,7 @@ class DaoFactory {
                     "", randomLong(),
                     AccountAttributes(
                             "", "", "", randomBoolean(), randomAccountType(), "" ,
-                            randomInt(), "", 0.0, "", "",
+                            randomLong(), "", 0.0, "", "",
                             "", "", "", "", "",
                             "", 0.0, "" ,"", "", "",
                             "","", "", randomBoolean()

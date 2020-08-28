@@ -86,14 +86,18 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             val piggyTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_piggy_periodic_$piggyWorkManagerId").get()
             if(piggyTag == null || piggyTag.size == 0){
-                val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
-                val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
+                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val delay = appPref.workManagerDelay
+                val battery = appPref.workManagerLowBattery
+                val networkType = appPref.workManagerNetworkType
+                val requireCharging = appPref.workManagerRequireCharging
                 val piggyBankWork = PeriodicWorkRequestBuilder<PiggyBankWorker>(Duration.ofMinutes(delay))
                         .setInputData(piggyData)
                         .addTag("add_piggy_periodic_$piggyWorkManagerId")
                         .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
+                                .setRequiresCharging(requireCharging)
                                 .build())
                         .build()
                 WorkManager.getInstance(context).enqueue(piggyBankWork)

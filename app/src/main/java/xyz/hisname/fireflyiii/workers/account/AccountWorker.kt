@@ -54,14 +54,17 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     WorkManager.getInstance(context).getWorkInfosByTag(
                             "add_periodic_account_$accountName" + "_" + accountType).get()
             if(accountTag == null || accountTag.size == 0){
-                val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-                val workManagerDelay = AppPref(sharedPref).workManagerDelay
-                val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
-                val accountWork = PeriodicWorkRequestBuilder<AccountWorker>(Duration.ofMinutes(workManagerDelay))
+                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val delay = appPref.workManagerDelay
+                val battery = appPref.workManagerLowBattery
+                val networkType = appPref.workManagerNetworkType
+                val requireCharging = appPref.workManagerRequireCharging
+                val accountWork = PeriodicWorkRequestBuilder<AccountWorker>(Duration.ofMinutes(delay))
                         .setInputData(accountData)
                         .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
+                                .setRequiresCharging(requireCharging)
                                 .build())
                         .addTag("add_periodic_account_$accountName" + "_" + accountType)
                         .build()

@@ -88,18 +88,21 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
 
     companion object {
         fun initWorker(context: Context, dataBuilder: Data.Builder, type: String, transactionWorkManagerId: Long) {
-            val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-            val workManagerDelay = AppPref(sharedPref).workManagerDelay
-            val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
             val transactionTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_transaction_$transactionWorkManagerId").get()
             if (transactionTag == null || transactionTag.size == 0) {
+                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val delay = appPref.workManagerDelay
+                val battery = appPref.workManagerLowBattery
+                val networkType = appPref.workManagerNetworkType
+                val requireCharging = appPref.workManagerRequireCharging
                 dataBuilder.putString("transactionType", type)
-                val transactionWork = PeriodicWorkRequestBuilder<TransactionWorker>(Duration.ofMinutes(workManagerDelay))
+                val transactionWork = PeriodicWorkRequestBuilder<TransactionWorker>(Duration.ofMinutes(delay))
                         .setInputData(dataBuilder.build())
                         .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
+                                .setRequiresCharging(requireCharging)
                                 .build())
                         .addTag("add_periodic_transaction_$transactionWorkManagerId")
                         .build()

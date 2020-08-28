@@ -48,4 +48,17 @@
         <item>pt-rBR</item>
     </string-array>
 
+    <string-array name="networkType">
+        <item>Connected</item>
+        <item>Un-Metered</item>
+        <item>Not Roaming</item>
+    </string-array>
+
+    <string-array name="networkType_values">
+        <item>NetworkType.CONNECTED</item>
+        <item>NetworkType.UNMETERED</item>
+        <item>NetworkType.NOT_ROAMING</item>
+    </string-array>
+
+
 </resources>

@@ -22,14 +22,18 @@ class DeleteCurrencyWorker(private val context: Context, workerParameters: Worke
                 val currencyData = Data.Builder()
                         .putLong("currencyId", currencyId)
                         .build()
-                val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
-                val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
+                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val delay = appPref.workManagerDelay
+                val battery = appPref.workManagerLowBattery
+                val networkType = appPref.workManagerNetworkType
+                val requireCharging = appPref.workManagerRequireCharging
                 val deleteCurrencyWork = PeriodicWorkRequestBuilder<DeleteCurrencyWorker>(Duration.ofMinutes(delay))
                         .setInputData(currencyData)
                         .addTag("delete_currency_periodic$currencyId")
                         .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
+                                .setRequiresCharging(requireCharging)
                                 .build())
                         .build()
                 WorkManager.getInstance(context).enqueue(deleteCurrencyWork)

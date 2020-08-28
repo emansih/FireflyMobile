@@ -24,13 +24,17 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
                 val piggyData = Data.Builder()
                         .putLong("piggyId", piggyId)
                         .build()
-                val delay = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerDelay
-                val battery = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).workManagerLowBattery
+                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val delay = appPref.workManagerDelay
+                val battery = appPref.workManagerLowBattery
+                val networkType = appPref.workManagerNetworkType
+                val requireCharging = appPref.workManagerRequireCharging
                 val deletePiggyWork = PeriodicWorkRequestBuilder<DeletePiggyWorker>(Duration.ofMinutes(delay))
                         .setInputData(piggyData)
                         .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
+                                .setRequiresCharging(requireCharging)
                                 .build())
                         .addTag("delete_periodic_piggy_$piggyId")
                         .build()
