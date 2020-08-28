@@ -9,6 +9,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_currency.*
 import kotlinx.android.synthetic.main.progress_overlay.*
@@ -45,6 +46,13 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                     default_checkbox.isChecked = true
                 }
             }
+        }
+        setFab()
+    }
+
+    private fun setFab(){
+        if(currencyId != 0L){
+            addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
         addCurrencyFab.setOnClickListener {
             hideKeyboard()

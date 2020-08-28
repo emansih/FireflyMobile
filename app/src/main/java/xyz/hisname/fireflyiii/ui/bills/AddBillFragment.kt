@@ -13,8 +13,10 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_bill.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
@@ -52,6 +54,12 @@ class AddBillFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_bill_layout)
+        updateEditText()
+        showHelpText()
+        setFab()
+    }
+
+    private fun updateEditText(){
         if(billId != 0L){
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             billViewModel.getBillById(billId).observe(viewLifecycleOwner) {
@@ -79,22 +87,12 @@ class AddBillFragment: BaseAddObjectFragment() {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         }
-        val spinnerAdapter = ArrayAdapter(requireContext(),
-                R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        frequency_exposed_dropdown.setAdapter(spinnerAdapter)
-        showHelpText()
-        notes_edittext.setOnClickListener {
-            markdownViewModel.markdownText.postValue(notes_edittext.getString())
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, MarkdownFragment())
-                addToBackStack(null)
-            }
-        }
     }
 
-    override fun onStart() {
-        super.onStart()
+    private fun setFab(){
+        if(billId != 0L){
+            addBillFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+        }
         addBillFab.setOnClickListener {
             hideKeyboard()
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
@@ -186,6 +184,10 @@ class AddBillFragment: BaseAddObjectFragment() {
     }
 
     override fun setWidgets(){
+        val spinnerAdapter = ArrayAdapter(requireContext(),
+                R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        frequency_exposed_dropdown.setAdapter(spinnerAdapter)
         frequency_exposed_dropdown.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             repeatFreq = when (position) {
                 0 -> "weekly"
@@ -223,7 +225,13 @@ class AddBillFragment: BaseAddObjectFragment() {
         markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
             notes_edittext.setText(markdownText)
         }
-
+        notes_edittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(notes_edittext.getString())
+            parentFragmentManager.commit {
+                replace(R.id.bigger_fragment_container, MarkdownFragment())
+                addToBackStack(null)
+            }
+        }
     }
 
     override fun submitData(){

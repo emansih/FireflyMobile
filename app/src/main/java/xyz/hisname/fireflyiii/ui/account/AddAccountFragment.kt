@@ -14,6 +14,7 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.icon
 import kotlinx.android.synthetic.main.fragment_add_account.*
 import kotlinx.android.synthetic.main.fragment_add_account.currency_edittext
 import kotlinx.android.synthetic.main.fragment_add_account.currency_layout
@@ -30,7 +31,6 @@ import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import java.util.*
 
 class AddAccountFragment: BaseAddObjectFragment() {
 
@@ -45,12 +45,16 @@ class AddAccountFragment: BaseAddObjectFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_account, container)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(add_account_layout)
         updateData()
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
+        }
+        if(accountId != 0L){
+            addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
         addAccountFab.setOnClickListener {
             submitData()

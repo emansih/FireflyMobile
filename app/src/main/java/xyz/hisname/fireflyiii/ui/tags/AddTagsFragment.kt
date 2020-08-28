@@ -18,6 +18,7 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_tags.*
 import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
@@ -57,6 +58,13 @@ class AddTagsFragment: BaseAddObjectFragment() {
         }
         if(tagId != 0L){
             updateData()
+        }
+        setFab()
+    }
+
+    private fun setFab(){
+        if(tagId != 0L){
+            addTagFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
         addTagFab.setOnClickListener {
             hideKeyboard()

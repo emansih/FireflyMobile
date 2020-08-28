@@ -34,8 +34,10 @@ import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
@@ -181,6 +183,9 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setFab(){
+        if(transactionJournalId != 0L) {
+            addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+        }
         addTransactionFab.setOnClickListener {
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             hideKeyboard()
@@ -356,9 +361,9 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setCalculator(){
-        transaction_amount_placeholder_view.setOnTouchListener { v, event ->
+        transaction_amount_layout.setOnTouchListener { v, event ->
             if(event.action == MotionEvent.ACTION_UP){
-                transaction_amount_placeholder_view.performClick()
+                transaction_amount_layout.performClick()
                 transactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
                     "0.0"
                 } else {

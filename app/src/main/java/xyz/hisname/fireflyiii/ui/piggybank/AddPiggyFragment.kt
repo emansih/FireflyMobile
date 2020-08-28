@@ -17,8 +17,10 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import kotlinx.android.synthetic.main.fragment_add_piggy.description_edittext
@@ -55,6 +57,15 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_piggy_layout)
         piggyId = arguments?.getLong("piggyId") ?: 0
+        updateEditText()
+        setFab()
+        showHelpText()
+    }
+
+    private fun showHelpText() = showCase(R.string.piggy_bank_description_help_text,
+                "descriptionCaseView", description_edittext).show()
+
+    private fun updateEditText(){
         if(piggyId != 0L){
             piggyViewModel.getPiggyById(piggyId).observe(viewLifecycleOwner) { piggyData ->
                 val piggyAttributes = piggyData[0].piggyAttributes
@@ -73,12 +84,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 }
             }
         }
-        showHelpText()
     }
-
-    private fun showHelpText() = showCase(R.string.piggy_bank_description_help_text,
-                "descriptionCaseView", description_edittext).show()
-
 
     private fun setAccordion(){
         expansionLayout.addListener { _, expanded ->
@@ -93,8 +99,10 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    private fun setFab(){
+        if(piggyId != 0L){
+            addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+        }
         addPiggyFab.setOnClickListener {
             hideKeyboard()
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
@@ -124,7 +132,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 updatePiggyBank()
             }
         }
-
     }
 
     override fun setIcons(){
