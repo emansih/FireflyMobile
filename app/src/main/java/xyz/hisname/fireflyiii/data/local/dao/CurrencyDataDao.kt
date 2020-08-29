@@ -40,4 +40,6 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Update(entity = CurrencyData::class)
     abstract fun updateDefaultCurrency(currencyData: CurrencyData)
 
+    @Query("UPDATE currency SET currencyDefault =:currencyDefault WHERE name =:currencyName")
+    abstract fun changeDefaultCurrency(currencyName: String, currencyDefault: Boolean = true)
 }

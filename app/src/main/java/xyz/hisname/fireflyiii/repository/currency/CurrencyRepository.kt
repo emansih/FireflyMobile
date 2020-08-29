@@ -30,8 +30,21 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
             val networkCall = currencyService?.getDefaultCurrency()
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
-                deleteDefaultCurrency()
-                insertCurrency(responseBody.data)
+                val currencyDefault = networkCall.body()?.data?.currencyAttributes?.currencyDefault
+                if(currencyDefault == true){
+                    // Non buggy version of Firefly III >= 5.3.0
+                    updateDefaultCurrency(responseBody.data)
+                } else {
+                    /* _HACK_: Issue #115 ,#112 and #107
+                     * Since Firefly III returns a bad response(default = false) between version 5.2.0 to 5.2.8, we store
+                     * the response in memory. After that, we will delete the default currency in the database
+                     * and insert our bad response. Now, we will update our non-default currency to be the default
+                     */
+                    deleteDefaultCurrency()
+                    insertCurrency(responseBody.data)
+                    currencyDao.changeDefaultCurrency(responseBody.data.currencyAttributes?.name ?: "")
+                }
+
             }
         } catch (exception: Exception){ }
         return currencyDao.getDefaultCurrency()
