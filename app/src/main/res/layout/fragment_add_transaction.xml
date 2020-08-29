@@ -422,7 +422,6 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:visibility="invisible"
                         app:layout_constraintBottom_toBottomOf="@+id/piggy_layout"
                         app:layout_constraintTop_toTopOf="@+id/piggy_layout"
                         app:layout_constraintEnd_toEndOf="@+id/piggy_layout"/>

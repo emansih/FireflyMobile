@@ -123,65 +123,68 @@ class AddTransactionFragment: BaseFragment() {
             getCompatColor(R.color.md_black_1000)
         }
         descriptionTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_label_outline))
+                IconicsDrawable(requireContext()).apply {
+                    icon(GoogleMaterial.Icon.gmd_label)
+                    colorInt = getCompatColor(R.color.md_white_1000)
+                })
         transactionAmountTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         currencyTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         dateTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         sourceTextInputTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         sourceExposedTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         destinationTextInputTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         destinationExposedTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         timeTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         piggyTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         categoryTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         tagsTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
         budgetTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    icon(GoogleMaterial.Icon.gmd_label)
                     colorInt = iconColor
                 })
 
