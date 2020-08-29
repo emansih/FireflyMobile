@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.receiver
 
 import android.accounts.AccountManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
@@ -16,10 +17,13 @@ import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
+import xyz.hisname.fireflyiii.util.TaskerPlugin
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 
 class PluginReceiver: AbstractPluginSettingReceiver(){
 
@@ -86,14 +90,20 @@ class PluginReceiver: AbstractPluginSettingReceiver(){
                 amount.replace(',', '.'),sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
             val responseBody = response.body()
             if (response.isSuccessful && responseBody != null) {
+                var journalId: Long = 0
                 runBlocking(Dispatchers.IO){
-                    responseBody.data.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
+                    responseBody.data.transactionAttributes?.transactions?.forEach { transaction ->
                         val transactionDb = AppDatabase.getInstance(context).transactionDataDao()
                         transactionDb.insert(transaction)
                         transactionDb.insert(TransactionIndex(response.body()?.data?.transactionId,
                                 transaction.transaction_journal_id))
+                        journalId = transaction.transaction_journal_id
                     }
                 }
+                AttachmentWorker.initWorker(fileUri, journalId, context)
+                TaskerPlugin.Setting.signalFinish(context, Intent(), TaskerPlugin.Setting.RESULT_CODE_OK, null)
+            } else {
+                TaskerPlugin.Setting.signalFinish(context, Intent(), TaskerPlugin.Setting.RESULT_CODE_FAILED, null)
             }
         }))
     }
