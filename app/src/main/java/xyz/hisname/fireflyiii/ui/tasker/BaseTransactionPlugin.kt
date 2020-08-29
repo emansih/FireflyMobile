@@ -11,8 +11,8 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
 
     protected val bundle by lazy { Bundle() }
-    protected val resultBlurb by lazy { StringBuilder().append("The following will be ran: ") }
-    protected val viewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
+    private val resultBlurb by lazy { StringBuilder().append("The following will be ran: ") }
+    private val viewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
 
     abstract fun navigateFragment()
 
@@ -121,12 +121,38 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
     }
 
     override fun getResultBlurb(bundle: Bundle): String {
-        return resultBlurb.toString()
+        val transactionDescription = bundle.getString("transactionDescription")
+        val transactionType = bundle.getString("transactionType")
+        val transactionAmount = bundle.getString("transactionAmount")
+        val transactionDateTime = bundle.getString("transactionDateTime")
+        val transactionSourceAccount = bundle.getString("transactionSourceAccount")
+        val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
+        val transactionCurrency = bundle.getString("transactionCurrency")
+
+        return if(transactionDescription == null || transactionType == null || transactionAmount == null ||
+                transactionDateTime == null || transactionSourceAccount == null ||
+                transactionDestinationAccount == null || transactionCurrency == null){
+            resultBlurb.clear()
+            resultBlurb.append("Invalid data. Task will not run")
+            resultBlurb.toString()
+        } else {
+            resultBlurb.toString()
+        }
     }
 
 
     override fun getResultBundle() = bundle
 
-    override fun isBundleValid(bundle: Bundle) =  true
+    // This is called when going to edit screen
+    override fun isBundleValid(bundle: Bundle): Boolean {
+        bundle.getString("transactionDescription") ?: return false
+        bundle.getString("transactionType") ?: return false
+        bundle.getString("transactionAmount") ?: return false
+        bundle.getString("transactionDateTime") ?: return false
+        bundle.getString("transactionSourceAccount") ?: return false
+        bundle.getString("transactionDestinationAccount") ?: return false
+        bundle.getString("transactionCurrency") ?: return false
+        return true
+    }
 
 }
