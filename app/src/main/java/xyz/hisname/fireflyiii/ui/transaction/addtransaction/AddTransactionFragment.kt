@@ -208,13 +208,14 @@ class AddTransactionFragment: BaseFragment() {
                 val itemClicked = arrayAdapter.getItem(which)
                 transaction_amount_edittext.setText(itemClicked)
             }
-            println("1")
+            dialog.show()
         }
 
-        currency_edittext.setOnClickListener {
+        currencyTasker.setOnClickListener {
             dialog.setAdapter(arrayAdapter){ _, which ->
                 val itemClicked = arrayAdapter.getItem(which)
                 currency_edittext.setText(itemClicked)
+                currency = itemClicked ?: ""
             }
             dialog.show()
         }
@@ -437,7 +438,12 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun taskerPlugin(){
         val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
-            DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
+            // This is a tasker variable, do not parse
+            if(selectedTime.startsWith("%")){
+                selectedTime
+            } else {
+                DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
+            }
         } else {
             transaction_date_edittext.getString()
         }
@@ -644,10 +650,13 @@ class AddTransactionFragment: BaseFragment() {
             tags_chip.threshold = 1
             tags_chip.setAdapter(tagsAdapter)
         }
+
         currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
-            currency = currencyData?.code.toString()
-            currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+            if(!isTasker){
+                currency = currencyData?.code.toString()
+                currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+            }
         }
         accountViewModel.emptyAccount.observe(viewLifecycleOwner) {
             if(it == true){
