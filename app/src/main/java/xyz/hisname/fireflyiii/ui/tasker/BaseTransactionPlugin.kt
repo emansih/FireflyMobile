@@ -25,7 +25,7 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
         navigateFragment()
     }
 
-    private fun observeText(){
+    private fun observeText() {
         viewModel.transactionType.observe(this){ type ->
             if (type.isNotBlank()){
                 resultBlurb.append("\n Transaction Type: $type")
@@ -129,7 +129,13 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
         val transactionSourceAccount = bundle.getString("transactionSourceAccount")
         val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
         val transactionCurrency = bundle.getString("transactionCurrency")
-
+        if (TaskerPlugin.Setting.hostSupportsOnFireVariableReplacement(this)){
+            TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle, arrayOf(
+                    "transactionDescription", "transactionAmount", "transactionDateTime",
+                    "transactionPiggyBank", "transactionSourceAccount",
+                    "transactionDestinationAccount", "transactionCurrency", "transactionTags",
+                    "transactionBudget", "transactionCategory", "fileUri"))
+        }
         return if(transactionDescription == null || transactionType == null || transactionAmount == null ||
                 transactionDateTime == null || transactionSourceAccount == null ||
                 transactionDestinationAccount == null || transactionCurrency == null){

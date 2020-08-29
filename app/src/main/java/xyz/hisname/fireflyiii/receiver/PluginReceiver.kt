@@ -17,7 +17,6 @@ import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
-import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.util.TaskerPlugin
@@ -75,7 +74,6 @@ class PluginReceiver: AbstractPluginSettingReceiver(){
         val transactionBudget = bundle.getString("transactionBudget")
         val transactionCategory = bundle.getString("transactionCategory")
         val fileUri = bundle.getString("fileUri")
-
         addTransaction(context, transactionTypeBundle, transactionDescription, transactionDateTime,
                 transactionPiggyBank, transactionAmount, transactionSourceAccount,
                 transactionDestinationAccount, transactionCurrency, transactionCategory,
@@ -100,7 +98,9 @@ class PluginReceiver: AbstractPluginSettingReceiver(){
                         journalId = transaction.transaction_journal_id
                     }
                 }
-                AttachmentWorker.initWorker(fileUri, journalId, context)
+                if(fileUri != null){
+                    AttachmentWorker.initWorker(fileUri, journalId, context)
+                }
                 TaskerPlugin.Setting.signalFinish(context, Intent(), TaskerPlugin.Setting.RESULT_CODE_OK, null)
             } else {
                 TaskerPlugin.Setting.signalFinish(context, Intent(), TaskerPlugin.Setting.RESULT_CODE_FAILED, null)
