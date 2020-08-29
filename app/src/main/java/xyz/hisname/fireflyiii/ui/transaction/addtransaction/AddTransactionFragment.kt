@@ -104,17 +104,17 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         transactionType = arguments?.getString("transactionType") ?: ""
+        if(isTasker){
+            setTaskerBundle()
+        }
         setIcons()
         setWidgets()
         if(transactionJournalId != 0L){
             updateTransactionSetup()
         }
-        contextSwitch()
-        if(isTasker){
-            setTaskerBundle()
-        }
         setFab()
         setCalculator()
+        contextSwitch()
     }
 
     private fun setTaskerBundle(){
@@ -139,17 +139,25 @@ class AddTransactionFragment: BaseFragment() {
                 }
 
                 val transactionSourceAccount = bundle.getString("transactionSourceAccount")
-                if(source_exposed_menu.isVisible){
-                    source_exposed_dropdown.setText(transactionSourceAccount)
-                } else {
-                    source_edittext.setText(transactionSourceAccount)
-                }
-
                 val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
-                if(destination_exposed_menu.isVisible){
-                    destination_exposed_dropdown.setText(transactionDestinationAccount)
-                } else {
-                    destination_edittext.setText(transactionDestinationAccount)
+
+                when {
+                    Objects.equals("Withdrawal", transactionType) -> {
+                        destination_edittext.setText(transactionDestinationAccount)
+                        sourceName = transactionSourceAccount
+                        source_exposed_dropdown.setText(sourceName)
+                    }
+                    Objects.equals("Transfer", transactionType) -> {
+                        sourceName = transactionSourceAccount
+                        destinationName = transactionDestinationAccount
+                        source_exposed_dropdown.setText(sourceName)
+                        destination_exposed_dropdown.setText(destinationName)
+                    }
+                    Objects.equals("Deposit", transactionType) -> {
+                        source_edittext.setText(transactionSourceAccount)
+                        destinationName = transactionDestinationAccount
+                        destination_exposed_dropdown.setText(destinationName)
+                    }
                 }
 
                 val transactionCurrency = bundle.getString("transactionCurrency")
@@ -606,7 +614,7 @@ class AddTransactionFragment: BaseFragment() {
                 toastError(errorMessage)
             } else if (transactionResponse.getError() != null) {
                 when {
-                    Objects.equals("Transfers", transactionType) -> {
+                    Objects.equals("Transfer", transactionType) -> {
                         val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
                             action = "firefly.hisname.ADD_TRANSFER"
                         }
@@ -681,21 +689,21 @@ class AddTransactionFragment: BaseFragment() {
                 tags_chip.setText(transactionAttributes.tags)
             }
             when {
-                Objects.equals("withdrawal", transactionType) -> {
+                Objects.equals("Withdrawal", transactionType) -> {
                     destination_edittext.setText(transactionAttributes.destination_name)
                     sourceName = transactionAttributes.source_name
                     source_exposed_dropdown.setText(sourceName)
                 }
-                Objects.equals("transfer", transactionType) -> {
+                Objects.equals("Transfer", transactionType) -> {
                     sourceName = transactionAttributes.source_name
                     destinationName = transactionAttributes.destination_name
                     source_exposed_dropdown.setText(sourceName)
                     destination_exposed_dropdown.setText(destinationName)
                 }
-                Objects.equals("deposit", transactionType) -> {
-                    source_exposed_dropdown.setText(transactionAttributes.source_name)
+                Objects.equals("Deposit", transactionType) -> {
+                    source_edittext.setText(transactionAttributes.source_name)
                     destinationName = transactionAttributes.destination_name
-                    destination_edittext.setText(destinationName)
+                    destination_exposed_dropdown.setText(destinationName)
                 }
             }
         }

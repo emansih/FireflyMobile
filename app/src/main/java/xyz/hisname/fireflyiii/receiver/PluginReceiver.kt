@@ -44,7 +44,16 @@ class PluginReceiver: AbstractPluginSettingReceiver(){
 
     override fun isAsync() = true
 
-    override fun isBundleValid(bundle: Bundle) = true
+    override fun isBundleValid(bundle: Bundle): Boolean {
+        bundle.getString("transactionDescription") ?: return false
+        bundle.getString("transactionType") ?: return false
+        bundle.getString("transactionAmount") ?: return false
+        bundle.getString("transactionDateTime") ?: return false
+        bundle.getString("transactionSourceAccount") ?: return false
+        bundle.getString("transactionDestinationAccount") ?: return false
+        bundle.getString("transactionCurrency") ?: return false
+        return true
+    }
 
     override fun firePluginSetting(context: Context, bundle: Bundle) {
         accountManager = AuthenticatorManager(AccountManager.get(context))
