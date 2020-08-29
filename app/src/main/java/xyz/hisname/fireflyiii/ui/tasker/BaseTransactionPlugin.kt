@@ -6,6 +6,7 @@ import androidx.lifecycle.observe
 import com.twofortyfouram.locale.sdk.client.ui.activity.AbstractAppCompatPluginActivity
 import kotlinx.android.synthetic.main.activity_add_transaction.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.util.TaskerPlugin
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {

@@ -35,10 +35,7 @@ import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.color
-import com.mikepenz.iconics.utils.colorRes
-import com.mikepenz.iconics.utils.icon
-import com.mikepenz.iconics.utils.sizeDp
+import com.mikepenz.iconics.utils.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
@@ -58,6 +55,7 @@ import xyz.hisname.fireflyiii.ui.tasker.TransactionPluginViewModel
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
+import xyz.hisname.fireflyiii.util.TaskerPlugin
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 import kotlin.math.abs
@@ -65,7 +63,6 @@ import kotlin.math.abs
 // This code sucks :(
 class AddTransactionFragment: BaseFragment() {
 
-    //private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private lateinit var transactionType: String
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
@@ -106,6 +103,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionType = arguments?.getString("transactionType") ?: ""
         if(isTasker){
             setTaskerBundle()
+            setTaskerIcons()
         }
         setIcons()
         setWidgets()
@@ -115,6 +113,190 @@ class AddTransactionFragment: BaseFragment() {
         setFab()
         setCalculator()
         contextSwitch()
+    }
+
+    private fun setTaskerIcons(){
+        val variablesFromHost = TaskerPlugin.getRelevantVariableList(requireActivity().intent.extras)
+        val iconColor = if(isDarkMode()){
+            getCompatColor(R.color.md_white_1000)
+        } else {
+            getCompatColor(R.color.md_black_1000)
+        }
+        descriptionTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_label_outline))
+        transactionAmountTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        currencyTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        dateTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        sourceTextInputTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        sourceExposedTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        destinationTextInputTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        destinationExposedTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        timeTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        piggyTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        categoryTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        tagsTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+        budgetTasker.setImageDrawable(
+                IconicsDrawable(requireContext()).apply{
+                    icon(GoogleMaterial.Icon.gmd_label_outline)
+                    colorInt = iconColor
+                })
+
+        val arrayAdapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
+        variablesFromHost.forEach { variables ->
+            arrayAdapter.add(variables)
+        }
+        val dialog = AlertDialog.Builder(requireContext())
+                .setTitle("Select Variable")
+                .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+        descriptionTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                description_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        transactionAmountTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                transaction_amount_edittext.setText(itemClicked)
+            }
+            println("1")
+        }
+
+        currency_edittext.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                currency_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        dateTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                transaction_date_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        sourceTextInputTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                source_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        sourceExposedTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                source_exposed_dropdown.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        destinationTextInputTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                destination_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        destinationExposedTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                destination_exposed_dropdown.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        timeTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                time_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        piggyTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                piggy_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+        categoryTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                category_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        tagsTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                tags_chip.setText(itemClicked)
+            }
+            dialog.show()
+        }
+
+        budgetTasker.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                budget_edittext.setText(itemClicked)
+            }
+            dialog.show()
+        }
     }
 
     private fun setTaskerBundle(){
@@ -146,17 +328,24 @@ class AddTransactionFragment: BaseFragment() {
                         destination_edittext.setText(transactionDestinationAccount)
                         sourceName = transactionSourceAccount
                         source_exposed_dropdown.setText(sourceName)
+                        destinationExposedTasker.isVisible = false
+                        sourceTextInputTasker.isVisible = false
                     }
                     Objects.equals("Transfer", transactionType) -> {
                         sourceName = transactionSourceAccount
                         destinationName = transactionDestinationAccount
                         source_exposed_dropdown.setText(sourceName)
                         destination_exposed_dropdown.setText(destinationName)
+                        destinationTextInputTasker.isVisible = false
+                        sourceTextInputTasker.isVisible = false
+                        piggyTasker.isVisible = true
                     }
                     Objects.equals("Deposit", transactionType) -> {
                         source_edittext.setText(transactionSourceAccount)
                         destinationName = transactionDestinationAccount
                         destination_exposed_dropdown.setText(destinationName)
+                        sourceExposedTasker.isVisible = false
+                        destinationTextInputTasker.isVisible = false
                     }
                 }
 
@@ -549,9 +738,13 @@ class AddTransactionFragment: BaseFragment() {
             Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountNameByType("asset")
                     .observe(viewLifecycleOwner) { transferData ->
                         source_exposed_menu.isVisible = true
+                        sourceExposedTasker.isVisible = true
                         source_layout.isGone = true
+                        sourceTextInputTasker.isGone = true
                         destination_layout.isGone = true
+                        destinationTextInputTasker.isGone = true
                         destination_exposed_menu.isVisible = true
+                        destinationExposedTasker.isVisible = true
                         piggy_layout.isVisible = true
                         spinnerAdapter = ArrayAdapter(requireContext(),
                                 R.layout.cat_exposed_dropdown_popup_item, transferData)
@@ -567,12 +760,14 @@ class AddTransactionFragment: BaseFragment() {
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)
                 destination_layout.isVisible = false
+                destinationTextInputTasker.isVisible = false
+                source_exposed_menu.isVisible = false
+                sourceExposedTasker.isVisible = false
                 // Revenue account, autocomplete
                 val autocompleteAdapter = ArrayAdapter(requireContext(),
                         R.layout.cat_exposed_dropdown_popup_item, it.first)
                 source_edittext.threshold = 1
                 source_edittext.setAdapter(autocompleteAdapter)
-                source_exposed_menu.isVisible = false
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
             else -> {
@@ -580,6 +775,8 @@ class AddTransactionFragment: BaseFragment() {
                         accountViewModel.getAccountNameByType("expense")).observe(viewLifecycleOwner) { accountNames ->
                     source_layout.isVisible = false
                     destination_exposed_menu.isVisible = false
+                    sourceTextInputTasker.isVisible = false
+                    destinationExposedTasker.isVisible = false
                     // Spinner for source account
                     spinnerAdapter = ArrayAdapter(requireContext(),
                             R.layout.cat_exposed_dropdown_popup_item, accountNames.first)
