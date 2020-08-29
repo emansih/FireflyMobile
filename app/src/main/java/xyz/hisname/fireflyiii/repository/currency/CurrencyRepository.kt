@@ -23,9 +23,9 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     suspend fun deleteDefaultCurrency() = currencyDao.deleteDefaultCurrency()
 
-    suspend fun defaultCurrencyWithoutNetwork() = currencyDao.getDefaultCurrency()
+    suspend fun updateDefaultCurrency(currency: CurrencyData) = currencyDao.updateDefaultCurrency(currency)
 
-    suspend fun defaultCurrencyWithNetwork(){
+    suspend fun defaultCurrency(): MutableList<CurrencyData> {
         try {
             val networkCall = currencyService?.getDefaultCurrency()
             val responseBody = networkCall?.body()
@@ -34,6 +34,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
                 insertCurrency(responseBody.data)
             }
         } catch (exception: Exception){ }
+        return currencyDao.getDefaultCurrency()
     }
 
     private suspend fun deleteAllCurrency() = currencyDao.deleteAllCurrency()

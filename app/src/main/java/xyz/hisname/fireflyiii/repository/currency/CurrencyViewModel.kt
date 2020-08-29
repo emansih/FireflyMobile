@@ -101,16 +101,8 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             }
             val networkData = response.body()
             if (networkData != null) {
-                var defaultCurrency: MutableList<CurrencyData> = arrayListOf()
                 viewModelScope.launch(Dispatchers.IO) {
-                    defaultCurrency = repository.defaultCurrencyWithoutNetwork()
-                }.invokeOnCompletion {
-                    // This is needed otherwise we might get wrong default currency
-                    if(defaultCurrency[0].currencyAttributes?.name == name &&
-                            defaultCurrency[0].currencyAttributes?.currencyDefault != default){
-                        viewModelScope.launch(Dispatchers.IO) { repository.deleteDefaultCurrency() }
-                    }
-                    viewModelScope.launch(Dispatchers.IO) { repository.insertCurrency(networkData.data) }
+                    repository.updateDefaultCurrency(networkData.data)
                 }
                 apiLiveData.postValue(ApiResponses(response.body()))
             } else {
@@ -170,8 +162,7 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
         var currencyData: MutableList<CurrencyData> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO){
-            repository.defaultCurrencyWithNetwork()
-            currencyData = repository.defaultCurrencyWithoutNetwork()
+            currencyData = repository.defaultCurrency()
         }.invokeOnCompletion {
             currencyLiveData.postValue(currencyData)
         }

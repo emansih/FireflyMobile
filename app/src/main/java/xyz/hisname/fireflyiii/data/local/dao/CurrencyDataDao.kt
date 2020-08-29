@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.data.local.dao
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 
@@ -35,4 +36,8 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
 
     @Query("SELECT * FROM currency WHERE name =:currencyName")
     abstract fun getCurrencyByName(currencyName: String): MutableList<CurrencyData>
+
+    @Update(entity = CurrencyData::class)
+    abstract fun updateDefaultCurrency(currencyData: CurrencyData)
+
 }
