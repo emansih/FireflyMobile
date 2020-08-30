@@ -48,10 +48,17 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
             }
         }
 
-        viewModel.transactionDateTime.observe(this){ dateTime ->
-            if (dateTime.isNotBlank()){
-                resultBlurb.append("\n Date Time: $dateTime")
-                bundle.putString("transactionDateTime", dateTime)
+        viewModel.transactionDate.observe(this){ date ->
+            if(date.isNotBlank()){
+                resultBlurb.append("\n Date: $date")
+                bundle.putString("transactionDate", date)
+            }
+        }
+
+        viewModel.transactionTime.observe(this){ time ->
+            if(time.isNotBlank()){
+                resultBlurb.append("\n Time: $time")
+                bundle.putString("transactionTime", time)
             }
         }
 
@@ -126,19 +133,19 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
         val transactionDescription = bundle.getString("transactionDescription")
         val transactionType = bundle.getString("transactionType")
         val transactionAmount = bundle.getString("transactionAmount")
-        val transactionDateTime = bundle.getString("transactionDateTime")
+        val transactionDate = bundle.getString("transactionDate")
         val transactionSourceAccount = bundle.getString("transactionSourceAccount")
         val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
         val transactionCurrency = bundle.getString("transactionCurrency")
         if (TaskerPlugin.Setting.hostSupportsOnFireVariableReplacement(this)){
             TaskerPlugin.Setting.setVariableReplaceKeys(resultBundle, arrayOf(
-                    "transactionDescription", "transactionAmount", "transactionDateTime",
+                    "transactionDescription", "transactionAmount", "transactionDate", "transactionTime",
                     "transactionPiggyBank", "transactionSourceAccount",
                     "transactionDestinationAccount", "transactionCurrency", "transactionTags",
                     "transactionBudget", "transactionCategory", "fileUri"))
         }
         return if(transactionDescription == null || transactionType == null || transactionAmount == null ||
-                transactionDateTime == null || transactionSourceAccount == null ||
+                transactionDate == null || transactionSourceAccount == null ||
                 transactionDestinationAccount == null || transactionCurrency == null){
             resultBlurb.clear()
             resultBlurb.append("Invalid data. Task will not run")
@@ -156,7 +163,8 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
         bundle.getString("transactionDescription") ?: return false
         bundle.getString("transactionType") ?: return false
         bundle.getString("transactionAmount") ?: return false
-        bundle.getString("transactionDateTime") ?: return false
+        bundle.getString("transactionDate") ?: return false
+        bundle.getString("transactionTime") ?: return false
         bundle.getString("transactionSourceAccount") ?: return false
         bundle.getString("transactionDestinationAccount") ?: return false
         bundle.getString("transactionCurrency") ?: return false

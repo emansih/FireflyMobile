@@ -9,7 +9,8 @@ class TransactionPluginViewModel: ViewModel(){
 
     val transactionType: MutableLiveData<String> = MutableLiveData()
     val transactionDescription: MutableLiveData<String> = MutableLiveData()
-    val transactionDateTime: MutableLiveData<String> = MutableLiveData()
+    val transactionDate: MutableLiveData<String> = MutableLiveData()
+    val transactionTime: MutableLiveData<String> = MutableLiveData()
     val transactionPiggyBank: MutableLiveData<String?> = MutableLiveData()
     val transactionAmount: MutableLiveData<String> = MutableLiveData()
     val transactionSourceAccount: MutableLiveData<String> = MutableLiveData()

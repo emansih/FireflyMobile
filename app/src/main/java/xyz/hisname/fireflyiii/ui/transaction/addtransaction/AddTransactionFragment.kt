@@ -302,6 +302,18 @@ class AddTransactionFragment: BaseFragment() {
     private fun setTaskerBundle(){
         pluginViewModel.transactionBundle.observe(viewLifecycleOwner){ bundle ->
             if(bundle != null){
+
+                val transactionCurrency = bundle.getString("transactionCurrency")
+                if(transactionCurrency?.startsWith("%") == false){
+                    currencyViewModel.getCurrencyByCode(transactionCurrency).observe(viewLifecycleOwner){ currencyData ->
+                        val currencyAttributes = currencyData[0].currencyAttributes
+                        currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
+                    }
+                } else {
+                    // Is tasker variable
+                    currency_edittext.setText(transactionCurrency)
+                }
+
                 val transactionTypeBundle = bundle.getString("transactionType") ?: ""
                 transactionType = transactionTypeBundle
 
@@ -311,9 +323,11 @@ class AddTransactionFragment: BaseFragment() {
                 val transactionAmount = bundle.getString("transactionAmount")
                 transaction_amount_edittext.setText(transactionAmount)
 
-                val transactionDateTime = bundle.getString("transactionDateTime")
-                transaction_date_edittext.setText(DateTimeUtil.convertIso8601ToHumanDate(transactionDateTime))
-                time_edittext.setText(DateTimeUtil.convertIso8601ToHumanTime(transactionDateTime))
+                val transactionDate = bundle.getString("transactionDate")
+                transaction_date_edittext.setText(transactionDate)
+
+                val transactionTime = bundle.getString("transactionTime")
+                time_edittext.setText(transactionTime)
 
                 if(piggy_layout.isVisible){
                     val transactionPiggyBank = bundle.getString("transactionPiggyBank")
@@ -347,16 +361,6 @@ class AddTransactionFragment: BaseFragment() {
                         sourceExposedTasker.isVisible = false
                         destinationTextInputTasker.isVisible = false
                     }
-                }
-
-                val transactionCurrency = bundle.getString("transactionCurrency")
-                if(transactionCurrency?.startsWith("%") == false){
-                    currencyViewModel.getCurrencyByCode(transactionCurrency ?: "").observe(viewLifecycleOwner){ currencyData ->
-                        val currencyAttributes = currencyData[0].currencyAttributes
-                        currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
-                    }
-                } else {
-                    currency_edittext.setText(transactionCurrency)
                 }
 
                 val transactionTags = bundle.getString("transactionTags")
@@ -443,35 +447,26 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun taskerPlugin(){
-        val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
-            // This is a tasker variable, do not parse
-            if(selectedTime.startsWith("%")){
-                transaction_date_edittext.getString() + selectedTime
-            } else {
-                DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
-            }
+        val currencyText = currency_edittext.getString()
+        if(currencyText.startsWith("%")){
+            currency = currency_edittext.getString()
         } else {
-            transaction_date_edittext.getString()
+            /* Get content between brackets
+             * For example: Euro(EUR) becomes (EUR)
+             * Then we remove the first and last character and it becomes EUR
+             */
+            currency = currency_edittext.getString()
+            val regex = "(?<=\\().+?(?=\\))".toRegex()
+            val regexReplaced = regex.find(currency)
+            regexReplaced?.value
+            currency = regexReplaced?.value ?: ""
         }
-        if(currency.isBlank()){
-            val currencyText = currency_edittext.getString()
-            if(currencyText.startsWith("%")){
-                currency = currency_edittext.getString()
-            } else {
-                /* Get content between brackets
-                 * For example: Euro(EUR) becomes (EUR)
-                 * Then we remove the first and last character to become EUR
-                 */
-                currency = currency_edittext.getString()
-                Regex("\\((.*?)\\)").matches(currency)
-                currency.replace("(", "")
-                currency.replace(")", "")
-            }
-        }
+
         pluginViewModel.transactionType.postValue(transactionType)
         pluginViewModel.transactionDescription.postValue(description_edittext.getString())
         pluginViewModel.transactionAmount.postValue(transaction_amount_edittext.getString())
-        pluginViewModel.transactionDateTime.postValue(transactionDateTime)
+        pluginViewModel.transactionDate.postValue(transaction_date_edittext.getString())
+        pluginViewModel.transactionTime.postValue(time_edittext.getString())
         pluginViewModel.transactionPiggyBank.postValue(piggyBank)
         pluginViewModel.transactionSourceAccount.postValue(sourceAccount)
         pluginViewModel.transactionDestinationAccount.postValue(destinationAccount)
@@ -484,7 +479,7 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun updateData(){
-        val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
+        val transactionDateTime = if (selectedTime.isNotBlank()){
             DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
         } else {
             transaction_date_edittext.getString()

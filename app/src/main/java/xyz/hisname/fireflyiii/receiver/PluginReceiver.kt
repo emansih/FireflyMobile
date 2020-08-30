@@ -10,6 +10,7 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import com.twofortyfouram.locale.sdk.client.receiver.AbstractPluginSettingReceiver
+import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import retrofit2.Retrofit
@@ -19,7 +20,9 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.TaskerPlugin
+import xyz.hisname.fireflyiii.util.extension.getString
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
@@ -51,7 +54,7 @@ class PluginReceiver: AbstractPluginSettingReceiver(){
         bundle.getString("transactionDescription") ?: return false
         bundle.getString("transactionType") ?: return false
         bundle.getString("transactionAmount") ?: return false
-        bundle.getString("transactionDateTime") ?: return false
+        bundle.getString("transactionDate") ?: return false
         bundle.getString("transactionSourceAccount") ?: return false
         bundle.getString("transactionDestinationAccount") ?: return false
         bundle.getString("transactionCurrency") ?: return false
@@ -65,7 +68,8 @@ class PluginReceiver: AbstractPluginSettingReceiver(){
         val transactionTypeBundle = bundle.getString("transactionType") ?: ""
         val transactionDescription = bundle.getString("transactionDescription") ?: ""
         val transactionAmount = bundle.getString("transactionAmount") ?: ""
-        val transactionDateTime = bundle.getString("transactionDateTime") ?: ""
+        val transactionTime = bundle.getString("transactionTime")
+        val transactionDate = bundle.getString("transactionDate") ?: ""
         val transactionPiggyBank = bundle.getString("transactionPiggyBank")
         val transactionSourceAccount = bundle.getString("transactionSourceAccount")
         val transactionDestinationAccount = bundle.getString("transactionDestinationAccount") ?: ""
@@ -74,7 +78,12 @@ class PluginReceiver: AbstractPluginSettingReceiver(){
         val transactionBudget = bundle.getString("transactionBudget")
         val transactionCategory = bundle.getString("transactionCategory")
         val fileUri = bundle.getString("fileUri")
-        addTransaction(context, transactionTypeBundle, transactionDescription, transactionDateTime,
+        val dateTime = if(transactionTime == null){
+            transactionDate
+        } else {
+            DateTimeUtil.mergeDateTimeToIso8601(transactionDate, transactionTime)
+        }
+        addTransaction(context, transactionTypeBundle, transactionDescription, dateTime,
                 transactionPiggyBank, transactionAmount, transactionSourceAccount,
                 transactionDestinationAccount, transactionCurrency, transactionCategory,
                 transactionTags, transactionBudget, fileUri?.toUri())
