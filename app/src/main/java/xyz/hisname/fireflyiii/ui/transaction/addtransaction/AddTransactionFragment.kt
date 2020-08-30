@@ -888,7 +888,7 @@ class AddTransactionFragment: BaseFragment() {
                         requireActivity().sendBroadcast(withdrawalBroadcast)
                     }
                 }
-                toastOffline(getString(R.string.data_will_be_deleted_later, transactionType))
+                toastOffline(getString(R.string.data_added_when_user_online, transactionType))
                 handleBack()
             }
         }
