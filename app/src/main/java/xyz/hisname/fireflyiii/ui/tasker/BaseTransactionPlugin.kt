@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import androidx.lifecycle.observe
 import com.twofortyfouram.locale.sdk.client.ui.activity.AbstractAppCompatPluginActivity
@@ -112,7 +113,7 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
 
         viewModel.removeFragment.observe(this){ shouldRemove ->
             if(shouldRemove){
-                onBackPressed()
+                super.onBackPressed()
             }
         }
     }
@@ -160,6 +161,19 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
         bundle.getString("transactionDestinationAccount") ?: return false
         bundle.getString("transactionCurrency") ?: return false
         return true
+    }
+
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+                .setTitle("Are you sure?")
+                .setMessage("Your data is not saved and this task will not run")
+                .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton(android.R.string.ok){ _, _ ->
+                    super.onBackPressed()
+                }
+                .show()
     }
 
 }

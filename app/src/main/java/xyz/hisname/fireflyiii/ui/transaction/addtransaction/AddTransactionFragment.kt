@@ -354,7 +354,14 @@ class AddTransactionFragment: BaseFragment() {
                 }
 
                 val transactionCurrency = bundle.getString("transactionCurrency")
-                currency_edittext.setText(transactionCurrency)
+                if(transactionCurrency?.startsWith("%") == false){
+                    currencyViewModel.getCurrencyByCode(transactionCurrency ?: "").observe(viewLifecycleOwner){ currencyData ->
+                        val currencyAttributes = currencyData[0].currencyAttributes
+                        currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
+                    }
+                } else {
+                    currency_edittext.setText(transactionCurrency)
+                }
 
                 val transactionTags = bundle.getString("transactionTags")
                 tags_chip.setText(transactionTags)
@@ -449,6 +456,21 @@ class AddTransactionFragment: BaseFragment() {
             }
         } else {
             transaction_date_edittext.getString()
+        }
+        if(currency.isBlank()){
+            val currencyText = currency_edittext.getString()
+            if(currencyText.startsWith("%")){
+                currency = currency_edittext.getString()
+            } else {
+                /* Get content between brackets
+                 * For example: Euro(EUR) becomes (EUR)
+                 * Then we remove the first and last character to become EUR
+                 */
+                currency = currency_edittext.getString()
+                Regex("\\((.*?)\\)").matches(currency)
+                currency.replace("(", "")
+                currency.replace(")", "")
+            }
         }
         pluginViewModel.transactionType.postValue(transactionType)
         pluginViewModel.transactionDescription.postValue(description_edittext.getString())
@@ -971,7 +993,11 @@ class AddTransactionFragment: BaseFragment() {
             fragment_add_transaction_root.isVisible = false
             requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
         } else {
-            requireActivity().finish()
+            if(isTasker){
+                requireActivity().onBackPressed()
+            } else {
+                requireActivity().finish()
+            }
         }
     }
 }
