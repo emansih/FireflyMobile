@@ -117,11 +117,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun setTaskerIcons(){
         val variablesFromHost = TaskerPlugin.getRelevantVariableList(requireActivity().intent.extras)
-        val iconColor = if(isDarkMode()){
-            getCompatColor(R.color.md_white_1000)
-        } else {
-            getCompatColor(R.color.md_black_1000)
-        }
+        val iconColor = getCompatColor(R.color.colorAccent)
         descriptionTasker.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon(GoogleMaterial.Icon.gmd_label)
@@ -780,6 +776,7 @@ class AddTransactionFragment: BaseFragment() {
                         destination_exposed_menu.isVisible = true
                         destinationExposedTasker.isVisible = true
                         piggy_layout.isVisible = true
+                        piggyTasker.isVisible = true
                         spinnerAdapter = ArrayAdapter(requireContext(),
                                 R.layout.cat_exposed_dropdown_popup_item, transferData)
                         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
