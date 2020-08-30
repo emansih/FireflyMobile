@@ -164,7 +164,6 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
         bundle.getString("transactionType") ?: return false
         bundle.getString("transactionAmount") ?: return false
         bundle.getString("transactionDate") ?: return false
-        bundle.getString("transactionTime") ?: return false
         bundle.getString("transactionSourceAccount") ?: return false
         bundle.getString("transactionDestinationAccount") ?: return false
         bundle.getString("transactionCurrency") ?: return false
