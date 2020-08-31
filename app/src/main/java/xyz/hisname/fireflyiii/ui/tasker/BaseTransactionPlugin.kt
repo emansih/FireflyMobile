@@ -145,12 +145,27 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
                     "transactionBudget", "transactionCategory", "fileUri"))
         }
         return if(transactionDescription == null || transactionType == null || transactionAmount == null ||
-                transactionDate == null || transactionSourceAccount == null ||
-                transactionDestinationAccount == null || transactionCurrency == null){
+                transactionDate == null || transactionCurrency == null){
             resultBlurb.clear()
             resultBlurb.append("Invalid data. Task will not run")
             resultBlurb.toString()
         } else {
+            // Withdrawal does not need destination account
+            if(transactionType.contentEquals("Deposit") && transactionType.contentEquals("Transfer")){
+                if(transactionDestinationAccount == null){
+                    resultBlurb.clear()
+                    resultBlurb.append("Invalid data. Task will not run")
+                    resultBlurb.toString()
+                }
+            }
+            // Deposit does not needs source account
+            if(transactionType.contentEquals("Withdrawal") && transactionType.contentEquals("Transfer")){
+                if(transactionSourceAccount == null){
+                    resultBlurb.clear()
+                    resultBlurb.append("Invalid data. Task will not run")
+                    resultBlurb.toString()
+                }
+            }
             resultBlurb.toString()
         }
     }
@@ -161,11 +176,19 @@ abstract class BaseTransactionPlugin: AbstractAppCompatPluginActivity() {
     // This is called when going to edit screen
     override fun isBundleValid(bundle: Bundle): Boolean {
         bundle.getString("transactionDescription") ?: return false
-        bundle.getString("transactionType") ?: return false
+        val transactionType = bundle.getString("transactionType") ?: return false
         bundle.getString("transactionAmount") ?: return false
         bundle.getString("transactionDate") ?: return false
-        bundle.getString("transactionSourceAccount") ?: return false
-        bundle.getString("transactionDestinationAccount") ?: return false
+        val sourceAccount = bundle.getString("transactionSourceAccount")
+        val destinationAccount = bundle.getString("transactionDestinationAccount")
+        // Withdrawal does not need destination account
+        if(transactionType.contentEquals("Deposit") && transactionType.contentEquals("Transfer")){
+            return destinationAccount != null
+        }
+        // Deposit does not needs source account
+        if(transactionType.contentEquals("Withdrawal") && transactionType.contentEquals("Transfer")){
+            return sourceAccount != null
+        }
         bundle.getString("transactionCurrency") ?: return false
         return true
     }
