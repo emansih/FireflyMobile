@@ -12,6 +12,6 @@ class GetTransactionHelper(config: TaskerPluginConfig<GetTransactionInput>):
 
     override fun addToStringBlurb(input: TaskerInput<GetTransactionInput>, blurbBuilder: StringBuilder) {
         super.addToStringBlurb(input, blurbBuilder)
-        blurbBuilder.append("\nMost of the time you will only need to read from %response")
+        blurbBuilder.append("\n\nNote: Most of the time you will only need to read from %response")
     }
 }
