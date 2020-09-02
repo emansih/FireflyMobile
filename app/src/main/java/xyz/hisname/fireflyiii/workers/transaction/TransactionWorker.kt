@@ -14,6 +14,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
@@ -26,6 +27,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val transactionType = inputData.getString("transactionType") ?: ""
         val transactionDescription = inputData.getString("description") ?: ""
         val transactionDate = inputData.getString("date") ?: ""
+        val transactionTime = inputData.getString("time")
         val transactionAmount = inputData.getString("amount") ?: ""
         val transactionCurrency = inputData.getString("currency") ?: ""
         val destinationName = inputData.getString("destinationName")
@@ -34,9 +36,14 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val category = inputData.getString("categoryName")
         val tags = inputData.getString("tags")
         val budget = inputData.getString("budgetName")
+        val dateTime = if (transactionTime == null) {
+            transactionDate
+        } else {
+            DateTimeUtil.mergeDateTimeToIso8601(transactionDate, transactionTime)
+        }
         val transactionWorkManagerId = inputData.getLong("transactionWorkManagerId", 0)
         genericService?.create(TransactionService::class.java)?.addTransaction(convertString(transactionType),
-                transactionDescription, transactionDate, piggyBank, transactionAmount,sourceName,
+                transactionDescription, dateTime, piggyBank, transactionAmount,sourceName,
                 destinationName, transactionCurrency, category, tags, budget)?.enqueue(retrofitCallback({ response ->
                     var errorBody = ""
                     if (response.errorBody() != null) {

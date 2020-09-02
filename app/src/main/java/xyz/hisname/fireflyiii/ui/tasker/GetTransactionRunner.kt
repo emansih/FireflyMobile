@@ -8,7 +8,6 @@ import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerAction
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
-import com.joaomgcd.taskerpluginlibrary.runner.TaskerOutputRenames
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResult
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultSucess
 import kotlinx.coroutines.Dispatchers
