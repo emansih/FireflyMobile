@@ -36,7 +36,7 @@ object Dependencies{
     private const val markdownVersion = "0.13.0"
     private const val biometricVersion = "1.1.0-alpha01"
     private const val testVersion = "1.3.0-alpha03"
-    private const val taskerPluginVersion = "4.0.3"
+    private const val taskerPluginVersion = "0.3.3"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecyclerLiveDataCore = "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
@@ -89,5 +89,5 @@ object Dependencies{
     val biometricLib = "androidx.biometric:biometric:$biometricVersion"
     val testRunner = "androidx.test:runner:$testVersion"
     val testOrchestrator = "androidx.test:orchestrator:$testVersion"
-    val taskerPluginLib = "com.twofortyfouram:android-plugin-client-sdk-for-locale:$taskerPluginVersion"
+    val taskerPluginLib = "com.joaomgcd:taskerpluginlibrary:$taskerPluginVersion"
 }

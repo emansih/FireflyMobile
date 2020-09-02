@@ -129,5 +129,7 @@
     <string name="discard">放弃更改</string>
     <string name="frequency">频率</string>
     <string name="currency_deleted">%1$s 货币已删除</string>
+    <string name="time">时间</string>
+    <string name="file">文件</string>
 
 </resources>

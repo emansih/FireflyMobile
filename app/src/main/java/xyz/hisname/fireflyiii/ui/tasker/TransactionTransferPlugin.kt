@@ -5,8 +5,8 @@ import androidx.fragment.app.commit
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 
-class TransactionTransferPlugin: BaseTransactionPlugin() {
-
+class TransactionTransferPlugin: TransactionConfigPlugin<GetTransactionInput,
+        GetTransactionOutput, GetTransactionRunner, GetTransactionHelper>() {
 
     override fun navigateFragment() {
         supportFragmentManager.commit {

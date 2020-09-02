@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +18,7 @@ class TransactionPluginViewModel: ViewModel(){
     val transactionCategory: MutableLiveData<String> = MutableLiveData()
     val transactionTags: MutableLiveData<String?> = MutableLiveData()
     val transactionBudget: MutableLiveData<String> = MutableLiveData()
-    val fileUri: MutableLiveData<Uri?> = MutableLiveData()
+    val fileUri: MutableLiveData<String?> = MutableLiveData()
     val removeFragment: MutableLiveData<Boolean> = MutableLiveData()
     val transactionBundle: MutableLiveData<Bundle> = MutableLiveData()
 }

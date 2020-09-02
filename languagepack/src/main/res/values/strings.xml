@@ -146,4 +146,9 @@
     <string name="data_will_be_deleted_later">%1$s will be deleted later…</string>
     <string name="currency_deleted">Currency %1$s deleted</string>
     <string name="data_added_when_user_online">%1$s will be added when you are back online</string>
+    <string name="tasker_output_description">Your transaction details in JSON</string>
+    <string name="details">Details</string>
+    <string name="transactionType">Transaction Type</string>
+    <string name="time">Time</string>
+    <string name="file">File</string>
 </resources>

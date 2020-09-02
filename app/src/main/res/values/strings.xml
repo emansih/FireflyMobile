@@ -22,7 +22,6 @@
     <string name="generic_delete_error">An error occurred while deleting</string>
     <string name="authentication_failed">Authentication Failed</string>
     <string name="authentication_failed_message">There was an issue retrieving access token from your Firefly III instance. Ensure you are using %1$s as your redirect URI in your Firefly III config.</string>
-    <string name="details">Details</string>
     <string name="no_piggy_bank">No Piggy Bank found</string>
     <string name="no_transaction_found">No %1$s found</string>
     <string name="no_account_found">No %1$s found</string>

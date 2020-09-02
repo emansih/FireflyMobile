@@ -117,15 +117,6 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".receiver.PluginReceiver"
-            android:exported="true"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING"/>
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".service.TransactionTilesService"
             android:icon="@drawable/ic_refresh"

@@ -15,7 +15,6 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -37,6 +36,7 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
+import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
@@ -55,7 +55,6 @@ import xyz.hisname.fireflyiii.ui.tasker.TransactionPluginViewModel
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
-import xyz.hisname.fireflyiii.util.TaskerPlugin
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 import kotlin.math.abs
@@ -63,7 +62,7 @@ import kotlin.math.abs
 // This code sucks :(
 class AddTransactionFragment: BaseFragment() {
 
-    private lateinit var transactionType: String
+    private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
@@ -100,8 +99,9 @@ class AddTransactionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-        transactionType = arguments?.getString("transactionType") ?: ""
         if(isTasker){
+            // Disable file upload for now
+            add_attachment_button.isVisible = false
             setTaskerBundle()
             setTaskerIcons()
         }
@@ -314,9 +314,6 @@ class AddTransactionFragment: BaseFragment() {
                     currency_edittext.setText(transactionCurrency)
                 }
 
-                val transactionTypeBundle = bundle.getString("transactionType") ?: ""
-                transactionType = transactionTypeBundle
-
                 val transactionDescription = bundle.getString("transactionDescription")
                 description_edittext.setText(transactionDescription)
 
@@ -371,21 +368,6 @@ class AddTransactionFragment: BaseFragment() {
 
                 val transactionCategory = bundle.getString("transactionCategory")
                 category_edittext.setText(transactionCategory)
-
-                val fileUri = bundle.getString("fileUri")
-                if(fileUri != null){
-                    val attachmentDataAdapter = arrayListOf<AttachmentData>()
-                    attachment_information.isVisible = true
-                    attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                    attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                            "", "", FileUtils.getFileName(requireContext(), fileUri.toUri()) ?: "",
-                            "", "" , "", 0, "", "", ""), 0, ""))
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
-                            false) { data: AttachmentData ->
-                    }
-                }
-
             }
         }
     }
@@ -461,7 +443,6 @@ class AddTransactionFragment: BaseFragment() {
             regexReplaced?.value
             currency = regexReplaced?.value ?: ""
         }
-
         pluginViewModel.transactionType.postValue(transactionType)
         pluginViewModel.transactionDescription.postValue(description_edittext.getString())
         pluginViewModel.transactionAmount.postValue(transaction_amount_edittext.getString())
@@ -474,7 +455,7 @@ class AddTransactionFragment: BaseFragment() {
         pluginViewModel.transactionTags.postValue(transactionTags)
         pluginViewModel.transactionBudget.postValue(budgetName)
         pluginViewModel.transactionCategory.postValue(categoryName)
-        pluginViewModel.fileUri.postValue(fileUri)
+        pluginViewModel.fileUri.postValue(fileUri.toString())
         pluginViewModel.removeFragment.postValue(true)
     }
 
