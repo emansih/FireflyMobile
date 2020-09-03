@@ -9,6 +9,7 @@ import androidx.preference.PreferenceManager
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerAction
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResult
+import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultError
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultSucess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -81,16 +82,15 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
             taskerResult = addTransaction(context, transactionType, transactionDescription, dateTime,
                     transactionPiggyBank, transactionAmount, transactionSourceAccount,
                     transactionDestinationAccount, transactionCurrency, transactionCategory,
-                    transactionTags, transactionBudget)
+                    transactionTags, transactionBudget) as TaskerPluginResult<GetTransactionOutput>
         }
         return taskerResult
     }
 
-
     private suspend fun addTransaction(context: Context, type: String, description: String,
                                        date: String, piggyBankName: String?, amount: String,
                                        sourceName: String?, destinationName: String?, currencyName: String,
-                                       category: String?, tags: String?, budgetName: String?): TaskerPluginResult<GetTransactionOutput>{
+                                       category: String?, tags: String?, budgetName: String?): TaskerPluginResult<Unit>{
         try {
             val response = genericService()?.create(TransactionService::class.java)?.suspendAddTransaction(convertString(type),
                     description, date, piggyBankName, amount.replace(',', '.'),
@@ -99,7 +99,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
             val errorBody = response?.errorBody()
             var errorBodyMessage = ""
             if (errorBody != null) {
-                errorBodyMessage = String(errorBody.bytes())
+                errorBodyMessage = String(errorBody?.bytes())
             }
             if (response?.isSuccessful == true && responseBody != null) {
                 responseBody.data.transactionAttributes?.transactions?.forEach { transaction ->
@@ -108,12 +108,12 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                     transactionDb.insert(TransactionIndex(response.body()?.data?.transactionId,
                             transaction.transaction_journal_id))
                 }
-                return TaskerPluginResultSucess(GetTransactionOutput(response.body().toString()), null)
+                return TaskerPluginResultSucess(GetTransactionOutput(response.body().toString()), null) as TaskerPluginResult<Unit>
             } else {
-                return TaskerPluginResultSucess(GetTransactionOutput(errorBodyMessage), null)
+                return TaskerPluginResultError(0, errorBodyMessage)
             }
         } catch (exception: Exception){
-            return TaskerPluginResultSucess(GetTransactionOutput(exception.localizedMessage.toString()), null)
+            return TaskerPluginResultError(exception)
         }
     }
 
