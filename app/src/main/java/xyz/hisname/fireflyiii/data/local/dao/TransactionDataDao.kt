@@ -144,6 +144,6 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND budget_name = :budgetName")
     abstract fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String): MutableList<Transactions>
 
-    @Query("DELETE FROM transactionTable")
-    abstract fun deleteTransaction(): Int
+    @Query("DELETE FROM transactionTable WHERE isPending IS NOT :isPending")
+    abstract fun deleteTransaction(isPending: Boolean = true): Int
 }
