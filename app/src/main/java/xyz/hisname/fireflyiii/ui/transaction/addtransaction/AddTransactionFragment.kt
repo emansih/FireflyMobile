@@ -319,7 +319,9 @@ class AddTransactionFragment: BaseFragment() {
                 transaction_amount_edittext.setText(transactionAmount)
 
                 val transactionDate = bundle.getString("transactionDate")
-                transaction_date_edittext.setText(transactionDate)
+                if(transactionDate != null){
+                    transaction_date_edittext.setText(transactionDate)
+                }
 
                 val transactionTime = bundle.getString("transactionTime")
                 time_edittext.setText(transactionTime)
