@@ -29,19 +29,28 @@ class TransactionReceiver: BroadcastReceiver()  {
             notif.showNotSignedIn()
         } else {
             val transactionWorkManagerId = ThreadLocalRandom.current().nextLong()
+            val destinationName = intent.getStringExtra("destination") ?: ""
+            val sourceName = intent.getStringExtra("source") ?: ""
+            val category = intent.getStringExtra("category")
+            val transactionAmount = intent.getStringExtra("amount")
+            val budget = intent.getStringExtra("budget")
+            val description =  intent.getStringExtra("description")
+            val tags = intent.getStringExtra("tags")
+            val time = intent.getStringExtra("time")
+            val date = intent.getStringExtra("date")
             val transactionData = Data.Builder()
-                    .putString("description", intent.getStringExtra("description"))
-                    .putString("date", intent.getStringExtra("date"))
-                    .putString("time", intent.getStringExtra("time"))
-                    .putString("amount", intent.getStringExtra("amount"))
+                    .putString("description", description)
+                    .putString("date", date)
+                    .putString("time", time)
+                    .putString("amount", transactionAmount)
                     .putString("currency", intent.getStringExtra("currency"))
-                    .putString("tags", intent.getStringExtra("tags"))
-                    .putString("categoryName", intent.getStringExtra("categoryName"))
-                    .putString("budgetName", intent.getStringExtra("budgetName"))
+                    .putString("tags", tags)
+                    .putString("categoryName", category)
+                    .putString("budgetName", budget)
                     .putLong("transactionWorkManagerId", transactionWorkManagerId)
-                    .putString("sourceName", intent.getStringExtra("sourceName"))
-                    .putString("destinationName", intent.getStringExtra("destinationName"))
-                    .putString("piggyBank", intent.getStringExtra("piggyBank"))
+                    .putString("sourceName", sourceName)
+                    .putString("destinationName", destinationName)
+                    .putString("piggyBank", intent.getStringExtra("piggybank"))
             val transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
             val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
             var currency: CurrencyData
@@ -49,11 +58,6 @@ class TransactionReceiver: BroadcastReceiver()  {
                 currency = currencyDatabase.getCurrencyByCode(intent.getStringExtra("currency"))[0]
             }
             val currencyAttributes = currency.currencyAttributes
-            val transactionAmount = intent.getStringExtra("amount")
-            val budget = intent.getStringExtra("budgetName")
-            val category = intent.getStringExtra("categoryName")
-            val description =  intent.getStringExtra("description")
-            val tags = intent.getStringExtra("tags")
             val tagsList = arrayListOf<String>()
             if(tags != null){
                 tagsList.addAll(tags.split(",").map { it.trim() })
@@ -75,18 +79,6 @@ class TransactionReceiver: BroadcastReceiver()  {
                 }
                 else -> { }
             }
-            val destinationDbName = if(intent.getStringExtra("destinationName") != null){
-                intent.getStringExtra("destinationName")
-            } else {
-                ""
-            }
-            val sourceDbName = if(intent.getStringExtra("sourceName") != null){
-                intent.getStringExtra("sourceName")
-            } else {
-                ""
-            }
-            val time = intent.getStringExtra("time")
-            val date = intent.getStringExtra("date")
             val dateTime = if(time == null){
                 DateTimeUtil.offsetDateTimeWithoutTime(date)
             } else {
@@ -99,10 +91,10 @@ class TransactionReceiver: BroadcastReceiver()  {
                                  budget, 0,  category, currencyAttributes?.code ?: "",
                                 currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
                                 currencyAttributes?.name ?: "", currencyAttributes?.symbol ?: "",
-                                OffsetDateTime.parse(dateTime), description, 0, destinationDbName,
+                                OffsetDateTime.parse(dateTime), description, 0, destinationName,
                                 "", "",  0.0, "","", 0,
                                 "", "", 0, "", 0,
-                                sourceDbName, "", tagsList, transactionType, 0, piggyBank,true)
+                                sourceName, "", tagsList, transactionType, 0, piggyBank,true)
                 )
             }
         }
