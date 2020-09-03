@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import xyz.hisname.fireflyiii.Constants
@@ -27,11 +29,10 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.GsonConverterUtil
 
 
-
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
     BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class, Spent::class, BudgetLimitData::class],
-        version = 17,exportSchema = false)
+        version = 18, exportSchema = false)
 @TypeConverters(GsonConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
@@ -56,6 +57,13 @@ abstract class AppDatabase: RoomDatabase() {
                 INSTANCE ?: Room.databaseBuilder(context,
                         AppDatabase::class.java, Constants.DB_NAME)
                         .setQueryExecutor(Dispatchers.IO.asExecutor())
+                        .addMigrations(object: Migration(17, 18){
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("ALTER TABLE accounts ADD COLUMN isPending INTEGER")
+                                database.execSQL("ALTER TABLE bills ADD COLUMN isPending INTEGER")
+                                database.execSQL("ALTER TABLE piggy ADD COLUMN isPending INTEGER")
+                            }
+                        })
                         .fallbackToDestructiveMigration()
                         .build().also { INSTANCE = it }
             }
