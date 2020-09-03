@@ -17,6 +17,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment as SupportFragment
 
@@ -52,6 +53,12 @@ fun <T> lazyUnsynchronised(initializer: () -> T): Lazy<T> =
 fun <ViewT : View> SupportFragment.bindView(@IdRes idRes: Int): Lazy<ViewT> {
     return lazyUnsynchronised {
         requireActivity().findViewById<ViewT>(idRes)
+    }
+}
+
+fun <ViewT : View> AppCompatActivity.bindView(@IdRes idRes: Int): Lazy<ViewT> {
+    return lazyUnsynchronised {
+        findViewById<ViewT>(idRes)
     }
 }
 

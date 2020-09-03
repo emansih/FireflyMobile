@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.onboarding
 import android.accounts.AccountManager
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.core.os.bundleOf
@@ -19,6 +20,7 @@ import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.ui.HomeActivity
+import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 import java.util.*
@@ -29,6 +31,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
 
     private val accManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
     private val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(this) }
+    private val progressOverlay by bindView<View>(R.id.progress_overlay)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,6 +135,7 @@ class OnboardingActivity: AccountAuthenticatorActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+        ProgressBar.animateView(progressOverlay, View.GONE, 0f, 200)
     }
 
     override fun finish() {
