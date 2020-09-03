@@ -17,7 +17,19 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         currencyDao.insert(currency)
     }
 
-    suspend fun getCurrencyByCode(currencyCode: String) = currencyDao.getCurrencyByCode(currencyCode)
+    suspend fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData> {
+        try {
+            val networkCall = currencyService?.getCurrencyByCode(currencyCode)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                currencyDao.deleteCurrencyByCode(currencyCode)
+                responseBody.data.forEach { currencyData ->
+                    currencyDao.insert(currencyData)
+                }
+            }
+        } catch (exception: Exception){ }
+        return currencyDao.getCurrencyByCode(currencyCode)
+    }
 
     suspend fun getCurrencyById(currencyId: Long) = currencyDao.getCurrencyById(currencyId)
 

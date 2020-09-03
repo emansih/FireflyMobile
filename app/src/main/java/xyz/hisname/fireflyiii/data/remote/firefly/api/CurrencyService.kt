@@ -43,4 +43,7 @@ interface CurrencyService {
     @DELETE("$CURRENCY_API_ENDPOINT/{currencyCode}")
     suspend fun deleteCurrencyByCode(@Path("currencyCode") currencyCode: String): Response<CurrencyModel>
 
+    @GET("$CURRENCY_API_ENDPOINT/{currencyCode}")
+    suspend fun getCurrencyByCode(@Query("currencyCode") currencyCode: String): Response<CurrencyModel>
+
 }
