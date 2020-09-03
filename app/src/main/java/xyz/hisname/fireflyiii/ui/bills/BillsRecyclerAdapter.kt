@@ -1,16 +1,14 @@
 package xyz.hisname.fireflyiii.ui.bills
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.bills_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
-import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 import java.text.DecimalFormat
 
@@ -33,24 +31,29 @@ class BillsRecyclerAdapter(private val items: MutableList<BillData>, private val
     inner class BillsHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(billData: BillData, clickListener: (BillData) -> Unit) = with(itemView) {
             val billResponse = billData.billAttributes
-            val billName = billResponse?.name
+            var billName = billResponse?.name
+            val isPending = billResponse?.isPending
             if(billName != null){
                 if(billName.length >= 17){
-                    itemView.billName.text = billName.substring(0,17) + "..."
-                } else {
-                    itemView.billName.text = billName
+                    billName = billName.substring(0,17) + "..."
                 }
+                if(isPending == true){
+                    billName = "$billName (Pending)"
+                    itemView.billName.setTextColor(context.getCompatColor(R.color.md_red_500))
+                }
+                itemView.billName.text = billName
             }
             itemView.setOnClickListener{clickListener(billData)}
             itemView.billAmount.text = context.getString(R.string.bill_amount, billResponse?.currency_code,
                     DecimalFormat("0.00").format(billResponse?.amount_max).toString())
             val freq = billResponse?.repeat_freq
-            if(freq!!.isNotBlank() or freq.isNotEmpty()){
-                @SuppressLint("SetTextI18n")
+            if(freq != null && freq.isNotBlank()){
                 itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
-
             }
-            itemView.billNextDueDate.text = billResponse.next_expected_match
+            val nextMatch = billResponse?.next_expected_match
+            if(nextMatch != null){
+                itemView.billNextDueDate.text = billResponse.next_expected_match
+            }
             itemView.billCard.setOnClickListener{clickListener(billData)}
         }
     }

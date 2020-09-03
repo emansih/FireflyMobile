@@ -117,7 +117,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                                    account.accountAttributes?.name, defaultCurrency.currencyId, currencyCode, currencySymbol,
                                    currencyDp, targetAmount.toBigDecimal(),  percentage,
                                    currentAmount?.toBigDecimal() ?: 0.toBigDecimal(),
-                                   leftToSave.toBigDecimal(), 0.toBigDecimal(), startDate, endDate, 0, true, notes
+                                   leftToSave.toBigDecimal(), 0.toBigDecimal(), startDate, endDate, 0, true, notes, true
                            ))
                     )
                 }

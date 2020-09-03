@@ -25,7 +25,7 @@ class DaoFactory {
                             randomLong(), "", 0.0, "", "",
                             "", "", "", "", "",
                             "", 0.0, "" ,"", "", "",
-                            "","", "", randomBoolean()
+                            "","", "", randomBoolean(), false
                     )
             )
         }

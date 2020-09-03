@@ -19,7 +19,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,7 +44,6 @@ import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
@@ -653,25 +651,6 @@ class AddTransactionFragment: BaseFragment() {
             if(!isTasker){
                 currency = currencyData?.code.toString()
                 currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
-            }
-        }
-        accountViewModel.emptyAccount.observe(viewLifecycleOwner) {
-            if(it == true){
-                AlertDialog.Builder(requireContext())
-                        .setTitle("No asset accounts found!")
-                        .setMessage("We tried searching for an asset account but is unable to find any. Would you like" +
-                                "to add an asset account first? ")
-                        .setPositiveButton("OK"){ _,_ ->
-                            parentFragmentManager.commit {
-                                replace(R.id.bigger_fragment_container, AddAccountFragment())
-                                arguments = bundleOf("accountType" to "asset")
-                            }
-                        }
-                        .setNegativeButton("No"){ _,_ ->
-                            handleBack()
-                        }
-                        .setCancelable(false)
-                        .show()
             }
         }
         piggy_edittext.setOnClickListener {

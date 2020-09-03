@@ -25,8 +25,8 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     abstract fun getAccountsWithNetworthAndCurrency(networth: Boolean = true,
                                                     currencyCode: String): Double
 
-    @Query("DELETE FROM accounts WHERE type =:accountType")
-    abstract fun deleteAccountByType(accountType: String): Int
+    @Query("DELETE FROM accounts WHERE type =:accountType AND isPending IS NOT :isPending")
+    abstract fun deleteAccountByType(accountType: String, isPending: Boolean = true): Int
 
     @Query("DELETE FROM accounts WHERE type =:accountType AND name =:accountName")
     abstract fun deleteAccountByTypeAndName(accountType: String, accountName: String): Int

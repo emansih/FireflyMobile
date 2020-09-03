@@ -1,9 +1,10 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.content.Context
-import android.graphics.PorterDuff
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
@@ -12,6 +13,7 @@ import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
+import kotlin.math.abs
 
 class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private val clickListener:(PiggyData) -> Unit):
         DiffUtilAdapter<PiggyData,PiggyRecyclerAdapter.PiggyHolder>(){
@@ -31,23 +33,30 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
     inner class PiggyHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(piggyData: PiggyData, clickListener: (PiggyData) -> Unit){
             val piggyBankData = piggyData.piggyAttributes
-            itemView.piggyName.text = piggyBankData?.name
-            if(piggyBankData?.name != null){
-                if(piggyBankData.name.length >= 19){
-                    itemView.piggyName.text = piggyBankData.name.substring(0,19) + "..."
-                } else {
-                    itemView.piggyName.text = piggyBankData.name
+            var piggyBankName = piggyBankData?.name
+            val isPending = piggyBankData?.isPending
+            if(piggyBankName != null){
+                if(piggyBankName.length >= 17){
+                    piggyBankName = piggyBankName.substring(0,19) + "..."
+                }
+                if(isPending == true){
+                    itemView.piggyName.setTextColor(context.getCompatColor(R.color.md_red_500))
+                    piggyBankName = "$piggyBankName (Pending)"
                 }
             }
+            itemView.piggyName.text = piggyBankName
+
             itemView.goal_save.text = piggyBankData?.currency_symbol + " " + piggyBankData?.target_amount
             itemView.currently_saved.text = piggyBankData?.currency_symbol + " " + piggyBankData?.current_amount.toString()
             val percentage = piggyBankData?.percentage ?: 0
             if(percentage <= 15){
-                itemView.goal_progress_bar.progressDrawable.setColorFilter(context.getCompatColor(R.color.md_red_700),
-                        PorterDuff.Mode.SRC_IN)
+                itemView.goal_progress_bar.progressDrawable.colorFilter =
+                        BlendModeColorFilterCompat.createBlendModeColorFilterCompat(context.getCompatColor(R.color.md_red_700),
+                                BlendModeCompat.SRC_ATOP)
             } else if(percentage <= 50){
-                itemView.goal_progress_bar.progressDrawable.setColorFilter(context.getCompatColor(R.color.md_green_500),
-                        PorterDuff.Mode.SRC_IN)
+                itemView.goal_progress_bar.progressDrawable.colorFilter =
+                        BlendModeColorFilterCompat.createBlendModeColorFilterCompat(context.getCompatColor(R.color.md_green_500),
+                        BlendModeCompat.SRC_ATOP)
             }
             itemView.goal_progress_bar.progress = percentage
             val targetDate = piggyBankData?.target_date
@@ -59,7 +68,7 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
                             daysDiff == 0 -> it.text = context.getString(R.string.due_today)
                             daysDiff == 1 -> it.text = context.getString(R.string.one_more_day_to_target)
                             daysDiff < 0 -> {
-                                val inverseMath = Math.abs(daysDiff)
+                                val inverseMath = abs(daysDiff)
                                 it.text =  context.getString(R.string.target_missed,inverseMath)
                             }
                             daysDiff == -1 -> it.text = context.getString(R.string.yesterday_target)

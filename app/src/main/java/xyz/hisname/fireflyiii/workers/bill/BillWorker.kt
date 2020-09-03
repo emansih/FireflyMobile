@@ -117,7 +117,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                                     currency.currencyAttributes?.decimal_places ?: 0,
                                     minAmount.toBigDecimal(), maxAmount.toBigDecimal(), billDate,
                                     repeatFreq, skip.toInt(), true, 0, listOf(),
-                                    listOf(), notes, null)
+                                    listOf(), notes, null, true)
                             )
                     )
                 }

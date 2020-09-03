@@ -29,5 +29,6 @@ data class AccountAttributes(
         val liability_start_date: String?,
         val interest: String?,
         val interest_period: String?,
-        val include_net_worth: Boolean
+        val include_net_worth: Boolean,
+        val isPending: Boolean
 )

@@ -84,7 +84,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                             currencySymbol, "", notes, "", "", accountNumber,
                             iban, bic, 0.0,
                             openingBalance, openingBalanceDate, liabilityType,
-                            liabilityAmount, liabilityStartDate, interest, interestPeriod, includeInNetWorth)
+                            liabilityAmount, liabilityStartDate, interest, interestPeriod, includeInNetWorth, true)
                     ))
                 }
             }

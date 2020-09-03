@@ -23,5 +23,6 @@ data class PiggyAttributes(
         val target_date: String?,
         val order: Int?,
         val active: Boolean?,
-        val notes: String?
+        val notes: String?,
+        val isPending: Boolean
 )
