@@ -15,6 +15,8 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.util.FileUtils
+import java.net.UnknownServiceException
+import java.security.cert.CertificateException
 
 class PatViewModel(application: Application): BaseViewModel(application) {
 
@@ -33,10 +35,18 @@ class PatViewModel(application: Application): BaseViewModel(application) {
         authInit(accessToken, baseUrl)
         repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){
-            repository.authViaPat()
-        }.invokeOnCompletion {
-            if(repository.authStatus.value == true){
+            try {
+                repository.authViaPat()
                 AuthenticatorManager(accountManager).authMethod = "pat"
+            } catch (exception: UnknownServiceException){
+                repository.responseApi.postValue("http is not supported. Please use https")
+                repository.authStatus.postValue(false)
+            } catch (certificateException: CertificateException){
+                repository.responseApi.postValue("Are you using self signed cert?")
+                repository.authStatus.postValue(false)
+            } catch (exception: Exception){
+                repository.responseApi.postValue(exception.localizedMessage)
+                repository.authStatus.postValue(false)
             }
         }
         return repository.responseApi

@@ -26,23 +26,13 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     * Returns true and empty string if auth succeeds
     * Returns false and exception string if auth fails
     */
+    @Throws(Exception::class)
     suspend fun authViaPat(): MutableLiveData<Boolean>{
-        try {
-            val networkCall = accountsService?.getPaginatedAccountType("asset", 1)
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                authStatus.postValue(true)
-                responseApi.postValue("success")
-            } else {
-                authStatus.postValue(false)
-                responseApi.postValue("There was an issue communicating with your server")
-            }
-        } catch (certificationException: CertificateException){
-            responseApi.postValue("Are you using self signed cert?")
-            authStatus.postValue(false)
-        } catch (exception: Exception) {
-            responseApi.postValue(exception.cause?.message)
-            authStatus.postValue(false)
+        val networkCall = accountsService?.getPaginatedAccountType("asset", 1)
+        val responseBody = networkCall?.body()
+        if (responseBody != null && networkCall.isSuccessful) {
+            authStatus.postValue(true)
+            responseApi.postValue("success")
         }
         return authStatus
     }

@@ -48,21 +48,15 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
                         authFailedReason.postValue(errorBodyMessage)
                         isAuthenticated.postValue(false)
                     }
-                } catch (exception: Exception) {
-                    when (exception) {
-                        is UnknownServiceException -> {
-                            authFailedReason.postValue("http is not supported. Please use https")
-                            isAuthenticated.postValue(false)
-                        }
-                        is CertificateException -> {
-                            authFailedReason.postValue("Are you using self signed cert?")
-                            isAuthenticated.postValue(false)
-                        }
-                        else -> {
-                            authFailedReason.postValue(exception.localizedMessage)
-                            isAuthenticated.postValue(false)
-                        }
-                    }
+                } catch (exception: UnknownServiceException){
+                    authFailedReason.postValue("http is not supported. Please use https")
+                    isAuthenticated.postValue(false)
+                } catch (certificateException: CertificateException){
+                    authFailedReason.postValue("Are you using self signed cert?")
+                    isAuthenticated.postValue(false)
+                } catch (exception: Exception){
+                    authFailedReason.postValue(exception.localizedMessage)
+                    isAuthenticated.postValue(false)
                 }
             }
         }
