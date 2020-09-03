@@ -23,7 +23,7 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
     abstract fun deleteAllPiggyBank(): Int
 
     @Transaction
-    @Query("SELECT piggy.name FROM piggy JOIN piggyFts ON (piggy.piggyId = piggyFts.piggyId) WHERE piggyFts MATCH :piggyName")
+    @Query("SELECT * FROM piggy JOIN piggyFts ON (piggy.piggyId = piggyFts.piggyId) WHERE piggyFts MATCH :piggyName")
     abstract fun searchPiggyName(piggyName: String): MutableList<PiggyData>
 
     @Query("SELECT * FROM piggy WHERE percentage != 100")
