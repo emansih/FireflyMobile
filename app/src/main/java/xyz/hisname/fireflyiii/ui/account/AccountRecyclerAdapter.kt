@@ -45,8 +45,8 @@ class AccountRecyclerAdapter(private val items: MutableList<AccountData>, privat
             }
             val isPending = data.accountAttributes?.isPending
             if(isPending != null && isPending == true){
-                itemView.accountNameText.setText(context.getCompatColor(R.color.md_red_500))
                 itemView.accountNameText.text = accountData?.name + " (Pending)"
+                itemView.accountNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
             } else {
                 itemView.accountNameText.text = accountData?.name
             }
