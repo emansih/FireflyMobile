@@ -95,16 +95,14 @@ class TransactionReceiver: BroadcastReceiver()  {
             runBlocking(Dispatchers.IO){
                 transactionDatabase.insert(
                         Transactions(
-                                transactionWorkManagerId, transactionAmount.toDouble(),  null,
-                                0, budget, 0, 0, category, currencyAttributes?.code ?: "",
+                                transactionWorkManagerId, transactionAmount.toDouble(),  0,
+                                 budget, 0,  category, currencyAttributes?.code ?: "",
                                 currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
                                 currencyAttributes?.name ?: "", currencyAttributes?.symbol ?: "",
-                                OffsetDateTime.parse(dateTime), description, null, 0, destinationDbName,
-                                "", "", 0, 0.0, "","", 0,
-                                "", "", "", "", "",
-                                "", 0 , "", "", "", true,
-                                0, 0, "", "", "", 0L, "",
-                                "", "", "", 0, sourceDbName, "", tagsList, transactionType, 0, piggyBank, true)
+                                OffsetDateTime.parse(dateTime), description, 0, destinationDbName,
+                                "", "",  0.0, "","", 0,
+                                "", "", 0, "", 0,
+                                sourceDbName, "", tagsList, transactionType, 0, piggyBank,true)
                 )
             }
         }

@@ -120,17 +120,14 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val transactionId = ThreadLocalRandom.current().nextLong()
         transactionDatabase.insert(
                 Transactions(
-                        transactionId, amount.toDouble(),  null,
-                        0, budgetName, 0, 0, category, currencyName,
+                        transactionId, amount.toDouble(),  0,
+                        budgetName, 0,  category, currency.currencyAttributes?.code ?: "",
                         currency.currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
                         currency.currencyAttributes?.name ?: "", currency.currencyAttributes?.symbol ?: "",
-                        OffsetDateTime.parse(dateTime), description, null, 0, destinationName,
-                        "", "", 0, 0.0, "","", 0,
-                        "", "", "", "", "",
-                        "", 0 , "", "", "", true,
-                        0, 0, "", "", "", 0L, "",
-                        "", "", "", 0, sourceName, "", tags, type, 0, piggyBankName,true
-                )
+                        OffsetDateTime.parse(dateTime), description, 0, destinationName,
+                        "", "",  0.0, "","", 0,
+                        "", "", 0, "", 0,
+                        sourceName, "", tags, type, 0, piggyBankName,true)
         )
     }
 
