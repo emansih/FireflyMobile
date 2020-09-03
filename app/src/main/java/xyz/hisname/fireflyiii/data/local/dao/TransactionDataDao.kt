@@ -132,11 +132,8 @@ abstract class TransactionDataDao {
     @Query("DELETE FROM transactionTable WHERE transaction_journal_id = :journalId")
     abstract fun deleteTransactionByJournalId(journalId: Long): Int
 
-   @Query("DELETE FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
-    abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String): Int
-
-    @Query("DELETE FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate)")
-    abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?): Int
+   @Query("DELETE FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND isPending IS NOT :isPending")
+    abstract fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String, isPending: Boolean = true): Int
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND source_name = :accountName")
     abstract fun getTransactionListByDateAndAccount(startDate: String, endDate: String, accountName: String): MutableList<Transactions>
