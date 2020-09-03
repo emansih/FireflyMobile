@@ -37,7 +37,7 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
             val isPending = piggyBankData?.isPending
             if(piggyBankName != null){
                 if(piggyBankName.length >= 17){
-                    piggyBankName = piggyBankName.substring(0,19) + "..."
+                    piggyBankName = piggyBankName.substring(0,17) + "..."
                 }
                 if(isPending == true){
                     itemView.piggyName.setTextColor(context.getCompatColor(R.color.md_red_500))
