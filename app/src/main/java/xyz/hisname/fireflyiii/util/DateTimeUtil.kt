@@ -233,6 +233,8 @@ object DateTimeUtil {
         }
     }
 
+    fun offsetDateTimeWithoutTime(date: String) = date + "T00:00:00" + ZonedDateTime.now().offset
+
 
     fun mergeDateTimeToIso8601(date: String, time: String) =  date + "T" + time + ZonedDateTime.now().offset
 

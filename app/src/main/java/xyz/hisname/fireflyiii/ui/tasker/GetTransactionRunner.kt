@@ -17,12 +17,18 @@ import net.dinglisch.android.tasker.TaskerPlugin
 import retrofit2.Retrofit
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
+import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
+import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.CustomCa
+import java.time.OffsetDateTime
+import java.util.concurrent.ThreadLocalRandom
 
 class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTransactionOutput>() {
 
@@ -32,6 +38,8 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
     private lateinit var accountManager: AuthenticatorManager
     private val sslSocketFactory by lazy { customCa.getCustomSSL() }
     private val trustManager by lazy { customCa.getCustomTrust() }
+    private lateinit var transactionDatabase: TransactionDataDao
+    private lateinit var currencyDatabase: CurrencyDataDao
 
     private fun genericService(): Retrofit? {
         val cert = AppPref(sharedPref).certValue
@@ -57,6 +65,8 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
 
     override fun run(context: Context, input: TaskerInput<GetTransactionInput>): TaskerPluginResult<GetTransactionOutput> {
         replaceVariable(input)
+        transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
+        currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
         accountManager = AuthenticatorManager(AccountManager.get(context))
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
         customCa = CustomCa(("file://" + context.filesDir.path + "/user_custom.pem").toUri().toFile())
@@ -66,8 +76,8 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val transactionTime = input.regular.transactionTime
         val transactionDate = input.regular.transactionDate ?: ""
         val transactionPiggyBank = input.regular.transactionPiggyBank
-        val transactionSourceAccount = input.regular.transactionSourceAccount
-        val transactionDestinationAccount = input.regular.transactionDestinationAccount
+        val transactionSourceAccount = input.regular.transactionSourceAccount ?: ""
+        val transactionDestinationAccount = input.regular.transactionDestinationAccount ?: ""
         val transactionCurrency = input.regular.transactionCurrency ?: ""
         val transactionTags = input.regular.transactionTags
         val transactionBudget = input.regular.transactionBudget
@@ -77,14 +87,51 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         } else {
             DateTimeUtil.mergeDateTimeToIso8601(transactionDate, transactionTime)
         }
+        val tagsList = arrayListOf<String>()
+        if(transactionTags != null){
+            tagsList.addAll(transactionTags.split(",").map { it.trim() })
+        }
         var taskerResult: TaskerPluginResult<GetTransactionOutput>
         runBlocking(Dispatchers.IO){
+            addTransactionToDb(transactionType, transactionDescription, transactionDate, transactionTime, transactionPiggyBank,
+                    transactionAmount, transactionSourceAccount, transactionDestinationAccount, transactionCurrency,
+            transactionCategory, tagsList, transactionBudget)
             taskerResult = addTransaction(context, transactionType, transactionDescription, dateTime,
                     transactionPiggyBank, transactionAmount, transactionSourceAccount,
                     transactionDestinationAccount, transactionCurrency, transactionCategory,
                     transactionTags, transactionBudget) as TaskerPluginResult<GetTransactionOutput>
         }
         return taskerResult
+    }
+
+    private fun addTransactionToDb(type: String, description: String,
+                                   date: String, time: String?, piggyBankName: String?, amount: String,
+                                   sourceName: String?, destinationName: String, currencyName: String,
+                                   category: String?, tags: List<String>, budgetName: String?){
+        val dateTime = if(time == null){
+            DateTimeUtil.offsetDateTimeWithoutTime(date)
+        } else {
+            DateTimeUtil.mergeDateTimeToIso8601(date, time)
+        }
+        var currency: CurrencyData
+        runBlocking(Dispatchers.IO) {
+            currency = currencyDatabase.getCurrencyByCode(currencyName)[0]
+        }
+        val transactionId = ThreadLocalRandom.current().nextLong()
+        transactionDatabase.insert(
+                Transactions(
+                        transactionId, amount.toDouble(),  null,
+                        0, budgetName, 0, 0, category, currencyName,
+                        currency.currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
+                        currency.currencyAttributes?.name ?: "", currency.currencyAttributes?.symbol ?: "",
+                        OffsetDateTime.parse(dateTime), description, null, 0, destinationName,
+                        "", "", 0, 0.0, "","", 0,
+                        "", "", "", "", "",
+                        "", 0 , "", "", "", true,
+                        0, 0, "", "", "", 0L, "",
+                        "", "", "", 0, sourceName, "", tags, type, 0, piggyBankName,true
+                )
+        )
     }
 
     private suspend fun addTransaction(context: Context, type: String, description: String,

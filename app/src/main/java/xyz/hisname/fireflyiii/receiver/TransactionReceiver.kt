@@ -15,6 +15,7 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import java.time.OffsetDateTime
 import java.util.concurrent.ThreadLocalRandom
 
@@ -40,6 +41,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                     .putLong("transactionWorkManagerId", transactionWorkManagerId)
                     .putString("sourceName", intent.getStringExtra("sourceName"))
                     .putString("destinationName", intent.getStringExtra("destinationName"))
+                    .putString("piggyBank", intent.getStringExtra("piggyBank"))
             val transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
             val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
             var currency: CurrencyData
@@ -56,6 +58,7 @@ class TransactionReceiver: BroadcastReceiver()  {
             if(tags != null){
                 tagsList.addAll(tags.split(",").map { it.trim() })
             }
+            val piggyBank = intent.getStringExtra("piggyBank")
             var transactionType = ""
             when (intent.action) {
                 "firefly.hisname.ADD_DEPOSIT" -> {
@@ -82,6 +85,13 @@ class TransactionReceiver: BroadcastReceiver()  {
             } else {
                 ""
             }
+            val time = intent.getStringExtra("time")
+            val date = intent.getStringExtra("date")
+            val dateTime = if(time == null){
+                DateTimeUtil.offsetDateTimeWithoutTime(date)
+            } else {
+                DateTimeUtil.mergeDateTimeToIso8601(date, time)
+            }
             runBlocking(Dispatchers.IO){
                 transactionDatabase.insert(
                         Transactions(
@@ -89,12 +99,12 @@ class TransactionReceiver: BroadcastReceiver()  {
                                 0, budget, 0, 0, category, currencyAttributes?.code ?: "",
                                 currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
                                 currencyAttributes?.name ?: "", currencyAttributes?.symbol ?: "",
-                                OffsetDateTime.now(), description, null, 0, destinationDbName,
+                                OffsetDateTime.parse(dateTime), description, null, 0, destinationDbName,
                                 "", "", 0, 0.0, "","", 0,
                                 "", "", "", "", "",
                                 "", 0 , "", "", "", true,
                                 0, 0, "", "", "", 0L, "",
-                                "", "", "", 0, sourceDbName, "", tagsList, transactionType, 0, true)
+                                "", "", "", 0, sourceDbName, "", tagsList, transactionType, 0, piggyBank, true)
                 )
             }
         }

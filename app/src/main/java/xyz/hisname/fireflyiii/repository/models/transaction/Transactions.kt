@@ -61,5 +61,6 @@ data class Transactions(
         @SerializedName("type")
         var transactionType: String?,
         var user: Int,
+        var piggy_bank_name: String?,
         var isPending: Boolean
 )

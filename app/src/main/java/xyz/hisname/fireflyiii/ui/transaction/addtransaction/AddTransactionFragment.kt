@@ -803,7 +803,8 @@ class AddTransactionFragment: BaseFragment() {
                         }
                         val extras = bundleOf(
                                 "description" to description_edittext.getString(),
-                                "date" to transactionDateTime,
+                                "date" to transaction_date_edittext.getString(),
+                                "time" to selectedTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "sourceName" to sourceAccount,
@@ -821,7 +822,8 @@ class AddTransactionFragment: BaseFragment() {
                         }
                         val extras = bundleOf(
                                 "description" to description_edittext.getString(),
-                                "date" to transactionDateTime,
+                                "date" to transaction_date_edittext.getString(),
+                                "time" to selectedTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "destinationName" to destinationAccount,
@@ -837,7 +839,8 @@ class AddTransactionFragment: BaseFragment() {
                         }
                         val extras = bundleOf(
                                 "description" to description_edittext.getString(),
-                                "date" to transactionDateTime,
+                                "date" to transaction_date_edittext.getString(),
+                                "time" to selectedTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
                                 "sourceName" to sourceAccount,
