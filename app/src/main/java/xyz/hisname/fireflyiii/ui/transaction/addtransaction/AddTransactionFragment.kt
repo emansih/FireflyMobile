@@ -10,6 +10,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
@@ -19,6 +21,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -717,6 +720,12 @@ class AddTransactionFragment: BaseFragment() {
                 selectedTime = "$selectedHour:$min"
                 time_edittext.setText(selectedTime)
             },hour, minute, true).show()
+        }
+        description_edittext.doAfterTextChanged { editable ->
+            transactionViewModel.getTransactionByDescription(editable.toString()).observe(viewLifecycleOwner){ list ->
+                val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, list)
+                description_edittext.setAdapter(adapter)
+            }
         }
     }
 

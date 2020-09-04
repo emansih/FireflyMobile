@@ -231,6 +231,27 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
+    suspend fun getTransactionByDescription(query: String): Flow<MutableList<Transactions>>{
+        val transactionData: MutableList<Transactions> = arrayListOf()
+        try {
+            // Search via API only if query is more than 3
+            if(query.length > 3){
+                val networkCall = transactionService?.searchTransaction(query)
+                val responseBody = networkCall?.body()
+                if (responseBody != null && networkCall.isSuccessful) {
+                    responseBody.data.forEach { data ->
+                        data.transactionAttributes?.transactions?.forEach { transaction ->
+                            transactionData.add(transaction)
+                            transactionDao.insert(transaction)
+                            transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id))
+                        }
+                    }
+                }
+            }
+        } catch (exception: Exception){ }
+        return transactionDao.getTransactionByDescription("%$query%")
+    }
+
     private suspend fun loadPaginatedData(startDate: String, endDate: String, sourceName: String, pageNumber: Int){
         try {
             val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,

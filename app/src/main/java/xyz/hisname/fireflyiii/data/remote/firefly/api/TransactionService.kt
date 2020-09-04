@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.data.remote.firefly.api
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.TRANSACTION_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
@@ -66,5 +67,8 @@ interface TransactionService {
 
     @GET("$TRANSACTION_API_ENDPOINT/{id}/attachments")
     fun getTransactionAttachment(@Path("id") transactionId: Long): Call<AttachmentModel>
+
+    @GET("${Constants.SEARCH_API_ENDPOINT}/transactions")
+    suspend fun searchTransaction(@Query("query") transaction: String): Response<TransactionModel>
 
 }

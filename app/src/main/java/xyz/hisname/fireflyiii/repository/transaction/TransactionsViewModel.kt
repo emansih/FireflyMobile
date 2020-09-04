@@ -2,13 +2,10 @@ package xyz.hisname.fireflyiii.repository.transaction
 
 import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
@@ -441,6 +438,23 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             data = repository.getTransactionListByDateAndBudget(startDate, endDate, budgetName)
         }.invokeOnCompletion {
             transactionData.postValue(data)
+        }
+        return transactionData
+    }
+
+    fun getTransactionByDescription(query: String) : LiveData<List<String>>{
+        val transactionData: MutableLiveData<List<String>> = MutableLiveData()
+        val displayName = arrayListOf<String>()
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getTransactionByDescription(query)
+                    .distinctUntilChanged()
+                    .debounce(1000)
+                    .collectLatest { transactionList ->
+                        transactionList.forEach { transactions ->
+                            displayName.add(transactions.description)
+                        }
+                        transactionData.postValue(displayName.distinct())
+            }
         }
         return transactionData
     }

@@ -143,4 +143,9 @@ abstract class TransactionDataDao {
 
     @Query("DELETE FROM transactionTable WHERE isPending IS NOT :isPending")
     abstract fun deleteTransaction(isPending: Boolean = true): Int
+
+    // TODO: Find out why I can't SELECT description FROM transactionTable
+    @Query("SELECT * FROM transactionTable WHERE description LIKE :description")
+    abstract fun getTransactionByDescription(description: String): Flow<MutableList<Transactions>>
+
 }
