@@ -727,6 +727,18 @@ class AddTransactionFragment: BaseFragment() {
                 description_edittext.setAdapter(adapter)
             }
         }
+        destination_edittext.doAfterTextChanged { editable ->
+            accountViewModel.getAccountByNameAndType("expense", editable.toString()).observe(viewLifecycleOwner){ list ->
+                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
+                destination_edittext.setAdapter(autocompleteAdapter)
+            }
+        }
+        source_edittext.doAfterTextChanged { editable ->
+            accountViewModel.getAccountByNameAndType("revenue", editable.toString()).observe(viewLifecycleOwner){ list ->
+                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
+                source_edittext.setAdapter(autocompleteAdapter)
+            }
+        }
     }
 
     private fun contextSwitch(){
@@ -750,39 +762,29 @@ class AddTransactionFragment: BaseFragment() {
                         source_exposed_dropdown.setAdapter(spinnerAdapter)
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     }
-            Objects.equals(transactionType, "Deposit") -> zipLiveData(accountViewModel.getAccountNameByType("revenue"),
-                    accountViewModel.getAccountNameByType("asset")).observe(viewLifecycleOwner ) {
+            Objects.equals(transactionType, "Deposit") ->
+                accountViewModel.getAccountNameByType("asset").observe(viewLifecycleOwner ) {
                 // Asset account, spinner
-                spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, it.second)
+                spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, it)
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)
                 destination_layout.isVisible = false
                 destinationTextInputTasker.isVisible = false
                 source_exposed_menu.isVisible = false
                 sourceExposedTasker.isVisible = false
-                // Revenue account, autocomplete
-                val autocompleteAdapter = ArrayAdapter(requireContext(),
-                        R.layout.cat_exposed_dropdown_popup_item, it.first)
-                source_edittext.threshold = 1
-                source_edittext.setAdapter(autocompleteAdapter)
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
             else -> {
-                zipLiveData(accountViewModel.getAccountNameByType("asset"),
-                        accountViewModel.getAccountNameByType("expense")).observe(viewLifecycleOwner) { accountNames ->
+                accountViewModel.getAccountNameByType("asset").observe(viewLifecycleOwner) { accountNames ->
                     source_layout.isVisible = false
                     destination_exposed_menu.isVisible = false
                     sourceTextInputTasker.isVisible = false
                     destinationExposedTasker.isVisible = false
                     // Spinner for source account
                     spinnerAdapter = ArrayAdapter(requireContext(),
-                            R.layout.cat_exposed_dropdown_popup_item, accountNames.first)
+                            R.layout.cat_exposed_dropdown_popup_item, accountNames)
                     spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     source_exposed_dropdown.setAdapter(spinnerAdapter)
-                    // This is used for auto complete for destination account
-                    val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, accountNames.second)
-                    destination_edittext.threshold = 1
-                    destination_edittext.setAdapter(autocompleteAdapter)
                     ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 }
             }

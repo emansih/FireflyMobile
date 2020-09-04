@@ -232,7 +232,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     suspend fun getTransactionByDescription(query: String): Flow<MutableList<Transactions>>{
-        val transactionData: MutableList<Transactions> = arrayListOf()
         try {
             // Search via API only if query is more than 3
             if(query.length > 3){
@@ -241,7 +240,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 if (responseBody != null && networkCall.isSuccessful) {
                     responseBody.data.forEach { data ->
                         data.transactionAttributes?.transactions?.forEach { transaction ->
-                            transactionData.add(transaction)
                             transactionDao.insert(transaction)
                             transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id))
                         }

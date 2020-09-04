@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.data.remote.firefly.api
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.ACCOUNTS_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
@@ -57,5 +58,10 @@ interface AccountsService {
 
     @DELETE("$ACCOUNTS_API_ENDPOINT/{id}")
     suspend fun deleteAccountById(@Path("id") id: Long): Response<AccountsModel>
+
+    @GET("${Constants.SEARCH_API_ENDPOINT}/accounts")
+    suspend fun searchAccount(@Query("query") query: String,
+                                  @Query("type") type: String,
+                                  @Query("field") field: String = "name"): Response<AccountsModel>
 
 }

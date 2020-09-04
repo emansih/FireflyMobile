@@ -31,4 +31,7 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("DELETE FROM accounts WHERE type =:accountType AND name =:accountName")
     abstract fun deleteAccountByTypeAndName(accountType: String, accountName: String): Int
 
+    @Query("SELECT * FROM accounts WHERE name LIKE :name AND type LIKE :type")
+    abstract fun getAccountByNameAndType(type: String, name: String): Flow<MutableList<AccountData>>
+
 }

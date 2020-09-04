@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
@@ -25,9 +27,7 @@ import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 class AccountsViewModel(application: Application): BaseViewModel(application){
 
     val repository: AccountRepository
-    var accountData: MutableList<AccountData>? = null
     private val accountsService by lazy { genericService()?.create(AccountsService::class.java) }
-    val emptyAccount: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
         val accountDao = AppDatabase.getInstance(application).accountDataDao()
@@ -241,5 +241,22 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             }
         }
         return isDeleted
+    }
+
+    fun getAccountByNameAndType(accountType: String, accountName: String): LiveData<List<String>>{
+        val accountData: MutableLiveData<List<String>> = MutableLiveData()
+        val displayName = arrayListOf<String>()
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getAccountByNameAndType(accountType, accountName)
+                    .distinctUntilChanged()
+                    .debounce(1000)
+                    .collectLatest { accountList ->
+                        accountList.forEach { accountData ->
+                            displayName.add(accountData.accountAttributes?.name ?: "")
+                        }
+                        accountData.postValue(displayName.distinct())
+                    }
+        }
+        return accountData
     }
 }

@@ -77,8 +77,25 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
 
+    suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<MutableList<AccountData>>{
+        try {
+            if(accountName.length > 3){
+                val networkCall = accountsService?.searchAccount(accountName, accountType)
+                val responseBody = networkCall?.body()
+                if (responseBody != null && networkCall.isSuccessful) {
+                    responseBody.data.forEach { data ->
+                        insertAccount(data)
+                    }
+                }
+            }
+
+        } catch (exception: Exception){}
+        return accountDao.getAccountByNameAndType(accountType, "%$accountName%")
+    }
+
     private suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)
 
+    @Deprecated("This is a very expensive network call. Use getAccountByNameAndType() instead")
     private suspend fun loadRemoteData(accountType: String){
         val accountData: MutableList<AccountData> = arrayListOf()
         try {
