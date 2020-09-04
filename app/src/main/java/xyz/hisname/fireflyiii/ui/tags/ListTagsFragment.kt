@@ -150,12 +150,7 @@ class ListTagsFragment: BaseFragment() {
         extendedFab.isGone = true
         activity?.activity_toolbar?.title = resources.getString(R.string.tags)
     }
-
-    override fun onDetach() {
-        super.onDetach()
-        extendedFab.isGone = true
-    }
-
+    
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.tags)

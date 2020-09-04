@@ -276,7 +276,7 @@ class AddBillFragment: BaseAddObjectFragment() {
     }
 
     override fun handleBack() {
-        unReveal(dialog_add_bill_layout)
+        unReveal(dialog_add_bill_layout, true)
     }
 
 }

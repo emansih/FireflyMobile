@@ -152,11 +152,6 @@ class ListAccountFragment: BaseFragment() {
         activity?.activity_toolbar?.title = convertString()
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        extendedFab.isGone = true
-    }
-
     override fun handleBack() {
         parentFragmentManager.popBackStack()
     }

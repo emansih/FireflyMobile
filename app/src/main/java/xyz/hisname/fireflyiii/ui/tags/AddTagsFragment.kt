@@ -221,7 +221,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun handleBack() {
-        unReveal(dialog_add_tags_layout)
+        unReveal(dialog_add_tags_layout, true)
     }
 
 }

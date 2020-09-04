@@ -153,11 +153,6 @@ class ListBillFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.bill)
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        extendedFab.isGone = true
-    }
-
     override fun handleBack() {
         parentFragmentManager.popBackStack()
     }

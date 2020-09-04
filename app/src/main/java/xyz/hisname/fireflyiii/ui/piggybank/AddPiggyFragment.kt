@@ -277,6 +277,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun handleBack() {
-        unReveal(dialog_add_piggy_layout)
+        unReveal(dialog_add_piggy_layout, true)
     }
 }
