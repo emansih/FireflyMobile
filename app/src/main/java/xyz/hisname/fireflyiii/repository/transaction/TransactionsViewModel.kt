@@ -269,7 +269,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 var transactionJournalId = 0L
                 viewModelScope.launch(Dispatchers.IO){
                     response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
-                        transactionJournalId = response.body()?.data?.transactionId ?: 0
+                        transactionJournalId = transaction.transaction_journal_id
                         repository.insertTransaction(transaction)
                         repository.insertTransaction(TransactionIndex(response.body()?.data?.transactionId,
                                 transaction.transaction_journal_id))
