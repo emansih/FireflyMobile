@@ -3,25 +3,25 @@ package xyz.hisname.fireflyiii.data.remote.firefly.api
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants.Companion.ATTACHMENT_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.attachment.Attachment
-import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 
 interface AttachmentService {
 
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @POST("$ATTACHMENT_API_ENDPOINT/{id}/upload")
-    fun uploadFile(@Path("id") id: Long,
-                   @Body file: RequestBody): Call<Void>
+    suspend fun uploadFile(@Path("id") id: Long,
+                   @Body file: RequestBody): Response<Void>
 
     @FormUrlEncoded
     @POST(ATTACHMENT_API_ENDPOINT)
-    fun storeAttachment(@Field("filename") filename: String,
+    suspend fun storeAttachment(@Field("filename") filename: String,
                         @Field("attachable_type") attachable_type: String,
                         @Field("attachable_id") attachable_id: Long,
                         @Field("title") title: String,
-                        @Field("notes") notes: String): Call<Attachment>
+                        @Field("notes") notes: String): Response<Attachment>
 
     @Streaming
     @GET
