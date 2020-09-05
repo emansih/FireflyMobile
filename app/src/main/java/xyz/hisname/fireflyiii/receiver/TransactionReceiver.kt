@@ -79,7 +79,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                 }
                 else -> { }
             }
-            val dateTime = if(time == null){
+            val dateTime = if(time.isNullOrEmpty()){
                 DateTimeUtil.offsetDateTimeWithoutTime(date)
             } else {
                 DateTimeUtil.mergeDateTimeToIso8601(date, time)

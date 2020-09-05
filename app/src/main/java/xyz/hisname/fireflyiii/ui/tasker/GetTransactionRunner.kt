@@ -108,7 +108,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                                    date: String, time: String?, piggyBankName: String?, amount: String,
                                    sourceName: String?, destinationName: String, currencyName: String,
                                    category: String?, tags: List<String>, budgetName: String?){
-        val dateTime = if(time == null){
+        val dateTime = if(time.isNullOrEmpty()){
             DateTimeUtil.offsetDateTimeWithoutTime(date)
         } else {
             DateTimeUtil.mergeDateTimeToIso8601(date, time)
