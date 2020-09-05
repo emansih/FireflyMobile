@@ -3,10 +3,11 @@
 
     <EditTextPreference
         app:iconSpaceReserved="false"
-        app:key="workManagerDelay"
-        app:title="Worker Delay(mins)"
+        app:key="workManagerDelayPref"
+        app:title="Worker Delay"
+        app:useSimpleSummaryProvider="false"
         app:defaultValue="15"
-        app:summary="Default value is 15 mins. Any value lower than 15 will be ignored.">
+        app:dialogMessage="Default value is 15 mins. Any value lower than 15 will be ignored.">
     </EditTextPreference>
 
     <CheckBoxPreference

@@ -74,6 +74,22 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         }
         set(value) = sharedPref.edit{ putLong("workManagerDelay", value) }
 
+    // Hack so that EditTextPreference don't crash
+    var workManagerDelayPref: String
+    get() {
+        var delay = sharedPref.getLong("workManagerDelay", 15)
+        delay = if(delay < 15){
+            15
+        } else {
+            sharedPref.getLong("workManagerDelay", 15)
+        }
+        return delay.toString()
+    }
+    set(value) {
+        sharedPref.edit{ putLong("workManagerDelay", java.lang.Long.parseLong(value)) }
+        sharedPref.edit{ putString("workManagerDelayPref", value) }
+    }
+
     override var workManagerLowBattery: Boolean
         get() = sharedPref.getBoolean("workManagerLowBattery", true)
         set(value) = sharedPref.edit{ putBoolean("workManagerLowBattery", value) }
