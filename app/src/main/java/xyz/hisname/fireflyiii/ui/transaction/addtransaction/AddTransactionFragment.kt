@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
 import android.Manifest
 import android.app.Activity
-import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,6 +24,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
 import com.hootsuite.nachos.chip.ChipSpan
@@ -695,29 +696,23 @@ class AddTransactionFragment: BaseFragment() {
             handleBack()
         }
         time_edittext.setOnClickListener {
-            // Do not use this yet as there is a bug
-            // https://github.com/material-components/material-components-android/issues/1508
-            /*MaterialTimePicker().apply {
-                setTimeFormat(TimeFormat.CLOCK_24H)
-                setListener { materialTimePickerListener ->
-                    selectedTime = "${materialTimePickerListener.hour}:${materialTimePickerListener.minute}"
-                    time_edittext.setText(selectedTime)
-                }
-                show(parentFragmentManager, "timePickerDialog")
-            }*/
-            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            val minute = calendar.get(Calendar.MINUTE)
-            TimePickerDialog(requireContext(), TimePickerDialog.OnTimeSetListener {
-                _, selectedHour, selectedMin ->
-                // We don't have to be really accurate down to seconds.
-                val min = if(selectedMin < 10){
-                    "0$selectedMin"
+            val materialTimePicker = MaterialTimePicker()
+            materialTimePicker.setTimeFormat(TimeFormat.CLOCK_24H)
+            materialTimePicker.setListener { materialTimePickerListener ->
+                val min = if(materialTimePickerListener.minute < 10){
+                    "0${materialTimePickerListener.minute}"
                 } else {
-                    selectedMin.toString()
+                    materialTimePickerListener.minute.toString()
                 }
-                selectedTime = "$selectedHour:$min"
+                val hour = if(materialTimePickerListener.hour < 10){
+                    "0${materialTimePickerListener.hour}"
+                } else {
+                    materialTimePickerListener.hour.toString()
+                }
+                selectedTime = "${hour}:${min}"
                 time_edittext.setText(selectedTime)
-            },hour, minute, true).show()
+            }
+            materialTimePicker.show(parentFragmentManager, "timePickerDialog")
         }
         description_edittext.doAfterTextChanged { editable ->
             transactionViewModel.getTransactionByDescription(editable.toString()).observe(viewLifecycleOwner){ list ->
