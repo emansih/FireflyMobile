@@ -11,6 +11,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import java.io.*
 
@@ -186,17 +187,12 @@ class FileUtils {
     }
 }
 
-fun Context.openFile(fileName: String): Boolean{
-    val fileToOpen = File("${FileUtils().folderDirectory(this)}/$fileName")
-    return if(fileToOpen.exists() && !fileToOpen.isDirectory){
-        val fileIntent = Intent(Intent.ACTION_VIEW)
-        fileIntent.setDataAndType(Uri.parse("${FileUtils().folderDirectory(this)}/$fileName"),
-                FileUtils.getMimeType(this, "${FileUtils().folderDirectory(this)}/$fileName".toUri()))
-        val openFileIntent = Intent.createChooser(fileIntent, "Open File")
-        openFileIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        this.startActivity(openFileIntent)
-        true
-    } else {
-        false
-    }
+fun Context.openFile(filePath: File): Intent{
+    val fileUri = FileProvider.getUriForFile(this, this.packageName + ".provider", filePath)
+    val fileIntent = Intent(Intent.ACTION_VIEW)
+    fileIntent.setDataAndType(fileUri, FileUtils.getMimeType(this, fileUri))
+    fileIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+    return Intent.createChooser(fileIntent, "Open File")
+    //this.startActivity(openFileIntent)
 }

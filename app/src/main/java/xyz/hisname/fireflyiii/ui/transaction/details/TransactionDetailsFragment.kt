@@ -19,9 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
@@ -37,6 +35,7 @@ import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
 import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.util.openFile
 
 
 class TransactionDetailsFragment: BaseFragment() {
@@ -230,9 +229,10 @@ class TransactionDetailsFragment: BaseFragment() {
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
         } else {
             val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-            attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { isDownloaded ->
+            attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
                 attachmentViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-                    if (!isDownloaded && !isLoading) {
+                    startActivity(requireContext().openFile(downloadedFile))
+                    /*if (!isDownloaded && !isLoading) {
                         toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                     }
                     if(isDownloaded && !isLoading){
@@ -241,7 +241,7 @@ class TransactionDetailsFragment: BaseFragment() {
                             icon = GoogleMaterial.Icon.gmd_folder_open
                             sizeDp = 12
                         }).into(downloadButton)
-                    }
+                    }*/
                 }
             }
 
