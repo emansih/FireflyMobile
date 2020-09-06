@@ -183,7 +183,17 @@ object DateTimeUtil {
         } else {
             timeToParse.format(DateTimeFormatter.ofPattern("HH:mm"))
         }
-        return timeToParse.year.toString() + "-" + timeToParse.monthValue + "-" + timeToParse.dayOfMonth + " @ " +
+        val month = if (timeToParse.monthValue < 10){
+            "0${timeToParse.monthValue}"
+        } else {
+            timeToParse.monthValue.toString()
+        }
+        val dayOfMonth = if(timeToParse.dayOfMonth < 10){
+            "0${timeToParse.dayOfMonth}"
+        } else {
+            timeToParse.dayOfMonth.toString()
+        }
+        return timeToParse.year.toString() + "-" + month + "-" + dayOfMonth + " @ " +
                 timeFormat
     }
 
