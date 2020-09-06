@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -16,25 +15,20 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
-import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
-import kotlinx.android.synthetic.main.transaction_attachment_items.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
-import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
 import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.openFile
 
@@ -86,11 +80,12 @@ class TransactionDetailsFragment: BaseFragment() {
     private fun setTransactionInfo(transactionData: MutableList<Transactions>){
         transactionList.clear()
         val details = transactionData[0]
-        val model = arrayListOf(DetailModel("Type", details.transactionType),
+        val model = arrayListOf(DetailModel(requireContext().getString(R.string.transactionType), details.transactionType),
                 DetailModel(resources.getString(R.string.description), details.description),
                 DetailModel(resources.getString(R.string.source_account), details.source_name),
                 DetailModel(resources.getString(R.string.destination_account), details.destination_name),
-                DetailModel(resources.getString(R.string.date), details.date.toString()))
+                DetailModel(resources.getString(R.string.date), DateTimeUtil.convertIso8601ToHumanDate(details.date)),
+                DetailModel(resources.getString(R.string.time), DateTimeUtil.convertIso8601ToHumanTime(details.date)))
         if(details.foreign_amount != null && details.foreign_currency_symbol != null){
             transactionList.add(DetailModel(resources.getString(R.string.amount),
                     details.currency_symbol + details.amount.toString() + " (" + details.foreign_currency_symbol
@@ -197,12 +192,6 @@ class TransactionDetailsFragment: BaseFragment() {
                     })
                     addToBackStack(null)
                 }
-            }
-            5 -> {
-                AlertDialog.Builder(requireContext())
-                        .setTitle(resources.getString(R.string.date))
-                        .setMessage(transactionDate)
-                        .show()
             }
         }
     }
