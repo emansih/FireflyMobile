@@ -194,5 +194,4 @@ fun Context.openFile(filePath: File): Intent{
     fileIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
     return Intent.createChooser(fileIntent, "Open File")
-    //this.startActivity(openFileIntent)
 }

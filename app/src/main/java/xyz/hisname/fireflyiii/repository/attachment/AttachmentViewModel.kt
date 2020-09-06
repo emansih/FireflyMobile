@@ -23,24 +23,19 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
 
     private val attachmentService by lazy { genericService()?.create(AttachmentService::class.java) }
     private val viewModelContext by lazy { getApplication() as Context }
-    private var totalFileSize: Int = 0
-    val progressListener = MutableLiveData<Int>()
+    val isDownloaded: MutableLiveData<Boolean> = MutableLiveData()
 
     fun downloadAttachment(attachmentData: AttachmentData): LiveData<File> {
-        val isDownloaded: MutableLiveData<Boolean> = MutableLiveData()
         val fileDownloadUrl = attachmentData.attachmentAttributes?.download_uri
         val fileName = attachmentData.attachmentAttributes?.filename ?: ""
         val downloadedFile: MutableLiveData<File> = MutableLiveData()
         val fileToOpen = File(viewModelContext.getExternalFilesDir(null).toString() + File.separator + fileName)
-        totalFileSize = attachmentData.attachmentAttributes?.size ?: 0
         if(fileToOpen.exists()){
-            progressListener.postValue(100)
             viewModelContext.openFile(fileToOpen)
             isDownloaded.value = true
             isLoading.value = false
             downloadedFile.postValue(fileToOpen)
         } else {
-            progressListener.postValue(0)
             attachmentService?.downloadFile(fileDownloadUrl)?.enqueue(retrofitCallback({ downloadResponse ->
                 val fileResponse = downloadResponse.body()
                 if (fileResponse != null) {
@@ -74,6 +69,5 @@ class AttachmentViewModel(application: Application): BaseViewModel(application) 
                 output.writeAll(input)
             }
         }
-        progressListener.postValue(100)
     }
 }

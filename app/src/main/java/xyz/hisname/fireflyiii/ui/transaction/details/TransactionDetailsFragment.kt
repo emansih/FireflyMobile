@@ -23,6 +23,7 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
+import kotlinx.android.synthetic.main.transaction_attachment_items.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
@@ -230,26 +231,11 @@ class TransactionDetailsFragment: BaseFragment() {
         } else {
             val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
             attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
-                attachmentViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+                attachmentViewModel.isDownloaded.observe(viewLifecycleOwner) { isLoading ->
                     startActivity(requireContext().openFile(downloadedFile))
-                    /*if (!isDownloaded && !isLoading) {
+                    if (!isLoading) {
                         toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                     }
-                    if(isDownloaded && !isLoading){
-                        val downloadButton = requireActivity().findViewById<ImageView>(R.id.downloadButton)
-                        Glide.with(requireContext()).load(IconicsDrawable(requireContext()).apply {
-                            icon = GoogleMaterial.Icon.gmd_folder_open
-                            sizeDp = 12
-                        }).into(downloadButton)
-                    }*/
-                }
-            }
-
-            attachmentViewModel.progressListener.observe(viewLifecycleOwner){ loadingPercent ->
-                if(loadingPercent != 100){
-                    ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                } else {
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 }
             }
         }

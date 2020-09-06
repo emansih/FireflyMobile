@@ -7,12 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.transaction_attachment_items.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
-import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.inflate
 import java.io.File
 
@@ -43,14 +43,17 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
             }
 
             if(shouldShowDownload) {
-                if (File("${FileUtils().folderDirectory(context)}/$fileName").exists()) {
+                val downloadedFile = File(context.getExternalFilesDir(null).toString() + File.separator + fileName)
+                if (downloadedFile.exists()) {
                     Glide.with(context).load(IconicsDrawable(context).apply {
                         icon = GoogleMaterial.Icon.gmd_folder_open
+                        colorRes = R.color.md_yellow_700
                         sizeDp = 12
                     }).into(itemView.downloadButton)
                 } else {
                     Glide.with(context).load(IconicsDrawable(context).apply {
                         icon = GoogleMaterial.Icon.gmd_file_download
+                        colorRes = R.color.md_green_500
                         sizeDp = 12
                     }).into(itemView.downloadButton)
                 }
