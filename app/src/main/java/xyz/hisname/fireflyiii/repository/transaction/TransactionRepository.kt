@@ -138,7 +138,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     suspend fun recentTransactions(limit: Int): MutableList<Transactions>{
-        loadRemoteData("", "", "all")
+        loadPaginatedData("", "", "all", 1)
         val listOfTransactions = arrayListOf<Transactions>()
         transactionDao.getTransactionLimit(limit).forEachIndexed { _, transactionIndex ->
             listOfTransactions.addAll(transactionDao.getTransactionFromJournalId(transactionIndex.transactionJournalId ?: 0L))
