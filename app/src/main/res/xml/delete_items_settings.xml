@@ -36,6 +36,26 @@
         app:title="@string/delete_recurring_transactions">
     </Preference>
 
+    <PreferenceCategory
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:title="@string/classification" />
+
+    <Preference
+        app:key="delete_categories"
+        app:title="@string/delete_all_categories">
+    </Preference>
+
+    <Preference
+        app:key="delete_tags"
+        app:title="@string/delete_all_tags">
+    </Preference>
+
+    <Preference
+        app:key="delete_object_group"
+        app:title="@string/delete_all_object_groups">
+    </Preference>
+
     <xyz.hisname.fireflyiii.ui.base.BasePreferenceCategory
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false"

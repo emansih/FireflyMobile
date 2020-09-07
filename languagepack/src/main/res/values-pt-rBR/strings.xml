@@ -1,8 +1,7 @@
 <resources
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
-    <string name="app_name" translatable="false">Language Changer</string>
-	<string name="dashboard">Dashboard</string>
+    <string name="dashboard">Dashboard</string>
     <string name="transfer">Transferir</string>
     <string name="tags">Etiquetas</string>
     <string name="account">Contas</string>
@@ -149,4 +148,7 @@
     <string name="delete_all_piggy_bank">Excluir TODOS os seus cofrinhos</string>
     <string name="delete_all_bills">Excluir TODAS as suas faturas</string>
     <string name="delete_all_budgets">Excluir TODOS os seus orçamentos</string>
+    <string name="delete_all_categories">Excluir TODAS as suas categorias</string>
+    <string name="delete_all_tags">Excluir TODAS as suas tags</string>
+    <string name="delete_all_object_groups">Excluir TODOS os seus grupos de objetos</string>
 </resources>

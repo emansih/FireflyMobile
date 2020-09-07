@@ -141,5 +141,8 @@
     <string name="delete_all_withdrawals">Verwijder AL je uitgaven</string>
     <string name="delete_all_deposits">Verwijder AL je inkomsten</string>
     <string name="delete_all_transfers">Verwijder AL je overschrijvingen</string>
+    <string name="delete_all_tags">Verwijder ALLE tags</string>
+    <string name="delete_all_categories">Verwijder ALLE categorieën</string>
+    <string name="delete_all_object_groups">Verwijder AL je objectgroepen</string>
 
 </resources>

@@ -170,4 +170,8 @@
     <string name="delete_data_from_firefly">Delete data from Firefly III</string>
     <string name="are_you_sure">Are you absolutely sure?</string>
     <string name="permanent_delete_stuff">Be careful with these buttons. Deleting stuff is permanent.</string>
+    <string name="delete_all_categories">Delete ALL your categories</string>
+    <string name="delete_all_tags">Delete ALL your tags</string>
+    <string name="delete_all_object_groups">Delete ALL your object groups</string>
+    <string name="user_understand">I understand the consequences</string>
 </resources>

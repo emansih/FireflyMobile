@@ -139,4 +139,7 @@
     <string name="delete_all_piggy_bank">Supprimer TOUTES vos tirelires</string>
     <string name="delete_all_bills">Supprimer TOUTES vos factures</string>
     <string name="delete_all_budgets">Supprimer TOUS vos budgets</string>
+    <string name="delete_all_object_groups">Supprimer TOUS vos groupes d\\\'objets</string>
+    <string name="delete_all_tags">Tous les étiquettes ont été supprimés</string>
+    <string name="delete_all_categories">Toutes les catégories ont été supprimées</string>
 </resources>

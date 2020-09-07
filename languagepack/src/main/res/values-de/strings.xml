@@ -145,5 +145,8 @@
     <string name="delete_all_piggy_bank">ALLE Ihre Sparschweine löschen</string>
     <string name="delete_all_bills">ALLE Ihre Rechnungen löschen</string>
     <string name="delete_all_budgets">ALLE Ihre Budgets löschen</string>
+    <string name="delete_all_object_groups">ALLE Objektgruppen löschen</string>
+    <string name="delete_all_tags">Alle Ihre Stichwörter löschen</string>
+    <string name="delete_all_categories">Alle Ihre Kategorien löschen</string>
 
 </resources>

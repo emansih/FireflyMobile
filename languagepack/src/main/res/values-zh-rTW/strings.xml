@@ -140,4 +140,9 @@
     <string name="currency_deleted">%1$s 貨幣已刪除</string>
     <string name="time">時間</string>
     <string name="file">文件</string>
+    <string name="delete_all_budgets">刪除所有您的預算</string>
+    <string name="delete_all_tags">刪除您的所有標籤</string>
+    <string name="delete_all_categories">刪除您的所有類別</string>
+    <string name="permanent_delete_stuff">小心使用這些按鈕。刪除內容是永久性的。</string>
+    <string name="are_you_sure">是否確定？您無法還原此操作</string>
 </resources>

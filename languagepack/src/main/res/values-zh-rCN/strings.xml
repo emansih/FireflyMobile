@@ -134,5 +134,7 @@
     <string name="delete_all_budgets">删除所有您的预算</string>
     <string name="are_you_sure">是否确定？您无法还原此操作</string>
     <string name="permanent_delete_stuff">小心使用这些按钮。删除内容是永久性的。</string>
+    <string name="delete_all_categories">删除您的所有类别</string>
+    <string name="delete_all_tags">删除您的所有标签</string>
 
 </resources>

@@ -142,4 +142,7 @@
     <string name="delete_all_piggy_bank">Borrar TODAS sus alcancías</string>
     <string name="delete_all_bills">Borrar TODAS sus facturas</string>
     <string name="delete_all_budgets">Eliminar todos sus presupuestos</string>
+    <string name="delete_all_categories">Eliminar todas sus categorías</string>
+    <string name="delete_all_tags">Eliminar todas sus etiquetas</string>
+    <string name="delete_all_object_groups">Borrar TODOS sus grupos de objetos</string>
 </resources>

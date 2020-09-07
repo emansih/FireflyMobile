@@ -35,6 +35,7 @@ class DeleteItemsFragment: BaseSettings() {
         handleAccounts()
         handleAutomation()
         handleTransaction()
+        handleClassification()
         destroyItemsViewModel.message.observe(this){ message ->
             toastInfo(message)
         }
@@ -179,6 +180,36 @@ class DeleteItemsFragment: BaseSettings() {
         }
     }
 
+    private fun handleClassification(){
+        val deleteCategories = findPreference<Preference>("delete_all_categories") as Preference
+        deleteCategories.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_exclamation_triangle).apply {
+            colorRes = setIconColor()
+            sizeDp = 24
+        }
+        deleteCategories.setOnPreferenceClickListener {
+            askUserConfirmation("categories")
+            true
+        }
+        val deleteTags = findPreference<Preference>("delete_tags") as Preference
+        deleteTags.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_tags).apply {
+            colorRes = setIconColor()
+            sizeDp = 24
+        }
+        deleteTags.setOnPreferenceClickListener {
+            askUserConfirmation("tags")
+            true
+        }
+        val deleteObjectGroups = findPreference<Preference>("delete_object_group") as Preference
+        deleteObjectGroups.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_envelope).apply {
+            colorRes = setIconColor()
+            sizeDp = 24
+        }
+        deleteObjectGroups.setOnPreferenceClickListener {
+            askUserConfirmation("object_groups")
+            true
+        }
+    }
+
     private fun askUserConfirmation(itemToDelete: String){
         val random = randomGenerator()
         val spannableString = SpannableString("This action cannot be undone. Please type $random to confirm")
@@ -190,10 +221,10 @@ class DeleteItemsFragment: BaseSettings() {
                 LinearLayout.LayoutParams.MATCH_PARENT)
         input.layoutParams = linearLayout
         AlertDialog.Builder(requireContext())
-                .setTitle("Are you absolutely sure?")
+                .setTitle(requireContext().getString(R.string.are_you_sure))
                 .setMessage(spannableString)
                 .setView(input)
-                .setPositiveButton("I understand the consequences"){ _, _ ->
+                .setPositiveButton(requireContext().getString(R.string.user_understand)){ _, _ ->
                     if(input.getString().contentEquals(random)){
                         destroyItemsViewModel.deleteObject(itemToDelete)
                     } else {
