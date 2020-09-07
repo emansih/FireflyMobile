@@ -38,6 +38,7 @@ class TransactionReceiver: BroadcastReceiver()  {
             val tags = intent.getStringExtra("tags")
             val time = intent.getStringExtra("time")
             val date = intent.getStringExtra("date")
+            val piggyBank = intent.getStringExtra("piggybank")
             val transactionData = Data.Builder()
                     .putString("description", description)
                     .putString("date", date)
@@ -50,7 +51,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                     .putLong("transactionWorkManagerId", transactionWorkManagerId)
                     .putString("sourceName", sourceName)
                     .putString("destinationName", destinationName)
-                    .putString("piggyBank", intent.getStringExtra("piggybank"))
+                    .putString("piggyBankName",piggyBank)
             val transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
             val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
             var currency: CurrencyData
@@ -62,7 +63,6 @@ class TransactionReceiver: BroadcastReceiver()  {
             if(tags != null){
                 tagsList.addAll(tags.split(",").map { it.trim() })
             }
-            val piggyBank = intent.getStringExtra("piggyBank")
             var transactionType = ""
             when (intent.action) {
                 "firefly.hisname.ADD_DEPOSIT" -> {

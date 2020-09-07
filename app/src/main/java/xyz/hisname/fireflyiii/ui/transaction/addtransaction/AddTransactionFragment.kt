@@ -813,9 +813,9 @@ class AddTransactionFragment: BaseFragment() {
                                 "time" to selectedTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
-                                "sourceName" to sourceAccount,
-                                "destinationName" to destinationAccount,
-                                "piggyBankName" to piggyBankList,
+                                "source" to sourceAccount,
+                                "destination" to destinationAccount,
+                                "piggybank" to piggyBankList,
                                 "category" to categoryName,
                                 "tags" to transactionTags
                         )
@@ -832,7 +832,8 @@ class AddTransactionFragment: BaseFragment() {
                                 "time" to selectedTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
-                                "destinationName" to destinationAccount,
+                                "destination" to destinationAccount,
+                                "source" to sourceAccount,
                                 "category" to categoryName,
                                 "tags" to transactionTags
                         )
@@ -849,7 +850,7 @@ class AddTransactionFragment: BaseFragment() {
                                 "time" to selectedTime,
                                 "amount" to transaction_amount_edittext.getString(),
                                 "currency" to currency,
-                                "sourceName" to sourceAccount,
+                                "source" to sourceAccount,
                                 "category" to categoryName,
                                 "tags" to transactionTags
                         )
