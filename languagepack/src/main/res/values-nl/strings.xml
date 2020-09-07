@@ -122,5 +122,24 @@
     <string name="search">Zoeken</string>
     <string name="make_default_currency">Maak standaard</string>
     <string name="currency_deleted">Valuta %1$s verwijderd</string>
+    <string name="delete_data_from_firefly">Delete data from Firefly III</string>
+    <string name="permanent_delete_stuff">Wees voorzichtig met deze knoppen. Het verwijderen van dingen is permanent.</string>
+    <string name="are_you_sure">Zeker weten? Je kan niet meer terug!</string>
+    <string name="delete_all_budgets">Verwijder ALLE budgetten</string>
+    <string name="delete_all_bills">Verwijder AL je contracten</string>
+    <string name="delete_all_piggy_bank">Verwijder AL je spaarpotjes</string>
+    <string name="automation">Automatisering</string>
+    <string name="delete_all_rules">Verwijder AL je regels</string>
+    <string name="delete_recurring_transactions">Verwijder AL je periodieke transacties</string>
+    <string name="delete_all_accounts_summary">Het verwijderen van rekeningen betekent dat ALLE bijbehorende transacties OOK worden verwijderd!</string>
+    <string name="delete_all_accounts">Verwijder AL je rekeningen</string>
+    <string name="delete_asset_accounts">Verwijder AL je betaalrekeningen</string>
+    <string name="delete_expense_accounts">Verwijder AL je crediteuren</string>
+    <string name="delete_revenue_accounts">Verwijder AL je debiteuren</string>
+    <string name="delete_liabilities_accounts">Verwijder AL je passiva</string>
+    <string name="delete_all_transactions">Verwijder AL je transacties</string>
+    <string name="delete_all_withdrawals">Verwijder AL je uitgaven</string>
+    <string name="delete_all_deposits">Verwijder AL je inkomsten</string>
+    <string name="delete_all_transfers">Verwijder AL je overschrijvingen</string>
 
 </resources>

@@ -120,4 +120,23 @@
     <string name="search">Rechercher</string>
     <string name="make_default_currency">Utiliser par défaut</string>
     <string name="currency_deleted">Devise %1$s supprimée</string>
+    <string name="permanent_delete_stuff">Attention à ces boutons. Ce que vous supprimez l\\\'est de façon définitive.</string>
+    <string name="are_you_sure">Êtes-vous sûr ? Vous ne pourrez pas annuler cette action.</string>
+    <string name="delete_data_from_firefly">Supprimer des données de Firefly III</string>
+    <string name="delete_all_transfers">Supprimer TOUS vos transferts</string>
+    <string name="delete_all_deposits">Supprimer TOUS vos dépôts</string>
+    <string name="delete_all_withdrawals">Supprimer TOUS vos retraits</string>
+    <string name="delete_all_transactions">Supprimer TOUTES vos opérations</string>
+    <string name="delete_liabilities_accounts">Supprimer TOUS vos passifs</string>
+    <string name="delete_revenue_accounts">Supprimer TOUS vos comptes de revenus</string>
+    <string name="delete_expense_accounts">Supprimer TOUS vos comptes de dépenses</string>
+    <string name="delete_asset_accounts">Supprimer TOUS vos comptes d\\\'actifs</string>
+    <string name="delete_all_accounts">Supprimer TOUS vos comptes</string>
+    <string name="delete_all_accounts_summary">La suppression des comptes supprimera également TOUS les retraits, dépôts et transferts associés !</string>
+    <string name="delete_recurring_transactions">Toutes les opérations récurrentes ont été supprimées</string>
+    <string name="delete_all_rules">Toutes les règles et les groupes de règles ont été supprimés</string>
+    <string name="automation">Automatisation</string>
+    <string name="delete_all_piggy_bank">Supprimer TOUTES vos tirelires</string>
+    <string name="delete_all_bills">Supprimer TOUTES vos factures</string>
+    <string name="delete_all_budgets">Supprimer TOUS vos budgets</string>
 </resources>

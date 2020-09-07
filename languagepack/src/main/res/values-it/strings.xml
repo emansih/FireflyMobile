@@ -122,5 +122,24 @@
     <string name="search">Cerca</string>
     <string name="make_default_currency">Rendila predefinita</string>
     <string name="currency_deleted">Valuta %1$s elimina</string>
+    <string name="delete_data_from_firefly">Elimina i dati da Firefly III</string>
+    <string name="are_you_sure">Sei sicuro? Non puoi annullare questo.</string>
+    <string name="permanent_delete_stuff">Fai attenzione con questi pulsanti. L\\\'eliminazione è permanente.</string>
+    <string name="delete_all_transfers">Elimina TUTTI i trasferimenti</string>
+    <string name="delete_all_deposits">Elimina TUTTI i depositi</string>
+    <string name="delete_all_withdrawals">Elimina TUTTI i prelievi</string>
+    <string name="delete_all_transactions">Elimina TUTTE le transazioni</string>
+    <string name="delete_liabilities_accounts">Elimina TUTTE le passività</string>
+    <string name="delete_revenue_accounts">Elimina TUTTI i conti entrate</string>
+    <string name="delete_expense_accounts">Elimina TUTTI i conti spese</string>
+    <string name="delete_asset_accounts">Elimina TUTTI i conti attività</string>
+    <string name="delete_all_accounts">Elimina TUTTI gli account</string>
+    <string name="delete_all_accounts_summary">L\\\'eliminazione dei conti cancellerà anche TUTTI i prelievi, i depositi e i trasferimenti associati!</string>
+    <string name="delete_recurring_transactions">Elimina TUTTE le transazioni ricorrenti</string>
+    <string name="delete_all_rules">Elimina TUTTE le regole</string>
+    <string name="automation">Automazione</string>
+    <string name="delete_all_piggy_bank">Elimina TUTTI i salvadanai</string>
+    <string name="delete_all_bills">Elimina TUTTE le bollette</string>
+    <string name="delete_all_budgets">Elimina TUTTI i budget</string>
 
 </resources>

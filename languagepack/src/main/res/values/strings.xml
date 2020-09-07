@@ -151,4 +151,23 @@
     <string name="transactionType">Transaction Type</string>
     <string name="time">Time</string>
     <string name="file">File</string>
+    <string name="delete_all_budgets">Delete ALL your budget</string>
+    <string name="delete_all_bills">Delete ALL your bills</string>
+    <string name="delete_all_piggy_bank">Delete ALL your piggy banks</string>
+    <string name="automation">Automation</string>
+    <string name="delete_all_rules">Delete all rules</string>
+    <string name="delete_recurring_transactions">Delete ALL your recurring transactions</string>
+    <string name="delete_all_accounts_summary">Deleting accounts will also delete ALL associated withdrawals, deposits and transfers!</string>
+    <string name="delete_all_accounts">Delete ALL your accounts</string>
+    <string name="delete_asset_accounts">Delete ALL your assets accounts</string>
+    <string name="delete_expense_accounts">Delete ALL your expense accounts</string>
+    <string name="delete_revenue_accounts">Delete ALL your revenue accounts</string>
+    <string name="delete_liabilities_accounts">Delete ALL your liabilities</string>
+    <string name="delete_all_transactions">Delete ALL your transactions</string>
+    <string name="delete_all_withdrawals">Delete ALL your withdrawals</string>
+    <string name="delete_all_deposits">Delete ALL your deposits</string>
+    <string name="delete_all_transfers">Delete ALL your transfers</string>
+    <string name="delete_data_from_firefly">Delete data from Firefly III</string>
+    <string name="are_you_sure">Are you absolutely sure?</string>
+    <string name="permanent_delete_stuff">Be careful with these buttons. Deleting stuff is permanent.</string>
 </resources>

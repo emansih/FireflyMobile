@@ -45,7 +45,8 @@
     <Preference
         app:key="delete_data"
         app:iconSpaceReserved="false"
-        app:title="Delete data from Firefly III">
+        app:title="@string/delete_data_from_firefly"
+        app:summary="@string/permanent_delete_stuff">
     </Preference>
 
 

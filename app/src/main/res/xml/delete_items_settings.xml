@@ -8,63 +8,63 @@
 
     <Preference
         app:key="delete_budget"
-        app:title="Delete ALL your budget">
+        app:title="@string/delete_all_budgets">
     </Preference>
 
     <Preference
         app:key="delete_bills"
-        app:title="Delete ALL your bills">
+        app:title="@string/delete_all_bills">
     </Preference>
 
     <Preference
         app:key="delete_piggy_bank"
-        app:title="Delete ALL your piggy banks">
+        app:title="@string/delete_all_piggy_bank">
     </Preference>
 
     <PreferenceCategory
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
-        app:title="Automation" />
+        app:title="@string/automation" />
 
     <Preference
         app:key="delete_rules"
-        app:title="Delete ALL your rules">
+        app:title="@string/delete_all_rules">
     </Preference>
 
     <Preference
         app:key="delete_recurring_transactions"
-        app:title="Delete ALL your recurring transactions">
+        app:title="@string/delete_recurring_transactions">
     </Preference>
 
     <xyz.hisname.fireflyiii.ui.base.BasePreferenceCategory
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
         app:title="@string/account"
-        app:summary="Deleting accounts will also delete ALL associated withdrawals, deposits and transfers!"/>
+        app:summary="@string/delete_all_accounts_summary"/>
 
     <Preference
         app:key="delete_all_accounts"
-        app:title="Delete ALL your accounts">
+        app:title="@string/delete_all_accounts">
     </Preference>
 
     <Preference
         app:key="delete_assets"
-        app:title="Delete ALL your assets accounts">
+        app:title="@string/delete_asset_accounts">
     </Preference>
 
     <Preference
         app:key="delete_expense"
-        app:title="Delete ALL your expense accounts">
+        app:title="@string/delete_expense_accounts">
     </Preference>
 
     <Preference
         app:key="delete_revenue"
-        app:title="Delete ALL your revenue accounts">
+        app:title="@string/delete_revenue_accounts">
     </Preference>
 
     <Preference
         app:key="delete_liabilities"
-        app:title="Delete ALL your liabilities">
+        app:title="@string/delete_liabilities_accounts">
     </Preference>
 
     <PreferenceCategory
@@ -75,23 +75,23 @@
 
     <Preference
         app:key="delete_transaction"
-        app:title="Delete ALL your transactions">
+        app:title="@string/delete_all_transactions">
     </Preference>
 
 
     <Preference
         app:key="delete_withdrawals"
-        app:title="Delete ALL your withdrawals">
+        app:title="@string/delete_all_withdrawals">
     </Preference>
 
     <Preference
         app:key="delete_deposits"
-        app:title="Delete ALL your deposits">
+        app:title="@string/delete_all_deposits">
     </Preference>
 
     <Preference
         app:key="delete_transfers"
-        app:title="Delete ALL your transfers">
+        app:title="@string/delete_all_transfers">
     </Preference>
 
 </PreferenceScreen>

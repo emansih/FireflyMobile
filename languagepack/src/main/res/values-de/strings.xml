@@ -126,5 +126,24 @@
     <string name="search">Suche</string>
     <string name="make_default_currency">Als Standard festlegen</string>
     <string name="currency_deleted">Währung %1$s gelöscht</string>
+    <string name="permanent_delete_stuff">Seien Sie vorsichtig mit diesen Schaltflächen. Das Löschen kann nicht widerrufen werden.</string>
+    <string name="are_you_sure">Sind Sie sich sicher? Sie können diesen Schritt nicht rückgängig machen.</string>
+    <string name="delete_data_from_firefly">Daten aus Firefly III löschen</string>
+    <string name="delete_all_transfers">Alle Umbuchungen wurden gelöscht</string>
+    <string name="delete_all_deposits">Alle Einzahlungen wurden gelöscht</string>
+    <string name="delete_all_withdrawals">Alle Ausgaben wurden gelöscht</string>
+    <string name="delete_all_transactions">Alle Buchungen wurden gelöscht</string>
+    <string name="delete_liabilities_accounts">Alle Verbindlichkeiten wurden gelöscht</string>
+    <string name="delete_revenue_accounts">Alle Einnahmenkonten wurden gelöscht</string>
+    <string name="delete_expense_accounts">Alle Ausgabenkonten wurden gelöscht</string>
+    <string name="delete_asset_accounts">Alle Bestandskonten wurden gelöscht</string>
+    <string name="delete_all_accounts">Alle Konten wurden gelöscht</string>
+    <string name="delete_all_accounts_summary">Beim Löschen von Konten werden auch ALLE damit verbundenen Abhebungen, Einzahlungen und Überweisungen gelöscht!</string>
+    <string name="delete_recurring_transactions">ALLE Daueraufträge löschen</string>
+    <string name="delete_all_rules">ALLE Ihre Regeln löschen</string>
+    <string name="automation">Automatisierungen</string>
+    <string name="delete_all_piggy_bank">ALLE Ihre Sparschweine löschen</string>
+    <string name="delete_all_bills">ALLE Ihre Rechnungen löschen</string>
+    <string name="delete_all_budgets">ALLE Ihre Budgets löschen</string>
 
 </resources>

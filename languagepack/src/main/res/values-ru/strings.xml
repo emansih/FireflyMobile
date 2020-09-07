@@ -122,4 +122,23 @@
     <string name="search">Поиск</string>
     <string name="make_default_currency">Сделать основной</string>
     <string name="currency_deleted">Валюта %1$s удалена</string>
+    <string name="delete_data_from_firefly">Удалить данные из Firefly III</string>
+    <string name="permanent_delete_stuff">Будьте осторожны с этими кнопками. Удаление нельзя будет отменить.</string>
+    <string name="are_you_sure">Вы уверены? Эту операцию нельзя будет отменить.</string>
+    <string name="automation">Автоматизация</string>
+    <string name="delete_all_transfers">Удалить ВСЕ ваши переводы</string>
+    <string name="delete_all_deposits">Удалить ВСЕ ваши доходы</string>
+    <string name="delete_all_withdrawals">Удалить ВСЕ ваши расходы</string>
+    <string name="delete_all_transactions">Удалить все ваши транзакции</string>
+    <string name="delete_liabilities_accounts">Удалить ВСЕ ваши обязательства</string>
+    <string name="delete_revenue_accounts">Удалить ВСЕ ваши счета доходов</string>
+    <string name="delete_expense_accounts">Удалить ВСЕ счета расходов</string>
+    <string name="delete_asset_accounts">Удалить ВСЕ ваши основные счета</string>
+    <string name="delete_all_accounts">Удалить ВСЕ ваши счета</string>
+    <string name="delete_all_accounts_summary">Удаление счетов приведёт к удалению ВСЕХ связанных расходов, доходов и переводов!</string>
+    <string name="delete_recurring_transactions">Все повторяющиеся операции были удалены</string>
+    <string name="delete_all_rules">Все правила и группы правил были удалены</string>
+    <string name="delete_all_piggy_bank">Все копилки были удалены</string>
+    <string name="delete_all_bills">Все счета на оплату были удалены</string>
+    <string name="delete_all_budgets">Все бюджеты были удалены</string>
 </resources>

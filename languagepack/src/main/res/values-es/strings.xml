@@ -123,4 +123,23 @@
     <string name="stored_new_bill">Factura %1$s creada</string>
     <string name="make_default_currency">Establecer por defecto</string>
     <string name="currency_deleted">Moneda %1$s eliminada</string>
+    <string name="delete_data_from_firefly">Eliminar datos de Firefly III</string>
+    <string name="permanent_delete_stuff">Tenga cuidado con estos botones. Eliminar cosas es permanente.</string>
+    <string name="are_you_sure">¿Esta usted seguro? usted no puede deshacer esto.</string>
+    <string name="delete_all_transfers">Borrar TODAS sus transferencias</string>
+    <string name="delete_all_deposits">Borrar TODOS sus depósitos</string>
+    <string name="delete_all_withdrawals">Borrar TODOS sus retiros</string>
+    <string name="delete_all_transactions">Borrar TODAS sus transacciones</string>
+    <string name="delete_liabilities_accounts">Borrar TODOS sus pasivos</string>
+    <string name="delete_revenue_accounts">Borrar TODAS sus cuentas de ingresos</string>
+    <string name="delete_expense_accounts">Borrar TODAS sus cuentas de gastos</string>
+    <string name="delete_asset_accounts">Borrar TODAS sus cuentas de activos</string>
+    <string name="delete_all_accounts">Borrar TODAS sus cuentas</string>
+    <string name="delete_all_accounts_summary">¡Eliminar cuentas también eliminará TODAS los retiros, depósitos y transferencias asociados!</string>
+    <string name="delete_recurring_transactions">Todas las transacciones recurrentes han sido eliminadas</string>
+    <string name="delete_all_rules">Borrar TODAS sus reglas</string>
+    <string name="automation">Automatización</string>
+    <string name="delete_all_piggy_bank">Borrar TODAS sus alcancías</string>
+    <string name="delete_all_bills">Borrar TODAS sus facturas</string>
+    <string name="delete_all_budgets">Eliminar todos sus presupuestos</string>
 </resources>

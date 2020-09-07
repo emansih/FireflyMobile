@@ -130,4 +130,23 @@
     <string name="updated_bill">Fatura atualizada %1$s</string>
     <string name="stored_new_bill">Nova fatura armazenada %1$s</string>
     <string name="currency_deleted">Moeda %1$s excluída</string>
+    <string name="permanent_delete_stuff">Tenha cuidado com estes botões. A exclusão de coisas é permanente.</string>
+    <string name="are_you_sure">Você tem certeza? Você não poderá desfazer isso.</string>
+    <string name="delete_data_from_firefly">Excluir dados do Firefly III</string>
+    <string name="delete_all_transfers">Excluir TODAS as suas transferências</string>
+    <string name="delete_all_deposits">Excluir TODOS os seus depósitos</string>
+    <string name="delete_all_withdrawals">Excluir TODOS os seus saques</string>
+    <string name="delete_all_transactions">Excluir TODAS as suas transações</string>
+    <string name="delete_liabilities_accounts">Excluir TODOS os seus passivos</string>
+    <string name="delete_revenue_accounts">Excluir TODAS as suas contas de receita</string>
+    <string name="delete_expense_accounts">Excluir TODAS as suas contas de despesas</string>
+    <string name="delete_asset_accounts">Excluir TODAS as suas contas de ativos</string>
+    <string name="delete_all_accounts">Excluir TODAS as suas contas</string>
+    <string name="delete_all_accounts_summary">A exclusão de contas também excluirá TODOS os saques, depósitos e transferências associados!</string>
+    <string name="delete_recurring_transactions">Excluir TODAS as suas transações recorrentes</string>
+    <string name="delete_all_rules">Excluir TODAS as suas regras</string>
+    <string name="automation">Automação</string>
+    <string name="delete_all_piggy_bank">Excluir TODOS os seus cofrinhos</string>
+    <string name="delete_all_bills">Excluir TODAS as suas faturas</string>
+    <string name="delete_all_budgets">Excluir TODOS os seus orçamentos</string>
 </resources>
