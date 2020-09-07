@@ -181,7 +181,7 @@ class DeleteItemsFragment: BaseSettings() {
     }
 
     private fun handleClassification(){
-        val deleteCategories = findPreference<Preference>("delete_all_categories") as Preference
+        val deleteCategories = findPreference<Preference>("delete_categories") as Preference
         deleteCategories.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_exclamation_triangle).apply {
             colorRes = setIconColor()
             sizeDp = 24
