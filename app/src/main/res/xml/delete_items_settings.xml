@@ -2,6 +2,7 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
+        app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
         app:title="@string/financial_control" />
 
@@ -21,6 +22,7 @@
     </Preference>
 
     <PreferenceCategory
+        app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
         app:title="Automation" />
 
@@ -34,7 +36,8 @@
         app:title="Delete ALL your recurring transactions">
     </Preference>
 
-    <PreferenceCategory
+    <xyz.hisname.fireflyiii.ui.base.BasePreferenceCategory
+        app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
         app:title="@string/account"
         app:summary="Deleting accounts will also delete ALL associated withdrawals, deposits and transfers!"/>
@@ -65,6 +68,7 @@
     </Preference>
 
     <PreferenceCategory
+        app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
         app:title="@string/transaction" />
 

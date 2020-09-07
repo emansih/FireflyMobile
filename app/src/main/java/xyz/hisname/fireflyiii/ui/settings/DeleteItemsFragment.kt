@@ -17,6 +17,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.sizeDp
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.DestroyItemsViewModel
@@ -32,6 +33,7 @@ class DeleteItemsFragment: BaseSettings() {
         addPreferencesFromResource(R.xml.delete_items_settings)
         handleFinancialControl()
         handleAccounts()
+        handleAutomation()
         handleTransaction()
         destroyItemsViewModel.message.observe(this){ message ->
             toastInfo(message)
@@ -42,6 +44,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteBudget = findPreference<Preference>("delete_budget") as Preference
         deleteBudget.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_chart_pie).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteBudget.setOnPreferenceClickListener {
             askUserConfirmation("budget")
@@ -50,6 +53,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteBills = findPreference<Preference>("delete_bills") as Preference
         deleteBills.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_calendar).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
 
         deleteBills.setOnPreferenceClickListener {
@@ -59,6 +63,7 @@ class DeleteItemsFragment: BaseSettings() {
         val piggyBanks = findPreference<Preference>("delete_piggy_bank") as Preference
         piggyBanks.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_piggy_bank).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         piggyBanks.setOnPreferenceClickListener {
             askUserConfirmation("piggy_banks")
@@ -70,6 +75,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteAllAccounts = findPreference<Preference>("delete_all_accounts") as Preference
         deleteAllAccounts.icon = IconicsDrawable(requireContext(), GoogleMaterial.Icon.gmd_credit_card).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteAllAccounts.setOnPreferenceClickListener {
             askUserConfirmation("accounts")
@@ -78,6 +84,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteAsset = findPreference<Preference>("delete_assets") as Preference
         deleteAsset.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteAsset.setOnPreferenceClickListener {
             askUserConfirmation("asset_accounts")
@@ -86,6 +93,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteExpense = findPreference<Preference>("delete_expense") as Preference
         deleteExpense.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_shopping_cart).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteExpense.setOnPreferenceClickListener {
             askUserConfirmation("expense_accounts")
@@ -94,6 +102,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteRevenue = findPreference<Preference>("delete_revenue") as Preference
         deleteRevenue.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_download).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteRevenue.setOnPreferenceClickListener {
             askUserConfirmation("revenue_accounts")
@@ -102,6 +111,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteLiabilities = findPreference<Preference>("delete_liabilities") as Preference
         deleteLiabilities.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_ticket_alt).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteLiabilities.setOnPreferenceClickListener {
             askUserConfirmation("liabilities")
@@ -113,6 +123,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteTransaction = findPreference<Preference>("delete_transaction") as Preference
         deleteTransaction.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_exchange_alt).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteTransaction.setOnPreferenceClickListener {
             askUserConfirmation("transactions")
@@ -121,6 +132,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteWithdrawals = findPreference<Preference>("delete_withdrawals") as Preference
         deleteWithdrawals.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_long_arrow_alt_left).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteWithdrawals.setOnPreferenceClickListener {
             askUserConfirmation("withdrawals")
@@ -129,6 +141,7 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteDeposits = findPreference<Preference>("delete_deposits") as Preference
         deleteDeposits.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_long_arrow_alt_right).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteDeposits.setOnPreferenceClickListener {
             askUserConfirmation("deposits")
@@ -137,9 +150,31 @@ class DeleteItemsFragment: BaseSettings() {
         val deleteTransfer = findPreference<Preference>("delete_transfers") as Preference
         deleteTransfer.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_exchange_alt).apply {
             colorRes = setIconColor()
+            sizeDp = 24
         }
         deleteTransfer.setOnPreferenceClickListener {
             askUserConfirmation("transfers")
+            true
+        }
+    }
+
+    private fun handleAutomation(){
+        val deleteRules = findPreference<Preference>("delete_rules") as Preference
+        deleteRules.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_random).apply {
+            colorRes = setIconColor()
+            sizeDp = 24
+        }
+        deleteRules.setOnPreferenceClickListener {
+            askUserConfirmation("rules")
+            true
+        }
+        val deleteRecurringTransaction = findPreference<Preference>("delete_recurring_transactions") as Preference
+        deleteRecurringTransaction.icon = IconicsDrawable(requireContext(), FontAwesome.Icon.faw_paint_brush).apply {
+            colorRes = setIconColor()
+            sizeDp = 24
+        }
+        deleteRecurringTransaction.setOnPreferenceClickListener {
+            askUserConfirmation("recurring")
             true
         }
     }
