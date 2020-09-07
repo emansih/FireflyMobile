@@ -720,12 +720,6 @@ class AddTransactionFragment: BaseFragment() {
                 description_edittext.setAdapter(adapter)
             }
         }
-        destination_edittext.doAfterTextChanged { editable ->
-            accountViewModel.getAccountByNameAndType("expense", editable.toString()).observe(viewLifecycleOwner){ list ->
-                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
-                destination_edittext.setAdapter(autocompleteAdapter)
-            }
-        }
         source_edittext.doAfterTextChanged { editable ->
             accountViewModel.getAccountByNameAndType("revenue", editable.toString()).observe(viewLifecycleOwner){ list ->
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)

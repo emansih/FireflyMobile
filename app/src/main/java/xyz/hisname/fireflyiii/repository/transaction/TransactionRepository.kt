@@ -1,12 +1,15 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.debounce
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.math.BigDecimal
 
@@ -235,16 +238,21 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         try {
             // Search via API only if query is more than 3
             if(query.length > 3){
-                val networkCall = transactionService?.searchTransaction(query)
-                val responseBody = networkCall?.body()
-                if (responseBody != null && networkCall.isSuccessful) {
-                    responseBody.data.forEach { data ->
-                        data.transactionAttributes?.transactions?.forEach { transaction ->
-                            transactionDao.insert(transaction)
-                            transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id))
+                val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
+                    runBlocking {
+                        val networkCall = transactionService?.searchTransaction(debouncedString)
+                        val responseBody = networkCall?.body()
+                        if (responseBody != null && networkCall.isSuccessful) {
+                            responseBody.data.forEach { data ->
+                                data.transactionAttributes?.transactions?.forEach { transaction ->
+                                    transactionDao.insert(transaction)
+                                    transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id))
+                                }
+                            }
                         }
                     }
                 }
+                handleSearch(query)
             }
         } catch (exception: Exception){ }
         return transactionDao.getTransactionByDescription("%$query%")

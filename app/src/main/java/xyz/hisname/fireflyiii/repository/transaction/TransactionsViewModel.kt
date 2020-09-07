@@ -447,8 +447,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         val displayName = arrayListOf<String>()
         viewModelScope.launch(Dispatchers.IO) {
             repository.getTransactionByDescription(query)
-                    .distinctUntilChanged()
-                    .debounce(1000)
                     .collectLatest { transactionList ->
                         transactionList.forEach { transactions ->
                             displayName.add(transactions.description)

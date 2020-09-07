@@ -1,13 +1,15 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.util.extension.debounce
 import xyz.hisname.fireflyiii.util.network.HttpConstants
-import java.security.cert.CertificateException
 
 @Suppress("RedundantSuspendModifier")
 class AccountRepository(private val accountDao: AccountsDataDao,
@@ -80,13 +82,18 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<MutableList<AccountData>>{
         try {
             if(accountName.length > 3){
-                val networkCall = accountsService?.searchAccount(accountName, accountType)
-                val responseBody = networkCall?.body()
-                if (responseBody != null && networkCall.isSuccessful) {
-                    responseBody.data.forEach { data ->
-                        insertAccount(data)
+                val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
+                    runBlocking {
+                        val networkCall = accountsService?.searchAccount(debouncedString, accountType)
+                        val responseBody = networkCall?.body()
+                        if (responseBody != null && networkCall.isSuccessful) {
+                            responseBody.data.forEach { data ->
+                                insertAccount(data)
+                            }
+                        }
                     }
                 }
+                handleSearch(accountName)
             }
 
         } catch (exception: Exception){}

@@ -249,7 +249,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAccountByNameAndType(accountType, accountName)
                     .distinctUntilChanged()
-                    .debounce(1000)
                     .collectLatest { accountList ->
                         accountList.forEach { accountData ->
                             displayName.add(accountData.accountAttributes?.name ?: "")
