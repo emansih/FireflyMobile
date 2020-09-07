@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <Preference
         app:key="account_options"
@@ -42,5 +41,12 @@
         app:title="Tutorial"
         app:summary="Click here to restart tutorial">
     </Preference>
+
+    <Preference
+        app:key="delete_data"
+        app:iconSpaceReserved="false"
+        app:title="Delete data from Firefly III">
+    </Preference>
+
 
 </PreferenceScreen>

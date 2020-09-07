@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/financial_control" />
+
+    <Preference
+        app:key="delete_budget"
+        app:title="Delete ALL your budget">
+    </Preference>
+
+    <Preference
+        app:key="delete_bills"
+        app:title="Delete ALL your bills">
+    </Preference>
+
+    <Preference
+        app:key="delete_piggy_bank"
+        app:title="Delete ALL your piggy banks">
+    </Preference>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="Automation" />
+
+    <Preference
+        app:key="delete_rules"
+        app:title="Delete ALL your rules">
+    </Preference>
+
+    <Preference
+        app:key="delete_recurring_transactions"
+        app:title="Delete ALL your recurring transactions">
+    </Preference>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/account"
+        app:summary="Deleting accounts will also delete ALL associated withdrawals, deposits and transfers!"/>
+
+    <Preference
+        app:key="delete_all_accounts"
+        app:title="Delete ALL your accounts">
+    </Preference>
+
+    <Preference
+        app:key="delete_assets"
+        app:title="Delete ALL your assets accounts">
+    </Preference>
+
+    <Preference
+        app:key="delete_expense"
+        app:title="Delete ALL your expense accounts">
+    </Preference>
+
+    <Preference
+        app:key="delete_revenue"
+        app:title="Delete ALL your revenue accounts">
+    </Preference>
+
+    <Preference
+        app:key="delete_liabilities"
+        app:title="Delete ALL your liabilities">
+    </Preference>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/transaction" />
+
+
+    <Preference
+        app:key="delete_transaction"
+        app:title="Delete ALL your transactions">
+    </Preference>
+
+
+    <Preference
+        app:key="delete_withdrawals"
+        app:title="Delete ALL your withdrawals">
+    </Preference>
+
+    <Preference
+        app:key="delete_deposits"
+        app:title="Delete ALL your deposits">
+    </Preference>
+
+    <Preference
+        app:key="delete_transfers"
+        app:title="Delete ALL your transfers">
+    </Preference>
+
+</PreferenceScreen>

@@ -36,6 +36,7 @@ class SettingsFragment: BaseSettings() {
         setThumbnail()
         setTutorial()
         setDeveloperOption()
+        deleteItems()
     }
 
     private fun setLanguagePref(){
@@ -178,6 +179,23 @@ class SettingsFragment: BaseSettings() {
             icon = GoogleMaterial.Icon.gmd_lock
             sizeDp = 24
             colorRes = setIconColor()
+        }
+    }
+
+    private fun deleteItems(){
+        val deleteData = findPreference<Preference>("delete_data") as Preference
+        deleteData.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_delete_forever
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
+        deleteData.setOnPreferenceClickListener {
+            parentFragmentManager.commit {
+                addToBackStack(null)
+                setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                replace(R.id.fragment_container, DeleteItemsFragment())
+            }
+            true
         }
     }
 }
