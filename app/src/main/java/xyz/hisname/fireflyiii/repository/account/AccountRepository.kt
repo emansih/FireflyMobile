@@ -80,10 +80,10 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
 
     suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<MutableList<AccountData>>{
-        try {
-            if(accountName.length > 3){
-                val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
-                    runBlocking {
+        if(accountName.length > 3){
+            val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
+                runBlocking {
+                    try {
                         val networkCall = accountsService?.searchAccount(debouncedString, accountType)
                         val responseBody = networkCall?.body()
                         if (responseBody != null && networkCall.isSuccessful) {
@@ -91,12 +91,11 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                                 insertAccount(data)
                             }
                         }
-                    }
+                    } catch (exception: Exception){ }
                 }
-                handleSearch(accountName)
             }
-
-        } catch (exception: Exception){}
+            handleSearch(accountName)
+        }
         return accountDao.getAccountByNameAndType(accountType, "%$accountName%")
     }
 

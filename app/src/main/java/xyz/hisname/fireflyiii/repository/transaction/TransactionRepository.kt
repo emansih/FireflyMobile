@@ -235,11 +235,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     suspend fun getTransactionByDescription(query: String): Flow<MutableList<Transactions>>{
-        try {
-            // Search via API only if query is more than 3
-            if(query.length > 3){
-                val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
-                    runBlocking {
+        // Search via API only if query is more than 3
+        if(query.length > 3){
+            val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
+                runBlocking {
+                    try {
                         val networkCall = transactionService?.searchTransaction(debouncedString)
                         val responseBody = networkCall?.body()
                         if (responseBody != null && networkCall.isSuccessful) {
@@ -250,11 +250,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                                 }
                             }
                         }
-                    }
+                    } catch (exception: Exception){ }
                 }
-                handleSearch(query)
             }
-        } catch (exception: Exception){ }
+            handleSearch(query)
+        }
         return transactionDao.getTransactionByDescription("%$query%")
     }
 
