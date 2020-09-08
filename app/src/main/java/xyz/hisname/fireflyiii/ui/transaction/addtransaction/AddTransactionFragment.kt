@@ -1,18 +1,17 @@
 package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
-import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -56,6 +55,7 @@ import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecycl
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
+import java.io.File
 import java.util.*
 import kotlin.math.abs
 
@@ -82,14 +82,10 @@ class AddTransactionFragment: BaseFragment() {
     private lateinit var spinnerAdapter: ArrayAdapter<String>
     private var sourceName: String? = ""
     private var destinationName: String? = ""
-    private val calendar by lazy {  Calendar.getInstance() }
     private var selectedTime = ""
     private var budgetName: String? = ""
-
-    companion object {
-        private const val OPEN_REQUEST_CODE  = 41
-        private const val STORAGE_REQUEST_CODE = 1337
-    }
+    private lateinit var takePicture: ActivityResultLauncher<Uri>
+    private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -113,6 +109,33 @@ class AddTransactionFragment: BaseFragment() {
         setFab()
         setCalculator()
         contextSwitch()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                val attachmentDataAdapter = arrayListOf<AttachmentData>()
+                attachment_information.isVisible = true
+                attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", "", FileUtils.getFileName(requireContext(), fileUri ?: Uri.EMPTY) ?: "",
+                        "", "", "", 0, "", "", ""), 0, ""))
+                attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData -> }
+            }
+        }
+        chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()){ fileChoosen ->
+            val attachmentDataAdapter = arrayListOf<AttachmentData>()
+            attachment_information.isVisible = true
+            attachment_information.layoutManager = LinearLayoutManager(requireContext())
+            attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                    "", "", FileUtils.getFileName(requireContext(), fileChoosen ?: Uri.EMPTY) ?: "",
+                    "", "", "", 0, "", "", ""), 0, ""))
+            attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData -> }
+
+        }
     }
 
     private fun setTaskerIcons(){
@@ -602,7 +625,7 @@ class AddTransactionFragment: BaseFragment() {
     private fun setWidgets(){
         showCase(R.string.urge_users_to_click_icons, "transactionIcons", transaction_amount_placeholder_view).show()
         add_attachment_button.setOnClickListener {
-            openDocViewer()
+            attachmentDialog()
         }
         transaction_date_edittext.setText(DateTimeUtil.getTodayDate())
         transaction_date_edittext.setOnClickListener {
@@ -902,50 +925,26 @@ class AddTransactionFragment: BaseFragment() {
         }
     }
 
-    private fun openDocViewer(){
-        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
-        } else {
-            val documentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                type = "*/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
-            startActivityForResult(documentIntent, OPEN_REQUEST_CODE)
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
-            STORAGE_REQUEST_CODE -> {
-                if (grantResults.size == 1
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openDocViewer()
-                }
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, resultData)
-        if(resultCode == Activity.RESULT_OK){
-            if (requestCode == OPEN_REQUEST_CODE) {
-                if (resultData != null) {
-                    fileUri = resultData.data
-                    val attachmentDataAdapter = arrayListOf<AttachmentData>()
-                    attachment_information.isVisible = true
-                    attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                    attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                            "", "", FileUtils.getFileName(requireContext(), fileUri ?: Uri.EMPTY) ?: "",
-                            "", "" , "", 0, "", "", ""), 0, ""))
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData ->
+    private fun attachmentDialog(){
+        val listItems = arrayOf("Capture image from camera", "Choose File")
+        AlertDialog.Builder(requireContext())
+                .setItems(listItems) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() + File.separator + "image.png")
+                            if(fileToOpen.exists()){
+                                fileToOpen.delete()
+                            }
+                            fileUri = FileProvider.getUriForFile(requireContext(),
+                                    requireContext().packageName + ".provider", fileToOpen)
+                            takePicture.launch(fileUri)
+                        }
+                        1 -> {
+                            chooseDocument.launch(arrayOf("*/*"))
+                        }
                     }
-
                 }
-            }
-        }
+                .show()
     }
 
     override fun handleBack() {
