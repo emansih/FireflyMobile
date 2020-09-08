@@ -63,8 +63,9 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
                     colorRes = R.color.md_red_500
                     sizeDp = 12
                 })
+                itemView.downloadButton.setOnClickListener { removeItemListener(removeItemListener) }
             }
-            itemView.downloadButton.setOnClickListener { removeItemListener(removeItemListener) }
+            itemView.downloadButton.setOnClickListener { clickListener(attachmentData) }
             itemView.setOnClickListener { clickListener(attachmentData) }
         }
     }

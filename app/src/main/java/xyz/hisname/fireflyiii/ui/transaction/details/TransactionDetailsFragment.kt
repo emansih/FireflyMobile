@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.attachment_information
 import xyz.hisname.fireflyiii.R
@@ -48,7 +47,6 @@ class TransactionDetailsFragment: BaseFragment() {
     private var transactionBudget = ""
     private var transactionAmount = ""
     private lateinit var chipTags: Chip
-    private lateinit var attachmentData: AttachmentData
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -202,15 +200,14 @@ class TransactionDetailsFragment: BaseFragment() {
                     attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
                     attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
                             true, { data: AttachmentData ->
-                        attachmentData = data
-                        setDownloadClickListener(data)
+                        setDownloadClickListener(data, attachmentDataAdapter)
                     }){ another: Int -> }
                 }
             }
         }
     }
 
-    private fun setDownloadClickListener(attachmentData: AttachmentData){
+    private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
         ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
         attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
@@ -220,8 +217,10 @@ class TransactionDetailsFragment: BaseFragment() {
                     toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                 } else {
                     // "Refresh" the icon. From downloading to open file
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(mutableListOf(attachmentData),
-                            true, { data: AttachmentData -> }){ another: Int -> }
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentAdapter,
+                            true, { data: AttachmentData ->
+                        setDownloadClickListener(data, attachmentDataAdapter)
+                    }){ another: Int -> }
                     startActivity(requireContext().openFile(downloadedFile))
                 }
             }
