@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -124,16 +125,29 @@ class AddTransactionFragment: BaseFragment() {
                         "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0, ""))
                 attachmentItemAdapter.add(fileUri)
-                attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData -> }
+                attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+                        false, { data: AttachmentData -> }){ another: Int ->
+                    attachmentDataAdapter.removeAt(another)
+                    attachmentItemAdapter.removeAt(another)
+                    attachment_information.adapter?.notifyItemRemoved(another)
+                }
+
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()){ fileChoosen ->
             attachment_information.isVisible = true
-            attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                    "", "", FileUtils.getFileName(requireContext(), fileChoosen) ?: "",
-                    "", "", "", 0, "", "", ""), 0, ""))
-            attachmentItemAdapter.add(fileChoosen)
-            attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData -> }
+            if(fileChoosen != null){
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", "", FileUtils.getFileName(requireContext(), fileChoosen) ?: "",
+                        "", "", "", 0, "", "", ""), 0, ""))
+                attachmentItemAdapter.add(fileChoosen)
+            }
+            attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+                    false, { data: AttachmentData -> }) { another: Int ->
+                attachmentDataAdapter.removeAt(another)
+                attachmentItemAdapter.removeAt(another)
+                attachment_information.adapter?.notifyItemRemoved(another)
+            }
 
         }
     }

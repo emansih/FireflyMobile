@@ -18,7 +18,8 @@ import java.io.File
 
 class TransactionAttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
                                            private val shouldShowDownload: Boolean = true,
-                                           private val clickListener:(AttachmentData) -> Unit):
+                                           private val clickListener:(AttachmentData) -> Unit,
+                                           private val removeItemListener:(position: Int) -> Unit):
         DiffUtilAdapter<AttachmentData, TransactionAttachmentRecyclerAdapter.AttachmentAdapter>() {
 
     private lateinit var context: Context
@@ -31,10 +32,10 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
 
     override fun getItemCount() = items.size
 
-    override fun onBindViewHolder(holder: AttachmentAdapter, position: Int) = holder.bind(items[position], clickListener)
+    override fun onBindViewHolder(holder: AttachmentAdapter, position: Int) = holder.bind(items[position], clickListener, position)
 
     inner class AttachmentAdapter(view: View): RecyclerView.ViewHolder(view) {
-        fun bind(attachmentData: AttachmentData, clickListener: (AttachmentData) -> Unit){
+        fun bind(attachmentData: AttachmentData, clickListener: (AttachmentData) -> Unit, removeItemListener: Int){
             val fileName = attachmentData.attachmentAttributes?.filename ?: ""
             if(fileName.length >= 21){
                 itemView.attachment_name.text = fileName.substring(0, 21) + "..."
@@ -57,7 +58,13 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
                         sizeDp = 12
                     }).into(itemView.downloadButton)
                 }
+            } else {
+                itemView.downloadButton.setImageDrawable(IconicsDrawable(context, GoogleMaterial.Icon.gmd_close).apply {
+                    colorRes = R.color.md_red_500
+                    sizeDp = 12
+                })
             }
+            itemView.downloadButton.setOnClickListener { removeItemListener(removeItemListener) }
             itemView.setOnClickListener { clickListener(attachmentData) }
         }
     }

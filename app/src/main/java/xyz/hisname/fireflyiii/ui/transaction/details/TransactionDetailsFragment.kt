@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.activity_base.*
+import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
+import kotlinx.android.synthetic.main.fragment_transaction_details.attachment_information
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
@@ -198,10 +200,11 @@ class TransactionDetailsFragment: BaseFragment() {
                     attachmentDataAdapter = ArrayList(attachment)
                     attachment_information.layoutManager = LinearLayoutManager(requireContext())
                     attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(ArrayList(attachment)) { data: AttachmentData ->
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+                            true, { data: AttachmentData ->
                         attachmentData = data
                         setDownloadClickListener(data)
-                    }
+                    }){ another: Int -> }
                 }
             }
         }
@@ -217,7 +220,8 @@ class TransactionDetailsFragment: BaseFragment() {
                     toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                 } else {
                     // "Refresh" the icon. From downloading to open file
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(mutableListOf(attachmentData)) { data: AttachmentData -> }
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(mutableListOf(attachmentData),
+                            true, { data: AttachmentData -> }){ another: Int -> }
                     startActivity(requireContext().openFile(downloadedFile))
                 }
             }
