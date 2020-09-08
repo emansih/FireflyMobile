@@ -19,6 +19,7 @@ import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.net.UnknownHostException
 import java.time.Duration
 
 class AttachmentWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
@@ -92,7 +93,11 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                     if(fileArray.lastIndex == index){
                         cancelWorker(transactionJournalId, context)
                     }
+                } catch (unknownHost: UnknownHostException){
+                   // Don't cancel work here
                 } catch (exception: Exception){
+                    // Only cancel work here
+                    cancelWorker(transactionJournalId, context)
                     ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
                     val throwMessage = exception.message
                     if(throwMessage != null && throwMessage.startsWith("Write error: ssl=")){
