@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.transaction.details
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -8,7 +7,6 @@ import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -49,10 +47,6 @@ class TransactionDetailsFragment: BaseFragment() {
     private var transactionAmount = ""
     private lateinit var chipTags: Chip
     private lateinit var attachmentData: AttachmentData
-
-    companion object {
-        private const val STORAGE_REQUEST_CODE = 1337
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -214,29 +208,12 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData){
-        if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_REQUEST_CODE)
-        } else {
-            val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-            attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
-                attachmentViewModel.isDownloaded.observe(viewLifecycleOwner) { isLoading ->
-                    startActivity(requireContext().openFile(downloadedFile))
-                    if (!isLoading) {
-                        toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
-            STORAGE_REQUEST_CODE -> {
-                if (grantResults.size == 1
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setDownloadClickListener(attachmentData)
+        val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
+        attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
+            attachmentViewModel.isDownloaded.observe(viewLifecycleOwner) { isLoading ->
+                startActivity(requireContext().openFile(downloadedFile))
+                if (!isLoading) {
+                    toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                 }
             }
         }
