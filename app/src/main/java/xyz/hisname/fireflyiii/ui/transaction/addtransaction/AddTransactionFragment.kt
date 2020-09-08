@@ -931,7 +931,14 @@ class AddTransactionFragment: BaseFragment() {
                 .setItems(listItems) { dialog, which ->
                     when (which) {
                         0 -> {
-                            val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() + File.separator + "image.png")
+                            val createTempDir = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp")
+                            if(!createTempDir.exists()){
+                                createTempDir.mkdir()
+                            }
+                            val randomId = UUID.randomUUID().toString().substring(0, 7)
+                            val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp" + File.separator + "${randomId}-firefly.png")
                             if(fileToOpen.exists()){
                                 fileToOpen.delete()
                             }
