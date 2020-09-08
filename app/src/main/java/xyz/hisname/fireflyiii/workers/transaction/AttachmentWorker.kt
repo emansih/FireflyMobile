@@ -60,7 +60,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                         val upload = service.uploadFile(responseBody.data.attachmentId, requestFile)
                         ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
                         if(upload.code() == 204) {
-                            context.displayNotification("File uploaded", channelName,
+                            context.displayNotification("$fileName uploaded", channelName,
                                     Constants.TRANSACTION_CHANNEL, channelIcon)
                         } else {
                             context.displayNotification(upload.message(), channelName,
