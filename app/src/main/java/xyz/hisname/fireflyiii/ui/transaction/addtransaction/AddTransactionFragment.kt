@@ -70,7 +70,7 @@ class AddTransactionFragment: BaseFragment() {
     private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val pluginViewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
-    private var fileUri: Uri? = null
+    private lateinit var fileUri: Uri
     private var currency = ""
     private var tags = ArrayList<String>()
     private var piggyBankList = ArrayList<String>()
@@ -86,6 +86,8 @@ class AddTransactionFragment: BaseFragment() {
     private var budgetName: String? = ""
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
+    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -109,30 +111,28 @@ class AddTransactionFragment: BaseFragment() {
         setFab()
         setCalculator()
         contextSwitch()
+        attachment_information.layoutManager = LinearLayoutManager(requireContext())
+        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                val attachmentDataAdapter = arrayListOf<AttachmentData>()
                 attachment_information.isVisible = true
-                attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                        "", "", FileUtils.getFileName(requireContext(), fileUri ?: Uri.EMPTY) ?: "",
+                        "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0, ""))
+                attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData -> }
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()){ fileChoosen ->
-            val attachmentDataAdapter = arrayListOf<AttachmentData>()
             attachment_information.isVisible = true
-            attachment_information.layoutManager = LinearLayoutManager(requireContext())
-            attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                    "", "", FileUtils.getFileName(requireContext(), fileChoosen ?: Uri.EMPTY) ?: "",
+                    "", "", FileUtils.getFileName(requireContext(), fileChoosen) ?: "",
                     "", "", "", 0, "", "", ""), 0, ""))
+            attachmentItemAdapter.add(fileChoosen)
             attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter, false) { data: AttachmentData -> }
 
         }
@@ -493,7 +493,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.updateTransaction(transactionJournalId,transactionType, description_edittext.getString(),
                 transactionDateTime, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
-                transactionTags, budgetName, fileUri).observe(viewLifecycleOwner) { transactionResponse->
+                transactionTags, budgetName, attachmentItemAdapter).observe(viewLifecycleOwner) { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -739,7 +739,7 @@ class AddTransactionFragment: BaseFragment() {
         }
         description_edittext.doAfterTextChanged { editable ->
             transactionViewModel.getTransactionByDescription(editable.toString()).observe(viewLifecycleOwner){ list ->
-                val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, list)
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
                 description_edittext.setAdapter(adapter)
             }
         }
@@ -816,7 +816,7 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transactionDateTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags, budgetName, fileUri).observe(viewLifecycleOwner) { transactionResponse ->
+                currency, categoryName, transactionTags, budgetName, attachmentItemAdapter).observe(viewLifecycleOwner) { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {

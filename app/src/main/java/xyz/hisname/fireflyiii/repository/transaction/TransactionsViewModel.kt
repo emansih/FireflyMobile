@@ -245,7 +245,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun addTransaction(type: String, description: String,
                        date: String, piggyBankName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?, budgetName: String?, fileUri: Uri?): LiveData<ApiResponses<TransactionSuccessModel>>{
+                       category: String?, tags: String?, budgetName: String?, fileUri: ArrayList<Uri>): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         transactionService?.addTransaction(convertString(type),description, date ,piggyBankName,
@@ -276,7 +276,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                                 transaction.transaction_journal_id))
                     }
                 }.invokeOnCompletion {
-                    if(fileUri != null){
+                    if(fileUri.isNotEmpty()){
                         AttachmentWorker.initWorker(fileUri, transactionJournalId, getApplication())
                     }
                 }
@@ -293,7 +293,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun updateTransaction(transactionJournalId: Long, type: String, description: String,
                        date: String, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?, budgetName: String?, fileUri: Uri?): LiveData<ApiResponses<TransactionSuccessModel>>{
+                       category: String?, tags: String?, budgetName: String?, fileUri: ArrayList<Uri>): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         var transactionId = 0L
@@ -328,7 +328,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                             }
                         }
                     }.invokeOnCompletion {
-                        if(fileUri != null){
+                        if(fileUri.isNotEmpty()){
                             AttachmentWorker.initWorker(fileUri, transactionJournalId, getApplication())
                         }
                     }
