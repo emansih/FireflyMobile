@@ -6,7 +6,8 @@ import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.core.os.bundleOf
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.commit
 import androidx.lifecycle.observe
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -150,9 +151,31 @@ class AddBillFragment: BaseAddObjectFragment() {
             placeHolderToolbar.inflateMenu(R.menu.delete_menu)
             placeHolderToolbar.setOnMenuItemClickListener { item ->
                 if (item.itemId == R.id.menu_item_delete) {
-                    val deleteBill = DeleteBillDialog()
-                    deleteBill.arguments = bundleOf("billId" to billId, "billDescription" to billDescription)
-                    deleteBill.show(parentFragmentManager.beginTransaction(), "delete_bill_dialog")
+                    AlertDialog.Builder(requireContext())
+                            .setTitle(resources.getString(R.string.delete_bill_message, billDescription))
+                            .setMessage(resources.getString(R.string.delete_bill_message, billDescription))
+                            .setIcon(IconicsDrawable(requireContext()).apply {
+                                icon = FontAwesome.Icon.faw_trash
+                                sizeDp = 15
+                                colorRes = R.color.md_green_600
+                            })
+                            .setPositiveButton(R.string.delete_permanently){ _,_ ->
+                                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+                                billViewModel.deleteBillById(billId).observe(viewLifecycleOwner) { billDeleted ->
+                                    if(billDeleted){
+                                        toastSuccess(resources.getString(R.string.bill_deleted, billDescription))
+                                    } else {
+                                        toastError(resources.getString(R.string.issue_deleting, "bill"),
+                                                Toast.LENGTH_LONG)
+                                    }
+                                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                                    handleBack()
+                                }
+                            }
+                            .setNegativeButton("No") { _, _ ->
+                                toastInfo("Bill not deleted")
+                            }
+                            .show()
                 }
                 true
             }
