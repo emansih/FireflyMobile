@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.transaction.details
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
@@ -21,6 +20,7 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
+import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
@@ -208,12 +208,17 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData){
+        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
         attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
             attachmentViewModel.isDownloaded.observe(viewLifecycleOwner) { isLoading ->
-                startActivity(requireContext().openFile(downloadedFile))
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 if (!isLoading) {
                     toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
+                } else {
+                    // "Refresh" the icon. From downloading to open file
+                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(mutableListOf(attachmentData)) { data: AttachmentData -> }
+                    startActivity(requireContext().openFile(downloadedFile))
                 }
             }
         }
