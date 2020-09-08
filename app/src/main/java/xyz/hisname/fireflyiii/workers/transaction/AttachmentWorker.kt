@@ -4,12 +4,14 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import androidx.work.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.FileUtils
@@ -17,6 +19,7 @@ import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.time.Duration
 
 class AttachmentWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
@@ -30,16 +33,30 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
             fileUri.forEach { uri ->
                 uriArray.add(uri.toString())
             }
-            val workBuilder = OneTimeWorkRequest
-                    .Builder(AttachmentWorker::class.java)
-                    .addTag("attachment_worker")
-                    .setInputData(dataBuilder.putLong("transactionJournalId" ,transactionJournalId).build())
-                    .setInputData(dataBuilder.putStringArray("fileUri", uriArray.toTypedArray()).build())
-                    .setConstraints(Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build())
-                    .build()
-            WorkManager.getInstance(context).enqueue(workBuilder)
+            val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+            val delay = appPref.workManagerDelay
+            val battery = appPref.workManagerLowBattery
+            val networkType = appPref.workManagerNetworkType
+            val requireCharging = appPref.workManagerRequireCharging
+            val attachmentTag =
+                    WorkManager.getInstance(context).getWorkInfosByTag("add_attachment_tag_$transactionJournalId").get()
+            if(attachmentTag == null || attachmentTag.size == 0){
+                val attachmentWork = PeriodicWorkRequestBuilder<AttachmentWorker>(Duration.ofMinutes(delay))
+                        .setInputData(dataBuilder.putLong("transactionJournalId" ,transactionJournalId).build())
+                        .setInputData(dataBuilder.putStringArray("fileUri", uriArray.toTypedArray()).build())
+                        .addTag("add_attachment_tag_$transactionJournalId")
+                        .setConstraints(Constraints.Builder()
+                                .setRequiredNetworkType(networkType)
+                                .setRequiresBatteryNotLow(battery)
+                                .setRequiresCharging(requireCharging)
+                                .build())
+                        .build()
+                WorkManager.getInstance(context).enqueue(attachmentWork)
+            }
+        }
+
+        fun cancelWorker(transactionJournalId: Long, context: Context){
+            WorkManager.getInstance(context).cancelAllWorkByTag("add_attachment_tag_$transactionJournalId")
         }
     }
 
@@ -48,7 +65,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         val fileArray = inputData.getStringArray("fileUri")
         val service = genericService?.create(AttachmentService::class.java)
         if(!fileArray.isNullOrEmpty()){
-            fileArray.forEach { fileToUpload ->
+            fileArray.forEachIndexed { index, fileToUpload ->
                 val fileName = FileUtils.getFileName(context, fileToUpload.toUri()) ?: ""
                 val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context, fileToUpload.toUri()) ?: ""),
                         copyFile(context, fileToUpload.toUri(), fileName))
@@ -70,6 +87,10 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                         ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
                         context.displayNotification(storeAttachment?.message() ?: "", channelName,
                                 Constants.TRANSACTION_CHANNEL, channelIcon)
+                    }
+                    // Last element in the array. Cancel work
+                    if(fileArray.lastIndex == index){
+                        cancelWorker(transactionJournalId, context)
                     }
                 } catch (exception: Exception){
                     ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
