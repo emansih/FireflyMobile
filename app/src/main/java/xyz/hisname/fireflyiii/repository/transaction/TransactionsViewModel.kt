@@ -23,6 +23,7 @@ import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
+import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import java.math.BigDecimal
 import kotlin.math.absoluteValue
 
@@ -360,9 +361,11 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         var transactionId = 0L
         viewModelScope.launch(Dispatchers.IO) {
             transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
-            if(transactionId != 0L){
-                isItDeleted = repository.deleteTransactionById(transactionId)
+            if(transactionId == 0L){
+                // User is offline and transaction is pending. Cancel work
+                TransactionWorker.cancelWorker(transactionJournalId, getApplication())
             }
+            isItDeleted = repository.deleteTransactionById(transactionId)
         }.invokeOnCompletion {
             when (isItDeleted) {
                 HttpConstants.FAILED -> {
