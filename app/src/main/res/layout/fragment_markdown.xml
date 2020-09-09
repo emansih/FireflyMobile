@@ -139,6 +139,7 @@
         android:layout_height="0dp"
         android:gravity="top"
         android:inputType="textMultiLine"
+        android:hint="Type your notes here"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linedivider"
         app:layout_constraintBottom_toBottomOf="parent"/>
