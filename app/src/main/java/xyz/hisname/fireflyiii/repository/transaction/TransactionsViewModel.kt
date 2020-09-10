@@ -414,19 +414,22 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                      * hindsight I should have looked at James Cole's design schema. But hindsight 10/10
                      **/
                     viewModelScope.launch(Dispatchers.IO) {
-                        attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
-                    }.invokeOnCompletion {
-                        isLoading.postValue(false)
-                        data.postValue(attachmentData)
+                        try {
+                            attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
+                            isLoading.postValue(false)
+                            data.postValue(attachmentData)
+                        } catch (exception: Exception){ }
                     }
                 }
             })
             { throwable ->
                 viewModelScope.launch(Dispatchers.IO) {
-                    attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
-                }.invokeOnCompletion {
-                    isLoading.postValue(false)
-                    data.postValue(attachmentData)
+                    try {
+                        attachmentData = attachmentRepository.getAttachmentFromJournalId(journalId)
+                        isLoading.postValue(false)
+                        data.postValue(attachmentData)
+                    } catch (exception: Exception){ }
+
                 }
                 apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
             })

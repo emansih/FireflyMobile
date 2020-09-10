@@ -268,10 +268,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     transactionDao.deleteTransaction()
                 }
                 responseBody.data.forEachIndexed { _, data ->
-                    transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                    data.transactionAttributes?.transactions?.forEach { transactions ->
+                        transactionDao.insert(transactions)
+                    }
                     transactionDao.insert(TransactionIndex(data.transactionId,
                             data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-
                 }
             }
         } catch(exception: Exception){ }
