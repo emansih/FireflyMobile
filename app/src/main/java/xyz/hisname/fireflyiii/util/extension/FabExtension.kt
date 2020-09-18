@@ -11,6 +11,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.sizeDp
 import xyz.hisname.fireflyiii.R
 
 fun FloatingActionButton.display(
@@ -57,12 +58,13 @@ fun ExtendedFloatingActionButton.display(clicky: View.() -> Unit){
 fun ExtendedFloatingActionButton.animateChange(isAdd: Boolean){
     val colorRemove = getCompatColor(R.color.md_red_600)
     val colorAdd = getCompatColor(R.color.colorAccent)
-    val animationAddToDelete = this.context.getCompatDrawable(R.drawable.ic_delete_to_add) as AnimatedVectorDrawable
+    val animationAddToDelete = this.context.getCompatDrawable(R.drawable.ic_add_to_delete) as AnimatedVectorDrawable
+    val animationDeleteToAdd  = this.context.getCompatDrawable(R.drawable.ic_delete_to_add) as AnimatedVectorDrawable
     if(isAdd){
         this.apply {
             text = "Add"
-            icon = animationAddToDelete
-            animationAddToDelete.start()
+            icon = animationDeleteToAdd
+            animationDeleteToAdd.start()
             animateBackgroundStateChange(colorRemove, colorAdd)
             isClickable = true
             isFocusable = true
@@ -83,7 +85,9 @@ fun ExtendedFloatingActionButton.animateChange(isAdd: Boolean){
 fun ExtendedFloatingActionButton.dropToRemove(){
     this.apply {
         text = "Drop to remove"
-        icon = IconicsDrawable(this.context, GoogleMaterial.Icon.gmd_delete)
+        icon = IconicsDrawable(this.context, GoogleMaterial.Icon.gmd_delete).apply {
+            sizeDp = 24
+        }
         isClickable = false
         isFocusable = false
     }

@@ -21,7 +21,6 @@ inline fun RecyclerView.enableDragDrop(fab: ExtendedFloatingActionButton,
                                                                  isCurrentlyActive: Boolean) -> Unit){
     val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or
             ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0){
-        //var viewBeingCleared = false
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = true
 
@@ -37,16 +36,10 @@ inline fun RecyclerView.enableDragDrop(fab: ExtendedFloatingActionButton,
         override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
             super.clearView(recyclerView, viewHolder)
             fab.animateChange(true)
-            //viewBeingCleared = true
         }
 
         override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-            /*if (viewBeingCleared) {
-                viewBeingCleared = false
-            } else {
-                onChildDraw(viewHolder, isCurrentlyActive)
-            }*/
             onChildDraw(viewHolder, isCurrentlyActive)
         }
         
