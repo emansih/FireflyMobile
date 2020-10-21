@@ -10,6 +10,6 @@
         <intent
             android:action="xyz.hisname.fireflyiii.ADD_TRANSACTION"
             android:targetPackage="xyz.hisname.fireflyiii.debug"
-            android:targetClass="xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity"/>
+            android:targetClass="xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity"/>
     </shortcut>
 </shortcuts>
