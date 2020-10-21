@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import xyz.hisname.fireflyiii.ui.HomeActivity
-import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
+import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 
 class FireflyAccountAuthenticator(private val context: Context): AbstractAccountAuthenticator(context) {
 
@@ -42,7 +42,7 @@ class FireflyAccountAuthenticator(private val context: Context): AbstractAccount
         val accounts = accountManager.getAccountsByType("OAUTH")
         lateinit var activityToLaunch: Intent
         activityToLaunch = if(accounts.isEmpty()){
-            Intent(context, OnboardingActivity::class.java)
+            Intent(context, AuthActivity::class.java)
         } else {
             Intent(context, HomeActivity::class.java)
         }

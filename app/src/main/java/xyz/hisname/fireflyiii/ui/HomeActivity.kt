@@ -45,7 +45,6 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
-import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV2
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment

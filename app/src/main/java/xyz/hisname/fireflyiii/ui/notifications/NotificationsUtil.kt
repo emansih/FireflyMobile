@@ -14,7 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.GenericReceiver
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
+import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import java.util.*
 
 
@@ -76,7 +76,7 @@ class NotificationUtils(base: Context) : ContextWrapper(base) {
 
     fun showNotSignedIn(){
         setUpOreo(Constants.GENERAL_NOTIFICATION, "General Notifications", "Show General Notifications")
-        val onboarding = Intent(this, OnboardingActivity::class.java).apply {
+        val onboarding = Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val onboardingIntent = NotificationCompat.Action(R.drawable.app_icon,

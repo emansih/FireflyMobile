@@ -26,7 +26,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
-import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
+import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.toastInfo
@@ -143,7 +143,7 @@ class SettingsAccountFragment: BaseSettings() {
                 AppPref(sharedPref).clearPref()
                 accManager.destroyAccount()
             }
-            val loginActivity = Intent(requireActivity(), OnboardingActivity::class.java)
+            val loginActivity = Intent(requireActivity(), AuthActivity::class.java)
             startActivity(loginActivity)
             FireflyClient.destroyInstance()
             requireActivity().finish()
