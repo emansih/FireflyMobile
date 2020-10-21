@@ -1,21 +1,28 @@
 package xyz.hisname.fireflyiii.receiver
 
 import android.accounts.AccountManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.preference.PreferenceManager
 import androidx.work.*
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.sizeDp
+import com.mikepenz.iconics.utils.toAndroidIconCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
-import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.showNotification
 import java.time.OffsetDateTime
 import java.util.concurrent.ThreadLocalRandom
 
@@ -25,8 +32,18 @@ class TransactionReceiver: BroadcastReceiver()  {
     override fun onReceive(context: Context, intent: Intent) {
         if(AppPref(PreferenceManager.getDefaultSharedPreferences(context)).baseUrl.isBlank() ||
                 AuthenticatorManager(AccountManager.get(context)).accessToken.isBlank()){
-            val notif = NotificationUtils(context)
-            notif.showNotSignedIn()
+            val onboarding = Intent(context, AuthActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val icon = IconicsDrawable(context).apply {
+                icon = GoogleMaterial.Icon.gmd_lock
+                sizeDp = 24
+            }.toAndroidIconCompat()
+           context.showNotification("Unauthenticated",
+                   "It appears you are not signed in. Please sign in before continuing",
+                   R.drawable.ic_perm_identity_black_24dp,
+                   PendingIntent.getActivity(context, 0, onboarding, PendingIntent.FLAG_CANCEL_CURRENT),
+           "Sign in", icon)
         } else {
             val transactionWorkManagerId = ThreadLocalRandom.current().nextLong()
             val destinationName = intent.getStringExtra("destination") ?: ""

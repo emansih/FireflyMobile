@@ -6,15 +6,14 @@ import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
-import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
@@ -51,8 +50,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     }
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     if (response.isSuccessful) {
-                        context.displayNotification("Transaction added successfully!", transactionType,
-                                Constants.TRANSACTION_CHANNEL, channelIcon)
+                        context.showNotification(transactionType, "Transaction added successfully!", channelIcon)
                         cancelWorker(transactionWorkManagerId, context)
                         response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
                             runBlocking(Dispatchers.IO) {
@@ -76,9 +74,8 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                                 error = gson.errors.transactions_source_name[0]
                             }
                         }
-                        WorkManager.getInstance(context).cancelAllWorkByTag(transactionWorkManagerId.toString())
-                        context.displayNotification(error, "Error Adding $transactionType",
-                                Constants.TRANSACTION_CHANNEL, channelIcon)
+                        context.showNotification("Error Adding $transactionType",
+                                error, channelIcon)
                         cancelWorker(transactionWorkManagerId, context)
                         Result.failure()
                     }

@@ -6,7 +6,6 @@ import androidx.work.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
@@ -14,8 +13,8 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
+import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.workers.BaseWorker
-import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
@@ -42,8 +41,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
             val responseBody = response.body()
             if (response.isSuccessful && responseBody != null) {
-                context.displayNotification("$name was added successfully!", "Piggy Bank Added",
-                        Constants.PIGGY_BANK_CHANNEL, channelIcon)
+                context.showNotification("Piggy Bank Added", "$name was added successfully!", channelIcon)
                 cancelWorker(piggyWorkManagerId, context)
                 runBlocking(Dispatchers.IO){
                     val piggyDatabase = AppDatabase.getInstance(context).piggyDataDao()
@@ -58,8 +56,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                     gson.errors.current_amount != null -> error = gson.errors.current_amount[0]
                 }
                 cancelWorker(piggyWorkManagerId, context)
-                context.displayNotification(error, "There was an issue adding $name",
-                        Constants.PIGGY_BANK_CHANNEL, channelIcon)
+                context.showNotification("There was an issue adding $name", error, channelIcon)
                 Result.failure()
             }
         })

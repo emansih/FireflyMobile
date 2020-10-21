@@ -133,6 +133,7 @@ dependencies {
     implementation Dependencies.osmdroid
     implementation Dependencies.accordionView
     implementation Dependencies.fancyshowcaseview
+    implementation Dependencies.notificationLib
 
     implementation Dependencies.taskerPluginLib
 

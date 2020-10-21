@@ -6,6 +6,10 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.*
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.sizeDp
+import com.mikepenz.iconics.utils.toAndroidIconCompat
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import xyz.hisname.fireflyiii.BuildConfig
@@ -13,8 +17,8 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
-import xyz.hisname.fireflyiii.ui.notifications.displayNotification
 import xyz.hisname.fireflyiii.util.FileUtils
+import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.io.BufferedInputStream
 import java.io.File
@@ -78,16 +82,18 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                         val upload = service.uploadFile(responseBody.data.attachmentId, requestFile)
                         ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
                         if(upload.code() == 204) {
-                            context.displayNotification("$fileName uploaded", channelName,
-                                    Constants.TRANSACTION_CHANNEL, channelIcon)
+                            context.showNotification("$fileName uploaded", "", channelIcon)
                         } else {
-                            context.displayNotification(upload.message(), channelName,
-                                    Constants.TRANSACTION_CHANNEL, channelIcon)
+                            val retryIcon = IconicsDrawable(context).apply {
+                                icon = GoogleMaterial.Icon.gmd_refresh
+                                sizeDp = 24
+                            }.toAndroidIconCompat()
+                            context.showNotification("$fileName upload failed",
+                                    upload.message(), channelIcon)
                         }
                     } else {
                         ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
-                        context.displayNotification(storeAttachment?.message() ?: "", channelName,
-                                Constants.TRANSACTION_CHANNEL, channelIcon)
+                        context.showNotification("$fileName upload failed", storeAttachment?.message() ?: "", channelIcon)
                     }
                     // Last element in the array. Cancel work
                     if(fileArray.lastIndex == index){
@@ -101,12 +107,11 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                     ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
                     val throwMessage = exception.message
                     if(throwMessage != null && throwMessage.startsWith("Write error: ssl=")){
-                        context.displayNotification("Unable to add attachment to transaction as " +
-                                "there is a file limit on server side", channelName,
-                                Constants.TRANSACTION_CHANNEL, channelIcon)
+                        context.showNotification("Upload Error",
+                                "Unable to add attachment to transaction as there is a file limit on server side", channelIcon)
                     } else {
-                        context.displayNotification(exception.localizedMessage, channelName,
-                                Constants.TRANSACTION_CHANNEL, channelIcon)
+                        context.showNotification("Upload Error",
+                                exception.localizedMessage, channelIcon)
                     }
                 }
             }

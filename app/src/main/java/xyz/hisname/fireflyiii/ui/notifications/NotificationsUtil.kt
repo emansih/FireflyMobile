@@ -18,80 +18,12 @@ import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import java.util.*
 
 
-fun Context.displayNotification(contextText: String, contextTitle: String, channelId: String, icon: Int) {
-    NotificationUtils(this).showNotification(contextText, contextTitle, channelId, icon)
-}
 
 class NotificationUtils(base: Context) : ContextWrapper(base) {
 
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
-    private inline val Context.manager: NotificationManager get() =
-    getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-    fun setupChannels(){
-        manager.createNotificationChannels(arrayListOf(
-                NotificationChannel(Constants.ACCOUNT_CHANNEL,
-                        "Accounts", NotificationManager.IMPORTANCE_HIGH).apply {
-                    enableLights(true)
-                    description = Constants.ACCOUNT_CHANNEL_DESCRIPTION
-                    enableVibration(false)
-                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-                },
-                NotificationChannel(Constants.TRANSACTION_CHANNEL,
-                        "Transactions", NotificationManager.IMPORTANCE_HIGH).apply {
-                    enableLights(true)
-                    description = Constants.TRANSACTION_CHANNEL_DESCRIPTION
-                    enableVibration(false)
-                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-                },
-                NotificationChannel(Constants.BILL_CHANNEL,
-                        "Bill", NotificationManager.IMPORTANCE_HIGH).apply {
-                    enableLights(true)
-                    description = Constants.BILL_CHANNEL_DESCRIPTION
-                    enableVibration(false)
-                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-                },
-                NotificationChannel(Constants.PIGGY_BANK_CHANNEL,
-                        "Piggy Bank", NotificationManager.IMPORTANCE_HIGH).apply {
-                    enableLights(true)
-                    description = Constants.PIGGY_BANK_CHANNEL_DESCRIPTION
-                    enableVibration(false)
-                    lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-                }
-        ))
-    }
-
-    fun showNotification(contextText: String, contextTitle: String, channelId: String, icon: Int){
-        val groupBuilder = NotificationCompat.Builder(this, channelId).apply {
-            setContentText(contextText)
-            setGroup(channelId)
-            setSmallIcon(icon)
-            setGroupSummary(true)
-            setStyle(NotificationCompat.BigTextStyle().bigText(contextTitle))
-            setStyle(NotificationCompat.BigTextStyle().bigText(contextText))
-            setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-        }.build()
-        notificationManager.notify(createNotificationId(), groupBuilder)
-    }
-
-    fun showNotSignedIn(){
-        setUpOreo(Constants.GENERAL_NOTIFICATION, "General Notifications", "Show General Notifications")
-        val onboarding = Intent(this, AuthActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val onboardingIntent = NotificationCompat.Action(R.drawable.app_icon,
-                "Click here to sign in",
-                PendingIntent.getActivity(this, 0, onboarding, PendingIntent.FLAG_CANCEL_CURRENT))
-        val notificationBuilder = NotificationCompat.Builder(this, Constants.GENERAL_NOTIFICATION).apply {
-            setContentTitle("Error communicating with Firefly")
-            setContentText("It appears you are not signed in. Please sign in before continuing.")
-            setGroup(Constants.GENERAL_NOTIFICATION)
-            addAction(onboardingIntent)
-            setSmallIcon(R.drawable.ic_perm_identity_black_24dp)
-            setGroupSummary(true)
-        }.build()
-        notificationManager.notify(createNotificationId(), notificationBuilder)
-    }
+    private inline val Context.manager: NotificationManager
+        get() = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
     fun showTransactionPersistentNotification(){
         setUpOreo(Constants.TRANSACTION_CHANNEL, "Transaction", "Shows Persistent Transaction Notifications")

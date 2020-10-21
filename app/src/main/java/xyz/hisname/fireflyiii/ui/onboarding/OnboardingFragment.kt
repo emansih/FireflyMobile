@@ -33,9 +33,6 @@ class OnboardingFragment: Fragment() {
         ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
         FireflyClient.destroyInstance()
         ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationUtils(requireContext()).setupChannels()
-        }
         getUser()
     }
 

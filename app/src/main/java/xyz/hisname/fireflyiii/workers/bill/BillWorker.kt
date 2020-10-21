@@ -15,7 +15,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.workers.BaseWorker
-import xyz.hisname.fireflyiii.ui.notifications.displayNotification
+import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
@@ -45,8 +45,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                     val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
                     val responseBody = response.body()
                     if (response.isSuccessful && responseBody != null) {
-                        context.displayNotification("$name added successfully!", "Bill Added",
-                                Constants.BILL_CHANNEL, channelIcon)
+                        context.showNotification("Bill Added", "$name added successfully!", channelIcon)
                         cancelWorker(billWorkManagerId, context)
                         runBlocking(Dispatchers.IO){
                             val billDatabase = AppDatabase.getInstance(context).billDataDao()
@@ -60,8 +59,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                             gson.errors.amount_min != null -> error = gson.errors.amount_min[0]
                             gson.errors.repeat_freq != null -> error = gson.errors.repeat_freq[0]
                         }
-                        context.displayNotification(error, "Error Adding $name",
-                                Constants.BILL_CHANNEL, channelIcon)
+                        context.showNotification("Error Adding $name", error, channelIcon)
                         cancelWorker(billWorkManagerId, context)
                         Result.failure()
                     }

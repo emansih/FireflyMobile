@@ -90,4 +90,5 @@ object Dependencies{
     val testRunner = "androidx.test:runner:$testVersion"
     val testOrchestrator = "androidx.test:orchestrator:$testVersion"
     val taskerPluginLib = "com.joaomgcd:taskerpluginlibrary:$taskerPluginVersion"
+    val notificationLib = "io.karn:notify:1.3.0"
 }
