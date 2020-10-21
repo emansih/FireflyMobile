@@ -24,8 +24,6 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
 
     fun getAccessToken(code: String): LiveData<Boolean> {
         authFailedReason.postValue("")
-        // Issue #46 on Github
-        // https://github.com/emansih/FireflyMobile/issues/46
         if (!code.isAscii()) {
             isAuthenticated.postValue(false)
             authFailedReason.postValue("Bearer Token contains invalid Characters!")

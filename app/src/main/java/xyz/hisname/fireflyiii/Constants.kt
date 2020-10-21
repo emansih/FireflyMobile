@@ -4,6 +4,7 @@ class Constants private constructor() {
 
     companion object {
         const val REDIRECT_URI = "http://${BuildConfig.HOSTNAME}"
+        const val DEMO_REDIRECT_URI = "https://api-docs.firefly-iii.org/oauth2-redirect.html"
         const val OAUTH_API_ENDPOINT = "oauth"
         const val SYSTEM_INFO_ENDPOINT = "api/v1/about"
         const val BILL_API_ENDPONT = "api/v1/bills"

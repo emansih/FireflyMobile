@@ -25,18 +25,19 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     // !!!!This is only used for PAT authentication, do not use it anywhere else!!!!
     /**
-    * Returns true and empty string if auth succeeds
-    * Returns false and exception string if auth fails
+    * Returns true if auth succeeds
+    * Returns false and throws exception if auth fails
     */
     @Throws(Exception::class)
-    suspend fun authViaPat(): MutableLiveData<Boolean>{
+    suspend fun authViaPat(): Boolean{
         val networkCall = accountsService?.getPaginatedAccountType("asset", 1)
         val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
+        return if (responseBody != null && networkCall.isSuccessful) {
             authStatus.postValue(true)
-            responseApi.postValue("success")
+            true
+        } else {
+            false
         }
-        return authStatus
     }
 
 

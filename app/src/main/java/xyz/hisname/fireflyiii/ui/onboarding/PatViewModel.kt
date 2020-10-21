@@ -36,7 +36,7 @@ class PatViewModel(application: Application): BaseViewModel(application) {
         repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){
             try {
-                repository.authViaPat()
+               // repository.authViaPat()
                 AuthenticatorManager(accountManager).authMethod = "pat"
             } catch (exception: UnknownServiceException){
                 repository.responseApi.postValue("http is not supported. Please use https")

@@ -1,99 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/firefly_url_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:hint="URL"
+        android:textSize="16sp"
+        android:background="@color/md_white_1000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/firefly_url_layout"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/firefly_url_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="URL"
-            android:letterSpacing="0.1"
-            android:textSize="16sp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/md_white_1000"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:inputType="text"
+            android:maxLines="1"
+            android:drawablePadding="4dp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/firefly_url_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="1"
-                android:drawablePadding="4dp" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/firefly_access_layout"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:hint="@string/personal_access_token"
+        android:textSize="16sp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/md_white_1000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/self_signed_checkbox"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/firefly_access_layout"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/firefly_access_edittext"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:hint="@string/personal_access_token"
-            android:textSize="16sp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/md_white_1000"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/firefly_url_layout"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:layout_height="match_parent"
+            android:inputType="text|textMultiLine"
+            android:drawablePadding="4dp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/firefly_access_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:inputType="text|textMultiLine"
-                android:drawablePadding="4dp" />
-        </com.google.android.material.textfield.TextInputLayout>
+    <CheckBox
+        android:id="@+id/self_signed_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/cert_path"
+        app:layout_constraintStart_toStartOf="@+id/firefly_access_layout" />
 
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/self_signed_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/firefly_access_layout"
-            app:layout_constraintStart_toStartOf="@+id/firefly_access_layout" />
+    <TextView
+        android:id="@+id/self_signed_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Import your self signed cert"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toTopOf="@+id/self_signed_checkbox"
+        app:layout_constraintBottom_toBottomOf="@+id/self_signed_checkbox"
+        app:layout_constraintStart_toEndOf="@+id/self_signed_checkbox"/>
 
-        <TextView
-            android:id="@+id/self_signed_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="I am using a self signed cert"
-            android:layout_marginStart="8dp"
-            app:layout_constraintTop_toTopOf="@+id/self_signed_checkbox"
-            app:layout_constraintBottom_toBottomOf="@+id/self_signed_checkbox"
-            app:layout_constraintStart_toEndOf="@+id/self_signed_checkbox"/>
+    <TextView
+        android:id="@+id/cert_path"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/fireflySignIn"
+        app:layout_constraintStart_toStartOf="@+id/self_signed_checkbox"
+        />
 
-        <TextView
-            android:id="@+id/cert_path"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            app:layout_constraintTop_toBottomOf="@+id/self_signed_checkbox"
-            app:layout_constraintStart_toStartOf="@+id/firefly_access_layout"/>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/fireflySignIn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="@string/sign_in"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/md_white_1000"
+        android:background="@color/md_black_1000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/firefly_access_layout"
+        app:layout_constraintEnd_toEndOf="@+id/firefly_access_layout" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/fireflySignIn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="@string/sign_in"
-            android:layout_marginTop="20dp"
-            android:textColor="@color/md_white_1000"
-            android:background="@color/md_black_1000"
-            app:layout_constraintTop_toBottomOf="@+id/cert_path"
-            app:layout_constraintStart_toStartOf="@+id/firefly_access_layout"
-            app:layout_constraintEnd_toEndOf="@+id/firefly_access_layout" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>

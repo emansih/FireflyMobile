@@ -44,6 +44,7 @@ import xyz.hisname.fireflyiii.ui.bills.ListBillFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
+import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.ui.onboarding.OnboardingActivity
 import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV2
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
@@ -76,7 +77,7 @@ class HomeActivity: BaseActivity(){
         super.onCreate(savedInstanceState)
         if(accountManager.authMethod.isBlank()|| sharedPref(this).baseUrl.isBlank()){
             AuthenticatorManager(AccountManager.get(this)).destroyAccount()
-            val onboardingActivity = Intent(this, OnboardingActivity::class.java)
+            val onboardingActivity = Intent(this, AuthActivity::class.java)
             startActivity(onboardingActivity)
             finish()
         } else {
