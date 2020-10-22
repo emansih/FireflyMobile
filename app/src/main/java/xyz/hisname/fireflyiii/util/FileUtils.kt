@@ -59,6 +59,9 @@ class FileUtils {
             bufferredInputStream.close()
         }
 
+        fun deleteCaFile(context: Context){
+            context.deleteFile(context.filesDir.toString() + "/user_custom.pem")
+        }
 
         fun getPathFromUri(context: Context, uri: Uri): String? {
             // DocumentProvider

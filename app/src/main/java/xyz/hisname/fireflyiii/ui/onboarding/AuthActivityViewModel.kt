@@ -60,12 +60,15 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                 AuthenticatorManager(accountManager).authMethod = "pat"
                 isAuthenticated.postValue(true)
             } catch (exception: UnknownServiceException){
+                FileUtils.deleteCaFile(applicationContext)
                 showErrorMessage.postValue("http is not supported. Please use https")
                 isAuthenticated.postValue(false)
             } catch (certificateException: CertificateException){
+                FileUtils.deleteCaFile(applicationContext)
                 showErrorMessage.postValue("Are you using self signed cert?")
                 isAuthenticated.postValue(false)
             } catch (exception: Exception){
+                FileUtils.deleteCaFile(applicationContext)
                 showErrorMessage.postValue(exception.localizedMessage)
                 isAuthenticated.postValue(false)
             }
@@ -123,17 +126,21 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                         accManager.authMethod = "oauth"
                         isAuthenticated.postValue(true)
                     } else if(errorBody != null){
+                        FileUtils.deleteCaFile(applicationContext)
                         val errorBodyMessage = String(errorBody.bytes())
                         showErrorMessage.postValue(errorBodyMessage)
                         isAuthenticated.postValue(false)
                     }
                 } catch (exception: UnknownServiceException){
+                    FileUtils.deleteCaFile(applicationContext)
                     showErrorMessage.postValue("http is not supported. Please use https")
                     isAuthenticated.postValue(false)
                 } catch (certificateException: CertificateException){
+                    FileUtils.deleteCaFile(applicationContext)
                     showErrorMessage.postValue("Are you using self signed cert?")
                     isAuthenticated.postValue(false)
                 } catch (exception: Exception){
+                    FileUtils.deleteCaFile(applicationContext)
                     showErrorMessage.postValue(exception.localizedMessage)
                     isAuthenticated.postValue(false)
                 }
