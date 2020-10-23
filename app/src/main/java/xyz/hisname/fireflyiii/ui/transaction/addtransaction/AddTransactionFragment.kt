@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -65,6 +64,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
+    private val isFromNotification by lazy { arguments?.getBoolean("isFromNotification") ?: false }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
@@ -101,8 +101,17 @@ class AddTransactionFragment: BaseFragment() {
         if(isTasker){
             // Disable file upload for now
             add_attachment_button.isVisible = false
-            setTaskerBundle()
+            pluginViewModel.transactionBundle.observe(viewLifecycleOwner) { bundle ->
+                if(bundle != null){
+                    setUiFromBundle(bundle)
+                }
+            }
             setTaskerIcons()
+        }
+        if(isFromNotification){
+            requireActivity().intent.extras?.let {
+                setUiFromBundle(it)
+            }
         }
         setIcons()
         setWidgets()
@@ -336,79 +345,74 @@ class AddTransactionFragment: BaseFragment() {
         }
     }
 
-    private fun setTaskerBundle(){
-        pluginViewModel.transactionBundle.observe(viewLifecycleOwner){ bundle ->
-            if(bundle != null){
+    private fun setUiFromBundle(bundle: Bundle){
+        val transactionCurrency = bundle.getString("transactionCurrency")
+        if(transactionCurrency?.startsWith("%") == false){
+            currencyViewModel.getCurrencyByCode(transactionCurrency).observe(viewLifecycleOwner){ currencyData ->
+                val currencyAttributes = currencyData[0].currencyAttributes
+                currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
+            }
+        } else {
+            // Is tasker variable
+            currency_edittext.setText(transactionCurrency)
+        }
 
-                val transactionCurrency = bundle.getString("transactionCurrency")
-                if(transactionCurrency?.startsWith("%") == false){
-                    currencyViewModel.getCurrencyByCode(transactionCurrency).observe(viewLifecycleOwner){ currencyData ->
-                        val currencyAttributes = currencyData[0].currencyAttributes
-                        currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
-                    }
-                } else {
-                    // Is tasker variable
-                    currency_edittext.setText(transactionCurrency)
-                }
+        val transactionDescription = bundle.getString("transactionDescription")
+        description_edittext.setText(transactionDescription)
 
-                val transactionDescription = bundle.getString("transactionDescription")
-                description_edittext.setText(transactionDescription)
+        val transactionAmount = bundle.getString("transactionAmount")
+        transaction_amount_edittext.setText(transactionAmount)
 
-                val transactionAmount = bundle.getString("transactionAmount")
-                transaction_amount_edittext.setText(transactionAmount)
+        val transactionDate = bundle.getString("transactionDate")
+        if(transactionDate != null){
+            transaction_date_edittext.setText(transactionDate)
+        }
 
-                val transactionDate = bundle.getString("transactionDate")
-                if(transactionDate != null){
-                    transaction_date_edittext.setText(transactionDate)
-                }
+        val transactionTime = bundle.getString("transactionTime")
+        time_edittext.setText(transactionTime)
 
-                val transactionTime = bundle.getString("transactionTime")
-                time_edittext.setText(transactionTime)
+        if(piggy_layout.isVisible){
+            val transactionPiggyBank = bundle.getString("transactionPiggyBank")
+            piggy_edittext.setText(transactionPiggyBank)
+        }
 
-                if(piggy_layout.isVisible){
-                    val transactionPiggyBank = bundle.getString("transactionPiggyBank")
-                    piggy_edittext.setText(transactionPiggyBank)
-                }
+        val transactionSourceAccount = bundle.getString("transactionSourceAccount")
+        val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
 
-                val transactionSourceAccount = bundle.getString("transactionSourceAccount")
-                val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
-
-                when {
-                    Objects.equals("Withdrawal", transactionType) -> {
-                        destination_edittext.setText(transactionDestinationAccount)
-                        sourceName = transactionSourceAccount
-                        source_exposed_dropdown.setText(sourceName)
-                        destinationExposedTasker.isVisible = false
-                        sourceTextInputTasker.isVisible = false
-                    }
-                    Objects.equals("Transfer", transactionType) -> {
-                        sourceName = transactionSourceAccount
-                        destinationName = transactionDestinationAccount
-                        source_exposed_dropdown.setText(sourceName)
-                        destination_exposed_dropdown.setText(destinationName)
-                        destinationTextInputTasker.isVisible = false
-                        sourceTextInputTasker.isVisible = false
-                        piggyTasker.isVisible = true
-                    }
-                    Objects.equals("Deposit", transactionType) -> {
-                        source_edittext.setText(transactionSourceAccount)
-                        destinationName = transactionDestinationAccount
-                        destination_exposed_dropdown.setText(destinationName)
-                        sourceExposedTasker.isVisible = false
-                        destinationTextInputTasker.isVisible = false
-                    }
-                }
-
-                val transactionTags = bundle.getString("transactionTags")
-                tags_chip.setText(transactionTags)
-
-                val transactionBudget = bundle.getString("transactionBudget")
-                budget_edittext.setText(transactionBudget)
-
-                val transactionCategory = bundle.getString("transactionCategory")
-                category_edittext.setText(transactionCategory)
+        when {
+            Objects.equals("Withdrawal", transactionType) -> {
+                destination_edittext.setText(transactionDestinationAccount)
+                sourceName = transactionSourceAccount
+                source_exposed_dropdown.setText(sourceName)
+                destinationExposedTasker.isVisible = false
+                sourceTextInputTasker.isVisible = false
+            }
+            Objects.equals("Transfer", transactionType) -> {
+                sourceName = transactionSourceAccount
+                destinationName = transactionDestinationAccount
+                source_exposed_dropdown.setText(sourceName)
+                destination_exposed_dropdown.setText(destinationName)
+                destinationTextInputTasker.isVisible = false
+                sourceTextInputTasker.isVisible = false
+                piggyTasker.isVisible = true
+            }
+            Objects.equals("Deposit", transactionType) -> {
+                source_edittext.setText(transactionSourceAccount)
+                destinationName = transactionDestinationAccount
+                destination_exposed_dropdown.setText(destinationName)
+                sourceExposedTasker.isVisible = false
+                destinationTextInputTasker.isVisible = false
             }
         }
+
+        val transactionTags = bundle.getString("transactionTags")
+        tags_chip.setText(transactionTags)
+
+        val transactionBudget = bundle.getString("transactionBudget")
+        budget_edittext.setText(transactionBudget)
+
+        val transactionCategory = bundle.getString("transactionCategory")
+        category_edittext.setText(transactionCategory)
     }
 
     private fun setFab(){
