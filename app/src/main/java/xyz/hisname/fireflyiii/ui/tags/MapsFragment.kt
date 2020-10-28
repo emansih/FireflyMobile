@@ -8,7 +8,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
@@ -52,7 +51,6 @@ class MapsFragment: BaseFragment() {
     private val nominatimViewModel by lazy { getViewModel(NominatimViewModel::class.java) }
     private val mapController by lazy { maps.controller }
     private val groomLake by lazy { GeoPoint(37.276675, -115.798936) }
-    private var runnable: Runnable? = null
     private lateinit var startMarker: Marker
     private var longitude: Double = 0.0
     private var latitude: Double = 0.0
@@ -116,24 +114,17 @@ class MapsFragment: BaseFragment() {
             }
             false
         }
-        val handler = Handler()
         mapSearch.addTextChangedListener(object : TextWatcher{
             override fun afterTextChanged(editable: Editable) {
-                runnable = Runnable {
-                    if(editable.isNotBlank()) {
-                        location(editable.toString())
-                        handler.removeCallbacks(runnable)
-                    }
+                if(editable.isNotBlank()) {
+                    location(editable.toString())
                 }
-                handler.postDelayed(runnable, 2000)
             }
 
             override fun beforeTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {
             }
 
-            override fun onTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {
-                handler.removeCallbacks(runnable)
-            }
+            override fun onTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {}
 
         })
         mapSearch.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->

@@ -51,7 +51,7 @@ class TransactionReceiver: BroadcastReceiver()  {
             val category = intent.getStringExtra("category")
             val transactionAmount = intent.getStringExtra("amount")
             val budget = intent.getStringExtra("budget")
-            val description =  intent.getStringExtra("description")
+            val description =  intent.getStringExtra("description") ?: ""
             val tags = intent.getStringExtra("tags")
             val time = intent.getStringExtra("time")
             val date = intent.getStringExtra("date")
@@ -73,7 +73,7 @@ class TransactionReceiver: BroadcastReceiver()  {
             val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
             var currency: CurrencyData
             runBlocking(Dispatchers.IO) {
-                currency = currencyDatabase.getCurrencyByCode(intent.getStringExtra("currency"))[0]
+                currency = currencyDatabase.getCurrencyByCode(intent.getStringExtra("currency") ?: "")[0]
             }
             val currencyAttributes = currency.currencyAttributes
             val tagsList = arrayListOf<String>()
@@ -99,10 +99,10 @@ class TransactionReceiver: BroadcastReceiver()  {
             val dateTime = if(time.isNullOrEmpty()){
                 DateTimeUtil.offsetDateTimeWithoutTime(date)
             } else {
-                DateTimeUtil.mergeDateTimeToIso8601(date, time)
+                DateTimeUtil.mergeDateTimeToIso8601(date ?: "", time)
             }
-            val amount = if(transactionAmount?.isEmpty() == true){
-                 0.0
+            val amount = if(transactionAmount.isNullOrEmpty()){
+                0.0
             } else {
                 transactionAmount.toDouble()
             }
