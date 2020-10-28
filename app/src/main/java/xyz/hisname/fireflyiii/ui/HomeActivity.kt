@@ -146,12 +146,6 @@ class HomeActivity: BaseActivity(){
                         bundleOf("transactionType" to "Transfer")
                     }))
                 }
-                // Home screen shortcut
-                "transactionFragment" -> {
-                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                        bundleOf("transactionType" to "Withdrawal")
-                    }))
-                }
             }
         }
         supportFragmentManager.commit {
