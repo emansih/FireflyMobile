@@ -83,27 +83,27 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                         error = gson.errors.transactions_source_name[0]
                     }
                 }
-                val transactionActivity = Intent(context, AddTransactionActivity::class.java).apply {
-                    bundleOf("transactionType" to transactionType,
-                            "transactionDescription" to transactionDescription,
-                            "transactionAmount" to transactionAmount,
-                            "transactionTime" to transactionTime,
-                            "transactionDate" to transactionDate,
-                            "transactionPiggyBank" to piggyBank,
-                            "transactionSourceAccount" to sourceName,
-                            "transactionDestinationAccount" to destinationName,
-                            "transactionTags" to tags,
-                            "transactionBudget" to budget,
-                            "transactionCategory" to category,
-                            "isFromNotification" to true)
-                }
+                val transactionIntent = Intent(context, AddTransactionActivity::class.java)
+                val bundleToPass =  bundleOf("transactionType" to transactionType,
+                        "transactionDescription" to transactionDescription,
+                        "transactionAmount" to transactionAmount,
+                        "transactionTime" to transactionTime,
+                        "transactionDate" to transactionDate,
+                        "transactionPiggyBank" to piggyBank,
+                        "transactionSourceAccount" to sourceName,
+                        "transactionDestinationAccount" to destinationName,
+                        "transactionTags" to tags,
+                        "transactionBudget" to budget,
+                        "transactionCategory" to category,
+                        "isFromNotification" to true)
+                transactionIntent.putExtras(bundleToPass)
                 val icon = IconicsDrawable(context).apply {
                     icon = FontAwesome.Icon.faw_edit
                     sizeDp = 24
                 }.toAndroidIconCompat()
                 context.showNotification("Error Adding $transactionType",
                         error, channelIcon,
-                        PendingIntent.getActivity(context, 0, transactionActivity, 0),
+                        PendingIntent.getActivity(context, 0, transactionIntent, PendingIntent.FLAG_UPDATE_CURRENT),
                         context.getString(R.string.edit), icon)
                 cancelWorker(transactionWorkManagerId, context)
                 Result.failure()

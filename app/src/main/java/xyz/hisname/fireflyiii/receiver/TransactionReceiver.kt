@@ -101,10 +101,15 @@ class TransactionReceiver: BroadcastReceiver()  {
             } else {
                 DateTimeUtil.mergeDateTimeToIso8601(date, time)
             }
+            val amount = if(transactionAmount?.isEmpty() == true){
+                 0.0
+            } else {
+                transactionAmount.toDouble()
+            }
             runBlocking(Dispatchers.IO){
                 transactionDatabase.insert(
                         Transactions(
-                                transactionWorkManagerId, transactionAmount.toDouble(),  0,
+                                transactionWorkManagerId, amount,  0,
                                  budget, 0,  category, currencyAttributes?.code ?: "",
                                 currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
                                 currencyAttributes?.name ?: "", currencyAttributes?.symbol ?: "",

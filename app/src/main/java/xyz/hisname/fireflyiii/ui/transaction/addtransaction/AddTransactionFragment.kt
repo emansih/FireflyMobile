@@ -64,7 +64,7 @@ class AddTransactionFragment: BaseFragment() {
 
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
-    private val isFromNotification by lazy { arguments?.getBoolean("isFromNotification") ?: false }
+    private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
