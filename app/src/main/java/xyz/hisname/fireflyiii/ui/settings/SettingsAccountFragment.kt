@@ -88,6 +88,7 @@ class SettingsAccountFragment: BaseSettings() {
             authViewModel.getRefreshToken().observe(viewLifecycleOwner) { success ->
                 if(success){
                     toastSuccess("Token refresh success!")
+                    tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager.tokenExpiry)
                 } else {
                     toastError("There was an error refreshing your token")
                 }
