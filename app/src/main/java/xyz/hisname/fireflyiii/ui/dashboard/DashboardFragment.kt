@@ -76,6 +76,8 @@ class DashboardFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        animateCard(balanceCard, billsCard, netEarningsCard, dailySummaryCard,
+                leftToSpendCard, networthCard, recentTransactionCard, budgetCard)
         twoMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(2)
         oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
         currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
@@ -91,9 +93,6 @@ class DashboardFragment: BaseFragment() {
             getTransactionData(currencyData)
 
         }
-
-        animateCard(balanceCard, billsCard, netEarningsCard, dailySummaryCard,
-                leftToSpendCard, networthCard, recentTransactionCard, budgetCard)
         setExtendedFab()
         parentFragmentManager.commit {
             replace(R.id.recentTransactionCard, RecentTransactionFragment())
@@ -438,11 +437,9 @@ class DashboardFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        extendedFab.isGone = true
+        if(extendedFab.isVisible){
+            extendedFab.isVisible = false
+        }
     }
 
     override fun handleBack() {
