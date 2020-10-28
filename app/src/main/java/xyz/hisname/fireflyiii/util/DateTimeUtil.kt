@@ -48,15 +48,6 @@ object DateTimeUtil {
         return Duration.between(todayDate.atStartOfDay(), localDate.atStartOfDay()).toDays().toString()
     }
 
-    /*
-    Accepts only yyyy-MM-dd parameter.
-    Output day in short form
-     */
-    fun getDayOfWeek(date: String): String{
-        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        return localDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-    }
-
     // Returns end of month date in yyyy-MM-dd (2018-01-04)
     fun getEndOfMonth(): String{
         val localDateTime = LocalDate.now()
@@ -86,30 +77,6 @@ object DateTimeUtil {
         return localDate.with(firstDayOfMonth()).toString()
     }
 
-    fun getStartOfYear(): String {
-        val localDateTime = LocalDate.now()
-        val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
-        return localDate.with(firstDayOfYear()).toString()
-    }
-
-    fun getEndOfYear(): String {
-        val localDateTime = LocalDate.now()
-        val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
-        return localDate.with(lastDayOfYear()).toString()
-    }
-
-    fun getStartOfWeek(): String {
-        val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
-        return LocalDate.now().with(TemporalAdjusters.previousOrSame(firstDayOfWeek)).toString()
-    }
-
-    fun getEndOfWeek(): String {
-        val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
-        val lastDayOfWeek = DayOfWeek.of(((firstDayOfWeek.value + 5) %
-                DayOfWeek.values().size) + 1)
-        return LocalDate.now().with(TemporalAdjusters.nextOrSame(lastDayOfWeek)).toString()
-    }
-
     fun getCurrentMonth(): String {
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
@@ -122,10 +89,6 @@ object DateTimeUtil {
         return localDate.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
     }
 
-    fun getPreviousMonth(duration: Long): String{
-        val localDateTime = LocalDate.now()
-        return localDateTime.minusMonths(duration).month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-    }
 
     fun getPreviousMonthShortName(duration: Long): String{
         val localDateTime = LocalDate.now()
@@ -134,11 +97,6 @@ object DateTimeUtil {
 
     fun getTodayDate(): String{
         return LocalDate.now().toString()
-    }
-
-    fun getWeeksBefore(date: String, weeks: Long): String {
-        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        return localDate.minusWeeks(weeks).toString()
     }
 
     fun getDaysBefore(date: String, days: Long): String{
@@ -211,20 +169,6 @@ object DateTimeUtil {
         return timeToParse.year.toString() + "-" + month + "-" + dayOfMonth
     }
 
-    fun convertIso8601ToHumanDate(timeToParse: String?): String? {
-        return try {
-            val dateTime = OffsetDateTime.parse(timeToParse)
-            val month = if ((dateTime.monthValue + 1 ) < 10){
-                "0"+ (dateTime.monthValue + 1)
-            } else {
-                dateTime.monthValue.toString()
-            }
-            dateTime.year.toString() + "-" + month + "-" + dateTime.dayOfMonth
-        } catch(exception: DateTimeParseException){
-            timeToParse
-        }
-    }
-
     fun convertIso8601ToHumanTime(timeToParse: OffsetDateTime): String{
         val min = if(timeToParse.minute < 10){
             "0${timeToParse.minute}"
@@ -234,23 +178,18 @@ object DateTimeUtil {
         return "${timeToParse.hour}:${min}"
     }
 
-    fun convertIso8601ToHumanTime(timeToParse: String?): String{
-        return try {
-            val dateTime = OffsetDateTime.parse(timeToParse)
-            val min = if(dateTime.minute < 10){
-                "0${dateTime.minute}"
-            } else {
-                (dateTime.minute).toString()
-            }
-            "${dateTime.hour}:${min}"
-        } catch (exception: DateTimeParseException){
-            ""
-        }
-    }
-
     fun offsetDateTimeWithoutTime(date: String) = date + "T00:00:00" + ZonedDateTime.now().offset
 
 
     fun mergeDateTimeToIso8601(date: String, time: String) =  date + "T" + time + ZonedDateTime.now().offset
+
+    fun convertEpochToHumanTime(dateToConvert: Long): String{
+        val date =
+                Instant.ofEpochMilli(dateToConvert).atZone(ZoneId.systemDefault()).toLocalDate()
+
+        return date.dayOfMonth.toString() + " " +
+                date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " " +
+                date.year + " @ " + convertIso8601ToHumanTime(date.atTime(OffsetTime.now()))
+    }
 
 }

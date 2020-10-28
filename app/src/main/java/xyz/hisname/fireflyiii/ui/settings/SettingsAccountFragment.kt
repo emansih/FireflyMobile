@@ -27,6 +27,7 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 import xyz.hisname.fireflyiii.util.extension.toastInfo
@@ -67,6 +68,9 @@ class SettingsAccountFragment: BaseSettings() {
         } else {
             authMethod.summary = resources.getString(R.string.personal_access_token)
         }
+
+        val tokenValidity = findPreference<Preference>("auth_token_time") as Preference
+        tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager.tokenExpiry)
 
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->
             preference.summary = newValue.toString()

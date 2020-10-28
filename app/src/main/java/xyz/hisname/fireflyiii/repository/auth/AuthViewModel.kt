@@ -4,14 +4,11 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
 
 class AuthViewModel(application: Application): BaseViewModel(application) {
 

@@ -7,11 +7,6 @@
         app:title="Authentication Method">
     </Preference>
 
-    <Preference
-        app:iconSpaceReserved="false"
-        app:key="logout"
-        app:title="Logout" />
-
     <EditTextPreference
         app:iconSpaceReserved="false"
         app:key="fireflyUrl"
@@ -24,13 +19,11 @@
         app:title="Access Token">
     </EditTextPreference>
 
-    <EditTextPreference
+    <Preference
         app:iconSpaceReserved="false"
-        app:key="cert_value"
-        app:title="Certificate Pinning Hash Value"
-        app:summary="Leave blank to disable"
-        app:useSimpleSummaryProvider="true">
-    </EditTextPreference>
+        app:key="auth_token_time"
+        app:title="Token expiring on">
+    </Preference>
 
     <Preference
         app:iconSpaceReserved="false"
@@ -38,7 +31,6 @@
         app:title="Refresh Token"
         app:summary="Click here to refresh your token">
     </Preference>
-
 
     <SwitchPreference
         app:iconSpaceReserved="false"
@@ -56,5 +48,17 @@
         app:dependency="auto_refresh_token">
     </ListPreference>
 
+    <EditTextPreference
+        app:iconSpaceReserved="false"
+        app:key="cert_value"
+        app:title="Certificate Pinning Hash Value"
+        app:summary="Leave blank to disable"
+        app:useSimpleSummaryProvider="true">
+    </EditTextPreference>
+
+    <Preference
+        app:iconSpaceReserved="false"
+        app:key="logout"
+        app:title="Logout" />
 
 </PreferenceScreen>
