@@ -255,15 +255,30 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             if (errorBody != null) {
                 errorBodyMessage = String(errorBody.bytes())
                 val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
-                errorBodyMessage = when {
-                    gson.errors.transactions_currency != null -> "Currency Code Required"
-                    gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
-                    gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
-                    gson.errors.transactions_source_name != null -> "Invalid Source Account"
-                    gson.errors.transaction_destination_id != null -> gson.errors.transaction_destination_id[0]
-                    gson.errors.transaction_amount != null -> "Amount field is required"
-                    gson.errors.description != null -> "Description is required"
-                    else -> "Error occurred while saving transaction"
+                try {
+                    gson.errors.transactions_currency?.let {
+                        errorBodyMessage = gson.errors.transactions_currency[0]
+                    }
+                    gson.errors.piggy_bank_name?.let {
+                        errorBodyMessage = gson.errors.piggy_bank_name[0]
+                    }
+                    gson.errors.transactions_destination_name?.let {
+                        errorBodyMessage = gson.errors.transactions_destination_name[0]
+                    }
+                    gson.errors.transactions_source_name?.let {
+                        errorBodyMessage = gson.errors.transactions_source_name[0]
+                    }
+                    gson.errors.transaction_destination_id?.let {
+                        errorBodyMessage = gson.errors.transaction_destination_id[0]
+                    }
+                    gson.errors.transaction_amount?.let {
+                        errorBodyMessage = "Amount field is required"
+                    }
+                    gson.errors.description?.let {
+                        errorBodyMessage = gson.errors.description[0]
+                    }
+                } catch (exception: Exception){
+                    errorBodyMessage = "The given data was invalid"
                 }
             }
             if (response.isSuccessful) {
@@ -307,15 +322,30 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 if (errorBody != null) {
                     errorBodyMessage = String(errorBody.bytes())
                     val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
-                    errorBodyMessage = when {
-                        gson.errors.transactions_currency != null -> "Currency Code Required"
-                        gson.errors.piggy_bank_name != null -> "Invalid Piggy Bank Name"
-                        gson.errors.transactions_destination_name != null -> "Invalid Destination Account"
-                        gson.errors.transactions_source_name != null -> "Invalid Source Account"
-                        gson.errors.transaction_destination_id != null -> gson.errors.transaction_destination_id[0]
-                        gson.errors.transaction_amount != null -> "Amount field is required"
-                        gson.errors.description != null -> "Description is required"
-                        else -> "Error occurred while saving transaction"
+                    try {
+                        gson.errors.transactions_currency?.let {
+                            errorBodyMessage = gson.errors.transactions_currency[0]
+                        }
+                        gson.errors.piggy_bank_name?.let {
+                            errorBodyMessage = gson.errors.piggy_bank_name[0]
+                        }
+                        gson.errors.transactions_destination_name?.let {
+                            errorBodyMessage = gson.errors.transactions_destination_name[0]
+                        }
+                        gson.errors.transactions_source_name?.let {
+                            errorBodyMessage = gson.errors.transactions_source_name[0]
+                        }
+                        gson.errors.transaction_destination_id?.let {
+                            errorBodyMessage = gson.errors.transaction_destination_id[0]
+                        }
+                        gson.errors.transaction_amount?.let {
+                            errorBodyMessage = "Amount field is required"
+                        }
+                        gson.errors.description?.let {
+                            errorBodyMessage = gson.errors.description[0]
+                        }
+                    } catch (exception: Exception){
+                        errorBodyMessage = "The given data was invalid"
                     }
                 }
                 if (response.isSuccessful) {
