@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.preference.PreferenceManager
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.preference.PreferenceFragmentCompat
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel

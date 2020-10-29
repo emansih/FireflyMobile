@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.observe
 import kotlinx.android.synthetic.main.fragment_onboarding.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient

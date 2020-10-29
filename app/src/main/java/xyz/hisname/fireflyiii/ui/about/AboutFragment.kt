@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.preference.PreferenceManager
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment

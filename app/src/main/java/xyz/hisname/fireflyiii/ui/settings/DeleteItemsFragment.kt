@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.observe
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import com.mikepenz.iconics.IconicsDrawable

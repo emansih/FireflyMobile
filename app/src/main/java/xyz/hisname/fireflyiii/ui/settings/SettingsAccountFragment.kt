@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.observe
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference

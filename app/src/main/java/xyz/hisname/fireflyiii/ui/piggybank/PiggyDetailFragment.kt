@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.observe
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import kotlinx.coroutines.Dispatchers
