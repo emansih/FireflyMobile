@@ -1,13 +1,16 @@
 package xyz.hisname.fireflyiii.data.remote.firefly
 
 import android.util.Base64
-import com.google.gson.*
+import com.squareup.moshi.Moshi
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import xyz.hisname.fireflyiii.util.OffsetDateTimeConverter
+import xyz.hisname.fireflyiii.data.remote.firefly.moshi.BigDecimalConverter
+import xyz.hisname.fireflyiii.data.remote.firefly.moshi.JsonObjectConverter
+import xyz.hisname.fireflyiii.data.remote.firefly.moshi.NULL_TO_EMPTY_STRING_ADAPTER
+import xyz.hisname.fireflyiii.data.remote.firefly.moshi.OffsetDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
@@ -47,26 +50,22 @@ class FireflyClient {
                     } catch (exception: IllegalArgumentException){ }
                 }
                 synchronized(FireflyClient::class.java){
+                    val moshi = Moshi.Builder()
+                            .add(NULL_TO_EMPTY_STRING_ADAPTER)
+                            .add(JsonObjectConverter)
+                            .add(OffsetDateTime::class.java, OffsetDateTimeConverter())
+                            .add(BigDecimalConverter())
+                            .build()
+                    MoshiConverterFactory.create()
                     INSTANCE = Retrofit.Builder()
                             .baseUrl(generateUrl(baseUrl))
                             .client(client.build())
                             .addConverterFactory(ScalarsConverterFactory.create())
-                            .addConverterFactory(GsonConverterFactory.create(convertIso8601()))
+                            .addConverterFactory(MoshiConverterFactory.create(moshi))
                             .build()
                 }
             }
             return INSTANCE
-        }
-
-        private fun convertIso8601(): Gson {
-            return GsonBuilder()
-                    .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeConverter())
-                    .enableComplexMapKeySerialization()
-                    .serializeNulls()
-                    .setPrettyPrinting()
-                    .setLenient()
-                    .setVersion(1.0)
-                    .create()
         }
 
         fun destroyInstance() {

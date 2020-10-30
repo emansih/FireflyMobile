@@ -1,9 +1,9 @@
 package xyz.hisname.fireflyiii.repository.models.rules
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 data class User(
         val links: Links,
-        @SerializedName("data")
+        @Json(name ="data")
         val data: RulesData
 )

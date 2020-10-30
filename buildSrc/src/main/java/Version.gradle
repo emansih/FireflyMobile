@@ -30,13 +30,18 @@ ext {
 
     network = Group {
         implementation Dependencies.retrofitLibs
-        implementation Dependencies.retrofitGson
+        implementation Dependencies.retrofitMoshi
         implementation Dependencies.retrofitScalar
     }
 
     kotlin = Group {
         implementation Dependencies.kotlinLib
         implementation Dependencies.coroutineCore
+    }
+
+    moshi = Group {
+        implementation Dependencies.moshiLib
+        kapt Dependencies.moshiCodegen
     }
 
     glide = Group {

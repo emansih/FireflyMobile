@@ -1,8 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.budget.limits
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class BudgetLimitModel(
-        @SerializedName("data")
+        @Json(name ="data")
         val budgetLimitData: List<BudgetLimitData>
 )

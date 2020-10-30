@@ -1,8 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.tags
 
 import androidx.room.Entity
+import com.squareup.moshi.JsonClass
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class TagsAttributes(
         val created_at: String,
         val updated_at: String,

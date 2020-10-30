@@ -5,10 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -40,8 +39,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             repository.getAccountByType(accountType).collectLatest {
                 accountData.postValue(it)
             }
-        }.invokeOnCompletion { accountError ->
-            apiResponse.postValue(accountError?.localizedMessage)
         }
         return accountData
     }
@@ -122,20 +119,20 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.name != null -> gson.errors.name[0]
-                    gson.errors.account_number != null -> gson.errors.account_number[0]
-                    gson.errors.interest != null -> gson.errors.interest[0]
-                    gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
-                    gson.errors.currency_code != null -> gson.errors.currency_code[0]
-                    gson.errors.iban != null -> gson.errors.iban[0]
-                    gson.errors.bic != null -> gson.errors.bic[0]
-                    gson.errors.opening_balance != null -> gson.errors.opening_balance[0]
-                    gson.errors.opening_balance_date != null -> gson.errors.opening_balance_date[0]
-                    gson.errors.interest_period != null -> gson.errors.interest_period[0]
-                    gson.errors.liability_amount != null -> gson.errors.liability_amount[0]
-                    gson.errors.exception != null -> gson.errors.exception[0]
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.account_number != null -> moshi.errors.account_number[0]
+                    moshi?.errors?.interest != null -> moshi.errors.interest[0]
+                    moshi?.errors?.liabilityStartDate != null -> moshi.errors.liabilityStartDate[0]
+                    moshi?.errors?.currency_code != null -> moshi.errors.currency_code[0]
+                    moshi?.errors?.iban != null -> moshi.errors.iban[0]
+                    moshi?.errors?.bic != null -> moshi.errors.bic[0]
+                    moshi?.errors?.opening_balance != null -> moshi.errors.opening_balance[0]
+                    moshi?.errors?.opening_balance_date != null -> moshi.errors.opening_balance_date[0]
+                    moshi?.errors?.interest_period != null -> moshi.errors.interest_period[0]
+                    moshi?.errors?.liability_amount != null -> moshi.errors.liability_amount[0]
+                    moshi?.errors?.exception != null -> moshi.errors.exception[0]
                     else -> "Error occurred while saving Account"
                 }
             }
@@ -179,20 +176,20 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.name != null -> gson.errors.name[0]
-                    gson.errors.account_number != null -> gson.errors.account_number[0]
-                    gson.errors.interest != null -> gson.errors.interest[0]
-                    gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
-                    gson.errors.currency_code != null -> gson.errors.currency_code[0]
-                    gson.errors.iban != null -> gson.errors.iban[0]
-                    gson.errors.bic != null -> gson.errors.bic[0]
-                    gson.errors.opening_balance != null -> gson.errors.opening_balance[0]
-                    gson.errors.opening_balance_date != null -> gson.errors.opening_balance_date[0]
-                    gson.errors.interest_period != null -> gson.errors.interest_period[0]
-                    gson.errors.liability_amount != null -> gson.errors.liability_amount[0]
-                    gson.errors.exception != null -> gson.errors.exception[0]
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.account_number != null -> moshi.errors.account_number[0]
+                    moshi?.errors?.interest != null -> moshi.errors.interest[0]
+                    moshi?.errors?.liabilityStartDate != null -> moshi.errors.liabilityStartDate[0]
+                    moshi?.errors?.currency_code != null -> moshi.errors.currency_code[0]
+                    moshi?.errors?.iban != null -> moshi.errors.iban[0]
+                    moshi?.errors?.bic != null -> moshi.errors.bic[0]
+                    moshi?.errors?.opening_balance != null -> moshi.errors.opening_balance[0]
+                    moshi?.errors?.opening_balance_date != null -> moshi.errors.opening_balance_date[0]
+                    moshi?.errors?.interest_period != null -> moshi.errors.interest_period[0]
+                    moshi?.errors?.liability_amount != null -> moshi.errors.liability_amount[0]
+                    moshi?.errors?.exception != null -> moshi.errors.exception[0]
                     else -> "Error occurred while updating Account"
                 }
             }

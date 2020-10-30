@@ -2,18 +2,17 @@ package xyz.hisname.fireflyiii.repository.models.currency
 
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 @Entity(tableName = "currency")
 data class CurrencyData(
         @PrimaryKey(autoGenerate = false)
-        @SerializedName("id")
+        @Json(name ="id")
         var currencyId: Long? = null,
         @Embedded
-        @SerializedName("attributes")
-        var currencyAttributes: CurrencyAttributes? = null,
-        @Ignore
-        val type: String = ""
+        @Json(name ="attributes")
+        var currencyAttributes: CurrencyAttributes? = null
 )

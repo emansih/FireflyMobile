@@ -1,9 +1,11 @@
 package xyz.hisname.fireflyiii.repository.models.bills
 
 import androidx.room.Entity
+import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class BillAttributes(
         val updated_at: String,
         val created_at: String,
@@ -18,10 +20,10 @@ data class BillAttributes(
         val repeat_freq: String,
         val skip: Int,
         val active: Boolean,
-        val attachments_count: Int,
+        val attachments_count: Int = 0,
         val pay_dates: List<String>,
         val paid_dates: List<String>,
         val notes: String?,
         val next_expected_match: String?,
-        val isPending: Boolean
+        val isPending: Boolean = false
 )

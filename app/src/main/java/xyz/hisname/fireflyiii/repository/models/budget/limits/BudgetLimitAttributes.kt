@@ -1,7 +1,9 @@
 package xyz.hisname.fireflyiii.repository.models.budget.limits
 
+import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
 
+@JsonClass(generateAdapter = true)
 data class BudgetLimitAttributes(
         val amount: BigDecimal,
         val budget_id: Int,

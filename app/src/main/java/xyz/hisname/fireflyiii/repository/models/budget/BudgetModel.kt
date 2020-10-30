@@ -1,11 +1,13 @@
 package xyz.hisname.fireflyiii.repository.models.budget
 
 import androidx.room.Embedded
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class BudgetModel(
         @Embedded
-        @SerializedName("data")
+        @Json(name ="data")
         val budgetData: List<BudgetData>,
         val meta: Meta
 )

@@ -2,9 +2,11 @@ package xyz.hisname.fireflyiii.repository.models.transaction
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import java.time.OffsetDateTime
 
+@JsonClass(generateAdapter = true)
 @Entity(tableName = "transactionTable")
 data class Transactions(
         @PrimaryKey(autoGenerate = false)
@@ -37,9 +39,9 @@ data class Transactions(
         var source_name: String?,
         var source_type: String?,
         var tags: List<String>,
-        @SerializedName("type")
+        @Json(name ="type")
         var transactionType: String?,
         var user: Int,
         var piggy_bank_name: String?,
-        var isPending: Boolean
+        var isPending: Boolean = false
 )

@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.workers.account
 import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
@@ -77,7 +77,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     val currencyId = currencyData.currencyId
                     val fakeAccountId = ThreadLocalRandom.current().nextLong()
                     accountDatabase.insert(AccountData(
-                            "", fakeAccountId, AccountAttributes(
+                            fakeAccountId, AccountAttributes(
                             "","", accountName, true,
                             accountType, accountRole, currencyId, currencyCode, 0.0,
                             currencySymbol, "", notes, "", "", accountNumber,
@@ -128,7 +128,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     if (response.errorBody() != null) {
                         errorBody = String(response.errorBody()?.bytes()!!)
                     }
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
                     val responseBody = response.body()
                     if (response.isSuccessful && responseBody != null) {
                         context.showNotification("Account Added", "$name was added successfully!", channelIcon)
@@ -140,10 +140,10 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                         Result.success()
                     } else {
                         error = when {
-                            gson.errors.name != null -> gson.errors.name[0]
-                            gson.errors.account_number != null -> gson.errors.account_number[0]
-                            gson.errors.interest != null -> gson.errors.interest[0]
-                            gson.errors.liabilityStartDate != null -> gson.errors.liabilityStartDate[0]
+                            moshi?.errors?.name != null -> moshi.errors.name[0]
+                            moshi?.errors?.account_number != null -> moshi.errors.account_number[0]
+                            moshi?.errors?.interest != null -> moshi.errors.interest[0]
+                            moshi?.errors?.liabilityStartDate != null -> moshi.errors.liabilityStartDate[0]
                             else -> "Error saving account"
                         }
                         cancelWorker(name,accountType, context)

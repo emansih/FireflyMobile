@@ -1,9 +1,9 @@
 package xyz.hisname.fireflyiii.repository.models.rules
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 data class Rulesmodel(
-        @SerializedName("data")
+        @Json(name ="data")
         val data: List<RulesData>,
         val included: List<Included>,
         val meta: Meta,

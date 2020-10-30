@@ -24,7 +24,9 @@ class BillRepository(private val billDao: BillDataDao,
                     insertBill(billData)
                 }
             }
-        } catch (exception: Exception){ }
+        } catch (exception: Exception){
+            exception.printStackTrace()
+        }
         return billDao.getPaginatedBills(pageNumber * Constants.PAGE_SIZE)
     }
 

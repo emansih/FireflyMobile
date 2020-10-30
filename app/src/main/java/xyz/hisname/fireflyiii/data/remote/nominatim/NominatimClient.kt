@@ -1,12 +1,8 @@
 package xyz.hisname.fireflyiii.data.remote.nominatim
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import xyz.hisname.fireflyiii.BuildConfig
-import xyz.hisname.fireflyiii.repository.models.Element
 
 class NominatimClient {
 
@@ -31,18 +27,12 @@ class NominatimClient {
                     INSTANCE = Retrofit.Builder()
                             .baseUrl("https://nominatim.openstreetmap.org")
                             .client(client)
-                            .addConverterFactory(GsonConverterFactory.create(deserializer()))
                             .build()
                 }
             }
             return INSTANCE
         }
 
-        private fun deserializer(): Gson {
-            return GsonBuilder()
-                    .registerTypeAdapter(Array<Element>::class.java, NominatimDeserializer())
-                    .create()
-        }
 
         fun destroyClient(){
             INSTANCE = null

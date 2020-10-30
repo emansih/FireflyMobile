@@ -114,7 +114,7 @@ dependencies {
     kotlin()
     glide()
     markdown()
-
+    moshi()
     testing()
 
     implementation Dependencies.materialDrawer

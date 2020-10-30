@@ -4,14 +4,16 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @Entity(tableName = "tags")
+@JsonClass(generateAdapter = true)
 data class TagsData(
         @Embedded
-        @SerializedName("attributes")
+        @Json(name ="attributes")
         var tagsAttributes: TagsAttributes? = null,
-        @SerializedName("id")
+        @Json(name ="id")
         @PrimaryKey(autoGenerate = false)
         var tagsId: Long? = null,
         @Ignore

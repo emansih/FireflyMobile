@@ -24,14 +24,14 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyFts
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
-import xyz.hisname.fireflyiii.util.GsonConverterUtil
+import xyz.hisname.fireflyiii.util.TypeConverterUtil
 
 
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
     BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class, Spent::class, BudgetLimitData::class],
-        version = 18, exportSchema = false)
-@TypeConverters(GsonConverterUtil::class)
+        version = 19, exportSchema = false)
+@TypeConverters(TypeConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun billDataDao(): BillDataDao

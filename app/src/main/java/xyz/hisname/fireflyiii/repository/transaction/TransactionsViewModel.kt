@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.repository.transaction
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.*
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -254,28 +254,28 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             var errorBodyMessage = ""
             if (errorBody != null) {
                 errorBodyMessage = String(errorBody.bytes())
-                val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBodyMessage)
                 try {
-                    gson.errors.transactions_currency?.let {
-                        errorBodyMessage = gson.errors.transactions_currency[0]
+                    moshi?.errors?.transactions_currency?.let {
+                        errorBodyMessage = moshi.errors.transactions_currency[0]
                     }
-                    gson.errors.piggy_bank_name?.let {
-                        errorBodyMessage = gson.errors.piggy_bank_name[0]
+                    moshi?.errors?.piggy_bank_name?.let {
+                        errorBodyMessage = moshi.errors.piggy_bank_name[0]
                     }
-                    gson.errors.transactions_destination_name?.let {
-                        errorBodyMessage = gson.errors.transactions_destination_name[0]
+                    moshi?.errors?.transactions_destination_name?.let {
+                        errorBodyMessage = moshi.errors.transactions_destination_name[0]
                     }
-                    gson.errors.transactions_source_name?.let {
-                        errorBodyMessage = gson.errors.transactions_source_name[0]
+                    moshi?.errors?.transactions_source_name?.let {
+                        errorBodyMessage = moshi.errors.transactions_source_name[0]
                     }
-                    gson.errors.transaction_destination_id?.let {
-                        errorBodyMessage = gson.errors.transaction_destination_id[0]
+                    moshi?.errors?.transaction_destination_id?.let {
+                        errorBodyMessage = moshi.errors.transaction_destination_id[0]
                     }
-                    gson.errors.transaction_amount?.let {
+                    moshi?.errors?.transaction_amount?.let {
                         errorBodyMessage = "Amount field is required"
                     }
-                    gson.errors.description?.let {
-                        errorBodyMessage = gson.errors.description[0]
+                    moshi?.errors?.description?.let {
+                        errorBodyMessage = moshi.errors.description[0]
                     }
                 } catch (exception: Exception){
                     errorBodyMessage = "The given data was invalid"
@@ -321,28 +321,28 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
                 var errorBodyMessage = ""
                 if (errorBody != null) {
                     errorBodyMessage = String(errorBody.bytes())
-                    val gson = Gson().fromJson(errorBodyMessage, ErrorModel::class.java)
+                    val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBodyMessage)
                     try {
-                        gson.errors.transactions_currency?.let {
-                            errorBodyMessage = gson.errors.transactions_currency[0]
+                        moshi?.errors?.transactions_currency?.let {
+                            errorBodyMessage = moshi.errors.transactions_currency[0]
                         }
-                        gson.errors.piggy_bank_name?.let {
-                            errorBodyMessage = gson.errors.piggy_bank_name[0]
+                        moshi?.errors?.piggy_bank_name?.let {
+                            errorBodyMessage = moshi.errors.piggy_bank_name[0]
                         }
-                        gson.errors.transactions_destination_name?.let {
-                            errorBodyMessage = gson.errors.transactions_destination_name[0]
+                        moshi?.errors?.transactions_destination_name?.let {
+                            errorBodyMessage = moshi.errors.transactions_destination_name[0]
                         }
-                        gson.errors.transactions_source_name?.let {
-                            errorBodyMessage = gson.errors.transactions_source_name[0]
+                        moshi?.errors?.transactions_source_name?.let {
+                            errorBodyMessage = moshi.errors.transactions_source_name[0]
                         }
-                        gson.errors.transaction_destination_id?.let {
-                            errorBodyMessage = gson.errors.transaction_destination_id[0]
+                        moshi?.errors?.transaction_destination_id?.let {
+                            errorBodyMessage = moshi.errors.transaction_destination_id[0]
                         }
-                        gson.errors.transaction_amount?.let {
+                        moshi?.errors?.transaction_amount?.let {
                             errorBodyMessage = "Amount field is required"
                         }
-                        gson.errors.description?.let {
-                            errorBodyMessage = gson.errors.description[0]
+                        moshi?.errors?.description?.let {
+                            errorBodyMessage = moshi.errors.description[0]
                         }
                     } catch (exception: Exception){
                         errorBodyMessage = "The given data was invalid"

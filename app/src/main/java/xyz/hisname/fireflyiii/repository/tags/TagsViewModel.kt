@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -51,12 +51,12 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.longitude != null -> gson.errors.longitude[0]
-                    gson.errors.tag != null -> gson.errors.tag[0]
-                    gson.errors.latitude != null -> gson.errors.latitude[0]
-                    gson.errors.zoomLevel != null -> gson.errors.zoomLevel[0]
+                    moshi?.errors?.longitude != null -> moshi.errors.longitude[0]
+                    moshi?.errors?.tag != null -> moshi.errors.tag[0]
+                    moshi?.errors?.latitude != null -> moshi.errors.latitude[0]
+                    moshi?.errors?.zoomLevel != null -> moshi.errors.zoomLevel[0]
                     else -> "Error occurred while saving tag"
                 }
             }
@@ -85,12 +85,12 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.longitude != null -> gson.errors.longitude[0]
-                    gson.errors.tag != null -> gson.errors.tag[0]
-                    gson.errors.latitude != null -> gson.errors.latitude[0]
-                    gson.errors.zoomLevel != null -> gson.errors.zoomLevel[0]
+                    moshi?.errors?.longitude != null -> moshi.errors.longitude[0]
+                    moshi?.errors?.tag != null -> moshi.errors.tag[0]
+                    moshi?.errors?.latitude != null -> moshi.errors.latitude[0]
+                    moshi?.errors?.zoomLevel != null -> moshi.errors.zoomLevel[0]
                     else -> "Error occurred while updating tag"
                 }
             }

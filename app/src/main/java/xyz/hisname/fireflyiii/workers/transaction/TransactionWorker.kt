@@ -6,12 +6,11 @@ import android.content.Intent
 import androidx.core.os.bundleOf
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.google.gson.Gson
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.utils.toAndroidIconCompat
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
@@ -57,7 +56,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
             if (response.errorBody() != null) {
                 errorBody = String(response.errorBody()?.bytes()!!)
             }
-            val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+            val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
             if (response.isSuccessful) {
                 context.showNotification(transactionType, "Transaction added successfully!", channelIcon)
                 cancelWorker(transactionWorkManagerId, context)
@@ -72,16 +71,30 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                 Result.success()
             } else {
                 var error = ""
-                when {
-                    gson.errors.transactions_destination_name != null -> {
-                        error = gson.errors.transactions_destination_name[0]
+                try {
+                    moshi?.errors?.transactions_currency?.let {
+                        error = moshi.errors.transactions_currency[0]
                     }
-                    gson.errors.transactions_currency != null -> {
-                        error = gson.errors.transactions_currency[0]
+                    moshi?.errors?.piggy_bank_name?.let {
+                        error = moshi.errors.piggy_bank_name[0]
                     }
-                    gson.errors.transactions_source_name != null -> {
-                        error = gson.errors.transactions_source_name[0]
+                    moshi?.errors?.transactions_destination_name?.let {
+                        error = moshi.errors.transactions_destination_name[0]
                     }
+                    moshi?.errors?.transactions_source_name?.let {
+                        error = moshi.errors.transactions_source_name[0]
+                    }
+                    moshi?.errors?.transaction_destination_id?.let {
+                        error = moshi.errors.transaction_destination_id[0]
+                    }
+                    moshi?.errors?.transaction_amount?.let {
+                        error = "Amount field is required"
+                    }
+                    moshi?.errors?.description?.let {
+                        error = moshi.errors.description[0]
+                    }
+                } catch (exception: Exception){
+                    error = "The given data was invalid"
                 }
                 val transactionIntent = Intent(context, AddTransactionActivity::class.java)
                 val bundleToPass =  bundleOf("transactionType" to transactionType,

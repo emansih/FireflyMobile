@@ -1,5 +1,8 @@
 package xyz.hisname.fireflyiii.repository.models.accounts
 
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 data class Pagination(
         val total: Int,
         val count: Int,

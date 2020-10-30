@@ -25,11 +25,11 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
             val summaryService = genericService()?.create(SummaryService::class.java)
             summaryService?.getBasicSummary(startDate, endDate,
                     currencyCode)?.enqueue(retrofitCallback({ response ->
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
+                val responseBody = response.body()
+                if (response.isSuccessful && responseBody != null) {
                     // so dirty I went to take a shower after writing this code
                     val netWorth = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("net-worth-in-$currencyCode")
                                 .getString("value_parsed")
                     } catch (exception: Exception){
@@ -37,7 +37,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     }
                     simpleData.networthValue = netWorth
                     val leftToSpend = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("left-to-spend-in-$currencyCode")
                                 .getString("value_parsed")
                     } catch (exception: Exception){
@@ -46,7 +46,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     simpleData.leftToSpend = leftToSpend
 
                     val balance = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("balance-in-$currencyCode")
                                 .getString("value_parsed")
                     } catch(exception: Exception){
@@ -55,7 +55,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     simpleData.balance = balance
 
                     val earned = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("earned-in-$currencyCode")
                                 .getString("value_parsed")
                     } catch(exception: Exception){
@@ -64,7 +64,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     simpleData.earned = earned
 
                     val spent = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("spent-in-$currencyCode")
                                 .getString("value_parsed")
                     } catch(exception: Exception){
@@ -73,7 +73,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     simpleData.spent = spent
 
                     val unPaidBills = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("bills-unpaid-in-$currencyCode")
                                 .getString("value_parsed")
                     } catch(exception: Exception){
@@ -82,7 +82,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     simpleData.unPaidBills = unPaidBills
 
                     val paidBills = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("bills-paid-in-$currencyCode")
                                 .getString("value_parsed")
                     } catch(exception: Exception){
@@ -91,7 +91,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                     simpleData.paidBills = paidBills
 
                     val leftToSpendPerDay = try {
-                        JSONObject(responseBody)
+                        responseBody
                                 .getJSONObject("left-to-spend-in-$currencyCode")
                                 .getString("sub_title")
                     } catch(exception: Exception){
@@ -119,6 +119,7 @@ class SummaryViewModel(application: Application): BaseViewModel(application) {
                 }
             })
             { throwable ->
+                println("summary: " + throwable.localizedMessage)
                 networthValue.postValue(simpleData.networthValue)
                 leftToSpendValue.postValue(simpleData.leftToSpend)
                 balanceValue.postValue(simpleData.balance)

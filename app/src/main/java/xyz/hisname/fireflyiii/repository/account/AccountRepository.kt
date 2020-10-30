@@ -16,7 +16,6 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                         private val accountsService: AccountsService?){
 
     private lateinit var apiResponse: String
-    val responseApi: MutableLiveData<String> = MutableLiveData()
     val authStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     suspend fun insertAccount(account: AccountData){

@@ -29,7 +29,10 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
                 apiOk.value = false
             }
         })
-        { throwable -> apiOk.value = false })
+        { throwable ->
+            println("getUser: " + throwable.localizedMessage)
+            apiOk.value = false
+        })
         isLoading.value = false
         return apiOk
     }
@@ -41,7 +44,9 @@ class UserInfoViewModel(application: Application) : BaseViewModel(application){
         viewModelScope.launch(Dispatchers.IO){
             try {
                 systemInfoModel = genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.body()
-            } catch (exception: Exception){ }
+            } catch (exception: Exception){
+                println("user system: " + exception.localizedMessage)
+            }
         }.invokeOnCompletion {
             val systemData = systemInfoModel?.systemData
             if (systemData != null) {

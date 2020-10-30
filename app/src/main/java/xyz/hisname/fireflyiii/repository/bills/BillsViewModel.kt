@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -88,14 +88,14 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
                     val responseErrorBody = response.errorBody()
                     if (responseErrorBody != null) {
                         errorMessage = String(responseErrorBody.bytes())
-                        val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                        val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                         errorMessage = when {
-                            gson.errors.name != null -> gson.errors.name[0]
-                            gson.errors.currency_code != null -> gson.errors.currency_code[0]
-                            gson.errors.amount_min != null -> gson.errors.amount_min[0]
-                            gson.errors.repeat_freq != null -> gson.errors.repeat_freq[0]
-                            gson.errors.date != null -> gson.errors.date[0]
-                            gson.errors.skip != null -> gson.errors.skip[0]
+                            moshi?.errors?.name != null -> moshi.errors.name[0]
+                            moshi?.errors?.currency_code != null -> moshi.errors.currency_code[0]
+                            moshi?.errors?.amount_min != null -> moshi.errors.amount_min[0]
+                            moshi?.errors?.repeat_freq != null -> moshi.errors.repeat_freq[0]
+                            moshi?.errors?.date != null -> moshi.errors.date[0]
+                            moshi?.errors?.skip != null -> moshi.errors.skip[0]
                             else -> "Error occurred while saving bill"
                         }
                     }
@@ -120,16 +120,27 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         billsService?.updateBill(billId, name, amountMin, amountMax, date,
                 repeatFreq, skip, active, currencyId, notes)?.enqueue(retrofitCallback(
                 { response ->
-                    var errorBody = ""
-                    if (response.errorBody() != null) {
-                        errorBody = String(response.errorBody()?.bytes()!!)
+                    var errorMessage = ""
+                    val responseErrorBody = response.errorBody()
+                    if (responseErrorBody != null) {
+                        errorMessage = String(responseErrorBody.bytes())
+                        val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
+                        errorMessage = when {
+                            moshi?.errors?.name != null -> moshi.errors.name[0]
+                            moshi?.errors?.currency_code != null -> moshi.errors.currency_code[0]
+                            moshi?.errors?.amount_min != null -> moshi.errors.amount_min[0]
+                            moshi?.errors?.repeat_freq != null -> moshi.errors.repeat_freq[0]
+                            moshi?.errors?.date != null -> moshi.errors.date[0]
+                            moshi?.errors?.skip != null -> moshi.errors.skip[0]
+                            else -> "Error occurred while saving bill"
+                        }
                     }
                     val networkData = response.body()
                     if (networkData != null) {
                         viewModelScope.launch(Dispatchers.IO) { repository.insertBill(networkData.data) }
                         apiLiveData.postValue(ApiResponses(response.body()))
                     } else {
-                        apiLiveData.postValue(ApiResponses(errorBody))
+                        apiLiveData.postValue(ApiResponses(errorMessage))
                     }
                 })
         { throwable -> apiLiveData.postValue(ApiResponses(throwable)) })

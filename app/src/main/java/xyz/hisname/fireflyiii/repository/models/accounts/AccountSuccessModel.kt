@@ -1,9 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.accounts
 
-import com.google.gson.annotations.SerializedName
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class AccountSuccessModel(
-        @SerializedName("data")
+        @Json(name ="data")
         val data: AccountData
 )

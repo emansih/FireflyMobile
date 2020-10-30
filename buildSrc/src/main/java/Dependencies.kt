@@ -37,12 +37,13 @@ object Dependencies{
     private const val biometricVersion = "1.1.0-beta01"
     private const val testVersion = "1.3.0-alpha03"
     private const val taskerPluginVersion = "0.3.3"
+    private const val moshiVersion = "1.11.0"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecyclerLiveDataCore = "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
     val lifeCycleExtension = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
     val retrofitLibs = "com.squareup.retrofit2:retrofit:$retrofitVersion"
-    val retrofitGson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    val retrofitMoshi = "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     val retrofitScalar = "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     val mockWebServer = "org.mock-server:mockserver-netty:5.8.1"
     val roomLibs = "androidx.room:room-runtime:$roomVersion"
@@ -91,4 +92,6 @@ object Dependencies{
     val testOrchestrator = "androidx.test:orchestrator:$testVersion"
     val taskerPluginLib = "com.joaomgcd:taskerpluginlibrary:$taskerPluginVersion"
     val notificationLib = "io.karn:notify:1.3.0"
+    val moshiLib = "com.squareup.moshi:moshi:$moshiVersion"
+    val moshiCodegen = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
 }

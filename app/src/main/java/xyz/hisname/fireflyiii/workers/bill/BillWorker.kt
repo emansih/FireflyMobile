@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.workers.bill
 import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.Constants
@@ -42,7 +42,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                     if (response.errorBody() != null) {
                         errorBody = String(response.errorBody()?.bytes()!!)
                     }
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+                    val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
                     val responseBody = response.body()
                     if (response.isSuccessful && responseBody != null) {
                         context.showNotification("Bill Added", "$name added successfully!", channelIcon)
@@ -54,10 +54,10 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                         Result.success()
                     } else {
                         when {
-                            gson.errors.name != null -> error = gson.errors.name[0]
-                            gson.errors.currency_code != null -> error = gson.errors.currency_code[0]
-                            gson.errors.amount_min != null -> error = gson.errors.amount_min[0]
-                            gson.errors.repeat_freq != null -> error = gson.errors.repeat_freq[0]
+                            moshi?.errors?.name != null -> error = moshi.errors.name[0]
+                            moshi?.errors?.currency_code != null -> error = moshi.errors.currency_code[0]
+                            moshi?.errors?.amount_min != null -> error = moshi.errors.amount_min[0]
+                            moshi?.errors?.repeat_freq != null -> error = moshi.errors.repeat_freq[0]
                         }
                         context.showNotification("Error Adding $name", error, channelIcon)
                         cancelWorker(billWorkManagerId, context)
@@ -109,7 +109,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                     val currency = currencyDatabase.getCurrencyByCode(currencyCode)[0]
                     billDatabase.insert(
                             BillData(
-                                 "", billWorkManagerId, BillAttributes("","",
+                                    billWorkManagerId, BillAttributes("","",
                                     name, currency.currencyId ?: 0L, currencyCode,
                                     currency.currencyAttributes?.symbol ?: "",
                                     currency.currencyAttributes?.decimal_places ?: 0,

@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -94,12 +94,12 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null){
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.name != null -> gson.errors.name[0]
-                    gson.errors.code != null -> gson.errors.code[0]
-                    gson.errors.symbol != null -> gson.errors.symbol[0]
-                    gson.errors.decimalPlaces != null -> gson.errors.decimalPlaces[0]
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.code != null -> moshi.errors.code[0]
+                    moshi?.errors?.symbol != null -> moshi.errors.symbol[0]
+                    moshi?.errors?.decimalPlaces != null -> moshi.errors.decimalPlaces[0]
                     else -> "Error occurred while updating currency"
                 }
             }
@@ -129,12 +129,12 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null){
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.name != null -> gson.errors.name[0]
-                    gson.errors.code != null -> gson.errors.code[0]
-                    gson.errors.symbol != null -> gson.errors.symbol[0]
-                    gson.errors.decimalPlaces != null -> gson.errors.decimalPlaces[0]
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.code != null -> moshi.errors.code[0]
+                    moshi?.errors?.symbol != null -> moshi.errors.symbol[0]
+                    moshi?.errors?.decimalPlaces != null -> moshi.errors.decimalPlaces[0]
                     else -> "Error occurred while saving currency"
                 }
             }

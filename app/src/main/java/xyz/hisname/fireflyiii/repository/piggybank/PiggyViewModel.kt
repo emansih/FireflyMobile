@@ -2,7 +2,7 @@ package xyz.hisname.fireflyiii.repository.piggybank
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -87,12 +87,12 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.name != null -> gson.errors.name[0]
-                    gson.errors.account_id != null -> gson.errors.account_id[0]
-                    gson.errors.current_amount != null -> gson.errors.current_amount[0]
-                    gson.errors.targetDate != null -> gson.errors.targetDate[0]
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.account_id != null -> moshi.errors.account_id[0]
+                    moshi?.errors?.current_amount != null -> moshi.errors.current_amount[0]
+                    moshi?.errors?.targetDate != null -> moshi.errors.targetDate[0]
                     else -> "Error occurred while saving piggy bank"
                 }
             }
@@ -122,12 +122,12 @@ class PiggyViewModel(application: Application): BaseViewModel(application)  {
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.name != null -> gson.errors.name[0]
-                    gson.errors.account_id != null -> gson.errors.account_id[0]
-                    gson.errors.current_amount != null -> gson.errors.current_amount[0]
-                    gson.errors.targetDate != null -> gson.errors.targetDate[0]
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.account_id != null -> moshi.errors.account_id[0]
+                    moshi?.errors?.current_amount != null -> moshi.errors.current_amount[0]
+                    moshi?.errors?.targetDate != null -> moshi.errors.targetDate[0]
                     else -> "Error occurred while updating piggy bank"
                 }
             }

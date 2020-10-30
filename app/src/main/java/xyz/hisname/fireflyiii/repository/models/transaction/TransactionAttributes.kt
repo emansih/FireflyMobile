@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.repository.models.transaction
 
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class TransactionAttributes(
         var created_at: String = "",
         var group_title: String = "",

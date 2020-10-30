@@ -1,9 +1,11 @@
 package xyz.hisname.fireflyiii.repository.models.currency
 
 import androidx.room.Entity
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class CurrencyAttributes(
         val updated_at: String,
         val created_at: String,
@@ -12,6 +14,6 @@ data class CurrencyAttributes(
         val code: String,
         val symbol: String,
         val decimal_places: Int,
-        @SerializedName("default")
+        @Json(name ="default")
         val currencyDefault: Boolean
 )

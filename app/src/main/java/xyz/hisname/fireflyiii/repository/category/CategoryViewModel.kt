@@ -2,7 +2,7 @@ package xyz.hisname.fireflyiii.repository.category
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -61,9 +61,9 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
             val responseErrorBody = response.errorBody()
             if (responseErrorBody != null) {
                 errorMessage = String(responseErrorBody.bytes())
-                val gson = Gson().fromJson(errorMessage, ErrorModel::class.java)
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
                 errorMessage = when {
-                    gson.errors.name != null -> gson.errors.name[0]
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
                     else -> "Error occurred while saving category"
                 }
             }

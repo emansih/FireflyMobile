@@ -3,7 +3,7 @@ package xyz.hisname.fireflyiii.workers.piggybank
 import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
@@ -38,7 +38,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             if (response.errorBody() != null) {
                 errorBody = String(response.errorBody()?.bytes()!!)
             }
-            val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
+            val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
             val responseBody = response.body()
             if (response.isSuccessful && responseBody != null) {
                 context.showNotification("Piggy Bank Added", "$name was added successfully!", channelIcon)
@@ -51,9 +51,9 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             } else {
                 var error = ""
                 when {
-                    gson.errors.name != null -> error = gson.errors.name[0]
-                    gson.errors.account_id != null -> error = gson.errors.account_id[0]
-                    gson.errors.current_amount != null -> error = gson.errors.current_amount[0]
+                    moshi?.errors?.name != null -> error = moshi.errors.name[0]
+                    moshi?.errors?.account_id != null -> error = moshi.errors.account_id[0]
+                    moshi?.errors?.current_amount != null -> error = moshi.errors.current_amount[0]
                 }
                 cancelWorker(piggyWorkManagerId, context)
                 context.showNotification("There was an issue adding $name", error, channelIcon)

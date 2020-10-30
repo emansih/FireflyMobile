@@ -2,18 +2,17 @@ package xyz.hisname.fireflyiii.repository.models.accounts
 
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 @Entity(tableName = "accounts")
 data class AccountData(
-        @Ignore
-        var type: String = "",
         @PrimaryKey(autoGenerate = false)
-        @SerializedName("id")
+        @Json(name ="id")
         var accountId: Long? = null,
         @Embedded
-        @SerializedName("attributes")
+        @Json(name ="attributes")
         var accountAttributes: AccountAttributes? = null
 )

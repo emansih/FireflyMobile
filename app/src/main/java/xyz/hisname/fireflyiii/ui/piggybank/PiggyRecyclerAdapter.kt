@@ -61,7 +61,7 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
             itemView.goal_progress_bar.progress = percentage
             val targetDate = piggyBankData?.target_date
             itemView.timeLeft.let {
-                if(targetDate != null){
+                if(!targetDate.isNullOrBlank()){
                     if(piggyBankData.percentage != 100){
                         val daysDiff = DateTimeUtil.getDaysDifference(targetDate).toInt()
                         when{

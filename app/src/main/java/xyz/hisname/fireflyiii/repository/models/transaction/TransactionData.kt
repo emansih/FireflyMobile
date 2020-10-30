@@ -1,14 +1,14 @@
 package xyz.hisname.fireflyiii.repository.models.transaction
 
 import androidx.room.*
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class TransactionData(
-        @Ignore
-        var type: String = "",
-        @SerializedName("id")
+        @Json(name ="id")
         var transactionId: Long? = null,
         @Embedded
-        @SerializedName("attributes")
+        @Json(name ="attributes")
         var transactionAttributes: TransactionAttributes? = null
 )

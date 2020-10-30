@@ -1,9 +1,11 @@
 package xyz.hisname.fireflyiii.repository.models.piggy
 
 import androidx.room.Entity
+import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class PiggyAttributes(
         val updated_at: String?,
         val created_at: String?,
@@ -24,5 +26,5 @@ data class PiggyAttributes(
         val order: Int?,
         val active: Boolean?,
         val notes: String?,
-        val isPending: Boolean
+        val isPending: Boolean = false
 )

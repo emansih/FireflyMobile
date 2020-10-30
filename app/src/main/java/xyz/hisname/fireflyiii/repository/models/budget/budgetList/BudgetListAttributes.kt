@@ -2,8 +2,10 @@ package xyz.hisname.fireflyiii.repository.models.budget.budgetList
 
 import androidx.room.Entity
 import androidx.room.Ignore
+import com.squareup.moshi.JsonClass
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class BudgetListAttributes(
         var active: Boolean?,
         var created_at: String?,

@@ -1,8 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.budget
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
 
+@JsonClass(generateAdapter = true)
 data class BudgetAttributes(
         val created_at: String,
         val updated_at: String,
@@ -11,8 +13,8 @@ data class BudgetAttributes(
         val currency_symbol: String,
         val currency_decimal_places: Int,
         val amount: BigDecimal,
-        @SerializedName("start")
+        @Json(name ="start")
         val start_date: String,
-        @SerializedName("end")
+        @Json(name ="end")
         val end_date: String
 )

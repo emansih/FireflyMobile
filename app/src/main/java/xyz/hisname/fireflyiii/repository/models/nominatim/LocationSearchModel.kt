@@ -1,5 +1,8 @@
 package xyz.hisname.fireflyiii.repository.models.nominatim
 
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 data class LocationSearchModel(
         val boundingbox: List<String>,
         val category: String,

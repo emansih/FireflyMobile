@@ -4,10 +4,9 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -107,8 +106,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             } else {
                 if (responseError != null) {
                     val errorBody = String(responseError.bytes())
-                    val gson = Gson().fromJson(errorBody, ErrorModel::class.java)
-                    if(gson == null){
+                    val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
+                    if(moshi == null){
                         apiResponse.postValue("Error Loading Data")
                     } else {
                         apiResponse.postValue(errorBody)

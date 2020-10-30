@@ -1,8 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.accounts
 
 import androidx.room.Entity
+import com.squareup.moshi.JsonClass
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class AccountAttributes(
         val updated_at: String,
         val created_at: String,
@@ -30,5 +32,5 @@ data class AccountAttributes(
         val interest: String?,
         val interest_period: String?,
         val include_net_worth: Boolean,
-        val isPending: Boolean
+        val isPending: Boolean = false
 )

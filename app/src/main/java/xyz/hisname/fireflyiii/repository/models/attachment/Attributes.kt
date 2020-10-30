@@ -1,8 +1,10 @@
 package xyz.hisname.fireflyiii.repository.models.attachment
 
 import androidx.room.Entity
+import com.squareup.moshi.JsonClass
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class Attributes(
         val attachable_id: Int,
         val attachable_type: String,
