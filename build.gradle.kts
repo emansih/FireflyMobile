@@ -7,7 +7,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.0")
+        // Do not update build tools to 4.1.0!!!
+        // See issue #130 on Github
+        classpath("com.android.tools.build:gradle:4.0.1")
         classpath(kotlin("gradle-plugin", Dependencies.kotlinVersion))
         classpath("com.project.starter:easylauncher:3.2.1")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.28.0")
