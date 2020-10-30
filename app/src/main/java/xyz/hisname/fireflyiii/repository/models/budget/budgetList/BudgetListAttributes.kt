@@ -12,8 +12,8 @@ data class BudgetListAttributes(
         var name: String,
         var order: Int?,
         @Ignore
-        var spent: List<Spent>?,
+        var spent: List<Spent> = listOf(),
         var updated_at: String?
 ){
-        constructor() : this(true,"","",1,null,"")
+        constructor() : this(true,"","",1, listOf(),"")
 }

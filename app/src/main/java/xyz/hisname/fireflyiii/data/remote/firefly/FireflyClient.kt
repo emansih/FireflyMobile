@@ -9,7 +9,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import xyz.hisname.fireflyiii.data.remote.firefly.moshi.BigDecimalConverter
 import xyz.hisname.fireflyiii.data.remote.firefly.moshi.JsonObjectConverter
-import xyz.hisname.fireflyiii.data.remote.firefly.moshi.NULL_TO_EMPTY_STRING_ADAPTER
+import xyz.hisname.fireflyiii.data.remote.firefly.moshi.NullToEmptyStringConverter
 import xyz.hisname.fireflyiii.data.remote.firefly.moshi.OffsetDateTimeConverter
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
@@ -51,7 +51,7 @@ class FireflyClient {
                 }
                 synchronized(FireflyClient::class.java){
                     val moshi = Moshi.Builder()
-                            .add(NULL_TO_EMPTY_STRING_ADAPTER)
+                            .add(NullToEmptyStringConverter)
                             .add(JsonObjectConverter)
                             .add(OffsetDateTime::class.java, OffsetDateTimeConverter())
                             .add(BigDecimalConverter())

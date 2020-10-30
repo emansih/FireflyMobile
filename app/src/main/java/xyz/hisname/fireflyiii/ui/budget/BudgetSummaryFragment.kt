@@ -29,7 +29,6 @@ import xyz.hisname.fireflyiii.ui.transaction.TransactionByBudgetDialogFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -82,9 +81,9 @@ class BudgetSummaryFragment: BaseFragment() {
                                 .toDouble()
                                 .div(fireflyData.first.first.absoluteValue.roundToInt().toDouble())
                                 .times(100)
-                        if (uniqueBudget == null) {
+                        if (uniqueBudget.isNullOrBlank()) {
                             pieEntryArray.add(PieEntry(percentageCategory.roundToInt().toFloat(),
-                                    requireContext().getString(R.string.expenses_without_budget),
+                                    getString(R.string.expenses_without_budget),
                                     transactionAmount))
                             noExpenses = transactionAmount
                         } else {
@@ -135,7 +134,7 @@ class BudgetSummaryFragment: BaseFragment() {
                     actualAmountValue.text = "--.--"
                     remainingAmountValue.text = "--.--"
                     val entryLabel = if(entry.label == requireContext().getString(R.string.expenses_without_budget)){
-                        null
+                        ""
                     } else {
                         entry.label
                     }
@@ -145,7 +144,7 @@ class BudgetSummaryFragment: BaseFragment() {
                         budgetAmountValue.text = currencyData.currencyAttributes?.symbol + " " + value.first
                         actualAmountValue.text = currencyData.currencyAttributes?.symbol + " " + value.second
                         remainingAmountValue.text = currencyData.currencyAttributes?.symbol + " " + remainingValue
-                        if(entryLabel != null) {
+                        if(entryLabel.isNotEmpty()) {
                             if (remainingValue.toString().contains("-")) {
                                 remainingAmountValue.setTextColor(getCompatColor(R.color.md_red_A700))
                                 remainingBudgetText.setTextColor(getCompatColor(R.color.md_red_A700))

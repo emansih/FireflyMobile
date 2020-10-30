@@ -12,7 +12,7 @@ import com.squareup.moshi.JsonClass
 data class Spent(
 // For some reason, foreign keys does not work. will have to settle with a hack :(
         @PrimaryKey(autoGenerate = false)
-        var spentId: Long,
+        var spentId: Long = 0,
         @Json(name ="sum")
         var amount: Double,
         var currency_code: String,
