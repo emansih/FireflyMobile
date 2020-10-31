@@ -83,6 +83,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
     }
 
     override fun setupFab(){
+        extendedFab.isVisible = false
         addTransactionFab.apply {
             translationX = (6 * 56).toFloat()
             animate().apply {
