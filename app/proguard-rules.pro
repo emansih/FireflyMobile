@@ -28,9 +28,6 @@
 
 -keepattributes Signature, InnerClasses,*Annotation*
 -dontwarn sun.misc.**
--keep class * implements com.google.gson.TypeAdapterFactory
--keep class * implements com.google.gson.JsonSerializer
--keep class * implements com.google.gson.JsonDeserializer
 -keepclassmembers,allowshrinking,allowobfuscation interface * {
     @retrofit2.http.* <methods>;
 }
@@ -44,3 +41,7 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -keep public class * implements com.bumptech.glide.module.GlideModule
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
