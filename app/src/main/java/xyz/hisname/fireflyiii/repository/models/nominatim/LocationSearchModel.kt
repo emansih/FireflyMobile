@@ -7,7 +7,7 @@ data class LocationSearchModel(
         val boundingbox: List<String>,
         val category: String,
         val display_name: String,
-        val icon: String,
+        val icon: String? = null,
         val importance: Double,
         val lat: Double,
         val licence: String,

@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.data.remote.nominatim
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 import xyz.hisname.fireflyiii.BuildConfig
 
 class NominatimClient {
@@ -26,6 +27,7 @@ class NominatimClient {
                 synchronized(NominatimClient::class.java){
                     INSTANCE = Retrofit.Builder()
                             .baseUrl("https://nominatim.openstreetmap.org")
+                            .addConverterFactory(MoshiConverterFactory.create().withNullSerialization())
                             .client(client)
                             .build()
                 }
