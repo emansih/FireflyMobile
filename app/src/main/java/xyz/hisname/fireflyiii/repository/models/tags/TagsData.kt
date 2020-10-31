@@ -12,10 +12,8 @@ import com.squareup.moshi.JsonClass
 data class TagsData(
         @Embedded
         @Json(name ="attributes")
-        var tagsAttributes: TagsAttributes? = null,
+        var tagsAttributes: TagsAttributes,
         @Json(name ="id")
         @PrimaryKey(autoGenerate = false)
-        var tagsId: Long? = null,
-        @Ignore
-        var type: String =""
+        var tagsId: Long
 )

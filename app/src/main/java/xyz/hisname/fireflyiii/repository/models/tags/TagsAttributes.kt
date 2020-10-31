@@ -8,10 +8,10 @@ import com.squareup.moshi.JsonClass
 data class TagsAttributes(
         val created_at: String,
         val updated_at: String,
-        val date: String?,
-        val description: String?,
-        val latitude: String?,
-        val longitude: String?,
+        val date: String,
+        val description: String,
+        val latitude: String,
+        val longitude: String,
         val tag: String,
-        val zoom_level: String?
+        val zoom_level: String
 )

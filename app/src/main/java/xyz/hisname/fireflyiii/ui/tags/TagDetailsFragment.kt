@@ -12,7 +12,6 @@ import androidx.fragment.app.commit
 import androidx.preference.PreferenceManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import com.mikepenz.iconics.utils.colorInt
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_tag_details.*
@@ -62,11 +61,10 @@ class TagDetailsFragment: BaseDetailFragment() {
             colorRes = R.color.md_green_400
         }
         val tagsAttributes = tagData[0].tagsAttributes
-        if(tagsAttributes?.tag != null){
-            tagName.text = tagsAttributes.tag
-            nameOfTag = tagsAttributes.tag
-        }
-        if(tagsAttributes?.latitude == null || tagsAttributes.longitude == null || tagsAttributes.zoom_level == null){
+        tagName.text = tagsAttributes.tag
+        nameOfTag = tagsAttributes.tag
+        if(tagsAttributes.latitude.isEmpty() ||
+                tagsAttributes.longitude.isEmpty() || tagsAttributes.zoom_level.isEmpty()){
             latitude_text.text = resources.getString(R.string.no_location_set)
             longitude_text.text = resources.getString(R.string.no_location_set)
             zoom_text.text = resources.getString(R.string.no_location_set)
@@ -94,7 +92,7 @@ class TagDetailsFragment: BaseDetailFragment() {
             tagDetailsMap.controller.setZoom(tagsAttributes.zoom_level.toDouble())
             zoom_text.text = tagsAttributes.zoom_level
         }
-        tagDescription.text = tagsAttributes?.description
+        tagDescription.text = tagsAttributes.description
     }
 
     override fun onStop() {
