@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.*
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -89,15 +90,18 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
                                                                currencyCode: String,
                                                                accountName: String): LiveData<BigDecimal>{
-        var transactionAmount: BigDecimal = 0.toBigDecimal()
+        var transactionAmount = 0.toBigDecimal()
         val data: MutableLiveData<BigDecimal> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
+        // TODO: Fix me, seriously
+        viewModelScope.launch(Dispatchers.IO + exceptionCoroutine){
             transactionAmount = repository.getTransactionsByAccountAndCurrencyCodeAndDate(startDate, endDate, currencyCode, accountName)
         }.invokeOnCompletion {
             data.postValue(transactionAmount)
         }
         return data
     }
+
+    private val exceptionCoroutine = CoroutineExceptionHandler{ a,b -> }
 
     fun getUniqueCategoryByDate(startDate: String, endDate: String, currencyCode: String,
                                 sourceName: String, transactionType: String): MutableLiveData<MutableList<String>>{
