@@ -19,7 +19,8 @@ object Dependencies{
     private const val androidxPrefVersion = "1.1.1"
     private const val androidxWorkVersion = "2.4.0"
     private const val materialDrawerVersion = "8.1.7"
-    private const val iconicsVersion = "5.1.0"
+    // Do not use 5.1.0 of iconics https://github.com/mikepenz/Android-Iconics/issues/524
+    private const val iconicsVersion = "5.0.3"
     private const val toastyVersion = "7be5e09082"
     private const val chartVersion = "3.1.0"
     private const val aboutLibVersion = "3.2.0-rc01"
@@ -63,8 +64,9 @@ object Dependencies{
     val materialDrawer = "com.mikepenz:materialdrawer:$materialDrawerVersion"
     val iconics = "com.mikepenz:iconics-core:$iconicsVersion"
     val materialDrawerIconics = "com.mikepenz:materialdrawer-iconics:$materialDrawerVersion"
-    val googleMaterialIcons  = "com.mikepenz:google-material-typeface:3.0.1.5.original-kotlin@aar"
-    val fontAwesome = "com.mikepenz:fontawesome-typeface:5.9.0.1-kotlin@aar"
+    // Do not upadte them yet!
+    val googleMaterialIcons  = "com.mikepenz:google-material-typeface:3.0.1.4.original-kotlin@aar"
+    val fontAwesome = "com.mikepenz:fontawesome-typeface:5.9.0.0-kotlin@aar"
     val toasty = "com.github.GrenderG:Toasty:$toastyVersion"
     val chart = "com.github.PhilJay:MPAndroidChart:$chartVersion"
     val aboutLib = "com.github.daniel-stoneuk:material-about-library:$aboutLibVersion"
