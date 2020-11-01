@@ -63,7 +63,7 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
 
     fun retrieveCurrentMonthBudget(currencyCode: String): LiveData<String>{
         val availableBudget: MutableList<BudgetData> = arrayListOf()
-        var currencyMonthBud: BigDecimal? = 0.toBigDecimal()
+        var currencyMonthBud = 0.toBigDecimal()
         budgetService?.getAllBudget()?.enqueue(retrofitCallback({ response ->
             val responseError = response.errorBody()
             if (response.isSuccessful) {
@@ -90,13 +90,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                             }
                         }.invokeOnCompletion {
                             viewModelScope.launch(Dispatchers.IO){
-                                currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                                DateTimeUtil.getEndOfMonth(), currencyCode) != null){
-                                    repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                            DateTimeUtil.getEndOfMonth(), currencyCode)
-                                } else {
-                                    0.toBigDecimal()
-                                }
+                                currencyMonthBud = repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                                        DateTimeUtil.getEndOfMonth(), currencyCode)
                             }.invokeOnCompletion {
                                 currentMonthBudgetValue.postValue(currencyMonthBud.toString())
                             }
@@ -114,13 +109,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
                     }
                 }
                 viewModelScope.launch(Dispatchers.IO){
-                    currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                    DateTimeUtil.getEndOfMonth(), currencyCode) != null){
-                        repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                DateTimeUtil.getEndOfMonth(), currencyCode)
-                    } else {
-                        0.toBigDecimal()
-                    }
+                    currencyMonthBud =  repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), currencyCode)
                 }.invokeOnCompletion {
                     currentMonthBudgetValue.postValue(currencyMonthBud.toString())
                 }
@@ -128,13 +118,8 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         })
         { throwable ->
             viewModelScope.launch(Dispatchers.IO){
-                currencyMonthBud = if(repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                                DateTimeUtil.getEndOfMonth(), currencyCode) != null){
-                    repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), currencyCode)
-                } else {
-                    0.toBigDecimal()
-                }
+                currencyMonthBud =  repository.retrieveConstraintBudgetWithCurrency(DateTimeUtil.getStartOfMonth(),
+                        DateTimeUtil.getEndOfMonth(), currencyCode)
             }.invokeOnCompletion {
                 currentMonthBudgetValue.postValue(currencyMonthBud.toString())
             }

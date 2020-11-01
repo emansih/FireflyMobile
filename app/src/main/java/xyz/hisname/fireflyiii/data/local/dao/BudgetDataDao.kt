@@ -15,7 +15,7 @@ abstract class BudgetDataDao: BaseDao<BudgetData> {
     @Query("SELECT sum(amount) FROM budget WHERE (start_date =:startDate AND end_date =:endDate) AND " +
             "currency_code =:currencyCode")
     abstract fun getConstraintBudgetWithCurrency(startDate: String, endDate: String,
-                                                 currencyCode: String): BigDecimal?
+                                                 currencyCode: String): BigDecimal
 
 
     @Query("DELETE FROM budget")

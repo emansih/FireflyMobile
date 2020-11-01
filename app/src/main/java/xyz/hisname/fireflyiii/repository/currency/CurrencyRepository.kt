@@ -103,6 +103,35 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         }
     }
 
+    // Expensive network call. Use appropriately
+    suspend fun getAllCurrency(): MutableList<CurrencyData>{
+        val currencyDataList = arrayListOf<CurrencyData>()
+        try {
+            val networkCall = currencyService?.getSuspendedPaginatedCurrency(1)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                currencyDataList.addAll(responseBody.data)
+                if (responseBody.meta.pagination.total_pages != 1) {
+                    for (items in 2..responseBody.meta.pagination.total_pages) {
+                        val repeatedCall = currencyService?.getSuspendedPaginatedCurrency(items)
+                        val repeatedCallResponse = repeatedCall?.body()
+                        if(repeatedCallResponse != null && networkCall.isSuccessful){
+                            currencyDataList.addAll(repeatedCallResponse.data)
+                        }
+                    }
+                }
+                currencyDataList.forEachIndexed { _, data ->
+                    currencyDao.insert(data)
+                }
+            }
+            // Clear list and put default currency as the first element in list
+            currencyDataList.clear()
+            currencyDataList.addAll(currencyDao.getDefaultCurrency())
+            currencyDataList.addAll(currencyDao.getDefaultCurrency(false))
+        } catch (exception: Exception){ }
+        return currencyDataList
+    }
+
     private suspend fun loadPaginatedData(pageNumber: Int){
         try {
             val networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)

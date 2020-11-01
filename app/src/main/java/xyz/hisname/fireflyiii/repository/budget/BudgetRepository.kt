@@ -2,13 +2,11 @@ package xyz.hisname.fireflyiii.repository.budget
 
 import androidx.annotation.WorkerThread
 import xyz.hisname.fireflyiii.Constants
-import xyz.hisname.fireflyiii.data.local.dao.BudgetDataDao
-import xyz.hisname.fireflyiii.data.local.dao.BudgetLimitDao
-import xyz.hisname.fireflyiii.data.local.dao.BudgetListDataDao
-import xyz.hisname.fireflyiii.data.local.dao.SpentDataDao
+import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
+import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
@@ -58,9 +56,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 budgetListData.addAll(responseBody.data)
-                if (responseBody.meta.pagination.current_page == 1) {
-                    deleteBudgetList()
-                }
                 if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
                     for (pagination in 2..responseBody.meta.pagination.total_pages) {
                         val repeatedCall = budgetService?.getPaginatedSpentBudget(pagination, startDate, endDate)
@@ -70,6 +65,7 @@ class BudgetRepository(private val budget: BudgetDataDao,
                         }
                     }
                 }
+                deleteBudgetList()
                 budgetListData.forEach { budgetList ->
                     insertBudgetList(budgetList)
                 }
@@ -89,6 +85,32 @@ class BudgetRepository(private val budget: BudgetDataDao,
     suspend fun retrieveConstraintBudgetWithCurrency(startDate: String, endDate: String,
                                                      currencyCode: String) =
             budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
+
+    suspend fun getAllAvailableBudget(startDate: String, endDate: String,
+                                      currencyCode: String): BigDecimal {
+        try {
+            val networkCall = budgetService?.getAvailableBudget(1, startDate, endDate)
+            val responseBody = networkCall?.body()
+            val availableBudget: MutableList<BudgetData> = arrayListOf()
+            if (responseBody != null && networkCall.isSuccessful) {
+                availableBudget.addAll(responseBody.budgetData)
+                if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
+                    for (pagination in 2..responseBody.meta.pagination.total_pages) {
+                        val repeatedCall = budgetService?.getAvailableBudget(pagination, startDate, endDate)
+                        val repeatedCallBody = repeatedCall?.body()
+                        if (repeatedCallBody != null) {
+                            availableBudget.addAll(repeatedCallBody.budgetData)
+                        }
+                    }
+                }
+                deleteAllBudget()
+                availableBudget.forEach { budget ->
+                    insertBudget(budget)
+                }
+            }
+        } catch (exception: Exception){ }
+        return budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
+    }
 
     suspend fun searchBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)
 

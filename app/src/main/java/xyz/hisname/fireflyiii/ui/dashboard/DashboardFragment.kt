@@ -45,6 +45,7 @@ import xyz.hisname.fireflyiii.ui.widgets.BalanceWidget
 import xyz.hisname.fireflyiii.ui.widgets.BillsToPayWidget
 import xyz.hisname.fireflyiii.util.*
 import xyz.hisname.fireflyiii.util.extension.*
+import java.math.BigDecimal
 import kotlin.math.roundToInt
 import kotlin.math.withSign
 
@@ -58,15 +59,15 @@ class DashboardFragment: BaseFragment() {
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java)}
     private val transactionVM by lazy { getImprovedViewModel(TransactionsViewModel::class.java) }
 
-    private var depositSum = 0.0
-    private var withdrawSum = 0.0
-    private var transaction = 0.0
+    private var depositSum = 0.toBigDecimal()
+    private var withdrawSum = 0.toBigDecimal()
+    private var transaction = 0.toBigDecimal()
     private var budgetSpent = 0f
     private var budgeted = 0f
-    private var month2Depot = 0.0
-    private var month3Depot = 0.0
-    private var month2With = 0.0
-    private var month3With = 0.0
+    private var month2Depot = 0.toBigDecimal()
+    private var month3Depot = 0.toBigDecimal()
+    private var month2With = 0.toBigDecimal()
+    private var month3With = 0.toBigDecimal()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -220,87 +221,88 @@ class DashboardFragment: BaseFragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setNetIncome(currencySymbol: String, transactionData: Sixple<Double,Double,Double,Double,Double,Double>){
-            withdrawSum = transactionData.first
-            depositSum = transactionData.second
-            month2With = transactionData.third
-            month2Depot = transactionData.fourth
-            month3With = transactionData.fifth
-            month3Depot = transactionData.sixth
-            currentExpense.text = currencySymbol + withdrawSum.toString()
-            currentMonthIncome.text = currencySymbol + depositSum.toString()
-            transaction = depositSum - withdrawSum
-            if(1.0.withSign(transaction) < 0){
-                currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
-            }
-            currentNetIncome.text = currencySymbol + " " + LocaleNumberParser.parseDecimal(transaction, requireContext())
+    private fun setNetIncome(currencySymbol: String, transactionData: Sixple<BigDecimal,BigDecimal,BigDecimal,BigDecimal,BigDecimal,BigDecimal>){
+        withdrawSum = transactionData.first
+        depositSum = transactionData.second
+        month2With = transactionData.third
+        month2Depot = transactionData.fourth
+        month3With = transactionData.fifth
+        month3Depot = transactionData.sixth
+        currentExpense.text = currencySymbol + withdrawSum.toString()
+        currentMonthIncome.text = currencySymbol + depositSum.toString()
+        transaction = depositSum - withdrawSum
+        if(transaction < 0.toBigDecimal()){
+            currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
+        }
+        currentNetIncome.text = currencySymbol + " " + transaction
 
-            transaction = month2Depot - month2With
-            oneMonthBeforeExpense.text = currencySymbol + month2With.toString()
-            oneMonthBeforeIncome.text = currencySymbol + month2Depot.toString()
-            if(1.0.withSign(transaction) < 0){
-                oneMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
-            }
-            oneMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
+        transaction = month2Depot - month2With
+        oneMonthBeforeExpense.text = currencySymbol + month2With.toString()
+        oneMonthBeforeIncome.text = currencySymbol + month2Depot.toString()
 
-            transaction = month3Depot - month3With
-            twoMonthBeforeExpense.text = currencySymbol + month3With.toString()
-            twoMonthBeforeIncome.text = currencySymbol + month3Depot.toString()
-            if(1.0.withSign(transaction) < 0){
-                twoMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
-            }
-            twoMonthBeforeNetIncome.text = currencySymbol + LocaleNumberParser.parseDecimal(transaction, requireContext())
+        if(transaction < 0.toBigDecimal()){
+            oneMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
+        }
+        oneMonthBeforeNetIncome.text = currencySymbol + transaction
 
-            val withDrawalHistory = arrayListOf(
-                    BarEntry(0f, month3With.toFloat()),
-                    BarEntry(1f, month2With.toFloat()),
-                    BarEntry(2f, withdrawSum.toFloat()))
-            val depositHistory = arrayListOf(
-                    BarEntry(0f, month3Depot.toFloat()),
-                    BarEntry(1f, month2Depot.toFloat()),
-                    BarEntry(2f, depositSum.toFloat()))
+        transaction = month3Depot - month3With
+        twoMonthBeforeExpense.text = currencySymbol + month3With.toString()
+        twoMonthBeforeIncome.text = currencySymbol + month3Depot.toString()
+        if(transaction < 0.toBigDecimal()){
+            twoMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
+        }
+        twoMonthBeforeNetIncome.text = currencySymbol + transaction
 
-            val withDrawalSets = BarDataSet(withDrawalHistory, resources.getString(R.string.withdrawal))
-            val depositSets = BarDataSet(depositHistory, resources.getString(R.string.deposit))
-            depositSets.apply {
-                valueFormatter = LargeValueFormatter()
-                valueTextColor = Color.GREEN
-                color = Color.GREEN
-                valueTextSize = 12f
-            }
-            withDrawalSets.apply {
-                valueTextColor = Color.RED
-                color = Color.RED
-                valueFormatter = LargeValueFormatter()
-                valueTextSize = 12f
-            }
-            netEarningsChart.apply {
-                description.isEnabled = false
-                isScaleXEnabled = false
-                setDrawBarShadow(false)
-                setDrawGridBackground(false)
-                xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(DateTimeUtil.getPreviousMonthShortName(2),
-                        DateTimeUtil.getPreviousMonthShortName(1),
-                        DateTimeUtil.getCurrentMonthShortName()))
-                data = BarData(depositSets, withDrawalSets)
-                barData.barWidth = 0.3f
-                xAxis.axisMaximum = netEarningsChart.barData.getGroupWidth(0.4f, 0f) * 3
-                groupBars(0f, 0.4f, 0f)
-                xAxis.setCenterAxisLabels(true)
-                data.isHighlightEnabled = false
-                animateY(1000)
-            }
+        val withDrawalHistory = arrayListOf(
+                BarEntry(0f, month3With.toFloat()),
+                BarEntry(1f, month2With.toFloat()),
+                BarEntry(2f, withdrawSum.toFloat()))
+        val depositHistory = arrayListOf(
+                BarEntry(0f, month3Depot.toFloat()),
+                BarEntry(1f, month2Depot.toFloat()),
+                BarEntry(2f, depositSum.toFloat()))
+
+        val withDrawalSets = BarDataSet(withDrawalHistory, resources.getString(R.string.withdrawal))
+        val depositSets = BarDataSet(depositHistory, resources.getString(R.string.deposit))
+        depositSets.apply {
+            valueFormatter = LargeValueFormatter()
+            valueTextColor = Color.GREEN
+            color = Color.GREEN
+            valueTextSize = 12f
+        }
+        withDrawalSets.apply {
+            valueTextColor = Color.RED
+            color = Color.RED
+            valueFormatter = LargeValueFormatter()
+            valueTextSize = 12f
+        }
+        netEarningsChart.apply {
+            description.isEnabled = false
+            isScaleXEnabled = false
+            setDrawBarShadow(false)
+            setDrawGridBackground(false)
+            xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(DateTimeUtil.getPreviousMonthShortName(2),
+                    DateTimeUtil.getPreviousMonthShortName(1),
+                    DateTimeUtil.getCurrentMonthShortName()))
+            data = BarData(depositSets, withDrawalSets)
+            barData.barWidth = 0.3f
+            xAxis.axisMaximum = netEarningsChart.barData.getGroupWidth(0.4f, 0f) * 3
+            groupBars(0f, 0.4f, 0f)
+            xAxis.setCenterAxisLabels(true)
+            data.isHighlightEnabled = false
+            animateY(1000)
+        }
     }
 
-    private fun setAverage(currencySymbol: String, currencyCode: String, transactionData: Sixple<Double,Double,Double,Double,Double,Double>){
+    private fun setAverage(currencySymbol: String, currencyCode: String, transactionData: Sixple<BigDecimal,BigDecimal,BigDecimal,BigDecimal,BigDecimal,BigDecimal>){
         val firstDay = transactionData.first
         val secondDay = transactionData.second
         val thirdDay = transactionData.third
         val fourthDay = transactionData.fourth
         val fifthDay = transactionData.fifth
         val sixthDay = transactionData.sixth
-        val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).div(6)
-        sixDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(sixDayAverage, requireContext())
+        val sixDayAverage = (firstDay + secondDay + thirdDay + fourthDay + fifthDay + sixthDay).div(6.toBigDecimal())
+        sixDaysAverage.text = currencySymbol + sixDayAverage
         val expenseHistory = arrayListOf(
                 BarEntry(0f, firstDay.toFloat()),
                 BarEntry(1f, secondDay.toFloat()),
@@ -335,8 +337,8 @@ class DashboardFragment: BaseFragment() {
         }
         transactionVM.getWithdrawalAmountWithCurrencyCode(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 30),
                 DateTimeUtil.getTodayDate(), currencyCode).observe(viewLifecycleOwner){ transaction ->
-            thirtyDaysAverage.text = currencySymbol + LocaleNumberParser.parseDecimal(
-                    transaction.div(30), requireContext())
+            thirtyDaysAverage.text = currencySymbol +
+                    transaction.div(30.toBigDecimal())
 
         }
     }

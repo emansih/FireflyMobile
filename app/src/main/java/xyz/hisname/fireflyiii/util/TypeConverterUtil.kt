@@ -21,14 +21,14 @@ object TypeConverterUtil{
 
     @TypeConverter
     @JvmStatic
-    fun toBigDecimal(value: BigDecimal): String{
-        return value.toString()
+    fun fromBigDecimal(value: BigDecimal): String{
+        return value.toPlainString()
     }
 
     @TypeConverter
     @JvmStatic
-    fun fromBigDecimal(value: String?): BigDecimal?{
-        return BigDecimal(value)
+    fun toBigDecimal(value: String?): BigDecimal{
+        return value?.toBigDecimal() ?: 0.toBigDecimal()
     }
 
     @TypeConverter

@@ -64,24 +64,20 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         return data
     }
 
-    fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
-        var withdrawData = 0.0
-        val data: MutableLiveData<Double> = MutableLiveData()
+    fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
+        val data: MutableLiveData<BigDecimal> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
-        }.invokeOnCompletion {
-            data.postValue(LocaleNumberParser.parseDecimal(withdrawData, getApplication()).absoluteValue)
+            val withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
+            data.postValue(withdrawData.abs())
         }
         return data
     }
 
-    fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<Double>{
-        var depositData = 0.0
-        val data: MutableLiveData<Double> = MutableLiveData()
+    fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
+        val data: MutableLiveData<BigDecimal> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
-        }.invokeOnCompletion {
-            data.postValue(LocaleNumberParser.parseDecimal(depositData, getApplication()).absoluteValue)
+            val depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
+            data.postValue(depositData.abs())
         }
         return data
     }
@@ -89,9 +85,9 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     // My god.... the name of this function is sooooooo looong...
     fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
                                                                currencyCode: String,
-                                                               accountName: String): LiveData<BigDecimal>{
-        var transactionAmount = 0.toBigDecimal()
-        val data: MutableLiveData<BigDecimal> = MutableLiveData()
+                                                               accountName: String): LiveData<Double>{
+        var transactionAmount = 0.0
+        val data: MutableLiveData<Double> = MutableLiveData()
         // TODO: Fix me, seriously
         viewModelScope.launch(Dispatchers.IO + exceptionCoroutine){
             transactionAmount = repository.getTransactionsByAccountAndCurrencyCodeAndDate(startDate, endDate, currencyCode, accountName)
@@ -121,18 +117,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         val data: MutableLiveData<MutableList<String>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             transactionData = repository.getUniqueBudgetByDate(startDate, endDate, currencyCode, sourceName, transactionType)
-        }.invokeOnCompletion {
-            data.postValue(transactionData)
-        }
-        return data
-    }
-
-    fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
-                              transactionType: String): MutableLiveData<MutableList<String?>>{
-        var transactionData: MutableList<String?> = arrayListOf()
-        val data: MutableLiveData<MutableList<String?>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            transactionData = repository.getUniqueBudgetByDate(startDate, endDate, currencyCode, transactionType)
         }.invokeOnCompletion {
             data.postValue(transactionData)
         }
@@ -209,24 +193,8 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         var transactionAmount: Double = 0.toDouble()
         val data: MutableLiveData<Double> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            transactionAmount = repository.getTransactionByDateAndBudgetAndCurrency(startDate, endDate,
+            transactionAmount = repository.getTransactionByDateAndBudgetAndCurrencyAndAccountName(startDate, endDate,
                     currencyCode, accountName, transactionType, budgetName)
-        }.invokeOnCompletion {
-            isLoading.postValue(false)
-            data.postValue(transactionAmount)
-        }
-        return data
-    }
-
-    fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
-                                                 currencyCode: String,
-                                                 transactionType: String, budgetName: String?): MutableLiveData<Double>{
-        isLoading.value = true
-        var transactionAmount: Double = 0.toDouble()
-        val data: MutableLiveData<Double> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            transactionAmount = repository.getTransactionByDateAndBudgetAndCurrency(startDate, endDate,
-                    currencyCode, transactionType, budgetName)
         }.invokeOnCompletion {
             isLoading.postValue(false)
             data.postValue(transactionAmount)
@@ -469,17 +437,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             })
         }
         return data
-    }
-
-    fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String?): LiveData<MutableList<Transactions>>{
-        val transactionData: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
-        var data: MutableList<Transactions> = arrayListOf()
-        viewModelScope.launch(Dispatchers.IO) {
-            data = repository.getTransactionListByDateAndBudget(startDate, endDate, budgetName)
-        }.invokeOnCompletion {
-            transactionData.postValue(data)
-        }
-        return transactionData
     }
 
     fun getTransactionByDescription(query: String) : LiveData<List<String>>{

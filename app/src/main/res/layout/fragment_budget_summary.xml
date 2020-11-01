@@ -5,94 +5,91 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
+    <Spinner
+        android:id="@+id/currencySpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/budgetSummaryPieChart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="300dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/currencySpinner"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/budgetDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/budgetSummaryPieChart"/>
 
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/budgetSummaryPieChart"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_marginTop="40dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+        android:id="@+id/budgetAmountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/budget"
+        app:layout_constraintTop_toBottomOf="@+id/budgetDuration"
+        app:layout_constraintStart_toStartOf="@+id/budgetDuration"/>
 
-            <TextView
-                android:id="@+id/budgetDuration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/budgetSummaryPieChart"/>
+    <TextView
+        android:id="@+id/actualBudgetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/spent"
+        android:textColor="@color/md_red_A700"
+        app:layout_constraintTop_toBottomOf="@+id/budgetAmountText"
+        app:layout_constraintStart_toStartOf="@+id/budgetDuration"/>
 
-            <TextView
-                android:id="@+id/budgetAmountText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/budget"
-                app:layout_constraintTop_toBottomOf="@+id/budgetDuration"
-                app:layout_constraintStart_toStartOf="@+id/budgetDuration"/>
+    <TextView
+        android:id="@+id/remainingBudgetText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/budget_left"
+        app:layout_constraintTop_toBottomOf="@+id/actualBudgetText"
+        app:layout_constraintStart_toStartOf="@+id/budgetDuration"/>
 
-            <TextView
-                android:id="@+id/actualBudgetText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/spent"
-                android:textColor="@color/md_red_A700"
-                app:layout_constraintTop_toBottomOf="@+id/budgetAmountText"
-                app:layout_constraintStart_toStartOf="@+id/budgetDuration"/>
+    <TextView
+        android:id="@+id/budgetAmountValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        app:layout_constraintTop_toTopOf="@+id/budgetAmountText"
+        app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
 
-            <TextView
-                android:id="@+id/remainingBudgetText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/budget_left"
-                app:layout_constraintTop_toBottomOf="@+id/actualBudgetText"
-                app:layout_constraintStart_toStartOf="@+id/budgetDuration"/>
+    <TextView
+        android:id="@+id/actualAmountValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/md_red_A700"
+        app:layout_constraintStart_toStartOf="@+id/budgetAmountValue"
+        app:layout_constraintTop_toTopOf="@+id/actualBudgetText"
+        app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
 
-            <TextView
-                android:id="@+id/budgetAmountValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                app:layout_constraintTop_toTopOf="@+id/budgetAmountText"
-                app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
+    <TextView
+        android:id="@+id/remainingAmountValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/budgetAmountValue"
+        app:layout_constraintTop_toTopOf="@+id/remainingBudgetText"
+        app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
 
-            <TextView
-                android:id="@+id/actualAmountValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/md_red_A700"
-                app:layout_constraintStart_toStartOf="@+id/budgetAmountValue"
-                app:layout_constraintTop_toTopOf="@+id/actualBudgetText"
-                app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
-
-            <TextView
-                android:id="@+id/remainingAmountValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@+id/budgetAmountValue"
-                app:layout_constraintTop_toTopOf="@+id/remainingBudgetText"
-                app:layout_constraintStart_toEndOf="@+id/budgetAmountText"/>
-
-            <Button
-                android:id="@+id/showTransactionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show Expenses"
-                android:visibility="gone"
-                android:layout_marginTop="20dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/remainingAmountValue" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/transactionList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/remainingAmountValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

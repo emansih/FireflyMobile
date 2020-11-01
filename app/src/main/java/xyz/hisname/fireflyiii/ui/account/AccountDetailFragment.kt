@@ -90,7 +90,7 @@ class AccountDetailFragment: BaseDetailFragment() {
                 transactionViewModel.getTransactionsByAccountAndCurrencyCodeAndDate(DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                         DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                         currencyCode, accountName)).observe(viewLifecycleOwner) { transactionData ->
-            val firstEntry = accountBalance.toBigDecimal().plus(transactionData.first)
+            val firstEntry = accountBalance.plus(transactionData.first)
             val secondEntry = firstEntry.plus(transactionData.second)
             val thirdEntry = secondEntry.plus(transactionData.third)
             val fourthEntry = thirdEntry.plus(transactionData.fourth)
