@@ -18,6 +18,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 class BudgetSummaryViewModel(application: Application): BaseViewModel(application) {
 
@@ -88,13 +89,23 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                         DateTimeUtil.getEndOfMonth(),
                         defaultCurrency, budgetName)
                 sumOfWithdrawal = sumOfWithdrawal.add(transactionBudget)
-                val percentage = transactionBudget.divide(budget).times(100.toBigDecimal()).toFloat()
+                val percentage = transactionBudget
+                        .divide(budget, 2, RoundingMode.HALF_UP)
+                        .times(100.toBigDecimal())
+                        .toFloat()
                 returnData.add(Triple(percentage, budgetName, transactionBudget))
             }
         }
 
         val expensesWithoutBudget = budget.minus(sumOfWithdrawal)
-        val percentage = expensesWithoutBudget.divide(budget).times(100.toBigDecimal()).toFloat()
+        var percentage = 0f
+        try {
+            percentage = expensesWithoutBudget
+                    .divide(budget,2, RoundingMode.HALF_UP)
+                    .times(100.toBigDecimal())
+                    .toFloat()
+        } catch (exception: Exception){ }
+
         returnData.add(Triple(percentage,
                 getApplication<Application>().getString(R.string.expenses_without_budget),
                 expensesWithoutBudget))
@@ -128,10 +139,10 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                     availableBudget.postValue("--.--")
 
                     totalTransaction.postValue(currencySymbol + " " +
-                            retrieveBudget(DateTimeUtil.getStartOfMonth(1),
-                                    DateTimeUtil.getEndOfMonth(1), defaultCurrency, ""))
+                            retrieveBudget(DateTimeUtil.getStartOfMonth(),
+                                    DateTimeUtil.getEndOfMonth(), defaultCurrency, ""))
                     data.postValue(transactionRepository.transactionList(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(1), "withdrawal"))
+                            DateTimeUtil.getEndOfMonth(), "withdrawal"))
                 } else {
                     availableBudget.postValue(originalBudgetString)
                     data.postValue(transactionRepository.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfMonth(),
@@ -140,6 +151,18 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
             }
         }
         return data
+    }
+
+    fun changeCurrency(position: Int){
+        val regex = "\\([^()]*\\)".toRegex()
+        val regexReplaced = regex.find(modifiedList[position])
+        val replacedCurrency = modifiedList[position].replace(regexReplaced?.value ?: "", "").trim()
+        viewModelScope.launch(Dispatchers.IO){
+            val currencyList = currencyRepository.getCurrencyCode(replacedCurrency)
+            defaultCurrency = currencyList[0].currencyAttributes?.code ?: ""
+            currencySymbol = currencyList[0].currencyAttributes?.symbol ?: ""
+            getTransaction()
+        }
     }
 
     fun getBalance(budget: String){

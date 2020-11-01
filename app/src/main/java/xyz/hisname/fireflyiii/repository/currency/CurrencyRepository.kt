@@ -120,6 +120,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
                         }
                     }
                 }
+                currencyDao.deleteAllCurrency()
                 currencyDataList.forEachIndexed { _, data ->
                     currencyDao.insert(data)
                 }
