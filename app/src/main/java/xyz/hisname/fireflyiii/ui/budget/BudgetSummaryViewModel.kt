@@ -144,7 +144,13 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                     data.postValue(transactionRepository.transactionListWithCurrency(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), "withdrawal", defaultCurrency))
                 } else {
-                    availableBudget.postValue(originalBudgetString)
+                    val budgetAmount = budgetRepository.getBudgetLimitByName(budget, DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), defaultCurrency)
+                    availableBudget.postValue("$currencySymbol $budgetAmount")
+                    val balance = budgetAmount.minus( retrieveBudget(DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), defaultCurrency, budget))
+                    balanceBudget.postValue("$currencySymbol $balance")
+
                     data.postValue(transactionRepository.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), budget, defaultCurrency))
                 }

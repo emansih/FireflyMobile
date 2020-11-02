@@ -11,6 +11,8 @@ abstract class BudgetLimitDao: BaseDao<BudgetLimitData> {
     @Query("DELETE FROM budgetLimit")
     abstract fun deleteAllBudgetLimit(): Int
 
-    @Query("SELECT amount FROM budgetlimit WHERE budget_id =:budgetId AND currency_code =:currencyCode")
-    abstract fun getBudgetLimitByIdAndCurrencyCode(budgetId: Long, currencyCode: String): Double
+    @Query("SELECT amount FROM budgetlimit WHERE budget_id =:budgetId AND currency_code =:currencyCode AND start =:startDate AND `end` =:endDate")
+    abstract fun getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId: Long, currencyCode: String,
+                                                          startDate: String, endDate: String): BigDecimal
+
 }

@@ -6,6 +6,7 @@ import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
+import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitModel
 import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
@@ -76,12 +77,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
 
     suspend fun deleteBudgetList() = budgetList.deleteAllBudgetList()
 
-    suspend fun getBudgetListByIdAndCurrencyCode(budgetName: String, currencyCode: String): Double {
-        val budgetNameList = searchBudgetByName(budgetName)
-        val budgetId = budgetNameList[0].budgetListId ?: 0
-        return spentDao.getBudgetListByIdAndCurrencyCode(budgetId, currencyCode)
-    }
-
     suspend fun retrieveConstraintBudgetWithCurrency(startDate: String, endDate: String,
                                                      currencyCode: String) =
             budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
@@ -114,12 +109,14 @@ class BudgetRepository(private val budget: BudgetDataDao,
 
     suspend fun searchBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)
 
-    suspend fun getBudgetLimitByName(budgetName: String, currencyCode: String, startDate: String, endDate: String): Double{
+    suspend fun getBudgetLimitByName(budgetName: String, startDate: String, endDate: String, currencyCode: String): BigDecimal{
         val budgetNameList = searchBudgetByName(budgetName)
         val budgetId = budgetNameList[0].budgetListId ?: 0
         try {
             val networkCall = budgetService?.getBudgetLimit(budgetId, startDate, endDate)
             val responseBody = networkCall?.body()
+            val rawww = networkCall?.raw()
+            // There is no pagination in API
             if (responseBody != null && networkCall.isSuccessful) {
                 budgetLimitDao.deleteAllBudgetLimit()
                 responseBody.budgetLimitData.forEach { limitData ->
@@ -127,6 +124,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
                 }
             }
         } catch (exception: Exception){ }
-        return budgetLimitDao.getBudgetLimitByIdAndCurrencyCode(budgetId, currencyCode)
+        return budgetLimitDao.getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId, currencyCode, startDate, endDate)
     }
 }

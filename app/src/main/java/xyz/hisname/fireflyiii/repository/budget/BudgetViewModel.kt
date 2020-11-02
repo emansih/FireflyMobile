@@ -140,29 +140,4 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
         return currentMonthSpentValue
     }
 
-    fun retrieveSpentBudgetById(budgetName: String, currencyCode: String): LiveData<String>{
-        var budgetSpent = 0.0
-        val currentMonthSpentValue: MutableLiveData<String> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO) {
-            if(budgetName.isNotEmpty()){
-                budgetSpent = repository.getBudgetListByIdAndCurrencyCode(budgetName, currencyCode)
-            }
-        }.invokeOnCompletion {
-            currentMonthSpentValue.postValue(budgetSpent.toString())
-        }
-        return currentMonthSpentValue
-    }
-
-    fun retrieveBudgetLimit(budgetName: String, currencyCode: String, startOfMonth: String, endOfMonth: String): LiveData<Double>{
-        var budgetLimit = 0.0
-        val budgetLimitLiveData: MutableLiveData<Double> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            if(budgetName.isNotEmpty()){
-                budgetLimit = repository.getBudgetLimitByName(budgetName, currencyCode, startOfMonth, endOfMonth)
-            }
-        }.invokeOnCompletion {
-            budgetLimitLiveData.postValue(budgetLimit)
-        }
-        return budgetLimitLiveData
-    }
 }
