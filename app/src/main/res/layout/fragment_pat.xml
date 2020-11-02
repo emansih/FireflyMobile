@@ -12,9 +12,9 @@
         android:hint="URL"
         android:textSize="16sp"
         android:background="@color/md_white_1000"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="24dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintBottom_toTopOf="@+id/firefly_access_layout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/firefly_url_edittext"
