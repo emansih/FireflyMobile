@@ -162,7 +162,8 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         budgetSummaryViewModel.changeCurrency(position)
-
+        dataAdapter.clear()
+        rtAdapter.notifyDataSetChanged()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {

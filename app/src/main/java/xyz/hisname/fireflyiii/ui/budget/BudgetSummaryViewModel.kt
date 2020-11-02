@@ -131,8 +131,8 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         val data: MutableLiveData<List<Transactions>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             if(budget == null){
-                data.postValue(transactionRepository.transactionList(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), "withdrawal"))
+                data.postValue(transactionRepository.transactionListWithCurrency(DateTimeUtil.getStartOfMonth(),
+                        DateTimeUtil.getEndOfMonth(), "withdrawal", defaultCurrency))
             } else {
                 if(budget.isEmpty()){
                     balanceBudget.postValue("--.--")
@@ -141,8 +141,8 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                     totalTransaction.postValue(currencySymbol + " " +
                             retrieveBudget(DateTimeUtil.getStartOfMonth(),
                                     DateTimeUtil.getEndOfMonth(), defaultCurrency, ""))
-                    data.postValue(transactionRepository.transactionList(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), "withdrawal"))
+                    data.postValue(transactionRepository.transactionListWithCurrency(DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), "withdrawal", defaultCurrency))
                 } else {
                     availableBudget.postValue(originalBudgetString)
                     data.postValue(transactionRepository.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfMonth(),

@@ -53,6 +53,16 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
+    suspend fun transactionListWithCurrency(startDate: String?, endDate: String?,source: String, currencyCode: String): MutableList<Transactions> {
+        loadRemoteData(startDate, endDate, source)
+        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
+            transactionDao.getTransactionListWithCurrency(convertString(source), currencyCode)
+        } else {
+            transactionDao.getTransactionListWithCurrencyAndDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(source), currencyCode)
+        }
+    }
+
     suspend fun allDepositWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): BigDecimal {
         loadRemoteData(startDate, endDate, "Deposit")
         return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
