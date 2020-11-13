@@ -89,23 +89,25 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                         DateTimeUtil.getEndOfMonth(),
                         defaultCurrency, budgetName)
                 sumOfWithdrawal = sumOfWithdrawal.add(transactionBudget)
-                val percentage = transactionBudget
-                        .divide(budget, 2, RoundingMode.HALF_UP)
-                        .times(100.toBigDecimal())
-                        .toFloat()
-                returnData.add(Triple(percentage, budgetName, transactionBudget))
+                if(budget != BigDecimal.ZERO){
+                    val percentage = transactionBudget
+                            .divide(budget, 2, RoundingMode.HALF_UP)
+                            .times(100.toBigDecimal())
+                            .toFloat()
+                    returnData.add(Triple(percentage, budgetName, transactionBudget))
+                }
             }
         }
 
         val expensesWithoutBudget = budget.minus(sumOfWithdrawal)
-        var percentage = 0f
-        try {
-            percentage = expensesWithoutBudget
+        val percentage = if(expensesWithoutBudget != BigDecimal.ZERO || expensesWithoutBudget != BigDecimal.ZERO){
+            expensesWithoutBudget
                     .divide(budget,2, RoundingMode.HALF_UP)
                     .times(100.toBigDecimal())
                     .toFloat()
-        } catch (exception: Exception){ }
-
+        } else {
+            0f
+        }
         returnData.add(Triple(percentage,
                 getApplication<Application>().getString(R.string.expenses_without_budget),
                 expensesWithoutBudget))
