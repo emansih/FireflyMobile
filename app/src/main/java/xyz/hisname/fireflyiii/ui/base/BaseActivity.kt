@@ -18,13 +18,14 @@ import xyz.hisname.languagepack.LanguageChanger
 @SuppressLint("Registered")
 open class BaseActivity: AppCompatActivity() {
 
+    protected val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
     }
 
     private fun setTheme(){
-        val globalViewModel = getViewModel(GlobalViewModel::class.java)
         globalViewModel.isDarkMode().observe(this){ isDark ->
             if(isDark){
                 setTheme(R.style.AppTheme_Dark_DrawerTheme)

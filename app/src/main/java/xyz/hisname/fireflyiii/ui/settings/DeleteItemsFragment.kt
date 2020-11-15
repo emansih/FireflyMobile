@@ -26,7 +26,6 @@ import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 class DeleteItemsFragment: BaseSettings() {
 
     private val destroyItemsViewModel by lazy { getImprovedViewModel(DestroyItemsViewModel::class.java) }
-    private val nightMode by lazy {  AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())).nightModeEnabled }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.delete_items_settings)
@@ -243,7 +242,8 @@ class DeleteItemsFragment: BaseSettings() {
     }
 
     private fun setIconColor(): Int{
-        return if(nightMode){
+        val isDarkMode = globalViewModel.isDarkMode().value ?: false
+        return if(isDarkMode){
             R.color.md_white_1000
         } else {
             R.color.md_black_1000

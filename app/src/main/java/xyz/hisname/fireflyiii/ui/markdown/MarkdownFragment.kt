@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.markdown
 
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -10,7 +9,6 @@ import android.view.*
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import androidx.preference.PreferenceManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
@@ -21,7 +19,6 @@ import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -30,7 +27,6 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 class MarkdownFragment: BaseFragment() {
 
     private val toolbar by lazy {requireActivity().findViewById<Toolbar>(R.id.activity_toolbar) }
-    private val appPref by lazy { AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -110,7 +106,7 @@ class MarkdownFragment: BaseFragment() {
     }
 
     private fun setIconColor(): Int{
-        return if(appPref.nightModeEnabled){
+        return if(isDarkMode()){
             R.color.md_white_1000
         } else {
             R.color.md_black_1000

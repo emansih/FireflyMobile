@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
@@ -18,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
@@ -81,9 +78,7 @@ abstract class BaseFragment: Fragment() {
 
     protected fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
 
-    protected fun isDarkMode(): Boolean{
-        return AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())).nightModeEnabled
-    }
+    protected fun isDarkMode() = globalViewModel.isDark
 
     private fun handleBackPress() {
         globalViewModel.backPress.observe(viewLifecycleOwner){ backPressValue ->

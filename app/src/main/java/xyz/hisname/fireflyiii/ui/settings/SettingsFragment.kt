@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
-import androidx.preference.PreferenceManager
 import androidx.core.app.ActivityCompat
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
@@ -23,8 +22,6 @@ import xyz.hisname.languagepack.LanguageChanger
 
 
 class SettingsFragment: BaseSettings() {
-
-    private val nightMode by lazy {  AppPref(PreferenceManager.getDefaultSharedPreferences(requireContext())).nightModeEnabled }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -162,7 +159,7 @@ class SettingsFragment: BaseSettings() {
     }
 
     private fun setIconColor(): Int{
-        return if(nightMode){
+        return if(globalViewModel.isDark){
             R.color.md_white_1000
         } else {
             R.color.md_black_1000

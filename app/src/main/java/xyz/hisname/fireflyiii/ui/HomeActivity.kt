@@ -36,7 +36,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
-import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -56,7 +55,6 @@ import xyz.hisname.fireflyiii.util.biometric.AuthenticationResult
 import xyz.hisname.fireflyiii.util.biometric.Authenticator
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 
 class HomeActivity: BaseActivity(){
@@ -66,7 +64,6 @@ class HomeActivity: BaseActivity(){
             com.mikepenz.materialdrawer.R.string.material_drawer_open,
             com.mikepenz.materialdrawer.R.string.material_drawer_close) }
     private lateinit var headerResult: AccountHeaderView
-    private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
     private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
     private val keyguardUtil by lazy { KeyguardUtil(this) }
     private var instanceState: Bundle? = null
