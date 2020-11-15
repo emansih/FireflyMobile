@@ -13,11 +13,7 @@ import retrofit2.Retrofit
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
-import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.network.CustomCa
-import java.io.File
-import javax.net.ssl.SSLSocketFactory
-import javax.net.ssl.X509TrustManager
 
 open class BaseViewModel(application: Application) : AndroidViewModel(application){
 
@@ -25,16 +21,13 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     val apiResponse: MutableLiveData<String> = MutableLiveData()
     protected val accManager by lazy { AuthenticatorManager(AccountManager.get(getApplication()))  }
     protected val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(getApplication()) }
-    private val customCa by lazy { CustomCa(("file://" + getApplication<Application>().filesDir.path + "/user_custom.pem").toUri().toFile()) }
-    private val sslSocketFactory by lazy { customCa.getCustomSSL() }
-    private val trustManager by lazy { customCa.getCustomTrust() }
 
     protected fun genericService(): Retrofit? {
-        var cert = ""
-        cert = AppPref(sharedPref).certValue
+        val cert = AppPref(sharedPref).certValue
         return if (AppPref(sharedPref).isCustomCa) {
+            val customCa = CustomCa(("file://" + getApplication<Application>().filesDir.path + "/user_custom.pem").toUri().toFile())
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
-                    accManager.accessToken, cert, trustManager, sslSocketFactory)
+                    accManager.accessToken, cert, customCa.getCustomTrust(), customCa.getCustomSSL())
         } else {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
                     accManager.accessToken, cert, null, null)
