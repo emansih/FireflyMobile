@@ -1,10 +1,9 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
 import android.accounts.AccountManager
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerAction
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
@@ -27,6 +26,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.CustomCa
+import java.io.File
 import java.time.OffsetDateTime
 import java.util.concurrent.ThreadLocalRandom
 
@@ -36,8 +36,6 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
     private lateinit var customCa: CustomCa
     private lateinit var sharedPref: SharedPreferences
     private lateinit var accountManager: AuthenticatorManager
-    private val sslSocketFactory by lazy { customCa.getCustomSSL() }
-    private val trustManager by lazy { customCa.getCustomTrust() }
     private lateinit var transactionDatabase: TransactionDataDao
     private lateinit var currencyDatabase: CurrencyDataDao
 
@@ -45,7 +43,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val cert = AppPref(sharedPref).certValue
         return if (AppPref(sharedPref).isCustomCa) {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
-                    accountManager.accessToken, cert, trustManager, sslSocketFactory)
+                    accountManager.accessToken, cert, customCa.getCustomTrust(), customCa.getCustomSSL())
         } else {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
                     accountManager.accessToken, cert, null, null)
@@ -69,7 +67,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
         accountManager = AuthenticatorManager(AccountManager.get(context))
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-        customCa = CustomCa(("file://" + context.filesDir.path + "/user_custom.pem").toUri().toFile())
+        customCa = CustomCa(File(context.filesDir.path + "/user_custom.pem"))
         val transactionType = input.regular.transactionType ?: ""
         val transactionDescription = input.regular.transactionDescription ?: ""
         val transactionAmount = input.regular.transactionAmount ?: ""
