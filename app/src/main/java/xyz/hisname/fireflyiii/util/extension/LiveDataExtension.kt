@@ -21,12 +21,6 @@ internal fun <T: ViewModel> Fragment.getImprovedViewModel(modelClass: Class<T>, 
     ViewModelProvider(this).get(modelClass)
 }
 
-internal fun <T: ViewModel> AppCompatActivity.getImprovedViewModel(modelClass: Class<T>, viewModelFactory: ViewModelProvider.Factory? = null): T {
-    return viewModelFactory?.let { ViewModelProvider(this, it).get(modelClass) } ?:
-    ViewModelProvider(this).get(modelClass)
-}
-
-
 /*
  * Copyright (C) 2017 Mitchell Skaggs, Keturah Gadson, Ethan Holtgrieve, Nathan Skelton, Pattonville School District
  *
