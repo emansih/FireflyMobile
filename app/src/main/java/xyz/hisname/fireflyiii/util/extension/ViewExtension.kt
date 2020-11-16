@@ -12,13 +12,14 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment as SupportFragment
 
 fun ViewGroup.inflate(layoutRes: Int, attachToRoot: Boolean = false): View {
@@ -39,26 +40,22 @@ fun SupportFragment.hideKeyboard() {
 }
 
 fun Activity.hideKeyboard() {
-    hideKeyboard(if (currentFocus == null) View(this) else currentFocus)
+    ViewCompat.getWindowInsetsController(findViewById<View>(android.R.id.content).rootView)?.hide(WindowInsetsCompat.Type.ime())
 }
 
-fun Context.hideKeyboard(view: View?) {
-    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow(view?.windowToken, 0)
-}
 
 fun <T> lazyUnsynchronised(initializer: () -> T): Lazy<T> =
         lazy(LazyThreadSafetyMode.NONE, initializer)
 
 fun <ViewT : View> SupportFragment.bindView(@IdRes idRes: Int): Lazy<ViewT> {
     return lazyUnsynchronised {
-        requireActivity().findViewById<ViewT>(idRes)
+        requireActivity().findViewById(idRes)
     }
 }
 
 fun <ViewT : View> AppCompatActivity.bindView(@IdRes idRes: Int): Lazy<ViewT> {
     return lazyUnsynchronised {
-        findViewById<ViewT>(idRes)
+        findViewById(idRes)
     }
 }
 
