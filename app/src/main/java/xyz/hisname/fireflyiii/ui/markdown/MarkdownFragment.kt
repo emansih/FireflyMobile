@@ -182,7 +182,17 @@ class MarkdownFragment: BaseFragment() {
             editableText.setSelection(result.length + markdownTextStart)
         }
         bulletMarkdown.setOnClickListener {
-            editableText.append("•")
+            val markdownText = editableText.getString()
+            val markdownTextStart = editableText.selectionStart
+            val markdownTextEnd = editableText.selectionEnd
+            val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
+            val result = if (hasNewLine(markdownText, markdownTextStart)) {
+                "• $markdownSubString"
+            } else {
+                "\n• $markdownSubString"
+            }
+            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            editableText.setSelection(result.length + markdownTextStart)
         }
         hyperlinkMarkdown.setOnClickListener {
             val layoutView = layoutInflater.inflate(R.layout.dialog_hyperlink, null)
