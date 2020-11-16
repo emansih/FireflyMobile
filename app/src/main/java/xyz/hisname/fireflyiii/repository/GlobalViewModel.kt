@@ -38,6 +38,9 @@ class GlobalViewModel(application: Application): AndroidViewModel(application) {
         if(appPreference.nightModeEnabled){
             isDark =  true
             darkModeLiveData.postValue(true)
+        } else {
+            isDark =  false
+            darkModeLiveData.postValue(false)
         }
         return darkModeLiveData
     }
