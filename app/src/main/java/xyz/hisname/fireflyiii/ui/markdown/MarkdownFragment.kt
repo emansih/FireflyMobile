@@ -82,13 +82,19 @@ class MarkdownFragment: BaseFragment() {
                 })
         quoteMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
-                    icon =GoogleMaterial.Icon.gmd_format_quote
+                    icon = GoogleMaterial.Icon.gmd_format_quote
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
         bulletMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_list_bulleted
+                    colorRes = setIconColor()
+                    sizeDp = 18
+                })
+        numberedListMarkdown.setImageDrawable(
+                IconicsDrawable(requireContext()).apply {
+                    icon = GoogleMaterial.Icon.gmd_format_list_numbered
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
@@ -218,7 +224,19 @@ class MarkdownFragment: BaseFragment() {
                 }
                 show()
             }
-
+        }
+        numberedListMarkdown.setOnClickListener {
+            val markdownText = editableText.getString()
+            val markdownTextStart = editableText.selectionStart
+            val markdownTextEnd = editableText.selectionEnd
+            val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
+            val result = if (hasNewLine(markdownText, markdownTextStart)) {
+                "1. $markdownSubString"
+            } else {
+                "\n1. $markdownSubString"
+            }
+            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            editableText.setSelection(result.length + markdownTextStart)
         }
     }
 
