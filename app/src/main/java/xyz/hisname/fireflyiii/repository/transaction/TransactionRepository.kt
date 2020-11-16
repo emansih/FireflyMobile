@@ -32,7 +32,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
 
-    suspend fun transactionList(startDate: String?, endDate: String?,source: String, pageNumber: Int): Flow<MutableList<Transactions>> {
+    suspend fun transactionList(startDate: String?, endDate: String?,source: String, pageNumber: Int): MutableList<Transactions> {
         return if(startDate == null || endDate == null){
             loadPaginatedData("", "", source, pageNumber)
             transactionDao.getTransactionLimitByType(convertString(source), pageNumber * Constants.PAGE_SIZE)

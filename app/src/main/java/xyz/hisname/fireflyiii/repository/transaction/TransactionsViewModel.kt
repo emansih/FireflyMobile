@@ -43,9 +43,7 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         isLoading.value = true
         val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            repository.transactionList(startDate, endDate, transactionType, pageNumber).collectLatest { transactions ->
-                data.postValue(transactions)
-            }
+            data.postValue(repository.transactionList(startDate, endDate, transactionType, pageNumber))
         }.invokeOnCompletion {
             isLoading.postValue(false)
         }
