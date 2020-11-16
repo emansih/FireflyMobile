@@ -20,6 +20,7 @@ import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.isAscii
+import java.io.File
 import java.net.UnknownServiceException
 import java.security.cert.CertificateException
 
@@ -34,6 +35,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     private val applicationContext = getApplication<Application>()
     private val accountManager = AccountManager.get(applicationContext)
     private val accountDao by lazy { AppDatabase.getInstance(applicationContext).accountDataDao() }
+    private val customCaFile by lazy { File(applicationContext.filesDir.toString() + File.pathSeparator +  "user_custom.pem") }
     private var accountsService: AccountsService? = null
     private lateinit var repository: AccountRepository
     private val oAuthService by lazy { genericService()?.create(OAuthService::class.java) }
@@ -60,15 +62,15 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                 AuthenticatorManager(accountManager).authMethod = "pat"
                 isAuthenticated.postValue(true)
             } catch (exception: UnknownServiceException){
-                FileUtils.deleteCaFile(applicationContext)
+                FileUtils.deleteCaFile(customCaFile)
                 showErrorMessage.postValue("http is not supported. Please use https")
                 isAuthenticated.postValue(false)
             } catch (certificateException: CertificateException){
-                FileUtils.deleteCaFile(applicationContext)
+                FileUtils.deleteCaFile(customCaFile)
                 showErrorMessage.postValue("Are you using self signed cert?")
                 isAuthenticated.postValue(false)
             } catch (exception: Exception){
-                FileUtils.deleteCaFile(applicationContext)
+                FileUtils.deleteCaFile(customCaFile)
                 showErrorMessage.postValue(exception.localizedMessage)
                 isAuthenticated.postValue(false)
             }
@@ -126,21 +128,21 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                         accManager.authMethod = "oauth"
                         isAuthenticated.postValue(true)
                     } else if(errorBody != null){
-                        FileUtils.deleteCaFile(applicationContext)
+                        FileUtils.deleteCaFile(customCaFile)
                         val errorBodyMessage = String(errorBody.bytes())
                         showErrorMessage.postValue(errorBodyMessage)
                         isAuthenticated.postValue(false)
                     }
                 } catch (exception: UnknownServiceException){
-                    FileUtils.deleteCaFile(applicationContext)
+                    FileUtils.deleteCaFile(customCaFile)
                     showErrorMessage.postValue("http is not supported. Please use https")
                     isAuthenticated.postValue(false)
                 } catch (certificateException: CertificateException){
-                    FileUtils.deleteCaFile(applicationContext)
+                    FileUtils.deleteCaFile(customCaFile)
                     showErrorMessage.postValue("Are you using self signed cert?")
                     isAuthenticated.postValue(false)
                 } catch (exception: Exception){
-                    FileUtils.deleteCaFile(applicationContext)
+                    FileUtils.deleteCaFile(customCaFile)
                     showErrorMessage.postValue(exception.localizedMessage)
                     isAuthenticated.postValue(false)
                 }
