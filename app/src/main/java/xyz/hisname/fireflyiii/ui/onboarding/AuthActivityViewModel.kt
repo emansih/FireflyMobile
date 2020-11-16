@@ -34,11 +34,8 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
 
     private val applicationContext = getApplication<Application>()
     private val accountManager = AccountManager.get(applicationContext)
-    private val accountDao by lazy { AppDatabase.getInstance(applicationContext).accountDataDao() }
     private val customCaFile by lazy { File(applicationContext.filesDir.toString() + File.pathSeparator +  "user_custom.pem") }
-    private var accountsService: AccountsService? = null
     private lateinit var repository: AccountRepository
-    private val oAuthService by lazy { genericService()?.create(OAuthService::class.java) }
 
 
     fun authViaPat(baseUrl: String, accessToken: String, fileUri: Uri?) {
@@ -55,6 +52,8 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             FileUtils.saveCaFile(fileUri, getApplication())
         }
         authInit(accessToken, baseUrl)
+        val accountDao = AppDatabase.getInstance(applicationContext).accountDataDao()
+        val accountsService = genericService()?.create(AccountsService::class.java)
         repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){
             try {
@@ -117,6 +116,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                     } else {
                         Constants.REDIRECT_URI
                     }
+                    val oAuthService = genericService()?.create(OAuthService::class.java)
                     networkCall = oAuthService?.getAccessToken(code.trim(), accManager.clientId,
                             accManager.secretKey, redirectUri)
                     val authResponse = networkCall?.body()
