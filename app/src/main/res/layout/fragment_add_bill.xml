@@ -201,35 +201,91 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/frequency"
-                    android:editable="false" />
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.github.florent37.expansionpanel.ExpansionHeader
+                android:id="@+id/expansionHeader"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                app:expansion_headerIndicator="@id/headerIndicator"
+                app:expansion_layout="@id/expansionLayout"
+                app:expansion_toggleOnClick="true"
+                app:layout_constraintTop_toBottomOf="@+id/frequency_menu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/notes_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/optional_field_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/optionalField"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:text="@string/optional_field"
+                        style="@style/TextAppearance.MaterialComponents.Headline5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <ImageView
+                    android:id="@+id/headerIndicator"
+                    android:adjustViewBounds="true"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_width="wrap_content"
+                    app:srcCompat="@drawable/ic_expansion_header_indicator_grey_24dp" />
+
+            </com.github.florent37.expansionpanel.ExpansionHeader>
+
+            <com.github.florent37.expansionpanel.ExpansionLayout
+                android:id="@+id/expansionLayout"
+                android:layout_height="match_parent"
                 android:layout_width="0dp"
-                android:layout_height="300dp"
-                android:layout_marginTop="24dp"
+                app:expansion_expanded="false"
                 app:layout_constraintEnd_toEndOf="@+id/bill_date_layout"
                 app:layout_constraintStart_toStartOf="@+id/bill_date_layout"
-                app:layout_constraintTop_toBottomOf="@+id/frequency_menu">
+                app:layout_constraintTop_toBottomOf="@+id/expansionHeader">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/notes_edittext"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/optionalLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="top"
-                    android:focusable="false"
-                    android:inputType="textMultiLine"
-                    android:drawablePadding="12dp"
-                    android:hint="Notes(Optional)"
-                    android:textSize="16sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="wrap_content">
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/notes_layout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_marginTop="24dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/notes_edittext"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="top"
+                            android:focusable="false"
+                            android:inputType="textMultiLine"
+                            android:drawablePadding="12dp"
+                            android:hint="@string/notes"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.github.florent37.expansionpanel.ExpansionLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addBillFab"
