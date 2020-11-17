@@ -114,7 +114,7 @@
             <com.github.florent37.expansionpanel.ExpansionLayout
                 android:id="@+id/expansionLayout"
                 android:layout_height="wrap_content"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 app:expansion_expanded="false"
                 app:layout_constraintTop_toBottomOf="@+id/expansionHeader"
                 app:layout_constraintStart_toStartOf="parent"
@@ -123,8 +123,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/optionalLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible">
+                    android:layout_height="wrap_content">
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/date_layout"

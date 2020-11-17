@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
@@ -21,8 +20,6 @@ import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_tags.*
 import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
-import kotlinx.android.synthetic.main.fragment_add_tags.expansionLayout
-import kotlinx.android.synthetic.main.fragment_add_tags.optionalLayout
 import kotlinx.android.synthetic.main.fragment_add_tags.placeHolderToolbar
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.progress_overlay.*
@@ -48,13 +45,6 @@ class AddTagsFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_tags_layout)
-        expansionLayout.addListener { expansionLayout, expanded ->
-            if(expanded){
-                optionalLayout.isVisible = true
-            } else {
-                optionalLayout.isInvisible = true
-            }
-        }
         if(tagId != 0L){
             updateData()
         }

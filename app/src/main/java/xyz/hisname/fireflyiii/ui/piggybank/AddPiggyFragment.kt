@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -24,7 +23,6 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import kotlinx.android.synthetic.main.fragment_add_piggy.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_piggy.expansionLayout
-import kotlinx.android.synthetic.main.fragment_add_piggy.optionalLayout
 import kotlinx.android.synthetic.main.fragment_add_piggy.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel

@@ -722,13 +722,10 @@ class AddTransactionFragment: BaseFragment() {
         }
         expansionLayout.addListener { _, expanded ->
             if(expanded){
-                optionalLayout.isVisible = true
                 if (piggy_layout.isVisible){
                     showCase(R.string.transactions_create_transfer_ffInput_piggy_bank_id,
                             "transactionPiggyShowCase", piggy_layout).show()
                 }
-            } else {
-                optionalLayout.isInvisible = true
             }
         }
         placeHolderToolbar.navigationIcon = getCompatDrawable(R.drawable.abc_ic_clear_material)
