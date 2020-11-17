@@ -16,8 +16,10 @@
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/all_tags"
+            style="@style/Widget.MaterialComponents.ChipGroup"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"/>
 
     </xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout>
 

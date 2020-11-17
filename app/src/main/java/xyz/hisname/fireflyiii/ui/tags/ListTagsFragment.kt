@@ -5,9 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -17,7 +18,6 @@ import androidx.fragment.app.commit
 import com.google.android.material.chip.Chip
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
@@ -28,8 +28,7 @@ import xyz.hisname.fireflyiii.util.extension.*
 
 class ListTagsFragment: BaseFragment() {
 
-    private lateinit var chipTags: Chip
-    private val baseLayout by lazy { requireActivity().findViewById<FrameLayout>(R.id.fragment_container) }
+    private val tagViewModel by lazy { getImprovedViewModel(ListTagsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -40,73 +39,70 @@ class ListTagsFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         baseSwipeLayout.isGone = true
         all_tags.setChipSpacing(16)
+        setResponse()
         displayView()
-        tagsViewModel.apiResponse.observe(viewLifecycleOwner) {
-            toastError(it)
-        }
         setFab()
         pullToRefresh()
     }
 
+    private fun setResponse(){
+        tagViewModel.apiResponse.observe(viewLifecycleOwner) {
+            toastError(it)
+        }
+        tagViewModel.isLoading.observe(viewLifecycleOwner){ isLoading ->
+            swipe_tags.isRefreshing = isLoading
+        }
+    }
+
     private fun displayView(){
-        swipe_tags.isRefreshing = true
-        tagsViewModel.getAllTags().observe(viewLifecycleOwner) { tags ->
+        tagViewModel.getAllTags().observe(viewLifecycleOwner) { tags ->
             all_tags.removeAllViewsInLayout()
-            tagsViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-                if(isLoading == false){
-                    if(tags.isEmpty()){
-                        listImage.isVisible = true
-                        listText.isVisible = true
-                        listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
-                            icon = FontAwesome.Icon.faw_tag
-                            sizeDp = 24
-                        })
-                        listText.text = "No Tags Found! Start tagging now?"
-                        swipe_tags.isRefreshing = false
-                    } else {
-                        listImage.isGone = true
-                        listText.isGone = true
-                        tags.forEachIndexed { _, tagsData ->
-                            chipTags = Chip(requireContext())
-                            chipTags.apply {
-                                text = tagsData.tagsAttributes?.tag
-                                isCloseIconVisible = true
-                                setOnCloseIconClickListener { close ->
-                                    val tagName = (close as TextView).text.toString()
-                                    deleteTag(tagName)
-                                }
-                                setOnClickListener {
-                                    parentFragmentManager.commit {
-                                        val tagDetails = TagDetailsFragment()
-                                        tagDetails.arguments = bundleOf("revealX" to extendedFab.width / 2,
-                                                "revealY" to extendedFab.height / 2, "tagId" to tagsData.tagsId)
-                                        addToBackStack(null)
-                                        replace(R.id.fragment_container, tagDetails)
-                                    }
-                                }
+            if(tags.isEmpty()){
+                listImage.isVisible = true
+                listText.isVisible = true
+                listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_tag
+                    sizeDp = 24
+                })
+                listText.text = "No Tags Found! Start tagging now?"
+            } else {
+                listImage.isGone = true
+                listText.isGone = true
+                tags.forEach { tagsData ->
+                    val chipTags = Chip(requireContext(), null, R.attr.chipStyle)
+                    chipTags.apply {
+                        text = tagsData.tagsAttributes.tag
+                        isCloseIconVisible = true
+                        setOnCloseIconClickListener { close ->
+                            val tagName = (close as TextView).text.toString()
+                            deleteTag(tagName, chipTags)
+                        }
+                        setOnClickListener {
+                            parentFragmentManager.commit {
+                                val tagDetails = TagDetailsFragment()
+                                tagDetails.arguments = bundleOf("revealX" to extendedFab.width / 2,
+                                        "revealY" to extendedFab.height / 2, "tagId" to tagsData.tagsId)
+                                addToBackStack(null)
+                                replace(R.id.fragment_container, tagDetails)
                             }
-                            swipe_tags.isRefreshing = false
-                            all_tags.addView(chipTags)
                         }
                     }
+                    all_tags.addView(chipTags)
                 }
             }
         }
     }
 
-    private fun deleteTag(tagName: String){
+    private fun deleteTag(tagName: String, chip: Chip){
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_tag_title, tagName))
                 .setMessage(resources.getString(R.string.delete_tag_message, tagName))
-                .setPositiveButton(R.string.delete_permanently){_, _ ->
-                    tagsViewModel.deleteTagByName(tagName).observe(viewLifecycleOwner) { status ->
+                .setPositiveButton(R.string.delete_permanently){ _, _ ->
+                    tagViewModel.deleteTagByName(tagName).observe(viewLifecycleOwner) { status ->
                         if (status) {
-                            parentFragmentManager.commit {
-                                replace(R.id.fragment_container, ListTagsFragment())
-                            }
+                            chip.setOnCloseIconClickListener(chipClickListener)
+                            chip.performCloseIconClick()
                             toastSuccess(resources.getString(R.string.tag_deleted, tagName))
-                        } else {
-                            toastError("There was an error deleting $tagName", Toast.LENGTH_LONG)
                         }
                     }
                 }
@@ -116,10 +112,24 @@ class ListTagsFragment: BaseFragment() {
                 .show()
     }
 
+    private val chipClickListener = View.OnClickListener {
+        val anim = AlphaAnimation(1f,0f)
+        anim.duration = 250
+        anim.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationRepeat(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation) {
+                all_tags.removeView(it)
+            }
+            override fun onAnimationStart(animation: Animation?) {}
+        })
+        it.startAnimation(anim)
+    }
+
+
     private fun setFab(){
         extendedFab.display {
             extendedFab.isClickable = false
-            baseLayout.isInvisible = true
+            requireActivity().findViewById<FrameLayout>(R.id.fragment_container).isInvisible = true
             parentFragmentManager.commit {
                 val addTags = AddTagsFragment()
                 addTags.arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2)
@@ -132,10 +142,7 @@ class ListTagsFragment: BaseFragment() {
 
     private fun pullToRefresh(){
         swipe_tags.setOnRefreshListener {
-            parentFragmentManager.commit {
-                // This hack is so nasty!
-                replace(R.id.fragment_container, ListTagsFragment())
-            }
+            displayView()
         }
     }
 
