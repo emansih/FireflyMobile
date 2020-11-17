@@ -446,6 +446,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         } else {
             unReveal(add_account_layout)
         }
+        markdownViewModel.markdownText.postValue("")
     }
 
 }
