@@ -21,6 +21,10 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_budget_summary.*
 import xyz.hisname.fireflyiii.R
@@ -47,6 +51,16 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setSpinner()
+        setText()
+        setWidget()
+        budgetSummaryViewModel.pieChartData.observe(viewLifecycleOwner){ list ->
+            setPieChart(list)
+        }
+        loadTransactionList(null)
+    }
+
+    private fun setWidget(){
         transactionExtendedFab.isGone = true
         for (col in ColorTemplate.COLORFUL_COLORS) {
             coloring.add(col)
@@ -54,16 +68,42 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
         for (col in ColorTemplate.JOYFUL_COLORS){
             coloring.add(col)
         }
-        budgetSummaryPieChart.isDrawHoleEnabled = false
-        setSpinner()
-        setText()
-        budgetSummaryViewModel.pieChartData.observe(viewLifecycleOwner){ list ->
-            setPieChart(list)
-        }
+        monthAndYearText.text = DateTimeUtil.getMonthAndYear(DateTimeUtil.getTodayDate())
         transactionList.layoutManager = LinearLayoutManager(requireContext())
         transactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         transactionList.adapter = rtAdapter
-        loadTransactionList(null)
+        budgetSummaryPieChart.isDrawHoleEnabled = false
+        previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_arrow_back
+            sizeDp = 24
+            colorRes = R.color.colorPrimary
+        })
+        nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_arrow_forward
+            sizeDp = 24
+            colorRes = R.color.colorPrimary
+        })
+        previousMonthArrow.setOnClickListener {
+            budgetSummaryViewModel.monthCount -=1
+            setDate()
+            dataAdapter.clear()
+            rtAdapter.notifyDataSetChanged()
+            budgetSummaryPieChart.clear()
+        }
+        nextMonthArrow.setOnClickListener {
+            budgetSummaryViewModel.monthCount +=1
+            setDate()
+            dataAdapter.clear()
+            rtAdapter.notifyDataSetChanged()
+            budgetSummaryPieChart.clear()
+        }
+        setDate()
+    }
+
+    private fun setDate(){
+        budgetSummaryViewModel.setDisplayDate().observe(viewLifecycleOwner){ dateToDisplay ->
+            monthAndYearText.text = dateToDisplay
+        }
     }
 
     private fun setSpinner(){

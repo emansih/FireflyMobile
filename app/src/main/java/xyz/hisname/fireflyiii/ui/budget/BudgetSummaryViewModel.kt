@@ -19,6 +19,7 @@ import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import java.math.BigDecimal
 import java.math.RoundingMode
+import kotlin.math.abs
 
 class BudgetSummaryViewModel(application: Application): BaseViewModel(application) {
 
@@ -30,14 +31,15 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
             AppDatabase.getInstance(application).transactionDataDao(),
             genericService()?.create(TransactionService::class.java))
 
-    private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
-    private val budgetLimitDao by lazy { AppDatabase.getInstance(application).budgetLimitDao() }
-    private val budgetDao by lazy { AppDatabase.getInstance(application).budgetDataDao() }
-    private val budgetListDao by lazy { AppDatabase.getInstance(application).budgetListDataDao() }
-    private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
+    private val spentDao = AppDatabase.getInstance(application).spentDataDao()
+    private val budgetLimitDao = AppDatabase.getInstance(application).budgetLimitDao()
+    private val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
+    private val budgetListDao = AppDatabase.getInstance(application).budgetListDataDao()
+    private val budgetService = genericService()?.create(BudgetService::class.java)
 
     private val budgetRepository = BudgetRepository(budgetDao, budgetListDao, spentDao, budgetLimitDao, budgetService)
-
+    private lateinit var startOfMonth: String
+    private lateinit var endOfMonth: String
 
     private var defaultCurrency = ""
     private var originalBudget: BigDecimal = 0.toBigDecimal()
@@ -53,6 +55,8 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
     val balanceBudget: MutableLiveData<String> = MutableLiveData()
     val uniqueBudgets: MutableLiveData<List<String>> = MutableLiveData()
     val pieChartData: MutableLiveData<List<Triple<Float, String, BigDecimal>>> = MutableLiveData()
+
+    var monthCount: Long = 0
 
     fun getCurrency(): LiveData<List<String>> {
         val data: MutableLiveData<List<String>> = MutableLiveData()
@@ -71,8 +75,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
     }
 
     private suspend fun getTransaction(){
-        transactionRepository.allWithdrawalWithCurrencyCode(DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), defaultCurrency)
+        transactionRepository.allWithdrawalWithCurrencyCode(startOfMonth, endOfMonth, defaultCurrency)
         val uniqBudget = transactionRepository.getUniqueBudgetByDate(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(),
@@ -80,13 +83,11 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         sumOfWithdrawal = 0.toBigDecimal()
         uniqueBudgets.postValue(uniqBudget)
 
-        val budget = budgetRepository.getAllAvailableBudget(DateTimeUtil.getStartOfMonth(),
-                    DateTimeUtil.getEndOfMonth(), defaultCurrency)
+        val budget = budgetRepository.getAllAvailableBudget(startOfMonth, endOfMonth, defaultCurrency)
         val returnData = arrayListOf<Triple<Float, String, BigDecimal>>()
         uniqBudget.forEach { budgetName ->
             if (budgetName.isNotEmpty()){
-                val transactionBudget = retrieveBudget(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(),
+                val transactionBudget = retrieveBudget(startOfMonth, endOfMonth,
                         defaultCurrency, budgetName)
                 sumOfWithdrawal = sumOfWithdrawal.add(transactionBudget)
                 if(budget != BigDecimal.ZERO){
@@ -100,7 +101,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         }
 
         val expensesWithoutBudget = budget.minus(sumOfWithdrawal)
-        val percentage = if(expensesWithoutBudget != BigDecimal.ZERO || expensesWithoutBudget != BigDecimal.ZERO){
+        val percentage = if(expensesWithoutBudget != BigDecimal.ZERO && expensesWithoutBudget != BigDecimal.ZERO){
             expensesWithoutBudget
                     .divide(budget,2, RoundingMode.HALF_UP)
                     .times(100.toBigDecimal())
@@ -133,8 +134,8 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         val data: MutableLiveData<List<Transactions>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             if(budget == null){
-                data.postValue(transactionRepository.transactionListWithCurrency(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(), "withdrawal", defaultCurrency))
+                data.postValue(transactionRepository.transactionListWithCurrency(startOfMonth, endOfMonth,
+                        "withdrawal", defaultCurrency))
             } else {
                 if(budget.isEmpty()){
                     balanceBudget.postValue("--.--")
@@ -143,8 +144,8 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                     totalTransaction.postValue(currencySymbol + " " +
                             retrieveBudget(DateTimeUtil.getStartOfMonth(),
                                     DateTimeUtil.getEndOfMonth(), defaultCurrency, ""))
-                    data.postValue(transactionRepository.transactionListWithCurrency(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), "withdrawal", defaultCurrency))
+                    data.postValue(transactionRepository.transactionListWithCurrency(startOfMonth, endOfMonth,
+                            "withdrawal", defaultCurrency))
                 } else {
                     val budgetAmount = budgetRepository.getBudgetLimitByName(budget, DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), defaultCurrency)
@@ -176,12 +177,42 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
     fun getBalance(budget: String){
         viewModelScope.launch(Dispatchers.IO){
             if (budget.isNotEmpty()){
-                val transactionBudget = retrieveBudget(DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getEndOfMonth(),
+                val transactionBudget = retrieveBudget(startOfMonth, endOfMonth,
                         defaultCurrency, budget)
                 totalTransaction.postValue("$currencySymbol $transactionBudget")
                 balanceBudget.postValue("$currencySymbol ${originalBudget.minus(transactionBudget)}")
             }
         }
+    }
+
+    fun setDisplayDate(): LiveData<String>{
+        val data: MutableLiveData<String> = MutableLiveData()
+        when {
+            monthCount == 0L -> {
+                // 0 -> current month
+                data.postValue(DateTimeUtil.getMonthAndYear(DateTimeUtil.getTodayDate()))
+                startOfMonth = DateTimeUtil.getStartOfMonth()
+                endOfMonth = DateTimeUtil.getEndOfMonth()
+            }
+            monthCount < 1L -> {
+                // Negative months will be previous months
+                // -1 -> 1 month before this month
+                // -2 -> 2 month before this month
+                data.postValue(DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth(abs(monthCount))))
+                startOfMonth = DateTimeUtil.getStartOfMonth(1)
+                endOfMonth = DateTimeUtil.getEndOfMonth(1)
+            }
+            else -> {
+                // +1 -> 1 month after this month
+                // +2 -> 2 month after this month
+                data.postValue(DateTimeUtil.getMonthAndYear(DateTimeUtil.getFutureStartOfMonth(monthCount)))
+                startOfMonth = DateTimeUtil.getFutureStartOfMonth(1)
+                endOfMonth = DateTimeUtil.getFutureEndOfMonth(1)
+            }
+        }
+        viewModelScope.launch(Dispatchers.IO){
+            getTransaction()
+        }
+        return data
     }
 }

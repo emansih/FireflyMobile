@@ -71,6 +71,22 @@ object DateTimeUtil {
         return previousLocalDate.with(firstDayOfMonth()).toString()
     }
 
+    fun getFutureStartOfMonth(duration: Long): String {
+        val localDateTime = LocalDate.now()
+        val previousMonth = localDateTime.plusMonths(duration)
+        val previousLocalDate =
+                LocalDate.of(previousMonth.year, previousMonth.monthValue, previousMonth.dayOfMonth)
+        return previousLocalDate.with(firstDayOfMonth()).toString()
+    }
+
+    fun getFutureEndOfMonth(duration: Long): String {
+        val localDateTime = LocalDate.now()
+        val previousMonth = localDateTime.plusMonths(duration)
+        val previousLocalDate =
+                LocalDate.of(previousMonth.year, previousMonth.monthValue, previousMonth.dayOfMonth)
+        return previousLocalDate.withDayOfMonth(previousMonth.lengthOfMonth()).toString()
+    }
+
     fun getStartOfMonth(): String{
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)
