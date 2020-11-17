@@ -1,28 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout
-        android:id="@+id/swipe_tags"
+    <!--
+     These nested scroll views are necessary. If a user has a ton of tags, user should be able to
+     scroll to view their tags that are off screen.
+
+     NestedScrollView is nested inside SwipeRefreshLayout because scrolling simply does not work
+     https://stackoverflow.com/questions/25294395/swiperefreshlayout-with-scrollview-and-layout-above
+
+     Keeping SwipeRefreshLayout allows user to refresh the screen and also show the loading circle
+     when loading occurs
+
+     Ideally, ChipGroup should be replaced with RecyclerView however, as of writing(17 Nov 2020),
+     I can't figure out how to add chips into a RecyclerView
+     -->
+
+    <ScrollView
+        android:id="@+id/tags_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:fillViewport="true"
+        android:orientation="vertical">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/all_tags"
-            style="@style/Widget.MaterialComponents.ChipGroup"
+        <xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout
+            android:id="@+id/swipe_tags"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:animateLayoutChanges="true"/>
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp">
 
-    </xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout>
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/all_tags"
+                        style="@style/Widget.MaterialComponents.ChipGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:animateLayoutChanges="true"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <!--"Fake view" to add padding to the end of the list -->
+                    <View
+                        android:id="@+id/fakeView"
+                        android:layout_width="match_parent"
+                        android:layout_height="111dp"
+                        app:layout_constraintTop_toBottomOf="@+id/all_tags"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout>
+
+    </ScrollView>
 
     <include layout="@layout/fragment_base_list"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
