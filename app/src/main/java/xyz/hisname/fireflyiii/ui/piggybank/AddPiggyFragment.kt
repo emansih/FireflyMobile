@@ -88,12 +88,8 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private fun setAccordion(){
         expansionLayout.addListener { _, expanded ->
             if(expanded){
-                optionalLayout.isVisible = true
                 showCase(R.string.piggy_bank_date_help_text,
                         "dateStartedCaseView", date_started_edittext).show()
-
-            } else {
-                optionalLayout.isInvisible = true
             }
         }
     }
