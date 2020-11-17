@@ -40,7 +40,7 @@ fun SupportFragment.hideKeyboard() {
 }
 
 fun Activity.hideKeyboard() {
-    ViewCompat.getWindowInsetsController(findViewById<View>(android.R.id.content).rootView)?.hide(WindowInsetsCompat.Type.ime())
+    ViewCompat.getWindowInsetsController(window.decorView.findViewById(android.R.id.content))?.hide(WindowInsetsCompat.Type.ime())
 }
 
 
