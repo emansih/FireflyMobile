@@ -122,7 +122,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                             },null, null, null)
         addAccountFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
         addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = FontAwesome.Icon.faw_credit_card
+            icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })

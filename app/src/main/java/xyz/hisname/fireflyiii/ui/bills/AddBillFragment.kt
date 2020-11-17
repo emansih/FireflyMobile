@@ -142,7 +142,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                 },null, null, null)
         addBillFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
         addBillFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = FontAwesome.Icon.faw_save
+            icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })

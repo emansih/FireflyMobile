@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
-import android.app.DatePickerDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -152,7 +151,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         },null, null, null)
         addPiggyFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
         addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = FontAwesome.Icon.faw_save
+            icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
@@ -160,17 +159,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
 
     override fun setWidgets(){
         setAccordion()
-        val calendar = Calendar.getInstance()
-        val startDate = DatePickerDialog.OnDateSetListener {
-            _, year, monthOfYear, dayOfMonth ->
-            run {
-                calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
-                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                date_target_edittext.setText(DateTimeUtil.getCalToString(calendar.timeInMillis.toString()))
-            }
-        }
-
         date_target_edittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()

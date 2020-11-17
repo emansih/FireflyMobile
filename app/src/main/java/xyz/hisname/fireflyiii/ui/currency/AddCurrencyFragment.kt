@@ -82,7 +82,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         },null, null, null)
         addCurrencyFab.setBackgroundColor(getCompatColor( R.color.colorPrimaryDark))
         addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = FontAwesome.Icon.faw_money_bill
+            icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
