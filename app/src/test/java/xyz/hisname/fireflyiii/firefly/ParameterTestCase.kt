@@ -1,10 +1,10 @@
 package xyz.hisname.fireflyiii.firefly
 
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockserver.client.MockServerClient
 import org.mockserver.integration.ClientAndServer
 import xyz.hisname.fireflyiii.Constants
@@ -22,7 +22,7 @@ class ParameterTestCase {
     private lateinit var mockServer: ClientAndServer
     private lateinit var mockServerClient: MockServerClient
 
-    @Before
+    @BeforeEach
     fun setupTest(){
         mockServer = ClientAndServer.startClientAndServer(443, 8777, 1234)
         mockServerClient = MockServerClient(FIREFLY_BASEURL, 443)
@@ -31,7 +31,7 @@ class ParameterTestCase {
         TimeUnit.SECONDS.sleep(3)
     }
 
-    @After
+    @AfterEach
     fun destroy() {
         FireflyClient.destroyInstance()
         mockServerClient.stop()
@@ -48,7 +48,7 @@ class ParameterTestCase {
                     "", null, null)?.create(AccountsService::class.java)?.getPaginatedAccountType(
                     "asset", 1)
         }
-        Assert.assertEquals(auth?.raw()?.request()?.url().toString(),
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
@@ -59,7 +59,7 @@ class ParameterTestCase {
                     "", null, null)?.create(AccountsService::class.java)?.getPaginatedAccountType(
                     "asset", 1)
         }
-        Assert.assertEquals(auth?.raw()?.request()?.url().toString(),
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
@@ -70,7 +70,7 @@ class ParameterTestCase {
                     "", null, null)?.create(AccountsService::class.java)?.getPaginatedAccountType(
                     "asset", 1)
         }
-        Assert.assertEquals(auth?.raw()?.request()?.url().toString(),
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
@@ -81,7 +81,7 @@ class ParameterTestCase {
                     "", null, null)?.create(AccountsService::class.java)?.getPaginatedAccountType(
                     "asset", 1)
         }
-        Assert.assertEquals(auth?.raw()?.request()?.url().toString(),
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
@@ -92,7 +92,7 @@ class ParameterTestCase {
                     "", null, null)?.create(AccountsService::class.java)?.getPaginatedAccountType(
                     "asset", 1)
         }
-        Assert.assertEquals(auth?.raw()?.request()?.url().toString(),
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 
@@ -103,7 +103,7 @@ class ParameterTestCase {
                     "", null, null)?.create(AccountsService::class.java)?.getPaginatedAccountType(
                     "asset", 1)
         }
-        Assert.assertEquals(auth?.raw()?.request()?.url().toString(),
+        assertEquals(auth?.raw()?.request()?.url().toString(),
                 "https://$FIREFLY_BASEURL:1234/login/${Constants.ACCOUNTS_API_ENDPOINT}?type=asset&page=1")
     }
 }

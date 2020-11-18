@@ -1,16 +1,16 @@
 package xyz.hisname.fireflyiii
 
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import xyz.hisname.fireflyiii.data.remote.nominatim.NominatimClient
 import xyz.hisname.fireflyiii.data.remote.nominatim.api.SearchService
 
 class NominatimClientTestCase {
 
-    @After
+    @AfterEach
     fun tearDown() {
         NominatimClient.destroyClient()
     }
@@ -20,7 +20,7 @@ class NominatimClientTestCase {
         val nom = runBlocking{
             NominatimClient.getClient()?.create(SearchService::class.java)?.searchLocation("Istana")
         }
-        assertTrue("list not empty", !nom.isNullOrEmpty())
+        assertTrue(!nom.isNullOrEmpty(), "list not empty")
         nom?.forEachIndexed { _, locationSearchModel ->
             if(locationSearchModel.display_name == "Istana, 1, Edinburgh Road, Robertson Quay, Selegie, Singapore, Central, 228091, Singapore"){
                 assertEquals("historic",locationSearchModel.category)
@@ -35,7 +35,7 @@ class NominatimClientTestCase {
         val nom = runBlocking{
             NominatimClient.getClient()?.create(SearchService::class.java)?.searchLocation("")
         }
-        assertTrue("list is empty", nom.isNullOrEmpty())
+        assertTrue(nom.isNullOrEmpty(), "list is empty")
     }
 
 

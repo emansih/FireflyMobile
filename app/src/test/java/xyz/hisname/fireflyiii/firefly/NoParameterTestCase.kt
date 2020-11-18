@@ -1,10 +1,10 @@
 package xyz.hisname.fireflyiii.firefly
 
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockserver.client.MockServerClient
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.integration.ClientAndServer.startClientAndServer
@@ -23,7 +23,7 @@ class NoParameterTestCase {
     private lateinit var mockServer: ClientAndServer
     private lateinit var mockServerClient: MockServerClient
 
-    @Before
+    @BeforeEach
     fun setupTest(){
         mockServer = startClientAndServer(443, 8777, 1234)
         mockServerClient = MockServerClient(FIREFLY_BASEURL, 443)
@@ -31,7 +31,7 @@ class NoParameterTestCase {
         TimeUnit.SECONDS.sleep(3)
     }
 
-    @After
+    @AfterEach
     fun destroy() {
         FireflyClient.destroyInstance()
         mockServerClient.stop()
