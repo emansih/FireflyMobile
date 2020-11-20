@@ -53,35 +53,6 @@ class CategoryViewModel(application: Application): BaseViewModel(application) {
         categoryName.value = details
     }
 
-    fun addCategory(categoryName: String): LiveData<ApiResponses<CategorySuccessModel>>{
-        val apiResponse: MediatorLiveData<ApiResponses<CategorySuccessModel>> =  MediatorLiveData()
-        val apiLiveData: MutableLiveData<ApiResponses<CategorySuccessModel>> = MutableLiveData()
-        categoryService?.createNewCategory(categoryName)?.enqueue(retrofitCallback({ response ->
-            var errorMessage = ""
-            val responseErrorBody = response.errorBody()
-            if (responseErrorBody != null) {
-                errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
-                    moshi?.errors?.name != null -> moshi.errors.name[0]
-                    else -> "Error occurred while saving category"
-                }
-            }
-            val networkData = response.body()
-            if (networkData != null) {
-                viewModelScope.launch(Dispatchers.IO) { repository.insertCategory(networkData.data) }
-                apiLiveData.postValue(ApiResponses(response.body()))
-            } else {
-                apiLiveData.postValue(ApiResponses(errorMessage))
-            }
-        })
-        { throwable ->
-            apiResponse.postValue(ApiResponses(throwable))
-        })
-        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
-        return apiResponse
-    }
-
     fun deleteCategoryByName(categoryName: String): LiveData<Boolean> {
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         var isItDeleted = 0

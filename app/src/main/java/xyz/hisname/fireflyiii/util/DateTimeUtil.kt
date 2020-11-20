@@ -93,6 +93,11 @@ object DateTimeUtil {
         return localDate.with(firstDayOfMonth()).toString()
     }
 
+    fun getStartOfWeekFromGivenDate(date: String, number: Long): String{
+        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        return localDate.plusWeeks(number).toString()
+    }
+
     fun getCurrentMonth(): String {
         val localDateTime = LocalDate.now()
         val localDate = LocalDate.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth)

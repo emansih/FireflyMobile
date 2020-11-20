@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_add_category.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.category.CategorySuccessModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.extension.*
 
@@ -15,7 +16,8 @@ import xyz.hisname.fireflyiii.util.extension.*
 class AddCategoriesFragment: BottomSheetDialogFragment() {
 
     private val progressLayout by bindView<View>(R.id.progress_overlay)
-    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
+    private val categoryViewModel by lazy { getImprovedViewModel(AddCategoryViewModel::class.java) }
+    private val categoryId by lazy { arguments?.getLong("categoryId")  ?: 0 }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -25,6 +27,11 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setWidgets()
+        if(categoryId != 0L){
+            categoryViewModel.getCategoryById(categoryId).observe(viewLifecycleOwner){ categoryData ->
+                category_name.setText(categoryData.categoryAttributes?.name)
+            }
+        }
     }
 
     override fun onStart() {
@@ -40,19 +47,38 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
         submitCategory.setOnClickListener {
             hideKeyboard()
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-            submitData()
+            if(categoryId != 0L){
+                updateData()
+            } else {
+                submitData()
+            }
+
+        }
+    }
+
+    private fun updateData(){
+        categoryViewModel.updateCategory(categoryId, category_name.getString()).observe(viewLifecycleOwner){ apiResponse ->
+            setResponse(apiResponse)
         }
     }
 
     private fun submitData(){
-        categoryViewModel.addCategory(category_name.getString()).observe(viewLifecycleOwner) {
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            val errorMessage = it.getErrorMessage()
-            if (errorMessage != null) {
+        categoryViewModel.addCategory(category_name.getString()).observe(viewLifecycleOwner) { apiResponse ->
+            setResponse(apiResponse)
+        }
+    }
+
+    private fun setResponse(apiResponse: ApiResponses<CategorySuccessModel>){
+        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+        val errorMessage = apiResponse.getErrorMessage()
+        when {
+            errorMessage != null -> {
                 toastError(errorMessage)
-            } else if (it.getError() != null) {
-                toastError(it.getError()?.localizedMessage)
-            } else if (it.getResponse() != null) {
+            }
+            apiResponse.getError() != null -> {
+                toastError(apiResponse.getError()?.localizedMessage)
+            }
+            apiResponse.getResponse() != null -> {
                 toastSuccess(requireContext().getString(R.string.category_added, category_name.getString()))
                 this.dismiss()
             }

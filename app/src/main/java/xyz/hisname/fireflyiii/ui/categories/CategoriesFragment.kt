@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.base_swipe_layout.*
@@ -28,7 +30,7 @@ class CategoriesFragment: BaseFragment() {
 
     private lateinit var scrollListener: EndlessRecyclerViewScrollListener
     private val catData by lazy { arrayListOf<CategoryData>() }
-    private val catAdapter by lazy { CategoriesRecyclerAdapter(catData) { data: CategoryData -> }  }
+    private val catAdapter by lazy { CategoriesRecyclerAdapter(catData) { data: CategoryData -> itemClicked(data) }  }
     private val categoryViewModel by lazy { getImprovedViewModel(CategoryViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -108,6 +110,15 @@ class CategoriesFragment: BaseFragment() {
             })
             recycler_view.isVisible = false
         }
+    }
+
+    private fun itemClicked(categoryData: CategoryData){
+        val bundle = bundleOf("categoryId" to categoryData.categoryId)
+        parentFragmentManager.commit {
+            replace(R.id.fragment_container, CategoryDetailsFragment().apply { arguments = bundle })
+            addToBackStack(null)
+        }
+        extendedFab.isGone = true
     }
 
     private fun initFab(){

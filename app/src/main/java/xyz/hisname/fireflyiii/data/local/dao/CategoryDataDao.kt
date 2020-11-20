@@ -20,4 +20,8 @@ abstract class CategoryDataDao: BaseDao<CategoryData> {
 
     @Query("SELECT * FROM category JOIN categoryFts ON category.categoryId == categoryFts.categoryId WHERE categoryFts MATCH :categoryName GROUP BY categoryFts.categoryId")
     abstract fun searchCategory(categoryName: String): MutableList<CategoryData>
+
+    @Query("SELECT * FROM category WHERE categoryId =:categoryId")
+    abstract fun getCategoryById(categoryId: Long): CategoryData
+
 }

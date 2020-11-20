@@ -174,4 +174,5 @@
     <string name="delete_all_tags">Delete ALL your tags</string>
     <string name="delete_all_object_groups">Delete ALL your object groups</string>
     <string name="user_understand">I understand the consequences</string>
+    <string name="chart_category_in_period">Chart for all transactions for category %1$s between %2$s and %3$s</string>
 </resources>

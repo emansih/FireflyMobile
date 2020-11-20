@@ -84,6 +84,16 @@ abstract class TransactionDataDao {
                                                             currencyCode: String, sourceName: String, transactionType: String,
                                                             categoryName: String): Double
 
+    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND category_id =:categoryId")
+    abstract fun getTransactionByDateAndCategory(startDate: String, endDate: String,
+                                                 categoryId: Long): Flow<List<Transactions>>
+
+    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) " +
+            "AND category_id =:categoryId AND transactionType =:transactionType")
+    abstract fun getTransactionValueByDateAndCategory(startDate: String, endDate: String,
+                                                 transactionType: String,
+                                                 categoryId: Long): BigDecimal
+
     @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate " +
             "AND :endDate) AND currency_code = :currencyCode AND source_name = :sourceName AND " +
             "transactionType =:transactionType AND budget_name =:budgetName")
