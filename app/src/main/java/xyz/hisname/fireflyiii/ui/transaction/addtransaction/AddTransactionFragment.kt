@@ -592,9 +592,30 @@ class AddTransactionFragment: BaseFragment() {
                 currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             }
         }
-        piggy_edittext.setOnClickListener {
-            val piggyBankDialog = PiggyDialog()
-            piggyBankDialog.show(parentFragmentManager, "piggyDialog")
+        piggy_edittext.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if(event.action == MotionEvent.ACTION_UP){
+                    piggy_edittext.compoundDrawables[0].bounds.width()
+                    if(event.x <= budget_edittext.compoundDrawables[0].bounds.width() + 30){
+                        val piggyBankDialog = PiggyDialog()
+                        piggyBankDialog.show(parentFragmentManager, "piggyDialog")
+
+                        return true
+                    }
+                }
+                return false
+            }
+        })
+        piggy_edittext.doAfterTextChanged { editable ->
+            piggyViewModel.getPiggyByName(editable.toString()).observe(viewLifecycleOwner){ list ->
+                val dataToDisplay = arrayListOf<String>()
+                list.forEach { piggyData ->
+                    dataToDisplay.add(piggyData.piggyAttributes?.name ?: "")
+                }
+                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
+                piggy_edittext.setAdapter(autocompleteAdapter)
+
+            }
         }
         piggyViewModel.piggyName.observe(viewLifecycleOwner) {
             piggy_edittext.setText(it)
