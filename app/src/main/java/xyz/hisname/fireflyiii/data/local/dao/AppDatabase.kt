@@ -30,7 +30,7 @@ import xyz.hisname.fireflyiii.util.TypeConverterUtil
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
     BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class, Spent::class, BudgetLimitData::class],
-        version = 20, exportSchema = false)
+        version = 21, exportSchema = false)
 @TypeConverters(TypeConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
