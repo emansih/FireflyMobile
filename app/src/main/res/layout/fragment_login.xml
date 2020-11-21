@@ -11,8 +11,6 @@
         android:layout_height="wrap_content"
         android:hint="@string/url"
         android:textSize="16sp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginBottom="36dp"
         app:layout_constraintBottom_toTopOf="@+id/firefly_id_layout"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,8 +33,6 @@
         android:hint="@string/client_id"
         android:textSize="16sp"
         android:layout_marginBottom="36dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/firefly_secret_layout"
         app:layout_constraintEnd_toEndOf="parent">
@@ -57,8 +53,6 @@
         android:hint="@string/client_secret"
         android:textSize="16sp"
         android:layout_marginBottom="36dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/self_signed_checkbox"
         app:layout_constraintEnd_toEndOf="parent">
@@ -107,8 +101,8 @@
         android:layout_marginTop="15dp"
         android:textColor="@color/md_white_1000"
         android:background="@color/md_black_1000"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/firefly_secret_layout"
+        app:layout_constraintStart_toStartOf="@+id/firefly_secret_layout"
         app:layout_constraintTop_toBottomOf="@+id/cert_path"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
