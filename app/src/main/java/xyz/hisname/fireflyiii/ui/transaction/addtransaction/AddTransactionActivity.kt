@@ -43,7 +43,7 @@ class AddTransactionActivity: BaseActivity() {
                 R.id.action_withdraw -> {
                     supportFragmentManager.commit {
                         replace(R.id.addTransactionFrame, AddTransactionFragment().apply {
-                            arguments = bundleOf("transactionType" to "Withdrawal")
+                            arguments = bundleOf("transactionType" to "Withdrawal", "FROM_TRANSACTION_ACTIVITY" to true)
                         })
                     }
                     true
@@ -51,7 +51,7 @@ class AddTransactionActivity: BaseActivity() {
                 R.id.action_deposit -> {
                     supportFragmentManager.commit {
                         replace(R.id.addTransactionFrame, AddTransactionFragment().apply {
-                            arguments = bundleOf("transactionType" to "Deposit")
+                            arguments = bundleOf("transactionType" to "Deposit", "FROM_TRANSACTION_ACTIVITY" to true)
                         })
                     }
                     true
@@ -59,7 +59,7 @@ class AddTransactionActivity: BaseActivity() {
                 R.id.action_transfer -> {
                     supportFragmentManager.commit {
                         replace(R.id.addTransactionFrame, AddTransactionFragment().apply {
-                            arguments = bundleOf("transactionType" to "Transfer")
+                            arguments = bundleOf("transactionType" to "Transfer", "FROM_TRANSACTION_ACTIVITY" to true)
                         })
                     }
                     true

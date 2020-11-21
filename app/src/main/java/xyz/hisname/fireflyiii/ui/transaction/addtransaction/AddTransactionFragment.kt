@@ -15,7 +15,6 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -35,6 +34,7 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
+import me.toptas.fancyshowcase.FancyShowCaseQueue
 import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
@@ -66,6 +66,7 @@ class AddTransactionFragment: BaseFragment() {
     private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
+    private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
     private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
@@ -640,7 +641,13 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setWidgets(){
-        showCase(R.string.urge_users_to_click_icons, "transactionIcons", transaction_amount_placeholder_view).show()
+        val queue = FancyShowCaseQueue()
+                .add(showCase(R.string.urge_users_to_click_icons, "transactionIcons", transaction_amount_placeholder_view))
+        if(transactionActivity == true){
+            queue.add(showCase(R.string.transactions_create_switch_box, "bottomNavigationShowCase",
+                           requireActivity().findViewById(R.id.transactionBottomView)))
+        }
+        queue.show()
         add_attachment_button.setOnClickListener {
             attachmentDialog()
         }
