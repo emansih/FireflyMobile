@@ -14,11 +14,12 @@ import androidx.fragment.app.Fragment as SupportFragment
 
 
 fun SupportFragment.showCase(@StringRes title: Int, showOnce: String, layout: View,
+                             fitWindow: Boolean = true,
                              dismissListener: DismissListener? = null) =
-        requireActivity().showCase(title, showOnce, layout, dismissListener =  dismissListener)
+        requireActivity().showCase(title, showOnce, layout, fitWindow, dismissListener =  dismissListener)
 
 
-fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View,  fitWindow: Boolean = true,
+fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View,  fitWindow: Boolean,
                       dismissListener: DismissListener? = null): FancyShowCaseView{
     val enterAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_from_left)
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
@@ -36,9 +37,6 @@ fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View,  fi
     }
     if(AppPref(sharedPref).nightModeEnabled){
         showCaseView.focusBorderColor(R.color.md_green_400)
-    }
-    if(!showCaseView.build().isShownBefore()){
-        layout.focusOnView()
     }
     return showCaseView.build()
 }

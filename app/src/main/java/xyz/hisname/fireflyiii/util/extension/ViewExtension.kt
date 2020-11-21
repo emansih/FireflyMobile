@@ -59,8 +59,6 @@ fun <ViewT : View> AppCompatActivity.bindView(@IdRes idRes: Int): Lazy<ViewT> {
     }
 }
 
-fun View.focusOnView() = this.parent.requestChildFocus(this, this)
-
 fun Context.getCompatColor(@ColorRes colorName: Int): Int{
     return ContextCompat.getColor(this, colorName)
 }

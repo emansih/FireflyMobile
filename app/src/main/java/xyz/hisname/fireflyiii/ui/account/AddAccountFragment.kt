@@ -416,11 +416,11 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private fun showHiddenHelpText(){
         if(iban_layout.isVisible && expansionLayout.isExpanded) {
             showCase(R.string.iban_help_text,
-                    "ibanCaseView", iban_layout, object : DismissListener {
+                    "ibanCaseView", iban_layout, true, object : DismissListener {
                 override fun onDismiss(id: String?) {
                     if(opening_balance_layout.isVisible){
                         val openingBalanceShow = showCase(R.string.opening_balance_help_text,
-                                "openingBalanceCaseView", opening_balance_layout, object : DismissListener{
+                                "openingBalanceCaseView", opening_balance_layout, true, object : DismissListener{
                             override fun onDismiss(id: String?) {
                                 if(virtual_balance_layout.isVisible) {
                                     showCase(R.string.virtual_balance_help_text, "virtualBalanceCaseView",

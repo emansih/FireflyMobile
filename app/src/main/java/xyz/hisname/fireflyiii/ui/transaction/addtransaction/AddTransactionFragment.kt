@@ -642,10 +642,11 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun setWidgets(){
         val queue = FancyShowCaseQueue()
-                .add(showCase(R.string.urge_users_to_click_icons, "transactionIcons", transaction_amount_placeholder_view))
+                .add(showCase(R.string.urge_users_to_click_icons, "transactionIcons",
+                        transaction_amount_placeholder_view))
         if(transactionActivity == true){
             queue.add(showCase(R.string.transactions_create_switch_box, "bottomNavigationShowCase",
-                           requireActivity().findViewById(R.id.transactionBottomView)))
+                           requireActivity().findViewById(R.id.transactionBottomView), false))
         }
         queue.show()
         add_attachment_button.setOnClickListener {
@@ -690,7 +691,7 @@ class AddTransactionFragment: BaseFragment() {
         tags_chip.enableEditChipOnTouch(false, true)
         tagsViewModel.getAllTags().observe(viewLifecycleOwner) {
             it.forEachIndexed{ _, tagsData ->
-                tags.add(tagsData.tagsAttributes?.tag!!)
+                tags.add(tagsData.tagsAttributes.tag)
             }
             val tagsAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, tags)
             tags_chip.threshold = 1
@@ -730,8 +731,15 @@ class AddTransactionFragment: BaseFragment() {
         expansionLayout.addListener { _, expanded ->
             if(expanded){
                 if (piggy_layout.isVisible){
-                    showCase(R.string.transactions_create_transfer_ffInput_piggy_bank_id,
-                            "transactionPiggyShowCase", piggy_layout).show()
+                    dialog_add_transaction_layout.post {
+                        dialog_add_transaction_layout.smoothScrollTo(0, piggy_layout.bottom)
+                    }
+                    dialog_add_transaction_layout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                        if(scrollY == piggy_layout.bottom){
+                            showCase(R.string.transactions_create_transfer_ffInput_piggy_bank_id,
+                                    "transactionPiggyShowCase", piggy_layout, false).show()
+                        }
+                    }
                 }
             }
         }
