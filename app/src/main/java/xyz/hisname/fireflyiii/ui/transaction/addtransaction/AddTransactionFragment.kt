@@ -665,6 +665,26 @@ class AddTransactionFragment: BaseFragment() {
                 destination_edittext.setAdapter(autocompleteAdapter)
             }
         }
+        category_edittext.doAfterTextChanged { editable ->
+            categoryViewModel.getCategoryByName(editable.toString()).observe(viewLifecycleOwner){ list ->
+                val dataToDisplay = arrayListOf<String>()
+                list.forEach { categoryData ->
+                    dataToDisplay.add(categoryData.categoryAttributes?.name ?: "")
+                }
+                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
+                category_edittext.setAdapter(autocompleteAdapter)
+            }
+        }
+        budget_edittext.doAfterTextChanged { editable ->
+            budgetViewModel.getBudgetByName(editable.toString()).observe(viewLifecycleOwner){ list ->
+                val dataToDisplay = arrayListOf<String>()
+                list.forEach { budgetData ->
+                    dataToDisplay.add(budgetData.budgetListAttributes?.name ?: "")
+                }
+                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
+                budget_edittext.setAdapter(autocompleteAdapter)
+            }
+        }
         source_edittext.doAfterTextChanged { editable ->
             accountViewModel.getAccountByNameAndType("revenue", editable.toString()).observe(viewLifecycleOwner){ list ->
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
