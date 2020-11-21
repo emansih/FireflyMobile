@@ -43,7 +43,9 @@ class MarkdownFragment: BaseFragment() {
     }
 
     private fun setWidget(){
-        toolbar.visibility = View.GONE
+        if(toolbar != null){
+            toolbar.visibility = View.GONE
+        }
         discardButton.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_close
@@ -254,7 +256,9 @@ class MarkdownFragment: BaseFragment() {
 
     override fun handleBack() {
         parentFragmentManager.popBackStack()
-        toolbar.visibility = View.VISIBLE
+        if(toolbar != null) {
+            toolbar.visibility = View.VISIBLE
+        }
         hideKeyboard()
     }
 }

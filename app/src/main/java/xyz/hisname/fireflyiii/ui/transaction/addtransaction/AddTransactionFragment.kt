@@ -8,6 +8,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -17,6 +19,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -34,10 +37,15 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
+import kotlinx.android.synthetic.main.fragment_add_transaction.currency_edittext
+import kotlinx.android.synthetic.main.fragment_add_transaction.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_transaction.expansionLayout
+import kotlinx.android.synthetic.main.fragment_add_transaction.placeHolderToolbar
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.receiver.TransactionReceiver
+import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
@@ -48,6 +56,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
 import xyz.hisname.fireflyiii.ui.tasker.TransactionPluginViewModel
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
@@ -161,75 +170,18 @@ class AddTransactionFragment: BaseFragment() {
         }
     }
 
-    private fun setTaskerIcons(){
-        val variablesFromHost = TaskerPlugin.getRelevantVariableList(requireActivity().intent.extras)
-        val iconColor = getCompatColor(R.color.colorAccent)
-        descriptionTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply {
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = getCompatColor(R.color.md_white_1000)
-                })
-        transactionAmountTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        currencyTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        dateTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        sourceTextInputTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        sourceExposedTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        destinationTextInputTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        destinationExposedTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        timeTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        piggyTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        categoryTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        tagsTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
-        budgetTasker.setImageDrawable(
-                IconicsDrawable(requireContext()).apply{
-                    icon(GoogleMaterial.Icon.gmd_label)
-                    colorInt = iconColor
-                })
+    private fun setTaskerImageDrawable(vararg view: ImageView){
+        view.forEach { image ->
+            image.setImageDrawable(
+                    IconicsDrawable(requireContext()).apply {
+                        icon(GoogleMaterial.Icon.gmd_label)
+                        colorInt = getCompatColor(R.color.colorAccent)
+                    })
+        }
+    }
 
+    private fun setTaskerText(imageView: ImageView, editText: EditText){
+        val variablesFromHost = TaskerPlugin.getRelevantVariableList(requireActivity().intent.extras)
         val arrayAdapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
         variablesFromHost.forEach { variables ->
             arrayAdapter.add(variables)
@@ -239,110 +191,38 @@ class AddTransactionFragment: BaseFragment() {
                 .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                     dialog.dismiss()
                 }
+        imageView.setOnClickListener {
+            dialog.setAdapter(arrayAdapter){ _, which ->
+                val itemClicked = arrayAdapter.getItem(which)
+                editText.setText(itemClicked)
+                if(editText == currency_edittext){
+                    // Yeah... we need to figure out how to make `currency` a non-global variable
+                    currency = itemClicked ?: ""
+                }
+            }
+            dialog.show()
 
-        descriptionTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                description_edittext.setText(itemClicked)
-            }
-            dialog.show()
         }
+    }
 
-        transactionAmountTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                transaction_amount_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        currencyTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                currency_edittext.setText(itemClicked)
-                currency = itemClicked ?: ""
-            }
-            dialog.show()
-        }
-
-        dateTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                transaction_date_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        sourceTextInputTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                source_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        sourceExposedTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                source_exposed_dropdown.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        destinationTextInputTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                destination_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        destinationExposedTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                destination_exposed_dropdown.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        timeTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                time_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        piggyTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                piggy_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
-        categoryTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                category_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        tagsTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                tags_chip.setText(itemClicked)
-            }
-            dialog.show()
-        }
-
-        budgetTasker.setOnClickListener {
-            dialog.setAdapter(arrayAdapter){ _, which ->
-                val itemClicked = arrayAdapter.getItem(which)
-                budget_edittext.setText(itemClicked)
-            }
-            dialog.show()
-        }
+    private fun setTaskerIcons(){
+        setTaskerImageDrawable(descriptionTasker, transactionAmountTasker,
+                currencyTasker, dateTasker, sourceTextInputTasker, sourceExposedTasker,
+                destinationTextInputTasker, destinationExposedTasker, timeTasker, piggyTasker,
+                categoryTasker, tagsTasker, budgetTasker, noteTasker)
+        setTaskerText(descriptionTasker, description_edittext)
+        setTaskerText(transactionAmountTasker, transaction_amount_edittext)
+        setTaskerText(dateTasker, transaction_date_edittext)
+        setTaskerText(sourceTextInputTasker, source_edittext)
+        setTaskerText(sourceExposedTasker, source_exposed_dropdown)
+        setTaskerText(destinationTextInputTasker, destination_edittext)
+        setTaskerText(destinationExposedTasker, destination_exposed_dropdown)
+        setTaskerText(timeTasker, time_edittext)
+        setTaskerText(piggyTasker, piggy_edittext)
+        setTaskerText(categoryTasker, category_edittext)
+        setTaskerText(tagsTasker, tags_chip)
+        setTaskerText(budgetTasker, budget_edittext)
+        setTaskerText(noteTasker, note_edittext)
     }
 
     private fun setUiFromBundle(bundle: Bundle){
@@ -413,6 +293,10 @@ class AddTransactionFragment: BaseFragment() {
 
         val transactionCategory = bundle.getString("transactionCategory")
         category_edittext.setText(transactionCategory)
+
+        val transactionNotes = bundle.getString("transactionNotes")
+        note_edittext.setText(transactionNotes)
+
     }
 
     private fun setFab(){
@@ -498,6 +382,7 @@ class AddTransactionFragment: BaseFragment() {
         pluginViewModel.transactionTags.postValue(transactionTags)
         pluginViewModel.transactionBudget.postValue(budgetName)
         pluginViewModel.transactionCategory.postValue(categoryName)
+        pluginViewModel.transactionNote.postValue(note_edittext.getString())
         pluginViewModel.fileUri.postValue(fileUri.toString())
         pluginViewModel.removeFragment.postValue(true)
     }
@@ -508,10 +393,12 @@ class AddTransactionFragment: BaseFragment() {
         } else {
             transaction_date_edittext.getString()
         }
-        transactionViewModel.updateTransaction(transactionJournalId,transactionType, description_edittext.getString(),
+        transactionViewModel.updateTransaction(transactionJournalId,transactionType,
+                description_edittext.getString(),
                 transactionDateTime, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, currency, categoryName,
-                transactionTags, budgetName, attachmentItemAdapter).observe(viewLifecycleOwner) { transactionResponse->
+                transactionTags, budgetName,
+                attachmentItemAdapter, note_edittext.getString()).observe(viewLifecycleOwner) { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -784,6 +671,17 @@ class AddTransactionFragment: BaseFragment() {
                 source_edittext.setAdapter(autocompleteAdapter)
             }
         }
+        val markdownViewModel = getViewModel(MarkdownViewModel::class.java)
+        markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
+            note_edittext.setText(markdownText)
+        }
+        note_edittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(note_edittext.getString())
+            parentFragmentManager.commit {
+                replace(R.id.bigger_fragment_container, MarkdownFragment())
+                addToBackStack(null)
+            }
+        }
     }
 
     private fun contextSwitch(){
@@ -845,7 +743,8 @@ class AddTransactionFragment: BaseFragment() {
         transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transactionDateTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags, budgetName, attachmentItemAdapter).observe(viewLifecycleOwner) { transactionResponse ->
+                currency, categoryName, transactionTags, budgetName, attachmentItemAdapter,
+                note_edittext.getString()).observe(viewLifecycleOwner) { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             val errorMessage = transactionResponse.getErrorMessage()
             if (transactionResponse.getResponse() != null) {
@@ -869,7 +768,8 @@ class AddTransactionFragment: BaseFragment() {
                                 "destination" to destinationAccount,
                                 "piggybank" to piggyBankList,
                                 "category" to categoryName,
-                                "tags" to transactionTags
+                                "tags" to transactionTags,
+                                "notes" to note_edittext.getString()
                         )
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
@@ -887,7 +787,8 @@ class AddTransactionFragment: BaseFragment() {
                                 "destination" to destinationAccount,
                                 "source" to sourceAccount,
                                 "category" to categoryName,
-                                "tags" to transactionTags
+                                "tags" to transactionTags,
+                                "notes" to note_edittext.getString()
                         )
                         transferBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(transferBroadcast)
@@ -904,7 +805,8 @@ class AddTransactionFragment: BaseFragment() {
                                 "currency" to currency,
                                 "source" to sourceAccount,
                                 "category" to categoryName,
-                                "tags" to transactionTags
+                                "tags" to transactionTags,
+                                "notes" to note_edittext.getString()
                         )
                         withdrawalBroadcast.putExtras(extras)
                         requireActivity().sendBroadcast(withdrawalBroadcast)
@@ -930,6 +832,7 @@ class AddTransactionFragment: BaseFragment() {
             transaction_date_edittext.setText(DateTimeUtil.convertIso8601ToHumanDate(transactionAttributes.date))
             category_edittext.setText(transactionAttributes.category_name)
             time_edittext.setText(DateTimeUtil.convertIso8601ToHumanTime(transactionAttributes.date))
+            note_edittext.setText(transactionAttributes.notes)
             if(transactionAttributes.tags.isNotEmpty()){
                 tags_chip.setText(transactionAttributes.tags)
             }

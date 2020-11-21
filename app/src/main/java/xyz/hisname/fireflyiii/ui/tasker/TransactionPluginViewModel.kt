@@ -18,6 +18,7 @@ class TransactionPluginViewModel: ViewModel(){
     val transactionCategory: MutableLiveData<String> = MutableLiveData()
     val transactionTags: MutableLiveData<String?> = MutableLiveData()
     val transactionBudget: MutableLiveData<String> = MutableLiveData()
+    val transactionNote: MutableLiveData<String> = MutableLiveData()
     val fileUri: MutableLiveData<String?> = MutableLiveData()
     val removeFragment: MutableLiveData<Boolean> = MutableLiveData()
     val transactionBundle: MutableLiveData<Bundle> = MutableLiveData()

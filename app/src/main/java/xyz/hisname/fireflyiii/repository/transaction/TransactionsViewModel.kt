@@ -215,11 +215,13 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     fun addTransaction(type: String, description: String,
                        date: String, piggyBankName: String?, amount: String,
                        sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?, budgetName: String?, fileUri: ArrayList<Uri>): LiveData<ApiResponses<TransactionSuccessModel>>{
+                       category: String?, tags: String?, budgetName: String?,
+                       fileUri: ArrayList<Uri>, notes: String): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         transactionService?.addTransaction(convertString(type),description, date ,piggyBankName,
-                amount.replace(',', '.'),sourceName,destinationName,currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
+                amount.replace(',', '.'),sourceName,destinationName,currencyName,
+                category, tags, budgetName, notes)?.enqueue(retrofitCallback({ response ->
             val errorBody = response.errorBody()
             var errorBodyMessage = ""
             if (errorBody != null) {
@@ -276,9 +278,10 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     }
 
     fun updateTransaction(transactionJournalId: Long, type: String, description: String,
-                       date: String, amount: String,
-                       sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?, budgetName: String?, fileUri: ArrayList<Uri>): LiveData<ApiResponses<TransactionSuccessModel>>{
+                          date: String, amount: String,
+                          sourceName: String?, destinationName: String?, currencyName: String,
+                          category: String?, tags: String?, budgetName: String?,
+                          fileUri: ArrayList<Uri>, notes: String): LiveData<ApiResponses<TransactionSuccessModel>>{
         val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
         val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
         var transactionId = 0L
@@ -286,7 +289,8 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
         }.invokeOnCompletion {
             transactionService?.updateTransaction(transactionId, convertString(type), description, date,
-                    amount.replace(',', '.'), sourceName, destinationName, currencyName, category, tags, budgetName)?.enqueue(retrofitCallback({ response ->
+                    amount.replace(',', '.'), sourceName, destinationName, currencyName,
+                    category, tags, budgetName, notes)?.enqueue(retrofitCallback({ response ->
                 val errorBody = response.errorBody()
                 var errorBodyMessage = ""
                 if (errorBody != null) {

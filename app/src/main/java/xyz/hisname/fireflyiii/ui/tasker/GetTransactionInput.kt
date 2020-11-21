@@ -17,5 +17,7 @@ class GetTransactionInput @JvmOverloads constructor(
         @field:TaskerInputField("transactionCurrency", R.string.currency_code) var transactionCurrency: String? = null,
         @field:TaskerInputField("transactionTags", R.string.tags) var transactionTags: String? = null,
         @field:TaskerInputField("transactionBudget", R.string.budget) var transactionBudget: String? = null,
-        @field:TaskerInputField("transactionCategory", R.string.categories) var transactionCategory: String? = null
+        @field:TaskerInputField("transactionCategory", R.string.categories) var transactionCategory: String? = null,
+        @field:TaskerInputField("transactionNotes", R.string.notes) var transactionNote: String? = null
+
 )

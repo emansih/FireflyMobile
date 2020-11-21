@@ -58,7 +58,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                      "transactionDescription", "transactionAmount", "transactionDate", "transactionTime",
                      "transactionPiggyBank", "transactionSourceAccount",
                      "transactionDestinationAccount", "transactionCurrency", "transactionTags",
-                     "transactionBudget", "transactionCategory"))
+                     "transactionBudget", "transactionCategory", "transactionNotes"))
     }
 
     override fun run(context: Context, input: TaskerInput<GetTransactionInput>): TaskerPluginResult<GetTransactionOutput> {
@@ -80,6 +80,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val transactionTags = input.regular.transactionTags
         val transactionBudget = input.regular.transactionBudget
         val transactionCategory = input.regular.transactionCategory
+        val transactionNotes = input.regular.transactionNote
         val dateTime = if (transactionTime == null) {
             transactionDate
         } else {
@@ -93,11 +94,11 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         runBlocking(Dispatchers.IO){
             addTransactionToDb(transactionType, transactionDescription, transactionDate, transactionTime, transactionPiggyBank,
                     transactionAmount, transactionSourceAccount, transactionDestinationAccount, transactionCurrency,
-            transactionCategory, tagsList, transactionBudget)
+            transactionCategory, tagsList, transactionBudget, transactionNotes)
             taskerResult = addTransaction(context, transactionType, transactionDescription, dateTime,
                     transactionPiggyBank, transactionAmount, transactionSourceAccount,
                     transactionDestinationAccount, transactionCurrency, transactionCategory,
-                    transactionTags, transactionBudget) as TaskerPluginResult<GetTransactionOutput>
+                    transactionTags, transactionBudget, transactionNotes) as TaskerPluginResult<GetTransactionOutput>
         }
         return taskerResult
     }
@@ -105,7 +106,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
     private fun addTransactionToDb(type: String, description: String,
                                    date: String, time: String?, piggyBankName: String?, amount: String,
                                    sourceName: String?, destinationName: String, currencyName: String,
-                                   category: String?, tags: List<String>, budgetName: String?){
+                                   category: String?, tags: List<String>, budgetName: String?, notes: String?){
         val dateTime = if(time.isNullOrEmpty()){
             DateTimeUtil.offsetDateTimeWithoutTime(date)
         } else {
@@ -124,7 +125,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                         currency.currencyAttributes?.name ?: "", currency.currencyAttributes?.symbol ?: "",
                         OffsetDateTime.parse(dateTime), description, 0, destinationName,
                         "", "",  0.0, "","", 0,
-                        "", "", 0, "", 0,
+                        "", notes, 0, "", 0,
                         sourceName, "", tags, type, 0, piggyBankName,true)
         )
     }
@@ -132,11 +133,11 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
     private suspend fun addTransaction(context: Context, type: String, description: String,
                                        date: String, piggyBankName: String?, amount: String,
                                        sourceName: String?, destinationName: String?, currencyName: String,
-                                       category: String?, tags: String?, budgetName: String?): TaskerPluginResult<Unit>{
+                                       category: String?, tags: String?, budgetName: String?, notes: String?): TaskerPluginResult<Unit>{
         try {
             val response = genericService()?.create(TransactionService::class.java)?.suspendAddTransaction(convertString(type),
                     description, date, piggyBankName, amount.replace(',', '.'),
-                    sourceName, destinationName, currencyName, category, tags, budgetName)
+                    sourceName, destinationName, currencyName, category, tags, budgetName, notes)
             val responseBody = response?.body()
             val errorBody = response?.errorBody()
             var errorBodyMessage = ""

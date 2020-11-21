@@ -56,6 +56,7 @@ class TransactionReceiver: BroadcastReceiver()  {
             val time = intent.getStringExtra("time")
             val date = intent.getStringExtra("date")
             val piggyBank = intent.getStringExtra("piggybank")
+            val notes = intent.getStringExtra("notes")
             val transactionData = Data.Builder()
                     .putString("description", description)
                     .putString("date", date)
@@ -69,6 +70,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                     .putString("sourceName", sourceName)
                     .putString("destinationName", destinationName)
                     .putString("piggyBankName",piggyBank)
+                    .putString("notes", notes)
             val transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
             val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
             var currency: CurrencyData
@@ -115,7 +117,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                                 currencyAttributes?.name ?: "", currencyAttributes?.symbol ?: "",
                                 OffsetDateTime.parse(dateTime), description, 0, destinationName,
                                 "", "",  0.0, "","", 0,
-                                "", "", 0, "", 0,
+                                "", notes, 0, "", 0,
                                 sourceName, "", tagsList, transactionType, 0, piggyBank,true)
                 )
             }

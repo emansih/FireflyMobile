@@ -43,6 +43,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val category = inputData.getString("categoryName")
         val tags = inputData.getString("tags")
         val budget = inputData.getString("budgetName")
+        val notes = inputData.getString("notes")
         val dateTime = if (transactionTime == null) {
             transactionDate
         } else {
@@ -51,7 +52,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val transactionWorkManagerId = inputData.getLong("transactionWorkManagerId", 0)
         genericService?.create(TransactionService::class.java)?.addTransaction(convertString(transactionType),
                 transactionDescription, dateTime, piggyBank, transactionAmount, sourceName,
-                destinationName, transactionCurrency, category, tags, budget)?.enqueue(retrofitCallback({ response ->
+                destinationName, transactionCurrency, category, tags, budget, notes)?.enqueue(retrofitCallback({ response ->
             var errorBody = ""
             if (response.errorBody() != null) {
                 errorBody = String(response.errorBody()?.bytes()!!)
@@ -108,6 +109,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                         "transactionTags" to tags,
                         "transactionBudget" to budget,
                         "transactionCategory" to category,
+                        "transactionNotes" to notes,
                         "isFromNotification" to true)
                 transactionIntent.putExtras(bundleToPass)
                 val icon = IconicsDrawable(context).apply {
