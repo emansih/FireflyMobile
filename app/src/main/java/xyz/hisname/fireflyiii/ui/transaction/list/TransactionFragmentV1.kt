@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.transaction
+package xyz.hisname.fireflyiii.ui.transaction.list
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -20,6 +20,8 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.DateRangeViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
+import xyz.hisname.fireflyiii.ui.transaction.TransactionDateRangeBottomSheet
+import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -117,7 +119,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         swipeContainer.isRefreshing = true
         transactionViewModel.getTransactionList(startDate, endDate,
                 transactionType, 1).observe(viewLifecycleOwner){ transactions ->
-            displayResults(transactions)
+            displayResults(false)
             dataAdapter.addAll(transactions)
             rtAdapter.notifyDataSetChanged()
             swipeContainer.isRefreshing = false
@@ -128,7 +130,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
                     swipeContainer.isRefreshing = true
                     transactionViewModel.getTransactionList(startDate, endDate, transactionType,
                             page + 1).observe(viewLifecycleOwner) { transactionList ->
-                        displayResults(transactionList)
+                        displayResults(false)
                         dataAdapter.addAll(transactionList)
                         rtAdapter.notifyDataSetChanged()
                         swipeContainer.isRefreshing = false

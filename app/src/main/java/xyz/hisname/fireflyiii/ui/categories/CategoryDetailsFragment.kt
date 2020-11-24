@@ -120,7 +120,7 @@ class CategoryDetailsFragment: BaseDetailFragment() {
         categoryDetailViewModel.getTransactionList().observe(viewLifecycleOwner){ transactionList ->
             dataAdapter.clear()
             dataAdapter.addAll(transactionList)
-            transactionAdapter.update(dataAdapter)
+          //  transactionAdapter.update(dataAdapter)
             transactionAdapter.notifyDataSetChanged()
         }
     }

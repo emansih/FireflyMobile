@@ -24,6 +24,8 @@ ext {
         implementation Dependencies.roomLibs
         implementation Dependencies.roomExtension
         kapt Dependencies.roomCompiler
+        //Paging
+        implementation Dependencies.pagingLib
         // Not really AndroidX
         implementation Dependencies.materialDesign
     }

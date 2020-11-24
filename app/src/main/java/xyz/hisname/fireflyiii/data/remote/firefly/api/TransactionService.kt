@@ -13,8 +13,9 @@ interface TransactionService {
 
     @GET(TRANSACTION_API_ENDPOINT)
     suspend fun getPaginatedTransactions(@Query("start") startDate: String?,
-                           @Query("end") endDate: String?,
-                           @Query("type") type: String,@Query("page") page: Int): Response<TransactionModel>
+                                         @Query("end") endDate: String?,
+                                         @Query("type") type: String,
+                                         @Query("page") page: Int): Response<TransactionModel>
 
     @GET("$TRANSACTION_API_ENDPOINT/{id}")
     suspend fun getTransactionById(@Path("id") id: Long): Response<TransactionModel>

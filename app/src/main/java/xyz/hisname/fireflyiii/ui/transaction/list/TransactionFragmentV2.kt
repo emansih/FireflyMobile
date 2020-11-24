@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.transaction
+package xyz.hisname.fireflyiii.ui.transaction.list
 
 import android.content.Context
 import android.os.Build
@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,12 +22,12 @@ import com.kizitonwose.calendarview.ui.ViewContainer
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
+import kotlinx.coroutines.flow.collectLatest
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.*
 import java.time.LocalDate
 import java.time.YearMonth
@@ -35,7 +37,6 @@ import java.util.*
 
 class TransactionFragmentV2: BaseTransactionFragment(){
 
-    private var currentDate = DateTimeUtil.getTodayDate()
     private lateinit var layoutManager: LinearLayoutManager
     private val monthTitleFormatter = DateTimeFormatter.ofPattern("MMMM")
     private var selectedDate: LocalDate? = null
@@ -44,6 +45,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
     private val dateRange by lazy { mutableSetOf<LocalDate>() }
     private var startDate = LocalDate.now()
     private var endDate = LocalDate.now()
+    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -61,40 +63,42 @@ class TransactionFragmentV2: BaseTransactionFragment(){
         layoutManager = LinearLayoutManager(requireContext())
         recycler_view.layoutManager = layoutManager
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = rtAdapter
+        recycler_view.adapter = transactionAdapter
         loadTransaction()
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && extendedFab.isShown) {
+                    extendedFab.hide()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    extendedFab.show()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
         swipeContainer.setOnRefreshListener {
             loadTransaction()
         }
     }
 
     private fun loadTransaction(){
-        swipeContainer.isRefreshing = true
-        transactionViewModel.getTransactionList(startDate.toString(), endDate.toString(),
-                transactionType, 1).observe(viewLifecycleOwner) { transList ->
-            displayResults(transList)
-            dataAdapter.apply {
-                clear()
-                addAll(transList)
-                distinct()
-            }
-            rtAdapter.notifyDataSetChanged()
+        transactionVm.getTransactionList(startDate.toString(), endDate.toString(),
+                transactionType).observe(viewLifecycleOwner){ pagingData ->
+            transactionAdapter.submitData(lifecycle, pagingData)
         }
-        scrollListener = object : EndlessRecyclerViewScrollListener(layoutManager){
-            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
-                if(!swipeContainer.isRefreshing) {
-                    swipeContainer.isRefreshing = true
-                    transactionViewModel.getTransactionList(currentDate, currentDate,
-                            transactionType, page + 1).observe(viewLifecycleOwner) { transactionList ->
-                        displayResults(transactionList)
-                        dataAdapter.addAll(transactionList)
-                        dataAdapter.distinct()
-                        rtAdapter.notifyDataSetChanged()
-                    }
+        transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            if(loadStates.refresh !is LoadState.Loading){
+                if(transactionAdapter.itemCount < 1){
+                    displayResults(false)
+                } else {
+                    displayResults(true)
                 }
             }
         }
-        recycler_view.addOnScrollListener(scrollListener)
     }
 
     override fun itemClicked(data: Transactions){

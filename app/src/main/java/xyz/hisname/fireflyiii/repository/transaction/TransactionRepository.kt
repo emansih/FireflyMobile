@@ -1,10 +1,10 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
+import androidx.paging.DataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.*
@@ -32,14 +32,15 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
 
-    suspend fun transactionList(startDate: String?, endDate: String?,source: String, pageNumber: Int): MutableList<Transactions> {
+    suspend fun transactionList(startDate: String?, endDate: String?,
+                                source: String, pageNumber: Int): MutableList<Transactions> {
         return if(startDate == null || endDate == null){
             loadPaginatedData("", "", source, pageNumber)
-            transactionDao.getTransactionLimitByType(convertString(source), pageNumber * Constants.PAGE_SIZE)
+            transactionDao.getTransactionByType(convertString(source))
         } else {
             loadPaginatedData(startDate, endDate, source, pageNumber)
-            transactionDao.getTransactionLimitByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(source), Constants.PAGE_SIZE)
+            transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(source))
         }
     }
 
@@ -158,29 +159,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun getTransactionIdFromJournalId(journalId: Long) =
             transactionDao.getTransactionIdFromJournalId(journalId)
 
-    suspend fun getTransactionById(transactionId: Long): MutableList<Transactions>{
-        try {
-            val transactionData: MutableList<TransactionData> = arrayListOf()
-            val networkCall = transactionService?.getTransactionById(transactionId)
-            transactionData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
-            networkCall?.body()?.data?.forEachIndexed { _, transaction ->
-                transactionDao.insert(TransactionIndex(transaction.transactionId,
-                        transaction.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-            }
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                transactionData.forEachIndexed { _, data ->
-                    transactionDao.insert(data.transactionAttributes?.transactions!![0])
-                    transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-                }
-
-            }
-        } catch (exception: Exception) { }
-        val transactionJournalId = transactionDao.getTransactionIdFromJournalId(transactionId)
-        return transactionDao.getTransactionFromJournalId(transactionJournalId)
-    }
-
     suspend fun deleteTransactionById(transactionId: Long): Int {
         try {
             val networkResponse: Response<TransactionSuccessModel>? = transactionService?.deleteTransactionById(transactionId)
@@ -269,9 +247,10 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (pageNumber == 1) {
-                    transactionDao.deleteTransaction()
+                    transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                            DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), sourceName)
                 }
-                responseBody.data.forEachIndexed { _, data ->
+                responseBody.data.forEach { data ->
                     data.transactionAttributes?.transactions?.forEach { transactions ->
                         transactionDao.insert(transactions)
                     }
@@ -303,7 +282,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     }
             }
                 deleteTransactionsByDate(startDate, endDate, sourceName)
-                transactionData.forEachIndexed { _, data ->
+                transactionData.forEach { data ->
                     transactionDao.insert(data.transactionAttributes?.transactions!![0])
                     transactionDao.insert(TransactionIndex(data.transactionId,
                             data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))

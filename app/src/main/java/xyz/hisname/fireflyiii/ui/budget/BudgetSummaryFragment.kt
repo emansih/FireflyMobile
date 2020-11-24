@@ -179,7 +179,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
        budgetSummaryViewModel.getTransactionList(budget).observe(viewLifecycleOwner){ transactionList ->
            dataAdapter.clear()
            dataAdapter.addAll(transactionList)
-           rtAdapter.update(transactionList)
+          // rtAdapter.update(transactionList)
            rtAdapter.notifyDataSetChanged()
        }
     }

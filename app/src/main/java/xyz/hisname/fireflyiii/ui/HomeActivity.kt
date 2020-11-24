@@ -44,12 +44,12 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
-import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV2
+import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragmentV2
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
-import xyz.hisname.fireflyiii.ui.transaction.TransactionFragmentV1
+import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragmentV1
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.biometric.AuthenticationResult
 import xyz.hisname.fireflyiii.util.biometric.Authenticator

@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
@@ -134,11 +135,14 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionIndexTable order by transactionId desc limit :limit")
     abstract fun getTransactionLimit(limit: Int): MutableList<TransactionIndex>
 
-    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType limit :limit")
-    abstract fun getTransactionLimitByDate(startDate: String, endDate: String, transactionType: String, limit: Int): MutableList<Transactions>
+    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
+    abstract suspend fun getTransactionByDate(startDate: String, endDate: String, transactionType: String): MutableList<Transactions>
 
-    @Query("SELECT * FROM transactionTable WHERE transactionType = :transactionType limit :limit")
-    abstract fun getTransactionLimitByType(transactionType: String, limit: Int): MutableList<Transactions>
+    @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
+    abstract suspend fun getTransactionByDateCount(startDate: String, endDate: String, transactionType: String): Int
+
+    @Query("SELECT * FROM transactionTable WHERE transactionType = :transactionType")
+    abstract fun getTransactionByType(transactionType: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
     abstract fun getTransactionFromJournalId(journalId: Long): MutableList<Transactions>
@@ -161,5 +165,4 @@ abstract class TransactionDataDao {
     // TODO: Find out why I can't SELECT description FROM transactionTable
     @Query("SELECT * FROM transactionTable WHERE description LIKE :description")
     abstract fun getTransactionByDescription(description: String): Flow<MutableList<Transactions>>
-
 }

@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.transaction
+package xyz.hisname.fireflyiii.ui.transaction.list
 
 import android.content.Context
 import android.os.Bundle
@@ -15,8 +15,10 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionRecyclerAdapter
 import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.bindView
+import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 abstract class BaseTransactionFragment: BaseFragment() {
@@ -27,10 +29,11 @@ abstract class BaseTransactionFragment: BaseFragment() {
     private val noTransactionText by bindView<TextView>(R.id.listText)
     private val noTransactionImage by bindView<ImageView>(R.id.listImage)
     protected lateinit var scrollListener: EndlessRecyclerViewScrollListener
+    protected val transactionVm by lazy { getImprovedViewModel(TransactionFragmentViewModel::class.java) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        transactionViewModel.apiResponse.observe(viewLifecycleOwner) {
+        transactionVm.apiResponse.observe(viewLifecycleOwner) {
             toastInfo(it)
         }
         setupFab()
@@ -39,9 +42,9 @@ abstract class BaseTransactionFragment: BaseFragment() {
     abstract fun setupFab()
     abstract fun itemClicked(data: Transactions)
 
-    protected fun displayResults(data: List<Transactions>){
+    protected fun displayResults(showList: Boolean){
         swipeContainer.isRefreshing = false
-        if(data.isEmpty()){
+        if(!showList){
             recycler_view.isGone = true
             noTransactionText.isVisible = true
             noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
