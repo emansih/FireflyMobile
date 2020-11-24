@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.recent_transaction_list.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
@@ -19,7 +18,6 @@ class TransactionRecyclerAdapter(private val items: MutableList<Transactions>, p
         DiffUtilAdapter<Transactions, TransactionRecyclerAdapter.RtAdapter>() {
 
     private lateinit var context: Context
-    private lateinit var chipTags: Chip
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RtAdapter {
         context = parent.context

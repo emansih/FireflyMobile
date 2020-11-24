@@ -50,9 +50,7 @@ class TransactionFragmentV1: BaseTransactionFragment() {
         setRecyclerView()
         transactionViewModel.getTransactionList(null, null,
                 transactionType,1).observe(viewLifecycleOwner) { transactionList ->
-            dataAdapter.clear()
             dataAdapter.addAll(transactionList)
-            rtAdapter.update(transactionList)
             rtAdapter.notifyDataSetChanged()
             loadTransaction(null, null)
             swipeContainer.isRefreshing = false
@@ -117,11 +115,10 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     private fun loadTransaction(startDate: String?, endDate: String?) {
         swipeContainer.isRefreshing = true
-        displayResults()
-        transactionViewModel.getTransactionList(startDate, endDate, transactionType, 1).observe(viewLifecycleOwner){ transactions ->
-            dataAdapter.clear()
+        transactionViewModel.getTransactionList(startDate, endDate,
+                transactionType, 1).observe(viewLifecycleOwner){ transactions ->
+            displayResults(transactions)
             dataAdapter.addAll(transactions)
-            rtAdapter.update(transactions)
             rtAdapter.notifyDataSetChanged()
             swipeContainer.isRefreshing = false
         }
@@ -129,12 +126,11 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
                 if(!swipeContainer.isRefreshing) {
                     swipeContainer.isRefreshing = true
-                    transactionViewModel.getTransactionList(startDate, endDate, transactionType, page + 1).observe(viewLifecycleOwner) { transactionList ->
-                        dataAdapter.clear()
+                    transactionViewModel.getTransactionList(startDate, endDate, transactionType,
+                            page + 1).observe(viewLifecycleOwner) { transactionList ->
+                        displayResults(transactionList)
                         dataAdapter.addAll(transactionList)
-                        rtAdapter.update(transactionList)
                         rtAdapter.notifyDataSetChanged()
-                        displayResults()
                         swipeContainer.isRefreshing = false
                     }
                 }

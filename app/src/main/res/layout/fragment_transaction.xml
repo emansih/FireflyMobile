@@ -1,38 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:id="@+id/fragment_transaction_rootview"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <CalendarView
-            android:id="@+id/transaction_calendar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <include layout="@layout/fragment_base_list"
-            android:id="@+id/base_layout"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@+id/transaction_calendar"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addTransactionFab"
+    <TextView
+        android:id="@+id/headerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_anchor="@+id/transaction_calendar"
-        app:layout_anchorGravity="bottom|right"
-        android:layout_marginEnd="16dp"
+        android:textColor="@color/md_blue_400"
+        android:textSize="26sp"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="12dp"/>
+
+    <include
+        android:id="@+id/legendLayout"
+        layout="@layout/calendar_day_legend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" />
+
+    <com.kizitonwose.calendarview.CalendarView
+        android:id="@+id/transaction_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cv_dayViewResource="@layout/calendar_day"
+        app:cv_orientation="horizontal"
+        app:cv_outDateStyle="endOfRow"
+        app:cv_inDateStyle="allMonths"
+        app:cv_scrollMode="paged" />
+
+    <include layout="@layout/fragment_base_list"
+        android:id="@+id/base_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

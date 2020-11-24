@@ -24,8 +24,8 @@ abstract class BaseTransactionFragment: BaseFragment() {
     protected var dataAdapter = arrayListOf<Transactions>()
     protected val rtAdapter by lazy { TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) } }
     protected val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
-    protected val noTransactionText by bindView<TextView>(R.id.listText)
-    protected val noTransactionImage by bindView<ImageView>(R.id.listImage)
+    private val noTransactionText by bindView<TextView>(R.id.listText)
+    private val noTransactionImage by bindView<ImageView>(R.id.listImage)
     protected lateinit var scrollListener: EndlessRecyclerViewScrollListener
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,9 +39,9 @@ abstract class BaseTransactionFragment: BaseFragment() {
     abstract fun setupFab()
     abstract fun itemClicked(data: Transactions)
 
-    protected fun displayResults(){
+    protected fun displayResults(data: List<Transactions>){
         swipeContainer.isRefreshing = false
-        if(dataAdapter.isEmpty()){
+        if(data.isEmpty()){
             recycler_view.isGone = true
             noTransactionText.isVisible = true
             noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)

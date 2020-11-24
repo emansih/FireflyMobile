@@ -23,6 +23,7 @@ import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -932,7 +933,7 @@ class AddTransactionFragment: BaseFragment() {
             parentFragmentManager.popBackStack()
             fragmentContainer.isVisible = true
             fragment_add_transaction_root.isVisible = false
-            requireActivity().findViewById<FloatingActionButton>(R.id.addTransactionFab).isVisible = true
+            extendedFab.isVisible = true
         } else {
             if(isTasker){
                 requireActivity().onBackPressed()

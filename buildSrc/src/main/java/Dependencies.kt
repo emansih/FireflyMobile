@@ -39,6 +39,7 @@ object Dependencies{
     private const val testVersion = "1.3.0-alpha03"
     private const val taskerPluginVersion = "0.3.3"
     private const val moshiVersion = "1.11.0"
+    private const val calendarViewVersion = "1.0.0"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecyclerLiveDataCore = "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
@@ -96,4 +97,5 @@ object Dependencies{
     val notificationLib = "io.karn:notify:1.3.0"
     val moshiLib = "com.squareup.moshi:moshi:$moshiVersion"
     val moshiCodegen = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
+    val calendarView = "com.github.kizitonwose:CalendarView:$calendarViewVersion"
 }

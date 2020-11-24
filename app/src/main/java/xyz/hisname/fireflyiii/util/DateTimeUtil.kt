@@ -48,6 +48,10 @@ object DateTimeUtil {
         return Duration.between(todayDate.atStartOfDay(), localDate.atStartOfDay()).toDays().toString()
     }
 
+    fun getDaysDifference(start: LocalDate, end: LocalDate): Long {
+        return Duration.between(start.atStartOfDay(), end.atStartOfDay()).toDays()
+    }
+
     // Returns end of month date in yyyy-MM-dd (2018-01-04)
     fun getEndOfMonth(): String{
         val localDateTime = LocalDate.now()

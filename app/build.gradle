@@ -134,7 +134,7 @@ dependencies {
     implementation Dependencies.accordionView
     implementation Dependencies.fancyshowcaseview
     implementation Dependencies.notificationLib
-
+    implementation Dependencies.calendarView
     implementation Dependencies.taskerPluginLib
 
     // Project Lib
