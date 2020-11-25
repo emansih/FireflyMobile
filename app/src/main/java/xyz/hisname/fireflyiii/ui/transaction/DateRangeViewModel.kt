@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.repository
+package xyz.hisname.fireflyiii.ui.transaction
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

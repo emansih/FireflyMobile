@@ -37,7 +37,6 @@ import java.util.*
 
 class TransactionFragmentV2: BaseTransactionFragment(){
 
-    private lateinit var layoutManager: LinearLayoutManager
     private val monthTitleFormatter = DateTimeFormatter.ofPattern("MMMM")
     private var selectedDate: LocalDate? = null
     private val today = LocalDate.now()
@@ -45,7 +44,6 @@ class TransactionFragmentV2: BaseTransactionFragment(){
     private val dateRange by lazy { mutableSetOf<LocalDate>() }
     private var startDate = LocalDate.now()
     private var endDate = LocalDate.now()
-    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -60,10 +58,6 @@ class TransactionFragmentV2: BaseTransactionFragment(){
 
 
     private fun setWidgets(){
-        layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.layoutManager = layoutManager
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = transactionAdapter
         loadTransaction()
         recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -89,16 +83,6 @@ class TransactionFragmentV2: BaseTransactionFragment(){
                 transactionType).observe(viewLifecycleOwner){ pagingData ->
             transactionAdapter.submitData(lifecycle, pagingData)
         }
-        transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
-            if(loadStates.refresh !is LoadState.Loading){
-                if(transactionAdapter.itemCount < 1){
-                    displayResults(false)
-                } else {
-                    displayResults(true)
-                }
-            }
-        }
     }
 
     override fun itemClicked(data: Transactions){
@@ -108,20 +92,6 @@ class TransactionFragmentV2: BaseTransactionFragment(){
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
             addToBackStack(null)
-        }
-    }
-
-    override fun setupFab(){
-        extendedFab.display{
-            val addTransaction = AddTransactionFragment()
-            addTransaction.arguments = bundleOf("transactionType" to transactionType,
-                    "SHOULD_HIDE" to true)
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, addTransaction)
-                addToBackStack(null)
-            }
-            extendedFab.isVisible = false
-            fragmentContainer.isVisible = false
         }
     }
 

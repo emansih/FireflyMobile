@@ -26,7 +26,6 @@ import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import java.math.BigDecimal
-import kotlin.math.absoluteValue
 
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
@@ -37,17 +36,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     init {
         val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
         repository = TransactionRepository(transactionDataDao, transactionService)
-    }
-
-    fun getTransactionList(startDate: String?, endDate: String?, transactionType: String, pageNumber: Int): LiveData<List<Transactions>> {
-        isLoading.value = true
-        val data: MutableLiveData<List<Transactions>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-         //   data.postValue(repository.transactionList(startDate, endDate, transactionType, pageNumber))
-        }.invokeOnCompletion {
-            isLoading.postValue(false)
-        }
-        return data
     }
 
     fun getRecentTransaction(limit: Int): LiveData<MutableList<Transactions>>{

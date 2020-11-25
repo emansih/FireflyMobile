@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
-import androidx.paging.DataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
@@ -29,19 +28,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         loadRemoteData(startDate, endDate, "Withdrawal")
         return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "withdrawal", currencyCode)
-    }
-
-
-    suspend fun transactionList(startDate: String?, endDate: String?,
-                                source: String, pageNumber: Int): MutableList<Transactions> {
-        return if(startDate == null || endDate == null){
-            loadPaginatedData("", "", source, pageNumber)
-            transactionDao.getTransactionByType(convertString(source))
-        } else {
-            loadPaginatedData(startDate, endDate, source, pageNumber)
-            transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(source))
-        }
     }
 
     suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<Transactions> {
@@ -148,7 +134,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun recentTransactions(limit: Int): MutableList<Transactions>{
         loadPaginatedData("", "", "all", 1)
         val listOfTransactions = arrayListOf<Transactions>()
-        transactionDao.getTransactionLimit(limit).forEachIndexed { _, transactionIndex ->
+        transactionDao.getTransactionLimit(limit).forEach { transactionIndex ->
             listOfTransactions.addAll(transactionDao.getTransactionFromJournalId(transactionIndex.transactionJournalId ?: 0L))
         }
         return listOfTransactions
@@ -266,7 +252,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val transactionData: MutableList<TransactionData> = arrayListOf()
             val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
                     convertString(sourceName), 1)
-            networkCall?.body()?.data?.toMutableList()?.forEachIndexed { _, transaction ->
+            networkCall?.body()?.data?.toMutableList()?.forEach { transaction ->
                 transactionData.add(transaction)
             }
             val responseBody = networkCall?.body()
@@ -276,7 +262,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     for (items in 2..pagination.total_pages) {
                         val service = transactionService?.getPaginatedTransactions(startDate, endDate,
                                 convertString(sourceName), items)?.body()
-                        service?.data?.forEachIndexed { _, dataToBeAdded ->
+                        service?.data?.forEach { dataToBeAdded ->
                             transactionData.add(dataToBeAdded)
                         }
                     }

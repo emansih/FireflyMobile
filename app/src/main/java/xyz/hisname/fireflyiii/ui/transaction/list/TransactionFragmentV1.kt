@@ -5,27 +5,23 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_transaction_v1.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.DateRangeViewModel
+import xyz.hisname.fireflyiii.ui.transaction.DateRangeViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.transaction.TransactionDateRangeBottomSheet
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
-import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
@@ -35,7 +31,6 @@ class TransactionFragmentV1: BaseTransactionFragment() {
             fragment_transaction_v1_root, requireActivity().findViewById(R.id.activity_toolbar),
             com.mikepenz.materialdrawer.R.string.material_drawer_open,
             com.mikepenz.materialdrawer.R.string.material_drawer_close) }
-    private val layoutManager by lazy { LinearLayoutManager(requireContext()) }
     private val dateRangeVm by lazy { getViewModel(DateRangeViewModel::class.java) }
     private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
 
@@ -48,24 +43,10 @@ class TransactionFragmentV1: BaseTransactionFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        swipeContainer.isRefreshing = true
-        setRecyclerView()
-        transactionViewModel.getTransactionList(null, null,
-                transactionType,1).observe(viewLifecycleOwner) { transactionList ->
-            dataAdapter.addAll(transactionList)
-            rtAdapter.notifyDataSetChanged()
-            loadTransaction(null, null)
-            swipeContainer.isRefreshing = false
-        }
         pullToRefresh()
+        loadTransaction(null, null)
         setDateTransaction()
         setTransactionCard()
-    }
-
-    private fun setRecyclerView(){
-        recycler_view.layoutManager = layoutManager
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = rtAdapter
     }
 
     private fun setTransactionCard(){
@@ -116,43 +97,9 @@ class TransactionFragmentV1: BaseTransactionFragment() {
     }
 
     private fun loadTransaction(startDate: String?, endDate: String?) {
-        swipeContainer.isRefreshing = true
-        transactionViewModel.getTransactionList(startDate, endDate,
-                transactionType, 1).observe(viewLifecycleOwner){ transactions ->
-            displayResults(false)
-            dataAdapter.addAll(transactions)
-            rtAdapter.notifyDataSetChanged()
-            swipeContainer.isRefreshing = false
-        }
-        scrollListener  = object : EndlessRecyclerViewScrollListener(layoutManager){
-            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
-                if(!swipeContainer.isRefreshing) {
-                    swipeContainer.isRefreshing = true
-                    transactionViewModel.getTransactionList(startDate, endDate, transactionType,
-                            page + 1).observe(viewLifecycleOwner) { transactionList ->
-                        displayResults(false)
-                        dataAdapter.addAll(transactionList)
-                        rtAdapter.notifyDataSetChanged()
-                        swipeContainer.isRefreshing = false
-                    }
-                }
-            }
-        }
-        recycler_view.addOnScrollListener(scrollListener)
-    }
-
-    override fun setupFab() {
-        extendedFab.display {
-            val addTransaction = AddTransactionFragment()
-            addTransaction.arguments = bundleOf("revealX" to extendedFab.width / 2,
-                    "revealY" to extendedFab.height / 2, "transactionType" to transactionType,
-                    "SHOULD_HIDE" to true)
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, addTransaction)
-                addToBackStack(null)
-            }
-            extendedFab.isGone = true
-            fragmentContainer.isVisible = false
+        transactionVm.getTransactionList(startDate, endDate,
+                transactionType).observe(viewLifecycleOwner) { pagingData ->
+            transactionAdapter.submitData(lifecycle, pagingData)
         }
     }
 
