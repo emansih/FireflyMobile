@@ -21,11 +21,11 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.display
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
-import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 abstract class BaseTransactionFragment: BaseFragment() {
 

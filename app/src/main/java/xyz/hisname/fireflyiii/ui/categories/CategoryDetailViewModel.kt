@@ -3,15 +3,21 @@ package xyz.hisname.fireflyiii.ui.categories
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
+import xyz.hisname.fireflyiii.repository.category.TransactionPagingSource
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -39,15 +45,11 @@ class CategoryDetailViewModel(application: Application): BaseViewModel(applicati
         return categoryLiveData
     }
 
-    fun getTransactionList(): LiveData<List<Transactions>>{
-        val transactionList: MutableLiveData<List<Transactions>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            transactionDao.getTransactionByDateAndCategory(DateTimeUtil.getStartOfDayInCalendarToEpoch(DateTimeUtil.getStartOfMonth()),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(DateTimeUtil.getEndOfMonth()), catId).collectLatest { transactions ->
-                transactionList.postValue(transactions)
-            }
-        }
-        return transactionList
+    fun getTransactionList(): LiveData<PagingData<Transactions>>{
+        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
+            TransactionPagingSource(DateTimeUtil.getStartOfDayInCalendarToEpoch(DateTimeUtil.getStartOfMonth()),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(DateTimeUtil.getEndOfMonth()), catId, transactionDao)
+        }.flow.cachedIn(viewModelScope).asLiveData()
     }
 
     fun deleteCategory(): LiveData<Boolean>{

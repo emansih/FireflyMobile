@@ -3,11 +3,13 @@ package xyz.hisname.fireflyiii.repository.transaction
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.*
+import androidx.paging.*
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -32,22 +34,10 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
     val repository: TransactionRepository
     val transactionAmount: MutableLiveData<String> = MutableLiveData()
     private val transactionService by lazy { genericService()?.create(TransactionService::class.java) }
+    private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
 
     init {
-        val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
         repository = TransactionRepository(transactionDataDao, transactionService)
-    }
-
-    fun getRecentTransaction(limit: Int): LiveData<MutableList<Transactions>>{
-        isLoading.value = true
-        var recentData: MutableList<Transactions> = arrayListOf()
-        val data: MutableLiveData<MutableList<Transactions>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            recentData = repository.recentTransactions(limit)
-        }.invokeOnCompletion {
-            data.postValue(recentData)
-        }
-        return data
     }
 
     fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{

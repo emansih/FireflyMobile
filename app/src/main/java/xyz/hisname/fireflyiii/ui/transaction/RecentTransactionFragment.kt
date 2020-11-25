@@ -10,28 +10,20 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import kotlinx.android.synthetic.main.fragment_dashboard_recent_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
-import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.create
-import java.util.*
+import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 
 class RecentTransactionFragment: BaseFragment() {
 
-    private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
+    private lateinit var recyclerAdapter: TransactionAdapter
+    private val recentViewModel by lazy { getImprovedViewModel(RecentViewModel::class.java) }
 
-
-    override fun handleBack() {
-    }
-
-    private var dataAdapter = ArrayList<Transactions>()
-    private lateinit var rtAdapter: TransactionRecyclerAdapter
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_dashboard_recent_transaction, container)
     }
@@ -42,24 +34,20 @@ class RecentTransactionFragment: BaseFragment() {
     }
 
     private fun loadTransaction() {
-        dataAdapter.clear()
+        recyclerAdapter = TransactionAdapter{ data -> itemClicked(data) }
         recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
-        recentTransactionList.addItemDecoration(DividerItemDecoration(recentTransactionList.context,
-                DividerItemDecoration.VERTICAL))
+        recentTransactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recentTransactionList.adapter = recyclerAdapter
         transactionLoader.show()
-        transactionViewModel.getRecentTransaction(5).observe(viewLifecycleOwner) {
-            dataAdapter = ArrayList(it)
+        recentViewModel.getRecentTransaction(5).observe(viewLifecycleOwner) { pagingData ->
             transactionLoader.hide()
-            if (dataAdapter.size == 0) {
+            if (recyclerAdapter.itemCount == 0) {
                 recentTransactionList.isGone = true
                 noTransactionText.isVisible = true
             } else {
                 recentTransactionList.isVisible = true
                 noTransactionText.isGone = true
-                rtAdapter = TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) }
-                recentTransactionList.adapter = rtAdapter
-                rtAdapter.apply { recentTransactionList.adapter as TransactionRecyclerAdapter }
-                rtAdapter.notifyDataSetChanged()
+                recyclerAdapter.submitData(lifecycle, pagingData)
             }
         }
     }
@@ -71,6 +59,9 @@ class RecentTransactionFragment: BaseFragment() {
             })
             addToBackStack(null)
         }
-        transactionExtendedFab.isVisible = false
     }
+
+    override fun handleBack() {
+    }
+
 }

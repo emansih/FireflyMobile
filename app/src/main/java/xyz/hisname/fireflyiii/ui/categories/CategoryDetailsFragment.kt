@@ -17,9 +17,8 @@ import kotlinx.android.synthetic.main.fragment_category_detail.*
 import kotlinx.android.synthetic.main.fragment_category_detail.transactionList
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
-import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
-import xyz.hisname.fireflyiii.ui.transaction.TransactionRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -112,16 +111,12 @@ class CategoryDetailsFragment: BaseDetailFragment() {
 
 
     private fun loadTransactionList(){
-        val dataAdapter = arrayListOf<Transactions>()
-        val transactionAdapter = TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) }
+        val transactionAdapter = TransactionAdapter{ data -> itemClicked(data) }
         transactionList.layoutManager = LinearLayoutManager(requireContext())
         transactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         transactionList.adapter = transactionAdapter
         categoryDetailViewModel.getTransactionList().observe(viewLifecycleOwner){ transactionList ->
-            dataAdapter.clear()
-            dataAdapter.addAll(transactionList)
-          //  transactionAdapter.update(dataAdapter)
-            transactionAdapter.notifyDataSetChanged()
+            transactionAdapter.submitData(lifecycle, transactionList)
         }
     }
 

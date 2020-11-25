@@ -88,8 +88,11 @@ abstract class TransactionDataDao {
                                                             categoryName: String): Double
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND category_id =:categoryId")
-    abstract fun getTransactionByDateAndCategory(startDate: String, endDate: String,
-                                                 categoryId: Long): Flow<List<Transactions>>
+    abstract suspend fun getTransactionByDateAndCategory(startDate: String, endDate: String,
+                                                 categoryId: Long): List<Transactions>
+
+    @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND category_id =:categoryId")
+    abstract suspend fun getTransactionByDateAndCategoryCount(startDate: String, endDate: String, categoryId: Long): Int
 
     @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) " +
             "AND category_id =:categoryId AND transactionType =:transactionType")
@@ -134,8 +137,8 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND budget_name IS NULL AND currency_code =:currencyCode")
     abstract fun getTransactionByDateAndNullBudgetAndCurrency(startDate: String, endDate: String, currencyCode: String): MutableList<Transactions>
 
-    @Query("SELECT * FROM transactionIndexTable order by transactionId desc limit :limit")
-    abstract fun getTransactionLimit(limit: Int): MutableList<TransactionIndex>
+    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.transactionJournalId ORDER BY transactionIndexTable.transactionJournalId DESC LIMIT :limit")
+    abstract suspend fun getTransactionLimit(limit: Int): MutableList<Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract suspend fun getTransactionByDate(startDate: String, endDate: String, transactionType: String): MutableList<Transactions>

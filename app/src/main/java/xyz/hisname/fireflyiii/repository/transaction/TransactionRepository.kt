@@ -123,11 +123,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     suspend fun recentTransactions(limit: Int): MutableList<Transactions>{
         loadPaginatedData("", "", "all", 1)
-        val listOfTransactions = arrayListOf<Transactions>()
-        transactionDao.getTransactionLimit(limit).forEach { transactionIndex ->
-            listOfTransactions.addAll(transactionDao.getTransactionFromJournalId(transactionIndex.transactionJournalId ?: 0L))
-        }
-        return listOfTransactions
+        return transactionDao.getTransactionLimit(limit)
     }
 
     suspend fun getTransactionByJournalId(journalId: Long) = transactionDao.getTransactionByJournalId(journalId)
