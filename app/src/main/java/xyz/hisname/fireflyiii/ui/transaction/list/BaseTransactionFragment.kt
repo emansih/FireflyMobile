@@ -40,9 +40,6 @@ abstract class BaseTransactionFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         layoutManager = LinearLayoutManager(requireContext())
-        transactionVm.apiResponse.observe(viewLifecycleOwner) {
-            toastInfo(it)
-        }
         setRecyclerView()
         setupFab()
         displayResult()

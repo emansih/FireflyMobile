@@ -31,12 +31,12 @@ class TransactionPagingSource(private val transactionService: TransactionService
                     convertString(transactionType), params.key ?: 1)
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
-                if (params.key == 1) {
+                if (params.key == null) {
                     if(startDate.isNullOrEmpty() || endDate.isNullOrEmpty()){
-                        transactionDao.deleteTransactionByType(transactionType = transactionType)
+                        transactionDao.deleteTransactionByType(transactionType = convertString(transactionType))
                     } else {
                         transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
+                                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(transactionType))
                     }
                 }
                 responseBody.data.forEach { data ->
@@ -66,6 +66,7 @@ class TransactionPagingSource(private val transactionService: TransactionService
                 return getOfflineData(params.key, previousKey)
             }
         } catch (exception: Exception){
+            exception.printStackTrace()
             return getOfflineData(params.key, previousKey)
         }
     }
