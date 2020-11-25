@@ -2,10 +2,10 @@ package xyz.hisname.fireflyiii.ui.transaction
 
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
@@ -40,7 +40,7 @@ class DeleteTransactionDialog: BaseFragment() {
                         if (it) {
                             toastSuccess(resources.getString(R.string.transaction_deleted))
                             parentFragmentManager.popBackStack()
-                            val v2Layout = requireActivity().findViewById<CoordinatorLayout>(R.id.fragment_transaction_rootview)
+                            val v2Layout = requireActivity().findViewById<LinearLayout>(R.id.fragment_transaction_rootview)
                             if(v2Layout != null){
                                 v2Layout.isVisible = true
                                 val mainToolbar = requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
