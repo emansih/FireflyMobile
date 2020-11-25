@@ -101,12 +101,14 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                             .times(100.toBigDecimal())
                             .toFloat()
                     returnData.add(Triple(percentage, budgetName, transactionBudget))
+                } else {
+                    returnData.add(Triple(0f, budgetName, transactionBudget))
                 }
             }
         }
 
         val expensesWithoutBudget = budget.minus(sumOfWithdrawal)
-        val percentage = if(expensesWithoutBudget != BigDecimal.ZERO && expensesWithoutBudget != BigDecimal.ZERO){
+        val percentage = if(expensesWithoutBudget != BigDecimal.ZERO && budget != BigDecimal.ZERO){
             expensesWithoutBudget
                     .divide(budget,2, RoundingMode.HALF_UP)
                     .times(100.toBigDecimal())
