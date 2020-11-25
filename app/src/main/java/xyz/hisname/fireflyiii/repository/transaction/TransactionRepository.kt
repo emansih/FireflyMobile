@@ -40,16 +40,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
-    suspend fun transactionListWithCurrency(startDate: String?, endDate: String?,source: String, currencyCode: String): MutableList<Transactions> {
-        loadRemoteData(startDate, endDate, source)
-        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
-            transactionDao.getTransactionListWithCurrency(convertString(source), currencyCode)
-        } else {
-            transactionDao.getTransactionListWithCurrencyAndDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(source), currencyCode)
-        }
-    }
-
     suspend fun allDepositWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): BigDecimal {
         loadRemoteData(startDate, endDate, "Deposit")
         return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
@@ -180,17 +170,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         loadRemoteData(startDate, endDate, "all")
         return transactionDao.getTransactionListByDateAndAccount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountName)
-    }
-    suspend fun getTransactionListByDateAndBudget(startDate: String, endDate: String,
-                                                  budgetName: String, currencyCode: String): MutableList<Transactions> {
-        loadRemoteData(startDate, endDate, "all")
-        return if(budgetName.isNotEmpty()){
-            transactionDao.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), budgetName,currencyCode)
-        } else {
-            transactionDao.getTransactionByDateAndNullBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode)
-        }
     }
 
     private suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{

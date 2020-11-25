@@ -29,17 +29,14 @@ import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 abstract class BaseTransactionFragment: BaseFragment() {
 
-    protected var dataAdapter = arrayListOf<Transactions>()
     protected val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
     private val noTransactionText by bindView<TextView>(R.id.listText)
     private val noTransactionImage by bindView<ImageView>(R.id.listImage)
     protected val transactionVm by lazy { getImprovedViewModel(TransactionFragmentViewModel::class.java) }
     protected val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
-    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        layoutManager = LinearLayoutManager(requireContext())
         setRecyclerView()
         setupFab()
         displayResult()
@@ -48,7 +45,7 @@ abstract class BaseTransactionFragment: BaseFragment() {
     abstract fun itemClicked(data: Transactions)
 
     private fun setRecyclerView(){
-        recycler_view.layoutManager = layoutManager
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = transactionAdapter
     }

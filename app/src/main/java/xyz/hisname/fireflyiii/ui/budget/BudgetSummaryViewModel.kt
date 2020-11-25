@@ -3,9 +3,12 @@ package xyz.hisname.fireflyiii.ui.budget
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
@@ -13,7 +16,9 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
+import xyz.hisname.fireflyiii.repository.budget.TransactionPagingSource as TransactionBudgetPagingSource
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.currency.TransactionPagingSource
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -23,13 +28,13 @@ import kotlin.math.abs
 
 class BudgetSummaryViewModel(application: Application): BaseViewModel(application) {
 
+    private val currencyService = genericService()?.create(CurrencyService::class.java)
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java))
+            AppDatabase.getInstance(application).currencyDataDao(), currencyService)
 
-    private val transactionRepository = TransactionRepository(
-            AppDatabase.getInstance(application).transactionDataDao(),
-            genericService()?.create(TransactionService::class.java))
+    private val transactionService = genericService()?.create(TransactionService::class.java)
+    private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val transactionRepository = TransactionRepository(transactionDataDao, transactionService)
 
     private val spentDao = AppDatabase.getInstance(application).spentDataDao()
     private val budgetLimitDao = AppDatabase.getInstance(application).budgetLimitDao()
@@ -130,36 +135,41 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         transactionRepository.getTransactionByDateAndBudgetAndCurrency(
                 start, end, currency, "withdrawal", budgetName)
 
-    fun getTransactionList(budget: String?): LiveData<List<Transactions>>{
-        val data: MutableLiveData<List<Transactions>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            if(budget == null){
-                data.postValue(transactionRepository.transactionListWithCurrency(startOfMonth, endOfMonth,
-                        "withdrawal", defaultCurrency))
-            } else {
-                if(budget.isEmpty()){
-                    balanceBudget.postValue("--.--")
-                    availableBudget.postValue("--.--")
-
+    fun getTransactionList(budget: String?): LiveData<PagingData<Transactions>>{
+        if(budget == null){
+            return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
+                TransactionPagingSource(currencyService, transactionDataDao, defaultCurrency,
+                        startOfMonth, endOfMonth, "withdrawal")
+            }.flow.cachedIn(viewModelScope).asLiveData(Dispatchers.IO)
+        } else {
+            if(budget.isEmpty()){
+                balanceBudget.postValue("--.--")
+                availableBudget.postValue("--.--")
+                viewModelScope.launch(Dispatchers.IO){
                     totalTransaction.postValue(currencySymbol + " " +
                             retrieveBudget(DateTimeUtil.getStartOfMonth(),
                                     DateTimeUtil.getEndOfMonth(), defaultCurrency, ""))
-                    data.postValue(transactionRepository.transactionListWithCurrency(startOfMonth, endOfMonth,
-                            "withdrawal", defaultCurrency))
-                } else {
+                }
+                return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
+                    TransactionPagingSource(currencyService, transactionDataDao, defaultCurrency,
+                            startOfMonth, endOfMonth, "withdrawal")
+                }.flow.cachedIn(viewModelScope).asLiveData(Dispatchers.IO)
+            } else {
+                viewModelScope.launch(Dispatchers.IO){
                     val budgetAmount = budgetRepository.getBudgetLimitByName(budget, DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), defaultCurrency)
                     availableBudget.postValue("$currencySymbol $budgetAmount")
                     val balance = budgetAmount.minus( retrieveBudget(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), defaultCurrency, budget))
                     balanceBudget.postValue("$currencySymbol $balance")
-
-                    data.postValue(transactionRepository.getTransactionListByDateAndBudget(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), budget, defaultCurrency))
                 }
+                return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
+                    TransactionBudgetPagingSource(budgetService, transactionDataDao,
+                            budgetListDao, budget, DateTimeUtil.getStartOfMonth(),
+                            DateTimeUtil.getEndOfMonth(), defaultCurrency)
+                }.flow.cachedIn(viewModelScope).asLiveData(Dispatchers.IO)
             }
         }
-        return data
     }
 
     fun changeCurrency(position: Int){

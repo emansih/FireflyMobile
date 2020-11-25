@@ -66,7 +66,6 @@ class TransactionPagingSource(private val transactionService: TransactionService
                 return getOfflineData(params.key, previousKey)
             }
         } catch (exception: Exception){
-            exception.printStackTrace()
             return getOfflineData(params.key, previousKey)
         }
     }

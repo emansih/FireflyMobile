@@ -17,7 +17,6 @@ abstract class BudgetDataDao: BaseDao<BudgetData> {
     abstract fun getConstraintBudgetWithCurrency(startDate: String, endDate: String,
                                                  currencyCode: String): BigDecimal
 
-
     @Query("DELETE FROM budget")
     abstract fun deleteAllBudget(): Int
 }

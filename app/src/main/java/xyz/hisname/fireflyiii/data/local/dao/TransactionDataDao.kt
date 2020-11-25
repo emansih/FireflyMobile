@@ -21,7 +21,7 @@ abstract class TransactionDataDao {
     abstract fun getTransactionList(type: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE transactionType = :type AND currency_code =:currencyCode")
-    abstract fun getTransactionListWithCurrency(type: String, currencyCode: String): MutableList<Transactions>
+    abstract suspend fun getTransactionListWithCurrency(type: String, currencyCode: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<Transactions>>
@@ -30,8 +30,10 @@ abstract class TransactionDataDao {
     abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND currency_code =:currencyCode")
-    abstract fun getTransactionListWithCurrencyAndDate(startDate: String?, endDate: String?,transactionType: String, currencyCode: String): MutableList<Transactions>
+    abstract suspend fun getTransactionListWithCurrencyAndDate(startDate: String, endDate: String,transactionType: String, currencyCode: String): MutableList<Transactions>
 
+    @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND currency_code =:currencyCode")
+    abstract suspend fun getTransactionListWithCurrencyAndDateCount(startDate: String, endDate: String,transactionType: String, currencyCode: String): Int
 
     // Takes transaction id as parameter and return transaction journal id
     @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId = :journalId")
@@ -141,6 +143,9 @@ abstract class TransactionDataDao {
     @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract suspend fun getTransactionByDateCount(startDate: String, endDate: String, transactionType: String): Int
 
+    @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate)")
+    abstract suspend fun getTransactionByDateCount(startDate: String, endDate: String): Int
+
     @Query("SELECT * FROM transactionTable WHERE transactionType = :transactionType ORDER BY transaction_journal_id DESC")
     abstract suspend fun getTransactionByType(transactionType: String): MutableList<Transactions>
 
@@ -153,14 +158,17 @@ abstract class TransactionDataDao {
     @Query("DELETE FROM transactionTable WHERE transaction_journal_id = :journalId")
     abstract fun deleteTransactionByJournalId(journalId: Long): Int
 
-   @Query("DELETE FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND isPending IS NOT :isPending")
+    @Query("DELETE FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND isPending IS NOT :isPending")
     abstract suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String, isPending: Boolean = true): Int
+
+    @Query("DELETE FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND isPending IS NOT :isPending")
+    abstract suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, isPending: Boolean = true): Int
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND source_name = :accountName")
     abstract fun getTransactionListByDateAndAccount(startDate: String, endDate: String, accountName: String): MutableList<Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND budget_name = :budgetName AND currency_code =:currencyCode")
-    abstract fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String, currencyCode: String): MutableList<Transactions>
+    abstract suspend fun getTransactionListByDateAndBudget(startDate: String, endDate: String, budgetName: String, currencyCode: String): MutableList<Transactions>
 
     @Query("DELETE FROM transactionTable WHERE isPending IS NOT :isPending")
     abstract fun deleteTransaction(isPending: Boolean = true): Int

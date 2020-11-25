@@ -7,6 +7,7 @@ import xyz.hisname.fireflyiii.Constants.Companion.CURRENCY_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 import xyz.hisname.fireflyiii.repository.models.currency.DefaultCurrencyModel
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/currency.html
 interface CurrencyService {
@@ -45,5 +46,12 @@ interface CurrencyService {
 
     @GET("$CURRENCY_API_ENDPOINT/{currencyCode}")
     suspend fun getCurrencyByCode(@Query("currencyCode") currencyCode: String): Response<CurrencyModel>
+
+    @GET("$CURRENCY_API_ENDPOINT/{code}")
+    suspend fun getTransactionByCurrencyCode(@Path("code") currencyCode: String,
+                                             @Query("page") page: Int,
+                                             @Query("start_date") startDate: String,
+                                             @Query("end_date") endDate: String,
+                                             @Query("type") transactionType: String): Response<TransactionModel>
 
 }

@@ -38,10 +38,11 @@ interface BudgetService {
 
     @GET("$BUDGET_API_ENDPOINT/{id}/transactions")
     suspend fun getPaginatedTransactionByBudget(
-            @Query("id") budgetId: Long,
+            @Path("id") budgetId: Long,
             @Query("page") page: Int,
             @Query("start") start: String,
-            @Query("end") end: String): Response<TransactionModel>
+            @Query("end") end: String,
+            @Query("type") transactionType: String): Response<TransactionModel>
 
 
 }

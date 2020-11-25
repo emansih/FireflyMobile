@@ -30,8 +30,8 @@ import kotlinx.android.synthetic.main.fragment_budget_summary.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.TransactionRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
+import xyz.hisname.fireflyiii.ui.transaction.list.TransactionAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
@@ -41,8 +41,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
     private val budgetSummaryViewModel by lazy { getImprovedViewModel(BudgetSummaryViewModel::class.java) }
-    private var dataAdapter = arrayListOf<Transactions>()
-    private val rtAdapter by lazy { TransactionRecyclerAdapter(dataAdapter){ data -> itemClicked(data) } }
+    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
     private val coloring = arrayListOf<Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,10 +53,10 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
         setSpinner()
         setText()
         setWidget()
+        loadTransactionList(null)
         budgetSummaryViewModel.pieChartData.observe(viewLifecycleOwner){ list ->
             setPieChart(list)
         }
-        loadTransactionList(null)
     }
 
     private fun setWidget(){
@@ -71,7 +70,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
         monthAndYearText.text = DateTimeUtil.getMonthAndYear(DateTimeUtil.getTodayDate())
         transactionList.layoutManager = LinearLayoutManager(requireContext())
         transactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        transactionList.adapter = rtAdapter
+        transactionList.adapter = transactionAdapter
         budgetSummaryPieChart.isDrawHoleEnabled = false
         previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_arrow_back
@@ -86,15 +85,13 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
         previousMonthArrow.setOnClickListener {
             budgetSummaryViewModel.monthCount -=1
             setDate()
-            dataAdapter.clear()
-            rtAdapter.notifyDataSetChanged()
+            transactionAdapter.notifyDataSetChanged()
             budgetSummaryPieChart.clear()
         }
         nextMonthArrow.setOnClickListener {
             budgetSummaryViewModel.monthCount +=1
             setDate()
-            dataAdapter.clear()
-            rtAdapter.notifyDataSetChanged()
+            transactionAdapter.notifyDataSetChanged()
             budgetSummaryPieChart.clear()
         }
         setDate()
@@ -177,10 +174,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     private fun loadTransactionList(budget: String?){
        budgetSummaryViewModel.getTransactionList(budget).observe(viewLifecycleOwner){ transactionList ->
-           dataAdapter.clear()
-           dataAdapter.addAll(transactionList)
-          // rtAdapter.update(transactionList)
-           rtAdapter.notifyDataSetChanged()
+           transactionAdapter.submitData(lifecycle,transactionList)
        }
     }
 
@@ -202,8 +196,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         budgetSummaryViewModel.changeCurrency(position)
-        dataAdapter.clear()
-        rtAdapter.notifyDataSetChanged()
+        transactionAdapter.notifyDataSetChanged()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
