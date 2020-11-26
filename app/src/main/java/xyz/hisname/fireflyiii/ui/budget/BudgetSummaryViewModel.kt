@@ -80,7 +80,8 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
     }
 
     private suspend fun getTransaction(){
-        transactionRepository.allWithdrawalWithCurrencyCode(startOfMonth, endOfMonth, defaultCurrency)
+        transactionRepository.getTransactionByDateAndCurrencyCode(startOfMonth, endOfMonth,
+                defaultCurrency, "withdrawal", true)
         val uniqBudget = transactionRepository.getUniqueBudgetByDate(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(),

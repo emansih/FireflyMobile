@@ -40,24 +40,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         repository = TransactionRepository(transactionDataDao, transactionService)
     }
 
-    fun getWithdrawalAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
-        val data: MutableLiveData<BigDecimal> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            val withdrawData = repository.allWithdrawalWithCurrencyCode(startDate, endDate, currencyCode)
-            data.postValue(withdrawData.abs())
-        }
-        return data
-    }
-
-    fun getDepositAmountWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): LiveData<BigDecimal>{
-        val data: MutableLiveData<BigDecimal> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            val depositData = repository.allDepositWithCurrencyCode(startDate, endDate, currencyCode)
-            data.postValue(depositData.abs())
-        }
-        return data
-    }
-
     // My god.... the name of this function is sooooooo looong...
     fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
                                                                currencyCode: String,

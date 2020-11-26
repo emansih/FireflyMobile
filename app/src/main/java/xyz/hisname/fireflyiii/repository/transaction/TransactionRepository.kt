@@ -24,12 +24,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         transactionDao.insert(transactionIndex)
     }
 
-    suspend fun allWithdrawalWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): BigDecimal {
-        loadRemoteData(startDate, endDate, "Withdrawal")
-        return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "withdrawal", currencyCode)
-    }
-
     suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<Transactions> {
         loadRemoteData(startDate, endDate, source)
         return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
@@ -40,10 +34,15 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
-    suspend fun allDepositWithCurrencyCode(startDate: String, endDate: String, currencyCode: String): BigDecimal {
-        loadRemoteData(startDate, endDate, "Deposit")
+    suspend fun getTransactionByDateAndCurrencyCode(startDate: String, endDate: String,
+                                                    currencyCode: String,
+                                                    transactionType: String,
+                                                    shouldLoadData: Boolean): BigDecimal{
+        if(shouldLoadData){
+            loadRemoteData(startDate, endDate, transactionType)
+        }
         return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "deposit", currencyCode)
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType, currencyCode)
     }
 
     suspend fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,

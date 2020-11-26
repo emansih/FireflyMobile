@@ -15,7 +15,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 interface BudgetService {
 
     @GET(AVAILABLE_BUDGET_API_ENDPOINT)
-    fun getAllBudget(): Call<BudgetModel>
+    suspend fun getAllBudget(): Response<BudgetModel>
 
     @GET(AVAILABLE_BUDGET_API_ENDPOINT)
     fun getPaginatedBudget(@Query("page") page: Int): Call<BudgetModel>

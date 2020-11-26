@@ -1,766 +1,816 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/dashboardNested"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/dashboardNested"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <HorizontalScrollView
+            android:id="@+id/summaryHorizontalScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="80dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <HorizontalScrollView
-                android:id="@+id/summaryHorizontalScrollView"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_marginStart="8dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/balanceCard"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:stateListAnimator="@animator/lift_on_touch"
+                    card_view:targetApi="lollipop"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardCornerRadius="2dp"
+                    app:cardElevation="2dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/balanceCard"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/balanceLayout"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:stateListAnimator="@animator/lift_on_touch"
-                        card_view:targetApi="lollipop"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        app:cardUseCompatPadding="true"
-                        app:cardPreventCornerOverlap="false"
-                        app:cardCornerRadius="2dp"
-                        app:cardElevation="2dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent">
+                        android:background="#00c0ef"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/balanceLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="#00c0ef"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/balanceIcon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/balanceIcon"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="4dp"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/balanceImageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/rectangle"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/balanceIcon"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/balanceImageView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:srcCompat="@drawable/rectangle"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintStart_toStartOf="@+id/balanceIcon"/>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/balanceTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="3dp"
+                            android:text="@string/balance"
+                            android:textStyle="bold"
+                            android:textColor="@color/md_white_1000"
+                            app:layout_constraintStart_toEndOf="@+id/balanceIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceImageView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/balanceTextView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:layout_marginStart="3dp"
-                                android:text="@string/balance"
-                                android:textStyle="bold"
-                                android:textColor="@color/md_white_1000"
-                                app:layout_constraintStart_toEndOf="@+id/balanceIcon"
-                                app:layout_constraintTop_toBottomOf="@+id/balanceImageView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/balanceText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            style="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:text="--.--"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceTextView"
+                            app:layout_constraintStart_toStartOf="@+id/balanceTextView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/balanceText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                style="@style/TextAppearance.MaterialComponents.Headline6"
-                                android:text="--.--"
-                                app:layout_constraintTop_toBottomOf="@+id/balanceTextView"
-                                app:layout_constraintStart_toStartOf="@+id/balanceTextView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/balanceEarnedText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="--.--"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceText"
+                            app:layout_constraintStart_toStartOf="@+id/balanceText" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/balanceEarnedText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="--.--"
-                                app:layout_constraintTop_toBottomOf="@+id/balanceText"
-                                app:layout_constraintStart_toStartOf="@+id/balanceText" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/balanceSpentText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="--.--"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceText"
+                            app:layout_constraintStart_toEndOf="@+id/balanceEarnedText" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/balanceSpentText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="--.--"
-                                app:layout_constraintTop_toBottomOf="@+id/balanceText"
-                                app:layout_constraintStart_toEndOf="@+id/balanceEarnedText" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/billsCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:stateListAnimator="@animator/lift_on_touch"
+                    card_view:targetApi="lollipop"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:layout_marginStart="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardCornerRadius="2dp"
+                    app:cardElevation="2dp"
+                    app:layout_constraintStart_toEndOf="@+id/balanceCard"
+                    app:layout_constraintTop_toTopOf="@+id/balanceCard">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/billsCard"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/billsLayout"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:stateListAnimator="@animator/lift_on_touch"
-                        card_view:targetApi="lollipop"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:layout_marginStart="2dp"
-                        app:cardUseCompatPadding="true"
-                        app:cardPreventCornerOverlap="false"
-                        app:cardCornerRadius="2dp"
-                        app:cardElevation="2dp"
-                        app:layout_constraintStart_toEndOf="@+id/balanceCard"
-                        app:layout_constraintTop_toTopOf="@+id/balanceCard">
+                        android:background="#39cccc"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/billsLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="#39cccc"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/billsIcon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/billsIcon"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="4dp"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/billsImageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/rectangle"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/billsIcon"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/billsImageView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:srcCompat="@drawable/rectangle"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintStart_toStartOf="@+id/billsIcon"/>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/billsTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="3dp"
+                            android:text="@string/bills_to_pay"
+                            android:textColor="@color/md_white_1000"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toEndOf="@+id/billsIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/billsImageView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/billsTextView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:layout_marginStart="3dp"
-                                android:text="@string/bills_to_pay"
-                                android:textColor="@color/md_white_1000"
-                                android:textStyle="bold"
-                                app:layout_constraintStart_toEndOf="@+id/billsIcon"
-                                app:layout_constraintTop_toBottomOf="@+id/billsImageView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/billsText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="--.--"
+                            style="@style/TextAppearance.MaterialComponents.Headline6"
+                            app:layout_constraintTop_toBottomOf="@+id/billsTextView"
+                            app:layout_constraintStart_toStartOf="@+id/billsTextView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/billsText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="--.--"
-                                style="@style/TextAppearance.MaterialComponents.Headline6"
-                                app:layout_constraintTop_toBottomOf="@+id/billsTextView"
-                                app:layout_constraintStart_toStartOf="@+id/billsTextView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/billsPaid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="@string/bills_paid"
+                            app:layout_constraintTop_toBottomOf="@+id/billsText"
+                            app:layout_constraintStart_toStartOf="@+id/billsTextView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/billsPaid"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="@string/bills_paid"
-                                app:layout_constraintTop_toBottomOf="@+id/billsText"
-                                app:layout_constraintStart_toStartOf="@+id/billsTextView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/billsPaidText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="--.--"
+                            app:layout_constraintTop_toBottomOf="@+id/billsText"
+                            app:layout_constraintStart_toEndOf="@+id/billsPaid" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/billsPaidText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="--.--"
-                                app:layout_constraintTop_toBottomOf="@+id/billsText"
-                                app:layout_constraintStart_toEndOf="@+id/billsPaid" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/leftToSpendCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:stateListAnimator="@animator/lift_on_touch"
+                    card_view:targetApi="lollipop"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:layout_marginStart="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardCornerRadius="2dp"
+                    app:cardElevation="2dp"
+                    app:layout_constraintStart_toEndOf="@+id/billsCard"
+                    app:layout_constraintTop_toTopOf="@+id/balanceCard">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/leftToSpendCard"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/leftToSpendLayout"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:stateListAnimator="@animator/lift_on_touch"
-                        card_view:targetApi="lollipop"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:layout_marginStart="2dp"
-                        app:cardUseCompatPadding="true"
-                        app:cardPreventCornerOverlap="false"
-                        app:cardCornerRadius="2dp"
-                        app:cardElevation="2dp"
-                        app:layout_constraintStart_toEndOf="@+id/billsCard"
-                        app:layout_constraintTop_toTopOf="@+id/balanceCard">
+                        android:background="#00ca6d"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/leftToSpendLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="#00ca6d"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/leftToSpendIcon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/leftToSpendIcon"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="4dp"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/leftToSpendImageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/rectangle"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/leftToSpendIcon"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/leftToSpendImageView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:srcCompat="@drawable/rectangle"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintStart_toStartOf="@+id/leftToSpendIcon"/>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/leftToSpendTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="3dp"
+                            android:text="@string/left_to_spend"
+                            android:textColor="@color/md_white_1000"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toEndOf="@+id/leftToSpendIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/leftToSpendImageView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/leftToSpendTextView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:layout_marginStart="3dp"
-                                android:text="@string/left_to_spend"
-                                android:textColor="@color/md_white_1000"
-                                android:textStyle="bold"
-                                app:layout_constraintStart_toEndOf="@+id/leftToSpendIcon"
-                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendImageView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/leftToSpendAmountText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="--.--"
+                            style="@style/TextAppearance.MaterialComponents.Headline6"
+                            app:layout_constraintTop_toBottomOf="@+id/leftToSpendTextView"
+                            app:layout_constraintStart_toStartOf="@+id/leftToSpendTextView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/leftToSpendAmountText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="--.--"
-                                style="@style/TextAppearance.MaterialComponents.Headline6"
-                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendTextView"
-                                app:layout_constraintStart_toStartOf="@+id/leftToSpendTextView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/leftToSpendText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="@string/left_to_pay_per_day"
+                            app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
+                            app:layout_constraintStart_toStartOf="@+id/leftToSpendAmountText" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/leftToSpendText"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="@string/left_to_pay_per_day"
-                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
-                                app:layout_constraintStart_toStartOf="@+id/leftToSpendAmountText" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/leftToSpendAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            android:text="--.--"
+                            app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
+                            app:layout_constraintStart_toEndOf="@+id/leftToSpendText" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/leftToSpendAmount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                android:text="--.--"
-                                app:layout_constraintTop_toBottomOf="@+id/leftToSpendAmountText"
-                                app:layout_constraintStart_toEndOf="@+id/leftToSpendText" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/networthCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:stateListAnimator="@animator/lift_on_touch"
+                    card_view:targetApi="lollipop"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:layout_marginStart="2dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardCornerRadius="2dp"
+                    app:cardElevation="2dp"
+                    app:layout_constraintStart_toEndOf="@+id/leftToSpendCard"
+                    app:layout_constraintTop_toTopOf="@+id/balanceCard">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/networthCard"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/networthLayout"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:stateListAnimator="@animator/lift_on_touch"
-                        card_view:targetApi="lollipop"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        android:layout_marginStart="2dp"
-                        app:cardUseCompatPadding="true"
-                        app:cardPreventCornerOverlap="false"
-                        app:cardCornerRadius="2dp"
-                        app:cardElevation="2dp"
-                        app:layout_constraintStart_toEndOf="@+id/leftToSpendCard"
-                        app:layout_constraintTop_toTopOf="@+id/balanceCard">
+                        android:background="#0089db"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/networthLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="#0089db"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/networthIcon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/networthIcon"
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="4dp"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent"/>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/networthImageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/rectangle"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/networthIcon"/>
 
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/networthImageView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:srcCompat="@drawable/rectangle"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintStart_toStartOf="@+id/networthIcon"/>
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/networthTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="3dp"
+                            android:text="@string/net_worth"
+                            android:textColor="@color/md_white_1000"
+                            app:layout_constraintStart_toEndOf="@+id/networthIcon"
+                            app:layout_constraintTop_toBottomOf="@+id/networthImageView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/networthTextView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:layout_marginStart="3dp"
-                                android:text="@string/net_worth"
-                                android:textColor="@color/md_white_1000"
-                                app:layout_constraintStart_toEndOf="@+id/networthIcon"
-                                app:layout_constraintTop_toBottomOf="@+id/networthImageView" />
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/networthAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/md_white_1000"
+                            style="@style/TextAppearance.MaterialComponents.Headline6"
+                            android:text="--.--"
+                            app:layout_constraintTop_toBottomOf="@+id/networthTextView"
+                            app:layout_constraintStart_toStartOf="@+id/networthTextView" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/networthAmount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/md_white_1000"
-                                style="@style/TextAppearance.MaterialComponents.Headline6"
-                                android:text="--.--"
-                                app:layout_constraintTop_toBottomOf="@+id/networthTextView"
-                                app:layout_constraintStart_toStartOf="@+id/networthTextView" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-                    </com.google.android.material.card.MaterialCardView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </HorizontalScrollView>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </HorizontalScrollView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/netEarningsCard"
+            android:layout_width="match_parent"
+            android:layout_height="352dp"
+            android:stateListAnimator="@animator/lift_on_touch"
+            card_view:targetApi="lollipop"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="false"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
+            app:layout_constraintTop_toBottomOf="@+id/summaryHorizontalScrollView">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/netEarningsCard"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="352dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                card_view:targetApi="lollipop"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="false"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
-                app:layout_constraintTop_toBottomOf="@+id/summaryHorizontalScrollView">
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/netEarningsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/net_earnings"
+                    android:textStyle="bold"
+                    android:layout_margin="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/netEarningsChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toBottomOf="@+id/netEarningsText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/netEarningsExtraInfoLayout"/>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/netEarningsExtraInfoLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="110dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#E1E1E1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
 
                     <TextView
-                        android:id="@+id/netEarningsText"
+                        android:id="@+id/currentMonthTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="48dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/incomeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/income"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/currentMonthTextView"/>
+
+                    <TextView
+                        android:id="@+id/expenseTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/expense"
+                        app:layout_constraintTop_toBottomOf="@+id/incomeTextView"
+                        app:layout_constraintStart_toStartOf="@+id/incomeTextView"/>
+
+                    <TextView
+                        android:id="@+id/netEarningsTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/net_earnings"
-                        android:textStyle="bold"
-                        android:layout_margin="8dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
-
-                    <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/netEarningsChart"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        app:layout_constraintTop_toBottomOf="@+id/netEarningsText"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toTopOf="@+id/netEarningsExtraInfoLayout"/>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/netEarningsExtraInfoLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="110dp"
                         android:layout_marginTop="8dp"
-                        android:background="#E1E1E1"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <TextView
-                            android:id="@+id/currentMonthTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:layout_marginEnd="48dp"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"/>
-
-                        <TextView
-                            android:id="@+id/incomeTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/income"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="4dp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/currentMonthTextView"/>
-
-                        <TextView
-                            android:id="@+id/expenseTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/expense"
-                            app:layout_constraintTop_toBottomOf="@+id/incomeTextView"
-                            app:layout_constraintStart_toStartOf="@+id/incomeTextView"/>
-
-                        <TextView
-                            android:id="@+id/netEarningsTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/net_earnings"
-                            android:layout_marginTop="8dp"
-                            android:textStyle="bold"
-                            app:layout_constraintTop_toBottomOf="@+id/expenseTextView"
-                            app:layout_constraintStart_toStartOf="@+id/incomeTextView"/>
-
-                        <TextView
-                            android:id="@+id/oneMonthBefore"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintEnd_toStartOf="@+id/currentMonthTextView"
-                            app:layout_constraintStart_toEndOf="@+id/twoMonthBefore"
-                            app:layout_constraintTop_toTopOf="@+id/currentMonthTextView"/>
-
-                        <TextView
-                            android:id="@+id/twoMonthBefore"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            app:layout_constraintStart_toEndOf="@+id/netEarningsTextView"
-                            app:layout_constraintTop_toTopOf="@+id/currentMonthTextView"/>
-
-                        <TextView
-                            android:id="@+id/twoMonthBeforeIncome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/incomeTextView"
-                            app:layout_constraintStart_toStartOf="@+id/twoMonthBefore"/>
-
-                        <TextView
-                            android:id="@+id/twoMonthBeforeExpense"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/md_red_700"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/expenseTextView"
-                            app:layout_constraintStart_toStartOf="@+id/twoMonthBefore"/>
-
-                        <TextView
-                            android:id="@+id/twoMonthBeforeNetIncome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/netEarningsTextView"
-                            app:layout_constraintStart_toStartOf="@+id/twoMonthBefore"/>
-
-                        <TextView
-                            android:id="@+id/oneMonthBeforeIncome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/incomeTextView"
-                            app:layout_constraintStart_toStartOf="@+id/oneMonthBefore"/>
-
-                        <TextView
-                            android:id="@+id/oneMonthBeforeExpense"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/md_red_700"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/expenseTextView"
-                            app:layout_constraintStart_toStartOf="@+id/oneMonthBefore"/>
-
-                        <TextView
-                            android:id="@+id/oneMonthBeforeNetIncome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/netEarningsTextView"
-                            app:layout_constraintStart_toStartOf="@+id/oneMonthBefore"/>
-
-                        <TextView
-                            android:id="@+id/currentMonthIncome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/incomeTextView"
-                            app:layout_constraintStart_toStartOf="@+id/currentMonthTextView"/>
-
-                        <TextView
-                            android:id="@+id/currentExpense"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/md_red_700"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/expenseTextView"
-                            app:layout_constraintStart_toStartOf="@+id/currentMonthTextView"/>
-
-                        <TextView
-                            android:id="@+id/currentNetIncome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="--.--"
-                            app:layout_constraintTop_toTopOf="@+id/netEarningsTextView"
-                            app:layout_constraintStart_toStartOf="@+id/currentMonthTextView"/>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/dailySummaryCard"
-                android:layout_width="0dp"
-                android:layout_height="352dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                card_view:targetApi="lollipop"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:layout_marginTop="8dp"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="false"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/netEarningsCard"
-                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toBottomOf="@+id/expenseTextView"
+                        app:layout_constraintStart_toStartOf="@+id/incomeTextView"/>
 
                     <TextView
-                        android:id="@+id/dailySummaryText"
+                        android:id="@+id/oneMonthBefore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:textStyle="bold"
-                        android:text="@string/daily_summary"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
-
-                    <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/dailySummaryChart"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        app:layout_constraintTop_toBottomOf="@+id/dailySummaryText"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toTopOf="@+id/dailySummaryExtraInfoLayout"/>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/dailySummaryExtraInfoLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#E1E1E1"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
-
-                        <TextView
-                            android:id="@+id/sixDaysAverageText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/six_day_average"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="4dp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/thirtyDaysAverageText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/thirty_day_average"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="4dp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/sixDaysAverageText"/>
-
-                        <TextView
-                            android:id="@+id/sixDaysAverage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="28dp"
-                            android:textColor="@color/md_red_500"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="@+id/sixDaysAverageText" />
-
-                        <TextView
-                            android:id="@+id/thirtyDaysAverage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/md_red_500"
-                            app:layout_constraintStart_toStartOf="@+id/sixDaysAverage"
-                            app:layout_constraintTop_toTopOf="@+id/thirtyDaysAverageText" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <FrameLayout
-                android:id="@+id/recentTransactionCard"
-                android:layout_width="0dp"
-                android:layout_height="340dp"
-                app:layout_constraintTop_toBottomOf="@+id/dailySummaryCard"
-                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/budgetCard"
-                android:layout_width="0dp"
-                android:layout_height="340dp"
-                android:stateListAnimator="@animator/lift_on_touch"
-                card_view:targetApi="lollipop"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:layout_marginTop="8dp"
-                app:cardUseCompatPadding="true"
-                app:cardPreventCornerOverlap="false"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/recentTransactionCard"
-                app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                        app:layout_constraintEnd_toStartOf="@+id/currentMonthTextView"
+                        app:layout_constraintStart_toEndOf="@+id/twoMonthBefore"
+                        app:layout_constraintTop_toTopOf="@+id/currentMonthTextView"/>
 
                     <TextView
-                        android:id="@+id/budgetSummary"
+                        android:id="@+id/twoMonthBefore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:textStyle="bold"
-                        android:text="@string/budget_summary"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        android:layout_marginStart="20dp"
+                        app:layout_constraintStart_toEndOf="@+id/netEarningsTextView"
+                        app:layout_constraintTop_toTopOf="@+id/currentMonthTextView"/>
 
-                    <com.github.mikephil.charting.charts.PieChart
-                        android:id="@+id/budgetChart"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
+                    <TextView
+                        android:id="@+id/twoMonthBeforeIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/incomeTextView"
+                        app:layout_constraintStart_toStartOf="@+id/twoMonthBefore"/>
+
+                    <TextView
+                        android:id="@+id/twoMonthBeforeExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/md_red_700"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/expenseTextView"
+                        app:layout_constraintStart_toStartOf="@+id/twoMonthBefore"/>
+
+                    <TextView
+                        android:id="@+id/twoMonthBeforeNetIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/netEarningsTextView"
+                        app:layout_constraintStart_toStartOf="@+id/twoMonthBefore"/>
+
+                    <TextView
+                        android:id="@+id/oneMonthBeforeIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/incomeTextView"
+                        app:layout_constraintStart_toStartOf="@+id/oneMonthBefore"/>
+
+                    <TextView
+                        android:id="@+id/oneMonthBeforeExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/md_red_700"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/expenseTextView"
+                        app:layout_constraintStart_toStartOf="@+id/oneMonthBefore"/>
+
+                    <TextView
+                        android:id="@+id/oneMonthBeforeNetIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/netEarningsTextView"
+                        app:layout_constraintStart_toStartOf="@+id/oneMonthBefore"/>
+
+                    <TextView
+                        android:id="@+id/currentMonthIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/incomeTextView"
+                        app:layout_constraintStart_toStartOf="@+id/currentMonthTextView"/>
+
+                    <TextView
+                        android:id="@+id/currentExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/md_red_700"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/expenseTextView"
+                        app:layout_constraintStart_toStartOf="@+id/currentMonthTextView"/>
+
+                    <TextView
+                        android:id="@+id/currentNetIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="--.--"
+                        app:layout_constraintTop_toTopOf="@+id/netEarningsTextView"
+                        app:layout_constraintStart_toStartOf="@+id/currentMonthTextView"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/dailySummaryCard"
+            android:layout_width="match_parent"
+            android:layout_height="352dp"
+            android:stateListAnimator="@animator/lift_on_touch"
+            card_view:targetApi="lollipop"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_marginTop="8dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="false"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:layout_constraintTop_toBottomOf="@+id/netEarningsCard"
+            app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/dailySummaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:textStyle="bold"
+                    android:text="@string/daily_summary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/dailySummaryChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toBottomOf="@+id/dailySummaryText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/dailySummaryExtraInfoLayout"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/dailySummaryExtraInfoLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#E1E1E1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:id="@+id/sixDaysAverageText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/six_day_average"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/thirtyDaysAverageText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/thirty_day_average"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/sixDaysAverageText"/>
+
+                    <TextView
+                        android:id="@+id/sixDaysAverage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="28dp"
+                        android:textColor="@color/md_red_500"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/sixDaysAverageText" />
+
+                    <TextView
+                        android:id="@+id/thirtyDaysAverage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/md_red_500"
+                        app:layout_constraintStart_toStartOf="@+id/sixDaysAverage"
+                        app:layout_constraintTop_toTopOf="@+id/thirtyDaysAverageText" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/recentTransactionCard"
+            android:layout_width="match_parent"
+            android:layout_height="340dp"
+            app:layout_constraintTop_toBottomOf="@+id/dailySummaryCard"
+            app:layout_constraintStart_toStartOf="@+id/summaryHorizontalScrollView"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/recentTransactionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="30sp"
+                    android:text="Recent Transactions"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/linedivider"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <View
+                    android:id="@+id/linedivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E1E1E1"
+                    android:layout_marginTop="5dp"
+                    app:layout_constraintTop_toBottomOf="@+id/recentTransactionText"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recentTransactionList"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linedivider">
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/noTransactionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text="No Transaction Found"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linedivider"/>
+
+                <androidx.core.widget.ContentLoadingProgressBar
+                    android:id="@+id/transactionLoader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?android:progressBarStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linedivider"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/budgetCard"
+            android:layout_width="match_parent"
+            android:layout_height="340dp"
+            android:stateListAnimator="@animator/lift_on_touch"
+            card_view:targetApi="lollipop"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:layout_marginTop="8dp"
+            app:cardUseCompatPadding="true"
+            app:cardPreventCornerOverlap="false"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:layout_constraintTop_toBottomOf="@+id/recentTransactionCard"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/budgetSummary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:textStyle="bold"
+                    android:text="@string/budget_summary"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.github.mikephil.charting.charts.PieChart
+                    android:id="@+id/budgetChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintTop_toBottomOf="@id/budgetSummary"
+                    app:layout_constraintStart_toStartOf="@+id/budgetSummary"
+                    app:layout_constraintBottom_toTopOf="@+id/budgetExtraInfoLayout"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/budgetExtraInfoLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#E1E1E1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:id="@+id/monthText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/budgetText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginTop="8dp"
-                        app:layout_constraintTop_toBottomOf="@id/budgetSummary"
-                        app:layout_constraintStart_toStartOf="@+id/budgetSummary"
-                        app:layout_constraintBottom_toTopOf="@+id/budgetExtraInfoLayout"
+                        android:text="@string/budget"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="@+id/monthText"
                         app:layout_constraintEnd_toEndOf="parent"/>
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/budgetExtraInfoLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="80dp"
-                        android:layout_marginTop="8dp"
-                        android:background="#E1E1E1"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent">
+                    <TextView
+                        android:id="@+id/spentText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/spent"
+                        android:textStyle="bold"
+                        android:layout_marginStart="40dp"
+                        app:layout_constraintStart_toEndOf="@+id/monthText"
+                        app:layout_constraintTop_toTopOf="@id/monthText" />
 
-                        <TextView
-                            android:id="@+id/monthText"
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:textStyle="bold"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
+                    <TextView
+                        android:id="@+id/expenseBudgetText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/expense"
+                        android:layout_marginBottom="8dp"
+                        app:layout_constraintStart_toStartOf="@+id/monthText"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-                        <TextView
-                            android:id="@+id/budgetText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:text="@string/budget"
-                            android:textStyle="bold"
-                            app:layout_constraintTop_toTopOf="@+id/monthText"
-                            app:layout_constraintEnd_toEndOf="parent"/>
+                    <androidx.core.widget.ContentLoadingProgressBar
+                        android:id="@+id/budgetProgress"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        app:layout_constraintEnd_toEndOf="@+id/budgetText"
+                        app:layout_constraintBottom_toBottomOf="@+id/expenseBudgetText"
+                        app:layout_constraintTop_toTopOf="@+id/expenseBudgetText"
+                        app:layout_constraintStart_toStartOf="@+id/spentText"/>
 
-                        <TextView
-                            android:id="@+id/spentText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/spent"
-                            android:textStyle="bold"
-                            android:layout_marginStart="40dp"
-                            app:layout_constraintStart_toEndOf="@+id/monthText"
-                            app:layout_constraintTop_toTopOf="@id/monthText" />
+                    <TextView
+                        android:id="@+id/spentAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="@+id/spentText"
+                        app:layout_constraintBottom_toTopOf="@+id/budgetProgress"/>
 
-                        <TextView
-                            android:id="@+id/expenseBudgetText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/expense"
-                            android:layout_marginBottom="8dp"
-                            app:layout_constraintStart_toStartOf="@+id/monthText"
-                            app:layout_constraintBottom_toBottomOf="parent" />
-
-                        <androidx.core.widget.ContentLoadingProgressBar
-                            android:id="@+id/budgetProgress"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            app:layout_constraintEnd_toEndOf="@+id/budgetText"
-                            app:layout_constraintBottom_toBottomOf="@+id/expenseBudgetText"
-                            app:layout_constraintTop_toTopOf="@+id/expenseBudgetText"
-                            app:layout_constraintStart_toStartOf="@+id/spentText"/>
-
-                        <TextView
-                            android:id="@+id/spentAmount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintStart_toStartOf="@+id/spentText"
-                            app:layout_constraintBottom_toTopOf="@+id/budgetProgress"/>
-
-                        <TextView
-                            android:id="@+id/budgetAmount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintBottom_toTopOf="@+id/budgetProgress"
-                            app:layout_constraintEnd_toEndOf="@+id/budgetText"/>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/budgetAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toTopOf="@+id/budgetProgress"
+                        app:layout_constraintEnd_toEndOf="@+id/budgetText"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-            </com.google.android.material.card.MaterialCardView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:layout_constraintTop_toBottomOf="@+id/budgetCard"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                app:layout_constraintTop_toBottomOf="@+id/budgetCard"
-                app:layout_constraintStart_toStartOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.core.widget.NestedScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitModel
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
@@ -50,7 +51,7 @@ class BudgetRepository(private val budget: BudgetDataDao,
         return budgetList.getAllBudgetList(pageNumber = pageNumber * Constants.PAGE_SIZE)
     }
 
-    suspend fun allActiveSpentList(currencyCode: String, startDate: String, endDate: String): Double{
+    suspend fun allActiveSpentList(currencyCode: String, startDate: String, endDate: String): BigDecimal{
         try {
             val budgetListData: MutableList<BudgetListData> = arrayListOf()
             val networkCall = budgetService?.getPaginatedSpentBudget(1, startDate, endDate)
@@ -115,7 +116,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
         try {
             val networkCall = budgetService?.getBudgetLimit(budgetId, startDate, endDate)
             val responseBody = networkCall?.body()
-            val rawww = networkCall?.raw()
             // There is no pagination in API
             if (responseBody != null && networkCall.isSuccessful) {
                 budgetLimitDao.deleteAllBudgetLimit()
@@ -125,5 +125,34 @@ class BudgetRepository(private val budget: BudgetDataDao,
             }
         } catch (exception: Exception){ }
         return budgetLimitDao.getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId, currencyCode, startDate, endDate)
+    }
+
+    suspend fun getAllBudget(){
+        try {
+            val availableBudget: MutableList<BudgetData> = arrayListOf()
+            val networkCall = budgetService?.getAllBudget()
+            if(networkCall != null && networkCall.isSuccessful){
+                deleteAllBudget()
+                val networkData = networkCall.body()
+                if (networkData?.meta?.pagination?.current_page != networkData?.meta?.pagination?.total_pages) {
+                    networkData?.meta?.pagination?.let { page ->
+                        for (pagination in 2..page.total_pages){
+                            budgetService?.getPaginatedBudget(pagination)?.enqueue(retrofitCallback({ response ->
+                                response.body()?.budgetData?.forEach { budgetList ->
+                                    availableBudget.add(budgetList)
+                                }
+                            }))
+                        }
+                    }
+                }
+                networkData?.budgetData?.forEach { budgetData ->
+                    insertBudget(budgetData)
+                }
+                availableBudget.forEach { budgetData ->
+                    insertBudget(budgetData)
+                }
+            }
+
+        } catch (exception: Exception){ }
     }
 }
