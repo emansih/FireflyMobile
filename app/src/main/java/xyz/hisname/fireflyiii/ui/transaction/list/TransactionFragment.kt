@@ -212,7 +212,7 @@ class TransactionFragment: BaseFragment(){
                         }
                         selectedDate == day.date -> {
                             if(selectedDate == today){
-                                textView.setTextColor(getCompatColor(R.color.md_red_600))
+                                textView.setTextColor(getCompatColor(R.color.md_red_800))
                             } else {
                                 textView.setTextColor(setDayNightTheme())
                             }
@@ -224,7 +224,11 @@ class TransactionFragment: BaseFragment(){
                         }
                     }
                 } else {
-                    textView.setTextColor(setDayNightTheme())
+                    if(globalViewModel.isDark){
+                        textView.setTextColor(getCompatColor(R.color.md_black_1000))
+                    } else {
+                        textView.setTextColor(getCompatColor(R.color.md_white_1000))
+                    }
                 }
             }
 
