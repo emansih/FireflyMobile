@@ -37,6 +37,7 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import kotlinx.android.synthetic.main.fragment_transaction.slider
+import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -188,6 +189,7 @@ class TransactionFragment: BaseFragment(){
                 container.day = day
                 val textView = container.onDayText
                 textView.text = day.date.dayOfMonth.toString()
+                setShowCase(textView)
                 if (day.owner == DayOwner.THIS_MONTH) {
                     when {
                         selectedDates.contains(day.date) -> {
@@ -313,6 +315,13 @@ class TransactionFragment: BaseFragment(){
             extendedFab.isVisible = false
             fragmentContainer.isVisible = false
         }
+    }
+
+    private fun setShowCase(textView: TextView){
+        FancyShowCaseQueue()
+                .add(showCase(R.string.transaction_calendar_date_help_text, "longClickDate", textView))
+                .add(showCase(R.string.transaction_calendar_header_help_text, "jumpDates", headerText))
+                .show()
     }
 
     private fun displayResult(){
