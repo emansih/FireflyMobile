@@ -201,28 +201,28 @@ class TransactionFragment: BaseFragment(){
                             } else {
                                 dateRange.clear()
                             }
-                            textView.setTextColor(getCompatColor(R.color.md_white_1000))
+                            textView.setTextColor(setDayNightTheme())
                             textView.setBackgroundResource(R.drawable.today_bg)
                         }
                         dateRange.contains(day.date) -> {
-                            textView.setTextColor(getCompatColor(R.color.md_white_1000))
+                            textView.setTextColor(setDayNightTheme())
                             textView.setBackgroundResource(R.drawable.today_bg)
                         }
                         selectedDate == day.date -> {
                             if(selectedDate == today){
                                 textView.setTextColor(getCompatColor(R.color.md_red_600))
                             } else {
-                                textView.setTextColor(getCompatColor(R.color.md_white_1000))
+                                textView.setTextColor(setDayNightTheme())
                             }
                             textView.setBackgroundResource(R.drawable.today_bg)
                         }
                         else -> {
-                            textView.setTextColor(getCompatColor(R.color.md_white_1000))
+                            textView.setTextColor(setDayNightTheme())
                             textView.background = null
                         }
                     }
                 } else {
-                    textView.setTextColor(getCompatColor(R.color.md_black_1000))
+                    textView.setTextColor(setDayNightTheme())
                 }
             }
 
@@ -241,10 +241,17 @@ class TransactionFragment: BaseFragment(){
         transaction_calendar.updateMonthConfiguration()
     }
 
+    private fun setDayNightTheme(): Int{
+        return if(globalViewModel.isDark){
+            getCompatColor(R.color.md_white_1000)
+        } else {
+            getCompatColor(R.color.md_black_1000)
+        }
+    }
 
     private fun setTransactionCard(){
         transactionCardLoader.show()
-        result.drawerArrowDrawable.color = getCompatColor(R.color.md_black_1000)
+        result.drawerArrowDrawable.color = setDayNightTheme()
         slider.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         transactionVm.getTransactionAmount(transactionType).observe(viewLifecycleOwner){ transactionArray ->
             transactionCardLoader.hide()
