@@ -79,7 +79,7 @@ class TransactionFragment: BaseFragment(){
         setupFab()
         transactionVm = getImprovedViewModel(TransactionFragmentViewModel::class.java)
         result = ActionBarDrawerToggle(requireActivity(),
-                fragment_transaction_root, requireActivity().findViewById(R.id.activity_toolbar),
+                fragment_transaction_root, invisibleToolbar,
                 com.mikepenz.materialdrawer.R.string.material_drawer_open,
                 com.mikepenz.materialdrawer.R.string.material_drawer_close)
         fragment_transaction_root.addDrawerListener(result)
@@ -244,6 +244,7 @@ class TransactionFragment: BaseFragment(){
 
     private fun setTransactionCard(){
         transactionCardLoader.show()
+        result.drawerArrowDrawable.color = getCompatColor(R.color.md_black_1000)
         slider.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         transactionVm.getTransactionAmount(transactionType).observe(viewLifecycleOwner){ transactionArray ->
             transactionCardLoader.hide()
