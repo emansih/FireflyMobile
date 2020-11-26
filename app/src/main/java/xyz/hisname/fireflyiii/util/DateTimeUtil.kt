@@ -19,6 +19,10 @@ object DateTimeUtil {
                 .toString()
     }
 
+    fun convertLongToLocalDate(date: Long): LocalDate{
+        return Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+
     fun getStartOfDayInCalendarToEpoch(calendarDate: String): String{
         val startOfDay = LocalDate.parse(calendarDate).atStartOfDay(ZoneId.of(ZoneId.systemDefault().id)).toEpochSecond()
         val startOfDayMilli = startOfDay.times(1000)

@@ -24,6 +24,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
@@ -86,6 +87,7 @@ class TransactionFragment: BaseFragment(){
         setWidgets()
         setCalendar()
         setTransactionCard()
+        jumpToDate()
     }
 
 
@@ -275,6 +277,20 @@ class TransactionFragment: BaseFragment(){
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = transactionAdapter
+    }
+
+    private fun jumpToDate(){
+        headerText.setOnClickListener {
+            val materialDatePicker = MaterialDatePicker.Builder
+                    .datePicker()
+                    .setInputMode(MaterialDatePicker.INPUT_MODE_TEXT)
+            val picker = materialDatePicker.build()
+            picker.show(parentFragmentManager, picker.toString())
+            picker.addOnPositiveButtonClickListener { time ->
+                selectedDates.add(DateTimeUtil.convertLongToLocalDate(time))
+                transaction_calendar.smoothScrollToDate(DateTimeUtil.convertLongToLocalDate(time))
+            }
+        }
     }
 
     private fun setupFab(){
