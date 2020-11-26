@@ -10,7 +10,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -218,12 +217,12 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
                 budgetSpentPercentage.postValue(BigDecimal.ZERO)
             } else {
                 budgetLeftPercentage.postValue(
-                        budgetSpent.divide(budgeted)
+                        budgetSpent.divide(budgeted, BigDecimal.ROUND_HALF_EVEN)
                                 .multiply(100.toBigDecimal())
                                 .setScale(2, BigDecimal.ROUND_HALF_DOWN))
                 budgetSpentPercentage.postValue(
                         budgeted.minus(budgetSpent)
-                                .divide(budgeted)
+                                .divide(budgeted, BigDecimal.ROUND_HALF_EVEN)
                                 .multiply(100.toBigDecimal())
                                 .setScale(2, BigDecimal.ROUND_HALF_DOWN))
             }
