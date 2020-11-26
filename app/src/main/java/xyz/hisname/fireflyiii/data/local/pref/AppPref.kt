@@ -46,10 +46,6 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("keyguard", false)
         set(value) = sharedPref.edit{ putBoolean("keyguard", value)}
 
-    override var transactionListType: Boolean
-        get() = sharedPref.getBoolean("transactionListType", false)
-        set(value) = sharedPref.edit{ putBoolean("transactionListType", value)}
-
     override var timeFormat: Boolean
         get() = sharedPref.getBoolean("timeFormat", false)
         set(value) = sharedPref.edit{ putBoolean("timeFormat", value)}

@@ -44,12 +44,11 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
-import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragmentV2
+import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
-import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragmentV1
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.biometric.AuthenticationResult
 import xyz.hisname.fireflyiii.util.biometric.Authenticator
@@ -414,28 +413,15 @@ class HomeActivity: BaseActivity(){
                     }
                     11L -> {
                         val bundle = bundleOf("transactionType" to "Withdrawal")
-                        if (sharedPref(this@HomeActivity).transactionListType) {
-                            changeFragment(TransactionFragmentV1().apply { arguments = bundle })
-
-                        } else {
-                            changeFragment(TransactionFragmentV2().apply { arguments = bundle })
-                        }
+                        changeFragment(TransactionFragment().apply { arguments = bundle })
                     }
                     12L -> {
                         val bundle = bundleOf("transactionType" to "Deposit")
-                        if (sharedPref(this@HomeActivity).transactionListType) {
-                            changeFragment(TransactionFragmentV1().apply { arguments = bundle })
-                        } else {
-                            changeFragment(TransactionFragmentV2().apply { arguments = bundle })
-                        }
+                        changeFragment(TransactionFragment().apply { arguments = bundle })
                     }
                     13L -> {
                         val bundle = bundleOf("transactionType" to "Transfer")
-                        if (sharedPref(this@HomeActivity).transactionListType) {
-                            changeFragment(TransactionFragmentV1().apply { arguments = bundle })
-                        } else {
-                            changeFragment(TransactionFragmentV2().apply { arguments = bundle })
-                        }
+                        changeFragment(TransactionFragment().apply { arguments = bundle })
                     }
                     15L -> {
                         changeFragment(ListPiggyFragment())

@@ -24,14 +24,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         transactionDao.insert(transactionIndex)
     }
 
-    suspend fun transactionList(startDate: String?, endDate: String?,source: String): MutableList<Transactions> {
-        loadRemoteData(startDate, endDate, source)
-        return if (startDate.isNullOrBlank() || endDate.isNullOrBlank()) {
-            transactionDao.getTransactionList(convertString(source))
-        } else {
-            transactionDao.getTransactionList(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(source))
-        }
+    suspend fun transactionCount(startDate: String, endDate: String,source: String): Int {
+        return transactionDao.getTransactionByDateCount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(source))
     }
 
     suspend fun getTransactionByDateAndCurrencyCode(startDate: String, endDate: String,
@@ -62,10 +57,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType)
     }
 
-    suspend fun getTotalTransactionType(startDate: String, endDate: String, currencyCode: String, transactionType: String): Double{
-        loadRemoteData(startDate, endDate, "all")
+    suspend fun getTotalTransactionType(startDate: String, endDate: String,
+                                        currencyCode: String, transactionType: String): BigDecimal{
+        loadRemoteData(startDate, endDate, convertString(transactionType))
         return transactionDao.getTotalTransactionType(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
     }
 
     suspend fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String, currencyCode: String,

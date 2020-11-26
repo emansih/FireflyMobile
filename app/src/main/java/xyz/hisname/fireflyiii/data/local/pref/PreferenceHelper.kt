@@ -14,7 +14,6 @@ interface PreferenceHelper {
     var languagePref: String
     var nightModeEnabled: Boolean
     var isKeyguardEnabled: Boolean
-    var transactionListType: Boolean
     var timeFormat: Boolean
     var isCustomCa: Boolean
     var isCurrencyThumbnailEnabled: Boolean

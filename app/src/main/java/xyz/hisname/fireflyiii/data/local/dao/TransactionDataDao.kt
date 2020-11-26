@@ -26,9 +26,6 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<Transactions>>
 
-    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
-    abstract fun getTransactionList(startDate: String?, endDate: String?,transactionType: String): MutableList<Transactions>
-
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND currency_code =:currencyCode")
     abstract suspend fun getTransactionListWithCurrencyAndDate(startDate: String, endDate: String,transactionType: String, currencyCode: String): MutableList<Transactions>
 
@@ -59,10 +56,8 @@ abstract class TransactionDataDao {
     abstract fun getTotalTransactionType(startDate: String, endDate: String, currencyCode: String,
                                   accountName: String, transactionType: String): Double
 
-    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) " +
-            "AND currency_code =:currencyCode AND transactionType =:transactionType")
-    abstract fun getTotalTransactionType(startDate: String, endDate: String, currencyCode: String,
-                                         transactionType: String): Double
+    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND currency_code =:currencyCode AND transactionType =:transactionType")
+    abstract fun getTotalTransactionType(startDate: String, endDate: String, currencyCode: String, transactionType: String): BigDecimal
 
     @Query("SELECT distinct category_name FROM transactionTable WHERE (date BETWEEN :startDate AND" +
             " :endDate) AND currency_code = :currencyCode AND source_name = :sourceName AND transactionType =:transactionType")

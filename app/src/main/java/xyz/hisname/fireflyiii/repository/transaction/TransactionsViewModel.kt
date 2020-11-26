@@ -3,13 +3,11 @@ package xyz.hisname.fireflyiii.repository.transaction
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.*
-import androidx.paging.*
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -19,15 +17,12 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionSuccessModel
-import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.LocaleNumberParser
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
-import java.math.BigDecimal
 
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
@@ -93,39 +88,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
             data.postValue(transactionAmount)
         }
         return data
-    }
-
-    fun getTotalTransactionAmountByDateAndCurrency(startDate: String, endDate: String,
-                                                   currencyCode: String,
-                                                   transactionType: String): MutableLiveData<Double>{
-        var transactionAmount = 0.0
-        val data: MutableLiveData<Double> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            transactionAmount = repository.getTotalTransactionType(startDate, endDate,
-                    currencyCode, transactionType)
-        }.invokeOnCompletion {
-            data.postValue(transactionAmount)
-        }
-        return data
-    }
-
-    fun getTotalTransactionAmountAndFreqByDateAndCurrency(startDate: String, endDate: String,
-                                                          currencyCode: String,
-                                                          transactionType: String,
-                                                          currencySymbol: String): MutableLiveData<TransactionAmountMonth>{
-        var transactionAmount = 0.0
-        var transactionFreq = 0
-        val transactionData: MutableLiveData<TransactionAmountMonth> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            transactionAmount = repository.getTotalTransactionType(startDate, endDate,
-                    currencyCode, transactionType)
-            transactionFreq = repository.transactionList(startDate, endDate, transactionType).size
-        }.invokeOnCompletion {
-            transactionData.postValue(TransactionAmountMonth(DateTimeUtil.getMonthAndYear(startDate),
-                    currencySymbol + LocaleNumberParser.parseDecimal(transactionAmount, getApplication()),
-                    transactionFreq))
-        }
-        return transactionData
     }
 
     fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String,

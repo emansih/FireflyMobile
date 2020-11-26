@@ -1,44 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.drawerlayout.widget.DrawerLayout
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_transaction_rootview"
+    android:id="@+id/fragment_transaction_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true">
+    <LinearLayout
+        android:id="@+id/fragment_transaction_rootview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/headerText"
+        <TextView
+            android:id="@+id/headerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/md_blue_400"
+            android:textSize="26sp"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <include
+            android:id="@+id/legendLayout"
+            layout="@layout/calendar_day_legend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
+
+        <com.kizitonwose.calendarview.CalendarView
+            android:id="@+id/transaction_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cv_dayViewResource="@layout/calendar_day"
+            app:cv_orientation="horizontal"
+            app:cv_outDateStyle="endOfRow"
+            app:cv_inDateStyle="allMonths"
+            app:cv_scrollMode="paged" />
+
+        <include layout="@layout/fragment_base_list"
+            android:id="@+id/base_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp" />
+
+    </LinearLayout>
+
+    <com.mikepenz.materialdrawer.widget.MaterialDrawerSliderView
+        android:id="@+id/slider"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/md_blue_400"
-        android:textSize="26sp"
-        android:layout_marginStart="12dp"
-        android:layout_marginBottom="12dp"/>
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:fitsSystemWindows="true">
 
-    <include
-        android:id="@+id/legendLayout"
-        layout="@layout/calendar_day_legend"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_weight="1" >
 
-    <com.kizitonwose.calendarview.CalendarView
-        android:id="@+id/transaction_calendar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cv_dayViewResource="@layout/calendar_day"
-        app:cv_orientation="horizontal"
-        app:cv_outDateStyle="endOfRow"
-        app:cv_inDateStyle="allMonths"
-        app:cv_scrollMode="paged" />
+            <androidx.core.widget.ContentLoadingProgressBar
+                android:id="@+id/transactionCardLoader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:progressBarStyle" />
 
-    <include layout="@layout/fragment_base_list"
-        android:id="@+id/base_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        />
+        </LinearLayout>
 
-</LinearLayout>
+    </com.mikepenz.materialdrawer.widget.MaterialDrawerSliderView>
+
+</androidx.drawerlayout.widget.DrawerLayout>

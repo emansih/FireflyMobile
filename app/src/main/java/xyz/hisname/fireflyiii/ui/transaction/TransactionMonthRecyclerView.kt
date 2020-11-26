@@ -10,7 +10,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMon
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class TransactionMonthRecyclerView(private val items: MutableList<TransactionAmountMonth>,
+class TransactionMonthRecyclerView(private val items: List<TransactionAmountMonth>,
                                    private val clickListener:(Int) -> Unit):
         DiffUtilAdapter<TransactionAmountMonth, TransactionMonthRecyclerView.TransactionAdapter>() {
 

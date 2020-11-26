@@ -1,25 +1,47 @@
 package xyz.hisname.fireflyiii.ui.transaction.list
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.customview.widget.ViewDragHelper
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.commit
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.sizeDp
+import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
+import kotlinx.android.synthetic.main.fragment_transaction.slider
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
+import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
+import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -29,7 +51,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import java.util.*
 
-class TransactionFragmentV2: BaseTransactionFragment(){
+class TransactionFragment: BaseFragment(){
 
     private val monthTitleFormatter = DateTimeFormatter.ofPattern("MMMM")
     private var selectedDate: LocalDate? = null
@@ -38,6 +60,12 @@ class TransactionFragmentV2: BaseTransactionFragment(){
     private val dateRange by lazy { mutableSetOf<LocalDate>() }
     private var startDate = LocalDate.now()
     private var endDate = LocalDate.now()
+    private lateinit var result: ActionBarDrawerToggle
+    private val transactionType: String by lazy { arguments?.getString("transactionType") ?: "" }
+    private val noTransactionText by bindView<TextView>(R.id.listText)
+    private val noTransactionImage by bindView<ImageView>(R.id.listImage)
+    private lateinit var transactionVm: TransactionFragmentViewModel
+    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -46,14 +74,24 @@ class TransactionFragmentV2: BaseTransactionFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setRecyclerView()
+        setupFab()
+        transactionVm = getImprovedViewModel(TransactionFragmentViewModel::class.java)
+        result = ActionBarDrawerToggle(requireActivity(),
+                fragment_transaction_root, requireActivity().findViewById(R.id.activity_toolbar),
+                com.mikepenz.materialdrawer.R.string.material_drawer_open,
+                com.mikepenz.materialdrawer.R.string.material_drawer_close)
+        fragment_transaction_root.addDrawerListener(result)
+        displayResult()
         setWidgets()
         setCalendar()
+        setTransactionCard()
     }
 
 
     private fun setWidgets(){
         loadTransaction()
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0 || dy < 0 && extendedFab.isShown) {
                     extendedFab.hide()
@@ -79,7 +117,7 @@ class TransactionFragmentV2: BaseTransactionFragment(){
         }
     }
 
-    override fun itemClicked(data: Transactions){
+    private fun itemClicked(data: Transactions){
         fragment_transaction_rootview.isVisible = false
         parentFragmentManager.commit {
             add(R.id.fragment_container, TransactionDetailsFragment().apply {
@@ -201,4 +239,108 @@ class TransactionFragmentV2: BaseTransactionFragment(){
         transaction_calendar.updateMonthConfiguration()
     }
 
+
+    private fun setTransactionCard(){
+        transactionCardLoader.show()
+        slider.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        transactionVm.getTransactionAmount(transactionType).observe(viewLifecycleOwner){ transactionArray ->
+            transactionCardLoader.hide()
+            slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){ data: Int -> }
+        }
+        fragment_transaction_root.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                extendedFab.hide()
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                extendedFab.show()
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                if (newState == ViewDragHelper.STATE_DRAGGING){
+                    extendedFab.hide()
+                }
+                if(newState == ViewDragHelper.STATE_IDLE && !fragment_transaction_root.isDrawerOpen(slider)){
+                    extendedFab.show()
+                }
+            }
+
+        })
+    }
+
+    private fun setRecyclerView(){
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recycler_view.adapter = transactionAdapter
+    }
+
+    private fun setupFab(){
+        extendedFab.display{
+            val addTransaction = AddTransactionFragment()
+            addTransaction.arguments = bundleOf("transactionType" to transactionType,
+                    "SHOULD_HIDE" to true)
+            parentFragmentManager.commit {
+                replace(R.id.bigger_fragment_container, addTransaction)
+                addToBackStack(null)
+            }
+            extendedFab.isVisible = false
+            fragmentContainer.isVisible = false
+        }
+    }
+
+    private fun displayResult(){
+        transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            if(loadStates.refresh !is LoadState.Loading){
+                if(transactionAdapter.itemCount < 1){
+                    recycler_view.isGone = true
+                    noTransactionText.isVisible = true
+                    noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
+                    noTransactionImage.isVisible = true
+                    noTransactionImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                        icon = FontAwesome.Icon.faw_exchange_alt
+                        sizeDp = 24
+                    })
+                } else {
+                    recycler_view.isVisible = true
+                    noTransactionText.isGone = true
+                    noTransactionImage.isGone = true
+                }
+            }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        result.onConfigurationChanged(newConfig)
+    }
+
+    override fun handleBack() {
+        parentFragmentManager.popBackStack()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val toolBarTitle = when {
+            transactionType.contains("Withdrawal") -> resources.getString(R.string.withdrawal)
+            transactionType.contains("Deposit") -> resources.getString(R.string.deposit)
+            transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
+            else -> ""
+        }
+        activity?.activity_toolbar?.title = toolBarTitle
+    }
+
+    override fun onAttach(context: Context){
+        super.onAttach(context)
+        val toolBarTitle = when {
+            transactionType.contains("Withdrawal") -> resources.getString(R.string.withdrawal)
+            transactionType.contains("Deposit") -> resources.getString(R.string.deposit)
+            transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
+            else -> ""
+        }
+        activity?.activity_toolbar?.title = toolBarTitle
+    }
 }
