@@ -30,7 +30,7 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
             genericService()?.create(CurrencyService::class.java)
     )
 
-    fun getTransactionList(startDate: String?, endDate: String?,
+    fun getTransactionList(startDate: String, endDate: String,
                            transactionType: String): LiveData<PagingData<Transactions>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
             TransactionPagingSource(transactionService, transactionDataDao, startDate, endDate, transactionType)

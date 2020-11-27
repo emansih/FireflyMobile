@@ -10,8 +10,8 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 
 class TransactionPagingSource(private val transactionService: TransactionService?,
                               private val transactionDao: TransactionDataDao,
-                              private val startDate: String?,
-                              private val endDate: String?,
+                              private val startDate: String,
+                              private val endDate: String,
                               private val transactionType: String): PagingSource<Int, Transactions>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Transactions> {
@@ -26,18 +26,13 @@ class TransactionPagingSource(private val transactionService: TransactionService
             null
         }
         try {
-            val networkCall = transactionService?.getPaginatedTransactions(startDate ?: "",
-                    endDate ?: "",
+            val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
                     convertString(transactionType), params.key ?: 1)
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
-                    if(startDate.isNullOrEmpty() || endDate.isNullOrEmpty()){
-                        transactionDao.deleteTransactionByType(transactionType = convertString(transactionType))
-                    } else {
-                        transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(transactionType))
-                    }
+                    transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                            DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(transactionType))
                 }
                 responseBody.data.forEach { data ->
                     data.transactionAttributes?.transactions?.forEach { transactions ->
@@ -54,14 +49,9 @@ class TransactionPagingSource(private val transactionService: TransactionService
                 } else {
                     null
                 }
-                return if(startDate.isNullOrEmpty() || endDate.isNullOrEmpty()){
-                    LoadResult.Page(transactionDao.getTransactionByType(convertString(transactionType)),
-                            previousKey, nextKey)
-                } else {
-                    LoadResult.Page(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                return LoadResult.Page(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                             DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType)),
                             previousKey, nextKey)
-                }
             } else {
                 return getOfflineData(params.key, previousKey)
             }
@@ -72,25 +62,17 @@ class TransactionPagingSource(private val transactionService: TransactionService
 
 
     private suspend fun getOfflineData(paramKey: Int?, previousKey: Int?): LoadResult<Int, Transactions>{
-        val numberOfRows = if(startDate.isNullOrEmpty() || endDate.isNullOrEmpty()){
-            transactionDao.getTransactionByTypeCount(convertString(transactionType))
-        } else {
-            transactionDao.getTransactionByDateCount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType))
-        }
+        val numberOfRows = transactionDao.getTransactionByDateCount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType))
         val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
             paramKey ?: 1 + 1
         } else {
             null
         }
-        return if(startDate.isNullOrEmpty() || endDate.isNullOrEmpty()){
-            LoadResult.Page(transactionDao.getTransactionByType(convertString(transactionType)),
-                    previousKey, nextKey)
-        } else {
-            LoadResult.Page(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+        return LoadResult.Page(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType)),
                     previousKey, nextKey)
-        }
+
     }
 
     override val keyReuseSupported = true

@@ -144,12 +144,6 @@ abstract class TransactionDataDao {
     @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate)")
     abstract suspend fun getTransactionByDateCount(startDate: String, endDate: String): Int
 
-    @Query("SELECT * FROM transactionTable WHERE transactionType = :transactionType ORDER BY transaction_journal_id DESC")
-    abstract suspend fun getTransactionByType(transactionType: String): MutableList<Transactions>
-
-    @Query("SELECT count(*) FROM transactionTable WHERE transactionType = :transactionType")
-    abstract suspend fun getTransactionByTypeCount(transactionType: String): Int
-
     @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
     abstract fun getTransactionFromJournalId(journalId: Long): MutableList<Transactions>
 
@@ -170,9 +164,6 @@ abstract class TransactionDataDao {
 
     @Query("DELETE FROM transactionTable WHERE isPending IS NOT :isPending")
     abstract fun deleteTransaction(isPending: Boolean = true): Int
-
-    @Query("DELETE FROM transactionTable WHERE isPending IS NOT :isPending AND transactionType =:transactionType")
-    abstract fun deleteTransactionByType(isPending: Boolean = true, transactionType: String): Int
 
     // TODO: Find out why I can't SELECT description FROM transactionTable
     @Query("SELECT * FROM transactionTable WHERE description LIKE :description")
