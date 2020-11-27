@@ -37,12 +37,7 @@ class TransactionAttachmentRecyclerAdapter(private val items: MutableList<Attach
     inner class AttachmentAdapter(view: View): RecyclerView.ViewHolder(view) {
         fun bind(attachmentData: AttachmentData, clickListener: (AttachmentData) -> Unit, removeItemListener: Int){
             val fileName = attachmentData.attachmentAttributes?.filename ?: ""
-            if(fileName.length >= 21){
-                itemView.attachment_name.text = fileName.substring(0, 21) + "..."
-            } else {
-                itemView.attachment_name.text = fileName
-            }
-
+            itemView.attachment_name.text = fileName
             if(shouldShowDownload) {
                 val downloadedFile = File(context.getExternalFilesDir(null).toString() + File.separator + fileName)
                 if (downloadedFile.exists()) {
