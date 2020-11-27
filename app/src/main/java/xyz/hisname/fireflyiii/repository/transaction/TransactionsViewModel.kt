@@ -365,14 +365,10 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     fun getTransactionByDescription(query: String) : LiveData<List<String>>{
         val transactionData: MutableLiveData<List<String>> = MutableLiveData()
-        val displayName = arrayListOf<String>()
         viewModelScope.launch(Dispatchers.IO) {
             repository.getTransactionByDescription(query)
                     .collectLatest { transactionList ->
-                        transactionList.forEach { transactions ->
-                            displayName.add(transactions.description)
-                        }
-                        transactionData.postValue(displayName.distinct())
+                        transactionData.postValue(transactionList.distinct())
             }
         }
         return transactionData

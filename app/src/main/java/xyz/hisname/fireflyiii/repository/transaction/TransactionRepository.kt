@@ -172,7 +172,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
-    suspend fun getTransactionByDescription(query: String): Flow<MutableList<Transactions>>{
+    suspend fun getTransactionByDescription(query: String): Flow<List<String>>{
         // Search via API only if query is more than 3
         if(query.length > 3){
             val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
