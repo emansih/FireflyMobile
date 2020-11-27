@@ -11,8 +11,15 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("SELECT * FROM accounts WHERE name =:accountName")
     abstract fun getAccountByName(accountName: String): MutableList<AccountData>
 
+    @Deprecated("Use suspend")
     @Query("SELECT * FROM accounts WHERE type =:accountType")
     abstract fun getAccountByType(accountType: String): Flow<MutableList<AccountData>>
+
+    @Query("SELECT * FROM accounts WHERE type =:accountType")
+    abstract suspend fun getAccountsByType(accountType: String): MutableList<AccountData>
+
+    @Query("SELECT COUNT(*) FROM accounts WHERE type =:accountType")
+    abstract suspend fun getAccountsByTypeCount(accountType: String): Int
 
     @Query("SELECT * FROM accounts WHERE accountId =:accountId")
     abstract fun getAccountById(accountId: Long): MutableList<AccountData>
@@ -26,7 +33,7 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
                                                     currencyCode: String): Double
 
     @Query("DELETE FROM accounts WHERE type =:accountType AND isPending IS NOT :isPending")
-    abstract fun deleteAccountByType(accountType: String, isPending: Boolean = true): Int
+    abstract suspend fun deleteAccountByType(accountType: String, isPending: Boolean = true): Int
 
     @Query("DELETE FROM accounts WHERE type =:accountType AND name =:accountName")
     abstract fun deleteAccountByTypeAndName(accountType: String, accountName: String): Int

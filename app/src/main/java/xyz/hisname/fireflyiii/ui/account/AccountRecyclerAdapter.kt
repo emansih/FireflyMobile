@@ -4,16 +4,17 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.account_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
-import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class AccountRecyclerAdapter(private val items: MutableList<AccountData>, private val clickListener:(AccountData) -> Unit):
-        DiffUtilAdapter<AccountData, AccountRecyclerAdapter.AccountViewHolder>(){
+class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
+        PagingDataAdapter<AccountData, AccountRecyclerAdapter.AccountViewHolder>(DIFF_CALLBACK){
 
     private lateinit var context: Context
 
@@ -22,9 +23,11 @@ class AccountRecyclerAdapter(private val items: MutableList<AccountData>, privat
         return AccountViewHolder(parent.inflate(R.layout.account_list_item))
     }
 
-    override fun getItemCount() = items.size
-
-    override fun onBindViewHolder(holder: AccountViewHolder, position: Int) = holder.bind(items[position],clickListener)
+    override fun onBindViewHolder(holder: AccountViewHolder, position: Int){
+        getItem(position)?.let{
+            holder.bind(it, clickListener)
+        }
+    }
 
 
     inner class AccountViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
@@ -59,6 +62,18 @@ class AccountRecyclerAdapter(private val items: MutableList<AccountData>, privat
 
             }
             itemView.setOnClickListener { clickListener(data) }
+        }
+    }
+
+    companion object {
+        private val DIFF_CALLBACK = object :
+                DiffUtil.ItemCallback<AccountData>() {
+            override fun areItemsTheSame(oldAccountData: AccountData,
+                                         newAccountData: AccountData) =
+                    oldAccountData == newAccountData
+
+            override fun areContentsTheSame(oldAccountData: AccountData,
+                                            newAccountData: AccountData) = oldAccountData == newAccountData
         }
     }
 }

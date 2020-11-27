@@ -12,6 +12,10 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import kotlinx.android.synthetic.main.account_list_item.view.*
@@ -25,18 +29,20 @@ import java.util.*
 
 class ListAccountFragment: BaseFragment() {
 
-    private var dataAdapter = ArrayList<AccountData>()
     private val accountType by lazy { arguments?.getString("accountType") ?: "" }
     private val noAccountImage by lazy { requireActivity().findViewById<ImageView>(R.id.listImage) }
     private val noAccountText by lazy { requireActivity().findViewById<TextView>(R.id.listText) }
+    private val accountVm by lazy { getImprovedViewModel(ListAccountViewModel::class.java) }
+    private val accountAdapter by lazy { AccountRecyclerAdapter { data: AccountData -> itemClicked(data) } }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_base_list, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setRecyclerView()
         displayView()
         pullToRefresh()
         initFab()
@@ -49,7 +55,7 @@ class ListAccountFragment: BaseFragment() {
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
                     val accountName = viewHolder.itemView.accountNameText.text.toString()
-                    accountViewModel.deleteAccountByName(accountName).observe(viewLifecycleOwner){ isDeleted ->
+                    accountVm.deleteAccountByName(accountName).observe(viewLifecycleOwner){ isDeleted ->
                         if(isDeleted){
                             when (accountType){
                                 "asset" -> toastSuccess(resources.getString(R.string.asset_account_deleted, accountName))
@@ -67,41 +73,49 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun displayView(){
-        swipeContainer.isRefreshing = true
-        runLayoutAnimation(recycler_view)
-        accountViewModel.getAccountByType(accountType).observe(viewLifecycleOwner){ accountData ->
-            if(accountData.isEmpty()){
-                recycler_view.isGone = true
-                noAccountImage.isVisible = true
-                noAccountText.isVisible = true
-                when (accountType) {
-                    "asset" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill))
-                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
-                    }
-                    "expense" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_shopping_cart))
-                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
-                    }
-                    "revenue" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_download))
-                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
-                    }
-                    "liabilities" -> {
-                        noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_ticket_alt))
-                        noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
-                    }
-                }
-            } else {
-                noAccountText.isGone = true
-                noAccountImage.isGone = true
-                recycler_view.isVisible = true
-                recycler_view.adapter = AccountRecyclerAdapter(accountData) { data: AccountData -> itemClicked(data) }
-            }
-            swipeContainer.isRefreshing = false
+        accountVm.getAccountList(accountType).observe(viewLifecycleOwner){ pagingData ->
+            accountAdapter.submitData(lifecycle, pagingData)
         }
     }
 
+
+    private fun setRecyclerView(){
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recycler_view.adapter = accountAdapter
+        accountAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            if(loadStates.refresh !is LoadState.Loading) {
+                if(accountAdapter.itemCount < 1){
+                    recycler_view.isGone = true
+                    noAccountImage.isVisible = true
+                    noAccountText.isVisible = true
+                    when (accountType) {
+                        "asset" -> {
+                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill))
+                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
+                        }
+                        "expense" -> {
+                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_shopping_cart))
+                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
+                        }
+                        "revenue" -> {
+                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_download))
+                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
+                        }
+                        "liabilities" -> {
+                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_ticket_alt))
+                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
+                        }
+                    }
+                } else {
+                    recycler_view.isVisible = true
+                    noAccountImage.isGone = true
+                    noAccountText.isGone = true
+                }
+            }
+        }
+    }
 
     private fun itemClicked(data: AccountData){
         val bundle = bundleOf("accountId" to data.accountId, "accountType" to accountType)
@@ -113,7 +127,6 @@ class ListAccountFragment: BaseFragment() {
 
     private fun pullToRefresh(){
         swipeContainer.setOnRefreshListener {
-            dataAdapter.clear()
             displayView()
         }
     }
