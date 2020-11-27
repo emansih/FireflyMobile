@@ -3,9 +3,9 @@ package xyz.hisname.fireflyiii.ui.transaction.details
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -271,7 +271,7 @@ class TransactionDetailsFragment: BaseFragment() {
 
     override fun handleBack() {
         parentFragmentManager.popBackStack()
-        val v2Layout = requireActivity().findViewById<LinearLayout>(R.id.fragment_transaction_rootview)
+        val v2Layout = requireActivity().findViewById<CoordinatorLayout>(R.id.fragment_transaction_rootview)
         if (v2Layout != null) {
             v2Layout.isVisible = true
             val mainToolbar = requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
