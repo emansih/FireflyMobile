@@ -190,44 +190,36 @@ class TransactionFragment: BaseFragment(){
                 val textView = container.onDayText
                 textView.text = day.date.dayOfMonth.toString()
                 setShowCase(textView)
-                if (day.owner == DayOwner.THIS_MONTH) {
-                    when {
-                        selectedDates.contains(day.date) -> {
-                            if (selectedDates.size == 2){
-                                for (x in 0 until DateTimeUtil.getDaysDifference(selectedDates[0], selectedDates[1])){
-                                    dateRange.add(selectedDates[1].minusDays(x))
-                                }
-                                startDate = selectedDates[0]
-                                endDate = selectedDates[1]
-                                loadTransaction()
-                            } else {
-                                dateRange.clear()
+                when {
+                    selectedDates.contains(day.date) -> {
+                        if (selectedDates.size == 2){
+                            for (x in 0 until DateTimeUtil.getDaysDifference(selectedDates[0], selectedDates[1])){
+                                dateRange.add(selectedDates[1].minusDays(x))
                             }
-                            textView.setTextColor(setDayNightTheme())
-                            textView.setBackgroundResource(R.drawable.today_bg)
+                            startDate = selectedDates[0]
+                            endDate = selectedDates[1]
+                            loadTransaction()
+                        } else {
+                            dateRange.clear()
                         }
-                        dateRange.contains(day.date) -> {
-                            textView.setTextColor(setDayNightTheme())
-                            textView.setBackgroundResource(R.drawable.today_bg)
-                        }
-                        selectedDate == day.date -> {
-                            if(selectedDate == today){
-                                textView.setTextColor(getCompatColor(R.color.md_red_800))
-                            } else {
-                                textView.setTextColor(setDayNightTheme())
-                            }
-                            textView.setBackgroundResource(R.drawable.today_bg)
-                        }
-                        else -> {
-                            textView.setTextColor(setDayNightTheme())
-                            textView.background = null
-                        }
+                        textView.setTextColor(setDayNightTheme())
+                        textView.setBackgroundResource(R.drawable.today_bg)
                     }
-                } else {
-                    if(globalViewModel.isDark){
-                        textView.setTextColor(getCompatColor(R.color.md_black_1000))
-                    } else {
-                        textView.setTextColor(getCompatColor(R.color.md_white_1000))
+                    dateRange.contains(day.date) -> {
+                        textView.setTextColor(setDayNightTheme())
+                        textView.setBackgroundResource(R.drawable.today_bg)
+                    }
+                    selectedDate == day.date -> {
+                        if(selectedDate == today){
+                            textView.setTextColor(getCompatColor(R.color.md_red_800))
+                        } else {
+                            textView.setTextColor(setDayNightTheme())
+                        }
+                        textView.setBackgroundResource(R.drawable.today_bg)
+                    }
+                    else -> {
+                        textView.setTextColor(setDayNightTheme())
+                        textView.background = null
                     }
                 }
             }
