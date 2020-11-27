@@ -17,14 +17,8 @@ abstract class TransactionDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(vararg obj: TransactionIndex)
 
-    @Query("SELECT * FROM transactionTable WHERE transactionType = :type")
-    abstract fun getTransactionList(type: String): MutableList<Transactions>
-
     @Query("SELECT * FROM transactionTable WHERE transactionType = :type AND currency_code =:currencyCode")
     abstract suspend fun getTransactionListWithCurrency(type: String, currencyCode: String): MutableList<Transactions>
-
-    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
-    abstract fun getTransaction(startDate: String?, endDate: String?,transactionType: String): LiveData<MutableList<Transactions>>
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND currency_code =:currencyCode ORDER BY date ASC")
     abstract suspend fun getTransactionListWithCurrencyAndDate(startDate: String, endDate: String,transactionType: String, currencyCode: String): MutableList<Transactions>

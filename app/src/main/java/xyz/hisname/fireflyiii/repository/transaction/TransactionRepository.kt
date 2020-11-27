@@ -116,11 +116,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                                       transactionType: String)= transactionDao.getUniqueBudgetByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
 
-    suspend fun recentTransactions(limit: Int): MutableList<Transactions>{
-        loadPaginatedData("", "", "all", 1)
-        return transactionDao.getTransactionLimit(limit)
-    }
-
     suspend fun getTransactionByJournalId(journalId: Long) = transactionDao.getTransactionByJournalId(journalId)
 
     suspend fun getTransactionIdFromJournalId(journalId: Long) =
@@ -194,27 +189,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             handleSearch(query)
         }
         return transactionDao.getTransactionByDescription("%$query%")
-    }
-
-    private suspend fun loadPaginatedData(startDate: String, endDate: String, sourceName: String, pageNumber: Int){
-        try {
-            val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
-                    convertString(sourceName), pageNumber)
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                if (pageNumber == 1) {
-                    transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                            DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), sourceName)
-                }
-                responseBody.data.forEach { data ->
-                    data.transactionAttributes?.transactions?.forEach { transactions ->
-                        transactionDao.insert(transactions)
-                    }
-                    transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
-                }
-            }
-        } catch(exception: Exception){ }
     }
 
     private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
