@@ -325,7 +325,6 @@ class TransactionFragment: BaseFragment(){
             swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
             if(loadStates.refresh !is LoadState.Loading){
                 if(transactionAdapter.itemCount < 1){
-                    recycler_view.isGone = true
                     noTransactionText.isVisible = true
                     noTransactionText.text = resources.getString(R.string.no_transaction_found, transactionType)
                     noTransactionImage.isVisible = true
