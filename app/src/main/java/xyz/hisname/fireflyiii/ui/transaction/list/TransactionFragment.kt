@@ -316,7 +316,7 @@ class TransactionFragment: BaseFragment(){
     private fun setShowCase(textView: TextView){
         FancyShowCaseQueue()
                 .add(showCase(R.string.transaction_calendar_date_help_text, "longClickDate", textView))
-                .add(showCase(R.string.transaction_calendar_header_help_text, "jumpDates", headerText))
+                .add(showCase(R.string.transaction_calendar_header_help_text, "jumpDates", headerText, true))
                 .show()
     }
 
