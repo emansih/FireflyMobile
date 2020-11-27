@@ -133,6 +133,11 @@ class AddTransactionFragment: BaseFragment() {
         contextSwitch()
         attachment_information.layoutManager = LinearLayoutManager(requireContext())
         attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+                false, { data: AttachmentData ->
+            attachmentDataAdapter.remove(data)
+            attachment_information.adapter?.notifyDataSetChanged()
+        }) { another: Int -> }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,13 +149,7 @@ class AddTransactionFragment: BaseFragment() {
                         "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0, ""))
                 attachmentItemAdapter.add(fileUri)
-                attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
-                        false, { data: AttachmentData -> }){ another: Int ->
-                    attachmentDataAdapter.removeAt(another)
-                    attachmentItemAdapter.removeAt(another)
-                    attachment_information.adapter?.notifyItemRemoved(another)
-                }
-
+                attachment_information.adapter?.notifyDataSetChanged()
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()){ fileChoosen ->
@@ -160,14 +159,8 @@ class AddTransactionFragment: BaseFragment() {
                         "", "", FileUtils.getFileName(requireContext(), fileChoosen) ?: "",
                         "", "", "", 0, "", "", ""), 0, ""))
                 attachmentItemAdapter.add(fileChoosen)
+                attachment_information.adapter?.notifyDataSetChanged()
             }
-            attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
-                    false, { data: AttachmentData -> }) { another: Int ->
-                attachmentDataAdapter.removeAt(another)
-                attachmentItemAdapter.removeAt(another)
-                attachment_information.adapter?.notifyItemRemoved(another)
-            }
-
         }
     }
 
