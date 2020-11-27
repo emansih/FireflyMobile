@@ -18,7 +18,7 @@ object Dependencies{
     private const val androidxConstraintLayoutVersion = "2.0.3"
     private const val androidxPrefVersion = "1.1.1"
     private const val androidxWorkVersion = "2.4.0"
-    private const val materialDrawerVersion = "8.1.7"
+    private const val materialDrawerVersion = "8.2.0"
     // Do not use 5.1.0 of iconics https://github.com/mikepenz/Android-Iconics/issues/524
     private const val iconicsVersion = "5.0.3"
     private const val toastyVersion = "7be5e09082"
