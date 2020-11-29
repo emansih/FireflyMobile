@@ -73,9 +73,9 @@ class DashboardFragment: BaseFragment() {
         networthCard.layoutParams.width = (getScreenWidth() - 425)
         setSummary()
         dashboardView.currencySymbol.observe(viewLifecycleOwner){ symbol ->
-            setPieChart(symbol)
+            setPieChart()
             setNetIncome(symbol)
-            setAverage(symbol)
+            setAverage()
             loadRecentTransaction()
         }
         setExtendedFab()
@@ -167,33 +167,33 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setNetIncome(currencySymbol: String){
-        zipLiveData(dashboardView.currentMonthDeposit, dashboardView.currentMonthWithdrawal,
-                dashboardView.lastMonthDeposit, dashboardView.lastMonthWithdrawal,
-                dashboardView.twoMonthsAgoDeposit,
-                dashboardView.twoMonthsAgoWithdrawal).observe(viewLifecycleOwner){ value ->
-            currentMonthIncome.text = currencySymbol + value.first.toString()
-            currentExpense.text = currencySymbol + value.second.toString()
-            if(dashboardView.currentMonthNet < BigDecimal.ZERO){
+        zipLiveData(dashboardView.currentMonthDepositLiveData, dashboardView.currentMonthWithdrawalLiveData,
+                dashboardView.lastMonthDepositLiveData, dashboardView.lastMonthWithdrawalLiveData,
+                dashboardView.twoMonthsAgoDepositLiveData,
+                dashboardView.twoMonthsAgoWithdrawalLiveData).observe(viewLifecycleOwner){ value ->
+            currentMonthIncome.text = dashboardView.currentMonthDeposit
+            currentExpense.text = dashboardView.currentMonthWithdrawal
+            if(dashboardView.currentMonthNetBigDecimal < BigDecimal.ZERO){
                 currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
-            currentNetIncome.text = currencySymbol + " " + dashboardView.currentMonthNet
+            currentNetIncome.text = dashboardView.currentMonthNetString
 
-            oneMonthBeforeIncome.text = currencySymbol + value.third.toString()
-            oneMonthBeforeExpense.text = currencySymbol + value.fourth.toString()
+            oneMonthBeforeIncome.text = dashboardView.lastMonthDeposit
+            oneMonthBeforeExpense.text = dashboardView.lastMonthWithdrawal
 
-            if(dashboardView.lastMonthNet < BigDecimal.ZERO){
+            if(dashboardView.lastMonthNetBigDecimal < BigDecimal.ZERO){
                 oneMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
-            oneMonthBeforeNetIncome.text = currencySymbol + dashboardView.lastMonthNet
+            oneMonthBeforeNetIncome.text = dashboardView.lastMonthNetString
 
 
-            twoMonthBeforeIncome.text = currencySymbol + value.fifth.toString()
-            twoMonthBeforeExpense.text = currencySymbol + value.sixth.toString()
-            if(dashboardView.twoMonthAgoNet < BigDecimal.ZERO){
+            twoMonthBeforeIncome.text = dashboardView.twoMonthsAgoDeposit
+            twoMonthBeforeExpense.text = dashboardView.twoMonthsAgoWithdrawal
+            if(dashboardView.twoMonthAgoNetBigDecimal < BigDecimal.ZERO){
                 twoMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
 
-            twoMonthBeforeNetIncome.text = currencySymbol + dashboardView.twoMonthAgoNet
+            twoMonthBeforeNetIncome.text = dashboardView.twoMonthAgoNetString
 
             val withDrawalHistory = arrayListOf(
                     BarEntry(0f, value.sixth.toFloat()),
@@ -240,7 +240,7 @@ class DashboardFragment: BaseFragment() {
         }
     }
 
-    private fun setAverage(currencySymbol: String){
+    private fun setAverage(){
         dashboardView.sixDayWithdrawalLiveData.observe(viewLifecycleOwner){ value ->
             val expenseHistory = arrayListOf(
                     BarEntry(0f, value.first.toFloat()),
@@ -274,12 +274,12 @@ class DashboardFragment: BaseFragment() {
                 animateY(1000)
                 setTouchEnabled(true)
             }
-            sixDaysAverage.text = currencySymbol + dashboardView.sixDaysAverage
-            thirtyDaysAverage.text = currencySymbol + dashboardView.thirtyDayAverage
+            sixDaysAverage.text = dashboardView.sixDaysAverage
+            thirtyDaysAverage.text = dashboardView.thirtyDayAverage
         }
     }
 
-    private fun setPieChart(symbol: String) {
+    private fun setPieChart() {
         monthText.text = DateTimeUtil.getCurrentMonth()
         val dataColor = arrayListOf(getCompatColor(R.color.md_red_700), getCompatColor(R.color.md_green_500))
         zipLiveData(dashboardView.budgetLeftPercentage,
@@ -326,10 +326,10 @@ class DashboardFragment: BaseFragment() {
             ObjectAnimator.ofInt(budgetProgress, "progress", budget.first.toInt()).start()
         }
         dashboardView.currentMonthBudgetValue.observe(viewLifecycleOwner){ budget ->
-            budgetAmount.text = symbol + budget
+            budgetAmount.text = budget
         }
         dashboardView.currentMonthSpentValue.observe(viewLifecycleOwner){ budget ->
-            spentAmount.text = symbol + budget
+            spentAmount.text = budget
         }
     }
 

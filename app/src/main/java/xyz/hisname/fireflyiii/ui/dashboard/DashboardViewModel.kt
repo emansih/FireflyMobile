@@ -10,6 +10,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.preference.PreferenceManager
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -48,7 +49,7 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
     )
 
     private lateinit var currencyCode: String
-
+    private var currencySymbolLocationIsAtEnd = false
     val currencySymbol: MutableLiveData<String> = MutableLiveData()
     val networthValue: MutableLiveData<String> = MutableLiveData()
     val leftToSpendValue: MutableLiveData<String> = MutableLiveData()
@@ -62,24 +63,43 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
     val currentMonthBudgetValue: MutableLiveData<String> = MutableLiveData()
     val budgetLeftPercentage: MutableLiveData<BigDecimal> = MutableLiveData()
     val budgetSpentPercentage: MutableLiveData<BigDecimal> = MutableLiveData()
-    val currentMonthWithdrawal: MutableLiveData<BigDecimal> = MutableLiveData()
-    val currentMonthDeposit: MutableLiveData<BigDecimal> = MutableLiveData()
-    val lastMonthWithdrawal: MutableLiveData<BigDecimal> = MutableLiveData()
-    val lastMonthDeposit: MutableLiveData<BigDecimal> = MutableLiveData()
-    val twoMonthsAgoDeposit: MutableLiveData<BigDecimal> = MutableLiveData()
-    val twoMonthsAgoWithdrawal: MutableLiveData<BigDecimal> = MutableLiveData()
+    val currentMonthWithdrawalLiveData: MutableLiveData<BigDecimal> = MutableLiveData()
+    val currentMonthDepositLiveData: MutableLiveData<BigDecimal> = MutableLiveData()
+    val lastMonthWithdrawalLiveData: MutableLiveData<BigDecimal> = MutableLiveData()
+    val lastMonthDepositLiveData: MutableLiveData<BigDecimal> = MutableLiveData()
+    val twoMonthsAgoDepositLiveData: MutableLiveData<BigDecimal> = MutableLiveData()
+    val twoMonthsAgoWithdrawalLiveData: MutableLiveData<BigDecimal> = MutableLiveData()
     val sixDayWithdrawalLiveData: MutableLiveData<Sixple<BigDecimal, BigDecimal,
             BigDecimal, BigDecimal, BigDecimal, BigDecimal>> = MutableLiveData()
-    var currentMonthNet: BigDecimal = 0.toBigDecimal()
+    var currentMonthNetBigDecimal = 0.toBigDecimal()
         private set
-    var lastMonthNet: BigDecimal = 0.toBigDecimal()
+    var lastMonthNetBigDecimal = 0.toBigDecimal()
         private set
-    var twoMonthAgoNet: BigDecimal = 0.toBigDecimal()
+    var twoMonthAgoNetBigDecimal = 0.toBigDecimal()
         private set
-    var sixDaysAverage: BigDecimal = 0.toBigDecimal()
+    var currentMonthNetString = ""
         private set
-    var thirtyDayAverage: BigDecimal = 0.toBigDecimal()
+    var lastMonthNetString = ""
         private set
+    var twoMonthAgoNetString = ""
+        private set
+    var sixDaysAverage: String = ""
+        private set
+    var thirtyDayAverage: String = ""
+        private set
+    var currentMonthWithdrawal: String = ""
+        private set
+    var currentMonthDeposit: String = ""
+        private set
+    var lastMonthWithdrawal: String = ""
+        private set
+    var lastMonthDeposit: String = ""
+        private set
+    var twoMonthsAgoDeposit: String = ""
+        private set
+    var twoMonthsAgoWithdrawal: String = ""
+        private set
+
 
     init {
         getDefaultCurrency()
@@ -91,14 +111,14 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
             val currencyList = currencyRepository.defaultCurrency()[0]
             currencySymbol.postValue(currencyList.currencyAttributes?.symbol)
             currencyCode = currencyList.currencyAttributes?.code ?: ""
-            getBasicSummary(currencyList.currencyAttributes?.code ?: "")
-            getPieChartData(currencyList.currencyAttributes?.code ?: "")
-            setNetEarnings(currencyList.currencyAttributes?.code ?: "")
+            getBasicSummary(currencyList.currencyAttributes?.code ?: "", currencyList.currencyAttributes?.symbol ?: "")
+            getPieChartData(currencyList.currencyAttributes?.code ?: "", currencyList.currencyAttributes?.symbol ?: "")
+            setNetEarnings(currencyList.currencyAttributes?.code ?: "", currencyList.currencyAttributes?.symbol ?: "")
         }
     }
 
 
-    private fun getBasicSummary(currencyCode: String){
+    private fun getBasicSummary(currencyCode: String, currencySymbol: String){
         val simpleData = SimpleData(PreferenceManager.getDefaultSharedPreferences(getApplication()))
         val summaryService = genericService()?.create(SummaryService::class.java)
         summaryService?.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
@@ -114,6 +134,9 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
                     "0.0"
                 }
                 simpleData.networthValue = netWorth
+                if(netWorth?.indexOf(currencySymbol) != 0){
+                    currencySymbolLocationIsAtEnd = true
+                }
                 val leftToSpend = try {
                     responseBody
                             .getJSONObject("left-to-spend-in-$currencyCode")
@@ -188,6 +211,9 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
             leftToSpendDay.postValue(simpleData.leftToSpendPerDay)
         })
         { throwable ->
+            if(simpleData.networthValue?.indexOf(currencySymbol) != 0){
+                currencySymbolLocationIsAtEnd = true
+            }
             networthValue.postValue(simpleData.networthValue)
             leftToSpendValue.postValue(simpleData.leftToSpend)
             balanceValue.postValue(simpleData.balance)
@@ -199,16 +225,24 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
         })
     }
 
-    private suspend fun getPieChartData(currencyCode: String){
+    private suspend fun getPieChartData(currencyCode: String, currencySymbol: String){
         val budgetSpent = budgetRepository.allActiveSpentList(currencyCode,
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth())
-        currentMonthSpentValue.postValue(budgetSpent.toString())
+        if(currencySymbolLocationIsAtEnd){
+            currentMonthSpentValue.postValue(budgetSpent.toString() + currencySymbol)
+        } else {
+            currentMonthSpentValue.postValue(currencySymbol + budgetSpent)
+        }
         budgetRepository.getAllBudget()
         val budgeted = budgetRepository.retrieveConstraintBudgetWithCurrency(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode)
-        currentMonthBudgetValue.postValue(budgeted.toString())
+        if(currencySymbolLocationIsAtEnd){
+            currentMonthBudgetValue.postValue(budgeted.toString() + currencySymbol)
+        } else {
+            currentMonthBudgetValue.postValue(currencySymbol + budgeted)
+        }
 
         if(budgetSpent == BigDecimal.ZERO){
             budgetLeftPercentage.postValue(BigDecimal.ZERO)
@@ -229,7 +263,7 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
         }
     }
 
-    private suspend fun setNetEarnings(currencyCode: String){
+    private suspend fun setNetEarnings(currencyCode: String, currencySymbol: String){
         val currentWithdrawal = transactionRepository.getTransactionByDateAndCurrencyCode(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode, "withdrawal",true)
@@ -248,21 +282,71 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
         val twoMonthsAgoDep = transactionRepository.getTransactionByDateAndCurrencyCode(
                 DateTimeUtil.getStartOfMonth(2),
                 DateTimeUtil.getEndOfMonth(2), currencyCode, "deposit",true)
-        currentMonthNet = currentDeposit - currentWithdrawal
-        lastMonthNet = lastMonthDep - lastMonthWithdraw
-        twoMonthAgoNet = twoMonthsAgoDep - twoMonthsAgoWithdraw
-        thirtyDayAverage = currentWithdrawal.div(30.toBigDecimal())
-        currentMonthWithdrawal.postValue(currentWithdrawal)
-        currentMonthDeposit.postValue(currentDeposit)
-        lastMonthWithdrawal.postValue(lastMonthWithdraw)
-        lastMonthDeposit.postValue(lastMonthDep)
-        twoMonthsAgoDeposit.postValue(twoMonthsAgoDep)
-        twoMonthsAgoWithdrawal.postValue(twoMonthsAgoWithdraw)
-        setDailySummary()
+        currentMonthNetBigDecimal = currentDeposit - currentWithdrawal
+        currentMonthNetString = if(currencySymbolLocationIsAtEnd){
+            currentMonthNetBigDecimal.toString() + currencySymbol
+        } else {
+            currencySymbol + currentMonthNetBigDecimal.toString()
+        }
+        lastMonthNetBigDecimal = lastMonthDep - lastMonthWithdraw
+        lastMonthNetString = if(currencySymbolLocationIsAtEnd){
+            lastMonthNetBigDecimal.toString() + currencySymbol
+        } else {
+            currencySymbol + lastMonthNetBigDecimal.toString()
+        }
+        twoMonthAgoNetBigDecimal = twoMonthsAgoDep - twoMonthsAgoWithdraw
+        twoMonthAgoNetString = if(currencySymbolLocationIsAtEnd){
+            twoMonthAgoNetBigDecimal.toString() + currencySymbol
+        } else {
+            currencySymbol + twoMonthAgoNetBigDecimal.toString()
+        }
+        thirtyDayAverage = if(currencySymbolLocationIsAtEnd){
+            currentWithdrawal.div(30.toBigDecimal()).toString() + currencySymbol
+        } else {
+            currencySymbol + currentWithdrawal.div(30.toBigDecimal()).toString()
+        }
+        currentMonthWithdrawal = if(currencySymbolLocationIsAtEnd){
+            currentWithdrawal.toString() + currencySymbol
+        } else {
+            currencySymbol + currentWithdrawal.toString()
+        }
+        currentMonthDeposit = if(currencySymbolLocationIsAtEnd){
+            currentDeposit.toString() + currencySymbol
+        } else {
+            currencySymbol + currentDeposit.toString()
+        }
+        lastMonthWithdrawal = if(currencySymbolLocationIsAtEnd){
+            lastMonthWithdraw.toString() + currencySymbol
+        } else {
+            currencySymbol + lastMonthWithdraw.toString()
+        }
+        lastMonthDeposit = if(currencySymbolLocationIsAtEnd){
+            lastMonthDep.toString() + currencySymbol
+        } else {
+            currencySymbol + lastMonthDep.toString()
+        }
+        twoMonthsAgoDeposit = if(currencySymbolLocationIsAtEnd){
+            twoMonthsAgoDep.toString() + currencySymbol
+        } else {
+            currencySymbol + twoMonthsAgoDep.toString()
+        }
+        twoMonthsAgoWithdrawal = if(currencySymbolLocationIsAtEnd){
+            twoMonthsAgoWithdraw.toString() + currencySymbol
+        } else {
+            currencySymbol + twoMonthsAgoWithdraw.toString()
+        }
+        currentMonthWithdrawalLiveData.postValue(currentWithdrawal)
+        currentMonthDepositLiveData.postValue(currentDeposit)
+        lastMonthWithdrawalLiveData.postValue(lastMonthWithdraw)
+        lastMonthDepositLiveData.postValue(lastMonthDep)
+        twoMonthsAgoDepositLiveData.postValue(twoMonthsAgoDep)
+        twoMonthsAgoWithdrawalLiveData.postValue(twoMonthsAgoWithdraw)
+
+        setDailySummary(currencySymbol)
     }
 
 
-    private suspend fun setDailySummary(){
+    private suspend fun setDailySummary(currencySymbol: String){
         val yesterdayWith = transactionRepository.getTransactionByDateAndCurrencyCode(
                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1),
                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 1), currencyCode,
@@ -287,8 +371,13 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6),
                 DateTimeUtil.getDaysBefore(DateTimeUtil.getTodayDate(), 6), currencyCode,
                 "withdrawal",false)
-        sixDaysAverage = (yesterdayWith + twoDaysAgoWith + threeDaysAgoWith +
-                fourDaysAgoWith + fiveDaysAgoWith + sixDaysAgoWith).div(6.toBigDecimal())
+        sixDaysAverage = if(currencySymbolLocationIsAtEnd){
+            (yesterdayWith + twoDaysAgoWith + threeDaysAgoWith +
+                    fourDaysAgoWith + fiveDaysAgoWith + sixDaysAgoWith).div(6.toBigDecimal()).toString() + currencySymbol
+        } else {
+            currencySymbol + (yesterdayWith + twoDaysAgoWith + threeDaysAgoWith +
+                    fourDaysAgoWith + fiveDaysAgoWith + sixDaysAgoWith).div(6.toBigDecimal()).toString()
+        }
         sixDayWithdrawalLiveData.postValue(Sixple(yesterdayWith, twoDaysAgoWith, threeDaysAgoWith,
                 fourDaysAgoWith, fiveDaysAgoWith, sixDaysAgoWith))
     }
