@@ -207,7 +207,6 @@ class TransactionFragment: BaseFragment(){
                             textView.setBackgroundResource(R.drawable.today_bg)
                         }
                         dateRange.contains(day.date) -> {
-                            textView.setTextColor(setDayNightTheme())
                             textView.setBackgroundResource(R.drawable.today_bg)
                         }
                         selectedDate == day.date -> {
@@ -231,9 +230,7 @@ class TransactionFragment: BaseFragment(){
                     }
                 }
             }
-
             override fun create(view: View) = DayViewContainer(view)
-
         }
 
         transaction_calendar.monthScrollListener = { calendarMonth ->
@@ -242,8 +239,8 @@ class TransactionFragment: BaseFragment(){
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusYears(80)
         val endMonth = currentMonth.plusYears(20)
-        transaction_calendar.setup(startMonth, endMonth, WeekFields.of(Locale.getDefault()).firstDayOfWeek)
-        transaction_calendar.scrollToMonth(currentMonth)
+        transaction_calendar.setupAsync(startMonth, endMonth, WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+        transaction_calendar.smoothScrollToMonth(currentMonth)
         transaction_calendar.updateMonthConfiguration()
     }
 
