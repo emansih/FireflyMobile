@@ -47,11 +47,10 @@ import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragme
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.time.temporal.WeekFields
-import java.util.*
 
 class TransactionFragment: BaseFragment(){
 
@@ -239,9 +238,10 @@ class TransactionFragment: BaseFragment(){
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusYears(80)
         val endMonth = currentMonth.plusYears(20)
-        transaction_calendar.setupAsync(startMonth, endMonth, WeekFields.of(Locale.getDefault()).firstDayOfWeek)
-        transaction_calendar.smoothScrollToMonth(currentMonth)
-        transaction_calendar.updateMonthConfiguration()
+        transaction_calendar.setupAsync(startMonth, endMonth, DayOfWeek.SUNDAY){
+            transaction_calendar.scrollToMonth(currentMonth)
+            transaction_calendar.updateMonthConfiguration()
+        }
     }
 
     private fun setDayNightTheme(): Int{
