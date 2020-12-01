@@ -18,6 +18,7 @@ import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.time.Duration
+import java.time.LocalDate
 import java.util.concurrent.ThreadLocalRandom
 
 class BillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
@@ -113,7 +114,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                                     name, currency.currencyId ?: 0L, currencyCode,
                                     currency.currencyAttributes?.symbol ?: "",
                                     currency.currencyAttributes?.decimal_places ?: 0,
-                                    minAmount.toBigDecimal(), maxAmount.toBigDecimal(), billDate,
+                                    minAmount.toBigDecimal(), maxAmount.toBigDecimal(), LocalDate.parse(billDate),
                                     repeatFreq, skip.toInt(), true, 0, listOf(),
                                     listOf(), notes, null, true)
                             )

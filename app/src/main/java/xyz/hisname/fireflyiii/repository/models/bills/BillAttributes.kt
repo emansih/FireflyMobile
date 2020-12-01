@@ -1,29 +1,33 @@
 package xyz.hisname.fireflyiii.repository.models.bills
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Entity
 @JsonClass(generateAdapter = true)
 data class BillAttributes(
-        val updated_at: String,
-        val created_at: String,
-        var name: String,
-        val currency_id: Long,
-        val currency_code: String,
-        val currency_symbol: String,
-        val currency_decimal_places: Int,
-        val amount_min: BigDecimal,
-        val amount_max: BigDecimal,
-        val date: String,
-        val repeat_freq: String,
-        val skip: Int,
-        val active: Boolean,
-        val attachments_count: Int = 0,
-        val pay_dates: List<String>,
-        val paid_dates: List<String>,
-        val notes: String?,
-        val next_expected_match: String?,
-        val isPending: Boolean = false
+        var updated_at: String = "",
+        var created_at: String = "",
+        var name: String = "",
+        var currency_id: Long = 0,
+        var currency_code: String = "",
+        var currency_symbol: String = "",
+        var currency_decimal_places: Int = 0,
+        var amount_min: BigDecimal = 0.toBigDecimal(),
+        var amount_max: BigDecimal = 0.toBigDecimal(),
+        var date: LocalDate = LocalDate.now(),
+        var repeat_freq: String = "",
+        var skip: Int = 0,
+        var active: Boolean = false,
+        var attachments_count: Int = 0,
+        @Ignore
+        var pay_dates: List<String> = listOf(),
+        @Ignore
+        var paid_dates: List<BillPaidDates> = listOf(),
+        var notes: String? = "",
+        var next_expected_match: String? = "",
+        var isPending: Boolean = false
 )

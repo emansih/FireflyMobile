@@ -12,24 +12,6 @@ import java.net.UnknownHostException
 class BillRepository(private val billDao: BillDataDao,
                      private val billService: BillsService?) {
 
-    suspend fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): Flow<MutableList<BillData>> {
-        try {
-            val networkCall = billService?.getPaginatedBills(pageNumber, startDate, endDate)
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                if (pageNumber == 1) {
-                    billDao.deleteAllBills()
-                }
-                responseBody.data.forEachIndexed { _, billData ->
-                    insertBill(billData)
-                }
-            }
-        } catch (exception: Exception){
-            exception.printStackTrace()
-        }
-        return billDao.getPaginatedBills(pageNumber * Constants.PAGE_SIZE)
-    }
-
     suspend fun insertBill(bill: BillData) = billDao.insert(bill)
 
 
@@ -49,9 +31,7 @@ class BillRepository(private val billDao: BillDataDao,
         } catch (exception: Exception){ }
         return billDao.getBillById(billId)
     }
-    
-    suspend fun getBillByName(billName: String) = billDao.getBillByName(billName)
-    
+
     suspend fun deleteBillById(billId: Long): Int{
         try {
             val networkResponse = billService?.deleteBillById(billId)

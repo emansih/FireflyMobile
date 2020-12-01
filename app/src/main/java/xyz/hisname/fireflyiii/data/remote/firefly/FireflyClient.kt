@@ -7,13 +7,13 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import xyz.hisname.fireflyiii.data.remote.firefly.moshi.BigDecimalConverter
-import xyz.hisname.fireflyiii.data.remote.firefly.moshi.JsonObjectConverter
-import xyz.hisname.fireflyiii.data.remote.firefly.moshi.NullToEmptyStringConverter
-import xyz.hisname.fireflyiii.data.remote.firefly.moshi.OffsetDateTimeConverter
+import xyz.hisname.fireflyiii.data.remote.firefly.moshi.*
+import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
+import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLSocketFactory
@@ -53,10 +53,10 @@ class FireflyClient {
                     val moshi = Moshi.Builder()
                             .add(NullToEmptyStringConverter)
                             .add(JsonObjectConverter)
+                            .add(LocalDate::class.java, LocalDateAdapter())
                             .add(OffsetDateTime::class.java, OffsetDateTimeConverter())
                             .add(BigDecimalConverter())
                             .build()
-                    MoshiConverterFactory.create()
                     INSTANCE = Retrofit.Builder()
                             .baseUrl(generateUrl(baseUrl))
                             .client(client.build())

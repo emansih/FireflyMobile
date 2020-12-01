@@ -17,10 +17,17 @@ abstract class BillDataDao: BaseDao<BillData>{
     abstract fun getBillById(billId: Long): MutableList<BillData>
 
     @Query("DELETE FROM bills")
-    abstract fun deleteAllBills(): Int
+    abstract suspend fun deleteAllBills(): Int
 
-    @Query("SELECT * FROM bills order by billId desc limit :limitNumber")
-    abstract fun getPaginatedBills(limitNumber: Int): Flow<MutableList<BillData>>
+    //@Query("SELECT * FROM bills WHERE  order by billId")
+    //abstract suspend fun getBillByDate(startDate:String, endDate: String): List<BillData>
+
+
+    @Query("SELECT * FROM bills order by billId desc")
+    abstract suspend fun getBills(): MutableList<BillData>
+
+    @Query("SELECT COUNT(*) FROM bills order by billId desc")
+    abstract suspend fun getBillsCount(): Long
 
     @Query("SELECT * FROM bills WHERE name = :billName")
     abstract fun getBillByName(billName: String): MutableList<BillData>

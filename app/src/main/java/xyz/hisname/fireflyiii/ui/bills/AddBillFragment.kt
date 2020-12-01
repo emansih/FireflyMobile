@@ -73,7 +73,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                     val currencyData = currencyList[0].currencyAttributes
                     currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
                 }
-                bill_date_edittext.setText(billAttribute?.date)
+                bill_date_edittext.setText(billAttribute?.date.toString())
                 skip_edittext.setText(billAttribute?.skip.toString())
                 notes_edittext.setText(billAttribute?.notes)
                 frequency_exposed_dropdown.setText(billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase()

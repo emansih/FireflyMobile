@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
@@ -29,17 +28,6 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
     init {
         val billDataDao = AppDatabase.getInstance(application).billDataDao()
         repository = BillRepository(billDataDao, billsService)
-    }
-
-
-    fun getPaginatedBills(pageNumber: Int, startDate: String, endDate: String): LiveData<MutableList<BillData>>{
-        val data: MutableLiveData<MutableList<BillData>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            repository.getPaginatedBills(pageNumber, startDate, endDate).collectLatest {
-                data.postValue(it)
-            }
-        }
-        return data
     }
 
     fun getBillById(billId: Long): LiveData<MutableList<BillData>>{
@@ -146,33 +134,6 @@ class BillsViewModel(application: Application): BaseViewModel(application) {
         { throwable -> apiLiveData.postValue(ApiResponses(throwable)) })
         apiResponse.addSource(apiLiveData){ apiResponse.value = it }
         return apiResponse
-    }
-
-    fun deleteBillByName(billName: String): LiveData<Boolean>{
-        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = 0
-        var billId: Long = 0
-        viewModelScope.launch(Dispatchers.IO) {
-            billId = repository.getBillByName(billName)[0].billId ?: 0
-            if (billId != 0L) {
-                isItDeleted = repository.deleteBillById(billId)
-            }
-        }.invokeOnCompletion {
-            // Since onDraw() is being called multiple times, we check if the bill exists locally in the DB.
-            when (isItDeleted) {
-                HttpConstants.FAILED -> {
-                    isDeleted.postValue(false)
-                    DeleteBillWorker.initPeriodicWorker(billId, getApplication())
-                }
-                HttpConstants.UNAUTHORISED -> {
-                    isDeleted.postValue(false)
-                }
-                HttpConstants.NO_CONTENT_SUCCESS -> {
-                    isDeleted.postValue(true)
-                }
-            }
-        }
-        return isDeleted
     }
 
 }

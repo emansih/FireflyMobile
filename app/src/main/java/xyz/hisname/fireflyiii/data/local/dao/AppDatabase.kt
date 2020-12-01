@@ -11,6 +11,8 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
+import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
+import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListFts
@@ -29,12 +31,15 @@ import xyz.hisname.fireflyiii.util.TypeConverterUtil
 
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
-    BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class, Spent::class, BudgetLimitData::class],
-        version = 21, exportSchema = false)
+    BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class,
+    Spent::class, BudgetLimitData::class, BillPaidDates::class, BillPayDates::class],
+        version = 22, exportSchema = false)
 @TypeConverters(TypeConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun billDataDao(): BillDataDao
+    abstract fun billPaidDao(): BillPaidDao
+    abstract fun billPayDao(): BillPayDao
     abstract fun piggyDataDao(): PiggyDataDao
     abstract fun accountDataDao(): AccountsDataDao
     abstract fun currencyDataDao(): CurrencyDataDao

@@ -58,4 +58,16 @@ object TypeConverterUtil{
     fun dateToTimestamp(date: OffsetDateTime?): Long? {
         return date?.toInstant()?.toEpochMilli()
     }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromLocalDate(value: String?): LocalDate? {
+        return LocalDate.parse(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toLocalDate(value: LocalDate?): String {
+        return value.toString()
+    }
 }
