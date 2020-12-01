@@ -242,8 +242,7 @@ class DeleteItemsFragment: BaseSettings() {
     }
 
     private fun setIconColor(): Int{
-        val isDarkMode = globalViewModel.isDarkMode().value ?: false
-        return if(isDarkMode){
+        return if(globalViewModel.isDark){
             R.color.md_white_1000
         } else {
             R.color.md_black_1000
