@@ -21,9 +21,9 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
+import xyz.hisname.fireflyiii.repository.userinfo.SystemInfoRepository
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.isAscii
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.io.File
 import java.net.UnknownServiceException
 import java.security.cert.CertificateException
@@ -39,6 +39,11 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     private val applicationContext = getApplication<Application>()
     private val accountManager = AccountManager.get(applicationContext)
     private val customCaFile by lazy { File(applicationContext.filesDir.toString() + File.pathSeparator +  "user_custom.pem") }
+    private val systemInfoRepository by lazy { SystemInfoRepository(
+            genericService()?.create(SystemInfoService::class.java),
+            sharedPref,
+            accManager)
+    }
     private lateinit var repository: AccountRepository
 
 
@@ -164,37 +169,23 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
 
     fun getUser(): LiveData<Boolean> {
         val apiOk: MutableLiveData<Boolean> = MutableLiveData()
-        val systemService = genericService()?.create(SystemInfoService::class.java)
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
             showErrorMessage.postValue(throwable.localizedMessage)
+            apiOk.postValue(false)
         }) {
-            val userAttribute = systemService?.getCurrentUserInfo()?.body()?.userData?.userAttributes
-            if (userAttribute != null) {
-                accManager.userEmail = userAttribute.email
-                if(userAttribute.role != null){
-                    AppPref(sharedPref).userRole = userAttribute.role
-                }
-                apiOk.postValue(true)
-            } else {
-                apiOk.postValue(false)
-            }
+            systemInfoRepository.getCurrentUserInfo()
+            apiOk.postValue(true)
         }
         return apiOk
     }
 
     fun userSystem(): LiveData<Boolean> {
         val apiOk: MutableLiveData<Boolean> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            val systemInfoModel = genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.body()
-            val systemData = systemInfoModel?.systemData
-            if (systemData != null) {
-                AppPref(sharedPref).serverVersion = systemData.version
-                AppPref(sharedPref).remoteApiVersion = systemData.api_version
-                AppPref(sharedPref).userOs = systemData.os
-                apiOk.postValue(true)
-            } else {
-                apiOk.postValue(false)
-            }
+        viewModelScope.launch(Dispatchers.IO+ CoroutineExceptionHandler { _, throwable ->
+            apiOk.postValue(false)
+        }){
+            systemInfoRepository.getUserSystem()
+            apiOk.postValue(true)
         }
         return apiOk
     }

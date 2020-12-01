@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
-import androidx.preference.PreferenceManager
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
@@ -20,24 +19,14 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
-import xyz.hisname.fireflyiii.repository.userinfo.UserInfoViewModel
 import xyz.hisname.fireflyiii.util.extension.getCompatDrawable
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class AboutFragment: MaterialAboutFragment() {
 
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
-    private val serverVersion by lazy { sharedPref.getString("server_version","") ?: ""}
-    private val apiVersion by lazy { sharedPref.getString("api_version","") ?: ""}
-    private val userOs by lazy { sharedPref.getString("user_os","") ?: ""}
     private val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
-    private val serverInfoViewModel by lazy { getImprovedViewModel(UserInfoViewModel::class.java) }
-
-    override fun onStart() {
-        super.onStart()
-        retrieveData()
-    }
+    private val aboutViewModel by lazy { getImprovedViewModel(AboutViewModel::class.java) }
 
     override fun getMaterialAboutList(context: Context): MaterialAboutList{
         return createMaterialAboutList()
@@ -45,11 +34,12 @@ class AboutFragment: MaterialAboutFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        retrieveData()
         handleBack()
     }
 
     private fun retrieveData(){
-        serverInfoViewModel.userSystem().observe(this){ isSuccessful ->
+        aboutViewModel.userSystem().observe(viewLifecycleOwner){ isSuccessful ->
             if(isSuccessful){
                 refreshMaterialAboutList()
             }
@@ -67,7 +57,7 @@ class AboutFragment: MaterialAboutFragment() {
                         },
                 resources.getString(R.string.mobile_version),false)).addItem(MaterialAboutActionItem.Builder()
                         .text(resources.getString(R.string.server_version))
-                        .subText(serverVersion)
+                        .subText(aboutViewModel.serverVersion)
                         .icon(IconicsDrawable(requireContext()).apply{
                             icon = FontAwesome.Icon.faw_server
                             sizeDp = 24
@@ -75,7 +65,7 @@ class AboutFragment: MaterialAboutFragment() {
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text(resources.getString(R.string.api_version))
-                        .subText(apiVersion)
+                        .subText(aboutViewModel.apiVersion)
                         .icon(IconicsDrawable(requireContext()).apply {
                             icon = FontAwesome.Icon.faw_globe
                             sizeDp = 24
@@ -83,7 +73,7 @@ class AboutFragment: MaterialAboutFragment() {
                         .build())
                 .addItem(MaterialAboutActionItem.Builder()
                         .text(resources.getString(R.string.operating_system))
-                        .subText(userOs)
+                        .subText(aboutViewModel.userOs)
                         .icon(setUserOsIcon())
                         .build())
                 .build()
@@ -112,11 +102,11 @@ class AboutFragment: MaterialAboutFragment() {
     }
 
     // Because why not?
-    private fun setUserOsIcon(): Drawable?{
+    private fun setUserOsIcon(): Drawable{
         return when {
-            userOs.toLowerCase().contains("windows") -> IconicsDrawable(requireContext(),FontAwesome.Icon.faw_windows)
-            userOs.toLowerCase().contains("linux") -> IconicsDrawable(requireContext(), FontAwesome.Icon.faw_linux)
-            userOs.toLowerCase().contains("bsd") -> // yea... this is freebsd icon. sorry other BSDs
+            aboutViewModel.userOs.toLowerCase().contains("windows") -> IconicsDrawable(requireContext(),FontAwesome.Icon.faw_windows)
+            aboutViewModel.userOs.toLowerCase().contains("linux") -> IconicsDrawable(requireContext(), FontAwesome.Icon.faw_linux)
+            aboutViewModel.userOs.toLowerCase().contains("bsd") -> // yea... this is freebsd icon. sorry other BSDs
                 IconicsDrawable(requireContext(), FontAwesome.Icon.faw_freebsd)
             else -> IconicsDrawable(requireContext(), FontAwesome.Icon.faw_server)
         }
