@@ -51,6 +51,7 @@ class TransactionAdapter(private val clickListener:(Transactions) -> Unit):
                 }
             }
             itemView.sourceNameText.text = transactionAttributes.source_name
+            itemView.transactionJournalId.text = transactionAttributes.transaction_journal_id.toString()
             itemView.dateText.text = DateTimeUtil.convertLocalDateTime(transactionAttributes.date , timePreference)
             if(transactionAttributes.amount.toString().startsWith("-")){
                 // Negative value means it's a withdrawal

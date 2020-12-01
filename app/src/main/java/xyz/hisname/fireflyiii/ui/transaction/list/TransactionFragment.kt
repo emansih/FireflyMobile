@@ -37,6 +37,7 @@ import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import kotlinx.android.synthetic.main.fragment_transaction.slider
+import kotlinx.android.synthetic.main.recent_transaction_list.view.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -88,6 +89,7 @@ class TransactionFragment: BaseFragment(){
         setCalendar()
         setTransactionCard()
         jumpToDate()
+        dragAndDrop()
     }
 
 
@@ -108,7 +110,7 @@ class TransactionFragment: BaseFragment(){
             }
         })
         swipeContainer.setOnRefreshListener {
-            loadTransaction()
+            transactionAdapter.refresh()
         }
     }
 
@@ -133,7 +135,6 @@ class TransactionFragment: BaseFragment(){
         class DayViewContainer(view: View): ViewContainer(view) {
             val onDayText = view.dayText
             lateinit var day: CalendarDay
-
             init {
                 selectedDate = today
                 view.setOnClickListener {
@@ -241,6 +242,29 @@ class TransactionFragment: BaseFragment(){
         transaction_calendar.setupAsync(startMonth, endMonth, DayOfWeek.SUNDAY){
             transaction_calendar.scrollToMonth(currentMonth)
             transaction_calendar.updateMonthConfiguration()
+        }
+    }
+
+    private fun dragAndDrop(){
+        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
+            if(viewHolder.itemView.list_item.isOverlapping(extendedFab)){
+                extendedFab.dropToRemove()
+                if(!isCurrentlyActive) {
+                    swipeContainer.isRefreshing = true
+                    val transactionJournalId = viewHolder.itemView.transactionJournalId.text.toString()
+                    val transactionName = viewHolder.itemView.transactionNameText.text
+                    transactionVm.deleteTransaction(transactionJournalId).observe(viewLifecycleOwner){ isDeleted ->
+                        transactionAdapter.refresh()
+                        swipeContainer.isRefreshing = false
+                        if(isDeleted){
+                            toastSuccess(resources.getString(R.string.transaction_deleted))
+                        } else {
+                            toastOffline(resources.getString(R.string.data_will_be_deleted_later,
+                                    transactionName), Toast.LENGTH_LONG)
+                        }
+                    }
+                }
+            }
         }
     }
 
