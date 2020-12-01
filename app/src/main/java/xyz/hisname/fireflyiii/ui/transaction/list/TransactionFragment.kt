@@ -119,6 +119,12 @@ class TransactionFragment: BaseFragment(){
                 transactionType).observe(viewLifecycleOwner){ pagingData ->
             transactionAdapter.submitData(lifecycle, pagingData)
         }
+        requireActivity().supportFragmentManager.addOnBackStackChangedListener {
+            if(requireActivity().supportFragmentManager.backStackEntryCount == 0){
+                transactionAdapter.refresh()
+            }
+        }
+
     }
 
     private fun itemClicked(data: Transactions){
