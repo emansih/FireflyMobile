@@ -3,8 +3,10 @@ package xyz.hisname.fireflyiii.ui.onboarding
 import android.accounts.AccountManager
 import android.app.Application
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -15,11 +17,13 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.isAscii
+import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.io.File
 import java.net.UnknownServiceException
 import java.security.cert.CertificateException
@@ -156,6 +160,43 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         accManager.clientId = "2"
         accManager.secretKey = "tfWoJQbmV88Fxej1ysAPIxFireflyIIIApiToken"
         getAccessToken(code, true)
+    }
+
+    fun getUser(): LiveData<Boolean> {
+        val apiOk: MutableLiveData<Boolean> = MutableLiveData()
+        val systemService = genericService()?.create(SystemInfoService::class.java)
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+            showErrorMessage.postValue(throwable.localizedMessage)
+        }) {
+            val userAttribute = systemService?.getCurrentUserInfo()?.body()?.userData?.userAttributes
+            if (userAttribute != null) {
+                accManager.userEmail = userAttribute.email
+                if(userAttribute.role != null){
+                    AppPref(sharedPref).userRole = userAttribute.role
+                }
+                apiOk.postValue(true)
+            } else {
+                apiOk.postValue(false)
+            }
+        }
+        return apiOk
+    }
+
+    fun userSystem(): LiveData<Boolean> {
+        val apiOk: MutableLiveData<Boolean> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            val systemInfoModel = genericService()?.create(SystemInfoService::class.java)?.getSystemInfo()?.body()
+            val systemData = systemInfoModel?.systemData
+            if (systemData != null) {
+                AppPref(sharedPref).serverVersion = systemData.version
+                AppPref(sharedPref).remoteApiVersion = systemData.api_version
+                AppPref(sharedPref).userOs = systemData.os
+                apiOk.postValue(true)
+            } else {
+                apiOk.postValue(false)
+            }
+        }
+        return apiOk
     }
 
     private fun authInit(accessToken: String, baseUrl: String){
