@@ -112,11 +112,6 @@ class TransactionFragment: BaseFragment(){
         swipeContainer.setOnRefreshListener {
             transactionAdapter.refresh()
         }
-        requireActivity().supportFragmentManager.addOnBackStackChangedListener {
-            if(requireActivity().supportFragmentManager.backStackEntryCount == 0){
-                transactionAdapter.refresh()
-            }
-        }
     }
 
     private fun loadTransaction(){
