@@ -29,7 +29,7 @@ class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
     }
 
     inner class BillsHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        fun bind(billData: BillData, clickListener: (BillData) -> Unit) = with(itemView) {
+        fun bind(billData: BillData, clickListener: (BillData) -> Unit){
             val billResponse = billData.billAttributes
             var billName = billResponse?.name
             val isPending = billResponse?.isPending
@@ -40,15 +40,18 @@ class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
                 }
                 itemView.billName.text = billName
             }
-            itemView.setOnClickListener{clickListener(billData)}
-            itemView.billAmount.text = context.getString(R.string.bill_amount, billResponse?.currency_symbol,
-                    billResponse?.amount_max)
+            itemView.billAmount.text = context.getString(R.string.bill_amount,
+                    billResponse?.currency_symbol, billResponse?.amount_max)
             val freq = billResponse?.repeat_freq
             if(freq != null && freq.isNotBlank()){
                 itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
             }
+            val nextMatch = billResponse?.next_expected_match
+            if(nextMatch != null){
+                itemView.billNextDueDate.text = billResponse.next_expected_match
+            }
             itemView.billId.text = billData.billId.toString()
-            itemView.billCard.setOnClickListener{clickListener(billData)}
+            itemView.setOnClickListener{clickListener(billData)}
         }
     }
 
