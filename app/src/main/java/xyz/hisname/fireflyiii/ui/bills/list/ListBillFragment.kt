@@ -11,7 +11,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -29,14 +28,12 @@ import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import kotlinx.android.synthetic.main.fragment_bill_list.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
 import xyz.hisname.fireflyiii.ui.bills.BillsRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -50,25 +47,24 @@ class ListBillFragment: BaseFragment() {
     private var selectedDate: LocalDate? = null
     private val today = LocalDate.now()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_bill_list, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = billAdapter
         setCalendar()
+        setRecyclerView()
         loadBill(today.toString())
         pullToRefresh()
         initFab()
-        enableDragDrop()
         jumpToDate()
     }
 
-    private fun enableDragDrop(){
+    private fun setRecyclerView(){
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        recycler_view.adapter = billAdapter
         recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
             if (viewHolder.itemView.billCard.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
@@ -85,6 +81,20 @@ class ListBillFragment: BaseFragment() {
                 }
             }
         }
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && extendedFab.isShown) {
+                    extendedFab.hide()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    extendedFab.show()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     private fun setCalendar(){
@@ -191,25 +201,6 @@ class ListBillFragment: BaseFragment() {
                 addToBackStack(null)
             }
             extendedFab.isClickable = true
-        }
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0 || dy < 0 && extendedFab.isShown) {
-                    extendedFab.hide()
-                }
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    extendedFab.show()
-                }
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-        })
-        requireActivity().supportFragmentManager.addOnBackStackChangedListener {
-            if(requireActivity().supportFragmentManager.backStackEntryCount == 0){
-                billAdapter.refresh()
-            }
         }
     }
 

@@ -47,10 +47,6 @@ class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
             if(freq != null && freq.isNotBlank()){
                 itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
             }
-            val nextMatch = billResponse?.next_expected_match
-            if(nextMatch != null){
-                itemView.billNextDueDate.text = billResponse.next_expected_match
-            }
             itemView.billId.text = billData.billId.toString()
             itemView.billCard.setOnClickListener{clickListener(billData)}
         }
