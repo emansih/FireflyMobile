@@ -6,6 +6,7 @@
     android:id="@+id/fragment_transaction_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:windowBackground"
     android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar

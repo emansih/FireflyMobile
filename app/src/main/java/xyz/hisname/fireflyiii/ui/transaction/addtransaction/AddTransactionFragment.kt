@@ -924,8 +924,6 @@ class AddTransactionFragment: BaseFragment() {
     override fun handleBack() {
         if(nastyHack){
             parentFragmentManager.popBackStack()
-            fragmentContainer.isVisible = true
-            fragment_add_transaction_root.isVisible = false
             extendedFab.isVisible = true
         } else {
             if(isTasker){

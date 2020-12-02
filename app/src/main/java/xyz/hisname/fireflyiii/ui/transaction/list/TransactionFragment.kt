@@ -122,7 +122,6 @@ class TransactionFragment: BaseFragment(){
     }
 
     private fun itemClicked(data: Transactions){
-        fragment_transaction_rootview.isVisible = false
         parentFragmentManager.commit {
             add(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
@@ -331,14 +330,12 @@ class TransactionFragment: BaseFragment(){
     private fun setupFab(){
         extendedFab.display{
             val addTransaction = AddTransactionFragment()
-            addTransaction.arguments = bundleOf("transactionType" to transactionType,
-                    "SHOULD_HIDE" to true)
+            addTransaction.arguments = bundleOf("transactionType" to transactionType, "SHOULD_HIDE" to true)
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, addTransaction)
                 addToBackStack(null)
             }
             extendedFab.isVisible = false
-            fragmentContainer.isVisible = false
         }
     }
 
