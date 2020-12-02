@@ -8,7 +8,10 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 abstract class BillDataDao: BaseDao<BillData>{
 
     @Query("SELECT * FROM bills")
-    abstract fun getAllBill(): MutableList<BillData>
+    abstract suspend fun getBill(): List<BillData>
+
+    @Query("SELECT COUNT(*) FROM bills")
+    abstract suspend fun getBillCount(): Long
 
     @Query("DELETE FROM bills WHERE billId = :billId")
     abstract fun deleteBillById(billId: Long): Int

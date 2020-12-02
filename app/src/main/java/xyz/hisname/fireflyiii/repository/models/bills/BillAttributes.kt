@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.models.bills
 
 import androidx.room.Entity
 import androidx.room.Ignore
+import androidx.room.Relation
 import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -26,6 +27,7 @@ data class BillAttributes(
         @Ignore
         var pay_dates: List<String> = listOf(),
         @Ignore
+        @Relation(parentColumn = "billId", entityColumn = "billPaidId")
         var paid_dates: List<BillPaidDates> = listOf(),
         var notes: String? = "",
         var next_expected_match: String? = "",

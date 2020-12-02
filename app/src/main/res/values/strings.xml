@@ -11,7 +11,7 @@
     <string name="authorization_error">Authorization Error</string>
     <string name="syncing_account">Syncing your account…</string>
     <string name="no_bills">Hurray! You have no bills</string>
-    <string name="bill_amount">-%1$s %2$s</string>
+    <string name="bill_amount">%1$s %2$s</string>
     <string name="no_browser_installed">No application can handle this request. Please install a web browser</string>
     <string name="user_did_it">You did it!</string>
     <string name="due_today">Due today</string>

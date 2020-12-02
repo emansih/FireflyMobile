@@ -26,14 +26,11 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
 
     private val billService = genericService()?.create(BillsService::class.java)
     private val billDataDao = AppDatabase.getInstance(application).billDataDao()
-    private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
-    private val billPayDao = AppDatabase.getInstance(application).billPayDao()
     private val billRepository = BillRepository(billDataDao, billService)
 
-    fun getBillList(date: String): LiveData<PagingData<BillData>> {
+    fun getBillList(): LiveData<PagingData<BillData>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-            BillPageSource(billService, billDataDao, billPaidDao,
-                    billPayDao, date, date)
+            BillPageSource(billService, billDataDao)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }
 

@@ -13,11 +13,7 @@ import java.time.LocalDate
 
 
 class BillPageSource(private val billsService: BillsService?,
-                     private val billDao: BillDataDao,
-                     private val billPaidDao: BillPaidDao,
-                     private val billPayDao: BillPayDao,
-                     private val startDate: String,
-                     private val endDate: String): PagingSource<Int, BillData>() {
+                     private val billDao: BillDataDao): PagingSource<Int, BillData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BillData> {
         val paramKey = params.key
@@ -31,28 +27,14 @@ class BillPageSource(private val billsService: BillsService?,
             null
         }
         try {
-            val networkCall = billsService?.getPaginatedBills(params.key ?: 1, startDate, endDate)
+            val networkCall = billsService?.getPaginatedBills(params.key ?: 1)
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     billDao.deleteAllBills()
-                    billPaidDao.deleteAllPaidList()
                 }
                 responseBody.data.forEach { data ->
                     billDao.insert(data)
-                    data.billAttributes?.paid_dates?.forEach {  paid ->
-                        billPaidDao.insert(BillPaidDates(
-                                0,
-                                paid.transaction_group_id,
-                                paid.transaction_journal_id,
-                                paid.date
-                        ))
-                    }
-                    data.billAttributes?.pay_dates?.forEach {  pay ->
-                        billPayDao.insert(BillPayDates(
-                                data.billId ?: 0, LocalDate.parse(pay)
-                        ))
-                    }
                 }
             }
             val pagination = responseBody?.meta?.pagination
@@ -62,7 +44,7 @@ class BillPageSource(private val billsService: BillsService?,
                 } else {
                     null
                 }
-                return LoadResult.Page(billPayDao.getBillsByDate(startDate), previousKey, nextKey)
+                return LoadResult.Page(billDao.getBill(), previousKey, nextKey)
             } else {
                 return getOfflineData(params.key, previousKey)
             }
@@ -72,13 +54,13 @@ class BillPageSource(private val billsService: BillsService?,
     }
 
     private suspend fun getOfflineData(paramKey: Int?, previousKey: Int?): LoadResult<Int, BillData>{
-        val numberOfRows = billPayDao.getBillsByDateCount(startDate)
+        val numberOfRows = billDao.getBillCount()
         val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
             paramKey ?: 1 + 1
         } else {
             null
         }
-        return LoadResult.Page(billPayDao.getBillsByDate(startDate), previousKey, nextKey)
+        return LoadResult.Page(billDao.getBill(), previousKey, nextKey)
 
     }
 

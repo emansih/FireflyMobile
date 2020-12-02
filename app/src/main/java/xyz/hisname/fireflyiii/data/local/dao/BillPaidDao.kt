@@ -9,4 +9,7 @@ abstract class BillPaidDao: BaseDao<BillPaidDates> {
 
     @Query("DELETE FROM billPaidList")
     abstract suspend fun deleteAllPaidList(): Int
+
+    @Query("SELECT * FROM billPaidList WHERE billPaidId =:billId AND date =:date")
+    abstract suspend fun getTransactionFromBillId(billId: Long, date: String): List<BillPaidDates>
 }

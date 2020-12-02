@@ -58,10 +58,18 @@
             app:layout_constraintBottom_toBottomOf="@+id/billName"/>
 
         <TextView
-            android:id="@+id/billId"
-            android:visibility="invisible"
+            android:id="@+id/billNextDueDate"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/billAmount"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/billId"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
