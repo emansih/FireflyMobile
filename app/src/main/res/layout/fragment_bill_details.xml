@@ -28,7 +28,7 @@
                 android:id="@+id/paidDatesText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text="Paid Dates"
+                android:text="Pay Dates"
                 style="@style/TextAppearance.MaterialComponents.Headline5" />
 
             <ImageView
@@ -72,19 +72,13 @@
                     android:layout_marginBottom="10dp" />
 
                 <com.kizitonwose.calendarview.CalendarView
-                    android:id="@+id/paidDatesCalendarView"
+                    android:id="@+id/payDatesCalendarView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:cv_dayViewResource="@layout/calendar_day"
                     app:cv_orientation="horizontal"
                     app:cv_outDateStyle="endOfGrid"
                     app:cv_scrollMode="paged" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/transactionPaidDatesRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
             </LinearLayout>
 
         </com.github.florent37.expansionpanel.ExpansionLayout>
