@@ -26,6 +26,8 @@ data class Transactions(
         var destination_id: Long,
         var destination_name: String,
         var destination_type: String,
+        var bill_id: Long?,
+        var bill_name: String?,
         var due_date: String?,
         var foreign_amount: Double?,
         var foreign_currency_code: String?,

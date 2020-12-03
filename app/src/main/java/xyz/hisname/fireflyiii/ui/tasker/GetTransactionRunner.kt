@@ -125,7 +125,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                             currency.currencyAttributes?.name
                                     ?: "", currency.currencyAttributes?.symbol ?: "",
                             OffsetDateTime.parse(dateTime), description, 0, destinationName,
-                            "", "", 0.0, "", "", 0,
+                            "", 0, "", "", 0.0, "", "", 0,
                             "", notes, 0, "", 0,
                             sourceName, "", tags, type, 0, piggyBankName, true)
             )

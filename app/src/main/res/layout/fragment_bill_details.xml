@@ -9,30 +9,39 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/billName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <com.github.florent37.expansionpanel.ExpansionHeader
-            android:id="@+id/paidDatesExpansionHeader"
+            android:id="@+id/payDatesExpansionHeader"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_marginTop="52dp"
+            android:layout_marginTop="12dp"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
-            app:expansion_headerIndicator="@id/headerIndicator"
-            app:expansion_layout="@id/expansionLayout"
+            app:expansion_headerIndicator="@id/payDatesHeaderIndicator"
+            app:expansion_layout="@id/payDatesExpansionLayout"
             app:expansion_toggleOnClick="true"
             app:expansion_expanded="false"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/billName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
-                android:id="@+id/paidDatesText"
+                android:id="@+id/payDatesText"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:text="Pay Dates"
                 style="@style/TextAppearance.MaterialComponents.Headline5" />
 
             <ImageView
-                android:id="@+id/headerIndicator"
+                android:id="@+id/payDatesHeaderIndicator"
                 android:adjustViewBounds="true"
                 android:layout_gravity="center_vertical|end"
                 android:layout_height="wrap_content"
@@ -43,7 +52,81 @@
         </com.github.florent37.expansionpanel.ExpansionHeader>
 
         <com.github.florent37.expansionpanel.ExpansionLayout
-            android:id="@+id/expansionLayout"
+            android:id="@+id/payDatesExpansionLayout"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            app:expansion_expanded="false"
+            app:layout_constraintTop_toBottomOf="@+id/payDatesExpansionHeader"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/payDatesHeaderText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <include
+                    android:id="@+id/legendLayout"
+                    layout="@layout/calendar_day_legend"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp" />
+
+                <com.kizitonwose.calendarview.CalendarView
+                    android:id="@+id/payDatesCalendarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:cv_dayViewResource="@layout/calendar_day"
+                    app:cv_orientation="horizontal"
+                    app:cv_outDateStyle="endOfGrid"
+                    app:cv_scrollMode="paged" />
+            </LinearLayout>
+
+        </com.github.florent37.expansionpanel.ExpansionLayout>
+
+        <com.github.florent37.expansionpanel.ExpansionHeader
+            android:id="@+id/paidDatesExpansionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="52dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            app:expansion_headerIndicator="@id/paidDatesHeaderIndicator"
+            app:expansion_layout="@id/paidDatesExpansionLayout"
+            app:expansion_toggleOnClick="true"
+            app:expansion_expanded="false"
+            app:layout_constraintTop_toBottomOf="@+id/payDatesExpansionLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/paidDatesText"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Paid Dates"
+                style="@style/TextAppearance.MaterialComponents.Headline5" />
+
+            <ImageView
+                android:id="@+id/paidDatesHeaderIndicator"
+                android:adjustViewBounds="true"
+                android:layout_gravity="center_vertical|end"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_width="wrap_content"
+                app:srcCompat="@drawable/ic_expansion_header_indicator_grey_24dp" />
+
+        </com.github.florent37.expansionpanel.ExpansionHeader>
+
+        <com.github.florent37.expansionpanel.ExpansionLayout
+            android:id="@+id/paidDatesExpansionLayout"
             android:layout_height="match_parent"
             android:layout_width="0dp"
             app:expansion_expanded="false"
@@ -72,13 +155,18 @@
                     android:layout_marginBottom="10dp" />
 
                 <com.kizitonwose.calendarview.CalendarView
-                    android:id="@+id/payDatesCalendarView"
+                    android:id="@+id/paidDatesCalendarView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     app:cv_dayViewResource="@layout/calendar_day"
                     app:cv_orientation="horizontal"
                     app:cv_outDateStyle="endOfGrid"
                     app:cv_scrollMode="paged" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/transactionRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
         </com.github.florent37.expansionpanel.ExpansionLayout>

@@ -161,4 +161,11 @@ abstract class TransactionDataDao {
 
     @Query("SELECT description FROM transactionTable WHERE description LIKE :description")
     abstract fun getTransactionByDescription(description: String): Flow<MutableList<String>>
+
+    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND bill_id = :billId ORDER BY date ASC")
+    abstract suspend fun getTransactionListByDateAndBill(billId: Long, startDate: String, endDate: String): MutableList<Transactions>
+
+    @Query("SELECT COUNT(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND bill_id = :billId ORDER BY date ASC")
+    abstract suspend fun getTransactionListByDateAndBillCount(billId: Long, startDate: String, endDate: String): Long
+
 }

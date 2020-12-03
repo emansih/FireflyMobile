@@ -24,7 +24,7 @@ class BillRepository(private val billDao: BillDataDao,
             if (responseBody != null && networkCall.isSuccessful) {
                 billData.addAll(responseBody.data.toMutableList())
                 billDao.deleteBillById(billId)
-                billData.forEachIndexed { _, data ->
+                billData.forEach { data ->
                     insertBill(data)
                 }
             }

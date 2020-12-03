@@ -116,7 +116,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                                 currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
                                 currencyAttributes?.name ?: "", currencyAttributes?.symbol ?: "",
                                 OffsetDateTime.parse(dateTime), description, 0, destinationName,
-                                "", "",  0.0, "","", 0,
+                                "", 0, "", "",  0.0, "","", 0,
                                 "", notes, 0, "", 0,
                                 sourceName, "", tagsList, transactionType, 0, piggyBank,true)
                 )

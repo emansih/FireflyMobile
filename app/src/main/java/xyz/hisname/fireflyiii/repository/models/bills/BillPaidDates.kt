@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.repository.models.bills
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.time.LocalDate
 

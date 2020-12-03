@@ -19,9 +19,7 @@ class BillPayRepository(private val billPayDao: BillPayDao,
                     billPayDao.insert(BillPayDates(id = billId, payDates = LocalDate.parse(localDate)))
                 }
             }
-        } catch (exception: Exception){
-            exception.printStackTrace()
-        }
+        } catch (exception: Exception){ }
         return billPayDao.getBillByDateAndId(billId,startDate, endDate)
     }
 

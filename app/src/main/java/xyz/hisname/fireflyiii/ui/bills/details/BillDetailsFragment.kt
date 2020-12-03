@@ -3,10 +3,15 @@ package xyz.hisname.fireflyiii.ui.bills.details
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
@@ -16,12 +21,12 @@ import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.fragment_bill_details.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
+import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getCompatColor
+import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 import java.time.LocalDate
 import java.time.YearMonth
@@ -31,12 +36,13 @@ import java.util.*
 
 class BillDetailsFragment: BaseDetailFragment() {
 
-    private var selectedDate: LocalDate? = null
-    private val selectedDates = arrayListOf<LocalDate>()
+    private val selectedPayDays = arrayListOf<LocalDate>()
+    private val selectedPaidDays = arrayListOf<LocalDate>()
     private val monthTitleFormatter = DateTimeFormatter.ofPattern("MMMM")
     private val billDetailsViewModel by lazy { getImprovedViewModel(BillDetailsViewModel::class.java) }
     private val billId: Long by lazy { arguments?.getLong("billId") ?: 0  }
     private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
+    private var selectedDate: LocalDate? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -45,30 +51,44 @@ class BillDetailsFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getPaidDates(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+        billDetailsViewModel.billId = billId
+        billDetailsViewModel.billName.observe(viewLifecycleOwner){ name ->
+            billName.text = name
+        }
+        setPayCalendar()
         setPaidCalendar()
-        setWidgets()
+        setCalendarWidgets(payDatesCalendarView)
+        setCalendarWidgets(paidDatesCalendarView)
+        getPayDates(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+        getPaidDates(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+        progressCircle()
+        transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        transactionRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        transactionRecyclerView.adapter = transactionAdapter
     }
 
-    private fun getPaidDates(startDate: String, endDate: String){
-        billDetailsViewModel.getPayList(billId, startDate, endDate).observe(viewLifecycleOwner){ billPayList ->
+    private fun getPayDates(startDate: String, endDate: String){
+        billDetailsViewModel.getPayList(startDate, endDate).observe(viewLifecycleOwner){ billPayList ->
             billPayList.forEach {  billPayDates ->
-                selectedDates.add(billPayDates.payDates)
+                selectedPayDays.add(billPayDates.payDates)
             }
             payDatesCalendarView.notifyCalendarChanged()
         }
     }
 
-    private fun setPaidCalendar(){
+    private fun getPaidDates(startDate: String, endDate: String){
+        billDetailsViewModel.getPaidList(startDate, endDate).observe(viewLifecycleOwner){ billPaidList ->
+            billPaidList.forEach {  billPaidDates ->
+                selectedPaidDays.add(billPaidDates.date)
+            }
+        }
+        paidDatesCalendarView.notifyCalendarChanged()
+    }
+
+    private fun setPayCalendar(){
         class DayViewContainer(view: View): ViewContainer(view) {
             lateinit var day: CalendarDay
             val onDayText = view.dayText
-            init {
-                view.setOnClickListener {
-                    selectedDate = day.date
-                    payDatesCalendarView.notifyCalendarChanged()
-                }
-            }
         }
 
         payDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
@@ -77,8 +97,8 @@ class BillDetailsFragment: BaseDetailFragment() {
                 val textView = container.onDayText
                 textView.text = day.date.dayOfMonth.toString()
                 if (day.owner == DayOwner.THIS_MONTH) {
-                    if (selectedDates.isNotEmpty()){
-                        selectedDates.forEach { data ->
+                    if (selectedPayDays.isNotEmpty()){
+                        selectedPayDays.forEach { data ->
                             if(data == day.date){
                                 textView.setBackgroundColor(getCompatColor(R.color.md_red_400))
                             } else {
@@ -99,22 +119,87 @@ class BillDetailsFragment: BaseDetailFragment() {
 
             override fun create(view: View): DayViewContainer = DayViewContainer(view)
         }
+        payDatesCalendarView.monthScrollListener = { month ->
+            getPayDates(month.yearMonth.atDay(1).toString(), month.yearMonth.atEndOfMonth().toString())
+            val title = "${monthTitleFormatter.format(month.yearMonth)} ${month.yearMonth.year}"
+            payDatesHeaderText.text = title
+        }
 
     }
 
-    private fun setWidgets(){
-        payDatesCalendarView.monthScrollListener = { month ->
+    private fun getPaidTransactions(date: LocalDate){
+        billDetailsViewModel.getPaidTransactions(date).observe(viewLifecycleOwner){ transactions ->
+            transactionAdapter.submitData(lifecycle, transactions)
+        }
+    }
+
+
+    private fun setPaidCalendar(){
+        class DayViewContainer(view: View): ViewContainer(view) {
+            lateinit var day: CalendarDay
+            val onDayText = view.dayText
+            init {
+                view.setOnClickListener {
+                    selectedDate = day.date
+                    getPaidTransactions(day.date)
+                    paidDatesCalendarView.notifyCalendarChanged()
+                }
+            }
+        }
+
+        paidDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
+            override fun bind(container: DayViewContainer, day: CalendarDay) {
+                container.day = day
+                val textView = container.onDayText
+                textView.text = day.date.dayOfMonth.toString()
+                if (day.owner == DayOwner.THIS_MONTH) {
+                    if (selectedPaidDays.isNotEmpty()){
+                        selectedPaidDays.forEach { data ->
+                            if(data == day.date){
+                                textView.setBackgroundColor(getCompatColor(R.color.md_green_500))
+                            } else {
+                                textView.setTextColor(setDayNightTheme())
+                            }
+                        }
+                    } else {
+                        textView.setTextColor(setDayNightTheme())
+                    }
+                } else {
+                    if(globalViewModel.isDark){
+                        textView.setTextColor(getCompatColor(R.color.md_black_1000))
+                    } else {
+                        textView.setTextColor(getCompatColor(R.color.md_white_1000))
+                    }
+                }
+            }
+
+            override fun create(view: View): DayViewContainer = DayViewContainer(view)
+        }
+        paidDatesCalendarView.monthScrollListener = { month ->
             val title = "${monthTitleFormatter.format(month.yearMonth)} ${month.yearMonth.year}"
             paidDatesHeaderText.text = title
             getPaidDates(month.yearMonth.atDay(1).toString(), month.yearMonth.atEndOfMonth().toString())
         }
+    }
+
+    private fun setCalendarWidgets(calendarView: CalendarView){
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusYears(40)
         val endMonth = currentMonth.plusYears(30)
-        payDatesCalendarView.setup(startMonth, endMonth,
+        calendarView.setup(startMonth, endMonth,
                 WeekFields.of(Locale.getDefault()).firstDayOfWeek)
-        payDatesCalendarView.scrollToMonth(currentMonth)
-        payDatesCalendarView.updateMonthConfiguration()
+        calendarView.scrollToMonth(currentMonth)
+        calendarView.updateMonthConfiguration()
+    }
+
+    private fun progressCircle(){
+        billDetailsViewModel.isLoading.observe(viewLifecycleOwner){ isloading ->
+            if(isloading){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
     }
 
     private fun itemClicked(data: Transactions){
@@ -135,6 +220,35 @@ class BillDetailsFragment: BaseDetailFragment() {
     }
 
     override fun deleteItem() {
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.delete_bill_title, billDetailsViewModel.billName))
+                .setMessage(resources.getString(R.string.delete_bill_message, billDetailsViewModel.billName))
+                .setPositiveButton(R.string.delete_permanently) { _, _ ->
+                    billDetailsViewModel.deleteBill().observe(viewLifecycleOwner) { isDeleted ->
+                        if(isDeleted){
+                            handleBack()
+                            toastSuccess(resources.getString(R.string.bill_deleted, billDetailsViewModel.billName))
+                        } else {
+                            toastOffline(getString(R.string.generic_delete_error))
+                        }
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel){dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+    }
+    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
+        android.R.id.home -> consume {
+            handleBack()
+        }
+        R.id.menu_item_delete -> consume {
+           deleteItem()
+        }
+        R.id.menu_item_edit -> consume {
+
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun handleBack() {
