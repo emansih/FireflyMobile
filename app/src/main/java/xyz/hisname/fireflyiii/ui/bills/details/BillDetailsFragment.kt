@@ -72,8 +72,7 @@ class BillDetailsFragment: BaseDetailFragment() {
             val attributes = billData[0].billAttributes
             val bill = arrayListOf(
                     DetailModel(resources.getString(R.string.name), attributes?.name),
-                    DetailModel("Next Expected Match", attributes?.next_expected_match),
-                    DetailModel("", attributes?.currency_symbol +
+                    DetailModel("Range", attributes?.currency_symbol +
                             attributes?.amount_min + " ~ " + attributes?.amount_max),
                     DetailModel(resources.getString(R.string.frequency), attributes?.repeat_freq),
                     DetailModel("Is Active", attributes?.active.toString())
