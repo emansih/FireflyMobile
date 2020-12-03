@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.ui.bills.details
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
@@ -256,21 +255,13 @@ class BillDetailsFragment: BaseDetailFragment() {
                 }
                 .show()
     }
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
-        android.R.id.home -> consume {
-            handleBack()
+
+    override fun editItem() {
+        parentFragmentManager.commit{
+            replace(R.id.bigger_fragment_container, AddBillFragment().apply{
+                arguments = bundleOf("billId" to billId)
+            })
         }
-        R.id.menu_item_delete -> consume {
-           deleteItem()
-        }
-        R.id.menu_item_edit -> consume {
-            parentFragmentManager.commit{
-                replace(R.id.bigger_fragment_container, AddBillFragment().apply{
-                    arguments = bundleOf("billId" to billId)
-                })
-            }
-        }
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun handleBack() {

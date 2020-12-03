@@ -34,7 +34,7 @@ class TagDetailsFragment: BaseDetailFragment() {
     private lateinit var nameOfTag: String
     private lateinit var startMarker: Marker
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         extendedFab.isGone = true
@@ -100,19 +100,13 @@ class TagDetailsFragment: BaseDetailFragment() {
         extendedFab.isVisible = true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
-        R.id.menu_item_edit -> consume {
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, AddTagsFragment().apply {
-                    arguments = bundleOf("tagId" to tagId)
-                })
-                addToBackStack(null)
-            }
+    override fun editItem() {
+        parentFragmentManager.commit {
+            replace(R.id.bigger_fragment_container, AddTagsFragment().apply {
+                arguments = bundleOf("tagId" to tagId)
+            })
+            addToBackStack(null)
         }
-        R.id.menu_item_delete -> consume {
-            deleteItem()
-        }
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun deleteItem() {

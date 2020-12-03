@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.ui.categories
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
@@ -150,20 +149,11 @@ class CategoryDetailsFragment: BaseDetailFragment() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
-        R.id.menu_item_delete -> consume {
-            deleteItem()
+    override fun editItem() {
+        val addCategoryFragment = AddCategoriesFragment().apply {
+            arguments = bundleOf("categoryId" to categoryId)
         }
-        android.R.id.home -> consume {
-            handleBack()
-        }
-        R.id.menu_item_edit -> consume {
-            val addCategoryFragment = AddCategoriesFragment().apply {
-                arguments = bundleOf("categoryId" to categoryId)
-            }
-            addCategoryFragment.show(parentFragmentManager, "add_category_fragment")
-        }
-        else -> super.onOptionsItemSelected(item)
+        addCategoryFragment.show(parentFragmentManager, "add_category_fragment")
     }
 
     override fun handleBack() {

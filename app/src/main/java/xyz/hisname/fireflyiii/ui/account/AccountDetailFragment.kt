@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.ui.account
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
@@ -308,22 +307,13 @@ class AccountDetailFragment: BaseDetailFragment() {
                 .show()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
-        R.id.menu_item_delete -> consume {
-            deleteItem()
+    override fun editItem() {
+        parentFragmentManager.commit {
+            replace(R.id.bigger_fragment_container, AddAccountFragment().apply{
+                arguments = bundleOf("accountType" to accountType, "accountId" to accountId)
+            })
+            addToBackStack(null)
         }
-        android.R.id.home -> consume {
-            parentFragmentManager.popBackStack()
-        }
-        R.id.menu_item_edit -> consume {
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, AddAccountFragment().apply{
-                    arguments = bundleOf("accountType" to accountType, "accountId" to accountId)
-                })
-                addToBackStack(null)
-            }
-        }
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun handleBack() {

@@ -141,18 +141,12 @@ class PiggyDetailFragment: BaseDetailFragment() {
         }.start()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
-        R.id.menu_item_edit -> consume {
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, AddPiggyFragment().apply {
-                    arguments = bundleOf("piggyId" to piggyId)
-                })
-            }
+    override fun editItem() {
+        parentFragmentManager.commit {
+            replace(R.id.bigger_fragment_container, AddPiggyFragment().apply {
+                arguments = bundleOf("piggyId" to piggyId)
+            })
         }
-        R.id.menu_item_delete -> consume {
-            deleteItem()
-        }
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onDestroy() {
