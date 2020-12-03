@@ -21,6 +21,7 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
+import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
 import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
@@ -97,7 +98,7 @@ class TransactionDetailsFragment: BaseFragment() {
         transactionList.addAll(model)
         transaction_info.layoutManager = LinearLayoutManager(requireContext())
         transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        transaction_info.adapter = TransactionDetailsRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
+        transaction_info.adapter = BaseDetailRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
     }
 
     private fun setMetaInfo(transactionData: MutableList<Transactions>){
@@ -131,7 +132,7 @@ class TransactionDetailsFragment: BaseFragment() {
         }
         meta_information.layoutManager = LinearLayoutManager(requireContext())
         meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        meta_information.adapter = TransactionDetailsRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
+        meta_information.adapter = BaseDetailRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
     }
 
     private fun setMetaInfoClick(position: Int){
