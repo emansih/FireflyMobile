@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.transaction.details
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
@@ -11,6 +12,10 @@ import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
@@ -25,7 +30,6 @@ import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
-import xyz.hisname.fireflyiii.ui.transaction.DeleteTransactionDialog
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -160,18 +164,6 @@ class TransactionDetailsFragment: BaseFragment() {
 
     private fun setTransactionInfoClick(position: Int){
         when(position){
-            0 -> {
-                AlertDialog.Builder(requireContext())
-                        .setTitle(resources.getString(R.string.amount))
-                        .setMessage(transactionAmount)
-                        .show()
-            }
-            2 ->{
-               AlertDialog.Builder(requireContext())
-                       .setTitle(resources.getString(R.string.description))
-                       .setMessage(transactionDescription)
-                       .show()
-            }
             3 -> {
                 parentFragmentManager.commit {
                     replace(R.id.fragment_container, AccountDetailFragment().apply {
@@ -249,13 +241,29 @@ class TransactionDetailsFragment: BaseFragment() {
             parentFragmentManager.popBackStack()
         }
         R.id.menu_item_delete -> consume {
-            parentFragmentManager.commit {
-                add(DeleteTransactionDialog().apply {
-                    arguments = bundleOf("transactionJournalId" to transactionJournalId,
-                            "transactionDescription" to transactionDescription,
-                    "transactionInfo" to convertString(transactionInfo))
-                }, "")
-            }
+            AlertDialog.Builder(requireContext())
+                    .setTitle(resources.getString(R.string.delete_account_title, transactionDescription))
+                    .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
+                    .setIcon(IconicsDrawable(requireContext()).apply {
+                        icon = FontAwesome.Icon.faw_trash
+                        sizeDp = 24
+                        colorRes = R.color.md_green_600
+                    })
+                    .setPositiveButton(R.string.delete_permanently) { _, _ ->
+                        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+                        transactionViewModel.deleteTransaction(transactionJournalId).observe(this) {
+                            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                            if (it) {
+                                toastSuccess(resources.getString(R.string.transaction_deleted))
+                                handleBack()
+                            } else {
+                                toastOffline(getString(R.string.data_will_be_deleted_later, transactionDescription),
+                                        Toast.LENGTH_LONG)
+                            }
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                    .show()
         }
         R.id.menu_item_edit -> consume {
             val addTransaction = AddTransactionFragment().apply {
