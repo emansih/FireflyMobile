@@ -9,14 +9,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/billName"
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/billInfoCard"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/TextAppearance.MaterialComponents.Headline5"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/billInfoRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </com.google.android.material.card.MaterialCardView>
+
 
         <com.github.florent37.expansionpanel.ExpansionHeader
             android:id="@+id/payDatesExpansionHeader"
@@ -29,7 +40,7 @@
             app:expansion_layout="@id/payDatesExpansionLayout"
             app:expansion_toggleOnClick="true"
             app:expansion_expanded="false"
-            app:layout_constraintTop_toBottomOf="@+id/billName"
+            app:layout_constraintTop_toBottomOf="@+id/billInfoCard"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

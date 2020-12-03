@@ -14,7 +14,7 @@ class TransactionDetailsRecyclerAdapter(private val items: MutableList<DetailMod
         DiffUtilAdapter<DetailModel, TransactionDetailsRecyclerAdapter.TransactionInfoAdapter>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionInfoAdapter {
-        return TransactionInfoAdapter(parent.inflate(R.layout.transaction_details))
+        return TransactionInfoAdapter(parent.inflate(R.layout.details))
     }
 
     override fun getItemCount() = items.size

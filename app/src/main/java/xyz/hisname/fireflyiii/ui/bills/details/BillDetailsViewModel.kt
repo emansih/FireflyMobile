@@ -18,6 +18,7 @@ import xyz.hisname.fireflyiii.repository.bills.BillPayRepository
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.bills.BillsPaidRepository
 import xyz.hisname.fireflyiii.repository.bills.TransactionPagingSource
+import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -37,17 +38,16 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
     private val billRepository = BillRepository(billDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
     var billId: Long = 0L
-    val billName = MutableLiveData<String>()
+    var billName = ""
 
-    init {
-        getBillName()
-    }
-
-    private fun getBillName(){
+    fun getBillInfo(): LiveData<List<BillData>>{
+        val billLiveDataList = MutableLiveData<List<BillData>>()
         viewModelScope.launch(Dispatchers.IO){
             val billList = billRepository.retrieveBillById(billId)
-            billName.postValue(billList[0].billAttributes?.name)
+            billName =  billList[0].billAttributes?.name ?: ""
+            billLiveDataList.postValue(billList)
         }
+        return billLiveDataList
     }
 
     fun getPayList(startDate: String, endDate: String): LiveData<List<BillPayDates>>{

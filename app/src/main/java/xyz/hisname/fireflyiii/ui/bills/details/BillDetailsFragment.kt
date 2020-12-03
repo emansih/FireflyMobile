@@ -20,9 +20,11 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.fragment_bill_details.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
+import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -52,9 +54,7 @@ class BillDetailsFragment: BaseDetailFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         billDetailsViewModel.billId = billId
-        billDetailsViewModel.billName.observe(viewLifecycleOwner){ name ->
-            billName.text = name
-        }
+        setBillInfo()
         setPayCalendar()
         setPaidCalendar()
         setCalendarWidgets(payDatesCalendarView)
@@ -65,6 +65,23 @@ class BillDetailsFragment: BaseDetailFragment() {
         transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         transactionRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         transactionRecyclerView.adapter = transactionAdapter
+    }
+
+    private fun setBillInfo(){
+        billDetailsViewModel.getBillInfo().observe(viewLifecycleOwner){ billData ->
+            val attributes = billData[0].billAttributes
+            val bill = arrayListOf(
+                    DetailModel(resources.getString(R.string.name), attributes?.name),
+                    DetailModel("Next Expected Match", attributes?.next_expected_match),
+                    DetailModel("", attributes?.currency_symbol +
+                            attributes?.amount_min + " ~ " + attributes?.amount_max),
+                    DetailModel(resources.getString(R.string.frequency), attributes?.repeat_freq),
+                    DetailModel("Is Active", attributes?.active.toString())
+            )
+            billInfoRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            billInfoRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            billInfoRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }
+        }
     }
 
     private fun getPayDates(startDate: String, endDate: String){

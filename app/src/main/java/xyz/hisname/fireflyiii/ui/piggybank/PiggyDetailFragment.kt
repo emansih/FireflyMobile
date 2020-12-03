@@ -7,7 +7,6 @@ import android.view.*
 import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
@@ -19,6 +18,7 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
+import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
 import kotlin.collections.ArrayList
@@ -64,7 +64,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
 
     private fun setupWidgets(){
-        val piggy = arrayListOf(
+        val piggy = mutableListOf(
                 DetailModel(resources.getString(R.string.account), piggyAttribute?.account_name),
                 DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
                 DetailModel(resources.getString(R.string.saved_so_far), piggyAttribute?.save_per_month.toString()),
@@ -77,7 +77,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 }
         )
         runLayoutAnimation(piggy_bank_details_recyclerview)
-        piggy_bank_details_recyclerview.adapter = PiggyDetailsRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
+        piggy_bank_details_recyclerview.adapter = BaseDetailRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
         piggyList.addAll(piggy)
         if(percentage <= 15){
             piggyBankProgressBar.progressDrawable.setColorFilter(getCompatColor(
