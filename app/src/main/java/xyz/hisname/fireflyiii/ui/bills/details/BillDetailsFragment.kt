@@ -25,6 +25,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -263,7 +264,11 @@ class BillDetailsFragment: BaseDetailFragment() {
            deleteItem()
         }
         R.id.menu_item_edit -> consume {
-
+            parentFragmentManager.commit{
+                replace(R.id.bigger_fragment_container, AddBillFragment().apply{
+                    arguments = bundleOf("billId" to billId)
+                })
+            }
         }
         else -> super.onOptionsItemSelected(item)
     }
