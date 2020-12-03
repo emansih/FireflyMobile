@@ -8,6 +8,8 @@ import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +78,8 @@ class PiggyDetailFragment: BaseDetailFragment() {
                     DetailModel(resources.getString(R.string.target_date), piggyAttribute?.target_date)
                 }
         )
-        runLayoutAnimation(piggy_bank_details_recyclerview)
+        piggy_bank_details_recyclerview.layoutManager = LinearLayoutManager(requireContext())
+        piggy_bank_details_recyclerview.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         piggy_bank_details_recyclerview.adapter = BaseDetailRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
         piggyList.addAll(piggy)
         if(percentage <= 15){
@@ -147,11 +150,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 arguments = bundleOf("piggyId" to piggyId)
             })
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        piggyList.clear()
     }
 
     override fun handleBack() {
