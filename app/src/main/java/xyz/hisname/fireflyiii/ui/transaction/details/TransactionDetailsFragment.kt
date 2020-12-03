@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import kotlinx.android.synthetic.main.activity_base.*
+import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.attachment_information
 import xyz.hisname.fireflyiii.R
@@ -96,9 +97,10 @@ class TransactionDetailsFragment: BaseFragment() {
         transactionDate = details.date.toString()
         downloadAttachment(details.transaction_journal_id)
         transactionList.addAll(model)
-        transaction_info.layoutManager = LinearLayoutManager(requireContext())
-        transaction_info.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        transaction_info.adapter = BaseDetailRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
+        info_text.text = getString(R.string.transaction_information)
+        detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
     }
 
     private fun setMetaInfo(transactionData: MutableList<Transactions>){

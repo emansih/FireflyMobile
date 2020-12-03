@@ -11,6 +11,7 @@ import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -78,9 +79,9 @@ class PiggyDetailFragment: BaseDetailFragment() {
                     DetailModel(resources.getString(R.string.target_date), piggyAttribute?.target_date)
                 }
         )
-        piggy_bank_details_recyclerview.layoutManager = LinearLayoutManager(requireContext())
-        piggy_bank_details_recyclerview.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        piggy_bank_details_recyclerview.adapter = BaseDetailRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
+        detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
         piggyList.addAll(piggy)
         if(percentage <= 15){
             piggyBankProgressBar.progressDrawable.setColorFilter(getCompatColor(

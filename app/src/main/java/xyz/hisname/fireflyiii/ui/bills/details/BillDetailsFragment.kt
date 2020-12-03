@@ -17,6 +17,7 @@ import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.calendar_day.view.*
+import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_bill_details.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
@@ -77,9 +78,9 @@ class BillDetailsFragment: BaseDetailFragment() {
                     DetailModel(resources.getString(R.string.frequency), attributes?.repeat_freq),
                     DetailModel("Is Active", attributes?.active.toString())
             )
-            billInfoRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            billInfoRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            billInfoRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }
+            detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }
         }
     }
 
