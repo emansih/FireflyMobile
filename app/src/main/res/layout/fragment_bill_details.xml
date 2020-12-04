@@ -10,6 +10,7 @@
         android:layout_height="match_parent">
 
         <include
+            android:id="@+id/billInfoCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             layout="@layout/details_card"
