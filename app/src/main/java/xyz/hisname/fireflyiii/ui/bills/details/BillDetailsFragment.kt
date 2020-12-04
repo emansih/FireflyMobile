@@ -157,10 +157,13 @@ class BillDetailsFragment: BaseDetailFragment() {
         class DayViewContainer(view: View): ViewContainer(view) {
             lateinit var day: CalendarDay
             val onDayText = view.dayText
+            val legendDivider = view.legendDivider
             init {
                 view.setOnClickListener {
-                    selectedDate = day.date
-                    getPaidTransactions(day.date)
+                    if (selectedPaidDays.contains(day.date)){
+                        selectedDate = day.date
+                        getPaidTransactions(day.date)
+                    }
                     paidDatesCalendarView.notifyCalendarChanged()
                 }
             }
@@ -170,19 +173,20 @@ class BillDetailsFragment: BaseDetailFragment() {
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.day = day
                 val textView = container.onDayText
+                val divider = container.legendDivider
                 textView.text = day.date.dayOfMonth.toString()
                 if (day.owner == DayOwner.THIS_MONTH) {
                     if (selectedPaidDays.isNotEmpty()){
                         selectedPaidDays.forEach { data ->
                             if(data == day.date){
-                                textView.setBackgroundColor(getCompatColor(R.color.md_green_500))
-                            } else {
-                                textView.setTextColor(setDayNightTheme())
+                                divider.setBackgroundColor(getCompatColor(R.color.md_green_500))
                             }
                         }
-                    } else {
-                        textView.setTextColor(setDayNightTheme())
                     }
+                    if(selectedDate == day.date){
+                        textView.setBackgroundColor(getCompatColor(R.color.md_green_500))
+                    }
+                    textView.setTextColor(setDayNightTheme())
                 } else {
                     if(globalViewModel.isDark){
                         textView.setTextColor(getCompatColor(R.color.md_black_1000))
