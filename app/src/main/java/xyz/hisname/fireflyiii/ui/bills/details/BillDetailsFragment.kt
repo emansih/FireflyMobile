@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kizitonwose.calendarview.CalendarView
@@ -98,8 +100,8 @@ class BillDetailsFragment: BaseDetailFragment() {
             billPaidList.forEach {  billPaidDates ->
                 selectedPaidDays.add(billPaidDates.date)
             }
+            paidDatesCalendarView.notifyCalendarChanged()
         }
-        paidDatesCalendarView.notifyCalendarChanged()
     }
 
     private fun setPayCalendar(){
@@ -215,6 +217,13 @@ class BillDetailsFragment: BaseDetailFragment() {
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
+        transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            if(loadStates.refresh !is LoadState.Loading) {
+                transactionLoader.hide()
+            } else {
+                transactionLoader.show()
             }
         }
     }
