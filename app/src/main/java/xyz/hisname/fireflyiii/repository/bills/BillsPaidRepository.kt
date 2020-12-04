@@ -13,9 +13,10 @@ class BillsPaidRepository(private val billsPaidDao: BillPaidDao,
             val networkCall = billsService?.getBillById(billId, startDate, endDate)
             val responseBody = networkCall?.body()
             if(responseBody != null && networkCall.isSuccessful){
+                billsPaidDao.deleteByBillId(billId)
                 responseBody.data.billAttributes?.paid_dates?.forEach {  billPaid ->
                     billsPaidDao.insert(BillPaidDates(
-                            billPaidId = billId, transaction_group_id = billPaid.transaction_group_id,
+                            id = billId, transaction_group_id = billPaid.transaction_group_id,
                             transaction_journal_id = billPaid.transaction_journal_id,
                             date = billPaid.date
                     ))
