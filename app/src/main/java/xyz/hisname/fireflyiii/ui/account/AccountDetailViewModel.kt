@@ -46,6 +46,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     val uniqueIncomeCategoryLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
     val uniqueBudgetLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
     val accountData = MutableLiveData<List<DetailModel>>()
+    val notes = MutableLiveData<String>()
 
     fun getAccountById(accountId: Long): MutableLiveData<MutableList<AccountData>>{
         val accountDataLiveData = MutableLiveData<MutableList<AccountData>>()
@@ -60,8 +61,8 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
                             currencySymbol + accountAttributes?.current_balance),
                     DetailModel(getApplication<Application>().getString(R.string.account_number),
                             accountAttributes?.account_number.toString()),
-                    DetailModel("Role",
-                            accountAttributes?.account_role),
+                    DetailModel("Role", accountAttributes?.account_role),
+                    DetailModel("Account Type", accountType),
                     DetailModel("Active ", accountAttributes?.active.toString())
             )
             if(accountType.contentEquals("liabilities")){
@@ -70,6 +71,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
                         accountAttributes?.interest + "% (" + accountAttributes?.interest_period + ")"))
             }
             accountData.postValue(arrayListOfDetails)
+            notes.postValue(accountAttributes?.notes)
             getTransactions(accountId, accountType)
             accountDataLiveData.postValue(accountList)
         }
