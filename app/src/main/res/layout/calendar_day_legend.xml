@@ -23,7 +23,6 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="MON"
-        android:textColor="@color/md_white_1000"
         android:textSize="14sp" />
 
     <TextView
