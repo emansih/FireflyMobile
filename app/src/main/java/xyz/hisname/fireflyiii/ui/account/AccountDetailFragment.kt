@@ -1,8 +1,6 @@
 package xyz.hisname.fireflyiii.ui.account
 
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,10 +18,6 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_account_detail.*
 import kotlinx.android.synthetic.main.fragment_markdown.*
-import org.commonmark.ext.autolink.AutolinkExtension
-import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.html.HtmlRenderer
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -76,16 +70,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             if(notes.isEmpty()){
                 notesCard.isGone = true
             } else {
-                val extensions = arrayListOf(StrikethroughExtension.create(), AutolinkExtension.create())
-                val parser = Parser.builder().extensions(extensions).build()
-                val renderer = HtmlRenderer.builder().extensions(extensions).build()
-                val document = parser.parse(notes)
-                @Suppress("DEPRECATION")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    displayText.text = Html.fromHtml(renderer.render(document), Html.FROM_HTML_MODE_COMPACT)
-                } else {
-                    displayText.text = Html.fromHtml(renderer.render(document))
-                }
+                displayText.text = notes.toMarkDown()
             }
         }
         balanceHistoryCardText.text = resources.getString(R.string.account_chart_description,

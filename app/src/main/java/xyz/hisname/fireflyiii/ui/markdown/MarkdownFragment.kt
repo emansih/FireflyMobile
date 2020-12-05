@@ -1,9 +1,7 @@
 package xyz.hisname.fireflyiii.ui.markdown
 
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
-import android.text.Html
 import android.text.TextWatcher
 import android.view.*
 import android.widget.EditText
@@ -14,10 +12,6 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_markdown.*
-import org.commonmark.ext.autolink.AutolinkExtension
-import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.html.HtmlRenderer
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -122,9 +116,6 @@ class MarkdownFragment: BaseFragment() {
     }
 
     private fun parseText(){
-        val extensions = arrayListOf(StrikethroughExtension.create(), AutolinkExtension.create())
-        val parser = Parser.builder().extensions(extensions).build()
-        val renderer = HtmlRenderer.builder().extensions(extensions).build()
         editableText.addTextChangedListener(object : TextWatcher{
             override fun afterTextChanged(editable: Editable) {
 
@@ -134,13 +125,7 @@ class MarkdownFragment: BaseFragment() {
             }
 
             override fun onTextChanged(charsequence: CharSequence, start: Int, before: Int, count: Int) {
-                val document = parser.parse(charsequence.toString())
-                @Suppress("DEPRECATION")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    displayText.text = Html.fromHtml(renderer.render(document), Html.FROM_HTML_MODE_COMPACT)
-                } else {
-                    displayText.text = Html.fromHtml(renderer.render(document))
-                }
+                displayText.text = charsequence.toString().toMarkDown()
             }
 
         })

@@ -21,6 +21,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/notesCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/billInfoCard">
+
+            <TextView
+                android:id="@+id/notesText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.card.MaterialCardView>
+
         <com.github.florent37.expansionpanel.ExpansionHeader
             android:id="@+id/payDatesExpansionHeader"
             android:layout_height="wrap_content"
@@ -32,7 +47,7 @@
             app:expansion_layout="@id/payDatesExpansionLayout"
             app:expansion_toggleOnClick="true"
             app:expansion_expanded="false"
-            app:layout_constraintTop_toBottomOf="@+id/billInfoCard"
+            app:layout_constraintTop_toBottomOf="@+id/notesCard"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

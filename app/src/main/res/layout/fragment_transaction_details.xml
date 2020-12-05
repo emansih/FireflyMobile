@@ -74,6 +74,19 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/notesCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/meta_information_card">
+            <TextView
+                android:id="@+id/notesText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/transaction_tags_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,8 +94,8 @@
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/meta_information_card"
-            app:layout_constraintStart_toStartOf="@+id/meta_information_card">
+            app:layout_constraintTop_toBottomOf="@+id/notesCard"
+            app:layout_constraintStart_toStartOf="@+id/notesCard">
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/transaction_tags"

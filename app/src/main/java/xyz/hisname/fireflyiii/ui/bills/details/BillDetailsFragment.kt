@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
@@ -80,6 +81,11 @@ class BillDetailsFragment: BaseDetailFragment() {
                     DetailModel(resources.getString(R.string.frequency), attributes?.repeat_freq),
                     DetailModel("Is Active", attributes?.active.toString())
             )
+            if(attributes?.notes.isNullOrEmpty()){
+                notesCard.isGone = true
+            } else {
+                notesText.text = attributes?.notes?.toMarkDown()
+            }
             detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }

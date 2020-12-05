@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,7 +30,7 @@ class CategoryDetailsFragment: BaseDetailFragment() {
     private lateinit var categoryName: String
     private val categoryId by lazy { arguments?.getLong("categoryId")  ?: 0 }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_category_detail, container)
     }
@@ -44,6 +45,11 @@ class CategoryDetailsFragment: BaseDetailFragment() {
             categoryName = categoryData.categoryAttributes?.name ?: ""
             durationText.text = getString(R.string.chart_category_in_period, categoryName,
                     DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+            if(categoryData.categoryAttributes?.notes.isNullOrEmpty()){
+                notesCard.isGone = true
+            } else {
+                notesText.text = categoryData.categoryAttributes?.notes?.toMarkDown()
+            }
         }
         setBarChart()
         loadTransactionList()

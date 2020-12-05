@@ -72,6 +72,7 @@ class TransactionDetailsFragment: BaseFragment() {
         transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(viewLifecycleOwner){ transactionData ->
             setTransactionInfo(transactionData)
             setMetaInfo(transactionData)
+            setNotes(transactionData[0].notes)
         }
     }
 
@@ -198,6 +199,10 @@ class TransactionDetailsFragment: BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun setNotes(notes: String?){
+        notesText.text = notes?.toMarkDown()
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
