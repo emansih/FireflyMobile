@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.account
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,19 +9,18 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
+import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_account_detail.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
+import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -51,7 +49,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             coloring.add(col)
         }
         accountDetailViewModel.getAccountById(accountId).observe(viewLifecycleOwner){ accountData ->
-            setLineChart()
+            setAccountData()
             setExpensesByCategory()
             setExpensesByBudget()
             setIncomeByCategory()
@@ -60,44 +58,11 @@ class AccountDetailFragment: BaseDetailFragment() {
         setDarkMode()
     }
 
-    private fun setLineChart(){
-        accountDetailViewModel.lineChartData.observe(viewLifecycleOwner){ amount ->
-            val lineChartEntries = arrayListOf(
-                    Entry(0f, amount.first.toFloat()),
-                    Entry(1f, amount.second.toFloat()),
-                    Entry(2f, amount.third.toFloat()),
-                    Entry(3f, amount.fourth.toFloat()),
-                    Entry(4f, amount.fifth.toFloat()),
-                    Entry(5f, amount.sixth.toFloat())
-            )
-            val dataSet = LineDataSet(lineChartEntries, accountDetailViewModel.accountName)
-            dataSet.apply {
-                setCircleColor(getCompatColor(R.color.colorAccent))
-                valueTextColor = Color.GREEN
-                valueTextSize = 15f
-            }
-            val lineChartData = LineData(dataSet)
-            transactionLineChart.apply {
-                xAxis.granularity = 1f
-                xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
-                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfMonth()),
-                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 1)),
-                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 2)),
-                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 3)),
-                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 4)),
-                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getEndOfMonth())))
-                xAxis.setDrawLabels(true)
-                xAxis.setDrawAxisLine(false)
-                xAxis.setDrawGridLines(false)
-                data = lineChartData
-                axisRight.isEnabled = false
-                description.isEnabled = false
-                xAxis.position = XAxis.XAxisPosition.BOTTOM
-                data.isHighlightEnabled = false
-                setTouchEnabled(true)
-                setPinchZoom(true)
-                animateY(1000, Easing.EaseOutBack)
-            }
+    private fun setAccountData(){
+        accountDetailViewModel.accountData.observe(viewLifecycleOwner){ list ->
+            detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(list){ }
         }
         balanceHistoryCardText.text = resources.getString(R.string.account_chart_description,
                 accountDetailViewModel.accountName, DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
@@ -178,9 +143,6 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setDarkMode(){
         if(isDarkMode()){
-            transactionLineChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
-            transactionLineChart.legend.textColor = getCompatColor(R.color.md_white_1000)
-            transactionLineChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
             categoryPieChart.legend.textColor = getCompatColor(R.color.md_white_1000)
             budgetPieChart.legend.textColor = getCompatColor(R.color.md_white_1000)
         }

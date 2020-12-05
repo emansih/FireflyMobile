@@ -8,7 +8,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class BaseDetailRecyclerAdapter(private val data: MutableList<DetailModel>,
+class BaseDetailRecyclerAdapter(private val data: List<DetailModel>,
                                 private val clickListener:(position: Int) -> Unit ):
         DiffUtilAdapter<DetailModel, BaseDetailRecyclerAdapter.BaseDetailViewHolder>() {
 

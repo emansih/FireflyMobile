@@ -17,10 +17,10 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.account.TransactionPageSource
+import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.Sixple
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -42,18 +42,34 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     var accountName = ""
         private set
 
-    val lineChartData = MutableLiveData<Sixple<BigDecimal,BigDecimal, BigDecimal, BigDecimal, BigDecimal, BigDecimal>>()
     val uniqueExpensesCategoryLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
     val uniqueIncomeCategoryLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
     val uniqueBudgetLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
+    val accountData = MutableLiveData<List<DetailModel>>()
 
     fun getAccountById(accountId: Long): MutableLiveData<MutableList<AccountData>>{
         val accountDataLiveData = MutableLiveData<MutableList<AccountData>>()
         viewModelScope.launch(Dispatchers.IO){
             val accountList = accountRepository.getAccountById(accountId)
-            currencySymbol = accountList[0].accountAttributes?.currency_symbol ?: ""
-            accountName =  accountList[0].accountAttributes?.name ?: ""
-            accountType = accountList[0].accountAttributes?.type ?: ""
+            val accountAttributes = accountList[0].accountAttributes
+            currencySymbol = accountAttributes?.currency_symbol ?: ""
+            accountName =  accountAttributes?.name ?: ""
+            accountType = accountAttributes?.type ?: ""
+            val arrayListOfDetails = arrayListOf(
+                    DetailModel(getApplication<Application>().getString(R.string.balance),
+                            currencySymbol + accountAttributes?.current_balance),
+                    DetailModel(getApplication<Application>().getString(R.string.account_number),
+                            accountAttributes?.account_number.toString()),
+                    DetailModel("Role",
+                            accountAttributes?.account_role),
+                    DetailModel("Active ", accountAttributes?.active.toString())
+            )
+            if(accountType.contentEquals("liabilities")){
+                arrayListOfDetails.add(DetailModel("Type of liability", accountAttributes?.liability_type))
+                arrayListOfDetails.add(DetailModel(getApplication<Application>().getString(R.string.interest),
+                        accountAttributes?.interest + "% (" + accountAttributes?.interest_period + ")"))
+            }
+            accountData.postValue(arrayListOfDetails)
             getTransactions(accountId, accountType)
             accountDataLiveData.postValue(accountList)
         }
@@ -63,28 +79,6 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     private suspend fun getTransactions(accountId: Long, accountType: String){
         accountRepository.getTransactionByAccountId(accountId, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), "all", transactionDao)
-        val startOfMonth = transactionRepository.getTransactionsBySourceAndDate(
-                DateTimeUtil.getStartOfMonth(), DateTimeUtil.getStartOfMonth(), accountId)
-        val weekOne = transactionRepository.getTransactionsBySourceAndDate(
-                DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 1),
-                accountId)
-        val weekTwo = transactionRepository.getTransactionsBySourceAndDate(
-                DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 2),
-                accountId)
-        val weekThree = transactionRepository.getTransactionsBySourceAndDate(
-                DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 3),
-                accountId)
-        val weekFour = transactionRepository.getTransactionsBySourceAndDate(
-                DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 4),
-                accountId)
-        val lastDayOfMonth = transactionRepository.getTransactionsBySourceAndDate(
-                DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), accountId)
-        lineChartData.postValue(Sixple(startOfMonth, weekOne, weekTwo, weekThree, weekFour, lastDayOfMonth))
-
         getCategoryExpenses(accountId, accountType)
         getBudgetExpenses(accountId)
         getIncomeCategory(accountId, accountType)

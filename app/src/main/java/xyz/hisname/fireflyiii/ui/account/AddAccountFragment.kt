@@ -385,7 +385,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 if(accountAttributes?.include_net_worth == true){
                     includeInNetWorthCheck.performClick()
                 }
-                opening_balance_edittext.setText(accountAttributes?.opening_balance)
+                opening_balance_edittext.setText(accountAttributes?.opening_balance.toString())
                 opening_balance_date_edittext.setText(accountAttributes?.opening_balance_date)
                 val accountRole = accountAttributes?.account_role
                 if(accountRole != null){

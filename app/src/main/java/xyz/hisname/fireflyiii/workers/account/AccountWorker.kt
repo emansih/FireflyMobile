@@ -16,6 +16,7 @@ import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
+import java.math.BigDecimal
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
 
@@ -82,7 +83,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                             accountType, accountRole, currencyId, currencyCode, 0.toBigDecimal(),
                             currencySymbol, "", notes, "", "", accountNumber,
                             iban, bic, 0.0,
-                            openingBalance, openingBalanceDate, liabilityType,
+                            BigDecimal(openingBalance), openingBalanceDate, liabilityType,
                             liabilityAmount, liabilityStartDate, interest, interestPeriod, includeInNetWorth, true)
                     ))
                 }
