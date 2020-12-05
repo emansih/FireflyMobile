@@ -80,12 +80,12 @@ class AccountDetailFragment: BaseDetailFragment() {
             transactionLineChart.apply {
                 xAxis.granularity = 1f
                 xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf(
-                        DateTimeUtil.getStartOfMonth(),
-                        DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 1),
-                        DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 2),
-                        DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 3),
-                        DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 4),
-                        DateTimeUtil.getEndOfMonth()))
+                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfMonth()),
+                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 1)),
+                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 2)),
+                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 3)),
+                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 4)),
+                        DateTimeUtil.getDayAndMonth(DateTimeUtil.getEndOfMonth())))
                 xAxis.setDrawLabels(true)
                 xAxis.setDrawAxisLine(false)
                 xAxis.setDrawGridLines(false)
