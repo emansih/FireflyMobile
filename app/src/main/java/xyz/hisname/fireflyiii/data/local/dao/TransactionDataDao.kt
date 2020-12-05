@@ -38,7 +38,10 @@ abstract class TransactionDataDao {
                                                               type: String, currencyCode: String): BigDecimal
 
     @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND source_id = :accountId AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId)")
-    abstract fun getTransactionsByAccountAndDate(startDate: String?, endDate: String?, accountId: Long): BigDecimal
+    abstract fun getTransactionsBySourceAndDate(startDate: String?, endDate: String?, accountId: Long): BigDecimal
+
+    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND destination_id = :accountId AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId)")
+    abstract fun getTransactionsByDestinationAndDate(startDate: String?, endDate: String?, accountId: Long): BigDecimal
 
     @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND currency_code =:currencyCode AND transactionType =:transactionType")
     abstract fun getTotalTransactionType(startDate: String, endDate: String, currencyCode: String, transactionType: String): BigDecimal
@@ -159,15 +162,28 @@ abstract class TransactionDataDao {
     abstract suspend fun getTransactionListByDateAndBillCount(billId: Long, startDate: String, endDate: String): Long
 
     @Query("SELECT category_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId) GROUP BY category_name")
-    abstract suspend fun getUniqueCategoryByAccountAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
+    abstract suspend fun getUniqueCategoryBySourceAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
+
+    @Query("SELECT category_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId) GROUP BY category_name")
+    abstract suspend fun getUniqueCategoryByDestinationAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
 
     @Query("SELECT budget_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId) GROUP BY budget_name")
-    abstract suspend fun getUniqueBudgetByAccountAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
+    abstract suspend fun getUniqueBudgetBySourceAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
+
+    @Query("SELECT budget_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId) GROUP BY budget_name")
+    abstract suspend fun getUniqueBudgetByDestinationAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
 
     @Query("SELECT * FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate) ORDER BY date ASC")
-    abstract suspend fun getTransactionByAccountIdAndDate(accountId: Long, startDate: String, endDate: String): List<Transactions>
+    abstract suspend fun getTransactionBySourceIdAndDate(accountId: Long, startDate: String, endDate: String): List<Transactions>
 
     @Query("SELECT COUNT(*) FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate)")
-    abstract suspend fun getTransactionByAccountIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
+    abstract suspend fun getTransactionBySourceIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
+
+    @Query("SELECT * FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate) ORDER BY date ASC")
+    abstract suspend fun getTransactionByDestinationIdAndDate(accountId: Long, startDate: String, endDate: String): List<Transactions>
+
+    @Query("SELECT COUNT(*) FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate)")
+    abstract suspend fun getTransactionByDestinationIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
+
 
 }

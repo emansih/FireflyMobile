@@ -85,7 +85,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun getTransactionByAccountId(accountId: Long, startDate: String,
                                           endDate: String, type: String,
-                                          transactionDao: TransactionDataDao): List<Transactions>{
+                                          transactionDao: TransactionDataDao){
         try {
             val networkCall = accountsService?.getTransactionsByAccountId(accountId, 1, startDate, endDate, type)
             val responseBody = networkCall?.body()
@@ -107,10 +107,6 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 }
             }
         } catch (exception: Exception){ }
-        return transactionDao.getTransactionByAccountIdAndDate(
-                accountId,
-                DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate))
     }
 
     suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<MutableList<AccountData>>{

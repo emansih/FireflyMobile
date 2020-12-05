@@ -35,7 +35,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     private val transactionRepository = TransactionRepository(
             transactionDao, genericService()?.create(TransactionService::class.java)
     )
-
+    private var accountType = ""
     var currencySymbol = ""
         private set
 
@@ -53,45 +53,51 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
             val accountList = accountRepository.getAccountById(accountId)
             currencySymbol = accountList[0].accountAttributes?.currency_symbol ?: ""
             accountName =  accountList[0].accountAttributes?.name ?: ""
-            getTransactions(accountId)
+            accountType = accountList[0].accountAttributes?.type ?: ""
+            getTransactions(accountId, accountType)
             accountDataLiveData.postValue(accountList)
         }
         return accountDataLiveData
     }
 
-    private suspend fun getTransactions(accountId: Long){
+    private suspend fun getTransactions(accountId: Long, accountType: String){
         accountRepository.getTransactionByAccountId(accountId, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), "all", transactionDao)
-        val startOfMonth = transactionRepository.getTransactionsByAccountAndDate(
+        val startOfMonth = transactionRepository.getTransactionsBySourceAndDate(
                 DateTimeUtil.getStartOfMonth(), DateTimeUtil.getStartOfMonth(), accountId)
-        val weekOne = transactionRepository.getTransactionsByAccountAndDate(
+        val weekOne = transactionRepository.getTransactionsBySourceAndDate(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 1),
                 accountId)
-        val weekTwo = transactionRepository.getTransactionsByAccountAndDate(
+        val weekTwo = transactionRepository.getTransactionsBySourceAndDate(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 2),
                 accountId)
-        val weekThree = transactionRepository.getTransactionsByAccountAndDate(
+        val weekThree = transactionRepository.getTransactionsBySourceAndDate(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 3),
                 accountId)
-        val weekFour = transactionRepository.getTransactionsByAccountAndDate(
+        val weekFour = transactionRepository.getTransactionsBySourceAndDate(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getStartOfWeekFromGivenDate(DateTimeUtil.getStartOfMonth(), 4),
                 accountId)
-        val lastDayOfMonth = transactionRepository.getTransactionsByAccountAndDate(
+        val lastDayOfMonth = transactionRepository.getTransactionsBySourceAndDate(
                 DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), accountId)
         lineChartData.postValue(Sixple(startOfMonth, weekOne, weekTwo, weekThree, weekFour, lastDayOfMonth))
 
-        getCategoryExpenses(accountId)
+        getCategoryExpenses(accountId, accountType)
         getBudgetExpenses(accountId)
-        getIncomeCategory(accountId)
+        getIncomeCategory(accountId, accountType)
     }
 
-    private suspend fun getCategoryExpenses(accountId: Long) {
-        val uniqueCategory = transactionRepository.getUniqueCategoryByAccountAndDateAndTypeAndCurrencyCode(accountId,
+    private suspend fun getCategoryExpenses(accountId: Long, accountType: String) {
+        val uniqueCategory = if(accountType.contentEquals("asset") || accountType.contentEquals("revenue")){
+            transactionRepository.getUniqueCategoryBySourceAndDateAndType(accountId,
                     DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "withdrawal")
+        } else {
+            transactionRepository.getUniqueCategoryByDestinationAndDateAndType(accountId,
+                    DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "withdrawal")
+        }
         var totalSumOfCategory = BigDecimal.ZERO
         val pieChartData = arrayListOf<Triple<Float, String, BigDecimal>>()
         uniqueCategory.forEach {  categorySum ->
@@ -113,8 +119,13 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     }
 
     private suspend fun getBudgetExpenses(accountId: Long){
-        val uniqueBudget = transactionRepository.getUniqueBudgetByAccountAndDateAndType(accountId,
-                DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "withdrawal")
+        val uniqueBudget = if(accountType.contentEquals("asset") || accountType.contentEquals("revenue") ){
+            transactionRepository.getUniqueBudgetBySourceAndDateAndType(accountId,
+                    DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "withdrawal")
+        } else {
+            transactionRepository.getUniqueBudgetByDestinationAndDateAndType(accountId,
+                    DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "withdrawal")
+        }
         var totalSumOfBudget = BigDecimal.ZERO
         val pieChartData = arrayListOf<Triple<Float, String, BigDecimal>>()
         uniqueBudget.forEach {  budgetSum ->
@@ -135,9 +146,14 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
         uniqueBudgetLiveData.postValue(pieChartData)
     }
 
-    private suspend fun getIncomeCategory(accountId: Long){
-        val uniqueCategory = transactionRepository.getUniqueCategoryByAccountAndDateAndTypeAndCurrencyCode(accountId,
-                DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "deposit")
+    private suspend fun getIncomeCategory(accountId: Long, accountType: String){
+        val uniqueCategory = if(accountType.contentEquals("asset") || accountType.contentEquals("revenue")){
+            transactionRepository.getUniqueCategoryByDestinationAndDateAndType(accountId,
+                    DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "deposit")
+        } else {
+            transactionRepository.getUniqueCategoryBySourceAndDateAndType(accountId,
+                    DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(), "deposit")
+        }
         var totalSumOfCategory = BigDecimal.ZERO
         val pieChartData = arrayListOf<Triple<Float, String, BigDecimal>>()
         uniqueCategory.forEach {  categorySum ->
@@ -159,6 +175,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     }
 
     fun getTransactionList(accountId: Long) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-        TransactionPageSource(transactionDao, accountId, DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+        TransactionPageSource(transactionDao, accountId, accountType, DateTimeUtil.getStartOfMonth(),
+                DateTimeUtil.getEndOfMonth())
     }.flow.cachedIn(viewModelScope).asLiveData()
 }

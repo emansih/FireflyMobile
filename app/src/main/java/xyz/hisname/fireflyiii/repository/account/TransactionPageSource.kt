@@ -8,6 +8,7 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 
 class TransactionPageSource(private val transactionDataDao: TransactionDataDao,
                             private val accountId: Long,
+                            private val accountType: String,
                             private val startDate: String,
                             private val endDate: String): PagingSource<Int, Transactions>() {
 
@@ -22,17 +23,30 @@ class TransactionPageSource(private val transactionDataDao: TransactionDataDao,
         } else {
             null
         }
-        val numberOfRows = transactionDataDao.getTransactionByAccountIdAndDateCount(accountId,
-                DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate))
+        val numberOfRows = if(accountType.contentEquals("asset") || accountType.contentEquals("revenue")){
+            transactionDataDao.getTransactionBySourceIdAndDateCount(accountId,
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate))
+        } else {
+            transactionDataDao.getTransactionByDestinationIdAndDateCount(accountId,
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate))
+        }
         val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
             paramKey ?: 1 + 1
         } else {
             null
         }
-        return LoadResult.Page(transactionDataDao.getTransactionByAccountIdAndDate(accountId,
-                DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate)),
-                previousKey, nextKey)
+        return if(accountType.contentEquals("asset") || accountType.contentEquals("revenue")){
+            LoadResult.Page(transactionDataDao.getTransactionBySourceIdAndDate(accountId,
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate)),
+                    previousKey, nextKey)
+        } else {
+            LoadResult.Page(transactionDataDao.getTransactionByDestinationIdAndDate(accountId,
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate)),
+                    previousKey, nextKey)
+        }
     }
 }
