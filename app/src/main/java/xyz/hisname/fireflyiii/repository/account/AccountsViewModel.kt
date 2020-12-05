@@ -61,7 +61,7 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
         var data: MutableList<AccountData> = arrayListOf()
         viewModelScope.launch(Dispatchers.IO) {
-            data = repository.retrieveAccountById(id)
+            data = repository.getAccountById(id)
         }.invokeOnCompletion {
             accountData.postValue(data)
         }

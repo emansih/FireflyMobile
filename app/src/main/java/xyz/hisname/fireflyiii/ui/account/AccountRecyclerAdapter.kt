@@ -12,6 +12,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
+import java.math.BigDecimal
 
 class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
         PagingDataAdapter<AccountData, AccountRecyclerAdapter.AccountViewHolder>(DIFF_CALLBACK){
@@ -53,13 +54,12 @@ class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
             } else {
                 itemView.accountNameText.text = accountData?.name
             }
-            val amount = accountData?.current_balance?.toBigDecimal()?.toPlainString()
+            val amount = accountData?.current_balance
             if(amount != null){
-                if(amount.startsWith("-")){
+                if(amount > BigDecimal.ZERO){
                     itemView.accountAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
                 }
                 itemView.accountAmountText.text = currencySymbol + " " + amount
-
             }
             itemView.setOnClickListener { clickListener(data) }
         }

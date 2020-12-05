@@ -40,21 +40,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType, currencyCode)
     }
 
-    suspend fun getTransactionsByAccountAndCurrencyCodeAndDate(startDate: String, endDate: String,
-                                                                       currencyCode: String,
-                                                               accountName: String): Double{
-        loadRemoteData(startDate, endDate, "all")
-        return transactionDao.getTransactionsByAccountAndCurrencyCodeAndDate(
+    suspend fun getTransactionsByAccountAndDate(startDate: String, endDate: String,
+                                                               accountId: Long): BigDecimal{
+        return transactionDao.getTransactionsByAccountAndDate(
                 DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName)
-    }
-
-
-    suspend fun getTotalTransactionType(startDate: String, endDate: String, currencyCode: String,
-                                                  accountName: String, transactionType: String): Double {
-        loadRemoteData(startDate, endDate, "all")
-        return transactionDao.getTotalTransactionType(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType)
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountId)
     }
 
     suspend fun getTotalTransactionType(startDate: String, endDate: String,
@@ -64,31 +54,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
     }
 
-    suspend fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String, currencyCode: String,
-                                                  accountName: String, transactionType: String, categoryName: String?): Double {
-        loadRemoteData(startDate, endDate, "all")
-        return if(categoryName != null){
-            transactionDao.getTransactionByDateAndCategoryAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType, categoryName)
-        } else {
-            transactionDao.getTransactionByDateAndNullCategoryAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType)
-        }
-    }
-
-    suspend fun getTransactionByDateAndBudgetAndCurrencyAndAccountName(startDate: String, endDate: String, currencyCode: String,
-                                                                       accountName: String, transactionType: String,
-                                                                       budgetName: String?): Double {
-        loadRemoteData(startDate, endDate, "all")
-        return if(budgetName != null){
-            transactionDao.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType, budgetName)
-        } else {
-            transactionDao.getTransactionByDateAndNullBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, accountName, transactionType)
-        }
-    }
-
     suspend fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
                                                          currencyCode: String,
                                                          transactionType: String,
@@ -96,14 +61,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         transactionDao.getTransactionByDateAndBudgetAndCurrency(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType, budgetName)
 
-
-
-    suspend fun getUniqueCategoryByDate(startDate: String, endDate: String, currencyCode: String,
-                                        sourceName: String, transactionType: String): MutableList<String>{
-        loadRemoteData(startDate, endDate, "all")
-        return transactionDao.getUniqueCategoryByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, sourceName, transactionType)
-    }
 
     suspend fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
                                       sourceName: String, transactionType: String): MutableList<String> {
@@ -151,12 +108,22 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
-    suspend fun getTransactionListByDateAndAccount(startDate: String, endDate: String,
-                                                   accountName: String): MutableList<Transactions>{
-        loadRemoteData(startDate, endDate, "all")
-        return transactionDao.getTransactionListByDateAndAccount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountName)
-    }
+    suspend fun getUniqueCategoryByAccountAndDateAndTypeAndCurrencyCode(accountId: Long,
+                                                                        startDate: String, endDate: String,
+                                                                        transactionType: String) =
+            transactionDao.getUniqueCategoryByAccountAndDateAndType(accountId,
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),
+                    transactionType)
+
+    suspend fun getUniqueBudgetByAccountAndDateAndType(accountId: Long,
+                                                       startDate: String, endDate: String,
+                                                       transactionType: String) =
+            transactionDao.getUniqueBudgetByAccountAndDateAndType(accountId,
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),
+                    transactionType)
+
 
     private suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{
         return if(startDate == null || endDate == null || startDate.isBlank() || endDate.isBlank()){

@@ -2,6 +2,7 @@ package xyz.hisname.fireflyiii.repository.models.accounts
 
 import androidx.room.Entity
 import com.squareup.moshi.JsonClass
+import java.math.BigDecimal
 
 @Entity
 @JsonClass(generateAdapter = true)
@@ -14,7 +15,7 @@ data class AccountAttributes(
         val account_role: String?,
         val currency_id: Long?,
         val currency_code: String?,
-        val current_balance: Double,
+        val current_balance: BigDecimal,
         val currency_symbol: String?,
         val current_balance_date: String,
         val notes: String?,

@@ -7,6 +7,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.ACCOUNTS_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/accounts.html
 interface AccountsService {
@@ -61,7 +62,13 @@ interface AccountsService {
 
     @GET("${Constants.SEARCH_API_ENDPOINT}/accounts")
     suspend fun searchAccount(@Query("query") query: String,
-                                  @Query("type") type: String,
-                                  @Query("field") field: String = "name"): Response<AccountsModel>
+                              @Query("type") type: String,
+                              @Query("field") field: String = "name"): Response<AccountsModel>
 
+    @GET("${Constants.SEARCH_API_ENDPOINT}/accounts/{id}/transactions")
+    suspend fun getTransactionsByAccountId(@Path("id") id: Long,
+                                           @Query("page") page: Int,
+                                           @Query("start") startDate: String,
+                                           @Query("end") endDate: String,
+                                           @Query("type") type: String): Response<TransactionModel>
 }

@@ -79,7 +79,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     accountDatabase.insert(AccountData(
                             fakeAccountId, AccountAttributes(
                             "","", accountName, true,
-                            accountType, accountRole, currencyId, currencyCode, 0.0,
+                            accountType, accountRole, currencyId, currencyCode, 0.toBigDecimal(),
                             currencySymbol, "", notes, "", "", accountNumber,
                             iban, bic, 0.0,
                             openingBalance, openingBalanceDate, liabilityType,

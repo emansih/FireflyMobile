@@ -6,8 +6,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
+import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.debounce
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 
@@ -45,7 +49,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         return accountDao.getAccountByType(accountType).distinctUntilChanged()
     }
 
-    suspend fun retrieveAccountById(accountId: Long) = accountDao.getAccountById(accountId)
+    suspend fun getAccountById(accountId: Long) = accountDao.getAccountById(accountId)
 
     suspend fun deleteAccountById(accountId: Long): Int {
         try {
@@ -78,6 +82,36 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     }
 
     suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
+
+    suspend fun getTransactionByAccountId(accountId: Long, startDate: String,
+                                          endDate: String, type: String,
+                                          transactionDao: TransactionDataDao): List<Transactions>{
+        try {
+            val networkCall = accountsService?.getTransactionsByAccountId(accountId, 1, startDate, endDate, type)
+            val responseBody = networkCall?.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                responseBody.data.forEach { transactionData ->
+                    transactionData.transactionAttributes?.transactions?.forEach { transactions ->
+                        transactionDao.insert(transactions)
+                        transactionDao.insert(TransactionIndex(
+                                transactionData.transactionId,
+                                transactions.transaction_journal_id
+                        ))
+                    }
+                }
+                val pagination = responseBody.meta.pagination
+                if (pagination.total_pages != pagination.current_page) {
+                    for (items in 2..pagination.total_pages) {
+                        accountsService?.getTransactionsByAccountId(accountId, items, startDate, endDate, "all")
+                    }
+                }
+            }
+        } catch (exception: Exception){ }
+        return transactionDao.getTransactionByAccountIdAndDate(
+                accountId,
+                DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate))
+    }
 
     suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<MutableList<AccountData>>{
         if(accountName.length > 3){

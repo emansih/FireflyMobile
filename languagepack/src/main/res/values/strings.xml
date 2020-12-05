@@ -105,6 +105,8 @@
     <string name="category_added">Stored new category %1$s</string>
     <string name="budget_left">Left</string>
     <string name="expenses_without_budget">Expenses without budget</string>
+    <string name="expenses_without_category">Expenses without category</string>
+    <string name="income_without_category">Income without category</string>
     <string name="save_on_account">Save on account</string>
     <string name="dashboard_balance_help_text">This little box and the boxes next to this one will give you a quick overview of your financial situation.</string>
     <string name="iban_help_text">Give your accounts a valid IBAN. This could make a data import very easy in the future.</string>
