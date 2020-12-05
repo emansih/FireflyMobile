@@ -46,7 +46,6 @@ import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
-import xyz.hisname.fireflyiii.ui.rules.RulesFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
 import xyz.hisname.fireflyiii.ui.tags.ListTagsFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
@@ -430,7 +429,6 @@ class HomeActivity: BaseActivity(){
                         changeFragment(ListBillFragment())
                     }
                     17L -> {
-                        changeFragment(RulesFragment())
                     }
                     19L -> {
                         changeFragment(SettingsFragment())
