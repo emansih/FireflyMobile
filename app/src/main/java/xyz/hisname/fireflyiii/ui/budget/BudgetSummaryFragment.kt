@@ -112,7 +112,6 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
     }
 
     private fun setText(){
-        budgetDuration.text = DateTimeUtil.getDurationText()
         budgetSummaryViewModel.availableBudget.observe(viewLifecycleOwner){ available ->
             budgetAmountValue.text = available
         }
@@ -161,6 +160,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
             })
         }
+        loadTransactionList(null)
     }
 
     private fun itemClicked(data: Transactions){
