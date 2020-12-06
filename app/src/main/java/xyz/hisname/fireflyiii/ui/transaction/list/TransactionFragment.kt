@@ -254,7 +254,6 @@ class TransactionFragment: BaseFragment(){
                     val transactionName = viewHolder.itemView.transactionNameText.text
                     transactionVm.deleteTransaction(transactionJournalId).observe(viewLifecycleOwner){ isDeleted ->
                         transactionAdapter.refresh()
-                        swipeContainer.isRefreshing = false
                         if(isDeleted){
                             toastSuccess(resources.getString(R.string.transaction_deleted))
                         } else {

@@ -95,22 +95,20 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
 
     fun deleteTransaction(transactionJournalId: String): MutableLiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = 0
         viewModelScope.launch(Dispatchers.IO){
             val transactionId = transactionRepository.getTransactionIdFromJournalId(transactionJournalId.toLong())
             if(transactionId != 0L){
-                isItDeleted = transactionRepository.deleteTransactionById(transactionId)
-            }
-            when (isItDeleted) {
-                HttpConstants.FAILED -> {
-                    isDeleted.postValue(false)
-                    DeleteTransactionWorker.setupWorker(transactionJournalId.toLong(), getApplication())
-                }
-                HttpConstants.UNAUTHORISED -> {
-                    isDeleted.postValue(false)
-                }
-                HttpConstants.NO_CONTENT_SUCCESS -> {
-                    isDeleted.postValue(true)
+                when (transactionRepository.deleteTransactionById(transactionId)) {
+                    HttpConstants.FAILED -> {
+                        isDeleted.postValue(false)
+                        DeleteTransactionWorker.setupWorker(transactionJournalId.toLong(), getApplication())
+                    }
+                    HttpConstants.UNAUTHORISED -> {
+                        isDeleted.postValue(false)
+                    }
+                    HttpConstants.NO_CONTENT_SUCCESS -> {
+                        isDeleted.postValue(true)
+                    }
                 }
             }
         }

@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.repository.transaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
-import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.*
@@ -71,13 +70,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
 
     suspend fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
-                                      sourceName: String, transactionType: String): MutableList<String> {
-        loadRemoteData(startDate, endDate, "all")
-        return transactionDao.getUniqueBudgetByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, sourceName, transactionType)
-    }
-
-    suspend fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
                                       transactionType: String)= transactionDao.getUniqueBudgetByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
 
@@ -88,7 +80,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     suspend fun deleteTransactionById(transactionId: Long): Int {
         try {
-            val networkResponse: Response<TransactionSuccessModel>? = transactionService?.deleteTransactionById(transactionId)
+            val networkResponse = transactionService?.deleteTransactionById(transactionId)
             when(networkResponse?.code()) {
                 204 -> {
                     transactionDao.deleteTransactionByJournalId(transactionId)
@@ -105,6 +97,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     // User probably deleted this on the web interface and tried to do it using mobile client
                     transactionDao.deleteTransactionByJournalId(transactionId)
                     return HttpConstants.NOT_FOUND
+                }
+                500 -> {
+                    // When deleting transactions on some versions of Firefly, HTTP 500 is returned
+                    transactionDao.deleteTransactionByJournalId(transactionId)
+                    return HttpConstants.NO_CONTENT_SUCCESS
                 }
                 else -> {
                     return HttpConstants.FAILED
