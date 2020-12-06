@@ -67,16 +67,10 @@ class CategoriesDialog: BaseDialog(){
         dialog?.dismiss()
     }
 
-    override fun setIcons() {
-    }
-
     override fun setWidgets() {
         setRecyclerView()
         searchData()
         displayView()
-    }
-
-    override fun submitData() {
     }
 
 }

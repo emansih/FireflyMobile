@@ -5,8 +5,10 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.AVAILABLE_BUDGET_API_ENDPOINT
 import xyz.hisname.fireflyiii.Constants.Companion.BUDGET_API_ENDPOINT
+import xyz.hisname.fireflyiii.repository.models.autocomplete.BudgetItems
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetModel
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListModel
 import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitModel
@@ -19,6 +21,9 @@ interface BudgetService {
 
     @GET(AVAILABLE_BUDGET_API_ENDPOINT)
     fun getPaginatedBudget(@Query("page") page: Int): Call<BudgetModel>
+
+    @GET("${Constants.AUTOCOMPLETE_API_ENDPOINT}/budgets")
+    suspend fun searchBudget(@Query("query") queryString: String): Response<List<BudgetItems>>
 
     @GET(AVAILABLE_BUDGET_API_ENDPOINT)
     suspend fun getAvailableBudget(@Query("page") page: Int,

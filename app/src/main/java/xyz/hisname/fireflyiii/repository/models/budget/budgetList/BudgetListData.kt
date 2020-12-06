@@ -10,12 +10,12 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 @Entity(tableName = "budget_list")
 data class BudgetListData(
-        @Embedded
-        @Json(name ="attributes")
-        var budgetListAttributes: BudgetListAttributes? = null,
         @PrimaryKey(autoGenerate = false)
         @Json(name ="id")
         var budgetListId: Long? = null,
+        @Embedded
+        @Json(name ="attributes")
+        var budgetListAttributes: BudgetListAttributes? = null,
         @Ignore
         var type: String = ""
 )

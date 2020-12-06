@@ -55,6 +55,7 @@ import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
+import xyz.hisname.fireflyiii.ui.budget.BudgetSearchViewModel
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialogViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
@@ -591,7 +592,7 @@ class AddTransactionFragment: BaseFragment() {
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if(event.action == MotionEvent.ACTION_UP){
                     piggy_edittext.compoundDrawables[0].bounds.width()
-                    if(event.x <= budget_edittext.compoundDrawables[0].bounds.width() + 30){
+                    if(event.x <= piggy_edittext.compoundDrawables[0].bounds.width() + 30){
                         val piggyBankDialog = PiggyDialog()
                         piggyBankDialog.show(parentFragmentManager, "piggyDialog")
 
@@ -628,7 +629,7 @@ class AddTransactionFragment: BaseFragment() {
                 return false
             }
         })
-        budgetViewModel.budgetName.observe(viewLifecycleOwner) { name ->
+        getViewModel(BudgetSearchViewModel::class.java).budgetName.observe(viewLifecycleOwner) { name ->
             budget_edittext.setText(name)
         }
         expansionLayout.addListener { _, expanded ->

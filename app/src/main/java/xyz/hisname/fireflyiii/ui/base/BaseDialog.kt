@@ -8,9 +8,6 @@ import android.view.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
-import xyz.hisname.fireflyiii.repository.piggybank.PiggyViewModel
 import xyz.hisname.fireflyiii.util.animation.BakedBezierInterpolator
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -28,7 +25,6 @@ abstract class BaseDialog: DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setIcons()
         setWidgets()
     }
 
@@ -62,7 +58,5 @@ abstract class BaseDialog: DialogFragment() {
     fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
 
 
-    abstract fun setIcons()
     abstract fun setWidgets()
-    abstract fun submitData()
 }

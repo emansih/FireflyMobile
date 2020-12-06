@@ -5,71 +5,68 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.dialog_search.*
+import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
-import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class BudgetSearchDialog: BaseDialog() {
 
-    private var dataAdapter = arrayListOf<BudgetListData>()
-    private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
-    private lateinit var scrollListener: EndlessRecyclerViewScrollListener
-    private val budgetAdapter by lazy { BudgetRecyclerAdapter(dataAdapter){ data: BudgetListData -> itemClicked(data) } }
+    private val budgetAdapter by lazy { BudgetRecyclerAdapter { data: BudgetListData -> itemClicked(data) } }
+    private val budgetSearchViewModel by lazy { getViewModel(BudgetSearchViewModel::class.java) }
+    private lateinit var initialBudget: PagingData<BudgetListData>
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.dialog_search, container)
     }
 
 
     private fun displayView(){
-        val linearLayoutManager = LinearLayoutManager(requireContext())
-        recycler_view.apply {
-            layoutManager = linearLayoutManager
-            addItemDecoration(DividerItemDecoration(requireContext(),
-                    LinearLayoutManager(requireContext()).orientation))
-            adapter = budgetAdapter
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recycler_view.adapter = budgetAdapter
+        budgetSearchViewModel.getAllBudget().observe(viewLifecycleOwner){ pagingData ->
+            initialBudget = pagingData
+            budgetAdapter.submitData(lifecycle, pagingData)
         }
-        swipeContainer.isRefreshing = true
-        budgetViewModel.retrieveAllBudgetLimits(1).observe(viewLifecycleOwner) { budgetData ->
-            dataAdapter.addAll(budgetData)
-            budgetAdapter.update(dataAdapter)
-            budgetAdapter.notifyDataSetChanged()
-        }
-        budgetViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
-            if (loading == false) {
-                swipeContainer.isRefreshing = false
-            }
-        }
-        scrollListener = object : EndlessRecyclerViewScrollListener(linearLayoutManager){
-            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
-                if(!swipeContainer.isRefreshing) {
-                    swipeContainer.isRefreshing = true
-                    budgetViewModel.retrieveAllBudgetLimits(page + 1).observe(viewLifecycleOwner){ budgetData ->
-                        dataAdapter.clear()
-                        dataAdapter.addAll(budgetData)
-                        budgetAdapter.update(budgetData)
-                        budgetAdapter.notifyDataSetChanged()
-                        swipeContainer.isRefreshing = false
-
-                    }
+        budgetAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            if(loadStates.refresh !is LoadState.Loading) {
+                if (budgetAdapter.itemCount < 1) {
+                    recycler_view.isGone = true
+                    listImage.isVisible = true
+                    listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                        icon = FontAwesome.Icon.faw_list
+                        sizeDp = 24
+                    })
+                    listText.isVisible = true
+                    listText.text = "No Budget Found"
+                } else {
+                    recycler_view.isVisible = true
+                    listImage.isGone = true
+                    listText.isGone = true
                 }
             }
         }
-        recycler_view.addOnScrollListener(scrollListener)
     }
 
     private fun itemClicked(budgetData: BudgetListData){
-        budgetViewModel.postBudgetName(budgetData.budgetListAttributes?.name)
+        budgetSearchViewModel.budgetName.postValue(budgetData.budgetListAttributes?.name)
         dialog?.dismiss()
     }
 
@@ -77,33 +74,22 @@ class BudgetSearchDialog: BaseDialog() {
     private fun searchData(){
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean{
+                budgetSearchViewModel.budgetName.postValue(query)
                 return false
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                filter(newText)
+                if(newText.isEmpty()){
+                    budgetAdapter.submitData(lifecycle, initialBudget)
+                } else {
+                    budgetSearchViewModel.searchBudget(newText).observe(viewLifecycleOwner){ pagingData ->
+                        budgetAdapter.submitData(lifecycle, pagingData)
+                    }
+                }
                 return true
             }
 
         })
-    }
-
-
-    private fun filter(budgetName: String){
-        dataAdapter.clear()
-        budgetViewModel.getBudgetByName(budgetName).observe(viewLifecycleOwner) { budgetData ->
-            budgetData.forEach { budget ->
-                dataAdapter.add(budget)
-            }
-            dataAdapter.clear()
-            dataAdapter.addAll(budgetData)
-            budgetAdapter.update(budgetData)
-            budgetAdapter.notifyDataSetChanged()
-        }
-    }
-
-    override fun setIcons() {
-
     }
 
     override fun setWidgets() {
@@ -111,6 +97,4 @@ class BudgetSearchDialog: BaseDialog() {
         searchData()
     }
 
-    override fun submitData() {
-    }
 }

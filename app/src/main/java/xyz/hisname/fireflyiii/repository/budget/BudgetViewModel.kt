@@ -22,8 +22,6 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
 
     private val repository: BudgetRepository
     private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
-    private var currentMonthBudgetValue: MutableLiveData<String> = MutableLiveData()
-    val budgetName =  MutableLiveData<String>()
     private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
     private val budgetLimitDao by lazy { AppDatabase.getInstance(application).budgetLimitDao() }
     private val budgetDao by lazy { AppDatabase.getInstance(application).budgetDataDao() }
@@ -31,19 +29,6 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
 
     init {
         repository = BudgetRepository(budgetDao, budgetListDao, spentDao, budgetLimitDao, budgetService)
-    }
-
-    fun retrieveAllBudgetLimits(pageNumber: Int): LiveData<MutableList<BudgetListData>> {
-        isLoading.value = true
-        var budgetListData: MutableList<BudgetListData> = arrayListOf()
-        val data: MutableLiveData<MutableList<BudgetListData>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            budgetListData = repository.allBudgetList(pageNumber)
-        }.invokeOnCompletion {
-            isLoading.postValue(false)
-            data.postValue(budgetListData)
-        }
-        return data
     }
 
     fun getBudgetByName(budgetName: String): LiveData<MutableList<BudgetListData>>{
@@ -55,9 +40,5 @@ class BudgetViewModel(application: Application): BaseViewModel(application) {
             data.postValue(budgetListData)
         }
         return data
-    }
-
-    fun postBudgetName(details: String?){
-        budgetName.value = details
     }
 }

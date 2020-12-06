@@ -81,14 +81,8 @@ class PiggyDialog: BaseDialog() {
         dialog?.dismiss()
     }
 
-    override fun setIcons() {
-    }
-
     override fun setWidgets() {
         displayView()
         searchData()
-    }
-
-    override fun submitData() {
     }
 }

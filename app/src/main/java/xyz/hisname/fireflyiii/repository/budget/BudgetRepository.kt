@@ -1,12 +1,11 @@
 package xyz.hisname.fireflyiii.repository.budget
 
 import androidx.annotation.WorkerThread
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListAttributes
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
-import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitModel
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
 
@@ -35,21 +34,21 @@ class BudgetRepository(private val budget: BudgetDataDao,
         }
     }
 
-    suspend fun allBudgetList(pageNumber: Int): MutableList<BudgetListData>{
+    suspend fun searchBudgetList(searchName: String): List<BudgetListData>{
         try {
-            val networkCall = budgetService?.getPaginatedSpentBudget(pageNumber)
+            val networkCall = budgetService?.searchBudget(searchName)
             val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                if (pageNumber == 1) {
-                    deleteBudgetList()
-                }
-                responseBody.data.forEachIndexed { _, budgetList ->
-                    insertBudgetList(budgetList)
+            if(responseBody != null && networkCall.isSuccessful){
+                responseBody.forEach {  budgetItems ->
+                    insertBudgetList(BudgetListData(budgetItems.id,
+                            BudgetListAttributes(true, "", budgetItems.name,
+                                    0, listOf(), "")))
                 }
             }
-        } catch (exception: Exception){ }
-        return budgetList.getAllBudgetList(pageNumber = pageNumber * Constants.PAGE_SIZE)
+        } catch (exception: Exception) { }
+        return budgetList.searchBudgetName("*$searchName*")
     }
+
 
     suspend fun allActiveSpentList(currencyCode: String, startDate: String, endDate: String): BigDecimal{
         try {

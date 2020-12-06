@@ -16,13 +16,11 @@ class CategorySearchPageSearch(private val searchName: String,
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 responseBody.forEach { category ->
-                    categoryDataDao.deleteCategoryById(category.id)
                     categoryDataDao.insert(CategoryData(category.id, CategoryAttributes("", "", category.name, "")))
                 }
             }
             LoadResult.Page(categoryDataDao.searchCategory("*$searchName*"), null, null)
         } catch (exception: Exception){
-            exception.printStackTrace()
             LoadResult.Page(categoryDataDao.searchCategory("*$searchName*"), null, null)
         }
     }
