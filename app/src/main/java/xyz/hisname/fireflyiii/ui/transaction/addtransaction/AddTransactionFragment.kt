@@ -56,6 +56,7 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
+import xyz.hisname.fireflyiii.ui.categories.CategoriesDialogViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
@@ -555,7 +556,7 @@ class AddTransactionFragment: BaseFragment() {
                 return false
             }
         })
-        categoryViewModel.categoryName.observe(viewLifecycleOwner) {
+        getViewModel(CategoriesDialogViewModel::class.java).categoryName.observe(viewLifecycleOwner) {
             category_edittext.setText(it)
         }
         currencyViewModel.currencyCode.observe(viewLifecycleOwner) {

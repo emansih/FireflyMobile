@@ -9,5 +9,5 @@ import com.squareup.moshi.JsonClass
 @Entity(tableName = "categoryFts")
 data class CategoryFts(
         val name: String,
-        val categoryId: String
+        val categoryId: Long
 )

@@ -21,6 +21,7 @@ class Constants private constructor() {
         const val TAGS_API_ENDPOINT = "api/v1/tags"
         const val SUMMARY_API_ENDPOINT = "api/v1/summary/basic"
         const val ACCOUNT_OVERVIEW_API_ENDPOINT = "api/v1/chart/account/overview"
+        const val AUTOCOMPLETE_API_ENDPOINT = "api/v1/autocomplete"
         const val ATTACHMENT_API_ENDPOINT = "/api/v1/attachments"
         const val SEARCH_API_ENDPOINT = "api/v1/search"
         const val DATA_API_ENDPOINT = "api/v1/data/destroy"

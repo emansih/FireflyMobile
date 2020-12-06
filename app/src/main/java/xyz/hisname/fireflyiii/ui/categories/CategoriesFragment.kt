@@ -13,6 +13,7 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
@@ -41,7 +42,7 @@ class CategoriesFragment: BaseFragment() {
         displayView()
         initFab()
         pullToRefresh()
-        recycler_view.layoutManager = linearLayout()
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = categoryAdapter
         enableDragAndDrop()

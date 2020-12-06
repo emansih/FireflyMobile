@@ -1,9 +1,12 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
+import xyz.hisname.fireflyiii.repository.models.category.CategoryFts
 
 
 @Dao
@@ -25,9 +28,8 @@ abstract class CategoryDataDao: BaseDao<CategoryData> {
     abstract suspend fun getCategoryCount(): Int
 
     @Query("SELECT * FROM category JOIN categoryFts ON category.categoryId == categoryFts.categoryId WHERE categoryFts MATCH :categoryName GROUP BY categoryFts.categoryId")
-    abstract fun searchCategory(categoryName: String): MutableList<CategoryData>
+    abstract suspend fun searchCategory(categoryName: String): List<CategoryData>
 
     @Query("SELECT * FROM category WHERE categoryId =:categoryId")
     abstract fun getCategoryById(categoryId: Long): CategoryData
-
 }

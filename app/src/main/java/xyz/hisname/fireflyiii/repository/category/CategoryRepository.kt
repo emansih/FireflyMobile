@@ -1,11 +1,10 @@
 package xyz.hisname.fireflyiii.repository.category
 
-import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
+import xyz.hisname.fireflyiii.repository.models.category.CategoryAttributes
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategorySuccessModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
@@ -22,9 +21,19 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
     suspend fun insertCategory(category: CategoryData) = categoryDao.insert(category)
 
-    suspend fun deleteAllCategory() = categoryDao.deleteAllCategory()
-
-    suspend fun searchCategoryByName(categoryName: String) = categoryDao.searchCategory(categoryName)
+    suspend fun searchCategoryByName(categoryName: String): List<CategoryData> {
+        try {
+            val networkCall = categoryService?.searchCategory(categoryName)
+            val responseBody = networkCall?.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                responseBody.forEach { category ->
+                    categoryDao.deleteCategoryById(category.id)
+                    categoryDao.insert(CategoryData(category.id, CategoryAttributes("", category.name, "", "")))
+                }
+            }
+        } catch (exception: Exception){ }
+        return categoryDao.searchCategory("*$categoryName*")
+    }
 
     suspend fun getCategoryById(categoryId: Long) = categoryDao.getCategoryById(categoryId)
 
@@ -91,22 +100,6 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
             categoryDao.deleteCategoryById(categoryId)
             return HttpConstants.FAILED
         }
-    }
-
-    suspend fun loadPaginatedData(pageNumber: Int): Flow<MutableList<CategoryData>> {
-        try {
-            val networkCall = categoryService?.getPaginatedCategory(pageNumber)
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                if (pageNumber == 1) {
-                    deleteAllCategory()
-                }
-                responseBody.data.forEachIndexed { _, categoryData ->
-                    insertCategory(categoryData)
-                }
-            }
-        } catch (exception: Exception){ }
-        return categoryDao.getPaginatedCategory(pageNumber * Constants.PAGE_SIZE)
     }
 
     @Throws(Exception::class)

@@ -3,17 +3,21 @@ package xyz.hisname.fireflyiii.data.remote.firefly.api
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
+import xyz.hisname.fireflyiii.Constants.Companion.AUTOCOMPLETE_API_ENDPOINT
 import xyz.hisname.fireflyiii.Constants.Companion.CATEGORY_API_ENDPOINT
+import xyz.hisname.fireflyiii.repository.models.autocomplete.CategoriesItems
 import xyz.hisname.fireflyiii.repository.models.category.CategoryModel
 import xyz.hisname.fireflyiii.repository.models.category.CategorySuccessModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 
 
-// Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/categories.html
 interface CategoryService {
 
     @GET(CATEGORY_API_ENDPOINT)
     suspend fun getPaginatedCategory(@Query("page") page: Int): Response<CategoryModel>
+
+    @GET("${AUTOCOMPLETE_API_ENDPOINT}/categories")
+    suspend fun searchCategory(@Query("query") queryString: String): Response<List<CategoriesItems>>
 
     @GET("${CATEGORY_API_ENDPOINT}/{id}/transactions")
     suspend fun getTransactionByCategory(@Path("id") categoryId: Long,
