@@ -17,7 +17,8 @@ import xyz.hisname.fireflyiii.util.Flags
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class CurrencyRecyclerAdapter(private val clickListener:(CurrencyData) -> Unit):
+class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
+                              private val clickListener:(CurrencyData) -> Unit):
         PagingDataAdapter<CurrencyData, CurrencyRecyclerAdapter.CurrencyHolder>(DIFF_CALLBACK){
 
     private lateinit var context: Context
@@ -41,13 +42,14 @@ class CurrencyRecyclerAdapter(private val clickListener:(CurrencyData) -> Unit):
             val currency = currencyData.currencyAttributes
             itemView.currencySymbol.text = currency?.symbol.toString()
             itemView.currencyCode.text = currency?.code
-            if(currency?.enabled == true){
-                itemView.currencyName.text = currency.name + " (" + currency.code + ")"
-            } else {
-                itemView.currencyName.text = currency?.name + " (" + currency?.code + ")" + " (Disabled)"
-                itemView.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
-                itemView.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
+            if(shouldShowDisabled){
+                if(currency?.enabled == false){
+                    itemView.currencyName.text = currency?.name + " (" + currency?.code + ")" + " (Disabled)"
+                    itemView.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
+                    itemView.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
+                }
             }
+            itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
             if(isThumbnailEnabled) {
                 itemView.flagImage.isVisible = true
                 Glide.with(context)

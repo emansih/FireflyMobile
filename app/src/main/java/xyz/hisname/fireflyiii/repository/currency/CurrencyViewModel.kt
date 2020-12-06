@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
@@ -16,14 +15,10 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
-import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
 
 class CurrencyViewModel(application: Application) : BaseViewModel(application) {
 
-    val currencyCode =  MutableLiveData<String>()
-    val currencyDetails = MutableLiveData<String>()
     val repository: CurrencyRepository
 
     private val currencyService by lazy { genericService()?.create(CurrencyService::class.java) }
@@ -43,16 +38,6 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             currencyData.postValue(data)
         }
         return currencyData
-    }
-
-    fun getCurrency(pageNumber: Int): LiveData<MutableList<CurrencyData>>{
-        val data: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            repository.getPaginatedCurrency(pageNumber).collectLatest {
-                data.postValue(it)
-            }
-        }
-        return data
     }
 
     fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
@@ -143,13 +128,5 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             currencyLiveData.postValue(currencyData)
         }
         return currencyLiveData
-    }
-
-    fun setCurrencyCode(code: String?) {
-        currencyCode.value = code
-    }
-
-    fun setFullDetails(details: String?){
-        currencyDetails.value = details
     }
 }

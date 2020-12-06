@@ -18,9 +18,6 @@ interface CurrencyService {
     @GET("$CURRENCY_API_ENDPOINT/default")
     suspend fun getDefaultCurrency(): Response<DefaultCurrencyModel>
 
-    @GET("$CURRENCY_API_ENDPOINT/{id}")
-    fun getCurrencyById(@Path("id") id: String)
-
     @FormUrlEncoded
     @POST(CURRENCY_API_ENDPOINT)
     fun createCurrency(@Field("name") name: String,

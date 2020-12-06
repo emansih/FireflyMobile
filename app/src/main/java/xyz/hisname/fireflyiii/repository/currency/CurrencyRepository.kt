@@ -65,11 +65,6 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     private suspend fun deleteAllCurrency() = currencyDao.deleteAllCurrency()
 
-    suspend fun getPaginatedCurrency(pageNumber: Int): Flow<MutableList<CurrencyData>> {
-        loadPaginatedData(pageNumber)
-        return currencyDao.getPaginatedCurrency(pageNumber * Constants.PAGE_SIZE)
-    }
-
     suspend fun getCurrencyCode(currencyName: String) = currencyDao.getCurrencyByName(currencyName)
 
     suspend fun deleteCurrencyByCode(currencyCode: String): Int {

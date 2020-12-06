@@ -23,11 +23,11 @@ import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
+import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -43,7 +43,7 @@ class AddBillFragment: BaseAddObjectFragment() {
     private var billDescription: String? = ""
     private lateinit var queue: FancyShowCaseQueue
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
-    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val billViewModel by lazy { getImprovedViewModel(BillsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -235,7 +235,7 @@ class AddBillFragment: BaseAddObjectFragment() {
             currency = it
         }
 
-        currencyViewModel.currencyDetails.observe(viewLifecycleOwner) {
+        currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
         }
         placeHolderToolbar.setNavigationOnClickListener{ handleBack() }

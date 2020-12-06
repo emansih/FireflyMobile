@@ -25,6 +25,7 @@ import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
+import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -37,9 +38,9 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private var currency: String = ""
     private lateinit var queue: FancyShowCaseQueue
-    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_account, container)
     }
@@ -141,7 +142,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
             currency = it
         }
-        currencyViewModel.currencyDetails.observe(viewLifecycleOwner) {
+        currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
         }
         currency_edittext.setOnClickListener{

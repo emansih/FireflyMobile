@@ -58,6 +58,7 @@ import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.budget.BudgetSearchViewModel
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialogViewModel
+import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
@@ -79,7 +80,7 @@ class AddTransactionFragment: BaseFragment() {
     private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
-    private val currencyViewModel by lazy { getViewModel(CurrencyViewModel::class.java) }
+    private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val pluginViewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
@@ -563,7 +564,7 @@ class AddTransactionFragment: BaseFragment() {
         currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
             currency = it
         }
-        currencyViewModel.currencyDetails.observe(viewLifecycleOwner) {
+        currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
         }
         currency_edittext.setOnClickListener{
