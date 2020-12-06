@@ -144,5 +144,6 @@
     <string name="delete_all_categories">Elimina TUTTE le categorie</string>
     <string name="delete_all_tags">Elimina TUTTE le etichette</string>
     <string name="delete_all_object_groups">Elimina TUTTI i gruppi di oggetti</string>
+    <string name="earned">Guadagnato</string>
 
 </resources>

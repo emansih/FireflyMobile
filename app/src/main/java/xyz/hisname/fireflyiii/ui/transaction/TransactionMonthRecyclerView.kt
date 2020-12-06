@@ -8,6 +8,7 @@ import kotlinx.android.synthetic.main.transaction_card_details.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMonth
 import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
+import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
 class TransactionMonthRecyclerView(private val items: List<TransactionAmountMonth>,
@@ -32,6 +33,16 @@ class TransactionMonthRecyclerView(private val items: List<TransactionAmountMont
             itemView.transaction_freq.text = transactionData.transactionFreq.toString()
             itemView.spentAmount.text = transactionData.transactionAmount
             itemView.transaction_card_date.text = transactionData.monthYear
+            if(transactionData.transactionType.contentEquals("Withdrawal")){
+                itemView.transactionTypeText.setText(R.string.spent)
+                itemView.spentAmount.setTextColor(context.getCompatColor(R.color.md_red_500))
+            } else if(transactionData.transactionType.contentEquals("Deposit")){
+                itemView.transactionTypeText.setText(R.string.earned)
+                itemView.spentAmount.setTextColor(context.getCompatColor(R.color.md_green_500))
+            } else {
+                itemView.transactionTypeText.setText(R.string.transfer)
+                itemView.spentAmount.setTextColor(context.getCompatColor(R.color.md_green_500))
+            }
             itemView.setOnClickListener { clickListener(click) }
         }
     }

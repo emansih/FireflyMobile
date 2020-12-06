@@ -62,32 +62,32 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
                     DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth()),
                     "$currencySymbol $currentMonth",
                     transactionRepository.transactionCount(DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), transactionType)))
+                            DateTimeUtil.getEndOfMonth(), transactionType), transactionType))
             arrayOfAmount.add(TransactionAmountMonth(
                     DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth(1)),
                     "$currencySymbol $oneMonthAgo",
                     transactionRepository.transactionCount(DateTimeUtil.getStartOfMonth(1),
-                            DateTimeUtil.getEndOfMonth(1), transactionType)))
+                            DateTimeUtil.getEndOfMonth(1), transactionType), transactionType))
             arrayOfAmount.add(TransactionAmountMonth(
                     DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth(2)),
                     "$currencySymbol $twoMonthAgo",
                     transactionRepository.transactionCount(DateTimeUtil.getStartOfMonth(2),
-                            DateTimeUtil.getEndOfMonth(2), transactionType)))
+                            DateTimeUtil.getEndOfMonth(2), transactionType), transactionType))
             arrayOfAmount.add(TransactionAmountMonth(
                     DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth(3)),
                     "$currencySymbol $threeMonthAgo",
                     transactionRepository.transactionCount(DateTimeUtil.getStartOfMonth(3),
-                            DateTimeUtil.getEndOfMonth(3), transactionType)))
+                            DateTimeUtil.getEndOfMonth(3), transactionType), transactionType))
             arrayOfAmount.add( TransactionAmountMonth(
                     DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth(4)),
                     "$currencySymbol $fourMonthAgo",
                     transactionRepository.transactionCount(DateTimeUtil.getStartOfMonth(4),
-                            DateTimeUtil.getEndOfMonth(4), transactionType)))
+                            DateTimeUtil.getEndOfMonth(4), transactionType), transactionType))
             arrayOfAmount.add(TransactionAmountMonth(
                     DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth(5)),
                     "$currencySymbol $fiveMonthAgo",
                     transactionRepository.transactionCount(DateTimeUtil.getStartOfMonth(5),
-                            DateTimeUtil.getEndOfMonth(5), transactionType)))
+                            DateTimeUtil.getEndOfMonth(5), transactionType), transactionType))
             transactionData.postValue(arrayOfAmount)
         }
         return transactionData

@@ -151,4 +151,5 @@
     <string name="delete_all_categories">Excluir TODAS as suas categorias</string>
     <string name="delete_all_tags">Excluir TODAS as suas tags</string>
     <string name="delete_all_object_groups">Excluir TODOS os seus grupos de objetos</string>
+    <string name="earned">Ganho</string>
 </resources>

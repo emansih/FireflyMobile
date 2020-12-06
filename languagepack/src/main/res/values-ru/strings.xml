@@ -144,4 +144,5 @@
     <string name="delete_all_categories">Удалить ВСЕ ваши категории</string>
     <string name="delete_all_tags">Удалить ВСЕ ваши метки</string>
     <string name="delete_all_object_groups">Удалить все ваши группы объектов</string>
+    <string name="earned">Заработано</string>
 </resources>

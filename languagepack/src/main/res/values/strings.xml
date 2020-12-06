@@ -68,6 +68,7 @@
     <string name="currency_created">Currency %1$s created</string>
     <string name="currency_updated">Currency %1$s updated</string>
     <string name="spent">Spent</string>
+    <string name="earned">Earned</string>
     <string name="left_to_spend">Left To Spend</string>
     <string name="piggy_bank_description_help_text">What is your goal? A new couch, a camera, money for emergencies?</string>
     <string name="piggy_bank_date_help_text">You can set a target date or a deadline for your piggy bank.</string>

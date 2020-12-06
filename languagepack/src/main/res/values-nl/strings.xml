@@ -144,5 +144,6 @@
     <string name="delete_all_tags">Verwijder ALLE tags</string>
     <string name="delete_all_categories">Verwijder ALLE categorieën</string>
     <string name="delete_all_object_groups">Verwijder AL je objectgroepen</string>
+    <string name="earned">Verdiend</string>
 
 </resources>
