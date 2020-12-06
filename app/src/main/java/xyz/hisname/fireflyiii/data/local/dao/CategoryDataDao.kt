@@ -13,10 +13,16 @@ abstract class CategoryDataDao: BaseDao<CategoryData> {
     abstract fun deleteCategoryById(categoryId: Long): Int
 
     @Query("DELETE FROM category")
-    abstract fun deleteAllCategory(): Int
+    abstract suspend fun deleteAllCategory(): Int
 
     @Query("SELECT * FROM category order by categoryId desc limit :limitNumber")
     abstract fun getPaginatedCategory(limitNumber: Int): Flow<MutableList<CategoryData>>
+
+    @Query("SELECT * FROM category order by categoryId")
+    abstract suspend fun getCategory(): List<CategoryData>
+
+    @Query("SELECT COUNT(*) FROM category")
+    abstract suspend fun getCategoryCount(): Int
 
     @Query("SELECT * FROM category JOIN categoryFts ON category.categoryId == categoryFts.categoryId WHERE categoryFts MATCH :categoryName GROUP BY categoryFts.categoryId")
     abstract fun searchCategory(categoryName: String): MutableList<CategoryData>

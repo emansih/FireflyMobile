@@ -145,7 +145,7 @@
     <string name="insert_link">Insert Link</string>
     <string name="discard">Discard</string>
     <string name="urge_users_to_click_icons">Some of these icons can be clicked too</string>
-    <string name="data_will_be_deleted_later">%1$s will be deleted later…</string>
+    <string name="data_will_be_deleted_later">%1$s will be deleted later</string>
     <string name="currency_deleted">Currency %1$s deleted</string>
     <string name="data_added_when_user_online">%1$s will be added when you are back online</string>
     <string name="tasker_output_description">Your transaction details in JSON</string>

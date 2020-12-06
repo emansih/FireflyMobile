@@ -54,7 +54,7 @@ class CategoriesDialog: BaseDialog(){
                 initialAdapter.add(catData)
                 dataAdapter.add(catData)
             }
-            categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData -> itemClicked(data) }
+            categoriesRecyclerAdapter = CategoriesRecyclerAdapter() { data: CategoryData -> itemClicked(data) }
             recycler_view.adapter = categoriesRecyclerAdapter
         }
         scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout){
@@ -65,7 +65,7 @@ class CategoriesDialog: BaseDialog(){
                     categoryViewModel.getPaginatedCategory(page + 1).observe(this@CategoriesDialog) { catList ->
                         dataAdapter.clear()
                         dataAdapter.addAll(catList)
-                        categoriesRecyclerAdapter.update(dataAdapter)
+                     //   categoriesRecyclerAdapter.update(dataAdapter)
                         categoriesRecyclerAdapter.notifyDataSetChanged()
                         swipeContainer.isRefreshing = false
                     }
@@ -85,7 +85,7 @@ class CategoriesDialog: BaseDialog(){
 
             override fun onQueryTextChange(newText: String): Boolean {
                 if(newText.isBlank() or newText.isEmpty()){
-                    categoriesRecyclerAdapter = CategoriesRecyclerAdapter(initialAdapter) { data: CategoryData -> itemClicked(data) }
+               //     categoriesRecyclerAdapter = CategoriesRecyclerAdapter(initialAdapter) { data: CategoryData -> itemClicked(data) }
                     categoriesRecyclerAdapter.notifyDataSetChanged()
                     recycler_view.adapter = categoriesRecyclerAdapter
                 } else {
@@ -101,7 +101,7 @@ class CategoriesDialog: BaseDialog(){
         dataAdapter.clear()
         categoryViewModel.getCategoryByName(categoryName).observe(viewLifecycleOwner) { categoryData ->
             dataAdapter.addAll(categoryData)
-            categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData ->  itemClicked(data)}
+        //    categoriesRecyclerAdapter = CategoriesRecyclerAdapter(dataAdapter) { data: CategoryData ->  itemClicked(data)}
             categoriesRecyclerAdapter.notifyDataSetChanged()
             recycler_view.adapter = categoriesRecyclerAdapter
         }

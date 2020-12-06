@@ -106,7 +106,7 @@ class ListAccountFragment: BaseFragment() {
                         }
                         "liabilities" -> {
                             noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_ticket_alt))
-                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
+                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.liability_account))
                         }
                     }
                 } else {
