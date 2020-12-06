@@ -37,23 +37,21 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
     fun deleteBillById(billId: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            var isItDeleted = 0
             val billList = billRepository.retrieveBillById(billId.toLong())
             if (billList.isNotEmpty()) {
-                isItDeleted = billRepository.deleteBillById(billId.toLong())
-            }
-            // Since onDraw() is being called multiple times, we check if the bill exists locally in the DB.
-            when (isItDeleted) {
-                HttpConstants.FAILED -> {
-                    isDeleted.postValue(false)
-                    DeleteBillWorker.initPeriodicWorker(billId.toLong(), getApplication())
-                }
-                HttpConstants.UNAUTHORISED -> {
-                    isDeleted.postValue(false)
-                }
-                HttpConstants.NO_CONTENT_SUCCESS -> {
-                    isDeleted.postValue(true)
+                // Since onDraw() is being called multiple times, we check if the bill exists locally in the DB.
+                when (billRepository.deleteBillById(billId.toLong())) {
+                    HttpConstants.FAILED -> {
+                        isDeleted.postValue(false)
+                        DeleteBillWorker.initPeriodicWorker(billId.toLong(), getApplication())
+                    }
+                    HttpConstants.UNAUTHORISED -> {
+                        isDeleted.postValue(false)
+                    }
+                    HttpConstants.NO_CONTENT_SUCCESS -> {
+                        isDeleted.postValue(true)
 
+                    }
                 }
             }
         }

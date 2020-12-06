@@ -53,8 +53,9 @@ class ListBillFragment: BaseFragment() {
             if (viewHolder.itemView.billCard.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
-                    val billName = viewHolder.itemView.billId.text.toString()
-                    billViewModel.deleteBillById(billName).observe(viewLifecycleOwner){ isDeleted ->
+                    val billId = viewHolder.itemView.billId.text.toString()
+                    val billName = viewHolder.itemView.billName.text.toString()
+                    billViewModel.deleteBillById(billId).observe(viewLifecycleOwner){ isDeleted ->
                         billAdapter.refresh()
                         if(isDeleted){
                             toastSuccess(resources.getString(R.string.bill_deleted, billName))
