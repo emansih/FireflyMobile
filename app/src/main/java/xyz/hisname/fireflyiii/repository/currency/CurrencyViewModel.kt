@@ -25,7 +25,6 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
     val currencyCode =  MutableLiveData<String>()
     val currencyDetails = MutableLiveData<String>()
     val repository: CurrencyRepository
-    private var currencyData: MutableList<CurrencyData> = arrayListOf()
 
     private val currencyService by lazy { genericService()?.create(CurrencyService::class.java) }
 
@@ -54,34 +53,6 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
             }
         }
         return data
-    }
-
-    fun deleteCurrencyByName(currencyCode: String): LiveData<Boolean> {
-        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = 0
-        var currencyId: Long = 0
-        viewModelScope.launch(Dispatchers.IO){
-            currencyId = repository.getCurrencyByCode(currencyCode)[0].currencyId ?: 0
-            if(currencyId != 0L){
-                isItDeleted = repository.deleteCurrencyByName(currencyCode)
-            }
-        }.invokeOnCompletion {
-            // Since onDraw() is being called multiple times, we check if the currency exists locally in the DB.
-            when (isItDeleted) {
-                HttpConstants.FAILED -> {
-                    isDeleted.postValue(false)
-                    DeleteCurrencyWorker.initPeriodicWorker(currencyId, getApplication())
-                }
-                HttpConstants.UNAUTHORISED -> {
-                    isDeleted.postValue(false)
-                }
-                HttpConstants.NO_CONTENT_SUCCESS -> {
-                    isDeleted.postValue(true)
-                }
-            }
-
-        }
-        return isDeleted
     }
 
     fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
@@ -152,8 +123,9 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return apiResponse
     }
 
-    fun getCurrencyByCode(currencyCode: String): LiveData<MutableList<CurrencyData>>{
-        val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
+    fun getCurrencyByCode(currencyCode: String): LiveData<List<CurrencyData>>{
+        var currencyData: List<CurrencyData> = listOf()
+        val currencyLiveData: MutableLiveData<List<CurrencyData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             currencyData = repository.getCurrencyByCode(currencyCode)
         }.invokeOnCompletion {

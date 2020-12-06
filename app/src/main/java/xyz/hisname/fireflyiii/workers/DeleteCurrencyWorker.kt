@@ -44,8 +44,8 @@ class DeleteCurrencyWorker(private val context: Context, workerParameters: Worke
     override suspend fun doWork(): Result {
         val currencyId = inputData.getLong("currencyId", 0)
         val repository = CurrencyRepository(currencyDatabase, genericService?.create(CurrencyService::class.java))
-        val currencyName = repository.getCurrencyById(currencyId)[0].currencyAttributes?.name ?: ""
-        repository.deleteCurrencyByName(currencyName)
+        val currencyCode = repository.getCurrencyById(currencyId)[0].currencyAttributes?.code ?: ""
+        repository.deleteCurrencyByCode(currencyCode)
         return Result.success()
     }
 

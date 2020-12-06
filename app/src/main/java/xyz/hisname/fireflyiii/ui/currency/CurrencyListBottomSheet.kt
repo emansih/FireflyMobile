@@ -25,7 +25,7 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
     private lateinit var scrollListener: EndlessRecyclerViewScrollListener
     private val linearLayout by lazy { LinearLayoutManager(requireContext()) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.currency_bottom_sheet, container)
     }

@@ -17,7 +17,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         currencyDao.insert(currency)
     }
 
-    suspend fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData> {
+    suspend fun getCurrencyByCode(currencyCode: String): List<CurrencyData> {
         try {
             val networkCall = currencyService?.getCurrencyByCode(currencyCode)
             val responseBody = networkCall?.body()
@@ -72,8 +72,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     suspend fun getCurrencyCode(currencyName: String) = currencyDao.getCurrencyByName(currencyName)
 
-    suspend fun deleteCurrencyByName(currencyName: String): Int {
-        val currencyCode = currencyDao.getCurrencyByName(currencyName)[0].currencyAttributes?.code ?: ""
+    suspend fun deleteCurrencyByCode(currencyCode: String): Int {
         try {
             val networkResponse = currencyService?.deleteCurrencyByCode(currencyCode)
             when (networkResponse?.code()) {
@@ -104,16 +103,16 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     }
 
     // Expensive network call. Use appropriately
-    suspend fun getAllCurrency(): MutableList<CurrencyData>{
+    suspend fun getAllCurrency(): List<CurrencyData>{
         val currencyDataList = arrayListOf<CurrencyData>()
         try {
-            val networkCall = currencyService?.getSuspendedPaginatedCurrency(1)
+            val networkCall = currencyService?.getPaginatedCurrency(1)
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 currencyDataList.addAll(responseBody.data)
                 if (responseBody.meta.pagination.total_pages != 1) {
                     for (items in 2..responseBody.meta.pagination.total_pages) {
-                        val repeatedCall = currencyService?.getSuspendedPaginatedCurrency(items)
+                        val repeatedCall = currencyService?.getPaginatedCurrency(items)
                         val repeatedCallResponse = repeatedCall?.body()
                         if(repeatedCallResponse != null && networkCall.isSuccessful){
                             currencyDataList.addAll(repeatedCallResponse.data)
@@ -125,17 +124,13 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
                     currencyDao.insert(data)
                 }
             }
-            // Clear list and put default currency as the first element in list
-            currencyDataList.clear()
-            currencyDataList.addAll(currencyDao.getDefaultCurrency())
-            currencyDataList.addAll(currencyDao.getDefaultCurrency(false))
         } catch (exception: Exception){ }
-        return currencyDataList
+        return currencyDao.getSortedCurrency()
     }
 
     private suspend fun loadPaginatedData(pageNumber: Int){
         try {
-            val networkCall = currencyService?.getSuspendedPaginatedCurrency(pageNumber)
+            val networkCall = currencyService?.getPaginatedCurrency(pageNumber)
             val responseBody = networkCall?.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (pageNumber == 1) {

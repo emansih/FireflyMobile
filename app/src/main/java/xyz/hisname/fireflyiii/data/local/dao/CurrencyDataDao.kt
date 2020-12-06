@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
@@ -13,11 +12,25 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("SELECT * FROM currency ORDER BY name ASC LIMIT :currencyLimit")
     abstract fun getPaginatedCurrency(currencyLimit: Int): Flow<MutableList<CurrencyData>>
 
+    @Query("SELECT * FROM currency")
+    abstract suspend fun getCurrency(): List<CurrencyData>
+
+    @Query("SELECT COUNT(*) FROM currency")
+    abstract suspend fun getCurrencyCount(): Int
+
+    /* Sort currency according to their attributes
+     * 1. Sort currency by their names in alphabetical order
+     * 2. if currency has enabled = true as their attributes, put them at the top
+     * 3. if currencyDefault = true, put the currency at the first row
+     */
+    @Query("SELECT * FROM (SELECT * FROM (SELECT * FROM currency ORDER BY name) ORDER BY enabled DESC) ORDER BY currencyDefault DESC")
+    abstract suspend fun getSortedCurrency(): List<CurrencyData>
+
     @Query("DELETE FROM currency WHERE code = :currencyCode")
-    abstract fun deleteCurrencyByCode(currencyCode: String): Int
+    abstract suspend fun deleteCurrencyByCode(currencyCode: String): Int
 
     @Query("SELECT * FROM currency WHERE code = :currencyCode")
-    abstract fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData>
+    abstract suspend fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData>
 
     @Query("SELECT * FROM currency WHERE currencyDefault = :defaultCurrency")
     abstract fun getDefaultCurrency(defaultCurrency: Boolean = true): MutableList<CurrencyData>

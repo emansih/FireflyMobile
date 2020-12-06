@@ -7,30 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
 import androidx.fragment.app.commit
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.currency_list.view.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.EndlessRecyclerViewScrollListener
 import xyz.hisname.fireflyiii.util.extension.*
 
 class CurrencyListFragment: BaseFragment() {
 
-    private var dataAdapter = arrayListOf<CurrencyData>()
-    private val currencyAdapter by lazy { CurrencyRecyclerAdapter(dataAdapter) { data: CurrencyData ->
-        clickListener(data) }
-    }
-    private lateinit var scrollListener: EndlessRecyclerViewScrollListener
-    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
+    private val currencyAdapter by lazy { CurrencyRecyclerAdapter { data: CurrencyData -> clickListener(data) } }
+    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyListViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.base_swipe_layout, container)
     }
@@ -38,11 +33,11 @@ class CurrencyListFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         hideKeyboard()
-        recycler_view.layoutManager = linearLayout()
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = currencyAdapter
         initFab()
-        pullToRefresh()
+        refreshData()
         displayView()
         enableDragDrop()
     }
@@ -52,8 +47,9 @@ class CurrencyListFragment: BaseFragment() {
             if (viewHolder.itemView.currencyList.isOverlapping(extendedFab)) {
                 extendedFab.dropToRemove()
                 if (!isCurrentlyActive) {
-                    val currencyName = viewHolder.itemView.fakeCurrencyName.text.toString()
-                    currencyViewModel.deleteCurrencyByName(currencyName).observe(viewLifecycleOwner) { isDeleted ->
+                    val currencyName = viewHolder.itemView.currencyName.text
+                    currencyViewModel.deleteCurrency(viewHolder.itemView.currencyCode.text.toString()).observe(viewLifecycleOwner) { isDeleted ->
+                        currencyAdapter.refresh()
                         if (isDeleted) {
                             toastSuccess(resources.getString(R.string.currency_deleted, currencyName))
                         } else {
@@ -66,30 +62,12 @@ class CurrencyListFragment: BaseFragment() {
     }
 
     private fun displayView(){
-        swipeContainer.isRefreshing = true
-        currencyViewModel.getCurrency(1).observe(viewLifecycleOwner) { currencyData ->
-            dataAdapter.clear()
-            dataAdapter.addAll(currencyData)
-            currencyAdapter.update(dataAdapter)
-            swipeContainer.isRefreshing = false
-            currencyAdapter.notifyDataSetChanged()
+        currencyAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
         }
-        scrollListener = object : EndlessRecyclerViewScrollListener(linearLayout()){
-            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView) {
-                // Don't load more when data is refreshing
-                if(!swipeContainer.isRefreshing) {
-                    swipeContainer.isRefreshing = true
-                    currencyViewModel.getCurrency(page + 1).observe(viewLifecycleOwner) { currencyList ->
-                        dataAdapter.clear()
-                        dataAdapter.addAll(currencyList)
-                        currencyAdapter.update(currencyList)
-                        swipeContainer.isRefreshing = false
-                        currencyAdapter.notifyDataSetChanged()
-                    }
-                }
-            }
+        currencyViewModel.getCurrencyList().observe(viewLifecycleOwner){ pagingData ->
+            currencyAdapter.submitData(lifecycle, pagingData)
         }
-        recycler_view.addOnScrollListener(scrollListener)
     }
 
     private fun clickListener(data: CurrencyData){
@@ -114,12 +92,9 @@ class CurrencyListFragment: BaseFragment() {
         }
     }
 
-    private fun pullToRefresh(){
+    private fun refreshData(){
         swipeContainer.setOnRefreshListener {
-            scrollListener.resetState()
-            dataAdapter.clear()
-            currencyAdapter.notifyDataSetChanged()
-            displayView()
+           currencyAdapter.refresh()
         }
     }
 
@@ -131,16 +106,6 @@ class CurrencyListFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.currency)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        extendedFab.isGone = true
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        extendedFab.isGone = true
     }
 
     override fun handleBack() {

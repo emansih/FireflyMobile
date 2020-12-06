@@ -13,7 +13,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 interface CurrencyService {
 
     @GET(CURRENCY_API_ENDPOINT)
-    suspend fun getSuspendedPaginatedCurrency(@Query("page") page: Int): Response<CurrencyModel>
+    suspend fun getPaginatedCurrency(@Query("page") page: Int): Response<CurrencyModel>
 
     @GET("$CURRENCY_API_ENDPOINT/default")
     suspend fun getDefaultCurrency(): Response<DefaultCurrencyModel>
