@@ -55,7 +55,8 @@ class ListAccountFragment: BaseFragment() {
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
                     val accountName = viewHolder.itemView.accountNameText.text.toString()
-                    accountVm.deleteAccountByName(accountName).observe(viewLifecycleOwner){ isDeleted ->
+                    val accountId = viewHolder.itemView.accountId.text.toString()
+                    accountVm.deleteAccountByName(accountId).observe(viewLifecycleOwner){ isDeleted ->
                         accountAdapter.refresh()
                         if(isDeleted){
                             when (accountType){

@@ -36,4 +36,9 @@
         app:layout_constraintTop_toTopOf="@+id/accountNameText"
         app:layout_constraintBottom_toBottomOf="@+id/accountNameText"/>
 
+    <TextView
+        android:id="@+id/accountId"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

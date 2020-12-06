@@ -32,27 +32,23 @@ class ListAccountViewModel(application: Application): BaseViewModel(application)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }
 
-    fun deleteAccountByName(accountName: String): LiveData<Boolean>{
+    fun deleteAccountByName(accountId: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
-        var isItDeleted = 0
-        var accountId = 0L
         viewModelScope.launch(Dispatchers.IO) {
-            accountId = accountRepository.retrieveAccountByName(accountName)[0].accountId ?: 0
-            if(accountId != 0L){
-                isItDeleted = accountRepository.deleteAccountById(accountId)
-            }
-        }.invokeOnCompletion {
-            // Since onDraw() is being called multiple times, we check if the account exists locally in the DB.
-            when (isItDeleted) {
-                HttpConstants.FAILED -> {
-                    isDeleted.postValue(false)
-                    DeleteAccountWorker.initPeriodicWorker(accountId, getApplication())
-                }
-                HttpConstants.UNAUTHORISED -> {
-                    isDeleted.postValue(false)
-                }
-                HttpConstants.NO_CONTENT_SUCCESS -> {
-                    isDeleted.postValue(true)
+            val accountList = accountRepository.getAccountById(accountId.toLong())
+            if(accountList.isNotEmpty()){
+                // Since onDraw() is being called multiple times, we check if the account exists locally in the DB.
+                when (accountRepository.deleteAccountById(accountId.toLong())) {
+                    HttpConstants.FAILED -> {
+                        isDeleted.postValue(false)
+                        DeleteAccountWorker.initPeriodicWorker(accountId.toLong(), getApplication())
+                    }
+                    HttpConstants.UNAUTHORISED -> {
+                        isDeleted.postValue(false)
+                    }
+                    HttpConstants.NO_CONTENT_SUCCESS -> {
+                        isDeleted.postValue(true)
+                    }
                 }
             }
         }

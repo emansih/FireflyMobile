@@ -61,6 +61,7 @@ class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
                 }
                 itemView.accountAmountText.text = currencySymbol + " " + amount
             }
+            itemView.accountId.text = data.accountId.toString()
             itemView.setOnClickListener { clickListener(data) }
         }
     }
