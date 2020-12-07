@@ -7,7 +7,6 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.commit
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
@@ -22,8 +21,6 @@ import kotlinx.android.synthetic.main.fragment_add_bill.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
-import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -32,7 +29,6 @@ import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.workers.bill.BillWorker
 
 class AddBillFragment: BaseAddObjectFragment() {
 
@@ -45,10 +41,9 @@ class AddBillFragment: BaseAddObjectFragment() {
     private lateinit var queue: FancyShowCaseQueue
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
-    private val currencyVm by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private val billViewModel by lazy { getImprovedViewModel(BillsViewModel::class.java) }
+    private val billViewModel by lazy { getImprovedViewModel(AddBillViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_bill, container)
     }
@@ -63,17 +58,15 @@ class AddBillFragment: BaseAddObjectFragment() {
 
     private fun updateEditText(){
         if(billId != 0L){
-            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-            billViewModel.getBillById(billId).observe(viewLifecycleOwner) {
-                billAttribute = it[0].billAttributes
+            billViewModel.getBillById(billId).observe(viewLifecycleOwner) { billData ->
+                billAttribute = billData.billAttributes
                 description_edittext.setText(billAttribute?.name)
                 billDescription = billAttribute?.name
                 min_amount_edittext.setText(billAttribute?.amount_min.toString())
                 max_amount_edittext.setText(billAttribute?.amount_max.toString())
                 currency = billAttribute?.currency_code ?: ""
-                currencyVm.getCurrencyByCode(currency).observe(viewLifecycleOwner) { currencyList ->
-                    val currencyData = currencyList[0].currencyAttributes
-                    currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+                billViewModel.getBillCurrencyDetails(billId).observe(viewLifecycleOwner){ currencyDetails ->
+                    currency_edittext.setText(currencyDetails)
                 }
                 bill_date_edittext.setText(billAttribute?.date.toString())
                 skip_edittext.setText(billAttribute?.skip.toString())
@@ -86,7 +79,6 @@ class AddBillFragment: BaseAddObjectFragment() {
                         R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 frequency_exposed_dropdown.setAdapter(spinnerAdapter)
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         }
     }
@@ -97,7 +89,6 @@ class AddBillFragment: BaseAddObjectFragment() {
         }
         addBillFab.setOnClickListener {
             hideKeyboard()
-            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             notes = if(notes_edittext.isBlank()){
                 null
             } else {
@@ -148,39 +139,6 @@ class AddBillFragment: BaseAddObjectFragment() {
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
-        if(billId != 0L) {
-            placeHolderToolbar.inflateMenu(R.menu.delete_menu)
-            placeHolderToolbar.setOnMenuItemClickListener { item ->
-                if (item.itemId == R.id.menu_item_delete) {
-                    AlertDialog.Builder(requireContext())
-                            .setTitle(resources.getString(R.string.delete_bill_message, billDescription))
-                            .setMessage(resources.getString(R.string.delete_bill_message, billDescription))
-                            .setIcon(IconicsDrawable(requireContext()).apply {
-                                icon = FontAwesome.Icon.faw_trash
-                                sizeDp = 15
-                                colorRes = R.color.md_green_600
-                            })
-                            .setPositiveButton(R.string.delete_permanently){ _,_ ->
-                                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                                billViewModel.deleteBillById(billId).observe(viewLifecycleOwner) { billDeleted ->
-                                    if(billDeleted){
-                                        toastSuccess(resources.getString(R.string.bill_deleted, billDescription))
-                                    } else {
-                                        toastError(resources.getString(R.string.issue_deleting, "bill"),
-                                                Toast.LENGTH_LONG)
-                                    }
-                                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                                    handleBack()
-                                }
-                            }
-                            .setNegativeButton("No") { _, _ ->
-                                toastInfo("Bill not deleted")
-                            }
-                            .show()
-                }
-                true
-            }
-        }
     }
 
     private fun showHelpText(){
@@ -233,15 +191,15 @@ class AddBillFragment: BaseAddObjectFragment() {
         currency_edittext.setOnClickListener{
             CurrencyListBottomSheet().show(parentFragmentManager, "currencyList" )
         }
-        currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
-            currency = it
+        currencyViewModel.currencyCode.observe(viewLifecycleOwner) { currencyCode ->
+            currency = currencyCode
         }
 
         currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
         }
         placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
-        currencyVm.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
+        billViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             currency = currencyData?.code.toString()
@@ -256,6 +214,16 @@ class AddBillFragment: BaseAddObjectFragment() {
                 addToBackStack(null)
             }
         }
+        billViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
+            if(loader){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
+        billViewModel.apiResponse.observe(viewLifecycleOwner){ response ->
+            toastInfo(response, Toast.LENGTH_LONG)
+        }
     }
 
     override fun submitData(){
@@ -263,22 +231,13 @@ class AddBillFragment: BaseAddObjectFragment() {
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
                     currency, notes).observe(viewLifecycleOwner) { response ->
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                    val errorMessage = response.errorMessage
-                    if (errorMessage != null) {
-                        toastError(errorMessage)
-                    } else if (response.error != null) {
-                        BillWorker.initWorker(requireContext(), description_edittext.getString(),
-                                min_amount_edittext.getString(), max_amount_edittext.getString(),
-                                bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(),
-                                currency, notes)
-                        toastOffline(getString(R.string.data_added_when_user_online, "Bill"))
-                        handleBack()
-                    } else if (response.response != null) {
-                        toastSuccess(getString(R.string.stored_new_bill, description_edittext.getString()))
-                        handleBack()
-                    }
-                }
+            if(response.first){
+                toastSuccess(response.second)
+                handleBack()
+            } else {
+                toastInfo(response.second)
+            }
+        }
     }
 
     private fun updateBill(){
@@ -286,15 +245,11 @@ class AddBillFragment: BaseAddObjectFragment() {
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), getFreq(frequency_exposed_dropdown.getString()),
                 skip_edittext.getString(), "1", currency, notes).observe(viewLifecycleOwner) { response ->
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            if (response.errorMessage != null) {
-                toastError(response.errorMessage)
-            } else if (response.error != null) {
-                toastError(response.error.localizedMessage)
-            } else if (response.response != null) {
-                val billName = response.response.data.billAttributes?.name
-                toastSuccess(getString(R.string.updated_bill, billName))
+            if(response.first){
+                toastSuccess(response.second)
                 handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
     }

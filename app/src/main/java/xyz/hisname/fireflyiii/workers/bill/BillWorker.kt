@@ -3,20 +3,17 @@ package xyz.hisname.fireflyiii.workers.bill
 import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
+import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.time.Duration
 import java.time.LocalDate
 import java.util.concurrent.ThreadLocalRandom
@@ -35,40 +32,34 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val currencyCode = inputData.getString("currencyCode") ?: ""
         val notes = inputData.getString("notes")
         val billWorkManagerId = inputData.getLong("billWorkManagerId", 0)
-        genericService?.create(BillsService::class.java)?.createBill(name, minAmount,
-                maxAmount, billDate, repeatFreq, skip,"1", currencyCode, notes)?.enqueue(
-                retrofitCallback({ response ->
-                    var errorBody = ""
-                    var error = ""
-                    if (response.errorBody() != null) {
-                        errorBody = String(response.errorBody()?.bytes()!!)
-                    }
-                    val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
-                    val responseBody = response.body()
-                    if (response.isSuccessful && responseBody != null) {
-                        context.showNotification("Bill Added", "$name added successfully!", channelIcon)
-                        cancelWorker(billWorkManagerId, context)
-                        runBlocking(Dispatchers.IO){
-                            val billDatabase = AppDatabase.getInstance(context).billDataDao()
-                            billDatabase.insert(responseBody.data)
-                        }
-                        Result.success()
-                    } else {
-                        when {
-                            moshi?.errors?.name != null -> error = moshi.errors.name[0]
-                            moshi?.errors?.currency_code != null -> error = moshi.errors.currency_code[0]
-                            moshi?.errors?.amount_min != null -> error = moshi.errors.amount_min[0]
-                            moshi?.errors?.repeat_freq != null -> error = moshi.errors.repeat_freq[0]
-                        }
-                        context.showNotification("Error Adding $name", error, channelIcon)
-                        cancelWorker(billWorkManagerId, context)
-                        Result.failure()
-                    }
-                })
-                { throwable ->
-                    Result.retry()
-                })
-        return Result.success()
+        val billRepository = BillRepository(
+                AppDatabase.getInstance(context).billDataDao(),
+                genericService?.create(BillsService::class.java)
+        )
+
+        val addBill = billRepository.addBill(name, minAmount,
+                maxAmount, billDate, repeatFreq, skip,"1", currencyCode, notes)
+        when {
+            addBill.response != null -> {
+                // Delete old data that we inserted when worker is being init
+                billRepository.deleteBillById(billWorkManagerId)
+                context.showNotification("Bill Added", context.getString(R.string.stored_new_bill, name), channelIcon)
+                return Result.success()
+            }
+            addBill.errorMessage != null -> {
+                context.showNotification("Error Adding $name", addBill.errorMessage, channelIcon)
+                cancelWorker(billWorkManagerId, context)
+                return Result.failure()
+            }
+            addBill.error != null -> {
+               return Result.retry()
+            }
+            else -> {
+                context.showNotification("Error Adding $name", "Please try again later", channelIcon)
+                cancelWorker(billWorkManagerId, context)
+                return Result.failure()
+            }
+        }
     }
 
     companion object {

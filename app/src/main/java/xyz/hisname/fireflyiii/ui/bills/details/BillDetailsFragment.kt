@@ -73,7 +73,7 @@ class BillDetailsFragment: BaseDetailFragment() {
 
     private fun setBillInfo(){
         billDetailsViewModel.getBillInfo().observe(viewLifecycleOwner){ billData ->
-            val attributes = billData[0].billAttributes
+            val attributes = billData.billAttributes
             val bill = arrayListOf(
                     DetailModel(resources.getString(R.string.name), attributes?.name),
                     DetailModel("Range", attributes?.currency_symbol +

@@ -18,7 +18,6 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillPageSource
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 
@@ -37,8 +36,8 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
     fun deleteBillById(billId: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            val billList = billRepository.retrieveBillById(billId.toLong())
-            if (billList.isNotEmpty()) {
+            val billAttributes = billRepository.getBillById(billId.toLong())
+            if (billAttributes.billId != 0L) {
                 // Since onDraw() is being called multiple times, we check if the bill exists locally in the DB.
                 when (billRepository.deleteBillById(billId.toLong())) {
                     HttpConstants.FAILED -> {

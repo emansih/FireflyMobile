@@ -40,11 +40,11 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
     var billId: Long = 0L
     var billName = ""
 
-    fun getBillInfo(): LiveData<List<BillData>>{
-        val billLiveDataList = MutableLiveData<List<BillData>>()
+    fun getBillInfo(): LiveData<BillData>{
+        val billLiveDataList = MutableLiveData<BillData>()
         viewModelScope.launch(Dispatchers.IO){
-            val billList = billRepository.retrieveBillById(billId)
-            billName =  billList[0].billAttributes?.name ?: ""
+            val billList = billRepository.getBillById(billId)
+            billName =  billList.billAttributes?.name ?: ""
             billLiveDataList.postValue(billList)
         }
         return billLiveDataList

@@ -34,9 +34,9 @@ class CurrencyViewModel(application: Application) : BaseViewModel(application) {
         return currencyLiveData
     }
 
-    fun getDefaultCurrency(): LiveData<MutableList<CurrencyData>>{
-        val currencyLiveData: MutableLiveData<MutableList<CurrencyData>> = MutableLiveData()
-        var currencyData: MutableList<CurrencyData> = arrayListOf()
+    fun getDefaultCurrency(): LiveData<List<CurrencyData>>{
+        val currencyLiveData: MutableLiveData<List<CurrencyData>> = MutableLiveData()
+        var currencyData: List<CurrencyData> = listOf()
         viewModelScope.launch(Dispatchers.IO){
             currencyData = repository.defaultCurrency()
         }.invokeOnCompletion {

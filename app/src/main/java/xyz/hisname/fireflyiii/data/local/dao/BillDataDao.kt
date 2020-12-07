@@ -17,7 +17,7 @@ abstract class BillDataDao: BaseDao<BillData>{
     abstract fun deleteBillById(billId: Long): Int
 
     @Query("SELECT * FROM bills WHERE billId = :billId")
-    abstract fun getBillById(billId: Long): MutableList<BillData>
+    abstract fun getBillById(billId: Long): BillData
 
     @Query("DELETE FROM bills")
     abstract suspend fun deleteAllBills(): Int

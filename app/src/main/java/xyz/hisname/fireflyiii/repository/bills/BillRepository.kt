@@ -1,10 +1,12 @@
 package xyz.hisname.fireflyiii.repository.bills
 
-import kotlinx.coroutines.flow.Flow
-import xyz.hisname.fireflyiii.Constants
+import com.squareup.moshi.Moshi
+import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
-import xyz.hisname.fireflyiii.repository.models.bills.BillData
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.net.UnknownHostException
 
@@ -12,25 +14,7 @@ import java.net.UnknownHostException
 class BillRepository(private val billDao: BillDataDao,
                      private val billService: BillsService?) {
 
-    suspend fun insertBill(bill: BillData) = billDao.insert(bill)
-
-
-    // Since we are retrieving only 1 item, there is no array. We wrap a try catch to prevent crash ;p
-    suspend fun retrieveBillById(billId: Long): MutableList<BillData>{
-        try {
-            val billData: MutableList<BillData> = arrayListOf()
-            val networkCall = billService?.getBillById(billId)
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                billData.addAll(responseBody.data.toMutableList())
-                billDao.deleteBillById(billId)
-                billData.forEach { data ->
-                    insertBill(data)
-                }
-            }
-        } catch (exception: Exception){ }
-        return billDao.getBillById(billId)
-    }
+    suspend fun getBillById(billId: Long) = billDao.getBillById(billId)
 
     suspend fun deleteBillById(billId: Long): Int{
         try {
@@ -59,6 +43,58 @@ class BillRepository(private val billDao: BillDataDao,
         } catch (exception: UnknownHostException){
             billDao.deleteBillById(billId)
             return HttpConstants.FAILED
+        }
+    }
+
+    suspend fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,
+                        skip: String, active: String, currencyCode: String,
+                        notes: String?): ApiResponses<BillSuccessModel>{
+        return try {
+            val networkCall = billService?.createBill(name, amountMin, amountMax, date,
+                    repeatFreq, skip, active, currencyCode, notes)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+    suspend fun updateBill(billId: Long, name: String, amountMin: String, amountMax: String, date: String,
+                           repeatFreq: String, skip: String,active: String, currencyCode: String,
+                           notes: String?): ApiResponses<BillSuccessModel>{
+        return try {
+            val networkCall = billService?.updateBill(billId, name, amountMin, amountMax, date,
+                    repeatFreq, skip, active, currencyCode, notes)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+    private suspend fun parseResponse(responseFromServer: Response<BillSuccessModel>?): ApiResponses<BillSuccessModel> {
+        val responseBody = responseFromServer?.body()
+        val responseErrorBody = responseFromServer?.errorBody()
+        if(responseBody != null && responseFromServer.isSuccessful){
+            if(responseErrorBody != null){
+                // Ignore lint warning. False positive
+                // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
+                var errorMessage = String(responseErrorBody.bytes())
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
+                errorMessage = when {
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.currency_code != null -> moshi.errors.currency_code[0]
+                    moshi?.errors?.amount_min != null -> moshi.errors.amount_min[0]
+                    moshi?.errors?.repeat_freq != null -> moshi.errors.repeat_freq[0]
+                    moshi?.errors?.date != null -> moshi.errors.date[0]
+                    moshi?.errors?.skip != null -> moshi.errors.skip[0]
+                    else -> "Error occurred while saving bill"
+                }
+                return ApiResponses(errorMessage = errorMessage)
+            } else {
+                billDao.insert(responseBody.data)
+                return ApiResponses(response = responseBody)
+            }
+        } else {
+            return ApiResponses(errorMessage = "Error occurred while saving Account")
         }
     }
 }

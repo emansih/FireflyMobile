@@ -52,4 +52,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
 
     @Query("UPDATE currency SET currencyDefault =:currencyDefault WHERE name =:currencyName")
     abstract fun changeDefaultCurrency(currencyName: String, currencyDefault: Boolean = true)
+
+    @Query("SELECT currency.name FROM bills JOIN currency ON bills.currency_id = currency.currencyId WHERE billId =:billId")
+    abstract suspend fun getCurrencyFromBill(billId: Long): String
 }
