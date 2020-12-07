@@ -8,6 +8,8 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
@@ -19,59 +21,38 @@ import xyz.hisname.fireflyiii.util.extension.*
 
 class ListPiggyFragment: BaseFragment(){
 
-    private var dataAdapter = arrayListOf<PiggyData>()
-    private var whichPiggy = true
+    private val piggyViewModel by lazy { getImprovedViewModel(ListPiggyViewModel::class.java) }
+    private val piggyRecyclerAdapter by lazy { PiggyRecyclerAdapter { data: PiggyData -> itemClicked(data) } }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_base_list, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        runLayoutAnimation(recycler_view)
         initFab()
-        setHasOptionsMenu(true)
-        displayAll()
+        displayView()
         pullToRefresh()
         enableDragDrop()
     }
 
     private fun displayView(){
-        swipeContainer.isRefreshing = false
-        if (dataAdapter.isNotEmpty()) {
-            listText.isVisible = false
-            listImage.isVisible = false
-            recycler_view.isVisible = true
-            recycler_view.adapter =  PiggyRecyclerAdapter(dataAdapter){ data: PiggyData ->
-                itemClicked(data)
-            }.apply {
-                update(dataAdapter)
+        piggyViewModel.getPiggyBank().observe(viewLifecycleOwner){ pagingData ->
+            piggyRecyclerAdapter.submitData(lifecycle, pagingData)
+        }
+        piggyRecyclerAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            if(loadStates.refresh !is LoadState.Loading) {
+                if (piggyRecyclerAdapter.itemCount < 1) {
+                    listText.text = resources.getString(R.string.no_piggy_bank)
+                    listText.isVisible = true
+                    listImage.isVisible = true
+                    listImage.setImageDrawable(getCompatDrawable(R.drawable.ic_piggy_bank))
+                } else {
+                    listImage.isGone = true
+                    listText.isGone = true
+                }
             }
-        } else {
-            listText.text = resources.getString(R.string.no_piggy_bank)
-            listText.isVisible = true
-            listImage.isVisible = true
-            listImage.setImageDrawable(getCompatDrawable(R.drawable.ic_piggy_bank))
-            recycler_view.isVisible = false
-        }
-    }
-
-    private fun displayAll(){
-        swipeContainer.isRefreshing = true
-        dataAdapter.clear()
-        piggyViewModel.getAllPiggyBanks().observe(viewLifecycleOwner) { piggyBankData ->
-            dataAdapter = ArrayList(piggyBankData)
-            displayView()
-        }
-    }
-
-    private fun displayIncomplete(){
-        swipeContainer.isRefreshing = true
-        dataAdapter.clear()
-        piggyViewModel.getNonCompletedPiggyBanks().observe(viewLifecycleOwner) { piggyBankData ->
-            dataAdapter = ArrayList(piggyBankData)
-            displayView()
         }
     }
 
@@ -87,12 +68,7 @@ class ListPiggyFragment: BaseFragment(){
 
     private fun pullToRefresh(){
         swipeContainer.setOnRefreshListener {
-            dataAdapter.clear()
-            if(whichPiggy){
-                displayAll()
-            } else {
-                displayIncomplete()
-            }
+            piggyRecyclerAdapter.refresh()
         }
     }
 
@@ -102,7 +78,9 @@ class ListPiggyFragment: BaseFragment(){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
                     val piggyName = viewHolder.itemView.piggyName.text.toString()
-                    piggyViewModel.deletePiggyByName(piggyName).observe(viewLifecycleOwner){ isDeleted ->
+                    val piggyId = viewHolder.itemView.piggyId.text.toString()
+                    piggyViewModel.deletePiggybank(piggyId).observe(viewLifecycleOwner){ isDeleted ->
+                        piggyRecyclerAdapter.refresh()
                         if(isDeleted){
                             toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyName))
                         } else {
@@ -125,27 +103,6 @@ class ListPiggyFragment: BaseFragment(){
             }
             extendedFab.isClickable = true
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.piggy_bank_list, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        item.isCheckable = true
-        if(id == R.id.menu_incomplete){
-            if(item.isChecked){
-                item.isChecked = false
-                displayAll()
-                whichPiggy = true
-            } else {
-                item.isChecked = true
-                displayIncomplete()
-                whichPiggy = false
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onAttach(context: Context){

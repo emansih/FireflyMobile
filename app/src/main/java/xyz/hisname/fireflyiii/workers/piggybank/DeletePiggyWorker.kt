@@ -10,7 +10,6 @@ import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 class DeletePiggyWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 

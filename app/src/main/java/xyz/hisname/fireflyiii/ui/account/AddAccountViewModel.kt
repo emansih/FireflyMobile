@@ -106,8 +106,8 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
         return apiResponse
     }
 
-    fun getAccountById(accountId: Long): LiveData<List<AccountData>>{
-        val accountListLiveData = MutableLiveData<List<AccountData>>()
+    fun getAccountById(accountId: Long): LiveData<AccountData>{
+        val accountListLiveData = MutableLiveData<AccountData>()
         viewModelScope.launch(Dispatchers.IO){
             accountListLiveData.postValue(accountRepository.getAccountById(accountId))
         }

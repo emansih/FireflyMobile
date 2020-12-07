@@ -35,8 +35,8 @@ class ListAccountViewModel(application: Application): BaseViewModel(application)
     fun deleteAccountByName(accountId: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            val accountList = accountRepository.getAccountById(accountId.toLong())
-            if(accountList.isNotEmpty()){
+            val accountData = accountRepository.getAccountById(accountId.toLong())
+            if(accountData.accountId != null && accountData.accountId != 0L){
                 // Since onDraw() is being called multiple times, we check if the account exists locally in the DB.
                 when (accountRepository.deleteAccountById(accountId.toLong())) {
                     HttpConstants.FAILED -> {

@@ -48,7 +48,21 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         return accountDao.getAccountByType(accountType).distinctUntilChanged()
     }
 
-    suspend fun getAccountById(accountId: Long) = accountDao.getAccountById(accountId)
+    suspend fun getAccountById(accountId: Long): AccountData{
+        val accountName = accountDao.getAccountById(accountId).accountAttributes?.name
+        if(accountName.isNullOrEmpty()){
+            try {
+                val networkCall = accountsService?.getAccountById(accountId)
+                val responseBody = networkCall?.body()
+                if(responseBody != null && networkCall.isSuccessful) {
+                    responseBody.data.forEach { accountData ->
+                        accountDao.insert(accountData)
+                    }
+                }
+            } catch (exception: Exception){ }
+        }
+        return accountDao.getAccountById(accountId)
+    }
 
     suspend fun deleteAccountById(accountId: Long): Int {
         try {
@@ -80,7 +94,22 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         }
     }
 
-    suspend fun retrieveAccountByName(accountName: String) = accountDao.getAccountByName(accountName)
+    suspend fun getAccountByName(accountName: String, accountType: String): AccountData{
+        val accountData = accountDao.getAccountByNameAndType(accountName, accountType)
+        if(accountData.accountAttributes?.name.isNullOrEmpty()) {
+            try {
+                val networkCall = accountsService?.searchAccount(accountName, accountType)
+                val responseBody = networkCall?.body()
+                if (responseBody != null && networkCall.isSuccessful) {
+                    responseBody.data.forEach { data ->
+                        accountDao.insert(data)
+                    }
+                }
+            } catch (exception: Exception) {
+            }
+        }
+        return accountDao.getAccountByNameAndType(accountName, accountType)
+    }
 
     suspend fun getTransactionByAccountId(accountId: Long, startDate: String,
                                           endDate: String, type: String,
@@ -125,7 +154,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             }
             handleSearch(accountName)
         }
-        return accountDao.getAccountByNameAndType(accountType, "%$accountName%")
+        return accountDao.searchAccountByNameAndType(accountType, "%$accountName%")
     }
 
     suspend fun addAccount(accountName: String, accountType: String,

@@ -23,8 +23,6 @@ import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.hootsuite.nachos.ChipConfiguration
@@ -61,7 +59,8 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesDialogViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
-import xyz.hisname.fireflyiii.ui.piggybank.PiggyDialog
+import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyDialog
+import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyViewModel
 import xyz.hisname.fireflyiii.ui.tasker.TransactionPluginViewModel
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -81,6 +80,7 @@ class AddTransactionFragment: BaseFragment() {
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
+    private val piggyViewModel by lazy { getViewModel(SearchPiggyViewModel::class.java) }
     private val currencyVm by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
@@ -595,7 +595,7 @@ class AddTransactionFragment: BaseFragment() {
                 if(event.action == MotionEvent.ACTION_UP){
                     piggy_edittext.compoundDrawables[0].bounds.width()
                     if(event.x <= piggy_edittext.compoundDrawables[0].bounds.width() + 30){
-                        val piggyBankDialog = PiggyDialog()
+                        val piggyBankDialog = SearchPiggyDialog()
                         piggyBankDialog.show(parentFragmentManager, "piggyDialog")
 
                         return true
@@ -605,7 +605,7 @@ class AddTransactionFragment: BaseFragment() {
             }
         })
         piggy_edittext.doAfterTextChanged { editable ->
-            piggyViewModel.getPiggyByName(editable.toString()).observe(viewLifecycleOwner){ list ->
+            /*piggyViewModel.getPiggyByName(editable.toString()).observe(viewLifecycleOwner){ list ->
                 val dataToDisplay = arrayListOf<String>()
                 list.forEach { piggyData ->
                     dataToDisplay.add(piggyData.piggyAttributes?.name ?: "")
@@ -613,7 +613,7 @@ class AddTransactionFragment: BaseFragment() {
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
                 piggy_edittext.setAdapter(autocompleteAdapter)
 
-            }
+            }*/
         }
         piggyViewModel.piggyName.observe(viewLifecycleOwner) {
             piggy_edittext.setText(it)

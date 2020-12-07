@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
@@ -30,21 +28,18 @@ import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.workers.piggybank.PiggyBankWorker
-import java.util.*
 
 class AddPiggyFragment: BaseAddObjectFragment() {
 
-    private var accounts = ArrayList<String>()
-    private var piggyId: Long = 0
-    private lateinit var accountAdapter: ArrayAdapter<String>
     private var currentAmount: String? = null
     private var startDate: String? = null
     private var targetDate: String? = null
     private var notes: String? = null
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
+    private val piggyViewModel by lazy { getImprovedViewModel(AddPiggyViewModel::class.java) }
+    private val piggyId by lazy { arguments?.getLong("piggyId") ?: 0 }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_piggy, container)
     }
@@ -52,7 +47,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showReveal(dialog_add_piggy_layout)
-        piggyId = arguments?.getLong("piggyId") ?: 0
         updateEditText()
         setFab()
         showHelpText()
@@ -64,20 +58,14 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private fun updateEditText(){
         if(piggyId != 0L){
             piggyViewModel.getPiggyById(piggyId).observe(viewLifecycleOwner) { piggyData ->
-                val piggyAttributes = piggyData[0].piggyAttributes
+                val piggyAttributes = piggyData.piggyAttributes
                 description_edittext.setText(piggyAttributes?.name)
                 target_amount_edittext.setText(piggyAttributes?.target_amount.toString())
                 current_amount_edittext.setText(piggyAttributes?.current_amount.toString())
                 date_started_edittext.setText(piggyAttributes?.start_date)
                 date_target_edittext.setText(piggyAttributes?.target_date)
                 note_edittext.setText(piggyAttributes?.notes)
-                accountViewModel.getAccountById(piggyAttributes?.account_id ?: 0L).observe(viewLifecycleOwner) { accountData ->
-                    val accountName = accountData[0].accountAttributes?.name
-                    accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, accounts)
-                    accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    account_exposed_dropdown.setAdapter(accountAdapter)
-                    account_exposed_dropdown.setText(accountName)
-                }
+                account_exposed_dropdown.setText(piggyData.piggyAttributes?.account_name)
             }
         }
     }
@@ -175,16 +163,10 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 date_started_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
-        accountViewModel.getAccountByType("asset").observe(viewLifecycleOwner) {
-            if(it.isNotEmpty()) {
-                it.forEachIndexed { _, accountData ->
-                    accounts.add(accountData.accountAttributes?.name!!)
-                }
-                accountAdapter = ArrayAdapter(requireContext(),
-                        R.layout.cat_exposed_dropdown_popup_item, accounts)
-                accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                account_exposed_dropdown.setAdapter(accountAdapter)
-            }
+        piggyViewModel.getAccount().observe(viewLifecycleOwner) { list ->
+            val accountAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, list)
+            accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            account_exposed_dropdown.setAdapter(accountAdapter)
         }
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
@@ -202,57 +184,27 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(viewLifecycleOwner) { accountData ->
-            piggyViewModel.addPiggyBank(description_edittext.getString(),
-                    accountData[0].accountId.toString(), currentAmount, notes, startDate,
-                    target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                val errorMessage = it.getErrorMessage()
-                val throwawableError = it.getError()
-                if (errorMessage != null) {
-                    toastError(errorMessage)
-                } else if (it.getError() != null) {
-                    if (throwawableError?.localizedMessage?.startsWith("Unable to resolve host") == true) {
-                        PiggyBankWorker.initWorker(requireContext(), description_edittext.getString(),
-                                accountData[0].accountId.toString(), target_amount_edittext.getString(), currentAmount,
-                                startDate, targetDate, notes)
-                        toastOffline(getString(R.string.data_added_when_user_online, "Piggy Bank"))
-                        handleBack()
-                    } else {
-                        toastError("Error saving piggy bank")
-                    }
-                } else if (it.getResponse() != null) {
-                    toastSuccess("Piggy bank saved")
-                    val bundle = bundleOf("piggyId" to it.getResponse()?.data?.piggyId)
-                    parentFragmentManager.commit {
-                        replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
-                        addToBackStack(null)
-                    }
-                    dialog_add_piggy_layout.isVisible = false
-                    fragmentContainer.isVisible = true
-                }
+        piggyViewModel.addPiggyBank(description_edittext.getString(),
+                account_exposed_dropdown.getString(), currentAmount, notes, startDate,
+                target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) { response ->
+            if(response.first){
+                toastSuccess(response.second)
+                handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
+
     }
 
     private fun updatePiggyBank(){
-        accountViewModel.getAccountByName(account_exposed_dropdown.getString()).observe(viewLifecycleOwner) { accountData ->
-            piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), accountData[0].accountId.toString(),
-                    currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                if (it.getErrorMessage() != null) {
-                    toastError(it.getErrorMessage())
-                } else if (it.getError() != null) {
-                    toastError(it.getError()?.localizedMessage)
-                } else if (it.getResponse() != null) {
-                    toastSuccess("Piggy bank updated")
-                    handleBack()
-                    val bundle = bundleOf("piggyId" to piggyId)
-                    parentFragmentManager.commit {
-                        replace(R.id.fragment_container, PiggyDetailFragment().apply { arguments = bundle })
-                        addToBackStack(null)
-                    }
-                }
+        piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), account_exposed_dropdown.getString(),
+                currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) { response ->
+            if(response.first){
+                toastSuccess(response.second)
+                handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
     }

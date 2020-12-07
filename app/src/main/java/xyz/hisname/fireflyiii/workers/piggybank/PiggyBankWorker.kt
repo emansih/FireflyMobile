@@ -3,22 +3,19 @@ package xyz.hisname.fireflyiii.workers.piggybank
 import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
-import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
+import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.workers.BaseWorker
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
-
 
 class PiggyBankWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
@@ -33,37 +30,31 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val endDate = inputData.getString("endDate") ?: ""
         val notes = inputData.getString("notes") ?: ""
         val piggyWorkManagerId = inputData.getLong("piggyWorkManagerId", 0)
-        genericService?.create(PiggybankService::class.java)?.createNewPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)?.enqueue(retrofitCallback({ response ->
-            var errorBody = ""
-            if (response.errorBody() != null) {
-                errorBody = String(response.errorBody()?.bytes()!!)
+        val piggyRepository = PiggyRepository(AppDatabase.getInstance(context).piggyDataDao(),
+                genericService?.create(PiggybankService::class.java))
+        val addPiggy = piggyRepository.addPiggyBank(name, accountId.toLong(), targetAmount,
+                currentAmount, startDate, endDate, notes)
+        when {
+            addPiggy.response != null -> {
+                // Delete old data that we inserted when worker is being init
+                piggyRepository.deletePiggyById(piggyWorkManagerId)
+                context.showNotification("Piggy bank added","Stored new piggy bank $name", channelIcon)
+                return Result.success()
             }
-            val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
-            val responseBody = response.body()
-            if (response.isSuccessful && responseBody != null) {
-                context.showNotification("Piggy Bank Added", "$name was added successfully!", channelIcon)
+            addPiggy.errorMessage != null -> {
+                context.showNotification("Error Adding $name", addPiggy.errorMessage, channelIcon)
                 cancelWorker(piggyWorkManagerId, context)
-                runBlocking(Dispatchers.IO){
-                    val piggyDatabase = AppDatabase.getInstance(context).piggyDataDao()
-                    piggyDatabase.insert(responseBody.data)
-                }
-                Result.success()
-            } else {
-                var error = ""
-                when {
-                    moshi?.errors?.name != null -> error = moshi.errors.name[0]
-                    moshi?.errors?.account_id != null -> error = moshi.errors.account_id[0]
-                    moshi?.errors?.current_amount != null -> error = moshi.errors.current_amount[0]
-                }
-                cancelWorker(piggyWorkManagerId, context)
-                context.showNotification("There was an issue adding $name", error, channelIcon)
-                Result.failure()
+                return Result.failure()
             }
-        })
-        { throwable ->
-            Result.retry()
-        })
-        return Result.success()
+            addPiggy.error != null -> {
+                return Result.retry()
+            }
+            else -> {
+                context.showNotification("Error Adding $name", "Please try again later", channelIcon)
+                cancelWorker(piggyWorkManagerId, context)
+                return Result.failure()
+            }
+        }
     }
 
     companion object {
@@ -101,7 +92,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                 runBlocking(Dispatchers.IO){
                     val piggyDatabase = AppDatabase.getInstance(context).piggyDataDao()
                     val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
-                    val account = accountDatabase.getAccountById(accountId.toLong())[0]
+                    val account = accountDatabase.getAccountById(accountId.toLong())
                     val defaultCurrency = AppDatabase.getInstance(context).currencyDataDao().getDefaultCurrency()[0]
                     val currencyCode = defaultCurrency.currencyAttributes?.code
                     val currencySymbol = defaultCurrency.currencyAttributes?.symbol

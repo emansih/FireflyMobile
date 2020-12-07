@@ -48,11 +48,11 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     val accountData = MutableLiveData<List<DetailModel>>()
     val notes = MutableLiveData<String>()
 
-    fun getAccountById(accountId: Long): MutableLiveData<MutableList<AccountData>>{
-        val accountDataLiveData = MutableLiveData<MutableList<AccountData>>()
+    fun getAccountById(accountId: Long): MutableLiveData<AccountData>{
+        val accountDataLiveData = MutableLiveData<AccountData>()
         viewModelScope.launch(Dispatchers.IO){
             val accountList = accountRepository.getAccountById(accountId)
-            val accountAttributes = accountList[0].accountAttributes
+            val accountAttributes = accountList.accountAttributes
             currencySymbol = accountAttributes?.currency_symbol ?: ""
             accountName =  accountAttributes?.name ?: ""
             accountType = accountAttributes?.type ?: ""

@@ -50,17 +50,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return accountData
     }
 
-    fun getAccountById(id: Long): LiveData<MutableList<AccountData>>{
-        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
-        var data: MutableList<AccountData> = arrayListOf()
-        viewModelScope.launch(Dispatchers.IO) {
-            data = repository.getAccountById(id)
-        }.invokeOnCompletion {
-            accountData.postValue(data)
-        }
-        return accountData
-    }
-
     fun deleteAccountById(accountId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         var isItDeleted = 0
@@ -84,17 +73,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
 
         }
         return isDeleted
-    }
-
-    fun getAccountByName(accountName: String): LiveData<MutableList<AccountData>>{
-        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
-        var data: MutableList<AccountData> = arrayListOf()
-        viewModelScope.launch(Dispatchers.IO) {
-            data = repository.retrieveAccountByName(accountName)
-        }.invokeOnCompletion {
-            accountData.postValue(data)
-        }
-        return accountData
     }
 
     fun getAccountByNameAndType(accountType: String, accountName: String): LiveData<List<String>>{

@@ -8,8 +8,8 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 @Dao
 abstract class AccountsDataDao: BaseDao<AccountData> {
 
-    @Query("SELECT * FROM accounts WHERE name =:accountName")
-    abstract fun getAccountByName(accountName: String): MutableList<AccountData>
+    @Query("SELECT * FROM accounts WHERE name =:accountName AND type =:accountType")
+    abstract fun getAccountByNameAndType(accountName: String, accountType: String): AccountData
 
     @Deprecated("Use suspend")
     @Query("SELECT * FROM accounts WHERE type =:accountType")
@@ -22,7 +22,7 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     abstract suspend fun getAccountsByTypeCount(accountType: String): Int
 
     @Query("SELECT * FROM accounts WHERE accountId =:accountId")
-    abstract fun getAccountById(accountId: Long): MutableList<AccountData>
+    abstract fun getAccountById(accountId: Long): AccountData
 
     @Query("DELETE FROM accounts WHERE accountId = :accountId")
     abstract fun deleteAccountById(accountId: Long): Int
@@ -39,6 +39,6 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     abstract fun deleteAccountByTypeAndName(accountType: String, accountName: String): Int
 
     @Query("SELECT * FROM accounts WHERE name LIKE :name AND type LIKE :type")
-    abstract fun getAccountByNameAndType(type: String, name: String): Flow<MutableList<AccountData>>
+    abstract fun searchAccountByNameAndType(type: String, name: String): Flow<MutableList<AccountData>>
 
 }

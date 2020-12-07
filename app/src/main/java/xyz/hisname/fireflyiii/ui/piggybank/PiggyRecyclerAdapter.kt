@@ -5,18 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
-import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 import kotlin.math.abs
 
-class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private val clickListener:(PiggyData) -> Unit):
-        DiffUtilAdapter<PiggyData,PiggyRecyclerAdapter.PiggyHolder>(){
+class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
+        PagingDataAdapter<PiggyData, PiggyRecyclerAdapter.PiggyHolder>(DIFF_CALLBACK){
 
     private lateinit var context: Context
 
@@ -25,10 +26,12 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
         return PiggyHolder(parent.inflate(R.layout.piggy_list_item))
     }
 
-    override fun onBindViewHolder(holder: PiggyHolder, position: Int) = holder.bind(items[position],clickListener)
+    override fun onBindViewHolder(holder: PiggyHolder, position: Int){
+        getItem(position)?.let{
+            holder.bind(it, clickListener)
+        }
+    }
 
-
-    override fun getItemCount() = items.size
 
     inner class PiggyHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(piggyData: PiggyData, clickListener: (PiggyData) -> Unit){
@@ -82,7 +85,19 @@ class PiggyRecyclerAdapter(private val items: MutableList<PiggyData>, private va
                     it.text = "No target Date"
                 }
             }
+            itemView.piggyId.text = piggyData.piggyId.toString()
             itemView.piggyCard.setOnClickListener{clickListener(piggyData)}
+        }
+    }
+
+    companion object {
+        private val DIFF_CALLBACK = object :
+                DiffUtil.ItemCallback<PiggyData>() {
+            override fun areItemsTheSame(oldPiggyData: PiggyData,
+                                         newPiggyData: PiggyData) = oldPiggyData == newPiggyData
+
+            override fun areContentsTheSame(oldPiggyData: PiggyData,
+                                            newPiggyDataa: PiggyData) = oldPiggyData == newPiggyDataa
         }
     }
 }

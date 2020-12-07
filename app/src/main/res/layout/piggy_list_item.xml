@@ -73,6 +73,11 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="@+id/goal_save"
                 app:layout_constraintBottom_toBottomOf="@+id/piggyName"/>
+
+            <TextView
+                android:id="@+id/piggyId"
+                android:layout_width="0dp"
+                android:layout_height="0dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

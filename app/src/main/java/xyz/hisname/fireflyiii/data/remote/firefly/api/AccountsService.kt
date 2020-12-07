@@ -71,4 +71,7 @@ interface AccountsService {
                                            @Query("start") startDate: String,
                                            @Query("end") endDate: String,
                                            @Query("type") type: String): Response<TransactionModel>
+
+    @GET("$ACCOUNTS_API_ENDPOINT/{id}")
+    suspend fun getAccountById(@Path("id") id: Long): Response<AccountsModel>
 }

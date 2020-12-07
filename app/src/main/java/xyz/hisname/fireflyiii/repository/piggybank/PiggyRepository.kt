@@ -1,18 +1,17 @@
 package xyz.hisname.fireflyiii.repository.piggybank
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import com.squareup.moshi.Moshi
+import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
-import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
-class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyService: PiggybankService?) {
-
-    suspend fun insertPiggy(piggy: PiggyData) = piggyDao.insert(piggy)
-
-    suspend fun retrievePiggyById(piggyId: Long) = piggyDao.getPiggyById(piggyId)
+class PiggyRepository(private val piggyDao: PiggyDataDao,
+                      private val piggyService: PiggybankService?) {
 
     suspend fun deletePiggyById(piggyId: Long): Int {
         try {
@@ -45,33 +44,52 @@ class PiggyRepository(private val piggyDao: PiggyDataDao, private val piggyServi
         }
     }
 
-    suspend fun allPiggyBanks(): Flow<MutableList<PiggyData>> {
-        val piggyData: MutableList<PiggyData> = arrayListOf()
-        try {
-            val networkCall = piggyService?.getPaginatedPiggyBank(1)
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                piggyData.addAll(responseBody.data.toMutableList())
-                val pagination = responseBody.meta.pagination
-                if (pagination.total_pages != pagination.current_page) {
-                    for (items in 2..pagination.total_pages) {
-                        piggyData.addAll(piggyService?.getPaginatedPiggyBank(items)
-                                ?.body()?.data?.toMutableList() ?: arrayListOf())
-                    }
-                }
-                piggyDao.deleteAllPiggyBank()
-                piggyData.forEachIndexed { _, piggyBankData ->
-                    insertPiggy(piggyBankData)
-                }
-            }
-        } catch (exception: Exception){ }
-        return piggyDao.getAllPiggy()
+    suspend fun getPiggyById(piggyId: Long) =  piggyDao.getPiggyFromId(piggyId)
+
+    suspend fun addPiggyBank(name: String, accountId: Long, targetAmount: String,
+                             currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel> {
+        return try {
+            val networkCall = piggyService?.addPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
     }
 
-    suspend fun searchPiggyByName(piggyName: String) = piggyDao.searchPiggyName(piggyName)
+    suspend fun updatePiggyBank(piggyId: Long, name: String, accountId: Long, targetAmount: String,
+                                currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel>{
+        return try {
+            val networkCall = piggyService?.updatePiggyBank(piggyId, name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
 
-    suspend fun getNonCompletedPiggyBanks() = piggyDao.getNonCompletedPiggyBanks().distinctUntilChanged()
-
-    suspend fun getPiggyById(piggyName: String) =  piggyDao.getPiggyIdFromName(piggyName)
+    private suspend fun parseResponse(responseFromServer: Response<PiggySuccessModel>?): ApiResponses<PiggySuccessModel>{
+        val responseBody = responseFromServer?.body()
+        val responseErrorBody = responseFromServer?.errorBody()
+        if(responseBody != null && responseFromServer.isSuccessful){
+            if(responseErrorBody != null){
+                // Ignore lint warning. False positive
+                // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
+                var errorMessage = String(responseErrorBody.bytes())
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
+                errorMessage = when {
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.account_id != null -> moshi.errors.account_id[0]
+                    moshi?.errors?.current_amount != null -> moshi.errors.current_amount[0]
+                    moshi?.errors?.targetDate != null -> moshi.errors.targetDate[0]
+                    else -> "Error occurred while saving piggy bank"
+                }
+                return ApiResponses(errorMessage = errorMessage)
+            } else {
+                piggyDao.insert(responseBody.data)
+                return ApiResponses(response = responseBody)
+            }
+        } else {
+            return ApiResponses(errorMessage = "Error occurred while saving piggy bank")
+        }
+    }
 
 }
