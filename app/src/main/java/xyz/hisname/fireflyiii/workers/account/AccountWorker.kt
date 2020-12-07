@@ -3,19 +3,17 @@ package xyz.hisname.fireflyiii.workers.account
 import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.work.*
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
+import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
-import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
@@ -119,42 +117,30 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val openingBalanceDate = inputData.getString("openingBalanceDate")
         val virtualBalance = inputData.getString("virtualBalance")
         val notes = inputData.getString("notes")
-        genericService?.create(AccountsService::class.java)?.addAccount(name, accountType, currencyCode,
+        val accountRepository = AccountRepository(
+                AppDatabase.getInstance(context).accountDataDao(),
+                genericService?.create(AccountsService::class.java)
+        )
+        val addAccount = accountRepository.addAccount(name, accountType, currencyCode,
                 iBanString, bicString, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod)?.enqueue(
-                retrofitCallback({ response ->
-                    var errorBody = ""
-                    var error = ""
-                    if (response.errorBody() != null) {
-                        errorBody = String(response.errorBody()?.bytes()!!)
-                    }
-                    val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
-                    val responseBody = response.body()
-                    if (response.isSuccessful && responseBody != null) {
-                        context.showNotification("Account Added", "$name was added successfully!", channelIcon)
-                        cancelWorker(name,accountType, context)
-                        runBlocking(Dispatchers.IO){
-                            val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
-                            accountDatabase.insert(responseBody.data)
-                        }
-                        Result.success()
-                    } else {
-                        error = when {
-                            moshi?.errors?.name != null -> moshi.errors.name[0]
-                            moshi?.errors?.account_number != null -> moshi.errors.account_number[0]
-                            moshi?.errors?.interest != null -> moshi.errors.interest[0]
-                            moshi?.errors?.liabilityStartDate != null -> moshi.errors.liabilityStartDate[0]
-                            else -> "Error saving account"
-                        }
-                        cancelWorker(name,accountType, context)
-                        context.showNotification("There was an error adding $name", error, channelIcon)
-                        Result.failure()
-                    }
-                })
-                { throwable ->
-                    Result.retry()
-                })
-        return Result.success()
+                liabilityStartDate, interest, interestPeriod)
+        when {
+            addAccount.response != null -> {
+                cancelWorker(name,accountType, context)
+                context.showNotification("Account Added", "$name was added successfully!", channelIcon)
+                return Result.success()
+            }
+            addAccount.errorMessage != null -> {
+                context.showNotification("There was an error adding $name", addAccount.errorMessage, channelIcon)
+                return Result.failure()
+            }
+            addAccount.error != null -> {
+                return Result.retry()
+            }
+            else -> {
+                return Result.failure()
+            }
+        }
     }
 }

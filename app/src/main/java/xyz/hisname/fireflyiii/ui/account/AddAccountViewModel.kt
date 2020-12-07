@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
@@ -29,8 +30,8 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
 
     var currency = ""
 
-    fun getDefaultCurrency(): LiveData<MutableList<CurrencyData>>{
-        val currencyListLiveData = MutableLiveData<MutableList<CurrencyData>>()
+    fun getDefaultCurrency(): LiveData<List<CurrencyData>>{
+        val currencyListLiveData = MutableLiveData<List<CurrencyData>>()
         viewModelScope.launch(Dispatchers.IO){
             val currencyList = currencyRepository.defaultCurrency()
             currencyListLiveData.postValue(currencyList)

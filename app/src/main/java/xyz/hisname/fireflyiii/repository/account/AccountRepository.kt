@@ -25,10 +25,6 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     private lateinit var apiResponse: String
     val authStatus: MutableLiveData<Boolean> = MutableLiveData()
 
-    suspend fun insertAccount(account: AccountData){
-        accountDao.insert(account)
-    }
-
     // !!!!This is only used for PAT authentication, do not use it anywhere else!!!!
     /**
     * Returns true if auth succeeds
@@ -121,7 +117,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                         val responseBody = networkCall?.body()
                         if (responseBody != null && networkCall.isSuccessful) {
                             responseBody.data.forEach { data ->
-                                insertAccount(data)
+                                accountDao.insert(data)
                             }
                         }
                     } catch (exception: Exception){ }
@@ -189,7 +185,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 }
                 return ApiResponses(errorMessage = errorMessage)
             } else {
-                insertAccount(responseBody.data)
+                accountDao.insert(responseBody.data)
                 return ApiResponses(response = responseBody)
             }
         } else {
