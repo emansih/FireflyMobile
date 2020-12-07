@@ -81,6 +81,7 @@ class AddTransactionFragment: BaseFragment() {
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
+    private val currencyVm by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
     private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
     private val pluginViewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
@@ -225,7 +226,7 @@ class AddTransactionFragment: BaseFragment() {
     private fun setUiFromBundle(bundle: Bundle){
         val transactionCurrency = bundle.getString("transactionCurrency")
         if(transactionCurrency?.startsWith("%") == false){
-            currencyViewModel.getCurrencyByCode(transactionCurrency).observe(viewLifecycleOwner){ currencyData ->
+            currencyVm.getCurrencyByCode(transactionCurrency).observe(viewLifecycleOwner){ currencyData ->
                 val currencyAttributes = currencyData[0].currencyAttributes
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
             }
@@ -397,14 +398,14 @@ class AddTransactionFragment: BaseFragment() {
                 transactionTags, budgetName,
                 attachmentItemAdapter, note_edittext.getString()).observe(viewLifecycleOwner) { transactionResponse->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            val errorMessage = transactionResponse.getErrorMessage()
-            if (transactionResponse.getResponse() != null) {
+            val errorMessage = transactionResponse.errorMessage
+            if (transactionResponse.response != null) {
                 toastSuccess(resources.getString(R.string.transaction_updated))
                 handleBack()
             } else if(errorMessage != null) {
                 toastError(errorMessage)
-            } else if(transactionResponse.getError() != null) {
-                toastError(transactionResponse.getError()?.localizedMessage)
+            } else if(transactionResponse.error != null) {
+                toastError(transactionResponse.error.localizedMessage)
             }
         }
     }
@@ -582,7 +583,7 @@ class AddTransactionFragment: BaseFragment() {
             tags_chip.setAdapter(tagsAdapter)
         }
 
-        currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
+        currencyVm.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             if(!isTasker){
                 currency = currencyData?.code.toString()
@@ -784,13 +785,13 @@ class AddTransactionFragment: BaseFragment() {
                 currency, categoryName, transactionTags, budgetName, attachmentItemAdapter,
                 note_edittext.getString()).observe(viewLifecycleOwner) { transactionResponse ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            val errorMessage = transactionResponse.getErrorMessage()
-            if (transactionResponse.getResponse() != null) {
+            val errorMessage = transactionResponse.errorMessage
+            if (transactionResponse.response != null) {
                 toastSuccess(resources.getString(R.string.transaction_added))
                 handleBack()
             } else if (errorMessage != null) {
                 toastError(errorMessage)
-            } else if (transactionResponse.getError() != null) {
+            } else if (transactionResponse.error != null) {
                 when {
                     Objects.equals("Transfer", transactionType) -> {
                         val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
@@ -862,7 +863,7 @@ class AddTransactionFragment: BaseFragment() {
             description_edittext.setText(transactionAttributes.description)
             transaction_amount_edittext.setText(abs(transactionAttributes.amount).toString())
             budget_edittext.setText(transactionAttributes.budget_name)
-            currencyViewModel.getCurrencyByCode(transactionAttributes.currency_code).observe(viewLifecycleOwner) { currencyData ->
+            currencyVm.getCurrencyByCode(transactionAttributes.currency_code).observe(viewLifecycleOwner) { currencyData ->
                 val currencyAttributes = currencyData[0].currencyAttributes
                 currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
             }

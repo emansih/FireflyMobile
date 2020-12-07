@@ -19,10 +19,8 @@ import kotlinx.android.synthetic.main.fragment_add_account.currency_layout
 import kotlinx.android.synthetic.main.fragment_add_account.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_account.placeHolderToolbar
 import me.toptas.fancyshowcase.FancyShowCaseQueue
-import me.toptas.fancyshowcase.listener.DismissListener
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
@@ -36,9 +34,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private val accountType: String by lazy { arguments?.getString("accountType") ?: "" }
     private val accountId: Long by lazy { arguments?.getLong("accountId") ?: 0L }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
-    private var currency: String = ""
-    private lateinit var queue: FancyShowCaseQueue
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
+    private val accountVM by lazy { getImprovedViewModel(AddAccountViewModel::class.java)}
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -139,8 +136,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     override fun setWidgets() {
         setAccordion()
-        currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
-            currency = it
+        currencyViewModel.currencyCode.observe(viewLifecycleOwner) { currency ->
+            accountVM.currency = currency
         }
         currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
@@ -150,10 +147,9 @@ class AddAccountFragment: BaseAddObjectFragment() {
             currencyListFragment.show(parentFragmentManager, "currencyList" )
         }
         if(accountId == 0L) {
-            currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
+            accountVM.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
                 val currencyData = defaultCurrency[0].currencyAttributes
                 currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
-                currency = currencyData?.code ?: ""
             }
         }
         if(accountType == "asset"){
@@ -191,7 +187,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         includeInNetWorthText.setOnClickListener {
             includeInNetWorthCheck.performClick()
         }
-        accountViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
+        accountVM.isLoading.observe(viewLifecycleOwner) { loader ->
             if(loader){
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
@@ -258,8 +254,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
         } else {
             note_edittext.getString()
         }
-        val currencyToBeSubmitted = if(currency_layout.isVisible && currency.isNotBlank()){
-            currency
+        val currencyToBeSubmitted = if(currency_layout.isVisible && accountVM.currency.isNotBlank()){
+            accountVM.currency
         } else {
             null
         }
@@ -314,18 +310,15 @@ class AddAccountFragment: BaseAddObjectFragment() {
                               openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                               virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                               liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?){
-        accountViewModel.updateAccount(accountId,accountName, accountType, currencyCode,
+        accountVM.updateAccount(accountId,accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){
-            val error = it.getError()
-            when {
-                error != null -> toastError(error.localizedMessage)
-                it.getResponse() != null -> {
-                    toastSuccess("Account updated")
-                    handleBack()
-                }
-                else -> toastError(it.getErrorMessage())
+                liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){ response ->
+            if(response.first){
+                toastSuccess("Account saved")
+                handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
     }
@@ -335,32 +328,26 @@ class AddAccountFragment: BaseAddObjectFragment() {
                            openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                            virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                            liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?){
-        accountViewModel.addAccounts(accountName, accountType, currencyCode,
+        accountVM.addAccount(accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){
-            val error = it.getError()
-            if (error != null) {
-                if(error.localizedMessage.startsWith("Unable to resolve host")) {
-                    toastOffline(getString(R.string.data_added_when_user_online, "Account"))
-                    handleBack()
-                } else {
-                    toastError(error.localizedMessage)
-                }
-            } else if (it.getResponse() != null) {
+                liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){ response ->
+            if(response.first){
                 toastSuccess("Account saved")
                 handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
     }
 
     private fun updateData(){
         if(accountId != 0L){
-            accountViewModel.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
+            accountVM.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
                 val accountAttributes = accountData[0].accountAttributes
                 description_edittext.setText(accountAttributes?.name)
                 currency_edittext.setText(accountAttributes?.currency_code + " (" + accountAttributes?.currency_symbol + " )")
-                currency = accountAttributes?.currency_code ?: ""
+                accountVM.currency = accountAttributes?.currency_code ?: ""
                 val liabilityType = accountAttributes?.liability_type
                 if(liabilityType != null){
                     when (liabilityType) {
@@ -407,37 +394,23 @@ class AddAccountFragment: BaseAddObjectFragment() {
     }
 
     private fun showHelpText(){
-        queue = FancyShowCaseQueue()
+        FancyShowCaseQueue()
                 .add(showCase(R.string.add_account_currency_help_text,
-                        "addAccountCurrencyCaseView", currency_layout))
-        queue.show()
+                        "addAccountCurrencyCaseView", currency_layout)).show()
     }
 
-    // This code is so nasty
     private fun showHiddenHelpText(){
         if(iban_layout.isVisible && expansionLayout.isExpanded) {
-            showCase(R.string.iban_help_text,
-                    "ibanCaseView", iban_layout, true, object : DismissListener {
-                override fun onDismiss(id: String?) {
-                    if(opening_balance_layout.isVisible){
-                        val openingBalanceShow = showCase(R.string.opening_balance_help_text,
-                                "openingBalanceCaseView", opening_balance_layout, true, object : DismissListener{
-                            override fun onDismiss(id: String?) {
-                                if(virtual_balance_layout.isVisible) {
-                                    showCase(R.string.virtual_balance_help_text, "virtualBalanceCaseView",
-                                            virtual_balance_layout).show()
-                                }
-                            }
-                            override fun onSkipped(id: String?) {
-                            }
-                        })
-                        openingBalanceShow.show()
-                    }
-                }
-
-                override fun onSkipped(id: String?) {
-                }
-            })
+            val queue = FancyShowCaseQueue()
+            queue.add(showCase(R.string.iban_help_text, "ibanCaseView", iban_layout, true))
+            if(opening_balance_layout.isVisible){
+                queue.add(showCase(R.string.opening_balance_help_text, "openingBalanceCaseView", opening_balance_layout))
+            }
+            if(virtual_balance_layout.isVisible) {
+                queue.add(showCase(R.string.virtual_balance_help_text, "virtualBalanceCaseView",
+                        virtual_balance_layout))
+            }
+            queue.show()
         }
     }
     

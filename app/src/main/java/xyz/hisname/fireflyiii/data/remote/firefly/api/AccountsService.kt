@@ -18,7 +18,7 @@ interface AccountsService {
 
     @FormUrlEncoded
     @POST(ACCOUNTS_API_ENDPOINT)
-    fun addAccount(@Field("name") name: String,
+    suspend fun addAccount(@Field("name") name: String,
                    @Field("type") type: String,
                    @Field("currency_code") currencyCode: String?,
                    @Field("iban") iban: String?,
@@ -34,11 +34,11 @@ interface AccountsService {
                    @Field("liability_amount") liabilityAmount: String?,
                    @Field("liability_start_date") liabilityStartDate: String?,
                    @Field("interest") interest: String?,
-                   @Field("interest_period") interestPeriod: String?): Call<AccountSuccessModel>
+                   @Field("interest_period") interestPeriod: String?): Response<AccountSuccessModel>
 
     @FormUrlEncoded
     @PUT("$ACCOUNTS_API_ENDPOINT/{accountId}")
-    fun updateAccount(@Path("accountId") accountId: Long,
+    suspend fun updateAccount(@Path("accountId") accountId: Long,
                       @Field("name") name: String,
                       @Field("type") type: String,
                       @Field("currency_code") currencyCode: String?,
@@ -55,7 +55,7 @@ interface AccountsService {
                       @Field("liability_amount") liabilityAmount: String?,
                       @Field("liability_start_date") liabilityStartDate: String?,
                       @Field("interest") interest: String?,
-                      @Field("interest_period") interestPeriod: String?): Call<AccountSuccessModel>
+                      @Field("interest_period") interestPeriod: String?): Response<AccountSuccessModel>
 
     @DELETE("$ACCOUNTS_API_ENDPOINT/{id}")
     suspend fun deleteAccountById(@Path("id") id: Long): Response<AccountsModel>

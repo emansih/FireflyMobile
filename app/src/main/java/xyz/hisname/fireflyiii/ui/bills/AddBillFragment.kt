@@ -23,6 +23,7 @@ import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillsViewModel
+import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -44,6 +45,7 @@ class AddBillFragment: BaseAddObjectFragment() {
     private lateinit var queue: FancyShowCaseQueue
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
+    private val currencyVm by lazy { getViewModel(CurrencyViewModel::class.java) }
     private val billViewModel by lazy { getImprovedViewModel(BillsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -69,7 +71,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                 min_amount_edittext.setText(billAttribute?.amount_min.toString())
                 max_amount_edittext.setText(billAttribute?.amount_max.toString())
                 currency = billAttribute?.currency_code ?: ""
-                currencyViewModel.getCurrencyByCode(currency).observe(viewLifecycleOwner) { currencyList ->
+                currencyVm.getCurrencyByCode(currency).observe(viewLifecycleOwner) { currencyList ->
                     val currencyData = currencyList[0].currencyAttributes
                     currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
                 }
@@ -239,7 +241,7 @@ class AddBillFragment: BaseAddObjectFragment() {
             currency_edittext.setText(it)
         }
         placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
-        currencyViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
+        currencyVm.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency[0].currencyAttributes
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             currency = currencyData?.code.toString()
@@ -262,17 +264,17 @@ class AddBillFragment: BaseAddObjectFragment() {
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
                     currency, notes).observe(viewLifecycleOwner) { response ->
                     ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                    val errorMessage = response.getErrorMessage()
+                    val errorMessage = response.errorMessage
                     if (errorMessage != null) {
                         toastError(errorMessage)
-                    } else if (response.getError() != null) {
+                    } else if (response.error != null) {
                         BillWorker.initWorker(requireContext(), description_edittext.getString(),
                                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(),
                                 currency, notes)
                         toastOffline(getString(R.string.data_added_when_user_online, "Bill"))
                         handleBack()
-                    } else if (response.getResponse() != null) {
+                    } else if (response.response != null) {
                         toastSuccess(getString(R.string.stored_new_bill, description_edittext.getString()))
                         handleBack()
                     }
@@ -285,12 +287,12 @@ class AddBillFragment: BaseAddObjectFragment() {
                 bill_date_edittext.getString(), getFreq(frequency_exposed_dropdown.getString()),
                 skip_edittext.getString(), "1", currency, notes).observe(viewLifecycleOwner) { response ->
             ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            if (response.getErrorMessage() != null) {
-                toastError(response.getErrorMessage())
-            } else if (response.getError() != null) {
-                toastError(response.getError()?.localizedMessage)
-            } else if (response.getResponse() != null) {
-                val billName = response.getResponse()?.data?.billAttributes?.name
+            if (response.errorMessage != null) {
+                toastError(response.errorMessage)
+            } else if (response.error != null) {
+                toastError(response.error.localizedMessage)
+            } else if (response.response != null) {
+                val billName = response.response.data.billAttributes?.name
                 toastSuccess(getString(R.string.updated_bill, billName))
                 handleBack()
             }
