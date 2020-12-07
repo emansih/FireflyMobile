@@ -13,21 +13,31 @@ import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.tags.TagsRepository
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 
-class ListTagsViewModel(application: Application): BaseViewModel(application) {
+class TagDetailsViewModel(application: Application): BaseViewModel(application) {
 
     private val tagsRepository = TagsRepository(
             AppDatabase.getInstance(application).tagsDataDao(),
             genericService()?.create(TagsService::class.java)
     )
 
-    fun getAllTags(): LiveData<MutableList<TagsData>> {
+    fun getTagById(tagId: Long): LiveData<TagsData> {
+        val tagData = MutableLiveData<TagsData>()
         isLoading.postValue(true)
-        val data: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            data.postValue(tagsRepository.allTags())
+            tagData.postValue(tagsRepository.getTagById(tagId))
             isLoading.postValue(false)
         }
-        return data
+        return tagData
+    }
+
+    fun getTagByName(nameOfTag: String): LiveData<TagsData>{
+        val tagData: MutableLiveData<TagsData> = MutableLiveData()
+        isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO){
+            tagData.postValue(tagsRepository.getTagByName(nameOfTag))
+            isLoading.postValue(false)
+        }
+        return tagData
     }
 
     fun deleteTagByName(tagName: String): LiveData<Boolean>{

@@ -9,15 +9,12 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.models.tags.TagsSuccessModel
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
 class TagsRepository(private val tagsDataDao: TagsDataDao,
                      private val tagsService: TagsService?) {
-
-    suspend fun insertTags(tags: TagsData){
-        tagsDataDao.insert(tags)
-    }
 
     suspend fun deleteTagByName(tagName: String): Int{
         return tagsDataDao.deleteTagByName(tagName)
@@ -41,7 +38,7 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
                 }
                 tagsDataDao.deleteTags()
                 tagsData.forEach { data ->
-                    insertTags(data)
+                    tagsDataDao.insert(data)
                 }
             }
         } catch (exception: Exception){ }
@@ -56,7 +53,7 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
                 val responseBody = networkCall?.body()
                 if(responseBody != null && networkCall.isSuccessful){
                     responseBody.data.forEach {  tagsData ->
-                        insertTags(tagsData)
+                        tagsDataDao.insert(tagsData)
                     }
                 }
             }
@@ -116,7 +113,7 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
                 }
                 return ApiResponses(errorMessage = errorMessage)
             } else {
-                insertTags(responseBody.data)
+                tagsDataDao.insert(responseBody.data)
                 return ApiResponses(response = responseBody)
             }
         } else {
@@ -124,4 +121,34 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
         }
     }
 
+    // Takes in tag id or tag name as parameter
+    suspend fun deleteTags(tagName: String): Int{
+        try {
+            val networkResponse = tagsService?.deleteTagByName(tagName)
+            when (networkResponse?.code()) {
+                204 -> {
+                    tagsDataDao.deleteTagByName(tagName)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                     *   now in inconsistent state. This use case is unlikely to happen unless user
+                     *   deletes their token from the web interface without updating the mobile client
+                     */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    tagsDataDao.deleteTagByName(tagName)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
+            }
+        } catch (exception: Exception){
+            tagsDataDao.deleteTagByName(tagName)
+            return HttpConstants.FAILED
+        }
+    }
 }

@@ -15,7 +15,7 @@ interface TagsService {
     suspend fun getPaginatedTags(@Query("page") page: Int): Response<TagsModel>
 
     @DELETE("$TAGS_API_ENDPOINT/{tagName}")
-    fun deleteTagByName(@Path("tagName") tagName: String): Call<TagsModel>
+    suspend fun deleteTagByName(@Path("tagName") tagName: String): Response<TagsModel>
 
     @FormUrlEncoded
     @POST(TAGS_API_ENDPOINT)
@@ -41,5 +41,5 @@ interface TagsService {
     suspend fun getTagByName(@Path("tagName") tagName: String): Response<TagsModel>
 
     @GET("$AUTOCOMPLETE_API_ENDPOINT/{tags}")
-    fun searchTag(@Query("query") queryString: String): Response<List<TagsItems>>
+    suspend fun searchTag(@Query("query") queryString: String): Response<List<TagsItems>>
 }

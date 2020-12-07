@@ -31,6 +31,7 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
     private val nameOfTagFromBundle by lazy { arguments?.getString("tagName") ?: ""}
+    private val tagsDetailViewModel by lazy { getImprovedViewModel(TagDetailsViewModel::class.java) }
     private lateinit var nameOfTag: String
     private lateinit var startMarker: Marker
 
@@ -44,15 +45,21 @@ class TagDetailsFragment: BaseDetailFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(tagId != 0L) {
-            tagsViewModel.getTagById(tagId).observe(viewLifecycleOwner) { data ->
+            tagsDetailViewModel.getTagById(tagId).observe(viewLifecycleOwner) { data ->
                 setTagData(data)
             }
         } else {
-            tagsViewModel.getTagByName(nameOfTagFromBundle).observe(viewLifecycleOwner) { data ->
+            tagsDetailViewModel.getTagByName(nameOfTagFromBundle).observe(viewLifecycleOwner) { data ->
                 setTagData(data)
             }
         }
-
+        tagsDetailViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
+            if(loader){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
     }
 
     private fun setTagData(tagData: TagsData){
@@ -114,9 +121,7 @@ class TagDetailsFragment: BaseDetailFragment() {
                 .setTitle(resources.getString(R.string.delete_tag_title, nameOfTag))
                 .setMessage(resources.getString(R.string.delete_tag_message, nameOfTag))
                 .setPositiveButton(R.string.delete_permanently){_, _ ->
-                    ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                    tagsViewModel.deleteTagByName(nameOfTag).observe(viewLifecycleOwner) { status ->
-                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                    tagsDetailViewModel.deleteTagByName(nameOfTag).observe(viewLifecycleOwner) { status ->
                         if (status) {
                             parentFragmentManager.commit {
                                 replace(R.id.fragment_container, ListTagsFragment())
