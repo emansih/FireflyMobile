@@ -11,9 +11,7 @@ import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_currency.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -21,9 +19,9 @@ import xyz.hisname.fireflyiii.util.extension.*
 class AddCurrencyFragment: BaseAddObjectFragment() {
 
     private val currencyId by lazy { arguments?.getLong("currencyId") ?: 0L }
-    private val currencyViewModel by lazy { getImprovedViewModel(CurrencyViewModel::class.java) }
+    private val currencyViewModel by lazy { getImprovedViewModel(AddCurrencyViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_currency, container)
     }
@@ -55,7 +53,6 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         }
         addCurrencyFab.setOnClickListener {
             hideKeyboard()
-            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
             if(currencyId != 0L){
                 updateData()
             } else {
@@ -98,19 +95,24 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
+        currencyViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
+            if(loader){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
     }
 
     private fun updateData(){
         currencyViewModel.updateCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(),
                 enabled_checkbox.isChecked, default_checkbox.isChecked).observe(viewLifecycleOwner) { response ->
-            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-            val errorMessage = response.getErrorMessage()
-            if (errorMessage != null) {
-                toastError(errorMessage)
-            } else if (response.getResponse() != null) {
+            if(response.first){
                 toastSuccess(resources.getString(R.string.currency_updated, name_edittext.getString()))
                 unReveal(addCurrencyFab)
+            } else {
+                toastInfo(response.second)
             }
         }
     }
@@ -119,13 +121,11 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         currencyViewModel.addCurrency(name_edittext.getString(), code_edittext.getString(),
                 symbol_edittext.getString(), decimal_places_edittext.getString(),
                 enabled_checkbox.isChecked, default_checkbox.isChecked).observe(viewLifecycleOwner) { response ->
-            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-            val errorMessage = response.getErrorMessage()
-            if (errorMessage != null) {
-                toastError(errorMessage)
-            } else if (response.getResponse() != null) {
+            if(response.first){
                 toastSuccess(resources.getString(R.string.currency_created, name_edittext.getString()))
                 unReveal(addCurrencyFab)
+            } else {
+                toastInfo(response.second)
             }
         }
     }

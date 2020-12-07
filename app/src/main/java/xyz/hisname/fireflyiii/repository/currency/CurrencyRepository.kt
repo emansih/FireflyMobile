@@ -1,11 +1,14 @@
 package xyz.hisname.fireflyiii.repository.currency
 
 import androidx.annotation.WorkerThread
-import kotlinx.coroutines.flow.Flow
-import xyz.hisname.fireflyiii.Constants
+import com.squareup.moshi.Moshi
+import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
+import xyz.hisname.fireflyiii.repository.models.currency.CurrencySuccessModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
@@ -63,9 +66,54 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         return currencyDao.getDefaultCurrency()
     }
 
-    private suspend fun deleteAllCurrency() = currencyDao.deleteAllCurrency()
-
     suspend fun getCurrencyCode(currencyName: String) = currencyDao.getCurrencyByName(currencyName)
+
+    suspend fun addCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
+                           enabled: Boolean,default: Boolean): ApiResponses<CurrencySuccessModel>{
+        return try {
+            val networkCall = currencyService?.addCurrency(name, code, symbol, decimalPlaces, enabled, default)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+    suspend fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
+                               enabled: Boolean,default: Boolean): ApiResponses<CurrencySuccessModel>{
+        return try {
+            val networkCall = currencyService?.updateCurrency(code, name, code, symbol, decimalPlaces, enabled, default)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+
+    private suspend fun parseResponse(responseFromServer: Response<CurrencySuccessModel>?): ApiResponses<CurrencySuccessModel>{
+        val responseBody = responseFromServer?.body()
+        val responseErrorBody = responseFromServer?.errorBody()
+        if(responseBody != null && responseFromServer.isSuccessful){
+            if(responseErrorBody != null){
+                // Ignore lint warning. False positive
+                // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
+                var errorMessage = String(responseErrorBody.bytes())
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
+                errorMessage = when {
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    moshi?.errors?.code != null -> moshi.errors.code[0]
+                    moshi?.errors?.symbol != null -> moshi.errors.symbol[0]
+                    moshi?.errors?.decimalPlaces != null -> moshi.errors.decimalPlaces[0]
+                    else -> "Error occurred while saving currency"
+                }
+                return ApiResponses(errorMessage = errorMessage)
+            } else {
+                insertCurrency(responseBody.data)
+                return ApiResponses(response = responseBody)
+            }
+        } else {
+            return ApiResponses(errorMessage = "Error occurred while saving currency")
+        }
+    }
 
     suspend fun deleteCurrencyByCode(currencyCode: String): Int {
         try {
@@ -121,21 +169,5 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
             }
         } catch (exception: Exception){ }
         return currencyDao.getSortedCurrency()
-    }
-
-    private suspend fun loadPaginatedData(pageNumber: Int){
-        try {
-            val networkCall = currencyService?.getPaginatedCurrency(pageNumber)
-            val responseBody = networkCall?.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                if (pageNumber == 1) {
-                    deleteAllCurrency()
-                }
-                responseBody.data.forEachIndexed { _, data ->
-                    currencyDao.insert(data)
-
-                }
-            }
-        } catch (exception: Exception){ }
     }
 }
