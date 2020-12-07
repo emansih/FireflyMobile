@@ -119,7 +119,7 @@ class TransactionDetailsFragment: BaseFragment() {
         val tagsInTransaction = details.tags
         if(tagsInTransaction.isNotEmpty()){
             transaction_tags.setChipSpacing(16)
-            tagsInTransaction.forEachIndexed { _, nameOfTag ->
+            tagsInTransaction.forEach { nameOfTag ->
                 chipTags = Chip(requireContext())
                 chipTags.apply {
                     text = nameOfTag

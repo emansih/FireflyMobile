@@ -2,19 +2,14 @@ package xyz.hisname.fireflyiii.repository.tags
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TagsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.models.ApiResponses
-import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
-import xyz.hisname.fireflyiii.repository.models.tags.TagsSuccessModel
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 
 class TagsViewModel(application: Application): BaseViewModel(application) {
@@ -41,74 +36,6 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
         return data
     }
 
-    fun addTag(tagName: String, date: String?, description: String?, latitude: String?, longitude: String?,
-               zoomLevel: String?): LiveData<ApiResponses<TagsSuccessModel>>{
-        val apiResponse: MediatorLiveData<ApiResponses<TagsSuccessModel>> =  MediatorLiveData()
-        val apiLiveData: MutableLiveData<ApiResponses<TagsSuccessModel>> = MutableLiveData()
-        tagsService?.createNewTag(tagName, date, description, latitude, longitude, zoomLevel)?.enqueue(retrofitCallback({
-            response ->
-            var errorMessage = ""
-            val responseErrorBody = response.errorBody()
-            if (responseErrorBody != null) {
-                errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
-                    moshi?.errors?.longitude != null -> moshi.errors.longitude[0]
-                    moshi?.errors?.tag != null -> moshi.errors.tag[0]
-                    moshi?.errors?.latitude != null -> moshi.errors.latitude[0]
-                    moshi?.errors?.zoomLevel != null -> moshi.errors.zoomLevel[0]
-                    else -> "Error occurred while saving tag"
-                }
-            }
-            val networkData = response.body()
-            if (networkData != null) {
-                viewModelScope.launch(Dispatchers.IO) { repository.insertTags(networkData.data) }
-                apiLiveData.postValue(ApiResponses(response.body()))
-            } else {
-                apiLiveData.postValue(ApiResponses(errorMessage))
-            }
-        })
-        { throwable ->
-            apiResponse.postValue(ApiResponses(throwable))
-        })
-        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
-        return apiResponse
-    }
-
-    fun updateTag(tagId: Long, tagName: String, date: String?, description: String?, latitude: String?, longitude: String?,
-               zoomLevel: String?): LiveData<ApiResponses<TagsSuccessModel>>{
-        val apiResponse: MediatorLiveData<ApiResponses<TagsSuccessModel>> =  MediatorLiveData()
-        val apiLiveData: MutableLiveData<ApiResponses<TagsSuccessModel>> = MutableLiveData()
-        tagsService?.updateTag(tagId, tagName, date, description, latitude, longitude, zoomLevel)?.enqueue(retrofitCallback({
-            response ->
-            var errorMessage = ""
-            val responseErrorBody = response.errorBody()
-            if (responseErrorBody != null) {
-                errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
-                    moshi?.errors?.longitude != null -> moshi.errors.longitude[0]
-                    moshi?.errors?.tag != null -> moshi.errors.tag[0]
-                    moshi?.errors?.latitude != null -> moshi.errors.latitude[0]
-                    moshi?.errors?.zoomLevel != null -> moshi.errors.zoomLevel[0]
-                    else -> "Error occurred while updating tag"
-                }
-            }
-            val networkData = response.body()
-            if (networkData != null) {
-                viewModelScope.launch(Dispatchers.IO) { repository.insertTags(networkData.data) }
-                apiLiveData.postValue(ApiResponses(response.body()))
-            } else {
-                apiLiveData.postValue(ApiResponses(errorMessage))
-            }
-        })
-        { throwable ->
-            apiResponse.postValue(ApiResponses(throwable))
-        })
-        apiResponse.addSource(apiLiveData){ apiResponse.value = it }
-        return apiResponse
-    }
-
     fun deleteTagByName(tagName: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         isLoading.value = true
@@ -129,38 +56,18 @@ class TagsViewModel(application: Application): BaseViewModel(application) {
         return isDeleted
     }
 
-    fun getTagById(tagId: Long): LiveData<MutableList<TagsData>>{
-        val tagData: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
-        var data: MutableList<TagsData> = arrayListOf()
+    fun getTagById(tagId: Long): LiveData<TagsData>{
+        val tagData = MutableLiveData<TagsData>()
         viewModelScope.launch(Dispatchers.IO){
-            data = repository.retrieveTagById(tagId)
-        }.invokeOnCompletion {
-            tagData.postValue(data)
+            tagData.postValue(repository.getTagById(tagId))
         }
         return tagData
     }
 
-    fun getTagByName(nameOfTag: String): LiveData<MutableList<TagsData>>{
-        val tagData: MutableLiveData<MutableList<TagsData>> = MutableLiveData()
-        var data: MutableList<TagsData>? = arrayListOf()
+    fun getTagByName(nameOfTag: String): LiveData<TagsData>{
+        val tagData: MutableLiveData<TagsData> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            data = repository.retrieveTagByName(nameOfTag)
-        }.invokeOnCompletion {
-            if(data == null){
-                tagsService?.getTagByName(nameOfTag)?.enqueue(retrofitCallback({ response ->
-                    if (response.isSuccessful) {
-                        val networkData = response.body()?.data
-                        networkData?.forEachIndexed { _, element ->
-                            viewModelScope.launch(Dispatchers.IO) {
-                                repository.insertTags(element)
-                            }
-                        }
-                        tagData.postValue(networkData?.toMutableList())
-                    }
-                }))
-            } else {
-                tagData.postValue(data)
-            }
+            tagData.postValue(repository.getTagByName(nameOfTag))
         }
         return tagData
     }

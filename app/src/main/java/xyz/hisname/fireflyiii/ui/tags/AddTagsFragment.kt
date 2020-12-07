@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.fragment_add_tags.*
 import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_tags.placeHolderToolbar
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
-import kotlinx.android.synthetic.main.progress_overlay.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
@@ -37,8 +36,9 @@ class AddTagsFragment: BaseAddObjectFragment() {
     private var longitude: String? = null
     private var zoomLevel: String? = null
     private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
+    private val addTagViewModel by lazy { getImprovedViewModel(AddTagsViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.create(R.layout.fragment_add_tags, container)
     }
 
@@ -57,7 +57,6 @@ class AddTagsFragment: BaseAddObjectFragment() {
         }
         addTagFab.setOnClickListener {
             hideKeyboard()
-            ProgressBar.animateView(progress_overlay, View.VISIBLE, 0.4f, 200)
             date = if(date_edittext.isBlank()){
                 null
             } else {
@@ -86,34 +85,20 @@ class AddTagsFragment: BaseAddObjectFragment() {
             if(tagId == 0L){
                 submitData()
             } else {
-                tagsViewModel.updateTag(tagId, tag_edittext.getString(), date, description, latitude,
-                        longitude, zoomLevel).observe(viewLifecycleOwner) { apiResponse ->
-                    val errorMessage = apiResponse.getErrorMessage()
-                    when {
-                        errorMessage != null -> toastError(errorMessage)
-                        apiResponse.getError() != null -> toastError("Error updating " + tag_edittext.getString())
-                        apiResponse.getResponse() != null -> {
-                            parentFragmentManager.commit {
-                                replace(R.id.fragment_container, ListTagsFragment())
-                            }
-                            toastSuccess(resources.getString(R.string.tag_updated, tag_edittext.getString()))
-                            unReveal(dialog_add_tags_layout)
-                        }
-                    }
-                }
+                updateTag()
             }
         }
     }
 
     private fun updateData(){
-        tagsViewModel.getTagById(tagId).observe(viewLifecycleOwner) {
-            val tagData = it[0].tagsAttributes
-            tag_edittext.setText(tagData?.tag)
-            date_edittext.setText(tagData?.date)
-            description_edittext.setText(tagData?.description)
-            latitude_edittext.setText(tagData?.latitude)
-            longitude_edittext.setText(tagData?.longitude)
-            zoom_edittext.setText(tagData?.zoom_level)
+        addTagViewModel.getTagById(tagId).observe(viewLifecycleOwner) { tagsData ->
+            val tagData = tagsData.tagsAttributes
+            tag_edittext.setText(tagData.tag)
+            date_edittext.setText(tagData.date)
+            description_edittext.setText(tagData.description)
+            latitude_edittext.setText(tagData.latitude)
+            longitude_edittext.setText(tagData.longitude)
+            zoom_edittext.setText(tagData.zoom_level)
         }
     }
 
@@ -151,6 +136,13 @@ class AddTagsFragment: BaseAddObjectFragment() {
         }
         placeHolderToolbar.setOnClickListener {
             handleBack()
+        }
+        addTagViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
+            if(loader){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
         }
     }
 
@@ -192,19 +184,24 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        tagsViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(viewLifecycleOwner) {
-            ProgressBar.animateView(progress_overlay, View.GONE, 0f, 200)
-            val errorMessage = it.getErrorMessage()
-            when {
-                errorMessage != null -> toastError(errorMessage)
-                it.getError() != null -> toastError("Error saving " + tag_edittext.getString())
-                it.getResponse() != null -> {
-                    parentFragmentManager.commit {
-                        replace(R.id.fragment_container, ListTagsFragment())
-                    }
-                    toastSuccess(resources.getString(R.string.tag_created, tag_edittext.getString()))
-                    unReveal(dialog_add_tags_layout)
-                }
+        addTagViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(viewLifecycleOwner) { response ->
+            if(response.first){
+                toastSuccess(response.second)
+                handleBack()
+            } else {
+                toastInfo(response.second)
+            }
+        }
+    }
+
+    private fun updateTag(){
+        addTagViewModel.updateTag(tagId, tag_edittext.getString(), date, description, latitude,
+                longitude, zoomLevel).observe(viewLifecycleOwner) { response ->
+            if(response.first){
+                toastSuccess(response.second)
+                handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
     }

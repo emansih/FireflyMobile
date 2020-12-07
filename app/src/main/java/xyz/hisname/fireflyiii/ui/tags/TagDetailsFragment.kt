@@ -55,12 +55,12 @@ class TagDetailsFragment: BaseDetailFragment() {
 
     }
 
-    private fun setTagData(tagData: MutableList<TagsData>){
+    private fun setTagData(tagData: TagsData){
         tagName.chipIcon = IconicsDrawable(requireContext()).apply{
             icon = FontAwesome.Icon.faw_tag
             colorRes = R.color.md_green_400
         }
-        val tagsAttributes = tagData[0].tagsAttributes
+        val tagsAttributes = tagData.tagsAttributes
         tagName.text = tagsAttributes.tag
         nameOfTag = tagsAttributes.tag
         if(tagsAttributes.latitude.isEmpty() ||
