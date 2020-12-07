@@ -1,12 +1,15 @@
 package xyz.hisname.fireflyiii.repository.category
 
+import com.squareup.moshi.Moshi
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.category.CategoryAttributes
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategorySuccessModel
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -18,8 +21,6 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
                          private val categoryService: CategoryService?,
                          private val transactionDao: TransactionDataDao? = null){
 
-
-    suspend fun insertCategory(category: CategoryData) = categoryDao.insert(category)
 
     suspend fun searchCategoryByName(categoryName: String): List<CategoryData> {
         try {
@@ -102,13 +103,44 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
         }
     }
 
-    @Throws(Exception::class)
-    suspend fun updateCategory(categoryId: Long, categoryName: String): Response<CategorySuccessModel>? {
-        val networkCall = categoryService?.updateCategory(categoryId, categoryName)
-        val responseBody = networkCall?.body()
-        if (responseBody != null && networkCall.isSuccessful) {
-            insertCategory(responseBody.data)
+    suspend fun addCategory(categoryName: String): ApiResponses<CategorySuccessModel>{
+        return try {
+            val networkCall = categoryService?.addCategory(categoryName)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
         }
-        return networkCall
+    }
+
+    suspend fun updateCategory(categoryId: Long, categoryName: String): ApiResponses<CategorySuccessModel> {
+        return try {
+            val networkCall = categoryService?.updateCategory(categoryId, categoryName)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+    private suspend fun parseResponse(responseFromServer: Response<CategorySuccessModel>?): ApiResponses<CategorySuccessModel>{
+        val responseBody = responseFromServer?.body()
+        val responseErrorBody = responseFromServer?.errorBody()
+        if(responseBody != null && responseFromServer.isSuccessful){
+            if(responseErrorBody != null){
+                // Ignore lint warning. False positive
+                // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
+                var errorMessage = String(responseErrorBody.bytes())
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
+                errorMessage = when {
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    else -> "Error occurred while saving category"
+                }
+                return ApiResponses(errorMessage = errorMessage)
+            } else {
+                categoryDao.insert(responseBody.data)
+                return ApiResponses(response = responseBody)
+            }
+        } else {
+            return ApiResponses(errorMessage = "Error occurred while saving category")
+        }
     }
 }

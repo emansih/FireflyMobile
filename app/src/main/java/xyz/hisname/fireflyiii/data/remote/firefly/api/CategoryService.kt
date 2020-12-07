@@ -28,7 +28,7 @@ interface CategoryService {
 
     @FormUrlEncoded
     @POST(CATEGORY_API_ENDPOINT)
-    fun createNewCategory(@Field("name") name: String): Call<CategorySuccessModel>
+    suspend fun addCategory(@Field("name") name: String): Response<CategorySuccessModel>
 
     @DELETE("${CATEGORY_API_ENDPOINT}/{id}")
     suspend fun deleteCategoryById(@Path("id") id: Long): Response<Void>
