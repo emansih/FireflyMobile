@@ -181,6 +181,13 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
             note_edittext.setText(markdownText)
         }
+        piggyViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
+            if(loader){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
     }
 
     override fun submitData(){
