@@ -19,6 +19,9 @@ abstract class TagsDataDao: BaseDao<TagsData>{
     @Query("SELECT * FROM tags WHERE tag = :nameOfTag")
     abstract fun getTagByName(nameOfTag: String): TagsData
 
+    @Query("SELECT description FROM tags WHERE description LIKE :name")
+    abstract fun searchTagByName(name: String): List<String>
+
     @Query("DELETE FROM tags")
     abstract fun deleteTags(): Int
 

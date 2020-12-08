@@ -10,19 +10,15 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.utils.toAndroidIconCompat
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
-import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
+import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
-import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
 
@@ -44,59 +40,23 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val tags = inputData.getString("tags")
         val budget = inputData.getString("budgetName")
         val notes = inputData.getString("notes")
-        val dateTime = if (transactionTime == null) {
-            transactionDate
-        } else {
-            DateTimeUtil.mergeDateTimeToIso8601(transactionDate, transactionTime)
-        }
         val transactionWorkManagerId = inputData.getLong("transactionWorkManagerId", 0)
-        genericService?.create(TransactionService::class.java)?.addTransaction(convertString(transactionType),
-                transactionDescription, dateTime, piggyBank, transactionAmount, sourceName,
-                destinationName, transactionCurrency, category, tags, budget, notes)?.enqueue(retrofitCallback({ response ->
-            var errorBody = ""
-            if (response.errorBody() != null) {
-                errorBody = String(response.errorBody()?.bytes()!!)
+        val transactionRepository = TransactionRepository(
+                AppDatabase.getInstance(context).transactionDataDao(),
+                genericService?.create(TransactionService::class.java)
+        )
+        val addTransaction = transactionRepository.addTransaction(transactionType, transactionDescription, transactionDate,
+                transactionTime, piggyBank, transactionAmount, sourceName,
+                destinationName, transactionCurrency, category, tags, budget, notes)
+
+        when {
+            addTransaction.response != null -> {
+                // Delete old data that we inserted when worker is being init
+                transactionRepository.deleteTransactionById(transactionWorkManagerId)
+                context.showNotification(transactionType, context.resources.getString(R.string.transaction_added), channelIcon)
+                return Result.success()
             }
-            val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBody)
-            if (response.isSuccessful) {
-                context.showNotification(transactionType, "Transaction added successfully!", channelIcon)
-                cancelWorker(transactionWorkManagerId, context)
-                response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
-                    runBlocking(Dispatchers.IO) {
-                        val transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
-                        transactionDatabase.insert(transaction)
-                        transactionDatabase.insert(TransactionIndex(response.body()?.data?.transactionId,
-                                transaction.transaction_journal_id))
-                    }
-                }
-                Result.success()
-            } else {
-                var error = ""
-                try {
-                    moshi?.errors?.transactions_currency?.let {
-                        error = moshi.errors.transactions_currency[0]
-                    }
-                    moshi?.errors?.piggy_bank_name?.let {
-                        error = moshi.errors.piggy_bank_name[0]
-                    }
-                    moshi?.errors?.transactions_destination_name?.let {
-                        error = moshi.errors.transactions_destination_name[0]
-                    }
-                    moshi?.errors?.transactions_source_name?.let {
-                        error = moshi.errors.transactions_source_name[0]
-                    }
-                    moshi?.errors?.transaction_destination_id?.let {
-                        error = moshi.errors.transaction_destination_id[0]
-                    }
-                    moshi?.errors?.transaction_amount?.let {
-                        error = "Amount field is required"
-                    }
-                    moshi?.errors?.description?.let {
-                        error = moshi.errors.description[0]
-                    }
-                } catch (exception: Exception){
-                    error = "The given data was invalid"
-                }
+            addTransaction.errorMessage != null -> {
                 val transactionIntent = Intent(context, AddTransactionActivity::class.java)
                 val bundleToPass =  bundleOf("transactionType" to transactionType,
                         "transactionDescription" to transactionDescription,
@@ -116,23 +76,24 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     icon = FontAwesome.Icon.faw_edit
                     sizeDp = 24
                 }.toAndroidIconCompat()
-                context.showNotification("Error Adding $transactionType",
-                        error, channelIcon,
-                        PendingIntent.getActivity(context, 0, transactionIntent, PendingIntent.FLAG_UPDATE_CURRENT),
+                context.showNotification("Error Adding $transactionDescription",
+                        addTransaction.errorMessage, channelIcon,
+                        PendingIntent.getActivity(context, 0, transactionIntent,
+                                PendingIntent.FLAG_UPDATE_CURRENT),
                         context.getString(R.string.edit), icon)
                 cancelWorker(transactionWorkManagerId, context)
-                Result.failure()
+                return Result.failure()
             }
-        })
-        { throwable ->
-            /*context.displayNotification(throwable.message.toString(),
-                            "Error Adding $transactionType", Constants.TRANSACTION_CHANNEL, channelIcon)*/
-            Result.retry()
-        })
-        return Result.success()
+            addTransaction.error != null -> {
+                context.showNotification("Error Adding $transactionDescription", "Please try again later", channelIcon)
+                cancelWorker(transactionWorkManagerId, context)
+                return Result.retry()
+            }
+            else -> {
+                return Result.failure()
+            }
+        }
     }
-
-    private fun convertString(type: String) = type.substring(0, 1).toLowerCase() + type.substring(1).toLowerCase()
 
     companion object {
         fun initWorker(context: Context, dataBuilder: Data.Builder, type: String, transactionWorkManagerId: Long) {

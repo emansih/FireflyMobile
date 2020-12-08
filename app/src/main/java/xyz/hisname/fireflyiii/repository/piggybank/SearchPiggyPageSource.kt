@@ -9,7 +9,7 @@ class SearchPiggyPageSource(private val piggyDao: PiggyDataDao,
 
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PiggyData> {
-        return LoadResult.Page(piggyDao.searchPiggyName(searchQuery), null, null)
+        return LoadResult.Page(piggyDao.searchPiggyName("*$searchQuery*"), null, null)
     }
 
     override val keyReuseSupported = true

@@ -8,13 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.fragment_calculator.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.util.calculator.*
 import xyz.hisname.fireflyiii.util.extension.*
 
 class TransactionCalculatorDialog: DialogFragment(), Calculator {
 
-    private val transactionsViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
+    private val transactionsViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -45,7 +44,7 @@ class TransactionCalculatorDialog: DialogFragment(), Calculator {
             true
         }
         btn_equals.setOnClickListener { calc.handleEquals() }
-        arrayOf(btn_decimal, btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9).forEachIndexed { _, button ->
+        arrayOf(btn_decimal, btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9).forEach { button ->
             button.setOnClickListener {
                 calc.numpadClicked(it.id)
             }

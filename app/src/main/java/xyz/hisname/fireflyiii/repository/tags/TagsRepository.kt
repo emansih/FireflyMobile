@@ -7,6 +7,7 @@ import xyz.hisname.fireflyiii.data.local.dao.TagsDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TagsService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.tags.TagsAttributes
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.models.tags.TagsSuccessModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -68,11 +69,34 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
                 val networkCall = tagsService?.searchTag(tagName)
                 val responseBody = networkCall?.body()
                 if(responseBody != null && networkCall.isSuccessful){
-                    getTagById(responseBody[0].id)
+                    responseBody.forEach {  tagsItems ->
+                        tagsDataDao.insert(TagsData(
+                                TagsAttributes("","","",
+                                        tagsItems.tag, "", "", "", ""),
+                                tagsItems.id
+                        ))
+                    }
                 }
             }
         } catch (exception: Exception){ }
         return tagsDataDao.getTagByName(tagName)
+    }
+
+    suspend fun searchTag(tagName: String): List<String>{
+        try {
+            val networkCall = tagsService?.searchTag(tagName)
+            val responseBody = networkCall?.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                responseBody.forEach {  tagsItems ->
+                    tagsDataDao.insert(TagsData(
+                            TagsAttributes("","","",
+                                    tagsItems.tag, "", "", "", ""),
+                            tagsItems.id
+                    ))
+                }
+            }
+        } catch (exception: Exception){ }
+        return tagsDataDao.searchTagByName("*$tagName*")
     }
 
     suspend fun addTags(tagName: String, date: String?, description: String?, latitude: String?,

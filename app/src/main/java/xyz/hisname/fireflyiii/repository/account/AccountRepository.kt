@@ -43,9 +43,9 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     }
 
 
-    suspend fun getAccountByType(accountType: String): Flow<MutableList<AccountData>> {
+    suspend fun getAccountByType(accountType: String): List<AccountData> {
         loadRemoteData(accountType)
-        return accountDao.getAccountByType(accountType).distinctUntilChanged()
+        return accountDao.getAccountsByType(accountType)
     }
 
     suspend fun getAccountById(accountId: Long): AccountData{
@@ -137,7 +137,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         } catch (exception: Exception){ }
     }
 
-    suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<MutableList<AccountData>>{
+    suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<List<String>>{
         if(accountName.length > 3){
             val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
                 runBlocking {

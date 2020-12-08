@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
 import android.accounts.AccountManager
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
@@ -10,7 +9,6 @@ import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResult
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultError
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultSucess
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import net.dinglisch.android.tasker.TaskerPlugin
 import retrofit2.Retrofit
@@ -21,14 +19,9 @@ import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
-import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
-import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import java.io.File
-import java.time.OffsetDateTime
-import java.util.concurrent.ThreadLocalRandom
 
 class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTransactionOutput>() {
 
@@ -81,86 +74,39 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val transactionBudget = input.regular.transactionBudget
         val transactionCategory = input.regular.transactionCategory
         val transactionNotes = input.regular.transactionNote
-        val dateTime = if (transactionTime == null) {
-            transactionDate
-        } else {
-            DateTimeUtil.mergeDateTimeToIso8601(transactionDate, transactionTime)
-        }
-        val tagsList = arrayListOf<String>()
-        if(transactionTags != null){
-            tagsList.addAll(transactionTags.split(",").map { it.trim() })
-        }
         var taskerResult: TaskerPluginResult<GetTransactionOutput>
-        runBlocking(Dispatchers.IO){
-            addTransactionToDb(transactionType, transactionDescription, transactionDate, transactionTime, transactionPiggyBank,
-                    transactionAmount, transactionSourceAccount, transactionDestinationAccount, transactionCurrency,
-            transactionCategory, tagsList, transactionBudget, transactionNotes)
-            taskerResult = addTransaction(context, transactionType, transactionDescription, dateTime,
+        runBlocking {
+            taskerResult = addTransaction(transactionType, transactionDescription, transactionDate, transactionTime,
                     transactionPiggyBank, transactionAmount, transactionSourceAccount,
                     transactionDestinationAccount, transactionCurrency, transactionCategory,
                     transactionTags, transactionBudget, transactionNotes) as TaskerPluginResult<GetTransactionOutput>
         }
+
         return taskerResult
     }
 
-    private fun addTransactionToDb(type: String, description: String,
-                                   date: String, time: String?, piggyBankName: String?, amount: String,
-                                   sourceName: String?, destinationName: String, currencyName: String,
-                                   category: String?, tags: List<String>, budgetName: String?, notes: String?){
-        val dateTime = if(time.isNullOrEmpty()){
-            DateTimeUtil.offsetDateTimeWithoutTime(date)
-        } else {
-            DateTimeUtil.mergeDateTimeToIso8601(date, time)
-        }
-        var currency: CurrencyData
-        runBlocking(Dispatchers.IO) {
-            currency = currencyDatabase.getCurrencyByCode(currencyName)[0]
-            val transactionId = ThreadLocalRandom.current().nextLong()
-            transactionDatabase.insert(
-                    Transactions(
-                            transactionId, amount.toDouble(), 0,
-                            budgetName, 0, category, currency.currencyAttributes?.code ?: "",
-                            currency.currencyAttributes?.decimal_places ?: 0, currency.currencyId
-                            ?: 0,
-                            currency.currencyAttributes?.name
-                                    ?: "", currency.currencyAttributes?.symbol ?: "",
-                            OffsetDateTime.parse(dateTime), description, 0, destinationName,
-                            "", 0, "", "", 0.0, "", "", 0,
-                            "", notes, 0, "", 0,
-                            sourceName, "", tags, type, 0, piggyBankName, true)
-            )
-        }
-    }
-
-    private suspend fun addTransaction(context: Context, type: String, description: String,
-                                       date: String, piggyBankName: String?, amount: String,
+    private suspend fun addTransaction(type: String, description: String,
+                                       date: String, time: String?, piggyBankName: String?, amount: String,
                                        sourceName: String?, destinationName: String?, currencyName: String,
                                        category: String?, tags: String?, budgetName: String?, notes: String?): TaskerPluginResult<Unit>{
-        try {
-            val response = genericService()?.create(TransactionService::class.java)?.suspendAddTransaction(convertString(type),
-                    description, date, piggyBankName, amount.replace(',', '.'),
-                    sourceName, destinationName, currencyName, category, tags, budgetName, notes)
-            val responseBody = response?.body()
-            val errorBody = response?.errorBody()
-            var errorBodyMessage = ""
-            if (errorBody != null) {
-                errorBodyMessage = String(errorBody?.bytes())
+
+        val transactionRepository = TransactionRepository(transactionDatabase, genericService()?.create(TransactionService::class.java))
+        val addTransaction = transactionRepository.addTransaction(type,description, date, time,  piggyBankName, amount.replace(',', '.'),
+                sourceName, destinationName, currencyName, category, tags, budgetName, notes)
+        return when {
+            addTransaction.response != null -> {
+                TaskerPluginResultSucess(GetTransactionOutput(addTransaction.response.toString())) as TaskerPluginResult<Unit>
             }
-            if (response?.isSuccessful == true && responseBody != null) {
-                responseBody.data.transactionAttributes?.transactions?.forEach { transaction ->
-                    val transactionDb = AppDatabase.getInstance(context).transactionDataDao()
-                    transactionDb.insert(transaction)
-                    transactionDb.insert(TransactionIndex(response.body()?.data?.transactionId,
-                            transaction.transaction_journal_id))
-                }
-                return TaskerPluginResultSucess(GetTransactionOutput(response.body().toString()), null) as TaskerPluginResult<Unit>
-            } else {
-                return TaskerPluginResultError(0, errorBodyMessage)
+            addTransaction.errorMessage != null -> {
+                TaskerPluginResultError(0, addTransaction.errorMessage)
             }
-        } catch (exception: Exception){
-            return TaskerPluginResultError(exception)
+            addTransaction.error != null -> {
+                TaskerPluginResultError(addTransaction.error)
+            }
+            else -> {
+                TaskerPluginResultError(Exception("Failed to add $description"))
+            }
         }
     }
 
-    private fun convertString(type: String) = type.substring(0, 1).toLowerCase() + type.substring(1).toLowerCase()
 }

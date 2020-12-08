@@ -46,6 +46,9 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
 
     suspend fun getPiggyById(piggyId: Long) =  piggyDao.getPiggyFromId(piggyId)
 
+    // Since there is no API to search piggy bank, we simply do a query in the piggy bank
+    suspend fun searchPiggyBank(searchQuery: String) = piggyDao.searchPiggyName("*$searchQuery*")
+
     suspend fun addPiggyBank(name: String, accountId: Long, targetAmount: String,
                              currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel> {
         return try {

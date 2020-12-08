@@ -1,10 +1,15 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
+import android.net.Uri
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
+import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.debounce
@@ -144,15 +149,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
 
-    private suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{
-        return if(startDate == null || endDate == null || startDate.isBlank() || endDate.isBlank()){
-            transactionDao.deleteTransaction()
-        } else {
-            transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
-        }
-    }
-
     suspend fun getTransactionByDescription(query: String): Flow<List<String>>{
         // Search via API only if query is more than 3
         if(query.length > 3){
@@ -177,6 +173,82 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return transactionDao.getTransactionByDescription("%$query%")
     }
 
+    suspend fun addTransaction(type: String, description: String,
+                               date: String, time: String?, piggyBankName: String?, amount: String,
+                               sourceName: String?, destinationName: String?, currencyName: String,
+                               category: String?, tags: String?, budgetName: String?,
+                               notes: String?): ApiResponses<TransactionSuccessModel> {
+        val dateTime = if (time == null) {
+            date
+        } else {
+            DateTimeUtil.mergeDateTimeToIso8601(date, time)
+        }
+        return try {
+            val networkCall = transactionService?.addTransaction(convertString(type), description, dateTime,
+                    piggyBankName, amount.replace(',', '.'), sourceName,
+                    destinationName, currencyName,
+                    category, tags, budgetName, notes)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+    suspend fun updateTransaction(transactionId: Long, type: String, description: String,
+                                  date: String, time: String?, piggyBankName: String?, amount: String,
+                                  sourceName: String?, destinationName: String?, currencyName: String,
+                                  category: String?, tags: String?, budgetName: String?,
+                                  notes: String): ApiResponses<TransactionSuccessModel> {
+        val dateTime = if (time == null) {
+            date
+        } else {
+            DateTimeUtil.mergeDateTimeToIso8601(date, time)
+        }
+        return try {
+            val networkCall = transactionService?.updateTransaction(transactionId,
+                    convertString(type),description, dateTime, piggyBankName,
+                    amount.replace(',', '.'),sourceName,destinationName,currencyName,
+                    category, tags, budgetName, notes)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+
+    private suspend fun parseResponse(responseFromServer: Response<TransactionSuccessModel>?): ApiResponses<TransactionSuccessModel>{
+        val responseBody = responseFromServer?.body()
+        val responseErrorBody = responseFromServer?.errorBody()
+        if(responseBody != null && responseFromServer.isSuccessful){
+            if(responseErrorBody != null){
+                // Ignore lint warning. False positive
+                // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
+                var errorMessage = String(responseErrorBody.bytes())
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
+                errorMessage = when {
+                    moshi?.errors?.transactions_currency != null -> moshi.errors.transactions_currency[0]
+                    moshi?.errors?.piggy_bank_name != null -> moshi.errors.piggy_bank_name[0]
+                    moshi?.errors?.transactions_destination_name != null -> moshi.errors.transactions_destination_name[0]
+                    moshi?.errors?.transactions_source_name  != null -> moshi.errors.transactions_source_name[0]
+                    moshi?.errors?.transaction_destination_id  != null -> moshi.errors.transaction_destination_id[0]
+                    moshi?.errors?.transaction_amount != null -> moshi.errors.transaction_amount[0]
+                    moshi?.errors?.description != null -> moshi.errors.description[0]
+                    else -> "The given data was invalid"
+                }
+                return ApiResponses(errorMessage = errorMessage)
+            } else {
+                responseBody.data.transactionAttributes?.transactions?.forEach { transaction ->
+                    insertTransaction(transaction)
+                    insertTransaction(TransactionIndex(responseBody.data.transactionId,
+                            transaction.transaction_journal_id))
+                }
+                return ApiResponses(response = responseBody)
+            }
+        } else {
+            return ApiResponses(errorMessage = "Error occurred while saving transactions")
+        }
+    }
+
     private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
         try {
             val transactionData: MutableList<TransactionData> = arrayListOf()
@@ -196,7 +268,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                             transactionData.add(dataToBeAdded)
                         }
                     }
-            }
+                }
                 deleteTransactionsByDate(startDate, endDate, sourceName)
                 transactionData.forEach { data ->
                     transactionDao.insert(data.transactionAttributes?.transactions!![0])
@@ -205,6 +277,15 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 }
             }
         } catch(exception: Exception){ }
+    }
+
+    private suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{
+        return if(startDate == null || endDate == null || startDate.isBlank() || endDate.isBlank()){
+            transactionDao.deleteTransaction()
+        } else {
+            transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
+        }
     }
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()

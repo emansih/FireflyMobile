@@ -27,147 +27,11 @@ import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
     val repository: TransactionRepository
-    val transactionAmount: MutableLiveData<String> = MutableLiveData()
     private val transactionService by lazy { genericService()?.create(TransactionService::class.java) }
     private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
 
     init {
         repository = TransactionRepository(transactionDataDao, transactionService)
-    }
-
-    fun addTransaction(type: String, description: String,
-                       date: String, piggyBankName: String?, amount: String,
-                       sourceName: String?, destinationName: String?, currencyName: String,
-                       category: String?, tags: String?, budgetName: String?,
-                       fileUri: ArrayList<Uri>, notes: String): LiveData<ApiResponses<TransactionSuccessModel>>{
-        val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
-        val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        transactionService?.addTransaction(convertString(type),description, date ,piggyBankName,
-                amount.replace(',', '.'),sourceName,destinationName,currencyName,
-                category, tags, budgetName, notes)?.enqueue(retrofitCallback({ response ->
-            val errorBody = response.errorBody()
-            var errorBodyMessage = ""
-            if (errorBody != null) {
-                errorBodyMessage = String(errorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBodyMessage)
-                try {
-                    moshi?.errors?.transactions_currency?.let {
-                        errorBodyMessage = moshi.errors.transactions_currency[0]
-                    }
-                    moshi?.errors?.piggy_bank_name?.let {
-                        errorBodyMessage = moshi.errors.piggy_bank_name[0]
-                    }
-                    moshi?.errors?.transactions_destination_name?.let {
-                        errorBodyMessage = moshi.errors.transactions_destination_name[0]
-                    }
-                    moshi?.errors?.transactions_source_name?.let {
-                        errorBodyMessage = moshi.errors.transactions_source_name[0]
-                    }
-                    moshi?.errors?.transaction_destination_id?.let {
-                        errorBodyMessage = moshi.errors.transaction_destination_id[0]
-                    }
-                    moshi?.errors?.transaction_amount?.let {
-                        errorBodyMessage = "Amount field is required"
-                    }
-                    moshi?.errors?.description?.let {
-                        errorBodyMessage = moshi.errors.description[0]
-                    }
-                } catch (exception: Exception){
-                    errorBodyMessage = "The given data was invalid"
-                }
-            }
-            if (response.isSuccessful) {
-                var transactionJournalId = 0L
-                viewModelScope.launch(Dispatchers.IO){
-                    response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
-                        transactionJournalId = transaction.transaction_journal_id
-                        repository.insertTransaction(transaction)
-                        repository.insertTransaction(TransactionIndex(response.body()?.data?.transactionId,
-                                transaction.transaction_journal_id))
-                    }
-                }.invokeOnCompletion {
-                    if(fileUri.isNotEmpty()){
-                        AttachmentWorker.initWorker(fileUri, transactionJournalId, getApplication())
-                    }
-                }
-                transaction.postValue(ApiResponses(response.body()))
-            } else {
-                transaction.postValue(ApiResponses(errorBodyMessage))
-            }
-        })
-        { throwable -> transaction.value = ApiResponses(throwable) })
-        apiResponse.addSource(transaction) { apiResponse.value = it }
-        return apiResponse
-    }
-
-    fun updateTransaction(transactionJournalId: Long, type: String, description: String,
-                          date: String, amount: String,
-                          sourceName: String?, destinationName: String?, currencyName: String,
-                          category: String?, tags: String?, budgetName: String?,
-                          fileUri: ArrayList<Uri>, notes: String): LiveData<ApiResponses<TransactionSuccessModel>>{
-        val transaction: MutableLiveData<ApiResponses<TransactionSuccessModel>> = MutableLiveData()
-        val apiResponse: MediatorLiveData<ApiResponses<TransactionSuccessModel>> = MediatorLiveData()
-        var transactionId = 0L
-        viewModelScope.launch(Dispatchers.IO){
-            transactionId = repository.getTransactionIdFromJournalId(transactionJournalId)
-        }.invokeOnCompletion {
-            transactionService?.updateTransaction(transactionId, convertString(type), description, date,
-                    amount.replace(',', '.'), sourceName, destinationName, currencyName,
-                    category, tags, budgetName, notes)?.enqueue(retrofitCallback({ response ->
-                val errorBody = response.errorBody()
-                var errorBodyMessage = ""
-                if (errorBody != null) {
-                    errorBodyMessage = String(errorBody.bytes())
-                    val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorBodyMessage)
-                    try {
-                        moshi?.errors?.transactions_currency?.let {
-                            errorBodyMessage = moshi.errors.transactions_currency[0]
-                        }
-                        moshi?.errors?.piggy_bank_name?.let {
-                            errorBodyMessage = moshi.errors.piggy_bank_name[0]
-                        }
-                        moshi?.errors?.transactions_destination_name?.let {
-                            errorBodyMessage = moshi.errors.transactions_destination_name[0]
-                        }
-                        moshi?.errors?.transactions_source_name?.let {
-                            errorBodyMessage = moshi.errors.transactions_source_name[0]
-                        }
-                        moshi?.errors?.transaction_destination_id?.let {
-                            errorBodyMessage = moshi.errors.transaction_destination_id[0]
-                        }
-                        moshi?.errors?.transaction_amount?.let {
-                            errorBodyMessage = "Amount field is required"
-                        }
-                        moshi?.errors?.description?.let {
-                            errorBodyMessage = moshi.errors.description[0]
-                        }
-                    } catch (exception: Exception){
-                        errorBodyMessage = "The given data was invalid"
-                    }
-                }
-                if (response.isSuccessful) {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        viewModelScope.launch(Dispatchers.IO){
-                            response.body()?.data?.transactionAttributes?.transactions?.forEachIndexed { _, transaction ->
-                                repository.insertTransaction(transaction)
-                                repository.insertTransaction(TransactionIndex(response.body()?.data?.transactionId,
-                                        transaction.transaction_journal_id))
-                            }
-                        }
-                    }.invokeOnCompletion {
-                        if(fileUri.isNotEmpty()){
-                            AttachmentWorker.initWorker(fileUri, transactionJournalId, getApplication())
-                        }
-                    }
-                    transaction.postValue(ApiResponses(response.body()))
-                } else {
-                    transaction.postValue(ApiResponses(errorBodyMessage))
-                }
-            })
-            { throwable -> transaction.value = ApiResponses(throwable) })
-        }
-        apiResponse.addSource(transaction) { apiResponse.value = it }
-        return apiResponse
     }
 
     fun getTransactionByJournalId(transactionJournalId: Long): LiveData<MutableList<Transactions>>{
@@ -210,8 +74,6 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         }
         return isDeleted
     }
-
-    private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
 
     fun getTransactionAttachment(journalId: Long): MutableLiveData<MutableList<AttachmentData>>{
         isLoading.value = true
@@ -263,16 +125,4 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
         }
         return data
     }
-
-    fun getTransactionByDescription(query: String) : LiveData<List<String>>{
-        val transactionData: MutableLiveData<List<String>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getTransactionByDescription(query)
-                    .collectLatest { transactionList ->
-                        transactionData.postValue(transactionList.distinct())
-            }
-        }
-        return transactionData
-    }
-
 }

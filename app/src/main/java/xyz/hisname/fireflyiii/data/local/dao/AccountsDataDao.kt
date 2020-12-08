@@ -11,12 +11,8 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("SELECT * FROM accounts WHERE name =:accountName AND type =:accountType")
     abstract fun getAccountByNameAndType(accountName: String, accountType: String): AccountData
 
-    @Deprecated("Use suspend")
     @Query("SELECT * FROM accounts WHERE type =:accountType")
-    abstract fun getAccountByType(accountType: String): Flow<MutableList<AccountData>>
-
-    @Query("SELECT * FROM accounts WHERE type =:accountType")
-    abstract suspend fun getAccountsByType(accountType: String): MutableList<AccountData>
+    abstract suspend fun getAccountsByType(accountType: String): List<AccountData>
 
     @Query("SELECT COUNT(*) FROM accounts WHERE type =:accountType")
     abstract suspend fun getAccountsByTypeCount(accountType: String): Int
@@ -38,7 +34,7 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("DELETE FROM accounts WHERE type =:accountType AND name =:accountName")
     abstract fun deleteAccountByTypeAndName(accountType: String, accountName: String): Int
 
-    @Query("SELECT * FROM accounts WHERE name LIKE :name AND type LIKE :type")
-    abstract fun searchAccountByNameAndType(type: String, name: String): Flow<MutableList<AccountData>>
+    @Query("SELECT name FROM accounts WHERE name LIKE :name AND type LIKE :type")
+    abstract fun searchAccountByNameAndType(type: String, name: String): Flow<List<String>>
 
 }

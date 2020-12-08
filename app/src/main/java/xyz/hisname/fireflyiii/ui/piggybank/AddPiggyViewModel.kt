@@ -45,12 +45,11 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
     fun getAccount(): LiveData<List<String>>{
         val accountListLiveData = MutableLiveData<List<String>>()
         viewModelScope.launch(Dispatchers.IO){
-            val account = arrayListOf<String>()
-            accountRepository.getAccountByType("asset").collectLatest { accountDataList ->
-                accountDataList.forEach { accountData ->
-                    accountData.accountAttributes?.name?.let { account.add(it) }
-                }
+            val accountList = arrayListOf<String>()
+            accountRepository.getAccountByType("asset").forEach {  data ->
+                data.accountAttributes?.name?.let { accountList.add(it) }
             }
+            accountListLiveData.postValue(accountList)
         }
         return accountListLiveData
     }

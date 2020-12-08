@@ -7,11 +7,10 @@ import androidx.core.view.isGone
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelper
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
-import com.joaomgcd.taskerpluginlibrary.input.TaskerInputInfos
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginRunner
 import kotlinx.android.synthetic.main.activity_add_transaction.*
-import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 
@@ -22,7 +21,7 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
     abstract fun navigateFragment()
 
     private val taskerHelper by lazy { getNewHelper(this) }
-    private val viewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
+    private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
     private var transactionType: String? = null
     private var transactionDescription: String? = null
     private var transactionAmount: String? = null
@@ -45,7 +44,7 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
     }
 
     private fun observeText(){
-        viewModel.transactionBundle.postValue(bundleOf(
+        addTransactionViewModel.transactionBundle.postValue(bundleOf(
                 "transactionDescription" to taskerHelper.config.getIntent()?.getStringExtra("transactionDescription"),
                 "transactionAmount" to taskerHelper.config.getIntent()?.getStringExtra("transactionAmount"),
                 "transactionCurrency" to taskerHelper.config.getIntent()?.getStringExtra("transactionCurrency"),
@@ -58,79 +57,79 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 "transactionBudget"  to taskerHelper.config.getIntent()?.getStringExtra("transactionBudget"),
                 "transactionPiggyBank" to taskerHelper.config.getIntent()?.getStringExtra("transactionPiggyBank")
         ))
-        viewModel.transactionType.observe(this) { type ->
+        addTransactionViewModel.transactionType.observe(this) { type ->
             if (type.isNotBlank()) {
                 transactionType = type
             }
         }
 
-        viewModel.transactionDescription.observe(this) { description ->
+        addTransactionViewModel.transactionDescription.observe(this) { description ->
             if (description.isNotBlank()) {
                 transactionDescription = description
             }
         }
 
-        viewModel.transactionAmount.observe(this) { amount ->
+        addTransactionViewModel.transactionAmount.observe(this) { amount ->
             if (amount.isNotBlank()) {
                 transactionAmount = amount
             }
         }
 
-        viewModel.transactionDate.observe(this) { date ->
+        addTransactionViewModel.transactionDate.observe(this) { date ->
             if (date.isNotBlank()) {
                 transactionDate = date
             }
         }
 
-        viewModel.transactionTime.observe(this) { time ->
+        addTransactionViewModel.transactionTime.observe(this) { time ->
             if (time.isNotBlank()) {
                 transactionTime = time
             }
         }
 
-        viewModel.transactionPiggyBank.observe(this) { piggyBank ->
+        addTransactionViewModel.transactionPiggyBank.observe(this) { piggyBank ->
             if (piggyBank != null && piggyBank.isNotBlank()) {
                 transactionPiggyBank = piggyBank
             }
         }
 
-        viewModel.transactionSourceAccount.observe(this) { sourceAccount ->
+        addTransactionViewModel.transactionSourceAccount.observe(this) { sourceAccount ->
             if (sourceAccount.isNotBlank()) {
                transactionSourceAccount = sourceAccount
             }
         }
 
-        viewModel.transactionDestinationAccount.observe(this) { destinationAccount ->
+        addTransactionViewModel.transactionDestinationAccount.observe(this) { destinationAccount ->
             if (destinationAccount.isNotBlank()) {
                 transactionDestinationAccount = destinationAccount
             }
         }
 
-        viewModel.transactionCurrency.observe(this) { currency ->
+        addTransactionViewModel.transactionCurrency.observe(this) { currency ->
             if (currency.isNotBlank()) {
                 transactionCurrency = currency
             }
         }
 
-        viewModel.transactionTags.observe(this) { tags ->
+        addTransactionViewModel.transactionTags.observe(this) { tags ->
             if (tags != null && tags.isNotBlank()) {
                 transactionTags = tags
             }
         }
 
-        viewModel.transactionBudget.observe(this) { budget ->
+        addTransactionViewModel.transactionBudget.observe(this) { budget ->
             if (budget != null && budget.isNotBlank()) {
                 transactionBudget = budget
             }
         }
 
-        viewModel.transactionCategory.observe(this) { category ->
+        addTransactionViewModel.transactionCategory.observe(this) { category ->
             if (category != null && category.isNotBlank()) {
                 transactionCategory = category
             }
         }
 
-        viewModel.removeFragment.observe(this){ remove ->
+        addTransactionViewModel.removeFragment.observe(this){ remove ->
             if(remove) {
                 taskerHelper.finishForTasker()
             }

@@ -16,7 +16,6 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.tags.TagsViewModel
 import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.bindView
@@ -32,7 +31,6 @@ abstract class BaseFragment: Fragment() {
     protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
     // Remove viewModels
     protected val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
-    protected val tagsViewModel by lazy { getViewModel(TagsViewModel::class.java) }
     protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     protected val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
     protected  val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }

@@ -1,7 +1,6 @@
 package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
@@ -15,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -35,6 +33,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
+import kotlinx.android.synthetic.main.fragment_add_tags.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.currency_edittext
 import kotlinx.android.synthetic.main.fragment_add_transaction.description_edittext
@@ -43,11 +42,7 @@ import kotlinx.android.synthetic.main.fragment_add_transaction.placeHolderToolba
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.receiver.TransactionReceiver
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
-import xyz.hisname.fireflyiii.repository.budget.BudgetViewModel
-import xyz.hisname.fireflyiii.repository.category.CategoryViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -61,87 +56,67 @@ import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyDialog
 import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyViewModel
-import xyz.hisname.fireflyiii.ui.tasker.TransactionPluginViewModel
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
 import java.io.File
 import java.util.*
-import kotlin.math.abs
 
 // This code sucks :(
 class AddTransactionFragment: BaseFragment() {
 
-    private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
-    private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
-    private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
-    private val nastyHack by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
+
+    private val addTransactionViewModel by lazy { getImprovedViewModel(AddTransactionViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
-    private val piggyViewModel by lazy { getViewModel(SearchPiggyViewModel::class.java) }
-    private val currencyVm by lazy { getViewModel(CurrencyViewModel::class.java) }
-    private val budgetViewModel by lazy { getViewModel(BudgetViewModel::class.java) }
-    private val categoryViewModel by lazy { getViewModel(CategoryViewModel::class.java) }
-    private val pluginViewModel by lazy { getViewModel(TransactionPluginViewModel::class.java) }
+    private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
+    private val budgetSearch by lazy { getViewModel(BudgetSearchViewModel::class.java) }
+    private val piggySearch by lazy { getViewModel(SearchPiggyViewModel::class.java) }
+    private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
+
+    private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
+    private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
+    private val isFromFragment by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
+    private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
+
     private lateinit var fileUri: Uri
-    private var currency = ""
-    private var tags = ArrayList<String>()
-    private var piggyBankList = ArrayList<String>()
-    private var piggyBank: String? = ""
-    private var categoryName: String? = ""
-    private var transactionTags: String? = ""
-    private var sourceAccount = ""
-    private var destinationAccount = ""
-    private lateinit var spinnerAdapter: ArrayAdapter<String>
-    private var sourceName: String? = ""
-    private var destinationName: String? = ""
     private var selectedTime = ""
-    private var budgetName: String? = ""
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_transaction, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         if(isTasker){
             // Disable file upload for now
             add_attachment_button.isVisible = false
-            pluginViewModel.transactionBundle.observe(viewLifecycleOwner) { bundle ->
-                if(bundle != null){
-                    setUiFromBundle(bundle)
-                }
+            addTransactionViewModel.transactionBundle.observe(viewLifecycleOwner) { bundle ->
+                addTransactionViewModel.parseBundle(bundle)
             }
             setTaskerIcons()
+            addTransactionViewModel.isFromTasker.postValue(true)
         }
         if(isFromNotification){
             requireActivity().intent.extras?.let {
-                setUiFromBundle(it)
+                addTransactionViewModel.parseBundle(it)
             }
         }
         setIcons()
         setWidgets()
         if(transactionJournalId != 0L){
-            updateTransactionSetup()
+            addTransactionViewModel.getTransactionFromJournalId(transactionJournalId)
         }
         setFab()
         setCalculator()
         contextSwitch()
-        attachment_information.layoutManager = LinearLayoutManager(requireContext())
-        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
-                false, { data: AttachmentData ->
-            attachmentDataAdapter.remove(data)
-            attachment_information.adapter?.notifyDataSetChanged()
-        }) { another: Int -> }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -195,7 +170,7 @@ class AddTransactionFragment: BaseFragment() {
                 editText.setText(itemClicked)
                 if(editText == currency_edittext){
                     // Yeah... we need to figure out how to make `currency` a non-global variable
-                    currency = itemClicked ?: ""
+                    addTransactionViewModel.currency = itemClicked ?: ""
                 }
             }
             dialog.show()
@@ -223,78 +198,49 @@ class AddTransactionFragment: BaseFragment() {
         setTaskerText(noteTasker, note_edittext)
     }
 
-    private fun setUiFromBundle(bundle: Bundle){
-        val transactionCurrency = bundle.getString("transactionCurrency")
-        if(transactionCurrency?.startsWith("%") == false){
-            currencyVm.getCurrencyByCode(transactionCurrency).observe(viewLifecycleOwner){ currencyData ->
-                val currencyAttributes = currencyData[0].currencyAttributes
-                currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
-            }
-        } else {
-            // Is tasker variable
+    private fun setUi() {
+        addTransactionViewModel.transactionCurrency.observe(viewLifecycleOwner) { transactionCurrency ->
             currency_edittext.setText(transactionCurrency)
         }
 
-        val transactionDescription = bundle.getString("transactionDescription")
-        description_edittext.setText(transactionDescription)
+        addTransactionViewModel.transactionDescription.observe(viewLifecycleOwner) { transactionDescription ->
+            description_edittext.setText(transactionDescription)
+        }
 
-        val transactionAmount = bundle.getString("transactionAmount")
-        transaction_amount_edittext.setText(transactionAmount)
+        addTransactionViewModel.transactionAmount.observe(viewLifecycleOwner) { transactionAmount ->
+            transaction_amount_edittext.setText(transactionAmount)
+        }
 
-        val transactionDate = bundle.getString("transactionDate")
-        if(transactionDate != null){
+        addTransactionViewModel.transactionDate.observe(viewLifecycleOwner) { transactionDate ->
             transaction_date_edittext.setText(transactionDate)
         }
 
-        val transactionTime = bundle.getString("transactionTime")
-        time_edittext.setText(transactionTime)
-
-        if(piggy_layout.isVisible){
-            val transactionPiggyBank = bundle.getString("transactionPiggyBank")
-            piggy_edittext.setText(transactionPiggyBank)
+        addTransactionViewModel.transactionTime.observe(viewLifecycleOwner) { transactionTime ->
+            time_edittext.setText(transactionTime)
         }
 
-        val transactionSourceAccount = bundle.getString("transactionSourceAccount")
-        val transactionDestinationAccount = bundle.getString("transactionDestinationAccount")
+        if (piggy_layout.isVisible) {
+            addTransactionViewModel.transactionPiggyBank.observe(viewLifecycleOwner) { transactionPiggyBank ->
+                piggy_edittext.setText(transactionPiggyBank)
 
-        when {
-            Objects.equals("Withdrawal", transactionType) -> {
-                destination_edittext.setText(transactionDestinationAccount)
-                sourceName = transactionSourceAccount
-                source_exposed_dropdown.setText(sourceName)
-                destinationExposedTasker.isVisible = false
-                sourceTextInputTasker.isVisible = false
-            }
-            Objects.equals("Transfer", transactionType) -> {
-                sourceName = transactionSourceAccount
-                destinationName = transactionDestinationAccount
-                source_exposed_dropdown.setText(sourceName)
-                destination_exposed_dropdown.setText(destinationName)
-                destinationTextInputTasker.isVisible = false
-                sourceTextInputTasker.isVisible = false
-                piggyTasker.isVisible = true
-            }
-            Objects.equals("Deposit", transactionType) -> {
-                source_edittext.setText(transactionSourceAccount)
-                destinationName = transactionDestinationAccount
-                destination_exposed_dropdown.setText(destinationName)
-                sourceExposedTasker.isVisible = false
-                destinationTextInputTasker.isVisible = false
             }
         }
 
-        val transactionTags = bundle.getString("transactionTags")
-        tags_chip.setText(transactionTags)
+        addTransactionViewModel.transactionTags.observe(viewLifecycleOwner) { transactionTags ->
+            tags_chip.setText(transactionTags)
+        }
 
-        val transactionBudget = bundle.getString("transactionBudget")
-        budget_edittext.setText(transactionBudget)
+        addTransactionViewModel.transactionBudget.observe(viewLifecycleOwner) { transactionBudget ->
+            budget_edittext.setText(transactionBudget)
+        }
 
-        val transactionCategory = bundle.getString("transactionCategory")
-        category_edittext.setText(transactionCategory)
+        addTransactionViewModel.transactionCategory.observe(viewLifecycleOwner) { transactionCategory ->
+            category_edittext.setText(transactionCategory)
+        }
 
-        val transactionNotes = bundle.getString("transactionNotes")
-        note_edittext.setText(transactionNotes)
-
+        addTransactionViewModel.transactionNote.observe(viewLifecycleOwner) { transactionNote ->
+            note_edittext.setText(transactionNote)
+        }
     }
 
     private fun setFab(){
@@ -304,28 +250,30 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionFab.setOnClickListener {
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             hideKeyboard()
-            piggyBank = if(piggy_edittext.isBlank()){
+            val piggyBank = if(piggy_edittext.isBlank()){
                 null
             } else {
                 piggy_edittext.getString()
             }
-            categoryName = if(category_edittext.isBlank()){
+            val categoryName = if(category_edittext.isBlank()){
                 null
             } else {
                 category_edittext.getString()
             }
-            transactionTags = if(tags_chip.allChips.isNullOrEmpty()){
+            val transactionTags = if(tags_chip.allChips.isNullOrEmpty()){
                 null
             } else {
                 // Remove [ and ] from beginning and end of string
                 val beforeTags = tags_chip.allChips.toString().substring(1)
                 beforeTags.substring(0, beforeTags.length - 1)
             }
-            budgetName = if(budget_edittext.isBlank()){
+            val budgetName = if(budget_edittext.isBlank()){
                 null
             } else {
                 budget_edittext.getString()
             }
+            var sourceAccount = ""
+            var destinationAccount = ""
             when {
                 Objects.equals("Withdrawal", transactionType) -> {
                     sourceAccount = source_exposed_dropdown.getString()
@@ -341,73 +289,49 @@ class AddTransactionFragment: BaseFragment() {
                 }
             }
             if(transactionJournalId != 0L){
-                updateData()
+                updateData(piggyBank, sourceAccount, destinationAccount, categoryName, transactionTags, budgetName)
             } else {
                 if(isTasker){
-                    taskerPlugin()
+                    taskerPlugin(piggyBank, sourceAccount, destinationAccount, categoryName, transactionTags, budgetName)
                 } else {
-                    submitData()
+                    submitData(piggyBank, sourceAccount, destinationAccount, categoryName, transactionTags, budgetName)
                 }
 
             }
         }
     }
 
-    private fun taskerPlugin(){
+    private fun taskerPlugin(piggyBank: String?, sourceAccount: String, destinationAccount: String,
+                             categoryName: String?, transactionTags: String?, budgetName: String?){
         val currencyText = currency_edittext.getString()
         if(currencyText.startsWith("%")){
-            currency = currency_edittext.getString()
+            addTransactionViewModel.currency = currency_edittext.getString()
         } else {
             /* Get content between brackets
              * For example: Euro(EUR) becomes (EUR)
              * Then we remove the first and last character and it becomes EUR
              */
-            currency = currency_edittext.getString()
+            addTransactionViewModel.currency = currency_edittext.getString()
             val regex = "(?<=\\().+?(?=\\))".toRegex()
-            val regexReplaced = regex.find(currency)
+            val regexReplaced = regex.find(addTransactionViewModel.currency)
             regexReplaced?.value
-            currency = regexReplaced?.value ?: ""
+            addTransactionViewModel.currency = regexReplaced?.value ?: ""
         }
-        pluginViewModel.transactionType.postValue(transactionType)
-        pluginViewModel.transactionDescription.postValue(description_edittext.getString())
-        pluginViewModel.transactionAmount.postValue(transaction_amount_edittext.getString())
-        pluginViewModel.transactionDate.postValue(transaction_date_edittext.getString())
-        pluginViewModel.transactionTime.postValue(time_edittext.getString())
-        pluginViewModel.transactionPiggyBank.postValue(piggyBank)
-        pluginViewModel.transactionSourceAccount.postValue(sourceAccount)
-        pluginViewModel.transactionDestinationAccount.postValue(destinationAccount)
-        pluginViewModel.transactionCurrency.postValue(currency)
-        pluginViewModel.transactionTags.postValue(transactionTags)
-        pluginViewModel.transactionBudget.postValue(budgetName)
-        pluginViewModel.transactionCategory.postValue(categoryName)
-        pluginViewModel.transactionNote.postValue(note_edittext.getString())
-        pluginViewModel.fileUri.postValue(fileUri.toString())
-        pluginViewModel.removeFragment.postValue(true)
-    }
-
-    private fun updateData(){
-        val transactionDateTime = if (selectedTime.isNotBlank()){
-            DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
-        } else {
-            transaction_date_edittext.getString()
-        }
-        transactionViewModel.updateTransaction(transactionJournalId,transactionType,
-                description_edittext.getString(),
-                transactionDateTime, transaction_amount_edittext.getString(),
-                sourceAccount, destinationAccount, currency, categoryName,
-                transactionTags, budgetName,
-                attachmentItemAdapter, note_edittext.getString()).observe(viewLifecycleOwner) { transactionResponse->
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            val errorMessage = transactionResponse.errorMessage
-            if (transactionResponse.response != null) {
-                toastSuccess(resources.getString(R.string.transaction_updated))
-                handleBack()
-            } else if(errorMessage != null) {
-                toastError(errorMessage)
-            } else if(transactionResponse.error != null) {
-                toastError(transactionResponse.error.localizedMessage)
-            }
-        }
+        addTransactionViewModel.transactionType.postValue(transactionType)
+        addTransactionViewModel.transactionDescription.postValue(description_edittext.getString())
+        addTransactionViewModel.transactionAmount.postValue(transaction_amount_edittext.getString())
+        addTransactionViewModel.transactionDate.postValue(transaction_date_edittext.getString())
+        addTransactionViewModel.transactionTime.postValue(time_edittext.getString())
+        addTransactionViewModel.transactionPiggyBank.postValue(piggyBank)
+        addTransactionViewModel.transactionSourceAccount.postValue(sourceAccount)
+        addTransactionViewModel.transactionDestinationAccount.postValue(destinationAccount)
+        addTransactionViewModel.transactionCurrency.postValue(addTransactionViewModel.currency)
+        addTransactionViewModel.transactionTags.postValue(transactionTags)
+        addTransactionViewModel.transactionBudget.postValue(budgetName)
+        addTransactionViewModel.transactionCategory.postValue(categoryName)
+        addTransactionViewModel.transactionNote.postValue(note_edittext.getString())
+        addTransactionViewModel.fileUri.postValue(fileUri.toString())
+        addTransactionViewModel.removeFragment.postValue(true)
     }
 
     private fun setIcons(){
@@ -492,7 +416,7 @@ class AddTransactionFragment: BaseFragment() {
         transaction_amount_layout.setOnTouchListener { v, event ->
             if(event.action == MotionEvent.ACTION_UP){
                 transaction_amount_layout.performClick()
-                transactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
+                addTransactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
                     "0.0"
                 } else {
                     transaction_amount_edittext.getString()
@@ -506,7 +430,7 @@ class AddTransactionFragment: BaseFragment() {
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if(event.action == MotionEvent.ACTION_UP){
                     if(event.x <= transaction_amount_edittext.compoundDrawables[0].bounds.width() + 30){
-                        transactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
+                        addTransactionViewModel.transactionAmount.value = if(transaction_amount_edittext.getString().isEmpty()){
                             "0.0"
                         } else {
                             transaction_amount_edittext.getString()
@@ -520,19 +444,19 @@ class AddTransactionFragment: BaseFragment() {
             }
 
         })
-        transactionViewModel.transactionAmount.observe(viewLifecycleOwner){ amount ->
+        addTransactionViewModel.transactionAmount.observe(viewLifecycleOwner){ amount ->
             transaction_amount_edittext.setText(amount)
         }
     }
 
     private fun setWidgets(){
         val queue = FancyShowCaseQueue()
-                .add(showCase(R.string.urge_users_to_click_icons, "transactionIcons",
-                        transaction_amount_placeholder_view))
         if(transactionActivity == true){
             queue.add(showCase(R.string.transactions_create_switch_box, "bottomNavigationShowCase",
                            requireActivity().findViewById(R.id.transactionBottomView), false))
         }
+        queue.add(showCase(R.string.urge_users_to_click_icons, "transactionIcons",
+                transaction_amount_placeholder_view))
         queue.show()
         add_attachment_button.setOnClickListener {
             attachmentDialog()
@@ -559,11 +483,11 @@ class AddTransactionFragment: BaseFragment() {
                 return false
             }
         })
-        getViewModel(CategoriesDialogViewModel::class.java).categoryName.observe(viewLifecycleOwner) {
+        categorySearch.categoryName.observe(viewLifecycleOwner) {
             category_edittext.setText(it)
         }
-        currencyViewModel.currencyCode.observe(viewLifecycleOwner) {
-            currency = it
+        currencyViewModel.currencyCode.observe(viewLifecycleOwner) { currency ->
+            addTransactionViewModel.currency = currency
         }
         currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
@@ -574,20 +498,16 @@ class AddTransactionFragment: BaseFragment() {
         tags_chip.addChipTerminator('\n' ,ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL)
         tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
         tags_chip.enableEditChipOnTouch(false, true)
-        tagsViewModel.getAllTags().observe(viewLifecycleOwner) {
-            it.forEachIndexed{ _, tagsData ->
-                tags.add(tagsData.tagsAttributes.tag)
+        tag_edittext.doAfterTextChanged { editable ->
+            addTransactionViewModel.getTags(editable.toString()).observe(viewLifecycleOwner){ tags ->
+                val tagsAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, tags)
+                tags_chip.threshold = 1
+                tags_chip.setAdapter(tagsAdapter)
             }
-            val tagsAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, tags)
-            tags_chip.threshold = 1
-            tags_chip.setAdapter(tagsAdapter)
         }
-
-        currencyVm.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
-            val currencyData = defaultCurrency[0].currencyAttributes
+        addTransactionViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             if(!isTasker){
-                currency = currencyData?.code.toString()
-                currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+                currency_edittext.setText(defaultCurrency)
             }
         }
         piggy_edittext.setOnTouchListener(object : View.OnTouchListener{
@@ -605,18 +525,13 @@ class AddTransactionFragment: BaseFragment() {
             }
         })
         piggy_edittext.doAfterTextChanged { editable ->
-            /*piggyViewModel.getPiggyByName(editable.toString()).observe(viewLifecycleOwner){ list ->
-                val dataToDisplay = arrayListOf<String>()
-                list.forEach { piggyData ->
-                    dataToDisplay.add(piggyData.piggyAttributes?.name ?: "")
-                }
+            addTransactionViewModel.getPiggyBank(editable.toString()).observe(viewLifecycleOwner){ dataToDisplay ->
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
                 piggy_edittext.setAdapter(autocompleteAdapter)
-
-            }*/
+            }
         }
-        piggyViewModel.piggyName.observe(viewLifecycleOwner) {
-            piggy_edittext.setText(it)
+        piggySearch.piggyName.observe(viewLifecycleOwner){ piggy ->
+            piggy_edittext.setText(piggy)
         }
         budget_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -631,7 +546,7 @@ class AddTransactionFragment: BaseFragment() {
                 return false
             }
         })
-        getViewModel(BudgetSearchViewModel::class.java).budgetName.observe(viewLifecycleOwner) { name ->
+        budgetSearch.budgetName.observe(viewLifecycleOwner) { name ->
             budget_edittext.setText(name)
         }
         expansionLayout.addListener { _, expanded ->
@@ -673,44 +588,35 @@ class AddTransactionFragment: BaseFragment() {
             materialTimePicker.show(parentFragmentManager, "timePickerDialog")
         }
         description_edittext.doAfterTextChanged { editable ->
-            transactionViewModel.getTransactionByDescription(editable.toString()).observe(viewLifecycleOwner){ list ->
+            addTransactionViewModel.getTransactionByDescription(editable.toString()).observe(viewLifecycleOwner){ list ->
                 val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
                 description_edittext.setAdapter(adapter)
             }
         }
         destination_edittext.doAfterTextChanged { editable ->
-            accountViewModel.getAccountByNameAndType("expense", editable.toString()).observe(viewLifecycleOwner){ list ->
+            addTransactionViewModel.getAccountByNameAndType("expense", editable.toString()).observe(viewLifecycleOwner){ list ->
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
                 destination_edittext.setAdapter(autocompleteAdapter)
             }
         }
         category_edittext.doAfterTextChanged { editable ->
-            categoryViewModel.getCategoryByName(editable.toString()).observe(viewLifecycleOwner){ list ->
-                val dataToDisplay = arrayListOf<String>()
-                list.forEach { categoryData ->
-                    dataToDisplay.add(categoryData.categoryAttributes?.name ?: "")
-                }
+            addTransactionViewModel.getCategory(editable.toString()).observe(viewLifecycleOwner) { dataToDisplay ->
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
                 category_edittext.setAdapter(autocompleteAdapter)
             }
         }
         budget_edittext.doAfterTextChanged { editable ->
-            budgetViewModel.getBudgetByName(editable.toString()).observe(viewLifecycleOwner){ list ->
-                val dataToDisplay = arrayListOf<String>()
-                list.forEach { budgetData ->
-                    dataToDisplay.add(budgetData.budgetListAttributes?.name ?: "")
-                }
-                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
+            addTransactionViewModel.getBudgetByName(editable.toString()).observe(viewLifecycleOwner){ list ->
+                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
                 budget_edittext.setAdapter(autocompleteAdapter)
             }
         }
         source_edittext.doAfterTextChanged { editable ->
-            accountViewModel.getAccountByNameAndType("revenue", editable.toString()).observe(viewLifecycleOwner){ list ->
+            addTransactionViewModel.getAccountByNameAndType("revenue", editable.toString()).observe(viewLifecycleOwner){ list ->
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
                 source_edittext.setAdapter(autocompleteAdapter)
             }
         }
-        val markdownViewModel = getViewModel(MarkdownViewModel::class.java)
         markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
             note_edittext.setText(markdownText)
         }
@@ -721,180 +627,123 @@ class AddTransactionFragment: BaseFragment() {
                 addToBackStack(null)
             }
         }
+        attachment_information.layoutManager = LinearLayoutManager(requireContext())
+        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+                false, { data: AttachmentData ->
+            attachmentDataAdapter.remove(data)
+            attachment_information.adapter?.notifyDataSetChanged()
+        }) { another: Int -> }
+        setUi()
     }
 
     private fun contextSwitch(){
-        when {
-            Objects.equals(transactionType, "Transfer") -> accountViewModel.getAccountNameByType("asset")
-                    .observe(viewLifecycleOwner) { transferData ->
-                        source_exposed_menu.isVisible = true
-                        sourceExposedTasker.isVisible = true
-                        source_layout.isGone = true
-                        sourceTextInputTasker.isGone = true
-                        destination_layout.isGone = true
-                        destinationTextInputTasker.isGone = true
-                        destination_exposed_menu.isVisible = true
-                        destinationExposedTasker.isVisible = true
-                        piggy_layout.isVisible = true
+        addTransactionViewModel.getAccounts().observe(viewLifecycleOwner){ accounts ->
+            if(transactionType.contentEquals("Transfer")){
+                source_exposed_menu.isVisible = true
+                sourceExposedTasker.isVisible = true
+                source_layout.isGone = true
+                sourceTextInputTasker.isGone = true
+                destination_layout.isGone = true
+                destinationTextInputTasker.isGone = true
+                destination_exposed_menu.isVisible = true
+                destinationExposedTasker.isVisible = true
+                piggy_layout.isVisible = true
+                piggyTasker.isVisible = true
+                val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, accounts)
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                destination_exposed_dropdown.setAdapter(spinnerAdapter)
+                source_exposed_dropdown.setAdapter(spinnerAdapter)
+                addTransactionViewModel.transactionDestinationAccount.observe(viewLifecycleOwner){ transactionDestinationAccount ->
+                    destination_exposed_dropdown.setText(transactionDestinationAccount)
+                }
+                addTransactionViewModel.transactionSourceAccount.observe(viewLifecycleOwner){ transactionSourceAccount ->
+                    source_exposed_dropdown.setText(transactionSourceAccount)
+                }
+                addTransactionViewModel.isFromTasker.observe(viewLifecycleOwner){ isTask ->
+                    if(isTask){
+                        destinationTextInputTasker.isVisible = false
+                        sourceTextInputTasker.isVisible = false
                         piggyTasker.isVisible = true
-                        spinnerAdapter = ArrayAdapter(requireContext(),
-                                R.layout.cat_exposed_dropdown_popup_item, transferData)
-                        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        destination_exposed_dropdown.setAdapter(spinnerAdapter)
-                        source_exposed_dropdown.setAdapter(spinnerAdapter)
-                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     }
-            Objects.equals(transactionType, "Deposit") ->
-                accountViewModel.getAccountNameByType("asset").observe(viewLifecycleOwner ) {
-                // Asset account, spinner
-                spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, it)
+                }
+            } else if(transactionType.contentEquals("Deposit")){
+                val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, accounts)
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)
                 destination_layout.isVisible = false
                 destinationTextInputTasker.isVisible = false
                 source_exposed_menu.isVisible = false
                 sourceExposedTasker.isVisible = false
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            }
-            else -> {
-                accountViewModel.getAccountNameByType("asset").observe(viewLifecycleOwner) { accountNames ->
-                    source_layout.isVisible = false
-                    destination_exposed_menu.isVisible = false
-                    sourceTextInputTasker.isVisible = false
-                    destinationExposedTasker.isVisible = false
-                    // Spinner for source account
-                    spinnerAdapter = ArrayAdapter(requireContext(),
-                            R.layout.cat_exposed_dropdown_popup_item, accountNames)
-                    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    source_exposed_dropdown.setAdapter(spinnerAdapter)
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                addTransactionViewModel.transactionDestinationAccount.observe(viewLifecycleOwner){ transactionDestinationAccount ->
+                    destination_exposed_dropdown.setText(transactionDestinationAccount)
+                }
+                addTransactionViewModel.transactionSourceAccount.observe(viewLifecycleOwner){ transactionSourceAccount ->
+                    source_edittext.setText(transactionSourceAccount)
+                }
+                addTransactionViewModel.isFromTasker.observe(viewLifecycleOwner){ isTask ->
+                    if(isTask){
+                        sourceExposedTasker.isVisible = false
+                        destinationTextInputTasker.isVisible = false
+                    }
+                }
+            } else if(transactionType.contentEquals("Withdrawal")){
+                source_layout.isVisible = false
+                destination_exposed_menu.isVisible = false
+                sourceTextInputTasker.isVisible = false
+                destinationExposedTasker.isVisible = false
+                // Spinner for source account
+                val spinnerAdapter = ArrayAdapter(requireContext(),
+                        R.layout.cat_exposed_dropdown_popup_item, accounts)
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                source_exposed_dropdown.setAdapter(spinnerAdapter)
+                addTransactionViewModel.transactionDestinationAccount.observe(viewLifecycleOwner){ transactionDestinationAccount ->
+                    destination_edittext.setText(transactionDestinationAccount)
+                }
+                addTransactionViewModel.transactionSourceAccount.observe(viewLifecycleOwner){ transactionSourceAccount ->
+                    source_exposed_dropdown.setText(transactionSourceAccount)
+                }
+                addTransactionViewModel.isFromTasker.observe(viewLifecycleOwner){ isTask ->
+                    if(isTask){
+                        destinationExposedTasker.isVisible = false
+                        sourceTextInputTasker.isVisible = false
+                    }
                 }
             }
         }
     }
 
-    private fun submitData() {
-        val transactionDateTime = if (time_layout.isVisible && selectedTime.isNotBlank()){
-            DateTimeUtil.mergeDateTimeToIso8601(transaction_date_edittext.getString(), selectedTime)
-        } else {
-            transaction_date_edittext.getString()
-        }
-        transactionViewModel.addTransaction(transactionType, description_edittext.getString(),
-                transactionDateTime, piggyBank, transaction_amount_edittext.getString(),
-                sourceAccount, destinationAccount,
-                currency, categoryName, transactionTags, budgetName, attachmentItemAdapter,
-                note_edittext.getString()).observe(viewLifecycleOwner) { transactionResponse ->
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            val errorMessage = transactionResponse.errorMessage
-            if (transactionResponse.response != null) {
-                toastSuccess(resources.getString(R.string.transaction_added))
+    private fun submitData(piggyBank: String?, sourceAccount: String, destinationAccount: String,
+                           categoryName: String?, transactionTags: String?, budgetName: String?) {
+        addTransactionViewModel.addTransaction(transactionType, description_edittext.getString(),
+                selectedTime, time_edittext.getString(), piggyBank, transaction_amount_edittext.getString(),
+                sourceAccount, destinationAccount, categoryName, transactionTags, budgetName, attachmentItemAdapter,
+                note_edittext.getString()).observe(viewLifecycleOwner){ response ->
+            if(response.first){
+                toastSuccess(response.second)
                 handleBack()
-            } else if (errorMessage != null) {
-                toastError(errorMessage)
-            } else if (transactionResponse.error != null) {
-                when {
-                    Objects.equals("Transfer", transactionType) -> {
-                        val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
-                            action = "firefly.hisname.ADD_TRANSFER"
-                        }
-                        val extras = bundleOf(
-                                "description" to description_edittext.getString(),
-                                "date" to transaction_date_edittext.getString(),
-                                "time" to selectedTime,
-                                "amount" to transaction_amount_edittext.getString(),
-                                "currency" to currency,
-                                "source" to sourceAccount,
-                                "destination" to destinationAccount,
-                                "piggybank" to piggyBankList,
-                                "category" to categoryName,
-                                "tags" to transactionTags,
-                                "notes" to note_edittext.getString()
-                        )
-                        transferBroadcast.putExtras(extras)
-                        requireActivity().sendBroadcast(transferBroadcast)
-                    }
-                    Objects.equals("Deposit", transactionType) -> {
-                        val transferBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
-                            action = "firefly.hisname.ADD_DEPOSIT"
-                        }
-                        val extras = bundleOf(
-                                "description" to description_edittext.getString(),
-                                "date" to transaction_date_edittext.getString(),
-                                "time" to selectedTime,
-                                "amount" to transaction_amount_edittext.getString(),
-                                "currency" to currency,
-                                "destination" to destinationAccount,
-                                "source" to sourceAccount,
-                                "category" to categoryName,
-                                "tags" to transactionTags,
-                                "notes" to note_edittext.getString()
-                        )
-                        transferBroadcast.putExtras(extras)
-                        requireActivity().sendBroadcast(transferBroadcast)
-                    }
-                    Objects.equals("Withdrawal", transactionType) -> {
-                        val withdrawalBroadcast = Intent(requireContext(), TransactionReceiver::class.java).apply {
-                            action = "firefly.hisname.ADD_WITHDRAW"
-                        }
-                        val extras = bundleOf(
-                                "description" to description_edittext.getString(),
-                                "date" to transaction_date_edittext.getString(),
-                                "time" to selectedTime,
-                                "amount" to transaction_amount_edittext.getString(),
-                                "currency" to currency,
-                                "source" to sourceAccount,
-                                "category" to categoryName,
-                                "tags" to transactionTags,
-                                "notes" to note_edittext.getString()
-                        )
-                        withdrawalBroadcast.putExtras(extras)
-                        requireActivity().sendBroadcast(withdrawalBroadcast)
-                    }
-                }
-                toastOffline(getString(R.string.data_added_when_user_online, transactionType))
-                handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
     }
 
-    private fun updateTransactionSetup(){
-        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(viewLifecycleOwner) { transactionData ->
-            val transactionAttributes = transactionData[0]
-            description_edittext.setText(transactionAttributes.description)
-            transaction_amount_edittext.setText(abs(transactionAttributes.amount).toString())
-            budget_edittext.setText(transactionAttributes.budget_name)
-            currencyVm.getCurrencyByCode(transactionAttributes.currency_code).observe(viewLifecycleOwner) { currencyData ->
-                val currencyAttributes = currencyData[0].currencyAttributes
-                currency_edittext.setText(currencyAttributes?.name + " (" + currencyAttributes?.code + ")")
-            }
-            currency = transactionAttributes.currency_code
-            transaction_date_edittext.setText(DateTimeUtil.convertIso8601ToHumanDate(transactionAttributes.date))
-            category_edittext.setText(transactionAttributes.category_name)
-            time_edittext.setText(DateTimeUtil.convertIso8601ToHumanTime(transactionAttributes.date))
-            note_edittext.setText(transactionAttributes.notes)
-            if(transactionAttributes.tags.isNotEmpty()){
-                tags_chip.setText(transactionAttributes.tags)
-            }
-            when {
-                Objects.equals("Withdrawal", transactionType) -> {
-                    destination_edittext.setText(transactionAttributes.destination_name)
-                    sourceName = transactionAttributes.source_name
-                    source_exposed_dropdown.setText(sourceName)
-                }
-                Objects.equals("Transfer", transactionType) -> {
-                    sourceName = transactionAttributes.source_name
-                    destinationName = transactionAttributes.destination_name
-                    source_exposed_dropdown.setText(sourceName)
-                    destination_exposed_dropdown.setText(destinationName)
-                }
-                Objects.equals("Deposit", transactionType) -> {
-                    source_edittext.setText(transactionAttributes.source_name)
-                    destinationName = transactionAttributes.destination_name
-                    destination_exposed_dropdown.setText(destinationName)
-                }
+    private fun updateData(piggyBank: String?, sourceAccount: String, destinationAccount: String,
+                           categoryName: String?, transactionTags: String?, budgetName: String?){
+        addTransactionViewModel.updateTransaction(transactionJournalId, transactionType,
+                description_edittext.getString(), transaction_date_edittext.getString(),
+                selectedTime, piggyBank, transaction_amount_edittext.getString(),
+                sourceAccount, destinationAccount, categoryName,
+                transactionTags, budgetName, note_edittext.getString()).observe(viewLifecycleOwner){ response ->
+            if(response.first){
+                toastSuccess(response.second)
+                handleBack()
+            } else {
+                toastInfo(response.second)
             }
         }
     }
+
 
     private fun attachmentDialog(){
         val listItems = arrayOf("Capture image from camera", "Choose File")
@@ -926,7 +775,7 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     override fun handleBack() {
-        if(nastyHack){
+        if(isFromFragment){
             parentFragmentManager.popBackStack()
             extendedFab.isVisible = true
         } else {

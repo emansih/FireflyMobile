@@ -26,30 +26,6 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         repository = AccountRepository(accountDao, accountsService)
     }
 
-    fun getAccountByType(accountType: String): LiveData<MutableList<AccountData>> {
-        val accountData: MutableLiveData<MutableList<AccountData>> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getAccountByType(accountType).collectLatest {
-                accountData.postValue(it)
-            }
-        }
-        return accountData
-    }
-
-    fun getAccountNameByType(accountType: String): LiveData<MutableList<String>>{
-        val accountData: MutableLiveData<MutableList<String>> = MutableLiveData()
-        val data: MutableList<String> = arrayListOf()
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getAccountByType(accountType).collectLatest { accountInfo ->
-                accountInfo.forEach { accountData ->
-                    data.add(accountData.accountAttributes?.name ?: "")
-                }
-                accountData.postValue(data)
-            }
-        }
-        return accountData
-    }
-
     fun deleteAccountById(accountId: Long): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         var isItDeleted = 0
@@ -75,19 +51,5 @@ class AccountsViewModel(application: Application): BaseViewModel(application){
         return isDeleted
     }
 
-    fun getAccountByNameAndType(accountType: String, accountName: String): LiveData<List<String>>{
-        val accountData: MutableLiveData<List<String>> = MutableLiveData()
-        val displayName = arrayListOf<String>()
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getAccountByNameAndType(accountType, accountName)
-                    .distinctUntilChanged()
-                    .collectLatest { accountList ->
-                        accountList.forEach { accountData ->
-                            displayName.add(accountData.accountAttributes?.name ?: "")
-                        }
-                        accountData.postValue(displayName.distinct())
-                    }
-        }
-        return accountData
-    }
+
 }

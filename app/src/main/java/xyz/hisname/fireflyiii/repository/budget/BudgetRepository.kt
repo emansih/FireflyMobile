@@ -107,10 +107,8 @@ class BudgetRepository(private val budget: BudgetDataDao,
         return budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
     }
 
-    suspend fun searchBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)
-
     suspend fun getBudgetLimitByName(budgetName: String, startDate: String, endDate: String, currencyCode: String): BigDecimal{
-        val budgetNameList = searchBudgetByName(budgetName)
+        val budgetNameList = budgetList.searchBudgetName(budgetName)
         val budgetId = budgetNameList[0].budgetListId ?: 0
         try {
             val networkCall = budgetService?.getBudgetLimit(budgetId, startDate, endDate)

@@ -344,7 +344,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private fun updateData(){
         if(accountId != 0L){
             accountVM.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
-                val accountAttributes = accountData[0].accountAttributes
+                val accountAttributes = accountData.accountAttributes
                 description_edittext.setText(accountAttributes?.name)
                 currency_edittext.setText(accountAttributes?.currency_code + " (" + accountAttributes?.currency_symbol + " )")
                 accountVM.currency = accountAttributes?.currency_code ?: ""
