@@ -15,7 +15,7 @@ class TransactionCalculatorDialog: DialogFragment(), Calculator {
 
     private val transactionsViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_calculator, container)
     }
@@ -29,7 +29,7 @@ class TransactionCalculatorDialog: DialogFragment(), Calculator {
 
     private fun setCalculator(){
         val calc = CalculatorImpl(this, requireContext(),
-                transactionsViewModel.transactionAmount.value ?: "")
+                transactionsViewModel.transactionAmount.value ?: "0")
         btn_plus.setOnClickListener { calc.handleOperation(PLUS) }
         btn_minus.setOnClickListener { calc.handleOperation(MINUS) }
         btn_multiply.setOnClickListener { calc.handleOperation(MULTIPLY) }
