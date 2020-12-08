@@ -37,15 +37,6 @@ abstract class TransactionDataDao {
     abstract fun getTransactionsByTypeWithDateAndCurrencyCode(startDate: String?, endDate: String?,
                                                               type: String, currencyCode: String): BigDecimal
 
-    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND source_id = :accountId AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId)")
-    abstract fun getTransactionsBySourceAndDate(startDate: String?, endDate: String?, accountId: Long): BigDecimal
-
-    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND destination_id = :accountId AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId)")
-    abstract fun getTransactionsByDestinationAndDate(startDate: String?, endDate: String?, accountId: Long): BigDecimal
-
-    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND currency_code =:currencyCode AND transactionType =:transactionType")
-    abstract fun getTotalTransactionType(startDate: String, endDate: String, currencyCode: String, transactionType: String): BigDecimal
-
     @Query("SELECT distinct category_name FROM transactionTable WHERE (date BETWEEN :startDate AND" +
             " :endDate) AND currency_code = :currencyCode AND source_name = :sourceName AND transactionType =:transactionType")
     abstract fun getUniqueCategoryByDate(startDate: String, endDate: String,
@@ -57,17 +48,9 @@ abstract class TransactionDataDao {
     abstract fun getUniqueBudgetByDate(startDate: String, endDate: String,
                                        currencyCode: String, sourceName: String, transactionType: String): MutableList<String>
 
-    @Query("SELECT distinct budget_name FROM transactionTable WHERE (date BETWEEN :startDate AND " +
-            ":endDate) AND currency_code = :currencyCode AND transactionType =:transactionType")
+    @Query("SELECT distinct budget_name FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND currency_code = :currencyCode AND transactionType =:transactionType")
     abstract fun getUniqueBudgetByDate(startDate: String, endDate: String,
                                        currencyCode: String, transactionType: String): List<String>
-
-    @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND" +
-            " currency_code = :currencyCode AND source_name = :sourceName AND transactionType =:transactionType " +
-            "AND category_name =:categoryName")
-    abstract fun getTransactionByDateAndCategoryAndCurrency(startDate: String, endDate: String,
-                                                            currencyCode: String, sourceName: String, transactionType: String,
-                                                            categoryName: String): Double
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND category_id =:categoryId")
     abstract suspend fun getTransactionByDateAndCategory(startDate: String, endDate: String,
@@ -76,45 +59,16 @@ abstract class TransactionDataDao {
     @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND category_id =:categoryId ORDER BY date ASC")
     abstract suspend fun getTransactionByDateAndCategoryCount(startDate: String, endDate: String, categoryId: Long): Int
 
-    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) " +
-            "AND category_id =:categoryId AND transactionType =:transactionType")
+    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND category_id =:categoryId AND transactionType =:transactionType")
     abstract fun getTransactionValueByDateAndCategory(startDate: String, endDate: String,
                                                  transactionType: String,
                                                  categoryId: Long): BigDecimal
-
-    @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate " +
-            "AND :endDate) AND currency_code = :currencyCode AND source_name = :sourceName AND " +
-            "transactionType =:transactionType AND budget_name =:budgetName")
-    abstract fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
-                                                          currencyCode: String, sourceName: String,
-                                                          transactionType: String,
-                                                          budgetName: String): Double
 
     @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND currency_code = :currencyCode AND transactionType =:transactionType AND budget_name =:budgetName")
     abstract fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
                                                           currencyCode: String,
                                                           transactionType: String,
                                                           budgetName: String): BigDecimal
-
-    @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate " +
-            "AND :endDate) AND currency_code = :currencyCode AND source_name = :sourceName AND " +
-            "transactionType =:transactionType AND budget_name IS NULL")
-    abstract fun getTransactionByDateAndNullBudgetAndCurrency(startDate: String, endDate: String,
-                                                              currencyCode: String, sourceName: String,
-                                                              transactionType: String): Double
-
-    @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate " +
-            "AND :endDate) AND currency_code = :currencyCode AND transactionType =:transactionType AND" +
-           " budget_name IS NULL")
-    abstract fun getTransactionAmountByDateAndNullBudgetAndCurrency(startDate: String, endDate: String,
-                                                              currencyCode: String,
-                                                              transactionType: String): Double
-
-    @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND" +
-            " currency_code = :currencyCode AND source_name = :sourceName AND transactionType =:transactionType " +
-            "AND category_name IS NULL")
-    abstract fun getTransactionByDateAndNullCategoryAndCurrency(startDate: String, endDate: String,
-                                                            currencyCode: String, sourceName: String, transactionType: String): Double
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND budget_name IS NULL AND currency_code =:currencyCode")
     abstract fun getTransactionByDateAndNullBudgetAndCurrency(startDate: String, endDate: String, currencyCode: String): MutableList<Transactions>
@@ -167,11 +121,20 @@ abstract class TransactionDataDao {
     @Query("SELECT category_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId) GROUP BY category_name")
     abstract suspend fun getUniqueCategoryByDestinationAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
 
+    @Query("SELECT category_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_code =:currencyCode GROUP BY category_name")
+    abstract suspend fun getUniqueCategoryByDateAndType(startDate: String, endDate: String, currencyCode: String, transactionType: String): List<ObjectSum>
+
     @Query("SELECT budget_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId) GROUP BY budget_name")
     abstract suspend fun getUniqueBudgetBySourceAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
 
+    @Query("SELECT budget_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_code =:currencyCode GROUP BY budget_name")
+    abstract suspend fun getUniqueBudgetByDateAndType(startDate: String, endDate: String, currencyCode: String, transactionType: String): List<ObjectSum>
+
     @Query("SELECT budget_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_id IN (SELECT currency_id FROM accounts WHERE accountId =:accountId) GROUP BY budget_name")
     abstract suspend fun getUniqueBudgetByDestinationAndDateAndType(accountId: Long, startDate: String, endDate: String, transactionType: String): List<ObjectSum>
+
+    @Query("SELECT destination_name AS objectName, SUM(amount) as objectSum FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType AND currency_code =:currencyCode GROUP BY destination_name")
+    abstract suspend fun getDestinationAccountByTypeAndDate(startDate: String, endDate: String, currencyCode: String, transactionType: String): List<ObjectSum>
 
     @Query("SELECT * FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate) ORDER BY date ASC")
     abstract suspend fun getTransactionBySourceIdAndDate(accountId: Long, startDate: String, endDate: String): List<Transactions>

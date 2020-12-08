@@ -45,17 +45,17 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
             val currencyAttributes = currencyRepository.defaultCurrency()[0].currencyAttributes
             val currencyCode = currencyAttributes?.code ?: ""
             val currencySymbol = currencyAttributes?.symbol
-            val currentMonth = transactionRepository.getTotalTransactionType(DateTimeUtil.getStartOfMonth(),
+            val currentMonth = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(),
                     DateTimeUtil.getEndOfMonth(), currencyCode, transactionType)
-            val oneMonthAgo = transactionRepository.getTotalTransactionType(DateTimeUtil.getStartOfMonth(1),
+            val oneMonthAgo = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(1),
                     DateTimeUtil.getEndOfMonth(1), currencyCode, transactionType)
-            val twoMonthAgo = transactionRepository.getTotalTransactionType(DateTimeUtil.getStartOfMonth(2),
+            val twoMonthAgo = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(2),
                     DateTimeUtil.getEndOfMonth(2), currencyCode, transactionType)
-            val threeMonthAgo = transactionRepository.getTotalTransactionType(DateTimeUtil.getStartOfMonth(3),
+            val threeMonthAgo = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(3),
                     DateTimeUtil.getEndOfMonth(3), currencyCode, transactionType)
-            val fourMonthAgo = transactionRepository.getTotalTransactionType(DateTimeUtil.getStartOfMonth(4),
+            val fourMonthAgo = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(4),
                     DateTimeUtil.getEndOfMonth(4), currencyCode, transactionType)
-            val fiveMonthAgo = transactionRepository.getTotalTransactionType(DateTimeUtil.getStartOfMonth(5),
+            val fiveMonthAgo = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(5),
                     DateTimeUtil.getEndOfMonth(5), currencyCode, transactionType)
             val arrayOfAmount = arrayListOf<TransactionAmountMonth>()
             arrayOfAmount.add(TransactionAmountMonth(

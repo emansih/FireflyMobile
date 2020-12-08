@@ -9,6 +9,7 @@ import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.ObjectSum
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -36,35 +37,14 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun getTransactionByDateAndCurrencyCode(startDate: String, endDate: String,
                                                     currencyCode: String,
                                                     transactionType: String,
-                                                    shouldLoadData: Boolean): BigDecimal{
+                                                    shouldLoadData: Boolean = true): BigDecimal{
         if(shouldLoadData){
-            loadRemoteData(startDate, endDate, transactionType)
+            loadRemoteData(startDate, endDate, convertString(transactionType))
         }
         return transactionDao.getTransactionsByTypeWithDateAndCurrencyCode(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType, currencyCode)
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(transactionType), currencyCode)
     }
 
-    suspend fun getTransactionsBySourceAndDate(startDate: String, endDate: String,
-                                                               accountId: Long): BigDecimal{
-        return transactionDao.getTransactionsBySourceAndDate(
-                DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountId)
-    }
-
-    suspend fun getTransactionsByDestinationAndDate(startDate: String, endDate: String,
-                                                      accountId: Long): BigDecimal{
-        return transactionDao.getTransactionsByDestinationAndDate(
-                DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), accountId)
-    }
-
-
-    suspend fun getTotalTransactionType(startDate: String, endDate: String,
-                                        currencyCode: String, transactionType: String): BigDecimal{
-        loadRemoteData(startDate, endDate, convertString(transactionType))
-        return transactionDao.getTotalTransactionType(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
-    }
 
     suspend fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
                                                          currencyCode: String,
@@ -118,6 +98,13 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
+    suspend fun getDestinationAccountByTypeAndDate(startDate: String, endDate: String,
+                                              currencyCode: String,
+                                              transactionType: String) =
+            transactionDao.getDestinationAccountByTypeAndDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
+
+
     suspend fun getUniqueCategoryBySourceAndDateAndType(accountId: Long,
                                                         startDate: String, endDate: String,
                                                         transactionType: String) =
@@ -148,6 +135,19 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             transactionDao.getUniqueBudgetByDestinationAndDateAndType(accountId,
                     DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
+
+    suspend fun getUniqueCategoryByDateAndType(startDate: String, endDate: String,
+                                               currencyCode: String, transactionType: String): List<ObjectSum>{
+        return transactionDao.getUniqueCategoryByDateAndType(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
+    }
+
+    suspend fun getUniqueBudgetByDateAndType(startDate: String, endDate: String,
+                                               currencyCode: String, transactionType: String): List<ObjectSum>{
+        return transactionDao.getUniqueBudgetByDateAndType(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
+    }
+
 
     suspend fun getTransactionByDescription(query: String): Flow<List<String>>{
         // Search via API only if query is more than 3
@@ -254,7 +254,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val transactionData: MutableList<TransactionData> = arrayListOf()
             val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
                     convertString(sourceName), 1)
-            networkCall?.body()?.data?.toMutableList()?.forEach { transaction ->
+            networkCall?.body()?.data?.forEach {  transaction ->
                 transactionData.add(transaction)
             }
             val responseBody = networkCall?.body()

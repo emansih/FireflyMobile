@@ -84,7 +84,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             } else {
                 val pieEntryArray = arrayListOf<PieEntry>()
                 categorySumList.forEach { categorySum ->
-                pieEntryArray.add(PieEntry(categorySum.first, categorySum.second, categorySum.third))
+                    pieEntryArray.add(PieEntry(categorySum.first, categorySum.second, categorySum.third))
                 }
                 val pieDataSet = PieDataSet(pieEntryArray, "").apply {
                     colors = coloring

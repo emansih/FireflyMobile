@@ -44,6 +44,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
+import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -280,7 +281,14 @@ class TransactionFragment: BaseFragment(){
         slider.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         transactionVm.getTransactionAmount(transactionType).observe(viewLifecycleOwner){ transactionArray ->
             transactionCardLoader.hide()
-            slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){ data: Int -> }
+            slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){ data: Int ->
+                parentFragmentManager.commit {
+                    replace(R.id.fragment_container, TransactionMonthSummaryFragment().apply {
+                        arguments = bundleOf("monthYear" to data, "transactionType" to transactionType)
+                    })
+                    addToBackStack(null)
+                }
+            }
         }
         fragment_transaction_root.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
