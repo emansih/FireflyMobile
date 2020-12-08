@@ -147,6 +147,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
             replace(R.id.bigger_fragment_container, AddPiggyFragment().apply {
                 arguments = bundleOf("piggyId" to piggyId)
             })
+            addToBackStack(null)
         }
     }
 

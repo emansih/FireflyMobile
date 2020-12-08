@@ -217,7 +217,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun handleBack() {
-        unReveal(dialog_add_piggy_layout, true)
+        unReveal(dialog_add_piggy_layout)
         markdownViewModel.markdownText.postValue("")
     }
 }
