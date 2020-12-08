@@ -205,7 +205,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             DateTimeUtil.mergeDateTimeToIso8601(date, time)
         }
         return try {
-            val networkCall = transactionService?.updateTransaction(transactionId,
+            val networkCall = transactionService?.updateTransaction(getTransactionIdFromJournalId(transactionId),
                     convertString(type),description, dateTime, piggyBankName,
                     amount.replace(',', '.'),sourceName,destinationName,currencyName,
                     category, tags, budgetName, notes)

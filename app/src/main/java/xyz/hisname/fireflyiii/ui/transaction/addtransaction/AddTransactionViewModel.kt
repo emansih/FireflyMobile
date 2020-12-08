@@ -212,7 +212,6 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             val addTransaction = transactionRepository.updateTransaction(transactionId, type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
                     category, tags, budgetName, notes)
-            var journalId = 0L
             when {
                 addTransaction.response != null -> {
                     apiResponse.postValue(Pair(true,
