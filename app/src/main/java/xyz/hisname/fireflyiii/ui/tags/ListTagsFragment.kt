@@ -14,6 +14,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.commit
 import com.google.android.material.chip.Chip
 import com.mikepenz.iconics.IconicsDrawable
@@ -43,6 +44,13 @@ class ListTagsFragment: BaseFragment() {
         displayView()
         setFab()
         pullToRefresh()
+        tagsNestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (scrollY > oldScrollY) {
+                extendedFab.hide()
+            } else {
+                extendedFab.show()
+            }
+        })
     }
 
     private fun setResponse(){
