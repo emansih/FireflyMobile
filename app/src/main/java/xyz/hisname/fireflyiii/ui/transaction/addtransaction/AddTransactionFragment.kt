@@ -33,7 +33,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
-import kotlinx.android.synthetic.main.fragment_add_tags.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.currency_edittext
 import kotlinx.android.synthetic.main.fragment_add_transaction.description_edittext
@@ -498,7 +497,7 @@ class AddTransactionFragment: BaseFragment() {
         tags_chip.addChipTerminator('\n' ,ChipTerminatorHandler.BEHAVIOR_CHIPIFY_ALL)
         tags_chip.addChipTerminator(',', ChipTerminatorHandler.BEHAVIOR_CHIPIFY_TO_TERMINATOR)
         tags_chip.enableEditChipOnTouch(false, true)
-        tag_edittext.doAfterTextChanged { editable ->
+        tags_chip.doAfterTextChanged { editable ->
             addTransactionViewModel.getTags(editable.toString()).observe(viewLifecycleOwner){ tags ->
                 val tagsAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, tags)
                 tags_chip.threshold = 1
