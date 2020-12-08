@@ -94,6 +94,7 @@ class AddTransactionFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         if(isTasker){
             // Disable file upload for now
             add_attachment_button.isVisible = false
@@ -709,6 +710,7 @@ class AddTransactionFragment: BaseFragment() {
                     }
                 }
             }
+            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
         }
     }
 
