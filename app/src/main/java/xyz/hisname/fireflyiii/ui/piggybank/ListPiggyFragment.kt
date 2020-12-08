@@ -10,6 +10,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
@@ -38,10 +40,14 @@ class ListPiggyFragment: BaseFragment(){
     }
 
     private fun displayView(){
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        recycler_view.adapter = piggyRecyclerAdapter
         piggyViewModel.getPiggyBank().observe(viewLifecycleOwner){ pagingData ->
             piggyRecyclerAdapter.submitData(lifecycle, pagingData)
         }
         piggyRecyclerAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
+            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
             if(loadStates.refresh !is LoadState.Loading) {
                 if (piggyRecyclerAdapter.itemCount < 1) {
                     listText.text = resources.getString(R.string.no_piggy_bank)
