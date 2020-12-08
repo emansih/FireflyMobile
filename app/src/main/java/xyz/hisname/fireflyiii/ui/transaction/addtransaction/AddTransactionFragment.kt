@@ -248,7 +248,14 @@ class AddTransactionFragment: BaseFragment() {
             addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
         addTransactionFab.setOnClickListener {
-            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            // Listen to loading only when FAB is clicked
+            addTransactionViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
+                if(loading){
+                    ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+                } else {
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                }
+            }
             hideKeyboard()
             val piggyBank = if(piggy_edittext.isBlank()){
                 null

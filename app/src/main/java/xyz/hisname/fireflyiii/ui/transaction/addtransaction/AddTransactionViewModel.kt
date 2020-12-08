@@ -147,6 +147,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                        category: String?, tags: String?, budgetName: String?,
                        fileUri: ArrayList<Uri>, notes: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
+        isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
             val addTransaction = transactionRepository.addTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
@@ -197,6 +198,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                     apiResponse.postValue(Pair(false, "Error adding transaction"))
                 }
             }
+            isLoading.postValue(false)
         }
         return apiResponse
     }
