@@ -29,7 +29,7 @@ interface CurrencyService {
 
     @FormUrlEncoded
     @PUT("$CURRENCY_API_ENDPOINT/{currencyCode}")
-    fun updateCurrency(@Path("currencyCode") currencyCode: String,
+    suspend fun updateCurrency(@Path("currencyCode") currencyCode: String,
                        @Field("name") name: String,
                        @Field("code") code: String,
                        @Field("symbol") symbol: String,
