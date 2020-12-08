@@ -16,7 +16,7 @@ interface PiggybankService {
 
     @FormUrlEncoded
     @POST(PIGGY_BANK_API_ENDPOINT)
-    fun addPiggyBank(@Field("name") name: String,
+    suspend fun addPiggyBank(@Field("name") name: String,
                      @Field("account_id") accountId: Long,
                      @Field("target_amount") targetAmount: String,
                      @Field("current_amount") currentAmount: String?,
@@ -25,7 +25,7 @@ interface PiggybankService {
                      @Field("notes") notes: String?): Response<PiggySuccessModel>
     @FormUrlEncoded
     @PUT("$PIGGY_BANK_API_ENDPOINT/{piggyId}")
-    fun updatePiggyBank(@Path("piggyId") piggyId: Long,
+    suspend fun updatePiggyBank(@Path("piggyId") piggyId: Long,
                         @Field("name") name: String,
                         @Field("account_id") accountId: Long,
                         @Field("target_amount") targetAmount: String,

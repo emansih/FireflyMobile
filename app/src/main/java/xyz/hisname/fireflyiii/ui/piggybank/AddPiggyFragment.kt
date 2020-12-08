@@ -85,7 +85,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         }
         addPiggyFab.setOnClickListener {
             hideKeyboard()
-            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             currentAmount = if (current_amount_edittext.isBlank()) {
                 null
             } else {

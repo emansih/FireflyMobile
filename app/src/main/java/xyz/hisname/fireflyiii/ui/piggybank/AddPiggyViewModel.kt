@@ -125,8 +125,8 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                 }
             } else {
                 apiResponse.postValue(Pair(false, "There was an error getting account data"))
-                isLoading.postValue(false)
             }
+            isLoading.postValue(false)
         }
         return apiResponse
     }
