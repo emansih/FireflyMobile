@@ -42,7 +42,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     abstract fun deleteDefaultCurrency(defaultCurrency: Boolean = true): Int
 
     @Query("DELETE FROM currency")
-    abstract fun deleteAllCurrency(): Int
+    abstract suspend fun deleteAllCurrency(): Int
 
     @Query("SELECT * FROM currency WHERE name =:currencyName")
     abstract fun getCurrencyByName(currencyName: String): MutableList<CurrencyData>
