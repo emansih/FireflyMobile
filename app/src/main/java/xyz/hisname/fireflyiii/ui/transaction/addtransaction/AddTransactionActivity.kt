@@ -21,12 +21,30 @@ class AddTransactionActivity: BaseActivity() {
         setContentView(R.layout.activity_add_transaction)
         hideKeyboard()
         setBottomNav()
+        setHelpText()
+        backstackCounter()
         when (transactionType) {
             "Withdrawal" -> transactionBottomView.selectedItemId = R.id.action_withdraw
             "Deposit" -> transactionBottomView.selectedItemId = R.id.action_deposit
             "Transfer" -> transactionBottomView.selectedItemId = R.id.action_transfer
             else -> transactionBottomView.selectedItemId = R.id.action_withdraw
         }
+    }
+
+    private fun backstackCounter(){
+        supportFragmentManager.addOnBackStackChangedListener {
+            if(supportFragmentManager.backStackEntryCount == 1){
+                addTransaction_coordinatorLayout.isInvisible = true
+            } else if(supportFragmentManager.backStackEntryCount == 0){
+                addTransaction_coordinatorLayout.isVisible = true
+            }
+        }
+
+    }
+
+    private fun setHelpText(){
+        showCase(R.string.transactions_create_switch_box, "bottomNavigationShowCase",
+                transactionBottomView, false).show()
     }
 
     private fun setBottomNav(){
