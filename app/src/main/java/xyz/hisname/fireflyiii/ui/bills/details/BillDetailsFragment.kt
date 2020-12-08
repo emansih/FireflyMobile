@@ -280,6 +280,7 @@ class BillDetailsFragment: BaseDetailFragment() {
             replace(R.id.bigger_fragment_container, AddBillFragment().apply{
                 arguments = bundleOf("billId" to billId)
             })
+            addToBackStack(null)
         }
     }
 
