@@ -1,9 +1,11 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -183,11 +185,17 @@ class TransactionMonthSummaryFragment: BaseFragment() {
 
     private fun itemClicked(data: Transactions){
         parentFragmentManager.commit {
-            add(R.id.bigger_fragment_container, TransactionDetailsFragment().apply {
+            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
             addToBackStack(null)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val mainToolbar = requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
+        mainToolbar.title = "$transactionType Summary"
     }
 
     override fun handleBack() {
