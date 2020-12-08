@@ -103,6 +103,8 @@ class ListTagsFragment: BaseFragment() {
                             chip.setOnCloseIconClickListener(chipClickListener)
                             chip.performCloseIconClick()
                             toastSuccess(resources.getString(R.string.tag_deleted, tagName))
+                        } else {
+                            toastError("There was an issue deleting your tags")
                         }
                     }
                 }

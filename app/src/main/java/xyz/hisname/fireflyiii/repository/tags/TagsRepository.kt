@@ -17,10 +17,6 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 class TagsRepository(private val tagsDataDao: TagsDataDao,
                      private val tagsService: TagsService?) {
 
-    suspend fun deleteTagByName(tagName: String): Int{
-        return tagsDataDao.deleteTagByName(tagName)
-    }
-
     suspend fun allTags(): MutableList<TagsData>{
         try {
             val tagsData: MutableList<TagsData> = arrayListOf()

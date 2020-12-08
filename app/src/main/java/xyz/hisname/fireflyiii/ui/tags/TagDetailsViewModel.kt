@@ -43,7 +43,7 @@ class TagDetailsViewModel(application: Application): BaseViewModel(application) 
     fun deleteTagByName(tagName: String): LiveData<Boolean>{
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
-            when (tagsRepository.deleteTagByName(tagName)) {
+            when (tagsRepository.deleteTags(tagName)) {
                 HttpConstants.FAILED -> {
                     isDeleted.postValue(false)
                 }
