@@ -93,7 +93,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                     val piggyDatabase = AppDatabase.getInstance(context).piggyDataDao()
                     val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
                     val account = accountDatabase.getAccountById(accountId.toLong())
-                    val defaultCurrency = AppDatabase.getInstance(context).currencyDataDao().getDefaultCurrency()[0]
+                    val defaultCurrency = AppDatabase.getInstance(context).currencyDataDao().getDefaultCurrency()
                     val currencyCode = defaultCurrency.currencyAttributes?.code
                     val currencySymbol = defaultCurrency.currencyAttributes?.symbol
                     val currencyDp = defaultCurrency.currencyAttributes?.decimal_places

@@ -30,12 +30,12 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
 
     var currency = ""
 
-    fun getDefaultCurrency(): LiveData<List<CurrencyData>>{
-        val currencyListLiveData = MutableLiveData<List<CurrencyData>>()
+    fun getDefaultCurrency(): LiveData<CurrencyData>{
+        val currencyListLiveData = MutableLiveData<CurrencyData>()
         viewModelScope.launch(Dispatchers.IO){
             val currencyList = currencyRepository.defaultCurrency()
             currencyListLiveData.postValue(currencyList)
-            currency = currencyList[0].currencyAttributes?.code ?: ""
+            currency = currencyList.currencyAttributes?.code ?: ""
         }
         return currencyListLiveData
     }

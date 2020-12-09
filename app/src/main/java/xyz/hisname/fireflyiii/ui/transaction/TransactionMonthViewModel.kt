@@ -64,7 +64,7 @@ class TransactionMonthViewModel(application: Application): BaseViewModel(applica
     fun getCategoryData(transactionType: String, monthYear: Int): LiveData<List<Triple<Float, String, BigDecimal>>>{
         val uniqueCategoryLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
         viewModelScope.launch(Dispatchers.IO){
-            val defaultCurrency = currencyRepository.defaultCurrency()[0].currencyAttributes
+            val defaultCurrency = currencyRepository.defaultCurrency().currencyAttributes
             currencyCode = defaultCurrency?.code ?: ""
             transactionSum = transactionRepository.getTransactionByDateAndCurrencyCode(getStartOfMonth(monthYear),
                 getEndOfMonth(monthYear), currencyCode, transactionType, false)

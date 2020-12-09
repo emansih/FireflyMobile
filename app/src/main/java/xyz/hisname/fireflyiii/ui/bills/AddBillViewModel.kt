@@ -100,8 +100,8 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
-    fun getDefaultCurrency(): LiveData<List<CurrencyData>>{
-        val currencyLiveData = MutableLiveData<List<CurrencyData>>()
+    fun getDefaultCurrency(): LiveData<CurrencyData>{
+        val currencyLiveData = MutableLiveData<CurrencyData>()
         viewModelScope.launch(Dispatchers.IO){
             currencyLiveData.postValue(currencyRepository.defaultCurrency())
         }

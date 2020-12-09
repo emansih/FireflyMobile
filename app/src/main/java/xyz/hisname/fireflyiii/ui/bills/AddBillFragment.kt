@@ -200,7 +200,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         }
         placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
         billViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
-            val currencyData = defaultCurrency[0].currencyAttributes
+            val currencyData = defaultCurrency.currencyAttributes
             currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             currency = currencyData?.code.toString()
         }

@@ -317,7 +317,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     fun getDefaultCurrency(): LiveData<String>{
         val currencyLiveData = MutableLiveData<String>()
         viewModelScope.launch(Dispatchers.IO){
-            val currencyList = currencyRepository.defaultCurrency()[0].currencyAttributes
+            val currencyList = currencyRepository.defaultCurrency().currencyAttributes
             currency = currencyList?.code ?: ""
             currencyLiveData.postValue(currencyList?.name + " (" + currencyList?.code + ")")
         }

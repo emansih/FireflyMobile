@@ -29,6 +29,7 @@ import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.MPPointF
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
@@ -86,6 +87,9 @@ class DashboardFragment: BaseFragment() {
             }
         }
         setIcon()
+        dashboardView.apiResponse.observe(viewLifecycleOwner){ response ->
+            Snackbar.make(coordinatorlayout, response, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     private fun setExtendedFab(){

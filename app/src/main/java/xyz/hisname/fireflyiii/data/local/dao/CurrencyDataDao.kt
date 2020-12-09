@@ -33,7 +33,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     abstract suspend fun getCurrencyByCode(currencyCode: String): MutableList<CurrencyData>
 
     @Query("SELECT * FROM currency WHERE currencyDefault = :defaultCurrency")
-    abstract fun getDefaultCurrency(defaultCurrency: Boolean = true): MutableList<CurrencyData>
+    abstract fun getDefaultCurrency(defaultCurrency: Boolean = true): CurrencyData
 
     @Query("SELECT * FROM currency WHERE currencyId =:currencyId")
     abstract fun getCurrencyById(currencyId: Long): MutableList<CurrencyData>

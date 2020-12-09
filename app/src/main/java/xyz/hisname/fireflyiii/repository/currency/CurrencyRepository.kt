@@ -55,7 +55,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     suspend fun deleteDefaultCurrency() = currencyDao.deleteDefaultCurrency()
 
-    suspend fun defaultCurrency(): List<CurrencyData> {
+    suspend fun defaultCurrency(): CurrencyData {
         try {
             val networkCall = currencyService.getDefaultCurrency()
             val responseBody = networkCall.body()

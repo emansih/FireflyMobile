@@ -148,7 +148,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         }
         if(accountId == 0L) {
             accountVM.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
-                val currencyData = defaultCurrency[0].currencyAttributes
+                val currencyData = defaultCurrency.currencyAttributes
                 currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
             }
         }
