@@ -724,7 +724,7 @@ class AddTransactionFragment: BaseFragment() {
     private fun submitData(piggyBank: String?, sourceAccount: String, destinationAccount: String,
                            categoryName: String?, transactionTags: String?, budgetName: String?) {
         addTransactionViewModel.addTransaction(transactionType, description_edittext.getString(),
-                selectedTime, time_edittext.getString(), piggyBank, transaction_amount_edittext.getString(),
+                transaction_date_edittext.getString(), selectedTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, categoryName, transactionTags, budgetName, attachmentItemAdapter,
                 note_edittext.getString()).observe(viewLifecycleOwner){ response ->
             if(response.first){
