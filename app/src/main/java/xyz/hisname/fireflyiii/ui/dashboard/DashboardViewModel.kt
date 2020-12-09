@@ -108,15 +108,14 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
     private fun getDefaultCurrency(){
         viewModelScope.launch(Dispatchers.IO){
             val currencyList = currencyRepository.defaultCurrency()
-            if(currencyList.currencyId == null){
-                apiResponse.postValue("There was an issue getting your default currency")
-            } else {
+            if(currencyList.currencyId != 0L){
                 currencySymbol.postValue(currencyList.currencyAttributes?.symbol)
                 currencyCode = currencyList.currencyAttributes?.code ?: ""
                 getBasicSummary(currencyList.currencyAttributes?.code ?: "", currencyList.currencyAttributes?.symbol ?: "")
                 getPieChartData(currencyList.currencyAttributes?.code ?: "", currencyList.currencyAttributes?.symbol ?: "")
                 setNetEarnings(currencyList.currencyAttributes?.code ?: "", currencyList.currencyAttributes?.symbol ?: "")
-
+            } else {
+                apiResponse.postValue("There was an issue getting your default currency")
             }
         }
     }

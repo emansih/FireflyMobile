@@ -11,7 +11,7 @@ import com.squareup.moshi.JsonClass
 data class CurrencyData(
         @PrimaryKey(autoGenerate = false)
         @Json(name ="id")
-        var currencyId: Long? = null,
+        var currencyId: Long = 0,
         @Embedded
         @Json(name ="attributes")
         var currencyAttributes: CurrencyAttributes? = null

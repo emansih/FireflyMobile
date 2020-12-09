@@ -43,7 +43,7 @@ class CurrencyListViewModel(application: Application): BaseViewModel(application
             when (isItDeleted) {
                 HttpConstants.FAILED -> {
                     isDeleted.postValue(false)
-                    val currencyId = currencyList[0].currencyId ?: 0
+                    val currencyId = currencyList[0].currencyId
                     if(currencyId != 0L){
                         DeleteCurrencyWorker.initPeriodicWorker(currencyId, getApplication())
                     }

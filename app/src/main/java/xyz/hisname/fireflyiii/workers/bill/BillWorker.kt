@@ -102,7 +102,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                     billDatabase.insert(
                             BillData(
                                     billWorkManagerId, BillAttributes("","",
-                                    name, currency.currencyId ?: 0L, currencyCode,
+                                    name, currency.currencyId, currencyCode,
                                     currency.currencyAttributes?.symbol ?: "",
                                     currency.currencyAttributes?.decimal_places ?: 0,
                                     minAmount.toBigDecimal(), maxAmount.toBigDecimal(), LocalDate.parse(billDate),
