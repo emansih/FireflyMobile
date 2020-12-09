@@ -61,7 +61,7 @@ class AttachmentRepository(private val attachmentDao: AttachmentDataDao,
         }
         return fileStatus
     }
-    
+
     private fun copyFile(context: Context, fileUri: Uri, name: String): File {
         var count: Int
         val data = ByteArray(4096)

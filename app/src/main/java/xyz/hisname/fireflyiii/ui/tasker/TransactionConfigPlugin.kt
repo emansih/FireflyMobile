@@ -58,31 +58,31 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 "transactionPiggyBank" to taskerHelper.config.getIntent()?.getStringExtra("transactionPiggyBank")
         ))
         addTransactionViewModel.transactionType.observe(this) { type ->
-            if (type.isNotBlank()) {
+            if (type != null && type.isNotBlank()) {
                 transactionType = type
             }
         }
 
         addTransactionViewModel.transactionDescription.observe(this) { description ->
-            if (description.isNotBlank()) {
+            if (description != null && description.isNotBlank()) {
                 transactionDescription = description
             }
         }
 
         addTransactionViewModel.transactionAmount.observe(this) { amount ->
-            if (amount.isNotBlank()) {
+            if (amount != null && amount.isNotBlank()) {
                 transactionAmount = amount
             }
         }
 
         addTransactionViewModel.transactionDate.observe(this) { date ->
-            if (date.isNotBlank()) {
+            if (date != null && date.isNotBlank()) {
                 transactionDate = date
             }
         }
 
         addTransactionViewModel.transactionTime.observe(this) { time ->
-            if (time.isNotBlank()) {
+            if (time != null && time.isNotBlank()) {
                 transactionTime = time
             }
         }
@@ -94,19 +94,19 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
         }
 
         addTransactionViewModel.transactionSourceAccount.observe(this) { sourceAccount ->
-            if (sourceAccount.isNotBlank()) {
+            if (sourceAccount != null && sourceAccount.isNotBlank()) {
                transactionSourceAccount = sourceAccount
             }
         }
 
         addTransactionViewModel.transactionDestinationAccount.observe(this) { destinationAccount ->
-            if (destinationAccount.isNotBlank()) {
+            if (destinationAccount != null && destinationAccount.isNotBlank()) {
                 transactionDestinationAccount = destinationAccount
             }
         }
 
         addTransactionViewModel.transactionCurrency.observe(this) { currency ->
-            if (currency.isNotBlank()) {
+            if (currency != null && currency.isNotBlank()) {
                 transactionCurrency = currency
             }
         }

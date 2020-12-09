@@ -67,15 +67,22 @@ class AddTransactionFragment: BaseFragment() {
 
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
+    private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
 
-    private val addTransactionViewModel by lazy { getImprovedViewModel(AddTransactionViewModel::class.java) }
+    // If we entered from Tasker's UI, we will need to keep view model referenced to the activity
+    private val addTransactionViewModel by lazy {
+        if(isTasker){
+            getViewModel(AddTransactionViewModel::class.java)
+        } else {
+            getImprovedViewModel(AddTransactionViewModel::class.java)
+        }
+    }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val budgetSearch by lazy { getViewModel(BudgetSearchViewModel::class.java) }
     private val piggySearch by lazy { getViewModel(SearchPiggyViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
 
-    private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
     private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
     private val isFromFragment by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
@@ -330,7 +337,6 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionViewModel.transactionBudget.postValue(budgetName)
         addTransactionViewModel.transactionCategory.postValue(categoryName)
         addTransactionViewModel.transactionNote.postValue(note_edittext.getString())
-        addTransactionViewModel.fileUri.postValue(fileUri.toString())
         addTransactionViewModel.removeFragment.postValue(true)
     }
 
