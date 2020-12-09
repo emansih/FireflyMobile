@@ -286,6 +286,7 @@ class TransactionFragment: BaseFragment(){
         transactionVm.getTransactionAmount(transactionType).observe(viewLifecycleOwner){ transactionArray ->
             transactionCardLoader.hide()
             slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){ data: Int ->
+                fragment_transaction_root.closeDrawer(slider)
                 parentFragmentManager.commit {
                     replace(R.id.fragment_container, TransactionMonthSummaryFragment().apply {
                         arguments = bundleOf("monthYear" to data, "transactionType" to transactionType)
