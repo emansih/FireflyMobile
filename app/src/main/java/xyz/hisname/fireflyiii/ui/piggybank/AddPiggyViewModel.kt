@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
@@ -57,35 +58,40 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
-            val accountId = accountRepository.getAccountByName(accountName, "asset").accountId
-            if(accountId != null || accountId == 0L){
-                val addPiggyBank = piggyRepository.addPiggyBank(piggyName, accountId, targetAmount,
-                        currentAmount, startDate, targetDate, notes)
-                when {
-                    addPiggyBank.response != null -> {
-                        apiResponse.postValue(Pair(true, "Piggy bank saved"))
-                    }
-                    addPiggyBank.errorMessage != null -> {
-                        apiResponse.postValue(Pair(false, addPiggyBank.errorMessage))
-                    }
-                    addPiggyBank.error != null -> {
-                        if(addPiggyBank.error is UnknownHostException){
-                            PiggyBankWorker.initWorker(getApplication(), piggyName, accountId.toString(), targetAmount,
-                                    currentAmount, startDate, targetDate, notes)
-                            apiResponse.postValue(Pair(false, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
-                        } else {
-                            apiResponse.postValue(Pair(false, addPiggyBank.error.localizedMessage))
-                        }
-
-                    }
-                    else -> {
-                        apiResponse.postValue(Pair(false, "Error saving piggy bank"))
-                    }
-                }
+            if(accountName.isBlank()){
+                apiResponse.postValue(Pair(false, "Please choose an account"))
                 isLoading.postValue(false)
             } else {
-                apiResponse.postValue(Pair(false, "There was an error getting account data"))
-                isLoading.postValue(false)
+                val accountId = accountRepository.getAccountByName(accountName, "asset").accountId
+                if(accountId != null || accountId == 0L){
+                    val addPiggyBank = piggyRepository.addPiggyBank(piggyName, accountId, targetAmount,
+                            currentAmount, startDate, targetDate, notes)
+                    when {
+                        addPiggyBank.response != null -> {
+                            apiResponse.postValue(Pair(true, "Piggy bank saved"))
+                        }
+                        addPiggyBank.errorMessage != null -> {
+                            apiResponse.postValue(Pair(false, addPiggyBank.errorMessage))
+                        }
+                        addPiggyBank.error != null -> {
+                            if(addPiggyBank.error is UnknownHostException){
+                                PiggyBankWorker.initWorker(getApplication(), piggyName, accountId.toString(), targetAmount,
+                                        currentAmount, startDate, targetDate, notes)
+                                apiResponse.postValue(Pair(false, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
+                            } else {
+                                apiResponse.postValue(Pair(false, addPiggyBank.error.localizedMessage))
+                            }
+
+                        }
+                        else -> {
+                            apiResponse.postValue(Pair(false, "Error saving piggy bank"))
+                        }
+                    }
+                    isLoading.postValue(false)
+                } else {
+                    apiResponse.postValue(Pair(false, "There was an error getting account data"))
+                    isLoading.postValue(false)
+                }
             }
         }
         return apiResponse

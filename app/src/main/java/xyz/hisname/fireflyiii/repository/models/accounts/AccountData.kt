@@ -11,7 +11,7 @@ import com.squareup.moshi.JsonClass
 data class AccountData(
         @PrimaryKey(autoGenerate = false)
         @Json(name ="id")
-        var accountId: Long? = null,
+        var accountId: Long = 0,
         @Embedded
         @Json(name ="attributes")
         var accountAttributes: AccountAttributes? = null
