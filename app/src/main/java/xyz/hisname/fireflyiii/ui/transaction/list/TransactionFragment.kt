@@ -113,6 +113,10 @@ class TransactionFragment: BaseFragment(){
         swipeContainer.setOnRefreshListener {
             transactionAdapter.refresh()
         }
+        buttonSummaryPanel.setOnClickListener {
+            extendedFab.hide()
+            fragment_transaction_root.openDrawer(slider)
+        }
     }
 
     private fun loadTransaction(){
