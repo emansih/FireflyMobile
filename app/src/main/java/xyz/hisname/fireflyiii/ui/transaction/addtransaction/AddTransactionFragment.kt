@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -62,7 +63,6 @@ import xyz.hisname.fireflyiii.util.extension.*
 import java.io.File
 import java.util.*
 
-// This code sucks :(
 class AddTransactionFragment: BaseFragment() {
 
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
@@ -248,15 +248,8 @@ class AddTransactionFragment: BaseFragment() {
             addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
         addTransactionFab.setOnClickListener {
-            // Listen to loading only when FAB is clicked
-            addTransactionViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
-                if(loading){
-                    ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                } else {
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                }
-            }
             hideKeyboard()
+            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             val piggyBank = if(piggy_edittext.isBlank()){
                 null
             } else {
@@ -728,9 +721,34 @@ class AddTransactionFragment: BaseFragment() {
                 sourceAccount, destinationAccount, categoryName, transactionTags, budgetName, attachmentItemAdapter,
                 note_edittext.getString()).observe(viewLifecycleOwner){ response ->
             if(response.first){
-                toastSuccess(response.second)
-                handleBack()
+                if(attachmentItemAdapter.isEmpty()){
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                    toastSuccess(response.second)
+                    handleBack()
+                } else {
+                    toastSuccess(response.second)
+                    addTransactionViewModel.attachmentMessageLiveData.observe(viewLifecycleOwner){ error ->
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                        if(error.isNotEmpty()){
+                            val errorMessage = ""
+                            error.forEachIndexed { index, s ->
+                                errorMessage.plus("$index. $s\n\n")
+                            }
+                            AlertDialog.Builder(requireContext())
+                                    .setTitle("There was some issue uploading your attachments")
+                                    .setMessage(errorMessage)
+                                    .setPositiveButton(android.R.string.ok){ _, _ ->
+                                        handleBack()
+                                    }
+                            toastError("Please try again later", Toast.LENGTH_LONG)
+                        } else {
+                            toastSuccess("File uploaded!")
+                            handleBack()
+                        }
+                    }
+                }
             } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 toastInfo(response.second)
             }
         }
@@ -743,6 +761,7 @@ class AddTransactionFragment: BaseFragment() {
                 selectedTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, categoryName,
                 transactionTags, budgetName, note_edittext.getString()).observe(viewLifecycleOwner){ response ->
+            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             if(response.first){
                 toastSuccess(response.second)
                 handleBack()

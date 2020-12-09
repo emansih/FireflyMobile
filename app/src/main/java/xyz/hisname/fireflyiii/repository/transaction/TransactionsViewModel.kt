@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
@@ -77,7 +78,8 @@ class TransactionsViewModel(application: Application): BaseViewModel(application
 
     fun getTransactionAttachment(journalId: Long): MutableLiveData<MutableList<AttachmentData>>{
         isLoading.value = true
-        val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao())
+        val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao(),
+                genericService().create(AttachmentService::class.java))
         val data: MutableLiveData<MutableList<AttachmentData>> = MutableLiveData()
         var attachmentData: MutableList<AttachmentData> = arrayListOf()
         var transactionId = 0L

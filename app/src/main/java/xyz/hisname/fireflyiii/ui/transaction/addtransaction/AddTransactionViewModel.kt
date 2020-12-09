@@ -13,9 +13,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.*
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
@@ -88,6 +90,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val removeFragment = MutableLiveData<Boolean>()
     val transactionBundle = MutableLiveData<Bundle>()
     val isFromTasker = MutableLiveData<Boolean>()
+    val attachmentMessageLiveData = MutableLiveData<ArrayList<String>>()
 
     fun parseBundle(bundle: Bundle?){
         if(bundle != null){
@@ -147,7 +150,6 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                        category: String?, tags: String?, budgetName: String?,
                        fileUri: ArrayList<Uri>, notes: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
-        isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
             val addTransaction = transactionRepository.addTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
@@ -162,7 +164,12 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                             journalId = transaction.transaction_journal_id
                         }
                         if(journalId != 0L){
-                            AttachmentWorker.initWorker(fileUri, journalId, getApplication())
+                            val attachmentRepository = AttachmentRepository(
+                                    AppDatabase.getInstance(getApplication()).attachmentDataDao(),
+                                    genericService().create(AttachmentService::class.java))
+                            val attachmentResponse =
+                                    attachmentRepository.uploadFile(getApplication(), journalId, fileUri)
+                            attachmentMessageLiveData.postValue(attachmentResponse)
                         }
                     }
                 }
@@ -198,7 +205,6 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                     apiResponse.postValue(Pair(false, "Error adding transaction"))
                 }
             }
-            isLoading.postValue(false)
         }
         return apiResponse
     }

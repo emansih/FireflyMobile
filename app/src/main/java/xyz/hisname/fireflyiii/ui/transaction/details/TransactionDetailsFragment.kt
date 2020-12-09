@@ -139,28 +139,7 @@ class TransactionDetailsFragment: BaseFragment() {
         }
         meta_information.layoutManager = LinearLayoutManager(requireContext())
         meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        meta_information.adapter = BaseDetailRecyclerAdapter(metaDataList){ position: Int -> setMetaInfoClick(position)}
-    }
-
-    private fun setMetaInfoClick(position: Int){
-        when(position) {
-            0 -> {
-                if (transactionCategory.isNotEmpty()) {
-                    AlertDialog.Builder(requireContext())
-                            .setTitle(resources.getString(R.string.categories))
-                            .setMessage(transactionCategory)
-                            .show()
-                }
-            }
-            1 -> {
-                if (transactionBudget.isNotEmpty()) {
-                    AlertDialog.Builder(requireContext())
-                            .setTitle(resources.getString(R.string.budget))
-                            .setMessage(transactionBudget)
-                            .show()
-                }
-            }
-        }
+        meta_information.adapter = BaseDetailRecyclerAdapter(metaDataList){  }
     }
 
     private fun setTransactionInfoClick(position: Int){

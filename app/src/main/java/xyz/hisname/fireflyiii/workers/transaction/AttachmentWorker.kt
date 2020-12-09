@@ -68,16 +68,16 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
     override suspend fun doWork(): Result {
         val transactionJournalId = inputData.getLong("transactionJournalId", 0)
         val fileArray = inputData.getStringArray("fileUri")
-        val service = genericService?.create(AttachmentService::class.java)
+        val service = genericService.create(AttachmentService::class.java)
         if(!fileArray.isNullOrEmpty()){
             fileArray.forEachIndexed { index, fileToUpload ->
                 val fileName = FileUtils.getFileName(context, fileToUpload.toUri()) ?: ""
                 val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context, fileToUpload.toUri()) ?: ""),
                         copyFile(context, fileToUpload.toUri(), fileName))
                 try {
-                    val storeAttachment = service?.storeAttachment(fileName, "TransactionJournal", transactionJournalId, fileName,
+                    val storeAttachment = service.storeAttachment(fileName, "TransactionJournal", transactionJournalId, fileName,
                             "File uploaded by " + BuildConfig.APPLICATION_ID)
-                    val responseBody = storeAttachment?.body()
+                    val responseBody = storeAttachment.body()
                     if (responseBody != null && storeAttachment.code() == 200) {
                         val upload = service.uploadFile(responseBody.data.attachmentId, requestFile)
                         ("file://" + context.filesDir.path + "/" + fileName).toUri().toFile().delete()
