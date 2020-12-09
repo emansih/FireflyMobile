@@ -108,24 +108,22 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         val responseBody = responseFromServer?.body()
         val responseErrorBody = responseFromServer?.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
+            insertCurrency(responseBody.data)
+            return ApiResponses(response = responseBody)
+        } else {
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
                 // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
-                var errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(responseErrorBody.source())
+                val errorMessage = when {
                     moshi?.errors?.name != null -> moshi.errors.name[0]
                     moshi?.errors?.code != null -> moshi.errors.code[0]
                     moshi?.errors?.symbol != null -> moshi.errors.symbol[0]
                     moshi?.errors?.decimalPlaces != null -> moshi.errors.decimalPlaces[0]
-                    else -> "Error occurred while saving currency"
+                    else -> moshi?.message ?: "Error occurred while saving currency"
                 }
                 return ApiResponses(errorMessage = errorMessage)
-            } else {
-                insertCurrency(responseBody.data)
-                return ApiResponses(response = responseBody)
             }
-        } else {
             return ApiResponses(errorMessage = "Error occurred while saving currency")
         }
     }

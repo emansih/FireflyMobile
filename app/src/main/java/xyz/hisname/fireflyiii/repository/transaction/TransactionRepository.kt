@@ -220,6 +220,13 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
+            responseBody.data.transactionAttributes?.transactions?.forEach { transaction ->
+                insertTransaction(transaction)
+                insertTransaction(TransactionIndex(responseBody.data.transactionId,
+                        transaction.transaction_journal_id))
+            }
+            return ApiResponses(response = responseBody)
+        } else {
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
                 // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
@@ -233,18 +240,10 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     moshi?.errors?.transaction_destination_id  != null -> moshi.errors.transaction_destination_id[0]
                     moshi?.errors?.transaction_amount != null -> moshi.errors.transaction_amount[0]
                     moshi?.errors?.description != null -> moshi.errors.description[0]
-                    else -> "The given data was invalid"
+                    else -> moshi?.message ?: "The given data was invalid"
                 }
                 return ApiResponses(errorMessage = errorMessage)
-            } else {
-                responseBody.data.transactionAttributes?.transactions?.forEach { transaction ->
-                    insertTransaction(transaction)
-                    insertTransaction(TransactionIndex(responseBody.data.transactionId,
-                            transaction.transaction_journal_id))
-                }
-                return ApiResponses(response = responseBody)
             }
-        } else {
             return ApiResponses(errorMessage = "Error occurred while saving transactions")
         }
     }

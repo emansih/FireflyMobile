@@ -74,26 +74,24 @@ class BillRepository(private val billDao: BillDataDao,
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
+            billDao.insert(responseBody.data)
+            return ApiResponses(response = responseBody)
+        } else {
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
                 // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
-                var errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(responseErrorBody.source())
+                val errorMessage = when {
                     moshi?.errors?.name != null -> moshi.errors.name[0]
                     moshi?.errors?.currency_code != null -> moshi.errors.currency_code[0]
                     moshi?.errors?.amount_min != null -> moshi.errors.amount_min[0]
                     moshi?.errors?.repeat_freq != null -> moshi.errors.repeat_freq[0]
                     moshi?.errors?.date != null -> moshi.errors.date[0]
                     moshi?.errors?.skip != null -> moshi.errors.skip[0]
-                    else -> "Error occurred while saving bill"
+                    else -> moshi?.message ?:"Error occurred while saving bill"
                 }
                 return ApiResponses(errorMessage = errorMessage)
-            } else {
-                billDao.insert(responseBody.data)
-                return ApiResponses(response = responseBody)
             }
-        } else {
             return ApiResponses(errorMessage = "Error occurred while saving Account")
         }
     }

@@ -192,12 +192,14 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
+            accountDao.insert(responseBody.data)
+            return ApiResponses(response = responseBody)
+        } else {
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
                 // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
-                var errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(responseErrorBody.source())
+                val errorMessage = when {
                     moshi?.errors?.name != null -> moshi.errors.name[0]
                     moshi?.errors?.account_number != null -> moshi.errors.account_number[0]
                     moshi?.errors?.interest != null -> moshi.errors.interest[0]
@@ -210,14 +212,10 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                     moshi?.errors?.interest_period != null -> moshi.errors.interest_period[0]
                     moshi?.errors?.liability_amount != null -> moshi.errors.liability_amount[0]
                     moshi?.errors?.exception != null -> moshi.errors.exception[0]
-                    else -> "Error occurred while saving Account"
+                    else -> moshi?.message ?: "Error occurred while saving Account"
                 }
                 return ApiResponses(errorMessage = errorMessage)
-            } else {
-                accountDao.insert(responseBody.data)
-                return ApiResponses(response = responseBody)
             }
-        } else {
             return ApiResponses(errorMessage = "Error occurred while saving Account")
         }
     }

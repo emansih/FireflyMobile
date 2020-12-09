@@ -119,24 +119,22 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
+            tagsDataDao.insert(responseBody.data)
+            return ApiResponses(response = responseBody)
+        } else {
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
                 // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
-                var errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(responseErrorBody.source())
+                val errorMessage = when {
                     moshi?.errors?.longitude != null -> moshi.errors.longitude[0]
                     moshi?.errors?.tag != null -> moshi.errors.tag[0]
                     moshi?.errors?.latitude != null -> moshi.errors.latitude[0]
                     moshi?.errors?.zoomLevel != null -> moshi.errors.zoomLevel[0]
-                    else -> "Error occurred while saving tag"
+                    else -> moshi?.message ?: "Error occurred while saving tag"
                 }
                 return ApiResponses(errorMessage = errorMessage)
-            } else {
-                tagsDataDao.insert(responseBody.data)
-                return ApiResponses(response = responseBody)
             }
-        } else {
             return ApiResponses(errorMessage = "Error occurred while saving tag")
         }
     }

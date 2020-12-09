@@ -73,24 +73,22 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
+            piggyDao.insert(responseBody.data)
+            return ApiResponses(response = responseBody)
+        } else {
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
                 // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
-                var errorMessage = String(responseErrorBody.bytes())
-                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-                errorMessage = when {
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(responseErrorBody.source())
+                val errorMessage = when {
                     moshi?.errors?.name != null -> moshi.errors.name[0]
                     moshi?.errors?.account_id != null -> moshi.errors.account_id[0]
                     moshi?.errors?.current_amount != null -> moshi.errors.current_amount[0]
                     moshi?.errors?.targetDate != null -> moshi.errors.targetDate[0]
-                    else -> "Error occurred while saving piggy bank"
+                    else -> moshi?.message ?: "Error occurred while saving piggy bank"
                 }
                 return ApiResponses(errorMessage = errorMessage)
-            } else {
-                piggyDao.insert(responseBody.data)
-                return ApiResponses(response = responseBody)
             }
-        } else {
             return ApiResponses(errorMessage = "Error occurred while saving piggy bank")
         }
     }
