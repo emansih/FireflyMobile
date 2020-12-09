@@ -64,7 +64,7 @@ abstract class TransactionDataDao {
                                                  transactionType: String,
                                                  categoryId: Long): BigDecimal
 
-    @Query("SELECT sum(amount) as someValue FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND currency_code = :currencyCode AND transactionType =:transactionType AND budget_name =:budgetName")
+    @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND currency_code = :currencyCode AND transactionType =:transactionType AND budget_name =:budgetName")
     abstract fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
                                                           currencyCode: String,
                                                           transactionType: String,

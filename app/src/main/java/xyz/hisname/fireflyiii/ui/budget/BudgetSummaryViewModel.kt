@@ -93,8 +93,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         val returnData = arrayListOf<Triple<Float, String, BigDecimal>>()
         uniqBudget.forEach { budgetName ->
             if (budgetName.isNotEmpty()){
-                val transactionBudget = retrieveBudget(startOfMonth, endOfMonth,
-                        defaultCurrency, budgetName)
+                val transactionBudget = getBudget(startOfMonth, endOfMonth, defaultCurrency, budgetName)
                 sumOfWithdrawal = sumOfWithdrawal.add(transactionBudget)
                 if(budget != BigDecimal.ZERO){
                     val percentage = transactionBudget
@@ -134,7 +133,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
 
     }
 
-    private suspend fun retrieveBudget(start: String, end: String, currency: String, budgetName: String) =
+    private suspend fun getBudget(start: String, end: String, currency: String, budgetName: String) =
         transactionRepository.getTransactionByDateAndBudgetAndCurrency(
                 start, end, currency, "withdrawal", budgetName)
 
@@ -150,7 +149,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                 availableBudget.postValue("--.--")
                 viewModelScope.launch(Dispatchers.IO){
                     totalTransaction.postValue(currencySymbol + " " +
-                            retrieveBudget(DateTimeUtil.getStartOfMonth(),
+                            getBudget(DateTimeUtil.getStartOfMonth(),
                                     DateTimeUtil.getEndOfMonth(), defaultCurrency, ""))
                 }
                 return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
@@ -162,7 +161,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                     val budgetAmount = budgetRepository.getBudgetLimitByName(budget, DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), defaultCurrency)
                     availableBudget.postValue("$currencySymbol $budgetAmount")
-                    val balance = budgetAmount.minus( retrieveBudget(DateTimeUtil.getStartOfMonth(),
+                    val balance = budgetAmount.minus(getBudget(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), defaultCurrency, budget))
                     balanceBudget.postValue("$currencySymbol $balance")
                 }
@@ -190,7 +189,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
     fun getBalance(budget: String){
         viewModelScope.launch(Dispatchers.IO){
             if (budget.isNotEmpty()){
-                val transactionBudget = retrieveBudget(startOfMonth, endOfMonth,
+                val transactionBudget = getBudget(startOfMonth, endOfMonth,
                         defaultCurrency, budget)
                 totalTransaction.postValue("$currencySymbol $transactionBudget")
                 balanceBudget.postValue("$currencySymbol ${originalBudget.minus(transactionBudget)}")
