@@ -240,7 +240,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
             null
         }
         val openingBalanceDate: String? = if(opening_balance_date_layout.isVisible){
-            opening_balance_edittext.getString()
+            opening_balance_date_edittext.getString()
         } else {
             null
         }
