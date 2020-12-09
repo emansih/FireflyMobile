@@ -29,15 +29,17 @@
             android:id="@+id/notesCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="@+id/categoryChart"
+            app:layout_constraintEnd_toEndOf="@+id/categoryChart"
             app:layout_constraintTop_toBottomOf="@+id/categoryChart">
 
             <TextView
                 android:id="@+id/notesText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="12dp" />
 
         </com.google.android.material.card.MaterialCardView>
 
