@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_tags.placeHolderToolbar
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -37,6 +38,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
     private var zoomLevel: String? = null
     private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
     private val addTagViewModel by lazy { getImprovedViewModel(AddTagsViewModel::class.java) }
+    private val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.create(R.layout.fragment_add_tags, container)

@@ -37,6 +37,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.models.nominatim.LocationSearchModel
 import xyz.hisname.fireflyiii.repository.nominatim.NominatimViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -48,6 +49,7 @@ class MapsFragment: BaseFragment() {
 
     private val locationService by lazy { requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
     private val nominatimViewModel by lazy { getViewModel(NominatimViewModel::class.java) }
+    private val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
     private val mapController by lazy { maps.controller }
     private val groomLake by lazy { GeoPoint(37.276675, -115.798936) }
     private lateinit var startMarker: Marker
@@ -146,10 +148,10 @@ class MapsFragment: BaseFragment() {
                 } else {
                     cloneLocationList = data.first
                     val displayName = arrayListOf<String>()
-                    data.first.forEachIndexed { _, locationSearchModel ->
+                    data.first.forEach { locationSearchModel ->
                         displayName.add(locationSearchModel.display_name)
                     }
-                    val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item, displayName)
+                    val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, displayName)
                     mapSearch.setAdapter(adapter)
                 }
             }
