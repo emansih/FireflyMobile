@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
@@ -94,21 +93,20 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         }
     }
 
+    @Throws(Exception::class)
     suspend fun getAccountByName(accountName: String, accountType: String): AccountData{
-        val accountData = accountDao.getAccountByNameAndType(accountName, accountType)
+        var accountData = accountDao.getAccountByNameAndType(accountName, accountType)
         if(accountData.accountAttributes?.name.isNullOrEmpty()) {
-            try {
-                val networkCall = accountsService.searchAccount(accountName, accountType)
-                val responseBody = networkCall.body()
-                if (responseBody != null && networkCall.isSuccessful) {
-                    responseBody.data.forEach { data ->
-                        accountDao.insert(data)
-                    }
+            val networkCall = accountsService.searchAccount(accountName, accountType)
+            val responseBody = networkCall.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                responseBody.data.forEach { data ->
+                    accountDao.insert(data)
                 }
-            } catch (exception: Exception) {
             }
+            accountData = accountDao.getAccountByNameAndType(accountName, accountType)
         }
-        return accountDao.getAccountByNameAndType(accountName, accountType)
+        return accountData
     }
 
     suspend fun getTransactionByAccountId(accountId: Long, startDate: String,

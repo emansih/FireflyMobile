@@ -57,41 +57,35 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                      startDate: String?, targetAmount: String, targetDate: String?): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
-        viewModelScope.launch(Dispatchers.IO){
-            if(accountName.isBlank()){
-                apiResponse.postValue(Pair(false, "Please choose an account"))
-                isLoading.postValue(false)
-            } else {
-                val accountId = accountRepository.getAccountByName(accountName, "asset").accountId
-                if(accountId != null || accountId == 0L){
-                    val addPiggyBank = piggyRepository.addPiggyBank(piggyName, accountId, targetAmount,
-                            currentAmount, startDate, targetDate, notes)
-                    when {
-                        addPiggyBank.response != null -> {
-                            apiResponse.postValue(Pair(true, "Piggy bank saved"))
-                        }
-                        addPiggyBank.errorMessage != null -> {
-                            apiResponse.postValue(Pair(false, addPiggyBank.errorMessage))
-                        }
-                        addPiggyBank.error != null -> {
-                            if(addPiggyBank.error is UnknownHostException){
-                                PiggyBankWorker.initWorker(getApplication(), piggyName, accountId.toString(), targetAmount,
-                                        currentAmount, startDate, targetDate, notes)
-                                apiResponse.postValue(Pair(false, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
-                            } else {
-                                apiResponse.postValue(Pair(false, addPiggyBank.error.localizedMessage))
-                            }
-
-                        }
-                        else -> {
-                            apiResponse.postValue(Pair(false, "Error saving piggy bank"))
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ ->
+            apiResponse.postValue(Pair(false, "There was an error getting account data"))
+            isLoading.postValue(false)
+        }){
+            val accountId = accountRepository.getAccountByName(accountName, "asset").accountId
+            if(accountId != 0L) {
+                val addPiggyBank = piggyRepository.addPiggyBank(piggyName, accountId, targetAmount,
+                        currentAmount, startDate, targetDate, notes)
+                when {
+                    addPiggyBank.response != null -> {
+                        apiResponse.postValue(Pair(true, "Piggy bank saved"))
+                    }
+                    addPiggyBank.errorMessage != null -> {
+                        apiResponse.postValue(Pair(false, addPiggyBank.errorMessage))
+                    }
+                    addPiggyBank.error != null -> {
+                        if (addPiggyBank.error is UnknownHostException) {
+                            PiggyBankWorker.initWorker(getApplication(), piggyName, accountId.toString(), targetAmount,
+                                    currentAmount, startDate, targetDate, notes)
+                            apiResponse.postValue(Pair(false, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
+                        } else {
+                            apiResponse.postValue(Pair(false, addPiggyBank.error.localizedMessage))
                         }
                     }
-                    isLoading.postValue(false)
-                } else {
-                    apiResponse.postValue(Pair(false, "There was an error getting account data"))
-                    isLoading.postValue(false)
+                    else -> {
+                        apiResponse.postValue(Pair(false, "Error saving piggy bank"))
+                    }
                 }
+                isLoading.postValue(false)
             }
         }
         return apiResponse
