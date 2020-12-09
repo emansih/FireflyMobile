@@ -33,7 +33,7 @@ interface CategoryService {
     @DELETE("${CATEGORY_API_ENDPOINT}/{id}")
     suspend fun deleteCategoryById(@Path("id") id: Long): Response<Void>
 
-    @GET("${CATEGORY_API_ENDPOINT}/{id}")
+    @PUT("${CATEGORY_API_ENDPOINT}/{id}")
     suspend fun updateCategory(@Path("id") id: Long,
                                @Query("name") name: String): Response<CategorySuccessModel>
 
