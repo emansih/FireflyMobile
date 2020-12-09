@@ -197,7 +197,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         note_edittext.setOnClickListener {
             markdownViewModel.markdownText.postValue(note_edittext.getString())
             parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, MarkdownFragment())
+                add(R.id.bigger_fragment_container, MarkdownFragment())
                 addToBackStack(null)
             }
         }
