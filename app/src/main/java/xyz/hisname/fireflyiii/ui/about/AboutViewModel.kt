@@ -15,7 +15,7 @@ import xyz.hisname.fireflyiii.repository.userinfo.SystemInfoRepository
 class AboutViewModel(application: Application): BaseViewModel(application) {
 
     private val systemInfoRepository by lazy { SystemInfoRepository(
-            genericService()?.create(SystemInfoService::class.java),
+            genericService().create(SystemInfoService::class.java),
             sharedPref,
             accManager)
     }

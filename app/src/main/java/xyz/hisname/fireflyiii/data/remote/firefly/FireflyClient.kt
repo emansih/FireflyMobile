@@ -8,8 +8,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import xyz.hisname.fireflyiii.data.remote.firefly.moshi.*
-import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
-import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
@@ -27,8 +25,8 @@ class FireflyClient {
         private lateinit var baseUrl: URL
 
         fun getClient(baseUrl: String, accessToken: String, certPinValue: String,
-                      trustManager: X509TrustManager?, sslSocketFactory: SSLSocketFactory?): Retrofit?{
-            if(INSTANCE == null){
+                      trustManager: X509TrustManager?, sslSocketFactory: SSLSocketFactory?): Retrofit{
+            return INSTANCE ?: synchronized(this){
                 val client = OkHttpClient().newBuilder()
                         .addInterceptor(HeaderInterceptor(accessToken))
                         .callTimeout(1, TimeUnit.MINUTES)
@@ -49,23 +47,20 @@ class FireflyClient {
                         client.certificatePinner(certPinner)
                     } catch (exception: IllegalArgumentException){ }
                 }
-                synchronized(FireflyClient::class.java){
-                    val moshi = Moshi.Builder()
-                            .add(NullToEmptyStringConverter)
-                            .add(JsonObjectConverter)
-                            .add(LocalDate::class.java, LocalDateAdapter())
-                            .add(OffsetDateTime::class.java, OffsetDateTimeConverter())
-                            .add(BigDecimalConverter())
-                            .build()
-                    INSTANCE = Retrofit.Builder()
-                            .baseUrl(generateUrl(baseUrl))
-                            .client(client.build())
-                            .addConverterFactory(ScalarsConverterFactory.create())
-                            .addConverterFactory(MoshiConverterFactory.create(moshi))
-                            .build()
-                }
+                val moshi = Moshi.Builder()
+                        .add(NullToEmptyStringConverter)
+                        .add(JsonObjectConverter)
+                        .add(LocalDate::class.java, LocalDateAdapter())
+                        .add(OffsetDateTime::class.java, OffsetDateTimeConverter())
+                        .add(BigDecimalConverter())
+                        .build()
+                INSTANCE ?: Retrofit.Builder()
+                        .baseUrl(generateUrl(baseUrl))
+                        .client(client.build())
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(MoshiConverterFactory.create(moshi))
+                        .build().also { INSTANCE = it }
             }
-            return INSTANCE
         }
 
         fun destroyInstance() {

@@ -12,14 +12,14 @@ import java.net.UnknownHostException
 
 @Suppress("RedundantSuspendModifier")
 class BillRepository(private val billDao: BillDataDao,
-                     private val billService: BillsService?) {
+                     private val billService: BillsService) {
 
     suspend fun getBillById(billId: Long) = billDao.getBillById(billId)
 
     suspend fun deleteBillById(billId: Long): Int{
         try {
-            val networkResponse = billService?.deleteBillById(billId)
-            when (networkResponse?.code()) {
+            val networkResponse = billService.deleteBillById(billId)
+            when (networkResponse.code()) {
                 204 -> {
                     billDao.deleteBillById(billId)
                     return HttpConstants.NO_CONTENT_SUCCESS
@@ -50,7 +50,7 @@ class BillRepository(private val billDao: BillDataDao,
                         skip: String, active: String, currencyCode: String,
                         notes: String?): ApiResponses<BillSuccessModel>{
         return try {
-            val networkCall = billService?.createBill(name, amountMin, amountMax, date,
+            val networkCall = billService.createBill(name, amountMin, amountMax, date,
                     repeatFreq, skip, active, currencyCode, notes)
             parseResponse(networkCall)
         } catch (exception: Exception){
@@ -62,7 +62,7 @@ class BillRepository(private val billDao: BillDataDao,
                            repeatFreq: String, skip: String,active: String, currencyCode: String,
                            notes: String?): ApiResponses<BillSuccessModel>{
         return try {
-            val networkCall = billService?.updateBill(billId, name, amountMin, amountMax, date,
+            val networkCall = billService.updateBill(billId, name, amountMin, amountMax, date,
                     repeatFreq, skip, active, currencyCode, notes)
             parseResponse(networkCall)
         } catch (exception: Exception){
@@ -70,9 +70,9 @@ class BillRepository(private val billDao: BillDataDao,
         }
     }
 
-    private suspend fun parseResponse(responseFromServer: Response<BillSuccessModel>?): ApiResponses<BillSuccessModel> {
-        val responseBody = responseFromServer?.body()
-        val responseErrorBody = responseFromServer?.errorBody()
+    private suspend fun parseResponse(responseFromServer: Response<BillSuccessModel>): ApiResponses<BillSuccessModel> {
+        val responseBody = responseFromServer.body()
+        val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive

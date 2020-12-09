@@ -31,7 +31,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val notes = inputData.getString("notes") ?: ""
         val piggyWorkManagerId = inputData.getLong("piggyWorkManagerId", 0)
         val piggyRepository = PiggyRepository(AppDatabase.getInstance(context).piggyDataDao(),
-                genericService?.create(PiggybankService::class.java))
+                genericService.create(PiggybankService::class.java))
         val addPiggy = piggyRepository.addPiggyBank(name, accountId.toLong(), targetAmount,
                 currentAmount, startDate, endDate, notes)
         when {

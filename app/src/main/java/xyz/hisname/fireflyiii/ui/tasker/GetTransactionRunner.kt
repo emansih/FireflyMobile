@@ -32,7 +32,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
     private lateinit var transactionDatabase: TransactionDataDao
     private lateinit var currencyDatabase: CurrencyDataDao
 
-    private fun genericService(): Retrofit? {
+    private fun genericService(): Retrofit {
         val cert = AppPref(sharedPref).certValue
         return if (AppPref(sharedPref).isCustomCa) {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
@@ -90,7 +90,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                                        sourceName: String?, destinationName: String?, currencyName: String,
                                        category: String?, tags: String?, budgetName: String?, notes: String?): TaskerPluginResult<Unit>{
 
-        val transactionRepository = TransactionRepository(transactionDatabase, genericService()?.create(TransactionService::class.java))
+        val transactionRepository = TransactionRepository(transactionDatabase, genericService().create(TransactionService::class.java))
         val addTransaction = transactionRepository.addTransaction(type,description, date, time,  piggyBankName, amount.replace(',', '.'),
                 sourceName, destinationName, currencyName, category, tags, budgetName, notes)
         return when {

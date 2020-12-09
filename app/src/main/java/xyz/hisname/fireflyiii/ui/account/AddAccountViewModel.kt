@@ -21,11 +21,11 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
 
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java)
+            genericService().create(CurrencyService::class.java)
     )
     private val accountRepository = AccountRepository(
             AppDatabase.getInstance(application).accountDataDao(),
-            genericService()?.create(AccountsService::class.java)
+            genericService().create(AccountsService::class.java)
     )
 
     var currency = ""

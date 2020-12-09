@@ -43,7 +43,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val transactionWorkManagerId = inputData.getLong("transactionWorkManagerId", 0)
         val transactionRepository = TransactionRepository(
                 AppDatabase.getInstance(context).transactionDataDao(),
-                genericService?.create(TransactionService::class.java)
+                genericService.create(TransactionService::class.java)
         )
         val addTransaction = transactionRepository.addTransaction(transactionType, transactionDescription, transactionDate,
                 transactionTime, piggyBank, transactionAmount, sourceName,

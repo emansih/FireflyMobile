@@ -21,7 +21,7 @@ import java.io.File
 
 class AttachmentViewModel(application: Application): BaseViewModel(application) {
 
-    private val attachmentService by lazy { genericService()?.create(AttachmentService::class.java) }
+    private val attachmentService by lazy { genericService().create(AttachmentService::class.java) }
     private val viewModelContext by lazy { getApplication() as Context }
     val isDownloaded: MutableLiveData<Boolean> = MutableLiveData()
 

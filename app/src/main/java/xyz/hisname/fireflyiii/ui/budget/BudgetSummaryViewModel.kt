@@ -28,11 +28,11 @@ import kotlin.math.abs
 
 class BudgetSummaryViewModel(application: Application): BaseViewModel(application) {
 
-    private val currencyService = genericService()?.create(CurrencyService::class.java)
+    private val currencyService = genericService().create(CurrencyService::class.java)
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(), currencyService)
 
-    private val transactionService = genericService()?.create(TransactionService::class.java)
+    private val transactionService = genericService().create(TransactionService::class.java)
     private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
     private val transactionRepository = TransactionRepository(transactionDataDao, transactionService)
 
@@ -40,7 +40,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
     private val budgetLimitDao = AppDatabase.getInstance(application).budgetLimitDao()
     private val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
     private val budgetListDao = AppDatabase.getInstance(application).budgetListDataDao()
-    private val budgetService = genericService()?.create(BudgetService::class.java)
+    private val budgetService = genericService().create(BudgetService::class.java)
 
     private val budgetRepository = BudgetRepository(budgetDao, budgetListDao, spentDao, budgetLimitDao, budgetService)
     private lateinit var startOfMonth: String

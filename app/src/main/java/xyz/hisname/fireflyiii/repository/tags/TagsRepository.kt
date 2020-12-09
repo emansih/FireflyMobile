@@ -15,20 +15,20 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
 class TagsRepository(private val tagsDataDao: TagsDataDao,
-                     private val tagsService: TagsService?) {
+                     private val tagsService: TagsService) {
 
     suspend fun allTags(): MutableList<TagsData>{
         try {
             val tagsData: MutableList<TagsData> = arrayListOf()
-            val networkCall = tagsService?.getPaginatedTags(1)
-            val responseBody = networkCall?.body()
+            val networkCall = tagsService.getPaginatedTags(1)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 tagsData.addAll(responseBody.data.toMutableList())
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
                     for (items in 2..pagination.total_pages) {
                         tagsData.addAll(
-                                tagsService?.getPaginatedTags(items)?.body()?.data?.toMutableList()
+                                tagsService.getPaginatedTags(items).body()?.data?.toMutableList()
                                         ?: arrayListOf())
 
                     }
@@ -46,8 +46,8 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
         try {
             val tag = tagsDataDao.getTagById(tagId)
             if (tag.tagsAttributes.description.isEmpty()){
-                val networkCall = tagsService?.getTagByName(tagId.toString())
-                val responseBody = networkCall?.body()
+                val networkCall = tagsService.getTagByName(tagId.toString())
+                val responseBody = networkCall.body()
                 if(responseBody != null && networkCall.isSuccessful){
                     responseBody.data.forEach {  tagsData ->
                         tagsDataDao.insert(tagsData)
@@ -62,8 +62,8 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
         try {
             val tag = tagsDataDao.getTagByName(tagName)
             if (tag.tagsAttributes.description.isEmpty()){
-                val networkCall = tagsService?.searchTag(tagName)
-                val responseBody = networkCall?.body()
+                val networkCall = tagsService.searchTag(tagName)
+                val responseBody = networkCall.body()
                 if(responseBody != null && networkCall.isSuccessful){
                     responseBody.forEach {  tagsItems ->
                         tagsDataDao.insert(TagsData(
@@ -80,8 +80,8 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
 
     suspend fun searchTag(tagName: String): List<String>{
         try {
-            val networkCall = tagsService?.searchTag(tagName)
-            val responseBody = networkCall?.body()
+            val networkCall = tagsService.searchTag(tagName)
+            val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
                 responseBody.forEach {  tagsItems ->
                     tagsDataDao.insert(TagsData(
@@ -98,7 +98,7 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
     suspend fun addTags(tagName: String, date: String?, description: String?, latitude: String?,
                         longitude: String?, zoomLevel: String?): ApiResponses<TagsSuccessModel> {
         return try {
-            val networkCall = tagsService?.addTag(tagName, date, description, latitude, longitude, zoomLevel)
+            val networkCall = tagsService.addTag(tagName, date, description, latitude, longitude, zoomLevel)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -108,16 +108,16 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
     suspend fun updateTags(tagId: Long, tagName: String, date: String?, description: String?, latitude: String?,
                         longitude: String?, zoomLevel: String?): ApiResponses<TagsSuccessModel> {
         return try {
-            val networkCall = tagsService?.updateTag(tagId, tagName, date, description, latitude, longitude, zoomLevel)
+            val networkCall = tagsService.updateTag(tagId, tagName, date, description, latitude, longitude, zoomLevel)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
         }
     }
 
-    private suspend fun parseResponse(responseFromServer: Response<TagsSuccessModel>?): ApiResponses<TagsSuccessModel>{
-        val responseBody = responseFromServer?.body()
-        val responseErrorBody = responseFromServer?.errorBody()
+    private suspend fun parseResponse(responseFromServer: Response<TagsSuccessModel>): ApiResponses<TagsSuccessModel>{
+        val responseBody = responseFromServer.body()
+        val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
@@ -144,8 +144,8 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
     // Takes in tag id or tag name as parameter
     suspend fun deleteTags(tagName: String): Int{
         try {
-            val networkResponse = tagsService?.deleteTagByName(tagName)
-            when (networkResponse?.code()) {
+            val networkResponse = tagsService.deleteTagByName(tagName)
+            when (networkResponse.code()) {
                 204 -> {
                     tagsDataDao.deleteTagByName(tagName)
                     return HttpConstants.NO_CONTENT_SUCCESS

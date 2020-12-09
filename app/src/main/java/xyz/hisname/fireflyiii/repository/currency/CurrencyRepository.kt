@@ -14,7 +14,7 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
 class CurrencyRepository(private val currencyDao: CurrencyDataDao,
-                         private val currencyService: CurrencyService?) {
+                         private val currencyService: CurrencyService) {
 
     suspend fun insertCurrency(currency: CurrencyData){
         currencyDao.insert(currency)
@@ -24,8 +24,8 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
         try {
             val currencyList = currencyDao.getCurrencyFromBill(billId)
             if(currencyList.isEmpty()){
-                val networkCall = currencyService?.getCurrencyByCode(currencyCode)
-                val responseBody = networkCall?.body()
+                val networkCall = currencyService.getCurrencyByCode(currencyCode)
+                val responseBody = networkCall.body()
                 if (responseBody != null && networkCall.isSuccessful) {
                     currencyDao.deleteCurrencyByCode(currencyCode)
                     responseBody.data.forEach { currencyData ->
@@ -39,8 +39,8 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     suspend fun getCurrencyByCode(currencyCode: String): List<CurrencyData> {
         try {
-            val networkCall = currencyService?.getCurrencyByCode(currencyCode)
-            val responseBody = networkCall?.body()
+            val networkCall = currencyService.getCurrencyByCode(currencyCode)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 currencyDao.deleteCurrencyByCode(currencyCode)
                 responseBody.data.forEach { currencyData ->
@@ -57,8 +57,8 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     suspend fun defaultCurrency(): List<CurrencyData> {
         try {
-            val networkCall = currencyService?.getDefaultCurrency()
-            val responseBody = networkCall?.body()
+            val networkCall = currencyService.getDefaultCurrency()
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 val currencyDefault = networkCall.body()?.data?.currencyAttributes?.currencyDefault
                 if(currencyDefault == true){
@@ -86,7 +86,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     suspend fun addCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
                            enabled: Boolean,default: Boolean): ApiResponses<CurrencySuccessModel>{
         return try {
-            val networkCall = currencyService?.addCurrency(name, code, symbol, decimalPlaces, enabled, default)
+            val networkCall = currencyService.addCurrency(name, code, symbol, decimalPlaces, enabled, default)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -96,7 +96,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     suspend fun updateCurrency(name: String, code: String, symbol: String, decimalPlaces: String,
                                enabled: Boolean,default: Boolean): ApiResponses<CurrencySuccessModel>{
         return try {
-            val networkCall = currencyService?.updateCurrency(code, name, code, symbol, decimalPlaces, enabled, default)
+            val networkCall = currencyService.updateCurrency(code, name, code, symbol, decimalPlaces, enabled, default)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -132,8 +132,8 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
 
     suspend fun deleteCurrencyByCode(currencyCode: String): Int {
         try {
-            val networkResponse = currencyService?.deleteCurrencyByCode(currencyCode)
-            when (networkResponse?.code()) {
+            val networkResponse = currencyService.deleteCurrencyByCode(currencyCode)
+            when (networkResponse.code()) {
                 204 -> {
                     currencyDao.deleteCurrencyByCode(currencyCode)
                     return HttpConstants.NO_CONTENT_SUCCESS
@@ -164,21 +164,21 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
     suspend fun getAllCurrency(): List<CurrencyData>{
         val currencyDataList = arrayListOf<CurrencyData>()
         try {
-            val networkCall = currencyService?.getPaginatedCurrency(1)
-            val responseBody = networkCall?.body()
+            val networkCall = currencyService.getPaginatedCurrency(1)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 currencyDataList.addAll(responseBody.data)
                 if (responseBody.meta.pagination.total_pages != 1) {
                     for (items in 2..responseBody.meta.pagination.total_pages) {
-                        val repeatedCall = currencyService?.getPaginatedCurrency(items)
-                        val repeatedCallResponse = repeatedCall?.body()
+                        val repeatedCall = currencyService.getPaginatedCurrency(items)
+                        val repeatedCallResponse = repeatedCall.body()
                         if(repeatedCallResponse != null && networkCall.isSuccessful){
                             currencyDataList.addAll(repeatedCallResponse.data)
                         }
                     }
                 }
                 currencyDao.deleteAllCurrency()
-                currencyDataList.forEachIndexed { _, data ->
+                currencyDataList.forEach { data ->
                     currencyDao.insert(data)
                 }
             }

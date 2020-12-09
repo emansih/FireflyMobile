@@ -23,7 +23,7 @@ import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 
 class ListBillViewModel(application: Application): BaseViewModel(application) {
 
-    private val billService = genericService()?.create(BillsService::class.java)
+    private val billService = genericService().create(BillsService::class.java)
     private val billDataDao = AppDatabase.getInstance(application).billDataDao()
     private val billRepository = BillRepository(billDataDao, billService)
 

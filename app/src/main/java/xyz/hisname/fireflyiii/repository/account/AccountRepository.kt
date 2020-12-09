@@ -20,7 +20,7 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
 class AccountRepository(private val accountDao: AccountsDataDao,
-                        private val accountsService: AccountsService?){
+                        private val accountsService: AccountsService){
 
     private lateinit var apiResponse: String
     val authStatus: MutableLiveData<Boolean> = MutableLiveData()
@@ -32,8 +32,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     */
     @Throws(Exception::class)
     suspend fun authViaPat(): Boolean{
-        val networkCall = accountsService?.getPaginatedAccountType("asset", 1)
-        val responseBody = networkCall?.body()
+        val networkCall = accountsService.getPaginatedAccountType("asset", 1)
+        val responseBody = networkCall.body()
         return if (responseBody != null && networkCall.isSuccessful) {
             authStatus.postValue(true)
             true
@@ -52,8 +52,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         val accountName = accountDao.getAccountById(accountId).accountAttributes?.name
         if(accountName.isNullOrEmpty()){
             try {
-                val networkCall = accountsService?.getAccountById(accountId)
-                val responseBody = networkCall?.body()
+                val networkCall = accountsService.getAccountById(accountId)
+                val responseBody = networkCall.body()
                 if(responseBody != null && networkCall.isSuccessful) {
                     responseBody.data.forEach { accountData ->
                         accountDao.insert(accountData)
@@ -66,8 +66,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     suspend fun deleteAccountById(accountId: Long): Int {
         try {
-            val networkResponse = accountsService?.deleteAccountById(accountId)
-            when (networkResponse?.code()) {
+            val networkResponse = accountsService.deleteAccountById(accountId)
+            when (networkResponse.code()) {
                 204 -> {
                     accountDao.deleteAccountById(accountId)
                     return HttpConstants.NO_CONTENT_SUCCESS
@@ -98,8 +98,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         val accountData = accountDao.getAccountByNameAndType(accountName, accountType)
         if(accountData.accountAttributes?.name.isNullOrEmpty()) {
             try {
-                val networkCall = accountsService?.searchAccount(accountName, accountType)
-                val responseBody = networkCall?.body()
+                val networkCall = accountsService.searchAccount(accountName, accountType)
+                val responseBody = networkCall.body()
                 if (responseBody != null && networkCall.isSuccessful) {
                     responseBody.data.forEach { data ->
                         accountDao.insert(data)
@@ -115,8 +115,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                                           endDate: String, type: String,
                                           transactionDao: TransactionDataDao){
         try {
-            val networkCall = accountsService?.getTransactionsByAccountId(accountId, 1, startDate, endDate, type)
-            val responseBody = networkCall?.body()
+            val networkCall = accountsService.getTransactionsByAccountId(accountId, 1, startDate, endDate, type)
+            val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
                 responseBody.data.forEach { transactionData ->
                     transactionData.transactionAttributes?.transactions?.forEach { transactions ->
@@ -130,7 +130,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
                     for (items in 2..pagination.total_pages) {
-                        accountsService?.getTransactionsByAccountId(accountId, items, startDate, endDate, "all")
+                        accountsService.getTransactionsByAccountId(accountId, items, startDate, endDate, "all")
                     }
                 }
             }
@@ -142,8 +142,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
                 runBlocking {
                     try {
-                        val networkCall = accountsService?.searchAccount(debouncedString, accountType)
-                        val responseBody = networkCall?.body()
+                        val networkCall = accountsService.searchAccount(debouncedString, accountType)
+                        val responseBody = networkCall.body()
                         if (responseBody != null && networkCall.isSuccessful) {
                             responseBody.data.forEach { data ->
                                 accountDao.insert(data)
@@ -163,7 +163,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                            virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                            liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?): ApiResponses<AccountSuccessModel>{
         return try {
-            val networkCall = accountsService?.addAccount(accountName, accountType, currencyCode, iban, bic, accountNumber,
+            val networkCall = accountsService.addAccount(accountName, accountType, currencyCode, iban, bic, accountNumber,
                     openingBalance, openingBalanceDate, accountRole, virtualBalance, includeInNetWorth,
                     notes, liabilityType, liabilityAmount, liabilityStartDate, interest, interestPeriod)
             parseResponse(networkCall)
@@ -178,7 +178,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                       virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                       liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?): ApiResponses<AccountSuccessModel>{
         return try {
-            val networkCall = accountsService?.updateAccount(accountId, accountName, accountType, currencyCode, iban, bic, accountNumber,
+            val networkCall = accountsService.updateAccount(accountId, accountName, accountType, currencyCode, iban, bic, accountNumber,
                     openingBalance, openingBalanceDate, accountRole, virtualBalance, includeInNetWorth,
                     notes, liabilityType, liabilityAmount, liabilityStartDate, interest, interestPeriod)
             parseResponse(networkCall)
@@ -188,9 +188,9 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     }
 
 
-    private suspend fun parseResponse(responseFromServer: Response<AccountSuccessModel>?): ApiResponses<AccountSuccessModel>{
-        val responseBody = responseFromServer?.body()
-        val responseErrorBody = responseFromServer?.errorBody()
+    private suspend fun parseResponse(responseFromServer: Response<AccountSuccessModel>): ApiResponses<AccountSuccessModel>{
+        val responseBody = responseFromServer.body()
+        val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
@@ -228,22 +228,22 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     private suspend fun loadRemoteData(accountType: String){
         val accountData: MutableList<AccountData> = arrayListOf()
         try {
-            val networkCall = accountsService?.getPaginatedAccountType(accountType, 1)
-            accountData.addAll(networkCall?.body()?.data?.toMutableList() ?: arrayListOf())
-            val responseBody = networkCall?.body()
-            apiResponse = networkCall?.message() ?: ""
+            val networkCall = accountsService.getPaginatedAccountType(accountType, 1)
+            accountData.addAll(networkCall.body()?.data?.toMutableList() ?: arrayListOf())
+            val responseBody = networkCall.body()
+            apiResponse = networkCall.message() ?: ""
             if (responseBody != null && networkCall.isSuccessful) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
                     for (items in 2..pagination.total_pages) {
                         accountData.addAll(
-                                accountsService?.getPaginatedAccountType(accountType, items)?.body()?.data?.toMutableList()
+                                accountsService.getPaginatedAccountType(accountType, items).body()?.data?.toMutableList()
                                         ?: arrayListOf()
                         )
                     }
                 }
                 deleteAccountByType(accountType)
-                accountData.forEachIndexed { _, data ->
+                accountData.forEach { data ->
                     accountDao.insert(data)
                 }
             }

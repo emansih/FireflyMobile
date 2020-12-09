@@ -18,7 +18,7 @@ class PiggyDetailViewModel(application: Application): BaseViewModel(application)
 
     private val piggyRepository = PiggyRepository(
             AppDatabase.getInstance(application).piggyDataDao(),
-            genericService()?.create(PiggybankService::class.java)
+            genericService().create(PiggybankService::class.java)
     )
 
     var accountId: Long = 0

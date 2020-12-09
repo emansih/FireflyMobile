@@ -49,7 +49,7 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
 
     override suspend fun doWork(): Result {
         val accountId = inputData.getLong("accountId", 0L)
-        val accountService = genericService?.create(AccountsService::class.java)
+        val accountService = genericService.create(AccountsService::class.java)
         val repository = AccountRepository(accountDatabase, accountService)
         return when(repository.deleteAccountById(accountId)){
             HttpConstants.NO_CONTENT_SUCCESS -> {

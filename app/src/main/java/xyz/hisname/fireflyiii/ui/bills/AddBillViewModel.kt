@@ -21,12 +21,12 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
 
     private val billRepository = BillRepository(
             AppDatabase.getInstance(application).billDataDao(),
-            genericService()?.create(BillsService::class.java)
+            genericService().create(BillsService::class.java)
     )
 
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java)
+            genericService().create(CurrencyService::class.java)
     )
 
     private var currencyCode: String = ""

@@ -20,7 +20,7 @@ import xyz.hisname.fireflyiii.repository.piggybank.SearchPiggyPageSource
 class SearchPiggyViewModel(application: Application): BaseViewModel(application) {
 
     private val piggyDao = AppDatabase.getInstance(application).piggyDataDao()
-    private val piggyService = genericService()?.create(PiggybankService::class.java)
+    private val piggyService = genericService().create(PiggybankService::class.java)
 
     val piggyName = MutableLiveData<String>()
 

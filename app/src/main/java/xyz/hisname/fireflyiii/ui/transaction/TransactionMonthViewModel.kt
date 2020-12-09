@@ -29,11 +29,11 @@ class TransactionMonthViewModel(application: Application): BaseViewModel(applica
 
 
     private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
-    private val transactionService = genericService()?.create(TransactionService::class.java)
+    private val transactionService = genericService().create(TransactionService::class.java)
     private val transactionRepository = TransactionRepository(transactionDataDao, transactionService)
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java)
+            genericService().create(CurrencyService::class.java)
     )
 
     private var currencyCode = ""

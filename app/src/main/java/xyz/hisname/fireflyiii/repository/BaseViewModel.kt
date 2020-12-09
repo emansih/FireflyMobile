@@ -21,7 +21,7 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     protected val accManager by lazy { AuthenticatorManager(AccountManager.get(getApplication()))  }
     protected val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(getApplication()) }
 
-    protected fun genericService(): Retrofit? {
+    protected fun genericService(): Retrofit {
         val cert = AppPref(sharedPref).certValue
         return if (AppPref(sharedPref).isCustomCa) {
             val customCa = CustomCa(File(getApplication<Application>().filesDir.path + "/user_custom.pem"))

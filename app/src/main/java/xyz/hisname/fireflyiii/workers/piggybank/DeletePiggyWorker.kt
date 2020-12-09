@@ -48,7 +48,7 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
 
     override suspend fun doWork(): Result {
         val piggyId = inputData.getLong("piggyId", 0)
-        val repository = PiggyRepository(piggyDataBase, genericService?.create(PiggybankService::class.java))
+        val repository = PiggyRepository(piggyDataBase, genericService.create(PiggybankService::class.java))
         return when (repository.deletePiggyById(piggyId)) {
             HttpConstants.NO_CONTENT_SUCCESS -> {
                 cancelWorker(piggyId, context)

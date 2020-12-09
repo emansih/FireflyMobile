@@ -28,12 +28,12 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
 
     private val accountRepository = AccountRepository(
             AppDatabase.getInstance(application).accountDataDao(),
-            genericService()?.create(AccountsService::class.java)
+            genericService().create(AccountsService::class.java)
     )
     private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
 
     private val transactionRepository = TransactionRepository(
-            transactionDao, genericService()?.create(TransactionService::class.java)
+            transactionDao, genericService().create(TransactionService::class.java)
     )
     private var accountType = ""
     var currencySymbol = ""

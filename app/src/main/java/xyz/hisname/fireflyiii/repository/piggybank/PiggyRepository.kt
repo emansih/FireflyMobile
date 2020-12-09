@@ -11,12 +11,12 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
 class PiggyRepository(private val piggyDao: PiggyDataDao,
-                      private val piggyService: PiggybankService?) {
+                      private val piggyService: PiggybankService) {
 
     suspend fun deletePiggyById(piggyId: Long): Int {
         try {
-            val networkResponse = piggyService?.deletePiggyBankById(piggyId)
-            when (networkResponse?.code()) {
+            val networkResponse = piggyService.deletePiggyBankById(piggyId)
+            when (networkResponse.code()) {
                 204 -> {
                     piggyDao.deletePiggyById(piggyId)
                     return HttpConstants.NO_CONTENT_SUCCESS
@@ -52,7 +52,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
     suspend fun addPiggyBank(name: String, accountId: Long, targetAmount: String,
                              currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel> {
         return try {
-            val networkCall = piggyService?.addPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
+            val networkCall = piggyService.addPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -62,16 +62,16 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
     suspend fun updatePiggyBank(piggyId: Long, name: String, accountId: Long, targetAmount: String,
                                 currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel>{
         return try {
-            val networkCall = piggyService?.updatePiggyBank(piggyId, name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
+            val networkCall = piggyService.updatePiggyBank(piggyId, name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
         }
     }
 
-    private suspend fun parseResponse(responseFromServer: Response<PiggySuccessModel>?): ApiResponses<PiggySuccessModel>{
-        val responseBody = responseFromServer?.body()
-        val responseErrorBody = responseFromServer?.errorBody()
+    private suspend fun parseResponse(responseFromServer: Response<PiggySuccessModel>): ApiResponses<PiggySuccessModel>{
+        val responseBody = responseFromServer.body()
+        val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive

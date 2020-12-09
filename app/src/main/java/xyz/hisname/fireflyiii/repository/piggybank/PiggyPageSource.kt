@@ -7,7 +7,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 
 class PiggyPageSource(private val piggyDao: PiggyDataDao,
-                      private val piggyService: PiggybankService?): PagingSource<Int, PiggyData>() {
+                      private val piggyService: PiggybankService): PagingSource<Int, PiggyData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PiggyData> {
         val paramKey = params.key
@@ -21,8 +21,8 @@ class PiggyPageSource(private val piggyDao: PiggyDataDao,
             null
         }
         try {
-            val networkCall = piggyService?.getPaginatedPiggyBank(params.key ?: 1)
-            val responseBody = networkCall?.body()
+            val networkCall = piggyService.getPaginatedPiggyBank(params.key ?: 1)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     piggyDao.deleteAllPiggyBank()

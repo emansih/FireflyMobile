@@ -15,7 +15,7 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 
 class AddCategoryViewModel(application: Application): BaseViewModel(application) {
 
-    private val categoryService by lazy { genericService()?.create(CategoryService::class.java) }
+    private val categoryService by lazy { genericService().create(CategoryService::class.java) }
     private val categoryDataDao = AppDatabase.getInstance(application).categoryDataDao()
     private val repository = CategoryRepository(categoryDataDao, categoryService)
 

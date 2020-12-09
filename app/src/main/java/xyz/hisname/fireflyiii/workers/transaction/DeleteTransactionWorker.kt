@@ -18,7 +18,7 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
 
     override suspend fun doWork(): Result {
         val transactionId = inputData.getLong("transactionId", 0)
-        val repository = TransactionRepository(transactionDatabase, genericService?.create(TransactionService::class.java))
+        val repository = TransactionRepository(transactionDatabase, genericService.create(TransactionService::class.java))
         return when (repository.deleteTransactionById(transactionId)) {
             HttpConstants.NO_CONTENT_SUCCESS -> {
                 cancelWorker(transactionId, context)

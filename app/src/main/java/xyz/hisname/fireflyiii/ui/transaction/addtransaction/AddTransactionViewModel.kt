@@ -34,28 +34,28 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
 
     private val transactionRepository = TransactionRepository(
             AppDatabase.getInstance(application).transactionDataDao(),
-            genericService()?.create(TransactionService::class.java)
+            genericService().create(TransactionService::class.java)
     )
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java)
+            genericService().create(CurrencyService::class.java)
     )
     private val accountRepository = AccountRepository(
             AppDatabase.getInstance(application).accountDataDao(),
-            genericService()?.create(AccountsService::class.java)
+            genericService().create(AccountsService::class.java)
     )
 
     // We do lazy init here because a user might not type anything inside category edit text
     private val categoryRepository by lazy {
         CategoryRepository(AppDatabase.getInstance(application).categoryDataDao(),
-                genericService()?.create(CategoryService::class.java))
+                genericService().create(CategoryService::class.java))
     }
     private val piggyRepository by lazy {
         PiggyRepository(AppDatabase.getInstance(application).piggyDataDao(),
-                genericService()?.create(PiggybankService::class.java))
+                genericService().create(PiggybankService::class.java))
     }
 
-    private val budgetService by lazy { genericService()?.create(BudgetService::class.java) }
+    private val budgetService by lazy { genericService().create(BudgetService::class.java) }
     private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
     private val budgetLimitDao by lazy { AppDatabase.getInstance(application).budgetLimitDao() }
     private val budgetDao by lazy { AppDatabase.getInstance(application).budgetDataDao() }
@@ -66,7 +66,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
 
     private val tagsRepository by lazy {
         TagsRepository(AppDatabase.getInstance(application).tagsDataDao(),
-                genericService()?.create(TagsService::class.java))
+                genericService().create(TagsService::class.java))
     }
 
     var currency = ""

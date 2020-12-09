@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -13,7 +12,6 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.workers.piggybank.PiggyBankWorker
@@ -23,12 +21,12 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
 
     private val piggyRepository = PiggyRepository(
             AppDatabase.getInstance(application).piggyDataDao(),
-            genericService()?.create(PiggybankService::class.java)
+            genericService().create(PiggybankService::class.java)
     )
 
     private val accountRepository = AccountRepository(
             AppDatabase.getInstance(application).accountDataDao(),
-            genericService()?.create(AccountsService::class.java)
+            genericService().create(AccountsService::class.java)
     )
 
     fun getPiggyById(piggyId: Long): LiveData<PiggyData>{

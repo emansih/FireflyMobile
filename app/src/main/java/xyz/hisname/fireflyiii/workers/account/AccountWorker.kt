@@ -119,7 +119,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val notes = inputData.getString("notes")
         val accountRepository = AccountRepository(
                 AppDatabase.getInstance(context).accountDataDao(),
-                genericService?.create(AccountsService::class.java)
+                genericService.create(AccountsService::class.java)
         )
         val addAccount = accountRepository.addAccount(name, accountType, currencyCode,
                 iBanString, bicString, accountNumber, openingBalance, openingBalanceDate,

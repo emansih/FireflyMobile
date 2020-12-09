@@ -18,14 +18,14 @@ import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
 class CategoryRepository(private val categoryDao: CategoryDataDao,
-                         private val categoryService: CategoryService?,
+                         private val categoryService: CategoryService,
                          private val transactionDao: TransactionDataDao? = null){
 
 
     suspend fun searchCategoryByName(categoryName: String): List<CategoryData> {
         try {
-            val networkCall = categoryService?.searchCategory(categoryName)
-            val responseBody = networkCall?.body()
+            val networkCall = categoryService.searchCategory(categoryName)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 responseBody.forEach { category ->
                     categoryDao.deleteCategoryById(category.id)
@@ -42,18 +42,18 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
                                                 endDate: String, transactionType: String): BigDecimal{
         checkNotNull(transactionDao)
         try {
-            val networkResponse = categoryService?.getTransactionByCategory( categoryId, 1,
+            val networkResponse = categoryService.getTransactionByCategory( categoryId, 1,
                     startDate, endDate, transactionType)
             val transactionData: MutableList<TransactionData> = mutableListOf()
-            val responseBody = networkResponse?.body()
+            val responseBody = networkResponse.body()
             if (responseBody != null && networkResponse.isSuccessful) {
                 transactionData.addAll(responseBody.data)
                 if(responseBody.meta.pagination.total_pages > 1){
                     for (items in 2..responseBody.meta.pagination.total_pages) {
                         val anotherNetworkCall =
-                                categoryService?.getTransactionByCategory(categoryId, items,
+                                categoryService.getTransactionByCategory(categoryId, items,
                                         startDate, endDate, transactionType)
-                        val anotherResponseBody = anotherNetworkCall?.body()
+                        val anotherResponseBody = anotherNetworkCall.body()
                         if(anotherResponseBody != null && anotherNetworkCall.isSuccessful){
                             transactionData.addAll(anotherResponseBody.data)
                         }
@@ -75,8 +75,8 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
     suspend fun deleteCategoryById(categoryId: Long): Int{
         try {
-            val networkResponse = categoryService?.deleteCategoryById(categoryId)
-            when(networkResponse?.code()) {
+            val networkResponse = categoryService.deleteCategoryById(categoryId)
+            when(networkResponse.code()) {
                 204 -> {
                     categoryDao.deleteCategoryById(categoryId)
                     return HttpConstants.NO_CONTENT_SUCCESS
@@ -105,7 +105,7 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
     suspend fun addCategory(categoryName: String): ApiResponses<CategorySuccessModel>{
         return try {
-            val networkCall = categoryService?.addCategory(categoryName)
+            val networkCall = categoryService.addCategory(categoryName)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -114,16 +114,16 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
 
     suspend fun updateCategory(categoryId: Long, categoryName: String): ApiResponses<CategorySuccessModel> {
         return try {
-            val networkCall = categoryService?.updateCategory(categoryId, categoryName)
+            val networkCall = categoryService.updateCategory(categoryId, categoryName)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
         }
     }
 
-    private suspend fun parseResponse(responseFromServer: Response<CategorySuccessModel>?): ApiResponses<CategorySuccessModel>{
-        val responseBody = responseFromServer?.body()
-        val responseErrorBody = responseFromServer?.errorBody()
+    private suspend fun parseResponse(responseFromServer: Response<CategorySuccessModel>): ApiResponses<CategorySuccessModel>{
+        val responseBody = responseFromServer.body()
+        val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive

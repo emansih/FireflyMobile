@@ -19,7 +19,7 @@ class CurrencyBottomSheetViewModel(application: Application): BaseViewModel(appl
     val currencyFullDetails = MutableLiveData<String>()
 
     private val currencyDao = AppDatabase.getInstance(application).currencyDataDao()
-    private val currencyService = genericService()?.create(CurrencyService::class.java)
+    private val currencyService = genericService().create(CurrencyService::class.java)
 
     fun getCurrencyList() =
             Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){

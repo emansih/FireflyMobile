@@ -7,13 +7,13 @@ import java.lang.Exception
 import java.time.LocalDate
 
 class BillPayRepository(private val billPayDao: BillPayDao,
-                        private val billsService: BillsService?) {
+                        private val billsService: BillsService) {
 
 
     suspend fun getPaidDatesFromBillId(billId: Long, startDate: String, endDate: String): List<BillPayDates>{
         try {
-            val networkCall = billsService?.getBillById(billId, startDate, endDate)
-            val responseBody = networkCall?.body()
+            val networkCall = billsService.getBillById(billId, startDate, endDate)
+            val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
                 responseBody.data.billAttributes?.pay_dates?.forEach { localDate ->
                     billPayDao.insert(BillPayDates(id = billId, payDates = LocalDate.parse(localDate)))

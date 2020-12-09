@@ -16,7 +16,7 @@ class AddCurrencyViewModel(application: Application): BaseViewModel(application)
 
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java)
+            genericService().create(CurrencyService::class.java)
     )
 
     fun getCurrencyById(currencyId: Long): LiveData<List<CurrencyData>>{

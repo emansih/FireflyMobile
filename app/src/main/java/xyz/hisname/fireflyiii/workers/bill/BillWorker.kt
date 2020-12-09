@@ -34,7 +34,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val billWorkManagerId = inputData.getLong("billWorkManagerId", 0)
         val billRepository = BillRepository(
                 AppDatabase.getInstance(context).billDataDao(),
-                genericService?.create(BillsService::class.java)
+                genericService.create(BillsService::class.java)
         )
 
         val addBill = billRepository.addBill(name, minAmount,

@@ -49,7 +49,7 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
 
     override suspend fun doWork(): Result {
         val billId = inputData.getLong("billId", 0)
-        val billService = genericService?.create(BillsService::class.java)
+        val billService = genericService.create(BillsService::class.java)
         val repository = BillRepository(billDatabase, billService)
         return when(repository.deleteBillById(billId)){
             HttpConstants.NO_CONTENT_SUCCESS -> {

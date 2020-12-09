@@ -7,7 +7,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 
 class CategoryPageSource(private val categoryDataDao: CategoryDataDao,
-                         private val categoryService: CategoryService?): PagingSource<Int, CategoryData>()  {
+                         private val categoryService: CategoryService): PagingSource<Int, CategoryData>()  {
 
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CategoryData> {
@@ -22,8 +22,8 @@ class CategoryPageSource(private val categoryDataDao: CategoryDataDao,
             null
         }
         try {
-            val networkCall = categoryService?.getPaginatedCategory(params.key ?: 1)
-            val responseBody = networkCall?.body()
+            val networkCall = categoryService.getPaginatedCategory(params.key ?: 1)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     categoryDataDao.deleteAllCategory()

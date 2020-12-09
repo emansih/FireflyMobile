@@ -18,7 +18,7 @@ import xyz.hisname.fireflyiii.repository.budget.BudgetSearchPagingSource
 class BudgetSearchViewModel(application: Application): BaseViewModel(application) {
 
     private val budgetDao = AppDatabase.getInstance(application).budgetListDataDao()
-    private val budgetService = genericService()?.create(BudgetService::class.java)
+    private val budgetService = genericService().create(BudgetService::class.java)
 
     val budgetName = MutableLiveData<String>()
 

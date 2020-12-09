@@ -14,15 +14,15 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
 
     private val isAuthenticated: MutableLiveData<Boolean> = MutableLiveData()
 
-    private val oAuthService by lazy { genericService()?.create(OAuthService::class.java) }
+    private val oAuthService by lazy { genericService().create(OAuthService::class.java) }
 
     fun getRefreshToken(): LiveData<Boolean> {
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                val networkCall = oAuthService?.getRefreshToken("refresh_token",
+                val networkCall = oAuthService.getRefreshToken("refresh_token",
                         accManager.refreshToken, accManager.clientId,
                         accManager.secretKey)
-                val authResponse = networkCall?.body()
+                val authResponse = networkCall.body()
                 if (authResponse != null && networkCall.isSuccessful) {
                     accManager.accessToken = authResponse.access_token
                     accManager.refreshToken = authResponse.refresh_token

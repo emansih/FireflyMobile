@@ -24,12 +24,12 @@ import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 
 class TransactionFragmentViewModel(application: Application): BaseViewModel(application) {
 
-    private val transactionService by lazy { genericService()?.create(TransactionService::class.java) }
+    private val transactionService by lazy { genericService().create(TransactionService::class.java) }
     private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
     private val transactionRepository = TransactionRepository(transactionDataDao, transactionService)
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java)
+            genericService().create(CurrencyService::class.java)
     )
 
     fun getTransactionList(startDate: String, endDate: String,

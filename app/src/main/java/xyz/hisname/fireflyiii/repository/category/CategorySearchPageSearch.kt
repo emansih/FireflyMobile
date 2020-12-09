@@ -8,12 +8,12 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 
 class CategorySearchPageSearch(private val searchName: String,
                                private val categoryDataDao: CategoryDataDao,
-                               private val categoryService: CategoryService?): PagingSource<Int, CategoryData>() {
+                               private val categoryService: CategoryService): PagingSource<Int, CategoryData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CategoryData> {
         return try {
-            val networkCall = categoryService?.searchCategory(searchName)
-            val responseBody = networkCall?.body()
+            val networkCall = categoryService.searchCategory(searchName)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 responseBody.forEach { category ->
                     categoryDataDao.insert(CategoryData(category.id, CategoryAttributes("", "", category.name, "")))

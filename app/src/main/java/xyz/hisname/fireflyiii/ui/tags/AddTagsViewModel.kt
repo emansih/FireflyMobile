@@ -17,7 +17,7 @@ class AddTagsViewModel(application: Application): BaseViewModel(application) {
 
     private val tagsRepository = TagsRepository(
             AppDatabase.getInstance(application).tagsDataDao(),
-            genericService()?.create(TagsService::class.java)
+            genericService().create(TagsService::class.java)
     )
 
     fun addTag(tagName: String, date: String?, description: String?, latitude: String?,

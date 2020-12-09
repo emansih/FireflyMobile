@@ -19,7 +19,7 @@ import java.math.BigDecimal
 
 @Suppress("RedundantSuspendModifier")
 class TransactionRepository(private val transactionDao: TransactionDataDao,
-                            private val transactionService: TransactionService?) {
+                            private val transactionService: TransactionService) {
 
     suspend fun insertTransaction(transaction: Transactions){
         transactionDao.insert(transaction)
@@ -65,8 +65,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     suspend fun deleteTransactionById(transactionId: Long): Int {
         try {
-            val networkResponse = transactionService?.deleteTransactionById(transactionId)
-            when(networkResponse?.code()) {
+            val networkResponse = transactionService.deleteTransactionById(transactionId)
+            when(networkResponse.code()) {
                 204 -> {
                     transactionDao.deleteTransactionByJournalId(transactionId)
                     return HttpConstants.NO_CONTENT_SUCCESS
@@ -155,8 +155,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
                 runBlocking {
                     try {
-                        val networkCall = transactionService?.searchTransaction(debouncedString)
-                        val responseBody = networkCall?.body()
+                        val networkCall = transactionService.searchTransaction(debouncedString)
+                        val responseBody = networkCall.body()
                         if (responseBody != null && networkCall.isSuccessful) {
                             responseBody.data.forEach { data ->
                                 data.transactionAttributes?.transactions?.forEach { transaction ->
@@ -184,7 +184,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             DateTimeUtil.mergeDateTimeToIso8601(date, time)
         }
         return try {
-            val networkCall = transactionService?.addTransaction(convertString(type), description, dateTime,
+            val networkCall = transactionService.addTransaction(convertString(type), description, dateTime,
                     piggyBankName, amount.replace(',', '.'), sourceName,
                     destinationName, currencyName,
                     category, tags, budgetName, notes)
@@ -205,7 +205,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             DateTimeUtil.mergeDateTimeToIso8601(date, time)
         }
         return try {
-            val networkCall = transactionService?.updateTransaction(getTransactionIdFromJournalId(transactionId),
+            val networkCall = transactionService.updateTransaction(getTransactionIdFromJournalId(transactionId),
                     convertString(type),description, dateTime, piggyBankName,
                     amount.replace(',', '.'),sourceName,destinationName,currencyName,
                     category, tags, budgetName, notes)
@@ -216,9 +216,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
 
-    private suspend fun parseResponse(responseFromServer: Response<TransactionSuccessModel>?): ApiResponses<TransactionSuccessModel>{
-        val responseBody = responseFromServer?.body()
-        val responseErrorBody = responseFromServer?.errorBody()
+    private suspend fun parseResponse(responseFromServer: Response<TransactionSuccessModel>): ApiResponses<TransactionSuccessModel>{
+        val responseBody = responseFromServer.body()
+        val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
             if(responseErrorBody != null){
                 // Ignore lint warning. False positive
@@ -252,18 +252,18 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     private suspend fun loadRemoteData(startDate: String?, endDate: String?, sourceName: String){
         try {
             val transactionData: MutableList<TransactionData> = arrayListOf()
-            val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+            val networkCall = transactionService.getPaginatedTransactions(startDate, endDate,
                     convertString(sourceName), 1)
-            networkCall?.body()?.data?.forEach {  transaction ->
+            networkCall.body()?.data?.forEach {  transaction ->
                 transactionData.add(transaction)
             }
-            val responseBody = networkCall?.body()
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {
                     for (items in 2..pagination.total_pages) {
-                        val service = transactionService?.getPaginatedTransactions(startDate, endDate,
-                                convertString(sourceName), items)?.body()
+                        val service = transactionService.getPaginatedTransactions(startDate, endDate,
+                                convertString(sourceName), items).body()
                         service?.data?.forEach { dataToBeAdded ->
                             transactionData.add(dataToBeAdded)
                         }

@@ -48,7 +48,7 @@ class DeleteCategoryWorker(private val context: Context, workerParameters: Worke
 
     override suspend fun doWork(): Result {
         val categoryId = inputData.getLong("categoryId", 0)
-        val repository = CategoryRepository(categoryDao, genericService?.create(CategoryService::class.java))
+        val repository = CategoryRepository(categoryDao, genericService.create(CategoryService::class.java))
         return when (repository.deleteCategoryById(categoryId)) {
             HttpConstants.NO_CONTENT_SUCCESS -> {
                 cancelWorker(categoryId, context)

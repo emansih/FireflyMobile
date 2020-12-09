@@ -10,7 +10,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -34,18 +33,18 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
 
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
-            genericService()?.create(CurrencyService::class.java))
+            genericService().create(CurrencyService::class.java))
     private val budgetRepository = BudgetRepository(
             AppDatabase.getInstance(application).budgetDataDao(),
             AppDatabase.getInstance(application).budgetListDataDao(),
             AppDatabase.getInstance(application).spentDataDao(),
             AppDatabase.getInstance(application).budgetLimitDao(),
-            genericService()?.create(BudgetService::class.java)
+            genericService().create(BudgetService::class.java)
     )
 
     private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
     private val transactionRepository = TransactionRepository(
-            transactionDao, genericService()?.create(TransactionService::class.java)
+            transactionDao, genericService().create(TransactionService::class.java)
     )
 
     private lateinit var currencyCode: String
@@ -120,9 +119,9 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
 
     private fun getBasicSummary(currencyCode: String, currencySymbol: String){
         val simpleData = SimpleData(PreferenceManager.getDefaultSharedPreferences(getApplication()))
-        val summaryService = genericService()?.create(SummaryService::class.java)
-        summaryService?.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
-                currencyCode)?.enqueue(retrofitCallback({ response ->
+        val summaryService = genericService().create(SummaryService::class.java)
+        summaryService.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
+                currencyCode).enqueue(retrofitCallback({ response ->
             val responseBody = response.body()
             if (response.isSuccessful && responseBody != null) {
                 // so dirty I went to take a shower after writing this code

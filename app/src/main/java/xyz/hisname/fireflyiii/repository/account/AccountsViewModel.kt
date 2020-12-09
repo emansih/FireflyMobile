@@ -19,7 +19,7 @@ import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 class AccountsViewModel(application: Application): BaseViewModel(application){
 
     val repository: AccountRepository
-    private val accountsService by lazy { genericService()?.create(AccountsService::class.java) }
+    private val accountsService by lazy { genericService().create(AccountsService::class.java) }
 
     init {
         val accountDao = AppDatabase.getInstance(application).accountDataDao()

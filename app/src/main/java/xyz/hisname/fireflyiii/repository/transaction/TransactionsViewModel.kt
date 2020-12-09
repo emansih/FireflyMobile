@@ -27,7 +27,7 @@ import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 class TransactionsViewModel(application: Application): BaseViewModel(application) {
 
     val repository: TransactionRepository
-    private val transactionService by lazy { genericService()?.create(TransactionService::class.java) }
+    private val transactionService by lazy { genericService().create(TransactionService::class.java) }
     private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
 
     init {
