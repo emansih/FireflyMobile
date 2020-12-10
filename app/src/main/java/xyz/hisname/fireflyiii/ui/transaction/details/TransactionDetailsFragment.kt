@@ -65,7 +65,6 @@ class TransactionDetailsFragment: BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        extendedFab.isVisible = false
     }
 
     private fun retrieveData(){
@@ -216,7 +215,6 @@ class TransactionDetailsFragment: BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        extendedFab.isVisible = false
         activity?.activity_toolbar?.title = resources.getString(R.string.details)
     }
 

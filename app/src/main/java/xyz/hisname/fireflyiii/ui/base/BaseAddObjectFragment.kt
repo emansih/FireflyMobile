@@ -15,7 +15,6 @@ abstract class BaseAddObjectFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fragmentContainer.isVisible = false
-        extendedFab.isGone = true
         setIcons()
         setWidgets()
     }
@@ -38,9 +37,6 @@ abstract class BaseAddObjectFragment: BaseFragment() {
                 }
                 rootView.isVisible = false
                 fragmentContainer.isVisible = true
-                if(shouldShow) {
-                    extendedFab.isVisible = true
-                }
             }
         })
         circularReveal.start()

@@ -347,7 +347,6 @@ class TransactionFragment: BaseFragment(){
                 replace(R.id.bigger_fragment_container, addTransaction)
                 addToBackStack(null)
             }
-            extendedFab.isVisible = false
         }
     }
 

@@ -411,9 +411,6 @@ class DashboardFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
-        if(extendedFab.isVisible){
-            extendedFab.isVisible = false
-        }
     }
 
     override fun handleBack() {

@@ -13,6 +13,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
 import com.bumptech.glide.Glide
@@ -497,11 +498,15 @@ class HomeActivity: BaseActivity(){
                 activity_base_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                 drawerToggle.isDrawerIndicatorEnabled = false
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                fab_action.isVisible = false
             } else {
                 activity_base_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 drawerToggle.isDrawerIndicatorEnabled = true
             }
+        }
+        supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
+            fab_action.isVisible = !(fragment is AboutFragment || fragment is SettingsFragment || fragment is DashboardFragment)
         }
         drawerToggle.setToolbarNavigationClickListener {
             onBackPressed()

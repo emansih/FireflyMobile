@@ -180,13 +180,11 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        extendedFab.isGone = true
         activity?.activity_toolbar?.title = getString(R.string.budget)
     }
 
     override fun onResume() {
         super.onResume()
-        extendedFab.isGone = true
         activity?.activity_toolbar?.title = getString(R.string.budget)
     }
 

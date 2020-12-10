@@ -38,7 +38,6 @@ class TagDetailsFragment: BaseDetailFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
-        extendedFab.isGone = true
         return inflater.create(R.layout.fragment_tag_details, container)
     }
 
@@ -100,11 +99,6 @@ class TagDetailsFragment: BaseDetailFragment() {
             zoom_text.text = tagsAttributes.zoom_level
         }
         tagDescription.text = tagsAttributes.description
-    }
-
-    override fun onStop() {
-        super.onStop()
-        extendedFab.isVisible = true
     }
 
     override fun editItem() {

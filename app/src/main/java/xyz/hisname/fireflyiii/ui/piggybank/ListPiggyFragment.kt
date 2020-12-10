@@ -69,7 +69,6 @@ class ListPiggyFragment: BaseFragment(){
             })
             addToBackStack(null)
         }
-        extendedFab.isGone = true
     }
 
     private fun pullToRefresh(){

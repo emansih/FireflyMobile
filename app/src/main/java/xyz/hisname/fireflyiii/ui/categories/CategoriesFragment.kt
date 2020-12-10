@@ -101,7 +101,6 @@ class CategoriesFragment: BaseFragment() {
             replace(R.id.fragment_container, CategoryDetailsFragment().apply { arguments = bundle })
             addToBackStack(null)
         }
-        extendedFab.isGone = true
     }
 
     private fun initFab(){
@@ -128,12 +127,6 @@ class CategoriesFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.categories)
-    }
-
-
-    override fun onDetach() {
-        super.onDetach()
-        extendedFab.isGone = true
     }
 
     override fun handleBack() {

@@ -163,7 +163,6 @@ class ListTagsFragment: BaseFragment() {
 
     override fun onStop() {
         super.onStop()
-        extendedFab.isGone = true
         activity?.activity_toolbar?.title = resources.getString(R.string.tags)
     }
     

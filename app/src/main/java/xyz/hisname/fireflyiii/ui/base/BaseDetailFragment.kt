@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
@@ -16,11 +15,6 @@ abstract class BaseDetailFragment: BaseFragment(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        extendedFab.isVisible = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -35,13 +29,7 @@ abstract class BaseDetailFragment: BaseFragment(){
 
     override fun onResume() {
         super.onResume()
-        extendedFab.isVisible = false
         activity?.activity_toolbar?.title = resources.getString(R.string.details)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        extendedFab.isVisible = true
     }
 
     abstract fun deleteItem()

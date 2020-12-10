@@ -810,7 +810,6 @@ class AddTransactionFragment: BaseFragment() {
     override fun handleBack() {
         if(isFromFragment){
             parentFragmentManager.popBackStack()
-            extendedFab.isVisible = true
         } else {
             if(isTasker){
                 requireActivity().onBackPressed()
