@@ -62,6 +62,7 @@ class DashboardFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dashboardView.getDefaultCurrency()
         animateCard(balanceCard, billsCard, netEarningsCard, dailySummaryCard,
                 leftToSpendCard, networthCard, recentTransactionCard, budgetCard)
         twoMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(2)

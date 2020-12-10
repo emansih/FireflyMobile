@@ -99,13 +99,7 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
     var twoMonthsAgoWithdrawal: String = ""
         private set
 
-
-    init {
-        getDefaultCurrency()
-    }
-
-
-    private fun getDefaultCurrency(){
+    fun getDefaultCurrency(){
         viewModelScope.launch(Dispatchers.IO){
             val currencyList = currencyRepository.defaultCurrency()
             if(currencyList.currencyId != 0L){
