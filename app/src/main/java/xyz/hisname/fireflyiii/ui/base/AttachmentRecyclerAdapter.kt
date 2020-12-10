@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.transaction.details
+package xyz.hisname.fireflyiii.ui.base
 
 import android.content.Context
 import android.view.View
@@ -12,15 +12,14 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.transaction_attachment_items.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
-import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.extension.inflate
 import java.io.File
 
-class TransactionAttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
-                                           private val shouldShowDownload: Boolean = true,
-                                           private val clickListener:(AttachmentData) -> Unit,
-                                           private val removeItemListener:(position: Int) -> Unit):
-        DiffUtilAdapter<AttachmentData, TransactionAttachmentRecyclerAdapter.AttachmentAdapter>() {
+class AttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
+                                private val shouldShowDownload: Boolean = true,
+                                private val clickListener:(AttachmentData) -> Unit,
+                                private val removeItemListener:(position: Int) -> Unit):
+        DiffUtilAdapter<AttachmentData, AttachmentRecyclerAdapter.AttachmentAdapter>() {
 
     private lateinit var context: Context
 

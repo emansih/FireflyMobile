@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.bills
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -8,9 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
@@ -31,6 +35,9 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
 
     private var currencyCode: String = ""
 
+    val attachmentMessageLiveData = MutableLiveData<ArrayList<String>>()
+
+
     fun getBillById(billId: Long): LiveData<BillData>{
         isLoading.postValue(true)
         val billLiveData: MutableLiveData<BillData> = MutableLiveData()
@@ -45,15 +52,24 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
 
 
     fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,
-                skip: String, active: String, currencyCode: String,notes: String?): LiveData<Pair<Boolean,String>>{
+                skip: String, active: String, currencyCode: String,notes: String?, fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
-            val addBill = billRepository.addBill(name, amountMin, amountMax, date, repeatFreq, skip, active, currencyCode, notes)
+            val addBill = billRepository.addBill(name, amountMin, amountMax, date, repeatFreq, skip,
+                    active, currencyCode, notes)
             when {
                 addBill.response != null -> {
                     apiResponse.postValue(Pair(true,
                             getApplication<Application>().getString(R.string.stored_new_bill, name)))
+                    if(fileToUpload.isNotEmpty()) {
+                        val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao(),
+                                genericService().create(AttachmentService::class.java))
+                        val attachmentResponse =
+                                attachmentRepository.uploadFile(getApplication(), addBill.response.data.billId,
+                                        fileToUpload, AttachableType.BILL)
+                        attachmentMessageLiveData.postValue(attachmentResponse)
+                    }
                 }
                 addBill.errorMessage != null -> {
                     apiResponse.postValue(Pair(false,addBill.errorMessage))

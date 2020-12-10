@@ -3,8 +3,6 @@ package xyz.hisname.fireflyiii.repository.attachment
 import android.content.Context
 import android.net.Uri
 import androidx.annotation.WorkerThread
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import xyz.hisname.fireflyiii.BuildConfig
@@ -28,14 +26,15 @@ class AttachmentRepository(private val attachmentDao: AttachmentDataDao,
 
     @Throws(Exception::class)
     // Bad idea to use context in this method
-    suspend fun uploadFile(context: Context, transactionJournalId: Long, fileUri: ArrayList<Uri>): ArrayList<String>{
+    suspend fun uploadFile(context: Context, objectId: Long, fileUri: ArrayList<Uri>,
+                           attachableType: AttachableType): ArrayList<String>{
         val fileStatus = arrayListOf<String>()
         fileUri.forEach { fileToUpload ->
             val fileName = FileUtils.getFileName(context, fileToUpload) ?: ""
             val requestFile = RequestBody.create(MediaType.parse(FileUtils.getMimeType(context,
                     fileToUpload) ?: ""), copyFile(context, fileToUpload, fileName))
-            val storeAttachment = attachmentService.storeAttachment(fileName, "TransactionJournal",
-                    transactionJournalId, fileName,
+            val storeAttachment = attachmentService.storeAttachment(fileName, attachableType.toString(),
+                    objectId, fileName,
                     "File uploaded by " + BuildConfig.APPLICATION_ID)
             val responseBody = storeAttachment.body()
             if (responseBody != null && storeAttachment.code() == 200) {

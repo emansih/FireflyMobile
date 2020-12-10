@@ -2,12 +2,20 @@ package xyz.hisname.fireflyiii.ui.bills
 
 import android.content.res.ColorStateList
 import android.graphics.Color.rgb
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
@@ -18,17 +26,29 @@ import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_bill.*
+import kotlinx.android.synthetic.main.fragment_add_bill.add_attachment_button
+import kotlinx.android.synthetic.main.fragment_add_bill.appbar
+import kotlinx.android.synthetic.main.fragment_add_bill.attachment_information
+import kotlinx.android.synthetic.main.fragment_add_bill.currency_edittext
+import kotlinx.android.synthetic.main.fragment_add_bill.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_bill.placeHolderToolbar
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
+import java.io.File
+import java.util.*
 
 class AddBillFragment: BaseAddObjectFragment() {
 
@@ -42,6 +62,11 @@ class AddBillFragment: BaseAddObjectFragment() {
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val billViewModel by lazy { getImprovedViewModel(AddBillViewModel::class.java) }
+    private lateinit var fileUri: Uri
+    private lateinit var takePicture: ActivityResultLauncher<Uri>
+    private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
+    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -55,6 +80,31 @@ class AddBillFragment: BaseAddObjectFragment() {
         showHelpText()
         setFab()
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                attachment_information.isVisible = true
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
+                        "", "", "", 0, "", "", ""), 0, ""))
+                attachmentItemAdapter.add(fileUri)
+                attachment_information.adapter?.notifyDataSetChanged()
+            }
+        }
+        chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()){ fileChoosen ->
+            attachment_information.isVisible = true
+            if(fileChoosen != null){
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", "", FileUtils.getFileName(requireContext(), fileChoosen) ?: "",
+                        "", "", "", 0, "", "", ""), 0, ""))
+                attachmentItemAdapter.add(fileChoosen)
+                attachment_information.adapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
 
     private fun updateEditText(){
         if(billId != 0L){
@@ -139,6 +189,14 @@ class AddBillFragment: BaseAddObjectFragment() {
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
+        attachment_information.layoutManager = LinearLayoutManager(requireContext())
+        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                false, { data: AttachmentData ->
+            attachmentDataAdapter.remove(data)
+            attachment_information.adapter?.notifyDataSetChanged()
+        }) { another: Int -> }
+
     }
 
     private fun showHelpText(){
@@ -224,18 +282,70 @@ class AddBillFragment: BaseAddObjectFragment() {
         billViewModel.apiResponse.observe(viewLifecycleOwner){ response ->
             toastInfo(response, Toast.LENGTH_LONG)
         }
+        add_attachment_button.setOnClickListener {
+            attachmentDialog()
+        }
     }
+
+    private fun attachmentDialog(){
+        val listItems = arrayOf("Capture image from camera", "Choose File")
+        AlertDialog.Builder(requireContext())
+                .setItems(listItems) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            val createTempDir = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp")
+                            if(!createTempDir.exists()){
+                                createTempDir.mkdir()
+                            }
+                            val randomId = UUID.randomUUID().toString().substring(0, 7)
+                            val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp" + File.separator + "${randomId}-firefly.png")
+                            if(fileToOpen.exists()){
+                                fileToOpen.delete()
+                            }
+                            fileUri = FileProvider.getUriForFile(requireContext(),
+                                    requireContext().packageName + ".provider", fileToOpen)
+                            takePicture.launch(fileUri)
+                        }
+                        1 -> {
+                            chooseDocument.launch(arrayOf("*/*"))
+                        }
+                    }
+                }
+                .show()
+    }
+
 
     override fun submitData(){
         billViewModel.addBill(description_edittext.getString(),
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
-                    currency, notes).observe(viewLifecycleOwner) { response ->
+                    currency, notes, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
+            toastSuccess(response.second)
             if(response.first){
-                toastSuccess(response.second)
-                handleBack()
-            } else {
-                toastInfo(response.second)
+                if(attachmentItemAdapter.isEmpty()) {
+                    handleBack()
+                } else {
+                    billViewModel.attachmentMessageLiveData.observe(viewLifecycleOwner){ error ->
+                        if(error.isNotEmpty()){
+                            val errorMessage = ""
+                            error.forEachIndexed { index, s ->
+                                errorMessage.plus("$index. $s\n\n")
+                            }
+                            AlertDialog.Builder(requireContext())
+                                    .setTitle("There was some issue uploading your attachments")
+                                    .setMessage(errorMessage)
+                                    .setPositiveButton(android.R.string.ok){ _, _ ->
+                                        handleBack()
+                                    }
+                            toastError("Please try again later", Toast.LENGTH_LONG)
+                        } else {
+                            toastSuccess("File uploaded!")
+                            handleBack()
+                        }
+                    }
+                }
             }
         }
     }

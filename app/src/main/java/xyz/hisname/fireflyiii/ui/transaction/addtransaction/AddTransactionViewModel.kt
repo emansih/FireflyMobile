@@ -17,6 +17,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.*
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
@@ -168,7 +169,8 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                                     AppDatabase.getInstance(getApplication()).attachmentDataDao(),
                                     genericService().create(AttachmentService::class.java))
                             val attachmentResponse =
-                                    attachmentRepository.uploadFile(getApplication(), journalId, fileUri)
+                                    attachmentRepository.uploadFile(getApplication(), journalId,
+                                            fileUri, AttachableType.TRANSACTION)
                             attachmentMessageLiveData.postValue(attachmentResponse)
                         }
                     }

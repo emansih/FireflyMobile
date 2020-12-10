@@ -27,6 +27,7 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
@@ -170,7 +171,7 @@ class TransactionDetailsFragment: BaseFragment() {
                     attachmentDataAdapter = ArrayList(attachment)
                     attachment_information.layoutManager = LinearLayoutManager(requireContext())
                     attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+                    attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                             true, { data: AttachmentData ->
                         setDownloadClickListener(data, attachmentDataAdapter)
                     }){ another: Int -> }
@@ -193,7 +194,7 @@ class TransactionDetailsFragment: BaseFragment() {
                     toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
                 } else {
                     // "Refresh" the icon. From downloading to open file
-                    attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentAdapter,
+                    attachment_information.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
                             true, { data: AttachmentData ->
                         setDownloadClickListener(data, attachmentDataAdapter)
                     }){ another: Int -> }

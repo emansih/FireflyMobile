@@ -11,7 +11,7 @@ import com.squareup.moshi.JsonClass
 data class BillData(
         @PrimaryKey(autoGenerate = false)
         @Json(name ="id")
-        var billId: Long? = null,
+        var billId: Long = 0,
         @Embedded
         @Json(name ="attributes")
         var billAttributes: BillAttributes? = null

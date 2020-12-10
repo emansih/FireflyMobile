@@ -56,7 +56,7 @@ import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyDialog
 import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyViewModel
-import xyz.hisname.fireflyiii.ui.transaction.details.TransactionAttachmentRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
@@ -635,7 +635,7 @@ class AddTransactionFragment: BaseFragment() {
         }
         attachment_information.layoutManager = LinearLayoutManager(requireContext())
         attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        attachment_information.adapter = TransactionAttachmentRecyclerAdapter(attachmentDataAdapter,
+        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                 false, { data: AttachmentData ->
             attachmentDataAdapter.remove(data)
             attachment_information.adapter?.notifyDataSetChanged()
