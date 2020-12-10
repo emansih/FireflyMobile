@@ -7,8 +7,8 @@ import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 @Dao
 abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
 
-    @Query("SELECT name FROM budget_list WHERE active = :budgetActive ORDER BY budgetListId DESC")
-    abstract suspend fun getAllBudgetList(budgetActive: Int = 1): MutableList<BudgetListData>
+    @Query("SELECT * FROM budget_list WHERE active = :budgetActive ORDER BY budgetListId DESC")
+    abstract suspend fun getAllBudgetList(budgetActive: Int = 1): List<BudgetListData>
 
     @Query("SELECT COUNT(name) FROM budget_list WHERE active = :budgetActive ORDER BY budgetListId DESC")
     abstract suspend fun getAllBudgetListCount(budgetActive: Int = 1): Long
@@ -17,5 +17,5 @@ abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
     abstract suspend fun deleteAllBudgetList(): Int
 
     @Query("SELECT budget_list.name, budget_list.budgetListId FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId) WHERE budgetListFts MATCH :budgetName")
-    abstract suspend fun searchBudgetName(budgetName: String): MutableList<BudgetListData>
+    abstract suspend fun searchBudgetName(budgetName: String): List<BudgetListData>
 }

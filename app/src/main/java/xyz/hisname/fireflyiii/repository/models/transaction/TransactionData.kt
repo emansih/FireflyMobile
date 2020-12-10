@@ -7,8 +7,8 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class TransactionData(
         @Json(name ="id")
-        var transactionId: Long? = null,
+        val transactionId: Long,
         @Embedded
         @Json(name ="attributes")
-        var transactionAttributes: TransactionAttributes? = null
+        val transactionAttributes: TransactionAttributes
 )

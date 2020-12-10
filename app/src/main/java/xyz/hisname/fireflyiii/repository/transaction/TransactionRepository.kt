@@ -159,7 +159,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                         val responseBody = networkCall.body()
                         if (responseBody != null && networkCall.isSuccessful) {
                             responseBody.data.forEach { data ->
-                                data.transactionAttributes?.transactions?.forEach { transaction ->
+                                data.transactionAttributes.transactions.forEach { transaction ->
                                     transactionDao.insert(transaction)
                                     transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id))
                                 }
@@ -220,7 +220,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
-            responseBody.data.transactionAttributes?.transactions?.forEach { transaction ->
+            responseBody.data.transactionAttributes.transactions.forEach { transaction ->
                 insertTransaction(transaction)
                 insertTransaction(TransactionIndex(responseBody.data.transactionId,
                         transaction.transaction_journal_id))
@@ -270,9 +270,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 }
                 deleteTransactionsByDate(startDate, endDate, sourceName)
                 transactionData.forEach { data ->
-                    transactionDao.insert(data.transactionAttributes?.transactions!![0])
+                    transactionDao.insert(data.transactionAttributes.transactions[0])
                     transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+                            data.transactionAttributes.transactions[0].transaction_journal_id))
                 }
             }
         } catch(exception: Exception){ }

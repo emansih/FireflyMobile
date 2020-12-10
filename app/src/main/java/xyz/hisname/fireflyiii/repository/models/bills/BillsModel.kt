@@ -8,6 +8,6 @@ import com.squareup.moshi.JsonClass
 @Entity
 data class BillsModel(
         @Embedded
-        val data: MutableCollection<BillData>,
+        val data: List<BillData>,
         val meta: Meta)
 

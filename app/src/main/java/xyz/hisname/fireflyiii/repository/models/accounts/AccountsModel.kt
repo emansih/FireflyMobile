@@ -8,6 +8,6 @@ import com.squareup.moshi.JsonClass
 @Entity
 data class AccountsModel(
         @Embedded
-        val data: MutableCollection<AccountData>,
+        val data: List<AccountData>,
         val meta: Meta
 )

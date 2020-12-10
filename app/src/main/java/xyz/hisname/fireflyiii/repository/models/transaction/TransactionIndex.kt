@@ -8,6 +8,5 @@ import com.squareup.moshi.JsonClass
 @Entity(tableName = "transactionIndexTable")
 data class TransactionIndex(
         @PrimaryKey(autoGenerate = false)
-        var transactionId: Long?,
-        var transactionJournalId: Long?
-)
+        val transactionId: Long,
+        val transactionJournalId: Long)

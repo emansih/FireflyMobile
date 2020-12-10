@@ -66,7 +66,7 @@ class BudgetSearchDialog: BaseDialog() {
     }
 
     private fun itemClicked(budgetData: BudgetListData){
-        budgetSearchViewModel.budgetName.postValue(budgetData.budgetListAttributes?.name)
+        budgetSearchViewModel.budgetName.postValue(budgetData.budgetListAttributes.name)
         dialog?.dismiss()
     }
 

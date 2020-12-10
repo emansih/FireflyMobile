@@ -8,12 +8,12 @@ import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 
 class BudgetSearchPagingSource(private val searchName: String,
                                private val budgetListDao: BudgetListDataDao,
-                               private val budgetService: BudgetService?): PagingSource<Int, BudgetListData>() {
+                               private val budgetService: BudgetService): PagingSource<Int, BudgetListData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BudgetListData> {
         return try {
-            val networkCall = budgetService?.searchBudget(searchName)
-            val responseBody = networkCall?.body()
+            val networkCall = budgetService.searchBudget(searchName)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 responseBody.forEach { budget ->
                     budgetListDao.insert(BudgetListData(budget.id,

@@ -67,11 +67,11 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         val data: MutableLiveData<List<String>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
             val currencyList = currencyRepository.getAllCurrency()
-            currencyList[0].currencyAttributes?.decimal_places
-            defaultCurrency = currencyList[0].currencyAttributes?.code ?: ""
-            currencySymbol = currencyList[0].currencyAttributes?.symbol ?: ""
+            currencyList[0].currencyAttributes.decimal_places
+            defaultCurrency = currencyList[0].currencyAttributes.code
+            currencySymbol = currencyList[0].currencyAttributes.symbol
             currencyList.forEach {  currencyData ->
-                modifiedList.add(currencyData.currencyAttributes?.name + " (${currencyData.currencyAttributes?.symbol})")
+                modifiedList.add(currencyData.currencyAttributes.name + " (${currencyData.currencyAttributes.symbol})")
             }
             data.postValue(modifiedList)
             getTransaction()
@@ -180,8 +180,8 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
         val replacedCurrency = modifiedList[position].replace(regexReplaced?.value ?: "", "").trim()
         viewModelScope.launch(Dispatchers.IO){
             val currencyList = currencyRepository.getCurrencyCode(replacedCurrency)
-            defaultCurrency = currencyList[0].currencyAttributes?.code ?: ""
-            currencySymbol = currencyList[0].currencyAttributes?.symbol ?: ""
+            defaultCurrency = currencyList[0].currencyAttributes.code
+            currencySymbol = currencyList[0].currencyAttributes.symbol
             getTransaction()
         }
     }

@@ -12,7 +12,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import java.time.LocalDate
 
 
-class BillPageSource(private val billsService: BillsService?,
+class BillPageSource(private val billsService: BillsService,
                      private val billDao: BillDataDao): PagingSource<Int, BillData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BillData> {
@@ -27,8 +27,8 @@ class BillPageSource(private val billsService: BillsService?,
             null
         }
         try {
-            val networkCall = billsService?.getPaginatedBills(params.key ?: 1)
-            val responseBody = networkCall?.body()
+            val networkCall = billsService.getPaginatedBills(params.key ?: 1)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     billDao.deleteAllBills()

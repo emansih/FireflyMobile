@@ -8,7 +8,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 
-class TransactionPagingSource(private val billService: BillsService?,
+class TransactionPagingSource(private val billService: BillsService,
                               private val transactionDao: TransactionDataDao,
                               private val billId: Long,
                               private val startDate: String): PagingSource<Int, Transactions>() {
@@ -25,15 +25,15 @@ class TransactionPagingSource(private val billService: BillsService?,
             null
         }
         try {
-            val networkCall = billService?.getTransactionFromBillById(billId, startDate)
-            val responseBody = networkCall?.body()
+            val networkCall = billService.getTransactionFromBillById(billId, startDate)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                             DateTimeUtil.getEndOfDayInCalendarToEpoch(startDate))
                 }
                 responseBody.data.forEach { data ->
-                    data.transactionAttributes?.transactions?.forEach { transactions ->
+                    data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
                         transactionDao.insert(TransactionIndex(data.transactionId,
                                 transactions.transaction_journal_id))

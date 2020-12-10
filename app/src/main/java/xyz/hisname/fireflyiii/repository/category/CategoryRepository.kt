@@ -62,7 +62,7 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
                 transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                         DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType, false)
                 transactionData.forEach { data ->
-                    data.transactionAttributes?.transactions?.forEach { transactions ->
+                    data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
                         transactionDao.insert(TransactionIndex(data.transactionId, transactions.transaction_journal_id))
                     }

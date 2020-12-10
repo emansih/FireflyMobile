@@ -44,7 +44,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
     private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
     private val coloring = arrayListOf<Int>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.create(R.layout.fragment_budget_summary, container)
     }
 

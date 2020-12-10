@@ -2,7 +2,6 @@ package xyz.hisname.fireflyiii.repository.models.category
 
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -12,10 +11,8 @@ import com.squareup.moshi.JsonClass
 data class CategoryData(
         @PrimaryKey(autoGenerate = false)
         @Json(name ="id")
-        var categoryId: Long? = null,
+        val categoryId: Long,
         @Embedded
         @Json(name ="attributes")
-        var categoryAttributes: CategoryAttributes? = null,
-        @Ignore
-        val type: String = ""
+        val categoryAttributes: CategoryAttributes
 )

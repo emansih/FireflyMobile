@@ -8,6 +8,6 @@ import com.squareup.moshi.JsonClass
 @Entity
 data class CurrencyModel(
         @Embedded
-        val data: MutableCollection<CurrencyData>,
+        val data: List<CurrencyData>,
         val meta: Meta
 )

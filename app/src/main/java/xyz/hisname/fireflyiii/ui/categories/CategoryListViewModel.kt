@@ -35,7 +35,7 @@ class CategoryListViewModel(application: Application): BaseViewModel(application
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
             val categoryList = categoryRepository.getCategoryById(categoryId.toLong())
-            if(categoryList.categoryId != null || categoryList.categoryId != 0L){
+            if(categoryList.categoryId != 0L){
                 // Since onDraw() is being called multiple times, we check if the category exists locally in the DB.
                 when (categoryRepository.deleteCategoryById(categoryId.toLong())) {
                     HttpConstants.FAILED -> {

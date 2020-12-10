@@ -24,7 +24,6 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.NetworkErrors
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
@@ -49,7 +48,7 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
         val billLiveDataList = MutableLiveData<BillData>()
         viewModelScope.launch(Dispatchers.IO){
             val billList = billRepository.getBillById(billId)
-            billName =  billList.billAttributes?.name ?: ""
+            billName =  billList.billAttributes.name
             billLiveDataList.postValue(billList)
         }
         return billLiveDataList
@@ -103,7 +102,7 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
         val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao(),
                 genericService().create(AttachmentService::class.java))
         val data: MutableLiveData<MutableList<AttachmentData>> = MutableLiveData()
-        var attachmentData: MutableList<AttachmentData> = arrayListOf()
+        var attachmentData: MutableList<AttachmentData>
         viewModelScope.launch(Dispatchers.IO) {
             billService.getBillAttachment(billId).enqueue(retrofitCallback({ response ->
                 if (response.isSuccessful) {

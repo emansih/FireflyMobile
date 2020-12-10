@@ -63,7 +63,7 @@ class CategoriesDialog: BaseDialog(){
     }
 
     private fun itemClicked(categoryData: CategoryData){
-        categoryViewModel.categoryName.postValue(categoryData.categoryAttributes?.name)
+        categoryViewModel.categoryName.postValue(categoryData.categoryAttributes.name)
         dialog?.dismiss()
     }
 

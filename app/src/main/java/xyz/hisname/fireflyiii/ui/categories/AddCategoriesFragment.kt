@@ -27,7 +27,7 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
         setWidgets()
         if(categoryId != 0L){
             categoryViewModel.getCategoryById(categoryId).observe(viewLifecycleOwner){ categoryData ->
-                category_name.setText(categoryData.categoryAttributes?.name)
+                category_name.setText(categoryData.categoryAttributes.name)
             }
         }
     }

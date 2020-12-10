@@ -8,6 +8,6 @@ import com.squareup.moshi.JsonClass
 @Entity
 data class CategoryModel(
         @Embedded
-        val data: MutableList<CategoryData>,
+        val data: List<CategoryData>,
         val meta: Meta
 )

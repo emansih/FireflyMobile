@@ -36,8 +36,8 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
     }
 
     private fun itemClicked(currencyData: CurrencyData){
-        currencyViewModel.currencyCode.postValue(currencyData.currencyAttributes?.code)
-        currencyViewModel.currencyFullDetails.postValue(currencyData.currencyAttributes?.name + " (" + currencyData.currencyAttributes?.code + ")")
+        currencyViewModel.currencyCode.postValue(currencyData.currencyAttributes.code)
+        currencyViewModel.currencyFullDetails.postValue(currencyData.currencyAttributes.name + " (" + currencyData.currencyAttributes.code + ")")
         dismiss()
     }
 }

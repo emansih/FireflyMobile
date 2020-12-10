@@ -8,7 +8,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 
-class TransactionPagingSource(private val currencyService: CurrencyService?,
+class TransactionPagingSource(private val currencyService: CurrencyService,
                               private val transactionDao: TransactionDataDao,
                               private val currencyCode: String,
                               private val startDate: String,
@@ -27,20 +27,20 @@ class TransactionPagingSource(private val currencyService: CurrencyService?,
             null
         }
         try {
-            val networkCall = currencyService?.getTransactionByCurrencyCode(currencyCode,
+            val networkCall = currencyService.getTransactionByCurrencyCode(currencyCode,
                     params.key ?: 1, startDate, endDate, convertString(transactionType))
-            val responseBody = networkCall?.body()
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                             DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(transactionType))
                 }
                 responseBody.data.forEach { data ->
-                    data.transactionAttributes?.transactions?.forEach { transactions ->
+                    data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
                     }
                     transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes?.transactions?.get(0)?.transaction_journal_id))
+                            data.transactionAttributes.transactions[0].transaction_journal_id))
                 }
             }
             val pagination = responseBody?.meta?.pagination

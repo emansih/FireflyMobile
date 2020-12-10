@@ -8,6 +8,6 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class PiggyModel(
         @Embedded
-        val data: MutableCollection<PiggyData>,
+        val data: List<PiggyData>,
         val meta: Meta
 )

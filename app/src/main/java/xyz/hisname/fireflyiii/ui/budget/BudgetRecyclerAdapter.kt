@@ -26,7 +26,7 @@ class BudgetRecyclerAdapter(private val clickListener:(BudgetListData) -> Unit):
     inner class BudgetHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(budgetData: BudgetListData, clickListener: (BudgetListData) -> Unit) {
             val budgetAttributes = budgetData.budgetListAttributes
-            itemView.budgetNameText.text = budgetAttributes?.name
+            itemView.budgetNameText.text = budgetAttributes.name
             itemView.setOnClickListener {clickListener(budgetData)}
         }
     }

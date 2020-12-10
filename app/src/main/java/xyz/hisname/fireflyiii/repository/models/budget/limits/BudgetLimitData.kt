@@ -11,10 +11,8 @@ import com.squareup.moshi.JsonClass
 @Entity(tableName = "budgetLimit")
 data class BudgetLimitData(
         @Embedded
-        var attributes: BudgetLimitAttributes? = null,
+        val attributes: BudgetLimitAttributes,
         @PrimaryKey(autoGenerate = false)
         @Json(name ="id")
-        var budgetLimitId: Long? = null,
-        @Ignore
-        var type: String? = ""
+        val budgetLimitId: Long
 )

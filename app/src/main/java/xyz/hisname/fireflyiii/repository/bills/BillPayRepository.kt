@@ -15,7 +15,7 @@ class BillPayRepository(private val billPayDao: BillPayDao,
             val networkCall = billsService.getBillById(billId, startDate, endDate)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
-                responseBody.data.billAttributes?.pay_dates?.forEach { localDate ->
+                responseBody.data.billAttributes.pay_dates.forEach { localDate ->
                     billPayDao.insert(BillPayDates(id = billId, payDates = LocalDate.parse(localDate)))
                 }
             }

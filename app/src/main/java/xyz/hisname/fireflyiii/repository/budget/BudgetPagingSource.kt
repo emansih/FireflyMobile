@@ -7,7 +7,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 
 class BudgetPagingSource(private val budgetDao: BudgetListDataDao,
-                         private val budgetService: BudgetService?): PagingSource<Int, BudgetListData>() {
+                         private val budgetService: BudgetService): PagingSource<Int, BudgetListData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BudgetListData> {
         val paramKey = params.key
@@ -21,8 +21,8 @@ class BudgetPagingSource(private val budgetDao: BudgetListDataDao,
             null
         }
         try {
-            val networkCall = budgetService?.getPaginatedSpentBudget(params.key ?: 1)
-            val responseBody = networkCall?.body()
+            val networkCall = budgetService.getPaginatedSpentBudget(params.key ?: 1)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     budgetDao.deleteAllBudgetList()

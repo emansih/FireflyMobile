@@ -40,20 +40,20 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
     inner class CurrencyHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         fun bind(currencyData: CurrencyData, clickListener: (CurrencyData) -> Unit){
             val currency = currencyData.currencyAttributes
-            itemView.currencySymbol.text = currency?.symbol.toString()
-            itemView.currencyCode.text = currency?.code
+            itemView.currencySymbol.text = currency.symbol.toString()
+            itemView.currencyCode.text = currency.code
             if(shouldShowDisabled){
-                if(currency?.enabled == false){
-                    itemView.currencyName.text = currency?.name + " (" + currency?.code + ")" + " (Disabled)"
+                if(!currency.enabled){
+                    itemView.currencyName.text = currency.name + " (" + currency.code + ")" + " (Disabled)"
                     itemView.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
                     itemView.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
                 }
             }
-            itemView.currencyName.text = currency?.name + " (" + currency?.code + ")"
+            itemView.currencyName.text = currency.name + " (" + currency.code + ")"
             if(isThumbnailEnabled) {
                 itemView.flagImage.isVisible = true
                 Glide.with(context)
-                        .load(Flags.getFlagByIso(currency?.code ?: ""))
+                        .load(Flags.getFlagByIso(currency.code ?: ""))
                         .error(R.drawable.unknown)
                         .into(itemView.flagImage)
             }

@@ -65,11 +65,11 @@ class TransactionMonthViewModel(application: Application): BaseViewModel(applica
         val uniqueCategoryLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
         viewModelScope.launch(Dispatchers.IO){
             val defaultCurrency = currencyRepository.defaultCurrency().currencyAttributes
-            currencyCode = defaultCurrency?.code ?: ""
+            currencyCode = defaultCurrency.code
             transactionSum = transactionRepository.getTransactionByDateAndCurrencyCode(getStartOfMonth(monthYear),
                 getEndOfMonth(monthYear), currencyCode, transactionType, false)
             totalSumLiveData.postValue(transactionSum.toString())
-            currencySymbol = defaultCurrency?.symbol ?: ""
+            currencySymbol = defaultCurrency.symbol
             val uniqueCategory = transactionRepository.getUniqueCategoryByDateAndType(getStartOfMonth(monthYear),
                     getEndOfMonth(monthYear), currencyCode, transactionType)
             val pieChartData = arrayListOf<Triple<Float, String, BigDecimal>>()

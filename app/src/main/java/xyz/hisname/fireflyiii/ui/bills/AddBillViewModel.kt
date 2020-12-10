@@ -43,7 +43,7 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
         val billLiveData: MutableLiveData<BillData> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             val billList = billRepository.getBillById(billId)
-            currencyCode =  billList.billAttributes?.currency_code ?: ""
+            currencyCode =  billList.billAttributes.currency_code
             billLiveData.postValue(billList)
             isLoading.postValue(false)
         }

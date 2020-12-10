@@ -23,7 +23,7 @@ class MarkdownFragment: BaseFragment() {
     private val toolbar by lazy {requireActivity().findViewById<Toolbar>(R.id.activity_toolbar) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_markdown, container)
     }

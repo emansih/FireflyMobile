@@ -7,7 +7,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 
 class CurrencyPagingSource(private val currencyDataDao: CurrencyDataDao,
-                           private val currencyService: CurrencyService?): PagingSource<Int, CurrencyData>() {
+                           private val currencyService: CurrencyService): PagingSource<Int, CurrencyData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CurrencyData> {
         val paramKey = params.key
@@ -21,8 +21,8 @@ class CurrencyPagingSource(private val currencyDataDao: CurrencyDataDao,
             null
         }
         try {
-            val networkCall = currencyService?.getPaginatedCurrency(params.key ?: 1)
-            val responseBody = networkCall?.body()
+            val networkCall = currencyService.getPaginatedCurrency(params.key ?: 1)
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     currencyDataDao.deleteAllCurrency()

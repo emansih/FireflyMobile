@@ -30,7 +30,7 @@ class CategoriesRecyclerAdapter(private val clickListener:(CategoryData) -> Unit
     inner class CategoryHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(categoryData: CategoryData, clickListener: (CategoryData) -> Unit) {
             val categoryDataSet = categoryData.categoryAttributes
-            itemView.categoryName.text = categoryDataSet?.name
+            itemView.categoryName.text = categoryDataSet.name
             itemView.categoryId.text = categoryData.categoryId.toString()
             itemView.setOnClickListener { clickListener(categoryData) }
         }

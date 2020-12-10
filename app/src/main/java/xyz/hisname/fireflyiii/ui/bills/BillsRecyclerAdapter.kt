@@ -31,22 +31,19 @@ class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
     inner class BillsHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(billData: BillData, clickListener: (BillData) -> Unit){
             val billResponse = billData.billAttributes
-            var billName = billResponse?.name
-            val isPending = billResponse?.isPending
-            if(billName != null){
-                if(isPending == true){
-                    billName = "$billName (Pending)"
-                    itemView.billName.setTextColor(context.getCompatColor(R.color.md_red_500))
-                }
-                itemView.billName.text = billName
+            var billName = billResponse.name
+            val isPending = billResponse.isPending
+            if(isPending){
+                billName = "$billName (Pending)"
+                itemView.billName.setTextColor(context.getCompatColor(R.color.md_red_500))
             }
+            itemView.billName.text = billName
             itemView.billAmount.text = context.getString(R.string.bill_amount,
-                    billResponse?.currency_symbol, billResponse?.amount_max)
-            val freq = billResponse?.repeat_freq
-            if(freq != null && freq.isNotBlank()){
-                itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
-            }
-            val nextMatch = billResponse?.next_expected_match
+                    billResponse.currency_symbol, billResponse.amount_max)
+            val freq = billResponse.repeat_freq
+            itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
+
+            val nextMatch = billResponse.next_expected_match
             if(nextMatch != null){
                 itemView.billNextDueDate.text = billResponse.next_expected_match
             }

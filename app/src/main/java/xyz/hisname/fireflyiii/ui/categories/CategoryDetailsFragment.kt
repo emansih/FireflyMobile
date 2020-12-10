@@ -42,13 +42,13 @@ class CategoryDetailsFragment: BaseDetailFragment() {
 
     private fun setWidget(){
         categoryDetailViewModel.getCategoryById(categoryId).observe(viewLifecycleOwner){ categoryData ->
-            categoryName = categoryData.categoryAttributes?.name ?: ""
+            categoryName = categoryData.categoryAttributes.name
             durationText.text = getString(R.string.chart_category_in_period, categoryName,
                     DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
-            if(categoryData.categoryAttributes?.notes.isNullOrEmpty()){
+            if(categoryData.categoryAttributes.notes.isNullOrEmpty()){
                 notesCard.isGone = true
             } else {
-                notesText.text = categoryData.categoryAttributes?.notes?.toMarkDown()
+                notesText.text = categoryData.categoryAttributes.notes.toMarkDown()
             }
         }
         setBarChart()

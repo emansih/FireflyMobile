@@ -21,8 +21,6 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 class AccountRepository(private val accountDao: AccountsDataDao,
                         private val accountsService: AccountsService){
 
-    private lateinit var apiResponse: String
-    val authStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     // !!!!This is only used for PAT authentication, do not use it anywhere else!!!!
     /**
@@ -33,12 +31,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     suspend fun authViaPat(): Boolean{
         val networkCall = accountsService.getPaginatedAccountType("asset", 1)
         val responseBody = networkCall.body()
-        return if (responseBody != null && networkCall.isSuccessful) {
-            authStatus.postValue(true)
-            true
-        } else {
-            false
-        }
+        return responseBody != null && networkCall.isSuccessful
     }
 
 
@@ -48,8 +41,8 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     }
 
     suspend fun getAccountById(accountId: Long): AccountData{
-        val accountName = accountDao.getAccountById(accountId).accountAttributes?.name
-        if(accountName.isNullOrEmpty()){
+        val accountName = accountDao.getAccountById(accountId).accountAttributes.name
+        if(accountName.isEmpty()){
             try {
                 val networkCall = accountsService.getAccountById(accountId)
                 val responseBody = networkCall.body()
@@ -96,7 +89,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
     @Throws(Exception::class)
     suspend fun getAccountByName(accountName: String, accountType: String): AccountData{
         var accountData = accountDao.getAccountByNameAndType(accountName, accountType)
-        if(accountData.accountAttributes?.name.isNullOrEmpty()) {
+        if(accountData.accountAttributes.name.isEmpty()) {
             val networkCall = accountsService.searchAccount(accountName, accountType)
             val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
@@ -117,7 +110,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
                 responseBody.data.forEach { transactionData ->
-                    transactionData.transactionAttributes?.transactions?.forEach { transactions ->
+                    transactionData.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
                         transactionDao.insert(TransactionIndex(
                                 transactionData.transactionId,
@@ -227,7 +220,6 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             val networkCall = accountsService.getPaginatedAccountType(accountType, 1)
             accountData.addAll(networkCall.body()?.data?.toMutableList() ?: arrayListOf())
             val responseBody = networkCall.body()
-            apiResponse = networkCall.message() ?: ""
             if (responseBody != null && networkCall.isSuccessful) {
                 val pagination = responseBody.meta.pagination
                 if (pagination.total_pages != pagination.current_page) {

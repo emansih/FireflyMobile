@@ -83,16 +83,16 @@ class BillDetailsFragment: BaseDetailFragment() {
         billDetailsViewModel.getBillInfo().observe(viewLifecycleOwner){ billData ->
             val attributes = billData.billAttributes
             val bill = arrayListOf(
-                    DetailModel(resources.getString(R.string.name), attributes?.name),
-                    DetailModel("Range", attributes?.currency_symbol +
-                            attributes?.amount_min + " ~ " + attributes?.amount_max),
-                    DetailModel(resources.getString(R.string.frequency), attributes?.repeat_freq),
-                    DetailModel("Is Active", attributes?.active.toString())
+                    DetailModel(resources.getString(R.string.name), attributes.name),
+                    DetailModel("Range", attributes.currency_symbol +
+                            attributes.amount_min + " ~ " + attributes.amount_max),
+                    DetailModel(resources.getString(R.string.frequency), attributes.repeat_freq),
+                    DetailModel("Is Active", attributes.active.toString())
             )
-            if(attributes?.notes.isNullOrEmpty()){
+            if(attributes.notes.isNullOrEmpty()){
                 notesCard.isGone = true
             } else {
-                notesText.text = attributes?.notes?.toMarkDown()
+                notesText.text = attributes.notes?.toMarkDown()
             }
             downloadAttachment(billData.billId)
             detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())

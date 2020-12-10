@@ -94,15 +94,15 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                     val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
                     val account = accountDatabase.getAccountById(accountId.toLong())
                     val defaultCurrency = AppDatabase.getInstance(context).currencyDataDao().getDefaultCurrency()
-                    val currencyCode = defaultCurrency.currencyAttributes?.code
-                    val currencySymbol = defaultCurrency.currencyAttributes?.symbol
-                    val currencyDp = defaultCurrency.currencyAttributes?.decimal_places
+                    val currencyCode = defaultCurrency.currencyAttributes.code
+                    val currencySymbol = defaultCurrency.currencyAttributes.symbol
+                    val currencyDp = defaultCurrency.currencyAttributes.decimal_places
                     val percentage = currentAmount?.toInt()?.div(targetAmount.toInt())?.times(100)
                     val leftToSave = targetAmount.toInt() - (currentAmount?.toInt() ?: 0)
                     piggyDatabase.insert(
-                           PiggyData( "", piggyWorkManagerId, PiggyAttributes(
+                           PiggyData(piggyWorkManagerId, PiggyAttributes(
                                    "","", name, account.accountId,
-                                   account.accountAttributes?.name, defaultCurrency.currencyId, currencyCode, currencySymbol,
+                                   account.accountAttributes.name, defaultCurrency.currencyId, currencyCode, currencySymbol,
                                    currencyDp, targetAmount.toBigDecimal(),  percentage,
                                    currentAmount?.toBigDecimal() ?: 0.toBigDecimal(),
                                    leftToSave.toBigDecimal(), 0.toBigDecimal(), startDate, endDate, 0, true, notes, true

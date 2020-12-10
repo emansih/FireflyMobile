@@ -32,14 +32,14 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         if(currencyId != 0L){
             currencyViewModel.getCurrencyById(currencyId).observe(viewLifecycleOwner) {
                 val currencyAttributes = it[0].currencyAttributes
-                name_edittext.setText(currencyAttributes?.name)
-                decimal_places_edittext.setText(currencyAttributes?.decimal_places.toString())
-                symbol_edittext.setText(currencyAttributes?.symbol)
-                code_edittext.setText(currencyAttributes?.code)
-                if(currencyAttributes?.enabled == true){
+                name_edittext.setText(currencyAttributes.name)
+                decimal_places_edittext.setText(currencyAttributes.decimal_places.toString())
+                symbol_edittext.setText(currencyAttributes.symbol)
+                code_edittext.setText(currencyAttributes.code)
+                if(currencyAttributes.enabled){
                     enabled_checkbox.isChecked = true
                 }
-                if(currencyAttributes?.currencyDefault == true){
+                if(currencyAttributes.currencyDefault){
                     default_checkbox.isChecked = true
                 }
             }

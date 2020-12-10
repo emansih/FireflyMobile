@@ -4,9 +4,9 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class TransactionAttributes(
-        var created_at: String = "",
-        var group_title: String = "",
-        var transactions: List<Transactions>? = null,
-        var updated_at: String = "",
-        var user: Int = 0
+        val created_at: String,
+        val group_title: String,
+        val transactions: List<Transactions>,
+        val updated_at: String,
+        val user: Int
 )

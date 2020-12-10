@@ -25,8 +25,8 @@ class BudgetRepository(private val budget: BudgetDataDao,
 
     suspend fun insertBudgetList(budgetData: BudgetListData){
         budgetList.insert(budgetData)
-        val spentList = budgetData.budgetListAttributes?.spent
-        if(spentList != null && spentList.isNotEmpty()){
+        val spentList = budgetData.budgetListAttributes.spent
+        if(spentList.isNotEmpty()){
             spentList.forEach { spent ->
                 spent.spentId = budgetData.budgetListId ?: 0
                 spentDao.insert(spent)

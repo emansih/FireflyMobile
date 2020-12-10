@@ -99,12 +99,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             if(currencyBundle?.startsWith("%") == false){
                 viewModelScope.launch(Dispatchers.IO){
                     val currencyAttributes = currencyRepository.getCurrencyByCode(currencyBundle)[0].currencyAttributes
-                    if(currencyAttributes?.name != null){
-                        transactionCurrency.postValue(currencyAttributes.name + " (" + currencyAttributes.code + ")")
-                    } else {
-                        transactionCurrency.postValue(currencyAttributes?.code)
-                        apiResponse.postValue("Unable to get currency data while offline")
-                    }
+                    transactionCurrency.postValue(currencyAttributes.name + " (" + currencyAttributes.code + ")")
                 }
             } else {
                 // Is tasker variable
@@ -161,7 +156,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                     apiResponse.postValue(Pair(true,
                             getApplication<Application>().resources.getString(R.string.transaction_added)))
                     if(fileUri.isNotEmpty()){
-                        addTransaction.response.data.transactionAttributes?.transactions?.forEach { transaction ->
+                        addTransaction.response.data.transactionAttributes.transactions.forEach { transaction ->
                             journalId = transaction.transaction_journal_id
                         }
                         if(journalId != 0L){
@@ -262,7 +257,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         viewModelScope.launch(Dispatchers.IO){
             val categoryList = arrayListOf<String>()
             categoryRepository.searchCategoryByName(categoryName).forEach { categoryData ->
-                categoryData.categoryAttributes?.name?.let { categoryList.add(it) }
+                categoryList.add(categoryData.categoryAttributes.name)
             }
             categoryLiveData.postValue(categoryList)
 
@@ -297,7 +292,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         val piggyList = arrayListOf<String>()
         viewModelScope.launch(Dispatchers.IO){
             piggyRepository.searchPiggyBank(piggyBankName).forEach { piggyData ->
-                piggyData.piggyAttributes?.name?.let { piggyList.add(it) }
+                piggyList.add(piggyData.piggyAttributes.name)
             }
             piggyLiveData.postValue(piggyList)
         }
@@ -309,7 +304,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         viewModelScope.launch(Dispatchers.IO) {
             val budgetList = arrayListOf<String>()
             budgetRepository.searchBudgetList(budgetName).forEach { budget ->
-                budget.budgetListAttributes?.name?.let { budgetList.add(it) }
+                budget.budgetListAttributes.name.let { budgetList.add(it) }
             }
             data.postValue(budgetList)
         }
@@ -320,8 +315,8 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         val currencyLiveData = MutableLiveData<String>()
         viewModelScope.launch(Dispatchers.IO){
             val currencyList = currencyRepository.defaultCurrency().currencyAttributes
-            currency = currencyList?.code ?: ""
-            currencyLiveData.postValue(currencyList?.name + " (" + currencyList?.code + ")")
+            currency = currencyList.code
+            currencyLiveData.postValue(currencyList.name + " (" + currencyList.code + ")")
         }
         return currencyLiveData
     }

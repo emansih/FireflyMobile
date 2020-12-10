@@ -4,6 +4,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class TransactionModel(
-        val data: MutableCollection<TransactionData>,
+        val data: List<TransactionData>,
         val meta: Meta
 )
