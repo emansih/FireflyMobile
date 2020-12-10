@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -181,7 +182,11 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun setNotes(notes: String?){
-        notesText.text = notes?.toMarkDown()
+        if(notes.isNullOrEmpty()){
+            notesCard.isGone = true
+        } else {
+            notesText.text = notes.toMarkDown()
+        }
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
