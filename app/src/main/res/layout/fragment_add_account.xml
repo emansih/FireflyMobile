@@ -260,7 +260,6 @@
                         android:hint="@string/iban"
                         android:inputType="number"
                         android:drawablePadding="12dp"
-                        android:focusable="false"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -281,7 +280,6 @@
                         android:hint="BIC"
                         android:inputType="number"
                         android:drawablePadding="12dp"
-                        android:focusable="false"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -302,7 +300,6 @@
                         android:hint="@string/account_number"
                         android:inputType="number"
                         android:drawablePadding="12dp"
-                        android:focusable="false"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
