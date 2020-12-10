@@ -179,7 +179,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
                     sizeDp = 24
                 },null, null, null)
         addTagFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = FontAwesome.Icon.faw_tag
+            icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
