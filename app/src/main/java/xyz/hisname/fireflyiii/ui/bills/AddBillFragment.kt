@@ -241,13 +241,13 @@ class AddBillFragment: BaseAddObjectFragment() {
         bill_date_edittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
-            picker.show(parentFragmentManager, picker.toString())
+            picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
                 bill_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
         currency_edittext.setOnClickListener{
-            CurrencyListBottomSheet().show(parentFragmentManager, "currencyList" )
+            CurrencyListBottomSheet().show(childFragmentManager, "currencyList" )
         }
         currencyViewModel.currencyCode.observe(viewLifecycleOwner) { currencyCode ->
             currency = currencyCode

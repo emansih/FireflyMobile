@@ -144,7 +144,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         }
         currency_edittext.setOnClickListener{
             val currencyListFragment = CurrencyListBottomSheet()
-            currencyListFragment.show(parentFragmentManager, "currencyList" )
+            currencyListFragment.show(childFragmentManager, "currencyList" )
         }
         if(accountId == 0L) {
             accountVM.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
@@ -157,7 +157,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
             opening_balance_date_edittext.setOnClickListener {
                 val materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 val picker = materialDatePicker.build()
-                picker.show(parentFragmentManager, picker.toString())
+                picker.show(childFragmentManager, picker.toString())
                 picker.addOnPositiveButtonClickListener { time ->
                     opening_balance_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
                 }
@@ -176,7 +176,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
             start_date_edittext.setOnClickListener {
                 val materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 val picker = materialDatePicker.build()
-                picker.show(parentFragmentManager, picker.toString())
+                picker.show(childFragmentManager, picker.toString())
                 picker.addOnPositiveButtonClickListener { time ->
                     start_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
                 }

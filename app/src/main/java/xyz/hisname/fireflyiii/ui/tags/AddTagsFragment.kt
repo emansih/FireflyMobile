@@ -108,7 +108,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
         date_edittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
-            picker.show(parentFragmentManager, picker.toString())
+            picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
                 transaction_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }

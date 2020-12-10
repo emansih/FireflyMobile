@@ -149,7 +149,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         date_target_edittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
-            picker.show(parentFragmentManager, picker.toString())
+            picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
                 date_target_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
@@ -157,7 +157,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         date_started_edittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
-            picker.show(parentFragmentManager, picker.toString())
+            picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
                 date_started_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
