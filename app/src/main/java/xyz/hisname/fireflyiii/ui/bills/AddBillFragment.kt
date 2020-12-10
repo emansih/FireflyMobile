@@ -268,7 +268,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         notes_edittext.setOnClickListener {
             markdownViewModel.markdownText.postValue(notes_edittext.getString())
             parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, MarkdownFragment())
+                add(R.id.bigger_fragment_container, MarkdownFragment())
                 addToBackStack(null)
             }
         }
