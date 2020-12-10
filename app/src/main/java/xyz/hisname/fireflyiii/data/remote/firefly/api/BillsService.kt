@@ -3,7 +3,9 @@ package xyz.hisname.fireflyiii.data.remote.firefly.api
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.BILL_API_ENDPONT
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillsModel
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 import xyz.hisname.fireflyiii.repository.models.bills.SingleBillModel
@@ -55,5 +57,7 @@ interface BillsService {
                            @Field("currency_code") currencyCode: String, @Field("notes") notes: String?
     ): Response<BillSuccessModel>
 
+    @GET("${Constants.BILL_API_ENDPONT}/{id}/attachments")
+    fun getBillAttachment(@Path("id") billId: Long): Call<AttachmentModel>
 
 }

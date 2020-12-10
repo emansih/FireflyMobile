@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
@@ -22,10 +23,15 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.calendar_day.view.*
 import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_bill_details.*
+import kotlinx.android.synthetic.main.fragment_bill_details.notesCard
+import kotlinx.android.synthetic.main.fragment_bill_details.notesText
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
@@ -34,6 +40,7 @@ import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
+import xyz.hisname.fireflyiii.util.openFile
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -44,6 +51,7 @@ class BillDetailsFragment: BaseDetailFragment() {
 
     private val selectedPayDays = arrayListOf<LocalDate>()
     private val selectedPaidDays = arrayListOf<LocalDate>()
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val monthTitleFormatter = DateTimeFormatter.ofPattern("MMMM")
     private val billDetailsViewModel by lazy { getImprovedViewModel(BillDetailsViewModel::class.java) }
     private val billId: Long by lazy { arguments?.getLong("billId") ?: 0  }
@@ -86,6 +94,7 @@ class BillDetailsFragment: BaseDetailFragment() {
             } else {
                 notesText.text = attributes?.notes?.toMarkDown()
             }
+            downloadAttachment(billData.billId)
             detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }
@@ -234,6 +243,41 @@ class BillDetailsFragment: BaseDetailFragment() {
                 transactionLoader.hide()
             } else {
                 transactionLoader.show()
+            }
+        }
+    }
+
+    // Ugly! Refactor!
+    private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
+        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+        val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
+        attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
+            attachmentViewModel.isDownloaded.observe(viewLifecycleOwner) { isLoading ->
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                if (!isLoading) {
+                    toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
+                } else {
+                    // "Refresh" the icon. From downloading to open file
+                    attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+                            true, { data: AttachmentData ->
+                        setDownloadClickListener(data, attachmentDataAdapter)
+                    }){ another: Int -> }
+                    startActivity(requireContext().openFile(downloadedFile))
+                }
+            }
+        }
+    }
+
+    private fun downloadAttachment(billId: Long){
+        billDetailsViewModel.getBillAttachment(billId).observe(viewLifecycleOwner) { attachment ->
+            if (attachment.isNotEmpty()) {
+                attachmentDataAdapter = ArrayList(attachment)
+                attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                        true, { data: AttachmentData ->
+                    setDownloadClickListener(data, attachmentDataAdapter)
+                }) { another: Int -> }
             }
         }
     }
