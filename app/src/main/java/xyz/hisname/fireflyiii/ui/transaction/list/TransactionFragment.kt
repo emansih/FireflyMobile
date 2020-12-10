@@ -183,6 +183,13 @@ class TransactionFragment: BaseFragment(){
                             }
                         }
                     }
+                    if(selectedDates.size == 2){
+                        for (x in 0 until DateTimeUtil.getDaysDifference(selectedDates[0], selectedDates[1])){
+                            dateRange.add(selectedDates[1].minusDays(x))
+                        }
+                        startDate = selectedDates[0]
+                        endDate = selectedDates[1]
+                    }
                     transaction_calendar.notifyCalendarChanged()
                     true
                 }
@@ -197,14 +204,7 @@ class TransactionFragment: BaseFragment(){
                 if (day.owner == DayOwner.THIS_MONTH) {
                     when {
                         selectedDates.contains(day.date) -> {
-                            if (selectedDates.size == 2){
-                                for (x in 0 until DateTimeUtil.getDaysDifference(selectedDates[0], selectedDates[1])){
-                                    dateRange.add(selectedDates[1].minusDays(x))
-                                }
-                                startDate = selectedDates[0]
-                                endDate = selectedDates[1]
-                                loadTransaction()
-                            } else {
+                            if (selectedDates.size != 2){
                                 dateRange.clear()
                             }
                             textView.setTextColor(setDayNightTheme())
