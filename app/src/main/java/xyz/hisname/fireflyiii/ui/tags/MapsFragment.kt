@@ -37,9 +37,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.repository.models.nominatim.LocationSearchModel
-import xyz.hisname.fireflyiii.repository.nominatim.NominatimViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -48,10 +46,8 @@ import java.io.File
 class MapsFragment: BaseFragment() {
 
     private val locationService by lazy { requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
-    private val nominatimViewModel by lazy { getViewModel(NominatimViewModel::class.java) }
     private val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
     private val mapController by lazy { maps.controller }
-    private val groomLake by lazy { GeoPoint(37.276675, -115.798936) }
     private lateinit var startMarker: Marker
     private var longitude: Double = 0.0
     private var latitude: Double = 0.0
@@ -82,28 +78,27 @@ class MapsFragment: BaseFragment() {
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
         Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
-        isGpsEnabled()
-        setMap()
+        startMarker = Marker(maps)
         setMapClick()
+        isGpsEnabled()
         setFab()
         searchLocation()
         okButton.setOnClickListener {
-            mapsViewModel.setLatitude(latitude)
-            mapsViewModel.setLongitude(longitude)
-            mapsViewModel.setZoomLevel(maps.zoomLevelDouble)
+            mapsViewModel.latitude.postValue(latitude)
+            mapsViewModel.longitude.postValue(longitude)
+            mapsViewModel.zoomLevel.postValue(maps.zoomLevelDouble)
             handleBack()
         }
         cancelButton.setOnClickListener {
-            mapsViewModel.setLatitude(0.0)
-            mapsViewModel.setLongitude(0.0)
-            mapsViewModel.setZoomLevel(0.0)
+            mapsViewModel.latitude.postValue(0.0)
+            mapsViewModel.longitude.postValue(0.0)
+            mapsViewModel.zoomLevel.postValue(0.0)
             handleBack()
         }
     }
 
-    private fun setMap(){
-        startMarker = Marker(maps)
-        startMarker.position = groomLake
+    private fun setMap(location: GeoPoint){
+        startMarker.position = location
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         maps.setMultiTouchControls(true)
         maps.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
@@ -114,8 +109,8 @@ class MapsFragment: BaseFragment() {
             colorRes = R.color.md_red_700
             sizeDp = 16
         }
-        mapController.animateTo(groomLake)
-        mapController.setZoom(15.0)
+        mapController.animateTo(location)
+        mapController.setZoom(18.0)
     }
 
     private fun searchLocation(){
@@ -152,19 +147,10 @@ class MapsFragment: BaseFragment() {
     }
 
     private fun location(query: String){
-        zipLiveData(nominatimViewModel.getLocationFromQuery(query), nominatimViewModel.isLoading).observe(viewLifecycleOwner){ data ->
-            if(!data.second){
-                if(data.first.isEmpty()){
-                    toastInfo("Location was not found")
-                } else {
-                    cloneLocationList = data.first
-                    val displayName = arrayListOf<String>()
-                    data.first.forEach { locationSearchModel ->
-                        displayName.add(locationSearchModel.display_name)
-                    }
-                    val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, displayName)
-                    mapSearch.setAdapter(adapter)
-                }
+        mapsViewModel.getLocationFromQuery(query).observe(viewLifecycleOwner){ data ->
+            if(data.isNotEmpty()){
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, data)
+                mapSearch.setAdapter(adapter)
             }
         }
     }
@@ -186,8 +172,7 @@ class MapsFragment: BaseFragment() {
             }
 
         }
-        val overlayEvents = MapEventsOverlay(mapReceiver)
-        maps.overlays.add(overlayEvents)
+        maps.overlays.add(MapEventsOverlay(mapReceiver))
     }
 
     private fun setFab(){
@@ -224,10 +209,11 @@ class MapsFragment: BaseFragment() {
 
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
-            mapController.setZoom(18.0)
+            setMap(GeoPoint(location.latitude, location.longitude))
+            /*mapController.setZoom(18.0)
             val startPoint = GeoPoint(location.latitude, location.longitude)
             mapController.animateTo(startPoint)
-            startMarker.position = startPoint
+            startMarker.position = startPoint*/
         }
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
@@ -245,6 +231,15 @@ class MapsFragment: BaseFragment() {
                         toastInfo("Alright...Using Network data instead.")
                     }
                     .show()
+        } else {
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                locationService.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
+                locationService.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+            } else {
+                setMap(GeoPoint(37.276675, -115.798936))
+            }
         }
     }
 

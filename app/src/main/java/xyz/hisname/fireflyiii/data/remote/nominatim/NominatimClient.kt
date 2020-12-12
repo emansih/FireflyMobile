@@ -12,9 +12,8 @@ class NominatimClient {
         @Volatile
         private var INSTANCE: Retrofit? = null
 
-        fun getClient(): Retrofit? {
-            if(INSTANCE == null){
-                // Fair use policy
+        fun getClient(): Retrofit {
+            return INSTANCE ?: synchronized(this) {
                 val client = OkHttpClient().newBuilder()
                         .addInterceptor { chain ->
                             val request = chain.request()
@@ -24,15 +23,12 @@ class NominatimClient {
                                     .build()
                             chain.proceed(authenticatedRequest)
                         }.build()
-                synchronized(NominatimClient::class.java){
-                    INSTANCE = Retrofit.Builder()
-                            .baseUrl("https://nominatim.openstreetmap.org")
-                            .addConverterFactory(MoshiConverterFactory.create().withNullSerialization())
-                            .client(client)
-                            .build()
-                }
+                INSTANCE ?: Retrofit.Builder()
+                        .baseUrl("https://nominatim.openstreetmap.org")
+                        .addConverterFactory(MoshiConverterFactory.create().withNullSerialization())
+                        .client(client)
+                        .build()
             }
-            return INSTANCE
         }
 
 
