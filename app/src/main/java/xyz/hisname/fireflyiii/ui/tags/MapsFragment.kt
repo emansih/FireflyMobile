@@ -17,12 +17,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.preference.PreferenceManager
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -56,21 +56,32 @@ class MapsFragment: BaseFragment() {
     private var longitude: Double = 0.0
     private var latitude: Double = 0.0
     private lateinit var cloneLocationList: List<LocationSearchModel>
+    private lateinit var gpsPermission: ActivityResultLauncher<String>
 
-    companion object {
-        private const val PERMISSION_LOCATION_REQUEST = 123
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.create(R.layout.fragment_map, container)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
-        Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
-        Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
-        return inflater.create(R.layout.fragment_map, container)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        gpsPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { success ->
+            if(success) {
+                if (ContextCompat.checkSelfPermission(requireContext(),
+                                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    toastInfo("Waiting for location...")
+                    locationService.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
+                    locationService.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+        Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
+        Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
         isGpsEnabled()
         setMap()
         setMapClick()
@@ -195,14 +206,14 @@ class MapsFragment: BaseFragment() {
                             .setMessage("Choosing coordinates data is simple when location data permission is granted. " +
                                     "Otherwise you may have to manually search for your location")
                             .setPositiveButton("OK"){_,_ ->
-                                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_LOCATION_REQUEST)
+                                gpsPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                             }
                             .setNegativeButton("No"){ _,_ ->
                                 toastInfo("Alright...")
                             }
                             .show()
                 } else {
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_LOCATION_REQUEST)
+                    gpsPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
             } else {
                 locationService.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
@@ -237,25 +248,6 @@ class MapsFragment: BaseFragment() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when(requestCode) {
-            PERMISSION_LOCATION_REQUEST -> {
-                if (grantResults.size == 1
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Location permission granted
-                    if (ContextCompat.checkSelfPermission(requireContext(),
-                                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        toastInfo("Waiting for location...")
-                        locationService.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
-                        locationService.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
-                    }
-                }
-            }
-        }
-    }
-
-
     override fun onResume() {
         super.onResume()
         maps.onResume()
@@ -279,6 +271,6 @@ class MapsFragment: BaseFragment() {
 
     override fun handleBack() {
         parentFragmentManager.popBackStack()
-        requireActivity().findViewById<FloatingActionButton>(R.id.addTagFab).isVisible = true
     }
+
 }
