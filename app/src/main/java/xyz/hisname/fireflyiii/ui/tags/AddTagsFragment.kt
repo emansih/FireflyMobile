@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_tags.placeHolderToolbar
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.MapsViewModel
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -121,19 +120,19 @@ class AddTagsFragment: BaseAddObjectFragment() {
             }
             addTagFab.isInvisible = true
         }
-        mapsViewModel.latitude.observe(viewLifecycleOwner) {
-            if(it != "0.0"){
-                latitude_edittext.setText(it)
+        mapsViewModel.latitude.observe(viewLifecycleOwner) { latitude ->
+            if(latitude != 0.toDouble()){
+                latitude_edittext.setText(latitude.toString())
             }
         }
-        mapsViewModel.longitude.observe(viewLifecycleOwner) {
-            if(it != "0.0"){
-                longitude_edittext.setText(it)
+        mapsViewModel.longitude.observe(viewLifecycleOwner) { longitude ->
+            if(longitude != 0.toDouble()){
+                longitude_edittext.setText(longitude.toString())
             }
         }
-        mapsViewModel.zoomLevel.observe(viewLifecycleOwner) {
-            if(it != "0.0"){
-                zoom_edittext.setText(it)
+        mapsViewModel.zoomLevel.observe(viewLifecycleOwner) { zoom ->
+            if(zoom != 0.toDouble()){
+                zoom_edittext.setText(zoom.toString())
             }
         }
         placeHolderToolbar.setOnClickListener {

@@ -210,10 +210,8 @@ class MapsFragment: BaseFragment() {
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             setMap(GeoPoint(location.latitude, location.longitude))
-            /*mapController.setZoom(18.0)
-            val startPoint = GeoPoint(location.latitude, location.longitude)
-            mapController.animateTo(startPoint)
-            startMarker.position = startPoint*/
+            latitude = location.latitude
+            longitude = location.longitude
         }
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
