@@ -7,6 +7,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.ACCOUNTS_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountsModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 
 // Link to relevant doc: https://firefly-iii.readthedocs.io/en/latest/api/accounts.html
@@ -74,4 +75,8 @@ interface AccountsService {
 
     @GET("$ACCOUNTS_API_ENDPOINT/{id}")
     suspend fun getAccountById(@Path("id") id: Long): Response<AccountsModel>
+
+    @GET("${ACCOUNTS_API_ENDPOINT}/{id}/attachments")
+    suspend fun getAccountAttachment(@Path("id") accountId: Long): Response<AttachmentModel>
+
 }

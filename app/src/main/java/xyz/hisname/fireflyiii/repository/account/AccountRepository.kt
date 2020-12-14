@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
+import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.util.extension.debounce
@@ -209,6 +211,19 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             }
             return ApiResponses(errorMessage = "Error occurred while saving Account")
         }
+    }
+
+    suspend fun getAttachment(accountId: Long, attachmentDao: AttachmentDataDao): List<AttachmentData>{
+        try {
+            val networkCall = accountsService.getAccountAttachment(accountId)
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                responseBody.data.forEach { attachmentData ->
+                    attachmentDao.insert(attachmentData)
+                }
+            }
+        } catch (exception: Exception) { }
+        return attachmentDao.getAttachmentFromJournalId(accountId)
     }
 
     private suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)

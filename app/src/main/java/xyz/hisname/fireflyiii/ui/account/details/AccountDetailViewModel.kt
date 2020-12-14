@@ -1,6 +1,7 @@
-package xyz.hisname.fireflyiii.ui.account
+package xyz.hisname.fireflyiii.ui.account.details
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -13,14 +14,20 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.account.TransactionPageSource
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.network.HttpConstants
+import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
+import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -35,6 +42,8 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     private val transactionRepository = TransactionRepository(
             transactionDao, genericService().create(TransactionService::class.java)
     )
+
+    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
     private var accountType = ""
     var currencySymbol = ""
         private set
@@ -47,31 +56,33 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     val uniqueBudgetLiveData = MutableLiveData<List<Triple<Float, String, BigDecimal>>>()
     val accountData = MutableLiveData<List<DetailModel>>()
     val notes = MutableLiveData<String>()
+    val accountAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun getAccountById(accountId: Long): MutableLiveData<AccountData>{
         val accountDataLiveData = MutableLiveData<AccountData>()
         viewModelScope.launch(Dispatchers.IO){
             val accountList = accountRepository.getAccountById(accountId)
+            accountAttachment.postValue(accountRepository.getAttachment(accountId, attachmentDao))
             val accountAttributes = accountList.accountAttributes
-            currencySymbol = accountAttributes?.currency_symbol ?: ""
-            accountName =  accountAttributes?.name ?: ""
-            accountType = accountAttributes?.type ?: ""
+            currencySymbol = accountAttributes.currency_symbol ?: ""
+            accountName =  accountAttributes.name
+            accountType = accountAttributes.type
             val arrayListOfDetails = arrayListOf(
                     DetailModel(getApplication<Application>().getString(R.string.balance),
-                            currencySymbol + accountAttributes?.current_balance),
+                            currencySymbol + accountAttributes.current_balance),
                     DetailModel(getApplication<Application>().getString(R.string.account_number),
-                            accountAttributes?.account_number.toString()),
-                    DetailModel("Role", accountAttributes?.account_role),
+                            accountAttributes.account_number.toString()),
+                    DetailModel("Role", accountAttributes.account_role),
                     DetailModel("Account Type", accountType),
-                    DetailModel("Active ", accountAttributes?.active.toString())
+                    DetailModel("Active ", accountAttributes.active.toString())
             )
             if(accountType.contentEquals("liabilities")){
-                arrayListOfDetails.add(DetailModel("Type of liability", accountAttributes?.liability_type))
+                arrayListOfDetails.add(DetailModel("Type of liability", accountAttributes.liability_type))
                 arrayListOfDetails.add(DetailModel(getApplication<Application>().getString(R.string.interest),
-                        accountAttributes?.interest + "% (" + accountAttributes?.interest_period + ")"))
+                        accountAttributes.interest + "% (" + accountAttributes.interest_period + ")"))
             }
             accountData.postValue(arrayListOfDetails)
-            notes.postValue(accountAttributes?.notes)
+            notes.postValue(accountAttributes.notes)
             getTransactions(accountId, accountType)
             accountDataLiveData.postValue(accountList)
         }
@@ -174,4 +185,42 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
         TransactionPageSource(transactionDao, accountId, accountType, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth())
     }.flow.cachedIn(viewModelScope).asLiveData()
+
+
+    fun deleteAccountById(accountId: Long): LiveData<Boolean> {
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO) {
+            when (accountRepository.deleteAccountById(accountId)) {
+                HttpConstants.FAILED -> {
+                    isDeleted.postValue(false)
+                    DeleteAccountWorker.initPeriodicWorker(accountId, getApplication())
+                }
+                HttpConstants.UNAUTHORISED -> {
+                    isDeleted.postValue(false)
+                }
+                HttpConstants.NO_CONTENT_SUCCESS -> {
+                    isDeleted.postValue(true)
+                }
+            }
+            isLoading.postValue(false)
+        }
+        return isDeleted
+    }
+
+    fun downloadAttachment(attachmentData: AttachmentData): LiveData<File>{
+        isLoading.postValue(true)
+        val fileName = attachmentData.attachmentAttributes.filename
+        val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
+                File.separator + fileName)
+        val downloadedFile: MutableLiveData<File> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            val attachmentRepository = AttachmentRepository(attachmentDao,
+                    genericService().create(AttachmentService::class.java))
+            downloadedFile.postValue(attachmentRepository.downloadOrOpenAttachment(
+                    attachmentData.attachmentAttributes.download_uri, fileToOpen))
+            isLoading.postValue(false)
+        }
+        return downloadedFile
+    }
 }

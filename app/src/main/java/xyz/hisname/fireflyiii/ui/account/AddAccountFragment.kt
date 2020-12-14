@@ -1,9 +1,12 @@
 package xyz.hisname.fireflyiii.ui.account
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -14,19 +17,26 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import kotlinx.android.synthetic.main.fragment_add_account.*
+import kotlinx.android.synthetic.main.fragment_add_account.attachment_information
 import kotlinx.android.synthetic.main.fragment_add_account.currency_edittext
 import kotlinx.android.synthetic.main.fragment_add_account.currency_layout
 import kotlinx.android.synthetic.main.fragment_add_account.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_account.expansionLayout
+import kotlinx.android.synthetic.main.fragment_add_account.note_edittext
 import kotlinx.android.synthetic.main.fragment_add_account.placeHolderToolbar
+import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
 
 class AddAccountFragment: BaseAddObjectFragment() {
@@ -35,7 +45,12 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private val accountId: Long by lazy { arguments?.getLong("accountId") ?: 0L }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
-    private val accountVM by lazy { getImprovedViewModel(AddAccountViewModel::class.java)}
+    private val accountViewModel by lazy { getImprovedViewModel(AddAccountViewModel::class.java)}
+    private lateinit var fileUri: Uri
+    private lateinit var takePicture: ActivityResultLauncher<Uri>
+    private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
+    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -54,6 +69,32 @@ class AddAccountFragment: BaseAddObjectFragment() {
         }
         addAccountFab.setOnClickListener {
             submitData()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                attachment_information.isVisible = true
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
+                        "", "", "", 0, "", "", ""), 0))
+                attachmentItemAdapter.add(fileUri)
+                attachment_information.adapter?.notifyDataSetChanged()
+            }
+        }
+        chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
+            attachment_information.isVisible = true
+            if(fileChoosen != null){
+                fileChoosen.forEach { file ->
+                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                            "", "", FileUtils.getFileName(requireContext(), file) ?: "",
+                            "", "", "", 0, "", "", ""), 0))
+                }
+                attachmentItemAdapter.addAll(fileChoosen)
+                attachment_information.adapter?.notifyDataSetChanged()
+            }
         }
     }
 
@@ -137,7 +178,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
     override fun setWidgets() {
         setAccordion()
         currencyViewModel.currencyCode.observe(viewLifecycleOwner) { currency ->
-            accountVM.currency = currency
+            accountViewModel.currency = currency
         }
         currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
             currency_edittext.setText(it)
@@ -147,9 +188,9 @@ class AddAccountFragment: BaseAddObjectFragment() {
             currencyListFragment.show(childFragmentManager, "currencyList" )
         }
         if(accountId == 0L) {
-            accountVM.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
+            accountViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
                 val currencyData = defaultCurrency.currencyAttributes
-                currency_edittext.setText(currencyData?.name + " (" + currencyData?.code + ")")
+                currency_edittext.setText(currencyData.name + " (" + currencyData.code + ")")
             }
         }
         if(accountType == "asset"){
@@ -187,7 +228,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         includeInNetWorthText.setOnClickListener {
             includeInNetWorthCheck.performClick()
         }
-        accountVM.isLoading.observe(viewLifecycleOwner) { loader ->
+        accountViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
             if(loader){
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
@@ -254,8 +295,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
         } else {
             note_edittext.getString()
         }
-        val currencyToBeSubmitted = if(currency_layout.isVisible && accountVM.currency.isNotBlank()){
-            accountVM.currency
+        val currencyToBeSubmitted = if(currency_layout.isVisible && accountViewModel.currency.isNotBlank()){
+            accountViewModel.currency
         } else {
             null
         }
@@ -310,7 +351,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                               openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                               virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                               liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?){
-        accountVM.updateAccount(accountId,accountName, accountType, currencyCode,
+        accountViewModel.updateAccount(accountId,accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
                 liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){ response ->
@@ -328,10 +369,10 @@ class AddAccountFragment: BaseAddObjectFragment() {
                            openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                            virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                            liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?){
-        accountVM.addAccount(accountName, accountType, currencyCode,
+        accountViewModel.addAccount(accountName, accountType, currencyCode,
                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                liabilityStartDate, interest, interestPeriod).observe(viewLifecycleOwner){ response ->
+                liabilityStartDate, interest, interestPeriod, attachmentItemAdapter).observe(viewLifecycleOwner){ response ->
             if(response.first){
                 toastSuccess("Account saved")
                 handleBack()
@@ -343,11 +384,11 @@ class AddAccountFragment: BaseAddObjectFragment() {
 
     private fun updateData(){
         if(accountId != 0L){
-            accountVM.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
+            accountViewModel.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
                 val accountAttributes = accountData.accountAttributes
                 description_edittext.setText(accountAttributes?.name)
                 currency_edittext.setText(accountAttributes?.currency_code + " (" + accountAttributes?.currency_symbol + " )")
-                accountVM.currency = accountAttributes?.currency_code ?: ""
+                accountViewModel.currency = accountAttributes?.currency_code ?: ""
                 val liabilityType = accountAttributes?.liability_type
                 if(liabilityType != null){
                     when (liabilityType) {

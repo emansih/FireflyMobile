@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.account
+package xyz.hisname.fireflyiii.ui.account.list
 
 import android.content.Context
 import android.os.Bundle
@@ -23,6 +23,9 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.ui.account.AccountRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
+import xyz.hisname.fireflyiii.ui.account.details.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*

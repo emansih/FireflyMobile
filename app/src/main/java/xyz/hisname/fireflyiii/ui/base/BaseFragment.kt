@@ -27,8 +27,6 @@ abstract class BaseFragment: Fragment() {
     protected val fragmentContainer by bindView<FrameLayout>(R.id.fragment_container)
     protected val revealX by lazy { arguments?.getInt("revealX") ?: 0 }
     protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
-    // Remove viewModels
-    protected val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
     protected  val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
     private var parentJob = Job()
     private val coroutineContext: CoroutineContext

@@ -19,7 +19,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.ProgressBar
-import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
+import xyz.hisname.fireflyiii.ui.account.details.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter

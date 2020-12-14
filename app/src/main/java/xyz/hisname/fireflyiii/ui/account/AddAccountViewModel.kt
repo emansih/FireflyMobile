@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.account
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -12,9 +13,11 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
 
 class AddAccountViewModel(application: Application): BaseViewModel(application) {
@@ -75,7 +78,8 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
                    currencyCode: String?, iban: String?, bic: String?, accountNumber: String?,
                    openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                    virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
-                   liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?): LiveData<Pair<Boolean,String>>{
+                   liabilityAmount: String?, liabilityStartDate: String?,
+                   interest: String?, interestPeriod: String?, fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
@@ -86,6 +90,11 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
             when {
                 addAccount.response != null -> {
                     apiResponse.postValue(Pair(true, "Account saved"))
+                    if(fileToUpload.isNotEmpty()){
+                        AttachmentWorker.initWorker(fileToUpload,
+                                addAccount.response.data.accountId,
+                                getApplication<Application>(), AttachableType.Account)
+                    }
                 }
                 addAccount.errorMessage != null -> {
                     apiResponse.postValue(Pair(false,addAccount.errorMessage))

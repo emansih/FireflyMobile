@@ -18,5 +18,11 @@ enum class AttachableType {
         override fun toString(): String {
             return "PiggyBank"
         }
+    },
+
+    Account{
+        override fun toString(): String {
+            return "Account"
+        }
     }
 }

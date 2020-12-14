@@ -12,8 +12,6 @@ import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
@@ -39,7 +37,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
-import xyz.hisname.fireflyiii.ui.account.ListAccountFragment
+import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment

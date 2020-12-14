@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.account
+package xyz.hisname.fireflyiii.ui.account.details
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,16 +17,24 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_account_detail.*
+import kotlinx.android.synthetic.main.fragment_account_detail.attachmentRecyclerView
+import kotlinx.android.synthetic.main.fragment_account_detail.notesCard
+import kotlinx.android.synthetic.main.fragment_bill_details.*
 import kotlinx.android.synthetic.main.fragment_markdown.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.util.openFile
+import java.util.ArrayList
 
 class AccountDetailFragment: BaseDetailFragment() {
 
@@ -34,6 +42,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private val accountType  by lazy { arguments?.getString("accountType")  }
     private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
     private val accountDetailViewModel by lazy { getImprovedViewModel(AccountDetailViewModel::class.java) }
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
 
     private val coloring = arrayListOf<Int>()
 
@@ -57,6 +66,14 @@ class AccountDetailFragment: BaseDetailFragment() {
             setIncomeByCategory()
             getAccountTransaction()
         }
+        accountDetailViewModel.isLoading.observe(viewLifecycleOwner){ isLoading ->
+            if(isLoading == true){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
+
         setDarkMode()
     }
 
@@ -65,6 +82,7 @@ class AccountDetailFragment: BaseDetailFragment() {
             detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(list){ }
+            downloadAttachment()
         }
         accountDetailViewModel.notes.observe(viewLifecycleOwner){ notes ->
             if(notes.isEmpty()){
@@ -75,6 +93,31 @@ class AccountDetailFragment: BaseDetailFragment() {
         }
         balanceHistoryCardText.text = resources.getString(R.string.account_chart_description,
                 accountDetailViewModel.accountName, DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
+    }
+
+    private fun downloadAttachment(){
+        accountDetailViewModel.accountAttachment.observe(viewLifecycleOwner) { attachment ->
+            if (attachment.isNotEmpty()) {
+                attachmentDataAdapter = ArrayList(attachment)
+                attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                        true, { data: AttachmentData ->
+                    setDownloadClickListener(data, attachmentDataAdapter)
+                }) { another: Int -> }
+            }
+        }
+    }
+
+    private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
+        accountDetailViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
+            // "Refresh" the icon. From downloading to open file
+            attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+                    true, { data: AttachmentData ->
+                setDownloadClickListener(data, attachmentDataAdapter)
+            }){ another: Int -> }
+            startActivity(requireContext().openFile(downloadedFile))
+        }
     }
 
     private fun setExpensesByCategory(){
@@ -213,18 +256,11 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     override fun deleteItem() {
-        accountViewModel.isLoading.observe(viewLifecycleOwner){
-            if(it == true){
-                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-            } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-            }
-        }
         AlertDialog.Builder(requireContext())
                 .setTitle(resources.getString(R.string.delete_account_title, accountDetailViewModel.accountName))
                 .setMessage(resources.getString(R.string.delete_account_message, accountDetailViewModel.accountName))
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                    accountViewModel.deleteAccountById(accountId).observe(viewLifecycleOwner) { isAccountDeleted ->
+                    accountDetailViewModel.deleteAccountById(accountId).observe(viewLifecycleOwner) { isAccountDeleted ->
                         if(isAccountDeleted){
                             parentFragmentManager.popBackStack()
                             when (accountType) {

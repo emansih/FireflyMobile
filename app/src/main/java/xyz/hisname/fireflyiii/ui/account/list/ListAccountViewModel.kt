@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.account
+package xyz.hisname.fireflyiii.ui.account.list
 
 import android.app.Application
 import androidx.lifecycle.LiveData
