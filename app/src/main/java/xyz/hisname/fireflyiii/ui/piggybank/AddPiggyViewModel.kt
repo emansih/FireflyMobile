@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -13,8 +14,10 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.piggybank.PiggyBankWorker
 import java.net.UnknownHostException
 
@@ -34,8 +37,8 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         val piggyListLiveData = MutableLiveData<PiggyData>()
         viewModelScope.launch(Dispatchers.IO){
             val piggyList = piggyRepository.getPiggyById(piggyId)
-            accountRepository.getAccountById(piggyList.piggyAttributes?.account_id ?: 0)
-            piggyList.piggyAttributes?.account_id
+            accountRepository.getAccountById(piggyList.piggyAttributes.account_id ?: 0)
+            piggyList.piggyAttributes.account_id
             piggyListLiveData.postValue(piggyList)
         }
         return piggyListLiveData
@@ -46,7 +49,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         viewModelScope.launch(Dispatchers.IO){
             val accountList = arrayListOf<String>()
             accountRepository.getAccountByType("asset").forEach {  data ->
-                data.accountAttributes?.name?.let { accountList.add(it) }
+                data.accountAttributes.name.let { accountList.add(it) }
             }
             accountListLiveData.postValue(accountList)
         }
@@ -54,7 +57,8 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun addPiggyBank(piggyName: String, accountName: String, currentAmount: String?, notes: String?,
-                     startDate: String?, targetAmount: String, targetDate: String?): LiveData<Pair<Boolean,String>>{
+                     startDate: String?, targetAmount: String, targetDate: String?,
+                     fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ ->
@@ -68,6 +72,11 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                 when {
                     addPiggyBank.response != null -> {
                         apiResponse.postValue(Pair(true, "Piggy bank saved"))
+                        if(fileToUpload.isNotEmpty()) {
+                            AttachmentWorker.initWorker(fileToUpload,
+                                    addPiggyBank.response.data.piggyId,
+                                    getApplication<Application>(), AttachableType.PIGGYBANK)
+                        }
                     }
                     addPiggyBank.errorMessage != null -> {
                         apiResponse.postValue(Pair(false, addPiggyBank.errorMessage))
@@ -96,11 +105,11 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
-            val originalAccountName = piggyRepository.getPiggyById(piggyId).piggyAttributes?.account_name ?: ""
+            val originalAccountName = piggyRepository.getPiggyById(piggyId).piggyAttributes.account_name ?: ""
             val accountIdFromRepo = accountRepository.getAccountByName(accountName, "asset").accountId
 
             val accountId = if(accountName.contentEquals(originalAccountName)){
-                piggyRepository.getPiggyById(piggyId).piggyAttributes?.account_id
+                piggyRepository.getPiggyById(piggyId).piggyAttributes.account_id
             } else {
                 accountIdFromRepo
             }

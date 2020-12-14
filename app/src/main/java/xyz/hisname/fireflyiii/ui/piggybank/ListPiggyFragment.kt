@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.piggybank.details.PiggyDetailFragment
 import xyz.hisname.fireflyiii.util.extension.*
 
 class ListPiggyFragment: BaseFragment(){

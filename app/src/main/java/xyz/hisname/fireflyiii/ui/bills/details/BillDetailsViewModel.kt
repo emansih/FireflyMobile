@@ -41,8 +41,6 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
     private val billPayRepository = BillPayRepository(billPayDao, billService)
     private val billRepository = BillRepository(billDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
-    private val attachmentRepository = AttachmentRepository(attachmentDao,
-            genericService().create(AttachmentService::class.java))
 
     var billId: Long = 0L
     var billName = ""

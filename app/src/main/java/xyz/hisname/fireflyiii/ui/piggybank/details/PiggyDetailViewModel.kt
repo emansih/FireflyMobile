@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.piggybank
+package xyz.hisname.fireflyiii.ui.piggybank.details
 
 import android.app.Application
 import androidx.lifecycle.LiveData
@@ -7,12 +7,16 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
+import java.io.File
 
 class PiggyDetailViewModel(application: Application): BaseViewModel(application) {
 
@@ -21,19 +25,23 @@ class PiggyDetailViewModel(application: Application): BaseViewModel(application)
             genericService().create(PiggybankService::class.java)
     )
 
+    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+
     var accountId: Long = 0
         private set
 
     var accountName: String = ""
         private set
+    val piggyAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun getPiggyBankById(piggyBankId: Long): LiveData<PiggyData>{
         val piggyLiveData = MutableLiveData<PiggyData>()
         viewModelScope.launch(Dispatchers.IO){
             val piggyData = piggyRepository.getPiggyById(piggyBankId)
-            accountId = piggyData.piggyAttributes?.account_id ?: 0
-            accountName = piggyData.piggyAttributes?.account_name ?: ""
+            accountId = piggyData.piggyAttributes.account_id ?: 0
+            accountName = piggyData.piggyAttributes.account_name ?: ""
             piggyLiveData.postValue(piggyData)
+            piggyAttachment.postValue(piggyRepository.getAttachment(piggyBankId, attachmentDao))
         }
         return piggyLiveData
     }
@@ -59,4 +67,19 @@ class PiggyDetailViewModel(application: Application): BaseViewModel(application)
         return isDeleted
     }
 
+    fun downloadAttachment(attachmentData: AttachmentData): LiveData<File>{
+        isLoading.postValue(true)
+        val fileName = attachmentData.attachmentAttributes.filename
+        val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
+                File.separator + fileName)
+        val downloadedFile: MutableLiveData<File> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            val attachmentRepository = AttachmentRepository(attachmentDao,
+                    genericService().create(AttachmentService::class.java))
+            downloadedFile.postValue(attachmentRepository.downloadOrOpenAttachment(
+                    attachmentData.attachmentAttributes.download_uri, fileToOpen))
+            isLoading.postValue(false)
+        }
+        return downloadedFile
+    }
 }

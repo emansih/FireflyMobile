@@ -2,9 +2,11 @@ package xyz.hisname.fireflyiii.repository.piggybank
 
 import com.squareup.moshi.Moshi
 import retrofit2.Response
+import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -93,4 +95,17 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
         }
     }
 
+
+    suspend fun getAttachment(piggyId: Long, attachmentDao: AttachmentDataDao): List<AttachmentData>{
+        try {
+            val networkCall = piggyService.getPiggyBankAttachment(piggyId)
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                responseBody.data.forEach { attachmentData ->
+                    attachmentDao.insert(attachmentData)
+                }
+            }
+        } catch (exception: Exception) { }
+        return attachmentDao.getAttachmentFromJournalId(piggyId)
+    }
 }

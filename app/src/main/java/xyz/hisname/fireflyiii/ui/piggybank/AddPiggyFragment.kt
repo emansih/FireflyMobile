@@ -2,12 +2,20 @@ package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
@@ -18,16 +26,23 @@ import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
+import kotlinx.android.synthetic.main.fragment_add_piggy.attachment_information
 import kotlinx.android.synthetic.main.fragment_add_piggy.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_piggy.expansionLayout
 import kotlinx.android.synthetic.main.fragment_add_piggy.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
+import java.io.File
+import java.util.*
 
 class AddPiggyFragment: BaseAddObjectFragment() {
 
@@ -38,6 +53,12 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val piggyViewModel by lazy { getImprovedViewModel(AddPiggyViewModel::class.java) }
     private val piggyId by lazy { arguments?.getLong("piggyId") ?: 0 }
+    private lateinit var fileUri: Uri
+    private lateinit var takePicture: ActivityResultLauncher<Uri>
+    private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
+    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -52,6 +73,61 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         showHelpText()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                attachment_information.isVisible = true
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
+                        "", "", "", 0, "", "", ""), 0))
+                attachmentItemAdapter.add(fileUri)
+                attachment_information.adapter?.notifyDataSetChanged()
+            }
+        }
+        chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
+            attachment_information.isVisible = true
+            if(fileChoosen != null){
+                fileChoosen.forEach { file ->
+                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                            "", "", FileUtils.getFileName(requireContext(), file) ?: "",
+                            "", "", "", 0, "", "", ""), 0))
+                }
+                attachmentItemAdapter.addAll(fileChoosen)
+                attachment_information.adapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
+    private fun attachmentDialog(){
+        val listItems = arrayOf("Capture image from camera", "Choose File")
+        AlertDialog.Builder(requireContext())
+                .setItems(listItems) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            val createTempDir = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp")
+                            if(!createTempDir.exists()){
+                                createTempDir.mkdir()
+                            }
+                            val randomId = UUID.randomUUID().toString().substring(0, 7)
+                            val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp" + File.separator + "${randomId}-firefly.png")
+                            if(fileToOpen.exists()){
+                                fileToOpen.delete()
+                            }
+                            fileUri = FileProvider.getUriForFile(requireContext(),
+                                    requireContext().packageName + ".provider", fileToOpen)
+                            takePicture.launch(fileUri)
+                        }
+                        1 -> {
+                            chooseDocument.launch(arrayOf("*/*"))
+                        }
+                    }
+                }
+                .show()
+    }
+
     private fun showHelpText() = showCase(R.string.piggy_bank_description_help_text,
                 "descriptionCaseView", description_edittext).show()
 
@@ -59,13 +135,13 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         if(piggyId != 0L){
             piggyViewModel.getPiggyById(piggyId).observe(viewLifecycleOwner) { piggyData ->
                 val piggyAttributes = piggyData.piggyAttributes
-                description_edittext.setText(piggyAttributes?.name)
-                target_amount_edittext.setText(piggyAttributes?.target_amount.toString())
-                current_amount_edittext.setText(piggyAttributes?.current_amount.toString())
-                date_started_edittext.setText(piggyAttributes?.start_date)
-                date_target_edittext.setText(piggyAttributes?.target_date)
-                note_edittext.setText(piggyAttributes?.notes)
-                account_exposed_dropdown.setText(piggyData.piggyAttributes?.account_name)
+                description_edittext.setText(piggyAttributes.name)
+                target_amount_edittext.setText(piggyAttributes.target_amount.toString())
+                current_amount_edittext.setText(piggyAttributes.current_amount.toString())
+                date_started_edittext.setText(piggyAttributes.start_date)
+                date_target_edittext.setText(piggyAttributes.target_date)
+                note_edittext.setText(piggyAttributes.notes)
+                account_exposed_dropdown.setText(piggyData.piggyAttributes.account_name)
             }
         }
     }
@@ -187,12 +263,23 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         }
+        add_attachment_button.setOnClickListener {
+            attachmentDialog()
+        }
+        attachment_information.layoutManager = LinearLayoutManager(requireContext())
+        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                false, { data: AttachmentData ->
+            attachmentDataAdapter.remove(data)
+            attachment_information.adapter?.notifyDataSetChanged()
+        }) { another: Int -> }
+
     }
 
     override fun submitData(){
         piggyViewModel.addPiggyBank(description_edittext.getString(),
                 account_exposed_dropdown.getString(), currentAmount, notes, startDate,
-                target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) { response ->
+                target_amount_edittext.getString(), targetDate, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
                 handleBack()

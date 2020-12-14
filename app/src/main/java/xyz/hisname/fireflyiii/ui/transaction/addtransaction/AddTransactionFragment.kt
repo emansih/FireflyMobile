@@ -9,7 +9,6 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -54,8 +53,8 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesDialogViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
-import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyDialog
-import xyz.hisname.fireflyiii.ui.piggybank.SearchPiggyViewModel
+import xyz.hisname.fireflyiii.ui.piggybank.search.SearchPiggyDialog
+import xyz.hisname.fireflyiii.ui.piggybank.search.SearchPiggyViewModel
 import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils

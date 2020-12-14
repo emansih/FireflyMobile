@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.piggybank
+package xyz.hisname.fireflyiii.ui.piggybank.search
 
 import android.app.Application
 import androidx.lifecycle.LiveData

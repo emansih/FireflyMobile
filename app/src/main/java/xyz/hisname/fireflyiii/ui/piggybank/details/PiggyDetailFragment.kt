@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.ui.piggybank
+package xyz.hisname.fireflyiii.ui.piggybank.details
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
@@ -17,16 +17,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.AccountDetailFragment
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.piggybank.AddPiggyFragment
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.util.openFile
+import java.util.ArrayList
 
 class PiggyDetailFragment: BaseDetailFragment() {
 
     private val piggyId: Long by lazy { arguments?.getLong("piggyId") as Long  }
     private val piggyDetailViewModel by lazy { getImprovedViewModel(PiggyDetailViewModel::class.java) }
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -52,12 +58,12 @@ class PiggyDetailFragment: BaseDetailFragment() {
         piggyDetailViewModel.getPiggyBankById(piggyId).observe(viewLifecycleOwner) { piggyData ->
             val piggyAttribute = piggyData.piggyAttributes
             val piggy = mutableListOf(
-                    DetailModel(resources.getString(R.string.account), piggyAttribute?.account_name),
-                    DetailModel(resources.getString(R.string.target_amount), piggyAttribute?.target_amount.toString()),
-                    DetailModel(resources.getString(R.string.saved_so_far), piggyAttribute?.save_per_month.toString()),
-                    DetailModel(resources.getString(R.string.left_to_save), piggyAttribute?.left_to_save.toString()),
-                    DetailModel(resources.getString(R.string.start_date), piggyAttribute?.start_date),
-                    if(piggyAttribute?.target_date == null){
+                    DetailModel(resources.getString(R.string.account), piggyAttribute.account_name),
+                    DetailModel(resources.getString(R.string.target_amount), piggyAttribute.target_amount.toString()),
+                    DetailModel(resources.getString(R.string.saved_so_far), piggyAttribute.save_per_month.toString()),
+                    DetailModel(resources.getString(R.string.left_to_save), piggyAttribute.left_to_save.toString()),
+                    DetailModel(resources.getString(R.string.start_date), piggyAttribute.start_date),
+                    if(piggyAttribute.target_date == null){
                         DetailModel(resources.getString(R.string.target_date), "")
                     } else {
                         DetailModel(resources.getString(R.string.target_date), piggyAttribute.target_date)
@@ -66,7 +72,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
             detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
-            val percentage = piggyData.piggyAttributes?.percentage ?: 0
+            val percentage = piggyData.piggyAttributes.percentage ?: 0
             when {
                 percentage <= 15 -> {
                     piggyBankProgressBar.progressDrawable.colorFilter =
@@ -85,10 +91,10 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 }
             }
 
-            amount.text = piggyAttribute?.current_amount.toString()
+            amount.text = piggyAttribute.current_amount.toString()
             amountPercentage.text = percentage.toString() + "%"
-            currencyCodeTextView.text = piggyAttribute?.currency_code
-            piggyBankName.text = piggyAttribute?.name
+            currencyCodeTextView.text = piggyAttribute.currency_code
+            piggyBankName.text = piggyAttribute.name
             setupProgressBar(percentage)
         }
         piggyDetailViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
@@ -96,6 +102,31 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             } else {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
+    }
+
+    private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
+        piggyDetailViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
+            // "Refresh" the icon. From downloading to open file
+            attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+                    true, { data: AttachmentData ->
+                setDownloadClickListener(data, attachmentDataAdapter)
+            }){ another: Int -> }
+            startActivity(requireContext().openFile(downloadedFile))
+        }
+    }
+
+    private fun downloadAttachment(){
+        piggyDetailViewModel.piggyAttachment.observe(viewLifecycleOwner) { attachment ->
+            if (attachment.isNotEmpty()) {
+                attachmentDataAdapter = ArrayList(attachment)
+                attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                        true, { data: AttachmentData ->
+                    setDownloadClickListener(data, attachmentDataAdapter)
+                }) { another: Int -> }
             }
         }
     }

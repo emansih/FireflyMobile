@@ -92,7 +92,7 @@ class BillDetailsFragment: BaseDetailFragment() {
             } else {
                 notesText.text = attributes.notes?.toMarkDown()
             }
-            downloadAttachment(billData.billId)
+            downloadAttachment()
             detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }
@@ -245,7 +245,6 @@ class BillDetailsFragment: BaseDetailFragment() {
         }
     }
 
-    // Ugly! Refactor!
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
         billDetailsViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
             // "Refresh" the icon. From downloading to open file
@@ -257,7 +256,7 @@ class BillDetailsFragment: BaseDetailFragment() {
         }
     }
 
-    private fun downloadAttachment(billId: Long){
+    private fun downloadAttachment(){
         billDetailsViewModel.billAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
