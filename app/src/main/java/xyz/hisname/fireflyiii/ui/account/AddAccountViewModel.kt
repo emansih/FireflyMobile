@@ -98,13 +98,13 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
                 }
                 addAccount.error != null -> {
                     if(addAccount.error is UnknownHostException){
+                        apiResponse.postValue(Pair(true,
+                                getApplication<Application>().getString(R.string.data_added_when_user_online,
+                                        "Account")))
                         AccountWorker.initWorker(getApplication(), accountName, accountType, currencyCode,
                                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
                                 liabilityStartDate, interest, interestPeriod, fileToUpload)
-                        apiResponse.postValue(Pair(true,
-                                getApplication<Application>().getString(R.string.data_added_when_user_online,
-                                        "Account")))
                     } else {
                         apiResponse.postValue(Pair(false, addAccount.error.localizedMessage))
                     }

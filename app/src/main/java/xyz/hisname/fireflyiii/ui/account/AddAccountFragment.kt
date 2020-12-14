@@ -412,6 +412,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
             if(response.first){
                 handleBack()
                 toastSuccess(response.second)
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             } else {
                 toastInfo(response.second)
             }
