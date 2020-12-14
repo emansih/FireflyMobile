@@ -3,6 +3,8 @@ package xyz.hisname.fireflyiii.workers.transaction
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.preference.PreferenceManager
 import androidx.work.*
@@ -16,9 +18,11 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.extension.showNotification
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
 
@@ -40,6 +44,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val tags = inputData.getString("tags")
         val budget = inputData.getString("budgetName")
         val notes = inputData.getString("notes")
+        val fileArray = inputData.getString("filesToUpload") ?: ""
         val transactionWorkManagerId = inputData.getLong("transactionWorkManagerId", 0)
         val transactionRepository = TransactionRepository(
                 AppDatabase.getInstance(context).transactionDataDao(),
@@ -54,6 +59,24 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                 // Delete old data that we inserted when worker is being init
                 transactionRepository.deleteTransactionById(transactionWorkManagerId)
                 context.showNotification(transactionType, context.resources.getString(R.string.transaction_added), channelIcon)
+                if(fileArray.isNotEmpty()){
+                    // Remove [ and ] in the string
+                    val beforeArray = fileArray.substring(1)
+                    val modifiedArray = beforeArray.substring(0, beforeArray.length - 1)
+                    val arrayOfString = modifiedArray.split(",")
+                    val arrayOfUri = arrayListOf<Uri>()
+                    arrayOfString.forEach { array ->
+                        // Remove white spaces. First element does not have white spaces however,
+                        // subsequent elements has it
+                        arrayOfUri.add(array.replace("\\s".toRegex(), "").toUri())
+                    }
+                    var journalId = 0L
+                    addTransaction.response.data.transactionAttributes.transactions.forEach { transactions ->
+                        journalId = transactions.transaction_journal_id
+                    }
+                    AttachmentWorker.initWorker(arrayOfUri, journalId,
+                            context, AttachableType.TRANSACTION)
+                }
                 return Result.success()
             }
             addTransaction.errorMessage != null -> {
@@ -96,7 +119,8 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
     }
 
     companion object {
-        fun initWorker(context: Context, dataBuilder: Data.Builder, type: String, transactionWorkManagerId: Long) {
+        fun initWorker(context: Context, dataBuilder: Data.Builder,
+                       type: String, transactionWorkManagerId: Long, fileArray: ArrayList<Uri>) {
             val transactionTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_transaction_$transactionWorkManagerId").get()
             if (transactionTag == null || transactionTag.size == 0) {
@@ -106,6 +130,9 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 dataBuilder.putString("transactionType", type)
+                if(fileArray.isNotEmpty()){
+                    dataBuilder.putString("filesToUpload", fileArray.toString())
+                }
                 val transactionWork = PeriodicWorkRequestBuilder<TransactionWorker>(Duration.ofMinutes(delay))
                         .setInputData(dataBuilder.build())
                         .setConstraints(Constraints.Builder()

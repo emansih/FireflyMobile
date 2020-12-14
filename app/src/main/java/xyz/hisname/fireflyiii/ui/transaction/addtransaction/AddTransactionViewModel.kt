@@ -140,9 +140,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                        category: String?, tags: String?, budgetName: String?,
                        fileUri: ArrayList<Uri>, notes: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
-            throwable.printStackTrace()
-        }){
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ -> }){
             val addTransaction = transactionRepository.addTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
                     category, tags, budgetName, notes)
@@ -179,10 +177,11 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                                 .putString("destinationName", destinationName)
                                 .putString("piggyBankName", piggyBankName)
                                 .putString("notes", notes)
-                        TransactionWorker.initWorker(getApplication(), transactionData, type, transactionWorkManagerId)
-                        apiResponse.postValue(Pair(false,
-                                getApplication<Application>().getString(R.string.data_will_be_deleted_later,
-                                        transactionType)))
+                        TransactionWorker.initWorker(getApplication(), transactionData,
+                                type, transactionWorkManagerId, fileUri)
+                        apiResponse.postValue(Pair(true,
+                                getApplication<Application>().getString(R.string.data_added_when_user_online,
+                                        type)))
                     } else {
                         apiResponse.postValue(Pair(false, addTransaction.error.localizedMessage))
                     }

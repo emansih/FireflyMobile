@@ -85,15 +85,18 @@ class TransactionReceiver: BroadcastReceiver()  {
             var transactionType = ""
             when (intent.action) {
                 "firefly.hisname.ADD_DEPOSIT" -> {
-                    TransactionWorker.initWorker(context, transactionData, "deposit", transactionWorkManagerId)
+                    TransactionWorker.initWorker(context, transactionData, "deposit",
+                            transactionWorkManagerId, arrayListOf())
                     transactionType = "deposit"
                 }
                 "firefly.hisname.ADD_WITHDRAW" -> {
-                    TransactionWorker.initWorker(context, transactionData, "withdrawal", transactionWorkManagerId)
+                    TransactionWorker.initWorker(context, transactionData, "withdrawal",
+                            transactionWorkManagerId, arrayListOf())
                     transactionType = "withdrawal"
                 }
                 "firefly.hisname.ADD_TRANSFER" -> {
-                    TransactionWorker.initWorker(context, transactionData, "transfer", transactionWorkManagerId)
+                    TransactionWorker.initWorker(context, transactionData, "transfer",
+                            transactionWorkManagerId, arrayListOf())
                     transactionType = "transfer"
                 }
                 else -> { }
@@ -112,9 +115,9 @@ class TransactionReceiver: BroadcastReceiver()  {
                 transactionDatabase.insert(
                         Transactions(
                                 transactionWorkManagerId, amount,  0,
-                                 budget, 0,  category, currencyAttributes?.code ?: "",
-                                currencyAttributes?.decimal_places ?: 0, currency.currencyId ?: 0,
-                                currencyAttributes?.name ?: "", currencyAttributes?.symbol ?: "",
+                                 budget, 0,  category, currencyAttributes.code ?: "",
+                                currencyAttributes.decimal_places ?: 0, currency.currencyId ?: 0,
+                                currencyAttributes.name ?: "", currencyAttributes.symbol ?: "",
                                 OffsetDateTime.parse(dateTime), description, 0, destinationName,
                                 "", 0, "", "",  0.0, "","", 0,
                                 "", notes, 0, "", 0,
