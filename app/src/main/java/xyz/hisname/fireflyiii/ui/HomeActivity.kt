@@ -13,6 +13,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
@@ -465,7 +466,6 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun changeFragment(fragment: Fragment){
-        addTransactionExtended.isGone = true
         supportFragmentManager.commit {
             replace(R.id.fragment_container, fragment)
         }
@@ -507,6 +507,7 @@ class HomeActivity: BaseActivity(){
         }
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
             fab_action.isVisible = !(fragment is AboutFragment || fragment is SettingsFragment || fragment is DashboardFragment)
+            addTransactionExtended.isVisible = fragment is DashboardFragment
         }
         drawerToggle.setToolbarNavigationClickListener {
             onBackPressed()
