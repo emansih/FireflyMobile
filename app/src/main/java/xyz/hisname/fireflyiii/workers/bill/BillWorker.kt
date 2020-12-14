@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.workers.bill
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
@@ -9,11 +11,13 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import java.time.Duration
 import java.time.LocalDate
 import java.util.concurrent.ThreadLocalRandom
@@ -31,6 +35,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val skip = inputData.getString("skip") ?: ""
         val currencyCode = inputData.getString("currencyCode") ?: ""
         val notes = inputData.getString("notes")
+        val fileArray = inputData.getString("filesToUpload") ?: ""
         val billWorkManagerId = inputData.getLong("billWorkManagerId", 0)
         val billRepository = BillRepository(
                 AppDatabase.getInstance(context).billDataDao(),
@@ -44,6 +49,20 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                 // Delete old data that we inserted when worker is being init
                 billRepository.deleteBillById(billWorkManagerId)
                 context.showNotification("Bill Added", context.getString(R.string.stored_new_bill, name), channelIcon)
+                if(fileArray.isNotEmpty()){
+                    // Remove [ and ] in the string
+                    val beforeArray = fileArray.substring(1)
+                    val modifiedArray = beforeArray.substring(0, beforeArray.length - 1)
+                    val arrayOfString = modifiedArray.split(",")
+                    val arrayOfUri = arrayListOf<Uri>()
+                    arrayOfString.forEach { array ->
+                        // Remove white spaces. First element does not have white spaces however,
+                        // subsequent elements has it
+                        arrayOfUri.add(array.replace("\\s".toRegex(), "").toUri())
+                    }
+                    AttachmentWorker.initWorker(arrayOfUri, addBill.response.data.billId,
+                            context, AttachableType.BILL)
+                }
                 return Result.success()
             }
             addBill.errorMessage != null -> {
@@ -64,7 +83,8 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
 
     companion object {
         fun initWorker(context: Context, name: String, minAmount: String, maxAmount: String,
-                       billDate: String, repeatFreq: String, skip: String, currencyCode: String, notes: String?){
+                       billDate: String, repeatFreq: String, skip: String, currencyCode: String,
+                       notes: String?, fileArray: ArrayList<Uri>){
             val billWorkManagerId = ThreadLocalRandom.current().nextLong()
             val billData = Data.Builder()
                     .putString("name", name)
@@ -76,7 +96,9 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                     .putString("currencyCode", currencyCode)
                     .putString("notes", notes)
                     .putLong("billWorkManagerId", billWorkManagerId)
-                    .build()
+            if(fileArray.isNotEmpty()){
+                billData.putString("filesToUpload", fileArray.toString())
+            }
             val billTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_bill_periodic_$billWorkManagerId").get()
             if(billTag == null || billTag.size == 0) {
@@ -86,7 +108,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val billWork = PeriodicWorkRequestBuilder<BillWorker>(Duration.ofMinutes(delay))
-                        .setInputData(billData)
+                        .setInputData(billData.build())
                         .addTag("add_bill_periodic_$billWorkManagerId")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)

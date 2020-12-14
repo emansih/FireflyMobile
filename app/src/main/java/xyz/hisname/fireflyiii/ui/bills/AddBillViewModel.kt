@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
@@ -21,6 +22,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.bill.BillWorker
+import java.net.UnknownHostException
 
 class AddBillViewModel(application: Application): BaseViewModel(application) {
 
@@ -53,7 +55,7 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
                 skip: String, active: String, currencyCode: String,notes: String?, fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(CoroutineExceptionHandler { _, _ -> }){
             val addBill = billRepository.addBill(name, amountMin, amountMax, date, repeatFreq, skip,
                     active, currencyCode, notes)
             when {
@@ -69,10 +71,14 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
                     apiResponse.postValue(Pair(false,addBill.errorMessage))
                 }
                 addBill.error != null -> {
-                    apiResponse.postValue(Pair(false,
-                            getApplication<Application>().getString(R.string.data_added_when_user_online, "Bill")))
-                    BillWorker.initWorker(getApplication(), name, amountMin, amountMax, date, repeatFreq,
-                            skip, currencyCode, notes)
+                    if(addBill.error is UnknownHostException) {
+                        apiResponse.postValue(Pair(true,
+                                getApplication<Application>().getString(R.string.data_added_when_user_online, "Bill")))
+                        BillWorker.initWorker(getApplication(), name, amountMin, amountMax, date, repeatFreq,
+                                skip, currencyCode, notes, fileToUpload)
+                    } else {
+                        apiResponse.postValue(Pair(false, addBill.error.localizedMessage))
+                    }
                 }
                 else -> {
                     apiResponse.postValue(Pair(false, "Error saving bill"))
