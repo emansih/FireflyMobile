@@ -138,13 +138,15 @@ class AddTransactionFragment: BaseFragment() {
                 attachment_information.adapter?.notifyDataSetChanged()
             }
         }
-        chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()){ fileChoosen ->
+        chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
             attachment_information.isVisible = true
             if(fileChoosen != null){
-                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                        "", "", FileUtils.getFileName(requireContext(), fileChoosen) ?: "",
-                        "", "", "", 0, "", "", ""), 0))
-                attachmentItemAdapter.add(fileChoosen)
+                fileChoosen.forEach { file ->
+                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                            "", "", FileUtils.getFileName(requireContext(), file) ?: "",
+                            "", "", "", 0, "", "", ""), 0))
+                }
+                attachmentItemAdapter.addAll(fileChoosen)
                 attachment_information.adapter?.notifyDataSetChanged()
             }
         }
