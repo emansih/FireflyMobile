@@ -26,12 +26,6 @@ import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_bill.*
-import kotlinx.android.synthetic.main.fragment_add_bill.add_attachment_button
-import kotlinx.android.synthetic.main.fragment_add_bill.appbar
-import kotlinx.android.synthetic.main.fragment_add_bill.attachment_information
-import kotlinx.android.synthetic.main.fragment_add_bill.currency_edittext
-import kotlinx.android.synthetic.main.fragment_add_bill.description_edittext
-import kotlinx.android.synthetic.main.fragment_add_bill.placeHolderToolbar
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel

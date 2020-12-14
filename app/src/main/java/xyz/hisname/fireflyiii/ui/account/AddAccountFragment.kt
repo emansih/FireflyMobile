@@ -7,8 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -17,20 +21,13 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import kotlinx.android.synthetic.main.fragment_add_account.*
-import kotlinx.android.synthetic.main.fragment_add_account.attachment_information
-import kotlinx.android.synthetic.main.fragment_add_account.currency_edittext
-import kotlinx.android.synthetic.main.fragment_add_account.currency_layout
-import kotlinx.android.synthetic.main.fragment_add_account.description_edittext
-import kotlinx.android.synthetic.main.fragment_add_account.expansionLayout
-import kotlinx.android.synthetic.main.fragment_add_account.note_edittext
-import kotlinx.android.synthetic.main.fragment_add_account.placeHolderToolbar
-import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
@@ -38,6 +35,8 @@ import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
+import java.io.File
+import java.util.*
 
 class AddAccountFragment: BaseAddObjectFragment() {
 
@@ -76,7 +75,6 @@ class AddAccountFragment: BaseAddObjectFragment() {
         super.onCreate(savedInstanceState)
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                attachment_information.isVisible = true
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
                         "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
@@ -85,7 +83,6 @@ class AddAccountFragment: BaseAddObjectFragment() {
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
-            attachment_information.isVisible = true
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
@@ -165,6 +162,45 @@ class AddAccountFragment: BaseAddObjectFragment() {
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
+        add_attachment_button.setOnClickListener {
+            attachmentDialog()
+        }
+        attachment_information.layoutManager = LinearLayoutManager(requireContext())
+        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                false, { data: AttachmentData ->
+            attachmentDataAdapter.remove(data)
+            attachment_information.adapter?.notifyDataSetChanged()
+        }) { another: Int -> }
+    }
+
+    private fun attachmentDialog(){
+        val listItems = arrayOf("Capture image from camera", "Choose File")
+        AlertDialog.Builder(requireContext())
+                .setItems(listItems) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            val createTempDir = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp")
+                            if(!createTempDir.exists()){
+                                createTempDir.mkdir()
+                            }
+                            val randomId = UUID.randomUUID().toString().substring(0, 7)
+                            val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() +
+                                    File.separator + "temp" + File.separator + "${randomId}-firefly.png")
+                            if(fileToOpen.exists()){
+                                fileToOpen.delete()
+                            }
+                            fileUri = FileProvider.getUriForFile(requireContext(),
+                                    requireContext().packageName + ".provider", fileToOpen)
+                            takePicture.launch(fileUri)
+                        }
+                        1 -> {
+                            chooseDocument.launch(arrayOf("*/*"))
+                        }
+                    }
+                }
+                .show()
     }
 
     private fun setAccordion(){
@@ -386,10 +422,10 @@ class AddAccountFragment: BaseAddObjectFragment() {
         if(accountId != 0L){
             accountViewModel.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
                 val accountAttributes = accountData.accountAttributes
-                description_edittext.setText(accountAttributes?.name)
-                currency_edittext.setText(accountAttributes?.currency_code + " (" + accountAttributes?.currency_symbol + " )")
-                accountViewModel.currency = accountAttributes?.currency_code ?: ""
-                val liabilityType = accountAttributes?.liability_type
+                description_edittext.setText(accountAttributes.name)
+                currency_edittext.setText(accountAttributes.currency_code + " (" + accountAttributes.currency_symbol + " )")
+                accountViewModel.currency = accountAttributes.currency_code ?: ""
+                val liabilityType = accountAttributes.liability_type
                 if(liabilityType != null){
                     when (liabilityType) {
                         "debt" -> liabilityTypeSpinner.setSelection(0)
@@ -397,10 +433,10 @@ class AddAccountFragment: BaseAddObjectFragment() {
                         "mortgage" -> liabilityTypeSpinner.setSelection(2)
                     }
                 }
-                start_amount_edittext.setText(accountAttributes?.liability_amount)
-                start_date_edittext.setText(accountAttributes?.liability_start_date)
-                interest_edittext.setText(accountAttributes?.interest)
-                val interestPeriod = accountAttributes?.interest_period
+                start_amount_edittext.setText(accountAttributes.liability_amount)
+                start_date_edittext.setText(accountAttributes.liability_start_date)
+                interest_edittext.setText(accountAttributes.interest)
+                val interestPeriod = accountAttributes.interest_period
                 if(interestPeriod != null){
                     when(interestPeriod){
                         "daily" -> interestPeriodSpinner.setSelection(0)
@@ -408,15 +444,15 @@ class AddAccountFragment: BaseAddObjectFragment() {
                         "yearly" -> interestPeriodSpinner.setSelection(2)
                     }
                 }
-                iban_edittext.setText(accountAttributes?.iban)
-                bic_edittext.setText(accountAttributes?.bic)
-                account_number_edittext.setText(accountAttributes?.account_number)
-                if(accountAttributes?.include_net_worth == true){
+                iban_edittext.setText(accountAttributes.iban)
+                bic_edittext.setText(accountAttributes.bic)
+                account_number_edittext.setText(accountAttributes.account_number)
+                if(accountAttributes.include_net_worth){
                     includeInNetWorthCheck.performClick()
                 }
-                opening_balance_edittext.setText(accountAttributes?.opening_balance.toString())
-                opening_balance_date_edittext.setText(accountAttributes?.opening_balance_date)
-                val accountRole = accountAttributes?.account_role
+                opening_balance_edittext.setText(accountAttributes.opening_balance.toString())
+                opening_balance_date_edittext.setText(accountAttributes.opening_balance_date)
+                val accountRole = accountAttributes.account_role
                 if(accountRole != null){
                     when(accountRole){
                         "defaultAsset" -> accountRoleSpinner.setSelection(0)
@@ -426,8 +462,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
                         "cashWalletAsset" -> accountRoleSpinner.setSelection(4)
                     }
                 }
-                virtual_balance_edittext.setText(accountAttributes?.virtual_balance.toString())
-                note_edittext.setText(accountAttributes?.notes)
+                virtual_balance_edittext.setText(accountAttributes.virtual_balance.toString())
+                note_edittext.setText(accountAttributes.notes)
             }
         } else {
             showHelpText()
