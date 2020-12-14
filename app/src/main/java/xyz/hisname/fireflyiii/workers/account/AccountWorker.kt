@@ -112,7 +112,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
     override suspend fun doWork(): Result {
         val name = inputData.getString("name") ?: ""
         val accountType = inputData.getString("type") ?: ""
-        val currencyCode = inputData.getString("currencyCode") ?: ""
+        val currencyCode = inputData.getString("currencyCode")
         val includeNetWorth = inputData.getBoolean("includeNetWorth",false)
         val accountRole = inputData.getString("accountRole")
         val liabilityType = inputData.getString("liabilityType")
