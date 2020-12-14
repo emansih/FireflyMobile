@@ -32,7 +32,7 @@ class SearchPiggyViewModel(application: Application): BaseViewModel(application)
 
     fun searchPiggyBank(query: String): LiveData<PagingData<PiggyData>>{
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-            SearchPiggyPageSource(piggyDao, query)
+            SearchPiggyPageSource(piggyDao, query, piggyService)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }
 }
