@@ -115,7 +115,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
 
     fun getTransactionFromJournalId(transactionJournalId: Long){
         viewModelScope.launch(Dispatchers.IO){
-            val transactionList = transactionRepository.getTransactionByJournalId(transactionJournalId)[0]
+            val transactionList = transactionRepository.getTransactionByJournalId(transactionJournalId)
             transactionDescription.postValue(transactionList.description)
             transactionBudget.postValue(transactionList.budget_name)
             transactionAmount.postValue(transactionList.amount.toString())

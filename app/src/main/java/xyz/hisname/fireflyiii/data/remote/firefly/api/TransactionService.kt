@@ -52,7 +52,7 @@ interface TransactionService {
                                   @Field("transactions[0][notes]") notes: String?): Response<TransactionSuccessModel>
 
     @GET("$TRANSACTION_API_ENDPOINT/{id}/attachments")
-    fun getTransactionAttachment(@Path("id") transactionId: Long): Call<AttachmentModel>
+    suspend fun getTransactionAttachment(@Path("id") transactionId: Long): Response<AttachmentModel>
 
     @GET("${Constants.SEARCH_API_ENDPOINT}/transactions")
     suspend fun searchTransaction(@Query("query") transaction: String): Response<TransactionModel>

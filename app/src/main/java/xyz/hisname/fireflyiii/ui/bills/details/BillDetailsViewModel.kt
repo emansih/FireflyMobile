@@ -25,9 +25,8 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import xyz.hisname.fireflyiii.util.network.HttpConstants
-import xyz.hisname.fireflyiii.util.network.NetworkErrors
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
+import java.io.File
 import java.time.LocalDate
 
 class BillDetailsViewModel(application: Application): BaseViewModel(application) {
@@ -37,12 +36,17 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
     private val billDao = AppDatabase.getInstance(application).billDataDao()
     private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
     private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
     private val billService = genericService().create(BillsService::class.java)
     private val billPayRepository = BillPayRepository(billPayDao, billService)
     private val billRepository = BillRepository(billDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
+    private val attachmentRepository = AttachmentRepository(attachmentDao,
+            genericService().create(AttachmentService::class.java))
+
     var billId: Long = 0L
     var billName = ""
+    val billAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun getBillInfo(): LiveData<BillData>{
         val billLiveDataList = MutableLiveData<BillData>()
@@ -50,6 +54,7 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
             val billList = billRepository.getBillById(billId)
             billName =  billList.billAttributes.name
             billLiveDataList.postValue(billList)
+            billAttachment.postValue(billRepository.getAttachment(billId, attachmentDao))
         }
         return billLiveDataList
     }
@@ -96,62 +101,20 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
             TransactionPagingSource(billService, transactionDao, billId, date.toString())
         }.flow.cachedIn(viewModelScope).asLiveData()
 
-    // TODO: Refactor this
-    fun getBillAttachment(billId: Long): MutableLiveData<MutableList<AttachmentData>>{
-        isLoading.value = true
-        val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao(),
-                genericService().create(AttachmentService::class.java))
-        val data: MutableLiveData<MutableList<AttachmentData>> = MutableLiveData()
-        var attachmentData: MutableList<AttachmentData>
-        viewModelScope.launch(Dispatchers.IO) {
-            billService.getBillAttachment(billId).enqueue(retrofitCallback({ response ->
-                if (response.isSuccessful) {
-                    response.body()?.data?.forEach { attachmentData ->
-                        viewModelScope.launch(Dispatchers.IO) {
-                            attachmentRepository.insertAttachmentInfo(attachmentData)
-                        }
-                    }
-                    data.postValue(response.body()?.data)
-                    isLoading.value = false
-                } else {
-                    /** 7 March 2019
-                     * In an ideal world, we should be using foreign keys and relationship to
-                     * retrieve related attachments by transaction ID. but alas! the world we live in
-                     * isn't ideal, therefore we have to develop a hack.
-                     *
-                     * P.S. This was a bad database design mistake I made when I wrote this software. On
-                     * hindsight I should have looked at James Cole's design schema. But hindsight 10/10
-                     **/
-                    /** 7 March 2019
-                     * In an ideal world, we should be using foreign keys and relationship to
-                     * retrieve related attachments by transaction ID. but alas! the world we live in
-                     * isn't ideal, therefore we have to develop a hack.
-                     *
-                     * P.S. This was a bad database design mistake I made when I wrote this software. On
-                     * hindsight I should have looked at James Cole's design schema. But hindsight 10/10
-                     **/
-                    viewModelScope.launch(Dispatchers.IO) {
-                        try {
-                            attachmentData = attachmentRepository.getAttachmentFromJournalId(billId)
-                            isLoading.postValue(false)
-                            data.postValue(attachmentData)
-                        } catch (exception: Exception){ }
-                    }
-                }
-            })
-            { throwable ->
-                viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        attachmentData = attachmentRepository.getAttachmentFromJournalId(billId)
-                        isLoading.postValue(false)
-                        data.postValue(attachmentData)
-                    } catch (exception: Exception){ }
-
-                }
-                apiResponse.postValue(NetworkErrors.getThrowableMessage(throwable.localizedMessage))
-            })
+    fun downloadAttachment(attachmentData: AttachmentData): LiveData<File>{
+        isLoading.postValue(true)
+        val fileName = attachmentData.attachmentAttributes.filename
+        val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
+                File.separator + fileName)
+        val downloadedFile: MutableLiveData<File> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            val attachmentRepository = AttachmentRepository(attachmentDao,
+                    genericService().create(AttachmentService::class.java))
+            downloadedFile.postValue(attachmentRepository.downloadOrOpenAttachment(
+                    attachmentData.attachmentAttributes.download_uri, fileToOpen))
+            isLoading.postValue(false)
         }
-        return data
+        return downloadedFile
     }
 
 }

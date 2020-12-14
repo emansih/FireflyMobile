@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
@@ -26,7 +25,6 @@ import kotlinx.android.synthetic.main.fragment_bill_details.*
 import kotlinx.android.synthetic.main.fragment_bill_details.notesCard
 import kotlinx.android.synthetic.main.fragment_bill_details.notesText
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -249,27 +247,18 @@ class BillDetailsFragment: BaseDetailFragment() {
 
     // Ugly! Refactor!
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
-        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-        val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-        attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
-            attachmentViewModel.isDownloaded.observe(viewLifecycleOwner) { isLoading ->
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                if (!isLoading) {
-                    toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
-                } else {
-                    // "Refresh" the icon. From downloading to open file
-                    attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
-                            true, { data: AttachmentData ->
-                        setDownloadClickListener(data, attachmentDataAdapter)
+        billDetailsViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
+            // "Refresh" the icon. From downloading to open file
+            attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+                    true, { data: AttachmentData ->
+                setDownloadClickListener(data, attachmentDataAdapter)
                     }){ another: Int -> }
-                    startActivity(requireContext().openFile(downloadedFile))
-                }
-            }
+            startActivity(requireContext().openFile(downloadedFile))
         }
     }
 
     private fun downloadAttachment(billId: Long){
-        billDetailsViewModel.getBillAttachment(billId).observe(viewLifecycleOwner) { attachment ->
+        billDetailsViewModel.billAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
                 attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())

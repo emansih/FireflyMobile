@@ -2,9 +2,11 @@ package xyz.hisname.fireflyiii.repository.bills
 
 import com.squareup.moshi.Moshi
 import retrofit2.Response
+import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -94,5 +96,18 @@ class BillRepository(private val billDao: BillDataDao,
             }
             return ApiResponses(errorMessage = "Error occurred while saving Account")
         }
+    }
+
+    suspend fun getAttachment(billId: Long, attachmentDao: AttachmentDataDao): List<AttachmentData>{
+        try {
+            val networkCall = billService.getBillAttachment(billId)
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                responseBody.data.forEach { attachmentData ->
+                    attachmentDao.insert(attachmentData)
+                }
+            }
+        } catch (exception: Exception) { }
+        return attachmentDao.getAttachmentFromJournalId(billId)
     }
 }

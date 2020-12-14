@@ -1,15 +1,16 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
-import android.net.Uri
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
+import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.ObjectSum
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.*
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -213,6 +214,20 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         } catch (exception: Exception){
             ApiResponses(error = exception)
         }
+    }
+
+    suspend fun getAttachment(transactionJournalId: Long, attachmentDao: AttachmentDataDao): List<AttachmentData>{
+        val transactionId = getTransactionIdFromJournalId(transactionJournalId)
+        try {
+            val networkCall = transactionService.getTransactionAttachment(transactionId)
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                responseBody.data.forEach { attachmentData ->
+                    attachmentDao.insert(attachmentData)
+                }
+            }
+        } catch (exception: Exception) { }
+        return attachmentDao.getAttachmentFromJournalId(transactionJournalId)
     }
 
 

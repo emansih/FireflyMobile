@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
-import xyz.hisname.fireflyiii.repository.transaction.TransactionsViewModel
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -30,7 +29,6 @@ abstract class BaseFragment: Fragment() {
     protected val revealY by lazy { arguments?.getInt("revealY") ?: 0 }
     // Remove viewModels
     protected val accountViewModel by lazy { getViewModel(AccountsViewModel::class.java) }
-    protected val transactionViewModel by lazy { getViewModel(TransactionsViewModel::class.java) }
     protected  val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
     private var parentJob = Job()
     private val coroutineContext: CoroutineContext

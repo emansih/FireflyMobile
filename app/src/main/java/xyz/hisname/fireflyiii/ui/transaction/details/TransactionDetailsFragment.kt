@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.*
 import kotlinx.android.synthetic.main.fragment_transaction_details.attachment_information
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.attachment.AttachmentViewModel
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -41,6 +40,7 @@ import xyz.hisname.fireflyiii.util.openFile
 class TransactionDetailsFragment: BaseFragment() {
 
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId", 0) ?: 0 }
+    private val transactionDetailsViewModel by lazy { getImprovedViewModel(TransactionDetailsViewModel::class.java) }
     private var transactionList: MutableList<DetailModel> = ArrayList()
     private var metaDataList: MutableList<DetailModel> = arrayListOf()
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
@@ -61,7 +61,14 @@ class TransactionDetailsFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        retrieveData()
+        getData()
+        transactionDetailsViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
+            if(loading){
+                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,17 +76,17 @@ class TransactionDetailsFragment: BaseFragment() {
         setHasOptionsMenu(true)
     }
 
-    private fun retrieveData(){
-        transactionViewModel.getTransactionByJournalId(transactionJournalId).observe(viewLifecycleOwner){ transactionData ->
+    private fun getData(){
+        transactionDetailsViewModel.getTransactionByJournalId(transactionJournalId).observe(viewLifecycleOwner){ transactionData ->
             setTransactionInfo(transactionData)
             setMetaInfo(transactionData)
-            setNotes(transactionData[0].notes)
+            setNotes(transactionData.notes)
         }
     }
 
-    private fun setTransactionInfo(transactionData: MutableList<Transactions>){
+    private fun setTransactionInfo(transactionData: Transactions){
         transactionList.clear()
-        val details = transactionData[0]
+        val details = transactionData
         val model = arrayListOf(DetailModel(requireContext().getString(R.string.transactionType), details.transactionType),
                 DetailModel(resources.getString(R.string.description), details.description),
                 DetailModel(resources.getString(R.string.source_account), details.source_name),
@@ -101,7 +108,7 @@ class TransactionDetailsFragment: BaseFragment() {
         destinationAccountId = details.destination_id
         transactionInfo = details.transactionType ?: ""
         transactionDate = details.date.toString()
-        downloadAttachment(details.transaction_journal_id)
+        downloadAttachment()
         transactionList.addAll(model)
         info_text.text = getString(R.string.transaction_information)
         detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -109,9 +116,9 @@ class TransactionDetailsFragment: BaseFragment() {
         detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
     }
 
-    private fun setMetaInfo(transactionData: MutableList<Transactions>){
+    private fun setMetaInfo(transactionData: Transactions){
         metaDataList.clear()
-        val details = transactionData[0]
+        val details = transactionData
         transactionCategory = details.category_name ?: ""
         transactionBudget = details.budget_name ?: ""
         val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
@@ -164,19 +171,17 @@ class TransactionDetailsFragment: BaseFragment() {
         }
     }
 
-    private fun downloadAttachment(journalId: Long){
-        transactionViewModel.getTransactionAttachment(journalId).observe(viewLifecycleOwner) { attachment ->
-            transactionViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
-                if (!loading && attachment.isNotEmpty()) {
-                    attachment_information_card.isVisible = true
-                    attachmentDataAdapter = ArrayList(attachment)
-                    attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                    attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                    attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
-                            true, { data: AttachmentData ->
-                        setDownloadClickListener(data, attachmentDataAdapter)
+    private fun downloadAttachment(){
+        transactionDetailsViewModel.transactionAttachment.observe(viewLifecycleOwner){ attachment ->
+            if(attachment.isNotEmpty()){
+                attachment_information_card.isVisible = true
+                attachmentDataAdapter = ArrayList(attachment)
+                attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                    true, { data: AttachmentData ->
+                    setDownloadClickListener(data, attachmentDataAdapter)
                     }){ another: Int -> }
-                }
             }
         }
     }
@@ -190,22 +195,13 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
-        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-        val attachmentViewModel = getViewModel(AttachmentViewModel::class.java)
-        attachmentViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
-            attachmentViewModel.isDownloaded.observe(viewLifecycleOwner) { isLoading ->
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                if (!isLoading) {
-                    toastError("There was an issue downloading " + attachmentData.attachmentAttributes?.filename)
-                } else {
-                    // "Refresh" the icon. From downloading to open file
-                    attachment_information.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
-                            true, { data: AttachmentData ->
-                        setDownloadClickListener(data, attachmentDataAdapter)
-                    }){ another: Int -> }
-                    startActivity(requireContext().openFile(downloadedFile))
-                }
-            }
+        transactionDetailsViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
+            // "Refresh" the icon. From downloading to open file
+            attachment_information.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+                    true, { data: AttachmentData ->
+                setDownloadClickListener(data, attachmentDataAdapter)
+            }){ another: Int -> }
+            startActivity(requireContext().openFile(downloadedFile))
         }
     }
 
@@ -238,9 +234,7 @@ class TransactionDetailsFragment: BaseFragment() {
                         colorRes = R.color.md_green_600
                     })
                     .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
-                        transactionViewModel.deleteTransaction(transactionJournalId).observe(this) {
-                            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                        transactionDetailsViewModel.deleteTransaction(transactionJournalId).observe(this) {
                             if (it) {
                                 toastSuccess(resources.getString(R.string.transaction_deleted))
                                 handleBack()

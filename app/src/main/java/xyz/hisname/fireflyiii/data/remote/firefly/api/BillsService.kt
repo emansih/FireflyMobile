@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.data.remote.firefly.api
 
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants
@@ -54,10 +53,10 @@ interface BillsService {
                            @Field("repeat_freq") repeatFreq: String,
                            @Field("skip") skip: String,
                            @Field("active") active: String,
-                           @Field("currency_code") currencyCode: String, @Field("notes") notes: String?
-    ): Response<BillSuccessModel>
+                           @Field("currency_code") currencyCode: String,
+                           @Field("notes") notes: String?): Response<BillSuccessModel>
 
     @GET("${Constants.BILL_API_ENDPONT}/{id}/attachments")
-    fun getBillAttachment(@Path("id") billId: Long): Call<AttachmentModel>
+    suspend fun getBillAttachment(@Path("id") billId: Long): Response<AttachmentModel>
 
 }

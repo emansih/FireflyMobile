@@ -9,10 +9,8 @@ import com.squareup.moshi.JsonClass
 data class AttachmentData(
         @Embedded
         @Json(name ="attributes")
-        var attachmentAttributes: Attributes? = null,
+        val attachmentAttributes: Attributes,
         @PrimaryKey(autoGenerate = false)
         @Json(name ="id")
-        var attachmentId: Long = 0,
-        @Ignore
-        var type: String = ""
+        val attachmentId: Long
 )

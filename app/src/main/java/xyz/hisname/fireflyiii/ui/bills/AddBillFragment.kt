@@ -88,7 +88,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                 attachment_information.isVisible = true
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
                         "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
-                        "", "", "", 0, "", "", ""), 0, ""))
+                        "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
             }
@@ -98,7 +98,7 @@ class AddBillFragment: BaseAddObjectFragment() {
             if(fileChoosen != null){
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
                         "", "", FileUtils.getFileName(requireContext(), fileChoosen) ?: "",
-                        "", "", "", 0, "", "", ""), 0, ""))
+                        "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileChoosen)
                 attachment_information.adapter?.notifyDataSetChanged()
             }

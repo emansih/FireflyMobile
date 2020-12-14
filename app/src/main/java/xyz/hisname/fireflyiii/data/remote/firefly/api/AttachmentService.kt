@@ -25,6 +25,6 @@ interface AttachmentService {
 
     @Streaming
     @GET
-    fun downloadFile(@Url fileUrl: String?): Call<ResponseBody>
+    suspend fun downloadFile(@Url fileUrl: String?): Response<ResponseBody>
 
 }

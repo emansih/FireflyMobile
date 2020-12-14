@@ -8,6 +8,6 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 abstract class AttachmentDataDao: BaseDao<AttachmentData> {
 
     @Query("SELECT * FROM attachment_info WHERE attachable_id =:journalId")
-    abstract fun getAttachmentFromJournalId(journalId: Long): MutableList<AttachmentData>
+    abstract fun getAttachmentFromJournalId(journalId: Long): List<AttachmentData>
 
 }

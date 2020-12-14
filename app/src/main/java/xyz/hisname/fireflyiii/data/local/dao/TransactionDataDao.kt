@@ -30,7 +30,7 @@ abstract class TransactionDataDao {
     abstract fun getTransactionIdFromJournalId(journalId: Long): Long
 
     @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
-    abstract fun getTransactionByJournalId(journalId: Long): MutableList<Transactions>
+    abstract fun getTransactionByJournalId(journalId: Long): Transactions
 
     // That is a really loooooooong name
     @Query("SELECT sum(amount) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :type AND currency_code = :currencyCode")
