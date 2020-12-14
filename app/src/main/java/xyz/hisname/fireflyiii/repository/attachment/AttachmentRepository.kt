@@ -1,9 +1,6 @@
 package xyz.hisname.fireflyiii.repository.attachment
 
-import androidx.lifecycle.viewModelScope
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -13,8 +10,6 @@ import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
-import xyz.hisname.fireflyiii.util.network.NetworkErrors
-import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.io.File
 import java.io.InputStream
 import java.net.URLConnection
