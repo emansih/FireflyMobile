@@ -5,8 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
@@ -19,6 +18,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
+import java.net.UnknownHostException
 
 class AddAccountViewModel(application: Application): BaseViewModel(application) {
 
@@ -38,7 +38,7 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
         viewModelScope.launch(Dispatchers.IO){
             val currencyList = currencyRepository.defaultCurrency()
             currencyListLiveData.postValue(currencyList)
-            currency = currencyList.currencyAttributes?.code ?: ""
+            currency = currencyList.currencyAttributes.code
         }
         return currencyListLiveData
     }
@@ -82,7 +82,7 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
                    interest: String?, interestPeriod: String?, fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(CoroutineExceptionHandler { _, _ -> }){
             val addAccount = accountRepository.addAccount( accountName, accountType, currencyCode,
                     iban, bic, accountNumber, openingBalance, openingBalanceDate,
                     accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
@@ -96,15 +96,21 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
                                 getApplication<Application>(), AttachableType.Account)
                     }
                 }
+                addAccount.error != null -> {
+                    if(addAccount.error is UnknownHostException){
+                        AccountWorker.initWorker(getApplication(), accountName, accountType, currencyCode,
+                                iban, bic, accountNumber, openingBalance, openingBalanceDate,
+                                accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
+                                liabilityStartDate, interest, interestPeriod, fileToUpload)
+                        apiResponse.postValue(Pair(true,
+                                getApplication<Application>().getString(R.string.data_added_when_user_online,
+                                        "Account")))
+                    } else {
+                        apiResponse.postValue(Pair(false, addAccount.error.localizedMessage))
+                    }
+                }
                 addAccount.errorMessage != null -> {
                     apiResponse.postValue(Pair(false,addAccount.errorMessage))
-                }
-                addAccount.error != null -> {
-                    apiResponse.postValue(Pair(false,addAccount.error.localizedMessage))
-                    AccountWorker.initWorker(getApplication(), accountName, accountType, currencyCode,
-                            iban, bic, accountNumber, openingBalance, openingBalanceDate,
-                            accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                            liabilityStartDate, interest, interestPeriod)
                 }
                 else -> {
                     apiResponse.postValue(Pair(false, "Error saving account"))
@@ -114,6 +120,7 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
         }
         return apiResponse
     }
+
 
     fun getAccountById(accountId: Long): LiveData<AccountData>{
         val accountListLiveData = MutableLiveData<AccountData>()

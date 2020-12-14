@@ -410,8 +410,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
                 liabilityStartDate, interest, interestPeriod, attachmentItemAdapter).observe(viewLifecycleOwner){ response ->
             if(response.first){
-                toastSuccess("Account saved")
                 handleBack()
+                toastSuccess(response.second)
             } else {
                 toastInfo(response.second)
             }

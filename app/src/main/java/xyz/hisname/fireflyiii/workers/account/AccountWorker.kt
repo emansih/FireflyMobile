@@ -1,6 +1,9 @@
 package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.net.toUri
+import androidx.core.text.toSpannable
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
@@ -10,10 +13,13 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
+import java.io.File
 import java.math.BigDecimal
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
@@ -26,9 +32,10 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
 
         fun initWorker(context: Context, accountName: String, accountType: String,
                        currencyCode: String?, iban: String?, bic: String?, accountNumber: String?,
-                       openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
+                       openingBalance: String? = "0", openingBalanceDate: String?, accountRole: String?,
                        virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
-                       liabilityAmount: String?, liabilityStartDate: String?, interest: String?, interestPeriod: String?){
+                       liabilityAmount: String?, liabilityStartDate: String?, interest: String?,
+                       interestPeriod: String?, fileArray: ArrayList<Uri>){
             val accountData = Data.Builder()
                     .putString("name", accountName)
                     .putString("type", accountType)
@@ -47,7 +54,9 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     .putString("liabilityStartDate", liabilityStartDate)
                     .putString("interest", interest)
                     .putString("interestPeriod", interestPeriod)
-                    .build()
+            if(fileArray.isNotEmpty()){
+                accountData.putString("filesToUpload", fileArray.toString())
+            }
             val accountTag =
                     WorkManager.getInstance(context).getWorkInfosByTag(
                             "add_periodic_account_$accountName" + "_" + accountType).get()
@@ -58,7 +67,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val accountWork = PeriodicWorkRequestBuilder<AccountWorker>(Duration.ofMinutes(delay))
-                        .setInputData(accountData)
+                        .setInputData(accountData.build())
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
@@ -72,14 +81,15 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
                     val currencyData =
                                 currencyDatabase.getCurrencyByCode(currencyCode ?: "")[0]
-                    val currencySymbol = currencyData.currencyAttributes?.symbol
+                    val currencySymbol = currencyData.currencyAttributes.symbol
                     val currencyId = currencyData.currencyId
                     val fakeAccountId = ThreadLocalRandom.current().nextLong()
                     accountDatabase.insert(AccountData(
                             fakeAccountId, AccountAttributes(
                             "","", accountName, true,
                             accountType, accountRole, currencyId, currencyCode, 0.toBigDecimal(),
-                            currencySymbol, "", notes, "", "", accountNumber,
+                            currencySymbol, "", notes, "",
+                            "", accountNumber,
                             iban, bic, 0.0,
                             BigDecimal(openingBalance), openingBalanceDate, liabilityType,
                             liabilityAmount, liabilityStartDate, interest, interestPeriod, includeInNetWorth, true)
@@ -117,6 +127,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val openingBalanceDate = inputData.getString("openingBalanceDate")
         val virtualBalance = inputData.getString("virtualBalance")
         val notes = inputData.getString("notes")
+        val fileArray = inputData.getString("filesToUpload") ?: ""
         val accountRepository = AccountRepository(
                 AppDatabase.getInstance(context).accountDataDao(),
                 genericService.create(AccountsService::class.java)
@@ -129,6 +140,20 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
             addAccount.response != null -> {
                 cancelWorker(name,accountType, context)
                 context.showNotification("Account Added", "$name was added successfully!", channelIcon)
+                if(fileArray.isNotEmpty()){
+                    // Remove [ and ] in the string
+                    val beforeArray = fileArray.substring(1)
+                    val modifiedArray = beforeArray.substring(0, beforeArray.length - 1)
+                    val arrayOfString = modifiedArray.split(",")
+                    val arrayOfUri = arrayListOf<Uri>()
+                    arrayOfString.forEach { array ->
+                        // Remove white spaces. First element does not have white spaces however,
+                        // subsequent elements has it
+                        arrayOfUri.add(array.replace("\\s".toRegex(), "").toUri())
+                    }
+                    AttachmentWorker.initWorker(arrayOfUri, addAccount.response.data.accountId,
+                            context, AttachableType.Account)
+                }
                 return Result.success()
             }
             addAccount.errorMessage != null -> {
