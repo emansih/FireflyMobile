@@ -13,7 +13,7 @@ interface AttachmentService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @POST("$ATTACHMENT_API_ENDPOINT/{id}/upload")
     suspend fun uploadFile(@Path("id") id: Long,
-                   @Body file: RequestBody): Response<Void>
+                           @Body file: RequestBody): Response<Void>
 
     @FormUrlEncoded
     @POST(ATTACHMENT_API_ENDPOINT)

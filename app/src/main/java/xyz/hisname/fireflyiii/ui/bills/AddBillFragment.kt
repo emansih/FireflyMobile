@@ -322,30 +322,13 @@ class AddBillFragment: BaseAddObjectFragment() {
                 min_amount_edittext.getString(), max_amount_edittext.getString(),
                 bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
                     currency, notes, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
-            toastSuccess(response.second)
             if(response.first){
-                if(attachmentItemAdapter.isEmpty()) {
-                    handleBack()
-                } else {
-                    billViewModel.attachmentMessageLiveData.observe(viewLifecycleOwner){ error ->
-                        if(error.isNotEmpty()){
-                            val errorMessage = ""
-                            error.forEachIndexed { index, s ->
-                                errorMessage.plus("$index. $s\n\n")
-                            }
-                            AlertDialog.Builder(requireContext())
-                                    .setTitle("There was some issue uploading your attachments")
-                                    .setMessage(errorMessage)
-                                    .setPositiveButton(android.R.string.ok){ _, _ ->
-                                        handleBack()
-                                    }
-                            toastError("Please try again later", Toast.LENGTH_LONG)
-                        } else {
-                            toastSuccess("File uploaded!")
-                            handleBack()
-                        }
-                    }
-                }
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                toastSuccess(response.second)
+                handleBack()
+            } else {
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                toastInfo(response.second)
             }
         }
     }

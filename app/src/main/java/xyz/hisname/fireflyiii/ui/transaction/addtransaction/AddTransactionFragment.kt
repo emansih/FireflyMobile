@@ -727,32 +727,9 @@ class AddTransactionFragment: BaseFragment() {
                 sourceAccount, destinationAccount, categoryName, transactionTags, budgetName, attachmentItemAdapter,
                 note_edittext.getString()).observe(viewLifecycleOwner){ response ->
             if(response.first){
-                if(attachmentItemAdapter.isEmpty()){
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                    toastSuccess(response.second)
-                    handleBack()
-                } else {
-                    toastSuccess(response.second)
-                    addTransactionViewModel.attachmentMessageLiveData.observe(viewLifecycleOwner){ error ->
-                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                        if(error.isNotEmpty()){
-                            val errorMessage = ""
-                            error.forEachIndexed { index, s ->
-                                errorMessage.plus("$index. $s\n\n")
-                            }
-                            AlertDialog.Builder(requireContext())
-                                    .setTitle("There was some issue uploading your attachments")
-                                    .setMessage(errorMessage)
-                                    .setPositiveButton(android.R.string.ok){ _, _ ->
-                                        handleBack()
-                                    }
-                            toastError("Please try again later", Toast.LENGTH_LONG)
-                        } else {
-                            toastSuccess("File uploaded!")
-                            handleBack()
-                        }
-                    }
-                }
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                toastSuccess(response.second)
+                handleBack()
             } else {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 toastInfo(response.second)

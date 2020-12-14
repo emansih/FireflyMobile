@@ -3,32 +3,27 @@ package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 import android.app.Application
 import android.net.Uri
 import android.os.Bundle
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.work.Data
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.*
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
-import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
-import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
-import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.repository.tags.TagsRepository
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.workers.transaction.AttachmentWorker
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import java.net.UnknownHostException
 import java.util.concurrent.ThreadLocalRandom
@@ -91,7 +86,6 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val removeFragment = MutableLiveData<Boolean>()
     val transactionBundle = MutableLiveData<Bundle>()
     val isFromTasker = MutableLiveData<Boolean>()
-    val attachmentMessageLiveData = MutableLiveData<ArrayList<String>>()
 
     fun parseBundle(bundle: Bundle?){
         if(bundle != null){
@@ -146,7 +140,9 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                        category: String?, tags: String?, budgetName: String?,
                        fileUri: ArrayList<Uri>, notes: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+        }){
             val addTransaction = transactionRepository.addTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
                     category, tags, budgetName, notes)
@@ -155,19 +151,12 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                 addTransaction.response != null -> {
                     apiResponse.postValue(Pair(true,
                             getApplication<Application>().resources.getString(R.string.transaction_added)))
+                    addTransaction.response.data.transactionAttributes.transactions.forEach { transactions ->
+                        journalId = transactions.transaction_journal_id
+                    }
                     if(fileUri.isNotEmpty()){
-                        addTransaction.response.data.transactionAttributes.transactions.forEach { transaction ->
-                            journalId = transaction.transaction_journal_id
-                        }
-                        if(journalId != 0L){
-                            val attachmentRepository = AttachmentRepository(
-                                    AppDatabase.getInstance(getApplication()).attachmentDataDao(),
-                                    genericService().create(AttachmentService::class.java))
-                            val attachmentResponse =
-                                    attachmentRepository.uploadFile(getApplication(), journalId,
-                                            fileUri, AttachableType.TRANSACTION)
-                            attachmentMessageLiveData.postValue(attachmentResponse)
-                        }
+                        AttachmentWorker.initWorker(fileUri, journalId, getApplication<Application>(),
+                                AttachableType.TRANSACTION)
                     }
                 }
                 addTransaction.errorMessage != null -> {
@@ -244,7 +233,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             isLoading.postValue(true)
             val accountList = arrayListOf<String>()
             accountRepository.getAccountByType("asset").forEach {  data ->
-                data.accountAttributes?.name?.let { accountList.add(it) }
+                data.accountAttributes.name.let { accountList.add(it) }
             }
             accountData.postValue(accountList)
             isLoading.postValue(false)

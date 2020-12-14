@@ -19,6 +19,7 @@ import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.bill.BillWorker
 
 class AddBillViewModel(application: Application): BaseViewModel(application) {
@@ -34,9 +35,6 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
     )
 
     private var currencyCode: String = ""
-
-    val attachmentMessageLiveData = MutableLiveData<ArrayList<String>>()
-
 
     fun getBillById(billId: Long): LiveData<BillData>{
         isLoading.postValue(true)
@@ -63,12 +61,8 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
                     apiResponse.postValue(Pair(true,
                             getApplication<Application>().getString(R.string.stored_new_bill, name)))
                     if(fileToUpload.isNotEmpty()) {
-                        val attachmentRepository = AttachmentRepository(AppDatabase.getInstance(getApplication()).attachmentDataDao(),
-                                genericService().create(AttachmentService::class.java))
-                        val attachmentResponse =
-                                attachmentRepository.uploadFile(getApplication(), addBill.response.data.billId,
-                                        fileToUpload, AttachableType.BILL)
-                        attachmentMessageLiveData.postValue(attachmentResponse)
+                        AttachmentWorker.initWorker(fileToUpload,
+                                addBill.response.data.billId, getApplication<Application>(), AttachableType.BILL)
                     }
                 }
                 addBill.errorMessage != null -> {

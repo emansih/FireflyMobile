@@ -5,5 +5,6 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class ErrorModel(
         val message: String?,
-        val errors: Errors?
+        val errors: Errors?,
+        val exception: String?
 )
