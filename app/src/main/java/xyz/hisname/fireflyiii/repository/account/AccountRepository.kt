@@ -88,7 +88,6 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         }
     }
 
-    @Throws(Exception::class)
     suspend fun getAccountByName(accountName: String, accountType: String): AccountData{
         var accountData = accountDao.getAccountByNameAndType(accountName, accountType)
         if(accountData.accountAttributes.name.isEmpty()) {

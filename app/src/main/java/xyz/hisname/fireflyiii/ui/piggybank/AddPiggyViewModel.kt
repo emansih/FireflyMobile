@@ -61,7 +61,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                      fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ ->
+        viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
             apiResponse.postValue(Pair(false, "There was an error getting account data"))
             isLoading.postValue(false)
         }){
@@ -84,8 +84,8 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                     addPiggyBank.error != null -> {
                         if (addPiggyBank.error is UnknownHostException) {
                             PiggyBankWorker.initWorker(getApplication(), piggyName, accountId.toString(), targetAmount,
-                                    currentAmount, startDate, targetDate, notes)
-                            apiResponse.postValue(Pair(false, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
+                                    currentAmount, startDate, targetDate, notes, fileToUpload)
+                            apiResponse.postValue(Pair(true, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
                         } else {
                             apiResponse.postValue(Pair(false, addPiggyBank.error.localizedMessage))
                         }
@@ -94,8 +94,8 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                         apiResponse.postValue(Pair(false, "Error saving piggy bank"))
                     }
                 }
-                isLoading.postValue(false)
             }
+            isLoading.postValue(false)
         }
         return apiResponse
     }

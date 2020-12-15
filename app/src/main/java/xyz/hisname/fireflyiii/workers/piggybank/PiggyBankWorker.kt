@@ -1,6 +1,8 @@
 package xyz.hisname.fireflyiii.workers.piggybank
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
@@ -9,10 +11,12 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.util.extension.showNotification
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
@@ -29,6 +33,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val startDate = inputData.getString("startDate") ?: ""
         val endDate = inputData.getString("endDate") ?: ""
         val notes = inputData.getString("notes") ?: ""
+        val fileArray = inputData.getString("filesToUpload") ?: ""
         val piggyWorkManagerId = inputData.getLong("piggyWorkManagerId", 0)
         val piggyRepository = PiggyRepository(AppDatabase.getInstance(context).piggyDataDao(),
                 genericService.create(PiggybankService::class.java))
@@ -39,6 +44,21 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                 // Delete old data that we inserted when worker is being init
                 piggyRepository.deletePiggyById(piggyWorkManagerId)
                 context.showNotification("Piggy bank added","Stored new piggy bank $name", channelIcon)
+                if(fileArray.isNotEmpty()){
+                    // Remove [ and ] in the string
+                    val beforeArray = fileArray.substring(1)
+                    val modifiedArray = beforeArray.substring(0, beforeArray.length - 1)
+                    val arrayOfString = modifiedArray.split(",")
+                    val arrayOfUri = arrayListOf<Uri>()
+                    arrayOfString.forEach { array ->
+                        // Remove white spaces. First element does not have white spaces however,
+                        // subsequent elements has it
+                        arrayOfUri.add(array.replace("\\s".toRegex(), "").toUri())
+                    }
+                    AttachmentWorker.initWorker(arrayOfUri, addPiggy.response.data.piggyId,
+                            context, AttachableType.PIGGYBANK)
+                }
+
                 return Result.success()
             }
             addPiggy.errorMessage != null -> {
@@ -59,7 +79,8 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
 
     companion object {
         fun initWorker(context: Context, name: String, accountId: String, targetAmount: String,
-                       currentAmount: String?, startDate: String?, endDate: String?, notes: String?){
+                       currentAmount: String?, startDate: String?, endDate: String?,
+                       notes: String?, fileArray: ArrayList<Uri>){
             val piggyWorkManagerId = ThreadLocalRandom.current().nextLong()
             val piggyData = Data.Builder()
                     .putString("name", name)
@@ -70,7 +91,9 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                     .putString("endDate", endDate)
                     .putString("notes", notes)
                     .putLong("piggyWorkManagerId", piggyWorkManagerId)
-                    .build()
+            if(fileArray.isNotEmpty()){
+                piggyData.putString("filesToUpload", fileArray.toString())
+            }
             val piggyTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_piggy_periodic_$piggyWorkManagerId").get()
             if(piggyTag == null || piggyTag.size == 0){
@@ -80,7 +103,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val piggyBankWork = PeriodicWorkRequestBuilder<PiggyBankWorker>(Duration.ofMinutes(delay))
-                        .setInputData(piggyData)
+                        .setInputData(piggyData.build())
                         .addTag("add_piggy_periodic_$piggyWorkManagerId")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)

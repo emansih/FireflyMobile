@@ -9,7 +9,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 abstract class AccountsDataDao: BaseDao<AccountData> {
 
     @Query("SELECT * FROM accounts WHERE name =:accountName AND type =:accountType")
-    abstract fun getAccountByNameAndType(accountName: String, accountType: String): AccountData
+    abstract suspend fun getAccountByNameAndType(accountName: String, accountType: String): AccountData
 
     @Query("SELECT * FROM accounts WHERE type =:accountType")
     abstract suspend fun getAccountsByType(accountType: String): List<AccountData>
