@@ -12,7 +12,7 @@ object Dependencies{
     private const val androidxFragmentVersion = "1.2.5"
     private const val androidxAnnotationVersion = "1.1.0"
     private const val androidxRecyclerViewVersion = "1.2.0-alpha05"
-    private const val materialDesignVersion = "1.3.0-alpha02"
+    private const val materialDesignVersion = "1.3.0-alpha04"
     private const val swipeRefreshVersion = "1.1.0"
     private const val androidxCoreVersion = "1.5.0-alpha05"
     private const val androidxConstraintLayoutVersion = "2.0.3"
@@ -41,6 +41,7 @@ object Dependencies{
     private const val moshiVersion = "1.11.0"
     private const val calendarViewVersion = "1.0.0"
     private const val pagingLibVersion = "3.0.0-alpha09"
+    private const val viewPager2Version = "1.1.0-alpha01"
 
     val lifecycleLibs = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     val lifecyclerLiveDataCore = "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
@@ -100,4 +101,5 @@ object Dependencies{
     val moshiCodegen = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
     val calendarView = "com.github.kizitonwose:CalendarView:$calendarViewVersion"
     val pagingLib = "androidx.paging:paging-runtime-ktx:$pagingLibVersion"
+    val viewPager2Lib = "androidx.viewpager2:viewpager2:$viewPager2Version"
 }

@@ -34,6 +34,14 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             AppDatabase.getInstance(application).transactionDataDao(),
             genericService().create(TransactionService::class.java)
     )
+
+    val inMemoryDb = AppDatabase.getMemoryInstance(application)
+
+    private val temporaryTransactionRepository = TransactionRepository(
+            inMemoryDb.transactionDataDao(),
+            genericService().create(TransactionService::class.java)
+    )
+
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
@@ -86,6 +94,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val removeFragment = MutableLiveData<Boolean>()
     val transactionBundle = MutableLiveData<Bundle>()
     val isFromTasker = MutableLiveData<Boolean>()
+    val saveData = MutableLiveData<Boolean>()
 
     fun parseBundle(bundle: Bundle?){
         if(bundle != null){
@@ -133,6 +142,21 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         }
     }
 
+    fun memoryCount(): LiveData<Int>{
+        val count = MutableLiveData<Int>()
+        viewModelScope.launch(Dispatchers.IO){
+            temporaryTransactionRepository.getMemoryCount().distinctUntilChanged().collectLatest {  number ->
+                count.postValue(number)
+            }
+        }
+        return count
+    }
+
+    fun uploadTransaction(groupTitle: String){
+        viewModelScope.launch(Dispatchers.IO){
+            temporaryTransactionRepository.addSplitTransaction(groupTitle)
+        }
+    }
 
     fun addTransaction(type: String, description: String,
                        date: String, time: String, piggyBankName: String?, amount: String,
@@ -140,8 +164,13 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                        category: String?, tags: String?, budgetName: String?,
                        fileUri: ArrayList<Uri>, notes: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ -> }){
-            val addTransaction = transactionRepository.addTransaction(type,description, date, time, piggyBankName,
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+            throwable.printStackTrace()
+        }){
+            temporaryTransactionRepository.storeSplitTransaction(type,description, date, time, piggyBankName,
+                    amount.replace(',', '.'), sourceName, destinationName, currency,
+                    category, tags, budgetName, notes)
+        /* val addTransaction = transactionRepository.addTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
                     category, tags, budgetName, notes)
             var journalId = 0L
@@ -189,7 +218,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                 else -> {
                     apiResponse.postValue(Pair(false, "Error adding transaction"))
                 }
-            }
+            }*/
         }
         return apiResponse
     }

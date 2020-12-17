@@ -42,7 +42,7 @@ data class Transactions(
         var source_type: String?,
         var tags: List<String>,
         @Json(name ="type")
-        var transactionType: String?,
+        var transactionType: String,
         var user: Int,
         var piggy_bank_name: String?,
         var isPending: Boolean = false

@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.data.remote.firefly.api
 
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants
@@ -19,6 +18,11 @@ interface TransactionService {
 
     @DELETE("$TRANSACTION_API_ENDPOINT/{transactionId}")
     suspend fun deleteTransactionById(@Path("transactionId") transactionId: Long): Response<TransactionSuccessModel>
+
+    @FormUrlEncoded
+    @POST(TRANSACTION_API_ENDPOINT)
+    suspend fun addSplitTransaction(@Field("group_title") groupTitle: String,
+                                    @QueryMap transactionData: Map<String, String?>): Response<TransactionSuccessModel>
 
     @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)

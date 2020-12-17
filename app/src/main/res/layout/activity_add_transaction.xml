@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bigger_fragment_container"
@@ -7,28 +7,30 @@
     android:background="?android:windowBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/addTransaction_coordinatorLayout"
+
+    <FrameLayout
+        android:id="@+id/addTransactionFrame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/transactionBottomView"/>
 
-        <FrameLayout
-            android:id="@+id/addTransactionFrame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </FrameLayout>
+    <include
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        layout="@layout/progress_overlay"/>
 
-        <include layout="@layout/progress_overlay"/>
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/transactionBottomView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/windowBackground"
-            android:foreground="?attr/selectableItemBackground"
-            android:layout_gravity="bottom"
-            app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
-            app:menu="@menu/transaction_bottom_nav_menu"
-            app:itemTextColor="@color/md_black_1000" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-</FrameLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/transactionBottomView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/windowBackground"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_gravity="bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
+        app:menu="@menu/transaction_bottom_nav_menu"
+        app:itemTextColor="@color/md_black_1000" />
+</androidx.constraintlayout.widget.ConstraintLayout>

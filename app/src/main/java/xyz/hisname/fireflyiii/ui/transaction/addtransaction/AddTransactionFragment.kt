@@ -20,7 +20,9 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.hootsuite.nachos.ChipConfiguration
@@ -37,7 +39,6 @@ import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.currency_edittext
 import kotlinx.android.synthetic.main.fragment_add_transaction.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_transaction.expansionLayout
-import kotlinx.android.synthetic.main.fragment_add_transaction.placeHolderToolbar
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
@@ -67,24 +68,16 @@ class AddTransactionFragment: BaseFragment() {
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
+    private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
+    private val isFromFragment by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
+    private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
 
-    // If we entered from Tasker's UI, we will need to keep view model referenced to the activity
-    private val addTransactionViewModel by lazy {
-        if(isTasker){
-            getViewModel(AddTransactionViewModel::class.java)
-        } else {
-            getImprovedViewModel(AddTransactionViewModel::class.java)
-        }
-    }
+    private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val budgetSearch by lazy { getViewModel(BudgetSearchViewModel::class.java) }
     private val piggySearch by lazy { getViewModel(SearchPiggyViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
-
-    private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
-    private val isFromFragment by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
-    private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
 
     private lateinit var fileUri: Uri
     private var selectedTime = ""
@@ -252,10 +245,7 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setFab(){
-        if(transactionJournalId != 0L) {
-            addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
-        }
-        addTransactionFab.setOnClickListener {
+        addTransactionViewModel.saveData.observe(viewLifecycleOwner){
             hideKeyboard()
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             val piggyBank = if(piggy_edittext.isBlank()){
@@ -406,11 +396,6 @@ class AddTransactionFragment: BaseFragment() {
                 return ChipSpan(requireContext(), existingChip)
             }
         }, ChipSpan::class.java)
-        addTransactionFab.setImageDrawable(IconicsDrawable(requireContext()).apply{
-            icon = FontAwesome.Icon.faw_plus
-            colorRes = R.color.md_black_1000
-            sizeDp = 24
-        })
         budget_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_gratipay
@@ -571,28 +556,25 @@ class AddTransactionFragment: BaseFragment() {
                 }
             }
         }
-        placeHolderToolbar.navigationIcon = getCompatDrawable(R.drawable.abc_ic_clear_material)
-        placeHolderToolbar.setNavigationOnClickListener {
-            handleBack()
-        }
         time_edittext.setOnClickListener {
-            val materialTimePicker = MaterialTimePicker()
-            materialTimePicker.setTimeFormat(TimeFormat.CLOCK_24H)
-            materialTimePicker.setListener { materialTimePickerListener ->
-                val min = if(materialTimePickerListener.minute < 10){
-                    "0${materialTimePickerListener.minute}"
+            val materialTimePicker = MaterialTimePicker.Builder()
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .build()
+            materialTimePicker.show(parentFragmentManager, "timePickerDialog")
+            materialTimePicker.addOnPositiveButtonClickListener { _ ->
+                val min = if(materialTimePicker.minute < 10){
+                    "0${materialTimePicker.minute}"
                 } else {
-                    materialTimePickerListener.minute.toString()
+                    materialTimePicker.minute.toString()
                 }
-                val hour = if(materialTimePickerListener.hour < 10){
-                    "0${materialTimePickerListener.hour}"
+                val hour = if(materialTimePicker.hour < 10){
+                    "0${materialTimePicker.hour}"
                 } else {
-                    materialTimePickerListener.hour.toString()
+                    materialTimePicker.hour.toString()
                 }
                 selectedTime = "${hour}:${min}"
                 time_edittext.setText(selectedTime)
             }
-            materialTimePicker.show(parentFragmentManager, "timePickerDialog")
         }
         description_edittext.doAfterTextChanged { editable ->
             addTransactionViewModel.getTransactionByDescription(editable.toString()).observe(viewLifecycleOwner){ list ->
@@ -669,8 +651,8 @@ class AddTransactionFragment: BaseFragment() {
                 }
                 addTransactionViewModel.isFromTasker.observe(viewLifecycleOwner){ isTask ->
                     if(isTask){
-                        destinationTextInputTasker.isVisible = false
-                        sourceTextInputTasker.isVisible = false
+                        destinationTextInputTasker.isGone = true
+                        sourceTextInputTasker.isGone = true
                         piggyTasker.isVisible = true
                     }
                 }
@@ -678,10 +660,10 @@ class AddTransactionFragment: BaseFragment() {
                 val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, accounts)
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)
-                destination_layout.isVisible = false
-                destinationTextInputTasker.isVisible = false
-                source_exposed_menu.isVisible = false
-                sourceExposedTasker.isVisible = false
+                destination_layout.isGone = true
+                destinationTextInputTasker.isGone = true
+                source_exposed_menu.isGone = true
+                sourceExposedTasker.isGone = true
                 addTransactionViewModel.transactionDestinationAccount.observe(viewLifecycleOwner){ transactionDestinationAccount ->
                     destination_exposed_dropdown.setText(transactionDestinationAccount)
                 }
@@ -690,15 +672,15 @@ class AddTransactionFragment: BaseFragment() {
                 }
                 addTransactionViewModel.isFromTasker.observe(viewLifecycleOwner){ isTask ->
                     if(isTask){
-                        sourceExposedTasker.isVisible = false
-                        destinationTextInputTasker.isVisible = false
+                        sourceExposedTasker.isGone = true
+                        destinationTextInputTasker.isGone = true
                     }
                 }
             } else if(transactionType.contentEquals("Withdrawal")){
-                source_layout.isVisible = false
-                destination_exposed_menu.isVisible = false
-                sourceTextInputTasker.isVisible = false
-                destinationExposedTasker.isVisible = false
+                source_layout.isGone = true
+                destination_exposed_menu.isGone = true
+                sourceTextInputTasker.isGone = true
+                destinationExposedTasker.isGone = true
                 // Spinner for source account
                 val spinnerAdapter = ArrayAdapter(requireContext(),
                         R.layout.cat_exposed_dropdown_popup_item, accounts)
@@ -712,8 +694,8 @@ class AddTransactionFragment: BaseFragment() {
                 }
                 addTransactionViewModel.isFromTasker.observe(viewLifecycleOwner){ isTask ->
                     if(isTask){
-                        destinationExposedTasker.isVisible = false
-                        sourceTextInputTasker.isVisible = false
+                        destinationExposedTasker.isGone = true
+                        sourceTextInputTasker.isGone = true
                     }
                 }
             }

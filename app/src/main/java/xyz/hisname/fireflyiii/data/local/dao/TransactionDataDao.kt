@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.data.local.dao
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.ObjectSum
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import java.math.BigDecimal
@@ -148,5 +149,13 @@ abstract class TransactionDataDao {
     @Query("SELECT COUNT(*) FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate)")
     abstract suspend fun getTransactionByDestinationIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
 
+
+    // In memory Database methods
+    @Query("SELECT COUNT(*) FROM transactionTable")
+    // suspend isn't supported for flow
+    abstract fun getMemoryCount(): Flow<Int>
+
+    @Query("SELECT * FROM transactionTable")
+    abstract suspend fun getMemoryDatabase(): List<Transactions>
 
 }

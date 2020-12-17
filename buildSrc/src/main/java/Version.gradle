@@ -16,6 +16,7 @@ ext {
         implementation Dependencies.androidxWork
         implementation Dependencies.swipeRefreshLayout
         implementation Dependencies.biometricLib
+        implementation Dependencies.viewPager2Lib
         // Lifecycle
         implementation Dependencies.lifecycleLibs
         implementation Dependencies.lifecyclerLiveDataCore

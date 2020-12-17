@@ -17,6 +17,10 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.debounce
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.math.BigDecimal
+import java.time.OffsetDateTime
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.random.Random
 
 @Suppress("RedundantSuspendModifier")
 class TransactionRepository(private val transactionDao: TransactionDataDao,
@@ -30,7 +34,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         transactionDao.insert(transactionIndex)
     }
 
-    suspend fun transactionCount(startDate: String, endDate: String,source: String): Int {
+    suspend fun transactionCount(startDate: String, endDate: String, source: String): Int {
         return transactionDao.getTransactionByDateCount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(source))
     }
@@ -57,7 +61,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     suspend fun getUniqueBudgetByDate(startDate: String, endDate: String, currencyCode: String,
                                       transactionType: String)= transactionDao.getUniqueBudgetByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
+            DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
 
     suspend fun getTransactionByJournalId(journalId: Long) = transactionDao.getTransactionByJournalId(journalId)
 
@@ -100,10 +104,10 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     suspend fun getDestinationAccountByTypeAndDate(startDate: String, endDate: String,
-                                              currencyCode: String,
-                                              transactionType: String) =
+                                                   currencyCode: String,
+                                                   transactionType: String) =
             transactionDao.getDestinationAccountByTypeAndDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
 
 
     suspend fun getUniqueCategoryBySourceAndDateAndType(accountId: Long,
@@ -115,8 +119,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     transactionType)
 
     suspend fun getUniqueCategoryByDestinationAndDateAndType(accountId: Long,
-                                                        startDate: String, endDate: String,
-                                                        transactionType: String) =
+                                                             startDate: String, endDate: String,
+                                                             transactionType: String) =
             transactionDao.getUniqueCategoryByDestinationAndDateAndType(accountId,
                     DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),
@@ -124,15 +128,15 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
 
     suspend fun getUniqueBudgetBySourceAndDateAndType(accountId: Long,
-                                                       startDate: String, endDate: String,
-                                                       transactionType: String) =
+                                                      startDate: String, endDate: String,
+                                                      transactionType: String) =
             transactionDao.getUniqueBudgetBySourceAndDateAndType(accountId,
                     DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
 
     suspend fun getUniqueBudgetByDestinationAndDateAndType(accountId: Long,
-                                                      startDate: String, endDate: String,
-                                                      transactionType: String) =
+                                                           startDate: String, endDate: String,
+                                                           transactionType: String) =
             transactionDao.getUniqueBudgetByDestinationAndDateAndType(accountId,
                     DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), transactionType)
@@ -144,7 +148,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     }
 
     suspend fun getUniqueBudgetByDateAndType(startDate: String, endDate: String,
-                                               currencyCode: String, transactionType: String): List<ObjectSum>{
+                                             currencyCode: String, transactionType: String): List<ObjectSum>{
         return transactionDao.getUniqueBudgetByDateAndType(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, convertString(transactionType))
     }
@@ -172,6 +176,101 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             handleSearch(query)
         }
         return transactionDao.getTransactionByDescription("%$query%")
+    }
+
+    suspend fun getMemoryCount() = transactionDao.getMemoryCount()
+
+    suspend fun addSplitTransaction(groupTitle: String){
+        val dynamicParams = HashMap<String, String>()
+        val transactionList = transactionDao.getMemoryDatabase()
+        transactionList.forEachIndexed { index, latest ->
+            for(i in 0..index){
+                val transactionTags = if(latest.tags.isNullOrEmpty()){
+                    null
+                } else {
+                    // Remove [ and ] from beginning and end of string
+                    val beforeTags = latest.tags.toString().substring(1)
+                    beforeTags.substring(0, beforeTags.length - 1)
+                }
+                dynamicParams["transactions[$i][type]"] = convertString(latest.transactionType)
+                dynamicParams["transactions[$i][description]"] = latest.description
+                dynamicParams["transactions[$i][date]"] = latest.date.toString()
+                val piggyBankName = latest.piggy_bank_name
+                if (piggyBankName != null){
+                    dynamicParams["transactions[$i][piggy_bank_name]"] = piggyBankName
+                }
+                dynamicParams["transactions[$i][amount]"] = latest.amount.toString()
+                val source = latest.source_name
+                if(source != null){
+                    dynamicParams["transactions[$i][source_name]"] = source
+                }
+                dynamicParams["transactions[$i][destination_name]"] = latest.destination_name
+                dynamicParams["transactions[$i][currency_code]"] = latest.currency_code
+                val category = latest.category_name
+                if(category != null){
+                    dynamicParams["transactions[$i][category_name]"] = category
+                }
+                if (transactionTags != null){
+                    dynamicParams["transactions[$i][tags]"] = transactionTags
+                }
+                val budgetName = latest.budget_name
+                if(budgetName != null){
+                    dynamicParams["transactions[$i][budget_name]"] = budgetName
+                }
+                val note = latest.notes
+                if(!note.isNullOrEmpty()){
+                    dynamicParams["transactions[$i][notes]"] = note
+                }
+            }
+        }
+        val network = transactionService.addSplitTransaction(groupTitle, dynamicParams)
+        val responseErrorBody = network.errorBody()
+        if(responseErrorBody != null){
+            // Ignore lint warning. False positive
+            // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
+            var errorMessage = String(responseErrorBody.bytes())
+            val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
+            errorMessage = when {
+                moshi?.errors?.transactions_currency != null -> moshi.errors.transactions_currency[0]
+                moshi?.errors?.piggy_bank_name != null -> moshi.errors.piggy_bank_name[0]
+                moshi?.errors?.transactions_destination_name != null -> moshi.errors.transactions_destination_name[0]
+                moshi?.errors?.transactions_source_name  != null -> moshi.errors.transactions_source_name[0]
+                moshi?.errors?.transaction_destination_id  != null -> moshi.errors.transaction_destination_id[0]
+                moshi?.errors?.transaction_amount != null -> moshi.errors.transaction_amount[0]
+                moshi?.errors?.description != null -> moshi.errors.description[0]
+                else -> moshi?.message ?: "The given data was invalid"
+            }
+        }
+        transactionDao.deleteTransaction(false)
+    }
+
+    suspend fun storeSplitTransaction(type: String, description: String,
+                                      date: String, time: String?, piggyBankName: String?, amount: String,
+                                      sourceName: String?, destinationName: String?, currencyName: String,
+                                      category: String?, tags: String?, budgetName: String?,
+                                      notes: String?){
+        val dateTime = if(time.isNullOrEmpty()){
+            DateTimeUtil.offsetDateTimeWithoutTime(date)
+        } else {
+            DateTimeUtil.mergeDateTimeToIso8601(date, time)
+        }
+        val transactionAmount = if(amount.isEmpty()){
+            0.0
+        } else {
+            amount.toDouble()
+        }
+        val tagsList = arrayListOf<String>()
+        if(tags != null){
+            tagsList.addAll(tags.split(",").map { it.trim() })
+        }
+        transactionDao.insert(Transactions(
+                Random.nextLong(), transactionAmount, 0, budgetName,
+                0, category, currencyName, 0, 0, "",
+                "", OffsetDateTime.parse(dateTime), description, 0, destinationName ?: "",
+                "", 0, "", "", 0.0, "",
+                "", 0, "", notes, 0, "", 0,
+                sourceName, "", tagsList, type, 0, piggyBankName, true
+        ))
     }
 
     suspend fun addTransaction(type: String, description: String,
@@ -207,8 +306,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
         return try {
             val networkCall = transactionService.updateTransaction(getTransactionIdFromJournalId(transactionId),
-                    convertString(type),description, dateTime, piggyBankName,
-                    amount.replace(',', '.'),sourceName,destinationName,currencyName,
+                    convertString(type), description, dateTime, piggyBankName,
+                    amount.replace(',', '.'), sourceName, destinationName, currencyName,
                     category, tags, budgetName, notes)
             parseResponse(networkCall)
         } catch (exception: Exception){
@@ -268,7 +367,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val transactionData: MutableList<TransactionData> = arrayListOf()
             val networkCall = transactionService.getPaginatedTransactions(startDate, endDate,
                     convertString(sourceName), 1)
-            networkCall.body()?.data?.forEach {  transaction ->
+            networkCall.body()?.data?.forEach { transaction ->
                 transactionData.add(transaction)
             }
             val responseBody = networkCall.body()
@@ -290,7 +389,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                             data.transactionAttributes.transactions[0].transaction_journal_id))
                 }
             }
-        } catch(exception: Exception){ }
+        } catch (exception: Exception){ }
     }
 
     private suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?, transactionType: String): Int{
@@ -302,6 +401,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
     }
 
-    private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
+    private fun convertString(type: String) = type.substring(0, 1).toLowerCase() + type.substring(1).toLowerCase()
 
 }
