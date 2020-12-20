@@ -1,9 +1,10 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
+import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.ObjectSum
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import java.math.BigDecimal
@@ -27,10 +28,10 @@ abstract class TransactionDataDao {
     abstract suspend fun getTransactionListWithCurrencyAndDateCount(startDate: String, endDate: String,transactionType: String, currencyCode: String): Int
 
     // Takes transaction id as parameter and return transaction journal id
-    @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId = :journalId")
+    @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId =:journalId")
     abstract fun getTransactionIdFromJournalId(journalId: Long): Long
 
-    @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
+    @Query("SELECT * FROM transactionTable WHERE transaction_journal_id =:journalId")
     abstract fun getTransactionByJournalId(journalId: Long): Transactions
 
     // That is a really loooooooong name
@@ -86,11 +87,8 @@ abstract class TransactionDataDao {
     @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate)")
     abstract suspend fun getTransactionByDateCount(startDate: String, endDate: String): Int
 
-    @Query("SELECT * FROM transactionTable WHERE transaction_journal_id = :journalId")
-    abstract fun getTransactionFromJournalId(journalId: Long): MutableList<Transactions>
-
     @Query("DELETE FROM transactionTable WHERE transaction_journal_id = :journalId")
-    abstract fun deleteTransactionByJournalId(journalId: Long): Int
+    abstract suspend fun deleteTransactionByJournalId(journalId: Long): Int
 
     @Query("DELETE FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType AND isPending IS NOT :isPending")
     abstract suspend fun deleteTransactionsByDate(startDate: String?, endDate: String?,transactionType: String, isPending: Boolean = true): Int
@@ -150,12 +148,20 @@ abstract class TransactionDataDao {
     abstract suspend fun getTransactionByDestinationIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
 
 
-    // In memory Database methods
-    @Query("SELECT COUNT(*) FROM transactionTable")
-    // suspend isn't supported for flow
-    abstract fun getMemoryCount(): Flow<Int>
+    // Temporary Database methods
+    @Query("SELECT COUNT(*) FROM transactionIndexTable WHERE transactionJournalId=:id")
+    abstract fun getPendingTransactionFromId(id: Long): LiveData<Int>
 
-    @Query("SELECT * FROM transactionTable")
-    abstract suspend fun getMemoryDatabase(): List<Transactions>
+    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.splitId WHERE transactionIndexTable.transactionJournalId =:id")
+    abstract suspend fun getPendingTransactionFromMasterIdId(id: Long): List<Transactions>
+
+    @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId=:id")
+    abstract suspend fun getTempIdFromMasterId(id: Long): List<Long>
+
+    @Query("DELETE FROM transactionIndexTable WHERE splitId=:id")
+    abstract suspend fun deleteTempMasterId(id: Long)
+
+    @Query("SELECT attachment FROM transactionTable WHERE transaction_journal_id =:journalId")
+    abstract suspend fun getAttachmentByJournalId(journalId: Long): List<String>
 
 }

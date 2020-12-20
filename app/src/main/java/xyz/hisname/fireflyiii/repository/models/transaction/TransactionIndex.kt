@@ -9,4 +9,6 @@ import com.squareup.moshi.JsonClass
 data class TransactionIndex(
         @PrimaryKey(autoGenerate = false)
         val transactionId: Long,
-        val transactionJournalId: Long)
+        val transactionJournalId: Long,
+        val splitId: Long
+)

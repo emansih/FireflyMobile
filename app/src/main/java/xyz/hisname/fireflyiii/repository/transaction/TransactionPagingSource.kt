@@ -35,10 +35,10 @@ class TransactionPagingSource(private val transactionService: TransactionService
                             DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(transactionType))
                 }
                 responseBody.data.forEach { data ->
-                    data.transactionAttributes?.transactions?.forEach { transactions ->
+                    data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
                         transactionDao.insert(TransactionIndex(data.transactionId,
-                                transactions.transaction_journal_id))
+                                transactions.transaction_journal_id, 0))
                     }
                 }
             }

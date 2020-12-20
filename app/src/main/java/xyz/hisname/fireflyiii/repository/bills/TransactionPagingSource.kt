@@ -36,7 +36,7 @@ class TransactionPagingSource(private val billService: BillsService,
                     data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
                         transactionDao.insert(TransactionIndex(data.transactionId,
-                                transactions.transaction_journal_id))
+                                transactions.transaction_journal_id, 0))
                     }
                 }
             }

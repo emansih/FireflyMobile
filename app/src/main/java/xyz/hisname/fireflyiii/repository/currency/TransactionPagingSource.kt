@@ -40,7 +40,7 @@ class TransactionPagingSource(private val currencyService: CurrencyService,
                         transactionDao.insert(transactions)
                     }
                     transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes.transactions[0].transaction_journal_id))
+                            data.transactionAttributes.transactions[0].transaction_journal_id, 0))
                 }
             }
             val pagination = responseBody?.meta?.pagination

@@ -121,7 +121,8 @@ class TransactionReceiver: BroadcastReceiver()  {
                                 OffsetDateTime.parse(dateTime), description, 0, destinationName,
                                 "", 0, "", "",  0.0, "","", 0,
                                 "", notes, 0, "", 0,
-                                sourceName, "", tagsList, transactionType, 0, piggyBank,true)
+                                sourceName, "", "",
+                                tagsList, transactionType, 0, piggyBank,true, arrayListOf())
                 )
             }
         }

@@ -69,7 +69,6 @@ class AddTransactionFragment: BaseFragment() {
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
     private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
-    private val isFromFragment by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
 
     private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
@@ -708,16 +707,7 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transaction_date_edittext.getString(), selectedTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, categoryName, transactionTags, budgetName, attachmentItemAdapter,
-                note_edittext.getString()).observe(viewLifecycleOwner){ response ->
-            if(response.first){
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                toastSuccess(response.second)
-                handleBack()
-            } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                toastInfo(response.second)
-            }
-        }
+                note_edittext.getString())
     }
 
     private fun updateData(piggyBank: String?, sourceAccount: String, destinationAccount: String,
@@ -767,15 +757,5 @@ class AddTransactionFragment: BaseFragment() {
                 .show()
     }
 
-    override fun handleBack() {
-        if(isFromFragment){
-            parentFragmentManager.popBackStack()
-        } else {
-            if(isTasker){
-                requireActivity().onBackPressed()
-            } else {
-                requireActivity().finish()
-            }
-        }
-    }
+    override fun handleBack() { }
 }

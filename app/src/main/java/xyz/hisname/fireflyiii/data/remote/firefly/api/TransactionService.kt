@@ -24,6 +24,7 @@ interface TransactionService {
     suspend fun addSplitTransaction(@Field("group_title") groupTitle: String,
                                     @QueryMap transactionData: Map<String, String?>): Response<TransactionSuccessModel>
 
+    @Deprecated("Switch to split transaction")
     @FormUrlEncoded
     @POST(TRANSACTION_API_ENDPOINT)
     suspend fun addTransaction(@Field("transactions[0][type]") type: String,

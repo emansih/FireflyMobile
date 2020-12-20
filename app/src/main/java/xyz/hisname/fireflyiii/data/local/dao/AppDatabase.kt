@@ -54,7 +54,6 @@ abstract class AppDatabase: RoomDatabase() {
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
-        @Volatile private var MEOMORY_INSTANCE: AppDatabase? = null
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this){
@@ -67,16 +66,5 @@ abstract class AppDatabase: RoomDatabase() {
         }
 
         fun clearDb(context: Context) = getInstance(context).clearAllTables()
-
-        fun getMemoryInstance(context: Context): AppDatabase{
-            return MEOMORY_INSTANCE ?: synchronized(this){
-                MEOMORY_INSTANCE ?: Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                        .setQueryExecutor(Dispatchers.IO.asExecutor())
-                        .build().also { MEOMORY_INSTANCE = it }
-            }
-        }
-
-
-        fun clearMemoryInstance(context: Context) = getMemoryInstance(context).clearAllTables()
     }
 }

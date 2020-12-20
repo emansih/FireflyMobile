@@ -3,6 +3,7 @@ package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 import android.app.Application
 import android.net.Uri
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.work.Data
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -12,10 +13,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.TmpDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.*
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
@@ -27,19 +30,26 @@ import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import java.net.UnknownHostException
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.random.Random
 
 class AddTransactionViewModel(application: Application): BaseViewModel(application) {
 
+
+    private val temporaryDb = TmpDatabase.getInstance(application)
+    private val transactionService = genericService().create(TransactionService::class.java)
+
     private val transactionRepository = TransactionRepository(
             AppDatabase.getInstance(application).transactionDataDao(),
-            genericService().create(TransactionService::class.java)
+            transactionService
     )
 
-    val inMemoryDb = AppDatabase.getMemoryInstance(application)
-
     private val temporaryTransactionRepository = TransactionRepository(
-            inMemoryDb.transactionDataDao(),
-            genericService().create(TransactionService::class.java)
+            temporaryDb.transactionDataDao(), transactionService
+    )
+
+    private val attachmentRepository = AttachmentRepository(
+            AppDatabase.getInstance(application).attachmentDataDao(),
+            genericService().create(AttachmentService::class.java)
     )
 
     private val currencyRepository = CurrencyRepository(
@@ -95,6 +105,13 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val transactionBundle = MutableLiveData<Bundle>()
     val isFromTasker = MutableLiveData<Boolean>()
     val saveData = MutableLiveData<Boolean>()
+    private var transactionMasterId = 0L
+
+    fun saveData(masterId: Long){
+        transactionMasterId = masterId
+        isLoading.postValue(true)
+        saveData.postValue(true)
+    }
 
     fun parseBundle(bundle: Bundle?){
         if(bundle != null){
@@ -142,85 +159,71 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         }
     }
 
-    fun memoryCount(): LiveData<Int>{
-        val count = MutableLiveData<Int>()
-        viewModelScope.launch(Dispatchers.IO){
-            temporaryTransactionRepository.getMemoryCount().distinctUntilChanged().collectLatest {  number ->
-                count.postValue(number)
+    fun memoryCount() = temporaryTransactionRepository.getPendingTransactionFromId(transactionMasterId)
+
+    fun uploadTransaction(groupTitle: String): LiveData<Pair<Boolean,String>>{
+        val apiResponse = MutableLiveData<Pair<Boolean,String>>()
+        viewModelScope.launch(CoroutineExceptionHandler { _, _ -> }){
+            val addTransaction = temporaryTransactionRepository.addSplitTransaction(groupTitle, transactionMasterId)
+            when {
+                addTransaction.response != null -> {
+                    apiResponse.postValue(Pair(true,
+                            getApplication<Application>().resources.getString(R.string.transaction_added)))
+                    addTransaction.response.data.transactionAttributes.transactions.forEach { transaction ->
+                        if(!transaction.internal_reference.isNullOrEmpty()){
+                            val uriArray = temporaryTransactionRepository.getTemporaryAttachment(transaction.internal_reference.toLong())
+                            if(!uriArray.isNullOrEmpty()){
+                                // Remove [[" and "]] in the string
+                                val beforeArray = uriArray.toString().substring(3)
+                                val modifiedArray = beforeArray.substring(0, beforeArray.length - 3)
+                                val arrayOfString = modifiedArray.split(",")
+                                val arrayOfUri = arrayListOf<Uri>()
+                                arrayOfString.forEach { array ->
+                                    arrayOfUri.add(array.toUri())
+                                }
+                                AttachmentWorker.initWorker(arrayOfUri,
+                                        transaction.transaction_journal_id, getApplication<Application>(),
+                                        AttachableType.TRANSACTION)
+                            }
+                        }
+                    }
+                    temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
+                }
+                addTransaction.errorMessage != null -> {
+                    apiResponse.postValue(Pair(false, addTransaction.errorMessage))
+                    temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
+                }
+                addTransaction.error != null -> {
+                    if(addTransaction.error is UnknownHostException){
+                        TransactionWorker.initWorker(getApplication(), groupTitle,
+                                transactionMasterId)
+                        apiResponse.postValue(Pair(true,
+                                getApplication<Application>().getString(R.string.data_added_when_user_online,
+                                        groupTitle)))
+                    } else {
+                        apiResponse.postValue(Pair(false, addTransaction.error.localizedMessage))
+                        temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
+                    }
+                }
+                else -> {
+                    apiResponse.postValue(Pair(false, "Error adding transaction"))
+                    temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
+                }
             }
         }
-        return count
-    }
-
-    fun uploadTransaction(groupTitle: String){
-        viewModelScope.launch(Dispatchers.IO){
-            temporaryTransactionRepository.addSplitTransaction(groupTitle)
-        }
+        return apiResponse
     }
 
     fun addTransaction(type: String, description: String,
                        date: String, time: String, piggyBankName: String?, amount: String,
                        sourceName: String?, destinationName: String?,
                        category: String?, tags: String?, budgetName: String?,
-                       fileUri: ArrayList<Uri>, notes: String): LiveData<Pair<Boolean,String>>{
-        val apiResponse = MutableLiveData<Pair<Boolean,String>>()
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
-            throwable.printStackTrace()
-        }){
+                       fileUri: ArrayList<Uri>, notes: String){
+        viewModelScope.launch(Dispatchers.IO){
             temporaryTransactionRepository.storeSplitTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
-                    category, tags, budgetName, notes)
-        /* val addTransaction = transactionRepository.addTransaction(type,description, date, time, piggyBankName,
-                    amount.replace(',', '.'), sourceName, destinationName, currency,
-                    category, tags, budgetName, notes)
-            var journalId = 0L
-            when {
-                addTransaction.response != null -> {
-                    apiResponse.postValue(Pair(true,
-                            getApplication<Application>().resources.getString(R.string.transaction_added)))
-                    addTransaction.response.data.transactionAttributes.transactions.forEach { transactions ->
-                        journalId = transactions.transaction_journal_id
-                    }
-                    if(fileUri.isNotEmpty()){
-                        AttachmentWorker.initWorker(fileUri, journalId, getApplication<Application>(),
-                                AttachableType.TRANSACTION)
-                    }
-                }
-                addTransaction.errorMessage != null -> {
-                    apiResponse.postValue(Pair(false, addTransaction.errorMessage))
-                }
-                addTransaction.error != null -> {
-                    if(addTransaction.error is UnknownHostException){
-                        val transactionWorkManagerId = ThreadLocalRandom.current().nextLong()
-                        val transactionData = Data.Builder()
-                                .putString("description", description)
-                                .putString("date", date)
-                                .putString("time", time)
-                                .putString("amount", amount)
-                                .putString("currency", currency)
-                                .putString("tags", tags)
-                                .putString("categoryName", category)
-                                .putString("budgetName", budgetName)
-                                .putLong("transactionWorkManagerId", transactionWorkManagerId)
-                                .putString("sourceName", sourceName)
-                                .putString("destinationName", destinationName)
-                                .putString("piggyBankName", piggyBankName)
-                                .putString("notes", notes)
-                        TransactionWorker.initWorker(getApplication(), transactionData,
-                                type, transactionWorkManagerId, fileUri)
-                        apiResponse.postValue(Pair(true,
-                                getApplication<Application>().getString(R.string.data_added_when_user_online,
-                                        type)))
-                    } else {
-                        apiResponse.postValue(Pair(false, addTransaction.error.localizedMessage))
-                    }
-                }
-                else -> {
-                    apiResponse.postValue(Pair(false, "Error adding transaction"))
-                }
-            }*/
+                    category, tags, budgetName, notes, fileUri, transactionMasterId)
         }
-        return apiResponse
     }
 
     fun updateTransaction(transactionId: Long, type: String, description: String,

@@ -6,16 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.add_transaction.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.util.extension.create
-import xyz.hisname.fireflyiii.util.extension.getString
+import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastInfo
+import kotlin.random.Random
 
-class AddTransactionPager: Fragment() {
+class AddTransactionPager: BaseFragment() {
 
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId") ?: 0 }
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
@@ -42,10 +42,20 @@ class AddTransactionPager: Fragment() {
            // TODO
         }
         addTransactionText.setOnClickListener {
-            addTransactionViewModel.saveData.postValue(true)
+            val masterId = Random.nextLong()
+            addTransactionViewModel.saveData(masterId)
             addTransactionViewModel.memoryCount().observe(viewLifecycleOwner){ count ->
                 if(adapter.itemCount == count){
-                    addTransactionViewModel.uploadTransaction(group_edittext.getString())
+                    addTransactionViewModel.uploadTransaction(group_edittext.getString()).observe(viewLifecycleOwner){ response ->
+                        if(response.first){
+                            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                            toastSuccess(response.second)
+                            handleBack()
+                        } else {
+                            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                            toastInfo(response.second)
+                        }
+                    }
                 }
             }
         }
@@ -81,5 +91,17 @@ class AddTransactionPager: Fragment() {
                 tab.text = "Split " + (position + 1)
             }
         }.attach()
+    }
+
+    override fun handleBack() {
+        if(isFromFragment){
+            parentFragmentManager.popBackStack()
+        } else {
+            if(isTasker){
+                requireActivity().onBackPressed()
+            } else {
+                requireActivity().finish()
+            }
+        }
     }
 }

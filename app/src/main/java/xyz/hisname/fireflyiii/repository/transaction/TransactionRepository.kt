@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
+import android.net.Uri
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,8 +19,9 @@ import xyz.hisname.fireflyiii.util.extension.debounce
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.math.abs
 import kotlin.random.Random
 
 @Suppress("RedundantSuspendModifier")
@@ -64,6 +66,8 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
 
     suspend fun getTransactionByJournalId(journalId: Long) = transactionDao.getTransactionByJournalId(journalId)
+
+    suspend fun getTemporaryAttachment(journalId: Long) = transactionDao.getAttachmentByJournalId(journalId)
 
     suspend fun getTransactionIdFromJournalId(journalId: Long) =
             transactionDao.getTransactionIdFromJournalId(journalId)
@@ -166,7 +170,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                             responseBody.data.forEach { data ->
                                 data.transactionAttributes.transactions.forEach { transaction ->
                                     transactionDao.insert(transaction)
-                                    transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id))
+                                    transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id, 0))
                                 }
                             }
                         }
@@ -178,77 +182,76 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return transactionDao.getTransactionByDescription("%$query%")
     }
 
-    suspend fun getMemoryCount() = transactionDao.getMemoryCount()
+    fun getPendingTransactionFromId(id: Long) = transactionDao.getPendingTransactionFromId(id)
 
-    suspend fun addSplitTransaction(groupTitle: String){
+    suspend fun deletePendingTransactionFromId(id: Long){
+        transactionDao.getTempIdFromMasterId(id).forEach { transactionId ->
+            transactionDao.deleteTransactionByJournalId(transactionId)
+        }
+        transactionDao.deleteTempMasterId(id)
+    }
+
+    suspend fun addSplitTransaction(groupTitle: String,
+                                    masterTransactionId: Long): ApiResponses<TransactionSuccessModel>{
         val dynamicParams = HashMap<String, String>()
-        val transactionList = transactionDao.getMemoryDatabase()
-        transactionList.forEachIndexed { index, latest ->
-            for(i in 0..index){
-                val transactionTags = if(latest.tags.isNullOrEmpty()){
-                    null
-                } else {
-                    // Remove [ and ] from beginning and end of string
-                    val beforeTags = latest.tags.toString().substring(1)
-                    beforeTags.substring(0, beforeTags.length - 1)
-                }
-                dynamicParams["transactions[$i][type]"] = convertString(latest.transactionType)
-                dynamicParams["transactions[$i][description]"] = latest.description
-                dynamicParams["transactions[$i][date]"] = latest.date.toString()
-                val piggyBankName = latest.piggy_bank_name
-                if (piggyBankName != null){
-                    dynamicParams["transactions[$i][piggy_bank_name]"] = piggyBankName
-                }
-                dynamicParams["transactions[$i][amount]"] = latest.amount.toString()
-                val source = latest.source_name
-                if(source != null){
-                    dynamicParams["transactions[$i][source_name]"] = source
-                }
-                dynamicParams["transactions[$i][destination_name]"] = latest.destination_name
-                dynamicParams["transactions[$i][currency_code]"] = latest.currency_code
-                val category = latest.category_name
-                if(category != null){
-                    dynamicParams["transactions[$i][category_name]"] = category
-                }
-                if (transactionTags != null){
-                    dynamicParams["transactions[$i][tags]"] = transactionTags
-                }
-                val budgetName = latest.budget_name
-                if(budgetName != null){
-                    dynamicParams["transactions[$i][budget_name]"] = budgetName
-                }
-                val note = latest.notes
-                if(!note.isNullOrEmpty()){
-                    dynamicParams["transactions[$i][notes]"] = note
-                }
+        val tempTransactionList = transactionDao.getPendingTransactionFromMasterIdId(masterTransactionId)
+        tempTransactionList.forEachIndexed { index, latest ->
+            val transactionTags = if(latest.tags.isNullOrEmpty()){
+                null
+            } else {
+                // Remove [ and ] from beginning and end of string
+                val beforeTags = latest.tags.toString().substring(1)
+                beforeTags.substring(0, beforeTags.length - 1)
+            }
+            dynamicParams["transactions[$index][type]"] = convertString(latest.transactionType)
+            dynamicParams["transactions[$index][description]"] = latest.description
+            dynamicParams["transactions[$index][date]"] = latest.date.toString()
+            val piggyBankName = latest.piggy_bank_name
+            if (piggyBankName != null){
+                dynamicParams["transactions[$index][piggy_bank_name]"] = piggyBankName
+            }
+            dynamicParams["transactions[$index][amount]"] = latest.amount.toString()
+            val source = latest.source_name
+            if(source != null){
+                dynamicParams["transactions[$index][source_name]"] = source
+            }
+            dynamicParams["transactions[$index][destination_name]"] = latest.destination_name
+            dynamicParams["transactions[$index][currency_code]"] = latest.currency_code
+            val category = latest.category_name
+            if(category != null){
+                dynamicParams["transactions[$index][category_name]"] = category
+            }
+            if (transactionTags != null){
+                dynamicParams["transactions[$index][tags]"] = transactionTags
+            }
+            val budgetName = latest.budget_name
+            if(budgetName != null){
+                dynamicParams["transactions[$index][budget_name]"] = budgetName
+            }
+            val note = latest.notes
+            if(!note.isNullOrEmpty()){
+                dynamicParams["transactions[$index][notes]"] = note
+            }
+            // !HACK!
+            val attachment = latest.attachment
+            if(!attachment.isNullOrEmpty()){
+                dynamicParams["transactions[$index][internal_reference]"] = latest.transaction_journal_id.toString()
             }
         }
         val network = transactionService.addSplitTransaction(groupTitle, dynamicParams)
-        val responseErrorBody = network.errorBody()
-        if(responseErrorBody != null){
-            // Ignore lint warning. False positive
-            // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
-            var errorMessage = String(responseErrorBody.bytes())
-            val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(errorMessage)
-            errorMessage = when {
-                moshi?.errors?.transactions_currency != null -> moshi.errors.transactions_currency[0]
-                moshi?.errors?.piggy_bank_name != null -> moshi.errors.piggy_bank_name[0]
-                moshi?.errors?.transactions_destination_name != null -> moshi.errors.transactions_destination_name[0]
-                moshi?.errors?.transactions_source_name  != null -> moshi.errors.transactions_source_name[0]
-                moshi?.errors?.transaction_destination_id  != null -> moshi.errors.transaction_destination_id[0]
-                moshi?.errors?.transaction_amount != null -> moshi.errors.transaction_amount[0]
-                moshi?.errors?.description != null -> moshi.errors.description[0]
-                else -> moshi?.message ?: "The given data was invalid"
-            }
+        return try {
+             parseResponse(network)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
         }
-        transactionDao.deleteTransaction(false)
     }
 
+    // Individual fragment will store the response to DB
     suspend fun storeSplitTransaction(type: String, description: String,
                                       date: String, time: String?, piggyBankName: String?, amount: String,
                                       sourceName: String?, destinationName: String?, currencyName: String,
                                       category: String?, tags: String?, budgetName: String?,
-                                      notes: String?){
+                                      notes: String?, fileUri: ArrayList<Uri>, transactionMasterId: Long){
         val dateTime = if(time.isNullOrEmpty()){
             DateTimeUtil.offsetDateTimeWithoutTime(date)
         } else {
@@ -263,16 +266,25 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         if(tags != null){
             tagsList.addAll(tags.split(",").map { it.trim() })
         }
+        val fakeId = abs(Random.nextLong())
+        val arrayOfString = arrayListOf<String>()
+        fileUri.forEach {  uri ->
+            arrayOfString.add(uri.toString())
+        }
         transactionDao.insert(Transactions(
-                Random.nextLong(), transactionAmount, 0, budgetName,
+                fakeId, transactionAmount, 0, budgetName,
                 0, category, currencyName, 0, 0, "",
                 "", OffsetDateTime.parse(dateTime), description, 0, destinationName ?: "",
                 "", 0, "", "", 0.0, "",
                 "", 0, "", notes, 0, "", 0,
-                sourceName, "", tagsList, type, 0, piggyBankName, true
+                sourceName, "", "", tagsList, type, 0, piggyBankName, true, arrayOfString
+        ))
+        transactionDao.insert(TransactionIndex(
+                abs(Random.nextLong()), transactionMasterId, fakeId
         ))
     }
 
+    @Deprecated("Switch to split transaction")
     suspend fun addTransaction(type: String, description: String,
                                date: String, time: String?, piggyBankName: String?, amount: String,
                                sourceName: String?, destinationName: String?, currencyName: String,
@@ -334,11 +346,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
         if(responseBody != null && responseFromServer.isSuccessful){
-            responseBody.data.transactionAttributes.transactions.forEach { transaction ->
-                insertTransaction(transaction)
-                insertTransaction(TransactionIndex(responseBody.data.transactionId,
-                        transaction.transaction_journal_id))
-            }
             return ApiResponses(response = responseBody)
         } else {
             if(responseErrorBody != null){
@@ -351,6 +358,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     moshi?.errors?.piggy_bank_name != null -> moshi.errors.piggy_bank_name[0]
                     moshi?.errors?.transactions_destination_name != null -> moshi.errors.transactions_destination_name[0]
                     moshi?.errors?.transactions_source_name  != null -> moshi.errors.transactions_source_name[0]
+                    moshi?.errors?.transactions_source_id != null -> moshi.errors.transactions_source_id[0]
                     moshi?.errors?.transaction_destination_id  != null -> moshi.errors.transaction_destination_id[0]
                     moshi?.errors?.transaction_amount != null -> moshi.errors.transaction_amount[0]
                     moshi?.errors?.description != null -> moshi.errors.description[0]
@@ -386,7 +394,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 transactionData.forEach { data ->
                     transactionDao.insert(data.transactionAttributes.transactions[0])
                     transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes.transactions[0].transaction_journal_id))
+                            data.transactionAttributes.transactions[0].transaction_journal_id, 0))
                 }
             }
         } catch (exception: Exception){ }

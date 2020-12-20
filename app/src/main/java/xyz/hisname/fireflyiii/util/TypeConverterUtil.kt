@@ -1,5 +1,7 @@
 package xyz.hisname.fireflyiii.util
 
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.room.TypeConverter
 import com.squareup.moshi.*
 import java.math.BigDecimal

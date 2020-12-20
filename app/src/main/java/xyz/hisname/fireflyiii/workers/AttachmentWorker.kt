@@ -19,7 +19,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
 
 
     companion object {
-        fun initWorker(fileUri: ArrayList<Uri>, objectId: Long, context: Context, attachableType: AttachableType){
+        fun initWorker(fileUri: List<Uri>, objectId: Long, context: Context, attachableType: AttachableType){
             val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
             val battery = appPref.workManagerLowBattery
             val networkType = appPref.workManagerNetworkType

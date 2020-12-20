@@ -115,7 +115,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                         transactionDao.insert(transactions)
                         transactionDao.insert(TransactionIndex(
                                 transactionData.transactionId,
-                                transactions.transaction_journal_id
+                                transactions.transaction_journal_id, 0
                         ))
                     }
                 }

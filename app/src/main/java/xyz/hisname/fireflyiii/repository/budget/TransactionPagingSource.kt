@@ -44,7 +44,7 @@ class TransactionPagingSource(private val budgetService: BudgetService,
                         transactionDao.insert(transactions)
                     }
                     transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes.transactions.get(0).transaction_journal_id))
+                            data.transactionAttributes.transactions.get(0).transaction_journal_id, 0))
                 }
             }
             val pagination = responseBody?.meta?.pagination
