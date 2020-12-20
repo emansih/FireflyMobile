@@ -45,7 +45,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthSummaryFragment
-import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionPager
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -341,7 +341,7 @@ class TransactionFragment: BaseFragment(){
 
     private fun setupFab(){
         extendedFab.display{
-            val addTransaction = AddTransactionFragment()
+            val addTransaction = AddTransactionPager()
             addTransaction.arguments = bundleOf("transactionType" to transactionType, "SHOULD_HIDE" to true)
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, addTransaction)
