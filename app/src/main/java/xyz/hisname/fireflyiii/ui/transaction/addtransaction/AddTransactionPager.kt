@@ -40,7 +40,7 @@ class AddTransactionPager: BaseFragment() {
 
     private fun setToolbar(){
         materialToolbar.setNavigationOnClickListener {
-           // TODO
+           handleBack()
         }
         addTransactionText.setOnClickListener {
             val masterId = Random.nextLong()
