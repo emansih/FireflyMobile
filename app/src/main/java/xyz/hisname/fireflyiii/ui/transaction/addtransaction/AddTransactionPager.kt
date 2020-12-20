@@ -80,6 +80,7 @@ class AddTransactionPager: BaseFragment() {
             } else {
                 numTabs--
                 tabLayout.removeTabAt(tabLayout.selectedTabPosition)
+                adapter.setFragmentCount(numTabs)
             }
         }
         TabLayoutMediator(tabLayout, viewPagerLayout){ tab, position ->
