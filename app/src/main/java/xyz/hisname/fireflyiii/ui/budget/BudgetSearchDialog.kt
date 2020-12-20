@@ -46,22 +46,6 @@ class BudgetSearchDialog: BaseDialog() {
         }
         budgetAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
             swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
-            if(loadStates.refresh !is LoadState.Loading) {
-                if (budgetAdapter.itemCount < 1) {
-                    recycler_view.isGone = true
-                    listImage.isVisible = true
-                    listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
-                        icon = FontAwesome.Icon.faw_list
-                        sizeDp = 24
-                    })
-                    listText.isVisible = true
-                    listText.text = "No Budget Found"
-                } else {
-                    recycler_view.isVisible = true
-                    listImage.isGone = true
-                    listText.isGone = true
-                }
-            }
         }
     }
 
