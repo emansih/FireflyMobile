@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -82,6 +83,9 @@ class AddTransactionFragment: BaseFragment() {
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
+
+    private val splitTransactionButton by bindView<TextView>(R.id.addSplit)
+    private val deleteTransactionButton by bindView<TextView>(R.id.removeSplit)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -621,6 +625,15 @@ class AddTransactionFragment: BaseFragment() {
             attachment_information.adapter?.notifyDataSetChanged()
         }) { another: Int -> }
         setUi()
+        addSplit.setOnClickListener {
+            addTransactionViewModel.increaseTab.postValue(true)
+        }
+        removeSplit.setOnClickListener {
+            addTransactionViewModel.decreaseTab.postValue(true)
+        }
+        if(addTransactionViewModel.numTabs > 1){
+            removeSplit.isVisible = true
+        }
     }
 
     private fun contextSwitch(){

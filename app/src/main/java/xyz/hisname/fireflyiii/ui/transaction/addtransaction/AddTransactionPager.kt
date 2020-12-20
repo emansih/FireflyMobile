@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.add_transaction.*
@@ -62,7 +63,7 @@ class AddTransactionPager: BaseFragment() {
     }
 
     private fun setTabs(){
-        var numTabs = tabLayout.tabCount + 1
+        addTransactionViewModel.numTabs = tabLayout.tabCount + 1
         adapter = AddTransactionAdapter(this,
                 bundleOf("transactionJournalId" to transactionJournalId,
                         "FROM_TRANSACTION_ACTIVITY" to transactionActivity,
@@ -70,28 +71,31 @@ class AddTransactionPager: BaseFragment() {
                         "SHOULD_HIDE" to isFromFragment,
                         "isFromNotification" to isFromNotification, "isTasker" to isTasker))
         viewPagerLayout.adapter = adapter
-        splitTransactionButton.setOnClickListener {
-            numTabs++
-            adapter.setFragmentCount(numTabs)
-        }
-        deleteTransactionButton.setOnClickListener {
-            if(tabLayout.selectedTabPosition == 0){
-                toastInfo("Unable to remove first split")
-            } else {
-                numTabs--
-                tabLayout.removeTabAt(tabLayout.selectedTabPosition)
-                adapter.setFragmentCount(numTabs)
-            }
-        }
+
         TabLayoutMediator(tabLayout, viewPagerLayout){ tab, position ->
-            if(numTabs == 1){
+            if(addTransactionViewModel.numTabs == 1){
                 tab.text = "No split"
             } else {
                 transaction_group_layout.isVisible = true
-                deleteTransactionButton.isVisible = true
                 tab.text = "Split " + (position + 1)
             }
         }.attach()
+        addTransactionViewModel.increaseTab.observe(viewLifecycleOwner){
+            addTransactionViewModel.numTabs++
+            adapter.setFragmentCount(addTransactionViewModel.numTabs)
+        }
+        addTransactionViewModel.decreaseTab.observe(viewLifecycleOwner){
+            if(tabLayout.selectedTabPosition == 0){
+                toastInfo("Unable to remove first split")
+            } else {
+                addTransactionViewModel.numTabs--
+                tabLayout.removeTabAt(tabLayout.selectedTabPosition)
+                adapter.setFragmentCount(addTransactionViewModel.numTabs)
+                if(addTransactionViewModel.numTabs == 1){
+                    transaction_group_layout.isGone = true
+                }
+            }
+        }
     }
 
     override fun handleBack() {

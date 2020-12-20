@@ -105,6 +105,10 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val transactionBundle = MutableLiveData<Bundle>()
     val isFromTasker = MutableLiveData<Boolean>()
     val saveData = MutableLiveData<Boolean>()
+    val increaseTab = MutableLiveData<Boolean>()
+    val decreaseTab = MutableLiveData<Boolean>()
+    var numTabs = 0
+
     private var transactionMasterId = 0L
 
     fun saveData(masterId: Long){
