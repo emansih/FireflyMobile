@@ -16,14 +16,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:navigationIcon="@drawable/abc_ic_clear_material">
 
-        <TextView
+        <Button
             android:id="@+id/addTransactionText"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:text="Save"
-            style="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:layout_marginEnd="30dp"
             android:layout_gravity="end"
-            android:layout_marginEnd="30dp" />
+            android:textColor="@color/md_white_1000"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
     </com.google.android.material.appbar.MaterialToolbar>
 
     <com.google.android.material.tabs.TabLayout
