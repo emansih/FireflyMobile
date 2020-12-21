@@ -244,6 +244,7 @@ class AddTransactionFragment: BaseFragment() {
                         "", "", FileUtils.getFileName(requireContext(), uriArray) ?: "",
                         "", "", "", 0, "", "", ""), 0))
             }
+            attachmentItemAdapter.addAll(uri)
             attachment_information.adapter?.notifyDataSetChanged()
         }
     }

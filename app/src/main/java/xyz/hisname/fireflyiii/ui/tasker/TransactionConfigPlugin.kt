@@ -60,7 +60,7 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 "transactionBudget"  to taskerHelper.config.getIntent()?.getStringExtra("transactionBudget"),
                 "transactionPiggyBank" to taskerHelper.config.getIntent()?.getStringExtra("transactionPiggyBank"),
                 "transactionNote" to taskerHelper.config.getIntent()?.getStringExtra("transactionNote"),
-                "transactionUri" to taskerHelper.config.getIntent()?.getStringArrayExtra("transactionUri")
+                "transactionUri" to taskerHelper.config.getIntent()?.getSerializableExtra("transactionUri")
         ))
         addTransactionViewModel.transactionType.observe(this) { type ->
             if (type != null && type.isNotBlank()) {
