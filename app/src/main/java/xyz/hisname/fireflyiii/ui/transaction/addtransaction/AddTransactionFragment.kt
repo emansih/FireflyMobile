@@ -9,7 +9,6 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -84,9 +83,6 @@ class AddTransactionFragment: BaseFragment() {
     private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
-    private val splitTransactionButton by bindView<TextView>(R.id.addSplit)
-    private val deleteTransactionButton by bindView<TextView>(R.id.removeSplit)
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_add_transaction, container)
@@ -96,11 +92,11 @@ class AddTransactionFragment: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         if(isTasker){
-            // Disable file upload for now
-            add_attachment_button.isVisible = false
             addTransactionViewModel.transactionBundle.observe(viewLifecycleOwner) { bundle ->
                 addTransactionViewModel.parseBundle(bundle)
             }
+            addSplit.isGone = true
+            removeSplit.isGone = true
             setTaskerIcons()
             addTransactionViewModel.isFromTasker.postValue(true)
         }
@@ -123,7 +119,6 @@ class AddTransactionFragment: BaseFragment() {
         super.onCreate(savedInstanceState)
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                attachment_information.isVisible = true
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
                         "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
@@ -132,7 +127,6 @@ class AddTransactionFragment: BaseFragment() {
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
-            attachment_information.isVisible = true
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
@@ -243,6 +237,15 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionViewModel.transactionNote.observe(viewLifecycleOwner) { transactionNote ->
             note_edittext.setText(transactionNote)
         }
+
+        addTransactionViewModel.fileUri.observe(viewLifecycleOwner){ uri ->
+            uri.forEach { uriArray ->
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", "", FileUtils.getFileName(requireContext(), uriArray) ?: "",
+                        "", "", "", 0, "", "", ""), 0))
+            }
+            attachment_information.adapter?.notifyDataSetChanged()
+        }
     }
 
     private fun setFab(){
@@ -329,6 +332,7 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionViewModel.transactionBudget.postValue(budgetName)
         addTransactionViewModel.transactionCategory.postValue(categoryName)
         addTransactionViewModel.transactionNote.postValue(note_edittext.getString())
+        addTransactionViewModel.fileUri.postValue(attachmentItemAdapter)
         addTransactionViewModel.removeFragment.postValue(true)
     }
 

@@ -1,7 +1,7 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
+import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
@@ -10,13 +10,14 @@ import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginRunner
 import kotlinx.android.synthetic.main.activity_add_transaction.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 
 abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
         TActionRunner : TaskerPluginRunner<TInput, TOutput>,
-        THelper: TaskerPluginConfigHelper<TInput, TOutput, TActionRunner>>: TaskerPluginConfig<GetTransactionInput>, AppCompatActivity() {
+        THelper: TaskerPluginConfigHelper<TInput, TOutput, TActionRunner>>: TaskerPluginConfig<GetTransactionInput>, BaseActivity() {
 
     abstract fun navigateFragment()
 
@@ -34,6 +35,8 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
     private var transactionTags: String? = null
     private var transactionBudget: String? = null
     private var transactionCategory: String? = null
+    private var transactionNote: String? = null
+    private var transactionUri: List<String> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +58,9 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 "transactionCategory" to taskerHelper.config.getIntent()?.getStringExtra("transactionCategory"),
                 "transactionTags" to taskerHelper.config.getIntent()?.getStringExtra("transactionTags"),
                 "transactionBudget"  to taskerHelper.config.getIntent()?.getStringExtra("transactionBudget"),
-                "transactionPiggyBank" to taskerHelper.config.getIntent()?.getStringExtra("transactionPiggyBank")
+                "transactionPiggyBank" to taskerHelper.config.getIntent()?.getStringExtra("transactionPiggyBank"),
+                "transactionNote" to taskerHelper.config.getIntent()?.getStringExtra("transactionNote"),
+                "transactionUri" to taskerHelper.config.getIntent()?.getStringArrayExtra("transactionUri")
         ))
         addTransactionViewModel.transactionType.observe(this) { type ->
             if (type != null && type.isNotBlank()) {
@@ -129,6 +134,22 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
             }
         }
 
+        addTransactionViewModel.transactionNote.observe(this){ note ->
+            if (note != null && note.isNotBlank()) {
+                transactionNote = note
+            }
+        }
+
+        addTransactionViewModel.fileUri.observe(this){ uriArray ->
+            if(uriArray != null && uriArray.isNotEmpty()){
+                val arrayOfString = arrayListOf<String>()
+                uriArray.forEach {  uri ->
+                    arrayOfString.add(uri.toString())
+                }
+                transactionUri = arrayOfString
+            }
+        }
+
         addTransactionViewModel.removeFragment.observe(this){ remove ->
             if(remove) {
                 taskerHelper.finishForTasker()
@@ -147,5 +168,5 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 transactionType, transactionDescription, transactionAmount,
                 transactionDate, transactionSourceAccount, transactionDestinationAccount,
                 transactionPiggyBank, transactionTime, transactionCurrency, transactionTags,
-                transactionBudget, transactionCategory))
+                transactionBudget, transactionCategory, transactionNote, transactionUri))
 }

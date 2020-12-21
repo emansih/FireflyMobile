@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.lifecycle.*
-import androidx.work.Data
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -29,8 +28,6 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import java.net.UnknownHostException
-import java.util.concurrent.ThreadLocalRandom
-import kotlin.random.Random
 
 class AddTransactionViewModel(application: Application): BaseViewModel(application) {
 
@@ -100,7 +97,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val transactionTags = MutableLiveData<String?>()
     val transactionBudget = MutableLiveData<String>()
     val transactionNote = MutableLiveData<String>()
-    val fileUri = MutableLiveData<String?>()
+    val fileUri = MutableLiveData<List<Uri>>()
     val removeFragment = MutableLiveData<Boolean>()
     val transactionBundle = MutableLiveData<Bundle>()
     val isFromTasker = MutableLiveData<Boolean>()
@@ -137,9 +134,17 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             transactionTags.postValue(bundle.getString("transactionTags"))
             transactionBudget.postValue(bundle.getString("transactionBudget"))
             transactionCategory.postValue(bundle.getString("transactionCategory"))
-            transactionNote.postValue(bundle.getString("transactionNotes"))
+            transactionNote.postValue(bundle.getString("transactionNote"))
             transactionSourceAccount.postValue(bundle.getString("transactionSourceAccount"))
             transactionDestinationAccount.postValue(bundle.getString("transactionDestinationAccount"))
+            val transactionUriBundle = bundle.getStringArray("transactionUri")
+            if(transactionUriBundle != null){
+                val uriArray = arrayListOf<Uri>()
+                transactionUriBundle.forEach { uri ->
+                    uriArray.add(uri.toUri())
+                }
+                fileUri.postValue(uriArray)
+            }
         }
     }
 

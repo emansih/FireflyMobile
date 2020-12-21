@@ -36,6 +36,9 @@ class AddTransactionPager: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTabs()
         setToolbar()
+        if(isTasker){
+            tabLayout.isGone = true
+        }
     }
 
     private fun setToolbar(){

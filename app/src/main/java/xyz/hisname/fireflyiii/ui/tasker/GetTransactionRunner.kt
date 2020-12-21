@@ -3,6 +3,8 @@ package xyz.hisname.fireflyiii.ui.tasker
 import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerAction
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
@@ -19,8 +21,10 @@ import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.network.CustomCa
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import java.io.File
 
 class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTransactionOutput>() {
@@ -51,7 +55,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                      "transactionDescription", "transactionAmount", "transactionDate", "transactionTime",
                      "transactionPiggyBank", "transactionSourceAccount",
                      "transactionDestinationAccount", "transactionCurrency", "transactionTags",
-                     "transactionBudget", "transactionCategory", "transactionNotes"))
+                     "transactionBudget", "transactionCategory", "transactionNote", "transactionUri"))
     }
 
     override fun run(context: Context, input: TaskerInput<GetTransactionInput>): TaskerPluginResult<GetTransactionOutput> {
@@ -74,27 +78,38 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val transactionBudget = input.regular.transactionBudget
         val transactionCategory = input.regular.transactionCategory
         val transactionNotes = input.regular.transactionNote
+        val fileUri = input.regular.transactionUri
+        val uriArray = arrayListOf<Uri>()
+        fileUri.forEach { uri ->
+            uriArray.add(uri.toUri())
+        }
         var taskerResult: TaskerPluginResult<GetTransactionOutput>
         runBlocking {
             taskerResult = addTransaction(transactionType, transactionDescription, transactionDate, transactionTime,
                     transactionPiggyBank, transactionAmount, transactionSourceAccount,
                     transactionDestinationAccount, transactionCurrency, transactionCategory,
-                    transactionTags, transactionBudget, transactionNotes) as TaskerPluginResult<GetTransactionOutput>
+                    transactionTags, transactionBudget, transactionNotes, uriArray, context) as TaskerPluginResult<GetTransactionOutput>
         }
-
         return taskerResult
     }
 
     private suspend fun addTransaction(type: String, description: String,
                                        date: String, time: String?, piggyBankName: String?, amount: String,
                                        sourceName: String?, destinationName: String?, currencyName: String,
-                                       category: String?, tags: String?, budgetName: String?, notes: String?): TaskerPluginResult<Unit>{
+                                       category: String?, tags: String?, budgetName: String?,
+                                       notes: String?, fileUri: List<Uri>, context: Context): TaskerPluginResult<Unit>{
 
         val transactionRepository = TransactionRepository(transactionDatabase, genericService().create(TransactionService::class.java))
-        val addTransaction = transactionRepository.addTransaction(type,description, date, time,  piggyBankName, amount.replace(',', '.'),
-                sourceName, destinationName, currencyName, category, tags, budgetName, notes)
+        val addTransaction = transactionRepository.addTransaction(type,description, date, time,
+                piggyBankName, amount, sourceName, destinationName, currencyName, category, tags, budgetName, notes)
         return when {
             addTransaction.response != null -> {
+                if(fileUri.isNotEmpty()){
+                    addTransaction.response.data.transactionAttributes.transactions.forEach { transactions ->
+                        AttachmentWorker.initWorker(fileUri, transactions.transaction_journal_id,
+                                context, AttachableType.TRANSACTION)
+                    }
+                }
                 TaskerPluginResultSucess(GetTransactionOutput(addTransaction.response.toString())) as TaskerPluginResult<Unit>
             }
             addTransaction.errorMessage != null -> {
