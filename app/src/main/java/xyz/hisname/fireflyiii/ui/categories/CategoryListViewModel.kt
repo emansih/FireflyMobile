@@ -17,7 +17,7 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryPageSource
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.util.network.HttpConstants
-import xyz.hisname.fireflyiii.workers.DeleteCategoryWorker
+import xyz.hisname.fireflyiii.workers.category.DeleteCategoryWorker
 
 class CategoryListViewModel(application: Application): BaseViewModel(application) {
 

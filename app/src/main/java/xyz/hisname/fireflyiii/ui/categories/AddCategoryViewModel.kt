@@ -12,6 +12,8 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
+import xyz.hisname.fireflyiii.workers.category.CategoryWorker
+import java.net.UnknownHostException
 
 class AddCategoryViewModel(application: Application): BaseViewModel(application) {
 
@@ -66,7 +68,12 @@ class AddCategoryViewModel(application: Application): BaseViewModel(application)
                     apiResponse.postValue(Pair(false, addCategory.errorMessage))
                 }
                 addCategory.error != null -> {
-                    apiResponse.postValue(Pair(false, addCategory.error.localizedMessage))
+                    if (addCategory.error is UnknownHostException) {
+                        CategoryWorker.initPeriodicWorker(categoryName, getApplication())
+                        apiResponse.postValue(Pair(true, getApplication<Application>().getString(R.string.data_added_when_user_online, "Category")))
+                    } else {
+                        apiResponse.postValue(Pair(false, addCategory.error.localizedMessage))
+                    }
                 }
                 else -> {
                     apiResponse.postValue(Pair(false, "Error saving category"))

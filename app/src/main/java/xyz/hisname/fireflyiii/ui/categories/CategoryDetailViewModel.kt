@@ -21,7 +21,7 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
-import xyz.hisname.fireflyiii.workers.DeleteCategoryWorker
+import xyz.hisname.fireflyiii.workers.category.DeleteCategoryWorker
 
 class CategoryDetailViewModel(application: Application): BaseViewModel(application) {
 

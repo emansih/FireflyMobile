@@ -1,4 +1,4 @@
-package xyz.hisname.fireflyiii.workers
+package xyz.hisname.fireflyiii.workers.category
 
 import android.content.Context
 import androidx.preference.PreferenceManager
@@ -8,8 +8,9 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.util.network.HttpConstants
+import xyz.hisname.fireflyiii.workers.BaseWorker
+import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 class DeleteCategoryWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
