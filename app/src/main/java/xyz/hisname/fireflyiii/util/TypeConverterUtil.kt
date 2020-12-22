@@ -35,7 +35,7 @@ object TypeConverterUtil{
 
     @TypeConverter
     @JvmStatic
-    fun fromString(value: List<String>): String{
+    fun fromString(value: List<String>?): String{
         val type = Types.newParameterizedType(List::class.java, String::class.java)
         val adapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(type)
         return adapter.toJson(value)
