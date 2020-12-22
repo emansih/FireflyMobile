@@ -158,10 +158,10 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.splitId WHERE transactionIndexTable.transactionJournalId =:id")
     abstract suspend fun getPendingTransactionFromMasterIdId(id: Long): List<Transactions>
 
-    @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId=:id")
+    @Query("SELECT splitId FROM transactionIndexTable WHERE transactionJournalId=:id")
     abstract suspend fun getTempIdFromMasterId(id: Long): List<Long>
 
-    @Query("DELETE FROM transactionIndexTable WHERE splitId=:id")
+    @Query("DELETE FROM transactionIndexTable WHERE transactionJournalId=:id")
     abstract suspend fun deleteTempMasterId(id: Long)
 
     @Query("SELECT attachment FROM transactionTable WHERE transaction_journal_id =:journalId")

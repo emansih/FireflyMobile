@@ -21,6 +21,7 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.repository.tags.TagsRepository
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
@@ -42,11 +43,6 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
 
     private val temporaryTransactionRepository = TransactionRepository(
             temporaryDb.transactionDataDao(), transactionService
-    )
-
-    private val attachmentRepository = AttachmentRepository(
-            AppDatabase.getInstance(application).attachmentDataDao(),
-            genericService().create(AttachmentService::class.java)
     )
 
     private val currencyRepository = CurrencyRepository(
@@ -201,6 +197,9 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                                         AttachableType.TRANSACTION)
                             }
                         }
+                        transactionRepository.insertTransaction(transaction)
+                        transactionRepository.insertTransaction(TransactionIndex(addTransaction.response.data.transactionId,
+                                transaction.transaction_journal_id,0))
                     }
                     temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
                 }

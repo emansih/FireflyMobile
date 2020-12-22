@@ -22,6 +22,8 @@ data class Errors(
         val transactions_source_name: List<String>?,
         @Json(name= "transactions.0.source_id")
         val transactions_source_id: List<String>?,
+        @Json(name= "transactions.0.budget_name")
+        val transactions_budget_name: List<String>?,
         val bill_name: List<String>?,
         val piggy_bank_name: List<String>?,
         val account_number: List<String>?,

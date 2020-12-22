@@ -3,7 +3,6 @@ package xyz.hisname.fireflyiii.repository.transaction
 import android.net.Uri
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
@@ -362,6 +361,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     moshi?.errors?.transaction_destination_id  != null -> moshi.errors.transaction_destination_id[0]
                     moshi?.errors?.transaction_amount != null -> moshi.errors.transaction_amount[0]
                     moshi?.errors?.description != null -> moshi.errors.description[0]
+                    moshi?.errors?.transactions_budget_name != null -> moshi.errors.transactions_budget_name[0]
                     else -> moshi?.message ?: "The given data was invalid"
                 }
                 return ApiResponses(errorMessage = errorMessage)
