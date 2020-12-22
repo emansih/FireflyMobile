@@ -558,7 +558,8 @@ class AddTransactionFragment: BaseFragment() {
                         val budgetDialog = BudgetSearchDialog()
                         budgetDialog.show(parentFragmentManager, "budgetDialog")
                         return true
-                    } else if(event.rawX >= (budget_edittext.right -
+                    } else if(budget_edittext.compoundDrawables[2] != null &&
+                            event.rawX >= (budget_edittext.right -
                                     budget_edittext.compoundDrawables[2].bounds.width())){
                         showTaskerVariable(budget_edittext)
                     }
