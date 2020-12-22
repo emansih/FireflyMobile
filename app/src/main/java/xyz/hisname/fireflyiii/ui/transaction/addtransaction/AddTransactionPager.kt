@@ -46,6 +46,7 @@ class AddTransactionPager: BaseFragment() {
            handleBack()
         }
         addTransactionText.setOnClickListener {
+            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             val masterId = Random.nextLong()
             addTransactionViewModel.saveData(masterId)
             addTransactionViewModel.memoryCount().observe(viewLifecycleOwner){ count ->
