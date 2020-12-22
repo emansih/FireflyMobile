@@ -43,8 +43,8 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
         val transactionData: MutableLiveData<List<TransactionAmountMonth>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             val currencyAttributes = currencyRepository.defaultCurrency().currencyAttributes
-            val currencyCode = currencyAttributes?.code ?: ""
-            val currencySymbol = currencyAttributes?.symbol
+            val currencyCode = currencyAttributes.code ?: ""
+            val currencySymbol = currencyAttributes.symbol
             val currentMonth = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(),
                     DateTimeUtil.getEndOfMonth(), currencyCode, transactionType)
             val oneMonthAgo = transactionRepository.getTransactionByDateAndCurrencyCode(DateTimeUtil.getStartOfMonth(1),

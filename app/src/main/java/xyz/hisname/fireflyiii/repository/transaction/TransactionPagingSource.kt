@@ -8,7 +8,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 
-class TransactionPagingSource(private val transactionService: TransactionService?,
+class TransactionPagingSource(private val transactionService: TransactionService,
                               private val transactionDao: TransactionDataDao,
                               private val startDate: String,
                               private val endDate: String,
@@ -26,9 +26,9 @@ class TransactionPagingSource(private val transactionService: TransactionService
             null
         }
         try {
-            val networkCall = transactionService?.getPaginatedTransactions(startDate, endDate,
+            val networkCall = transactionService.getPaginatedTransactions(startDate, endDate,
                     convertString(transactionType), params.key ?: 1)
-            val responseBody = networkCall?.body()
+            val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 if (params.key == null) {
                     transactionDao.deleteTransactionsByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
@@ -56,7 +56,6 @@ class TransactionPagingSource(private val transactionService: TransactionService
                 return getOfflineData(params.key, previousKey)
             }
         } catch (exception: Exception){
-            exception.printStackTrace()
             return getOfflineData(params.key, previousKey)
         }
     }

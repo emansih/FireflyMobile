@@ -57,6 +57,8 @@ import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
 import xyz.hisname.fireflyiii.ui.piggybank.search.SearchPiggyDialog
 import xyz.hisname.fireflyiii.ui.piggybank.search.SearchPiggyViewModel
 import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.transaction.search.DescriptionSearch
+import xyz.hisname.fireflyiii.ui.transaction.search.DescriptionViewModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
@@ -77,6 +79,7 @@ class AddTransactionFragment: BaseFragment() {
     private val budgetSearch by lazy { getViewModel(BudgetSearchViewModel::class.java) }
     private val piggySearch by lazy { getViewModel(SearchPiggyViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
+    private val descriptionSearch by lazy { getViewModel(DescriptionViewModel::class.java) }
 
     private lateinit var fileUri: Uri
     private var selectedTime = ""
@@ -619,6 +622,12 @@ class AddTransactionFragment: BaseFragment() {
                         event.rawX >= (description_edittext.right -
                                 description_edittext.compoundDrawables[2].bounds.width())) {
                     showTaskerVariable(description_edittext)
+                } else if(event.x <= category_edittext.compoundDrawables[0].bounds.width() + 30){
+                    val transactionDescription = DescriptionSearch()
+                    transactionDescription.show(parentFragmentManager, "descriptionDialog")
+                    descriptionSearch.transactionName.observe(viewLifecycleOwner){ search ->
+                        description_edittext.setText(search)
+                    }
                 }
             }
             false

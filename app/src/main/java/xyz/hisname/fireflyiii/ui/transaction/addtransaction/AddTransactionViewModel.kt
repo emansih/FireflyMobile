@@ -303,9 +303,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     fun getTransactionByDescription(query: String) : LiveData<List<String>>{
         val transactionData: MutableLiveData<List<String>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            transactionRepository.getTransactionByDescription(query).distinctUntilChanged().collectLatest { transactionList ->
-                transactionData.postValue(transactionList)
-            }
+            transactionData.postValue(transactionRepository.getTransactionByDescription(query))
         }
         return transactionData
     }

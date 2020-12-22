@@ -105,8 +105,11 @@ abstract class TransactionDataDao {
     @Query("DELETE FROM transactionTable WHERE isPending IS NOT :isPending")
     abstract fun deleteTransaction(isPending: Boolean = true): Int
 
-    @Query("SELECT DISTINCT(description) FROM transactionTable WHERE description LIKE :description")
-    abstract fun getTransactionByDescription(description: String): Flow<MutableList<String>>
+    @Query("SELECT distinct description FROM transactionTable WHERE description LIKE :description")
+    abstract suspend fun getTransactionByDescription(description: String): List<String>
+
+    @Query("SELECT distinct COUNT(description) FROM transactionTable WHERE description LIKE :description")
+    abstract suspend fun getTransactionByDescriptionCount(description: String): Int
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND bill_id = :billId ORDER BY date ASC")
     abstract suspend fun getTransactionListByDateAndBill(billId: Long, startDate: String, endDate: String): MutableList<Transactions>

@@ -35,21 +35,13 @@ class TransactionAdapter(private val clickListener:(Transactions) -> Unit):
         fun bind(transactionAttributes: Transactions, clickListener: (Transactions) -> Unit){
             val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).timeFormat
             val transactionDescription = transactionAttributes.description
-            if(transactionDescription.length >= 25){
-                if(transactionAttributes.isPending){
-                    itemView.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
-                    itemView.transactionNameText.text = transactionDescription.substring(0,25) + "..." + " (Pending)"
-                } else {
-                    itemView.transactionNameText.text = transactionDescription.substring(0,25) + "..."
-                }
+            val descriptionText = if(transactionAttributes.isPending){
+                itemView.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
+                "$transactionDescription (Pending)"
             } else {
-                if(transactionAttributes.isPending) {
-                    itemView.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
-                    itemView.transactionNameText.text = transactionDescription + " (Pending)"
-                } else {
-                    itemView.transactionNameText.text = transactionDescription
-                }
+                transactionDescription
             }
+            itemView.transactionNameText.text = descriptionText
             itemView.sourceNameText.text = transactionAttributes.source_name
             itemView.transactionJournalId.text = transactionAttributes.transaction_journal_id.toString()
             itemView.dateText.text = DateTimeUtil.convertLocalDateTime(transactionAttributes.date , timePreference)
