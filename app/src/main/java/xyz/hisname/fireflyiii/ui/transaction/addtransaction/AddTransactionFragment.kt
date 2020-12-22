@@ -615,7 +615,8 @@ class AddTransactionFragment: BaseFragment() {
         }
         description_edittext.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                if (event.rawX >= (description_edittext.right -
+                if (description_edittext.compoundDrawables[2] != null &&
+                        event.rawX >= (description_edittext.right -
                                 description_edittext.compoundDrawables[2].bounds.width())) {
                     showTaskerVariable(description_edittext)
                 }
