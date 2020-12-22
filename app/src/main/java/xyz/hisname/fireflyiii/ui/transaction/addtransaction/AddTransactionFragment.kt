@@ -94,7 +94,7 @@ class AddTransactionFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+        ProgressBar.animateView(addTransactionProgress, View.VISIBLE, 0.4f, 200)
         if(isTasker){
             addTransactionViewModel.transactionBundle.observe(viewLifecycleOwner) { bundle ->
                 addTransactionViewModel.parseBundle(bundle)
@@ -230,7 +230,6 @@ class AddTransactionFragment: BaseFragment() {
     private fun setFab(){
         addTransactionViewModel.saveData.observe(viewLifecycleOwner){
             hideKeyboard()
-            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             val piggyBank = if(piggy_edittext.isBlank()){
                 null
             } else {
@@ -754,7 +753,7 @@ class AddTransactionFragment: BaseFragment() {
                     source_exposed_dropdown.setText(transactionSourceAccount)
                 }
             }
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+            ProgressBar.animateView(addTransactionProgress, View.GONE, 0f, 200)
         }
     }
 
@@ -773,7 +772,6 @@ class AddTransactionFragment: BaseFragment() {
                 selectedTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, categoryName,
                 transactionTags, budgetName, note_edittext.getString()).observe(viewLifecycleOwner){ response ->
-            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             if(response.first){
                 toastSuccess(response.second)
                 handleBack()

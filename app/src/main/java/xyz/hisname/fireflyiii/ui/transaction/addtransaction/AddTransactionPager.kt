@@ -52,12 +52,11 @@ class AddTransactionPager: BaseFragment() {
             addTransactionViewModel.memoryCount().observe(viewLifecycleOwner){ count ->
                 if(adapter.itemCount == count){
                     addTransactionViewModel.uploadTransaction(group_edittext.getString()).observe(viewLifecycleOwner){ response ->
+                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if(response.first){
-                            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                             toastSuccess(response.second)
                             handleBack()
                         } else {
-                            ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                             toastInfo(response.second)
                         }
                     }
