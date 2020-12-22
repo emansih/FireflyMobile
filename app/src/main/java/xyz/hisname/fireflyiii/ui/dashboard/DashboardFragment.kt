@@ -413,8 +413,4 @@ class DashboardFragment: BaseFragment() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
     }
-
-    override fun handleBack() {
-        requireActivity().finish()
-    }
 }

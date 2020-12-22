@@ -148,7 +148,7 @@ class CategoryDetailsFragment: BaseDetailFragment() {
         categoryDetailViewModel.deleteCategory().observe(viewLifecycleOwner){ isDeleted ->
             if(isDeleted){
                 toastSuccess("$categoryName deleted")
-                handleBack()
+                parentFragmentManager.popBackStack()
             } else {
                 toastOffline("$categoryName will be deleted later")
             }
@@ -160,9 +160,5 @@ class CategoryDetailsFragment: BaseDetailFragment() {
             arguments = bundleOf("categoryId" to categoryId)
         }
         addCategoryFragment.show(parentFragmentManager, "add_category_fragment")
-    }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
     }
 }

@@ -473,18 +473,15 @@ class HomeActivity: BaseActivity(){
         if(activity_base_root.isDrawerOpen(slider)) {
             activity_base_root.closeDrawer(slider)
         } else {
-            when {
-                //supportFragmentManager.backStackEntryCount > 1 -> supportFragmentManager.popBackStack()
-                supportFragmentManager.backStackEntryCount == 0 -> {
+            when (supportFragmentManager.backStackEntryCount) {
+                0 -> {
                     if (supportFragmentManager.findFragmentByTag("dash") is DashboardFragment) {
                         finish()
                     } else {
                         slider.setSelection(1)
                     }
                 }
-                else -> {
-                    globalViewModel.handleBackPress(true)
-                }
+                else -> supportFragmentManager.popBackStack()
             }
         }
     }

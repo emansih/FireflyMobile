@@ -93,7 +93,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
             default_checkbox.performClick()
         }
         placeHolderToolbar.setNavigationOnClickListener {
-            handleBack()
+            unReveal(dialog_add_currency_layout)
         }
         currencyViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
             if(loader){
@@ -128,9 +128,5 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
                 toastInfo(response.second)
             }
         }
-    }
-
-    override fun handleBack() {
-        unReveal(dialog_add_currency_layout)
     }
 }

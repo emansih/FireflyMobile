@@ -198,7 +198,4 @@ class TransactionMonthSummaryFragment: BaseFragment() {
         mainToolbar.title = "$transactionType Summary"
     }
 
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

@@ -294,8 +294,4 @@ class AccountDetailFragment: BaseDetailFragment() {
             addToBackStack(null)
         }
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

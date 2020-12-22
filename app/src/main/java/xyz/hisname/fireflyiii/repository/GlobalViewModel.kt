@@ -13,12 +13,6 @@ class GlobalViewModel(application: Application): AndroidViewModel(application) {
     var isDark: Boolean = false
         private set
 
-    val backPress =  MutableLiveData<Boolean>()
-
-    fun handleBackPress(back: Boolean){
-        backPress.value = back
-    }
-
     fun isDarkMode(): MutableLiveData<Boolean>{
         val darkModeLiveData: MutableLiveData<Boolean> = MutableLiveData()
         val sharedPreferenceManager = PreferenceManager.getDefaultSharedPreferences(getApplication())

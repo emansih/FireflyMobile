@@ -774,7 +774,7 @@ class AddTransactionFragment: BaseFragment() {
                 transactionTags, budgetName, note_edittext.getString()).observe(viewLifecycleOwner){ response ->
             if(response.first){
                 toastSuccess(response.second)
-                handleBack()
+                parentFragmentManager.popBackStack()
             } else {
                 toastInfo(response.second)
             }
@@ -810,6 +810,4 @@ class AddTransactionFragment: BaseFragment() {
                 }
                 .show()
     }
-
-    override fun handleBack() { }
 }

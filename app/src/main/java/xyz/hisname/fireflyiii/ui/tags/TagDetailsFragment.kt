@@ -131,8 +131,4 @@ class TagDetailsFragment: BaseDetailFragment() {
                 }
                 .show()
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

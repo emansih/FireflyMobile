@@ -13,8 +13,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_piggy_detail.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
@@ -41,16 +39,6 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupWidgets()
-        // TODO: Remove this dirty hack. globalViewModel and scope should be private!
-        globalViewModel.backPress.observe(viewLifecycleOwner){ backPressValue ->
-            if(backPressValue == true) {
-                scope.launch(Dispatchers.Main) {
-                    handleBack()
-                }.invokeOnCompletion {
-                    globalViewModel.backPress.value = false
-                }
-            }
-        }
     }
 
 
@@ -151,7 +139,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
                 .setPositiveButton(R.string.delete_permanently) { dialog, _ ->
                     piggyDetailViewModel.deletePiggyBank(piggyId).observe(viewLifecycleOwner) { isDeleted ->
                         if(isDeleted){
-                            handleBack()
+                            parentFragmentManager.popBackStack()
                             toastSuccess(resources.getString(R.string.piggy_bank_deleted, piggyDetailViewModel.accountName))
                         } else {
                             toastOffline(resources.getString(R.string.generic_delete_error))
@@ -180,9 +168,5 @@ class PiggyDetailFragment: BaseDetailFragment() {
             })
             addToBackStack(null)
         }
-    }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
     }
 }

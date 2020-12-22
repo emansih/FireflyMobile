@@ -170,9 +170,4 @@ class ListTagsFragment: BaseFragment() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.tags)
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
-
 }

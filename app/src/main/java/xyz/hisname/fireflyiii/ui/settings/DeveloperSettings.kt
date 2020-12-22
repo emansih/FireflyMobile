@@ -37,8 +37,4 @@ class DeveloperSettings: BaseSettings() {
         super.onResume()
         activity?.activity_toolbar?.title = "Let There Be Dragons"
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

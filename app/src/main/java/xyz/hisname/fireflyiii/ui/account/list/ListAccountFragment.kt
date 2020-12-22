@@ -169,8 +169,4 @@ class ListAccountFragment: BaseFragment() {
         activity?.activity_toolbar?.title = convertString()
     }
 
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
-
 }

@@ -248,8 +248,4 @@ class DeleteItemsFragment: BaseSettings() {
             R.color.md_black_1000
         }
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

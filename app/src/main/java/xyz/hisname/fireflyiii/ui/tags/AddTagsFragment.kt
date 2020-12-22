@@ -136,7 +136,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
             }
         }
         placeHolderToolbar.setOnClickListener {
-            handleBack()
+            unReveal(dialog_add_tags_layout)
         }
         addTagViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
             if(loader){
@@ -188,7 +188,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
         addTagViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
-                handleBack()
+                unReveal(dialog_add_tags_layout)
             } else {
                 toastInfo(response.second)
             }
@@ -200,15 +200,11 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 longitude, zoomLevel).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
-                handleBack()
+                unReveal(dialog_add_tags_layout)
             } else {
                 toastInfo(response.second)
             }
         }
-    }
-
-    override fun handleBack() {
-        unReveal(dialog_add_tags_layout, true)
     }
 
 }

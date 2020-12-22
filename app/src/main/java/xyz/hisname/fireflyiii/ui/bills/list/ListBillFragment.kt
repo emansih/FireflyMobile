@@ -143,8 +143,4 @@ class ListBillFragment: BaseFragment() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.bill)
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

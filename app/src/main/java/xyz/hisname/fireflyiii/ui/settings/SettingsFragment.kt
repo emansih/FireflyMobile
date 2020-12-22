@@ -154,10 +154,6 @@ class SettingsFragment: BaseSettings() {
         activity?.activity_toolbar?.title = resources.getString(R.string.settings)
     }
 
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
-
     private fun setIconColor(): Int{
         return if(globalViewModel.isDark){
             R.color.md_white_1000

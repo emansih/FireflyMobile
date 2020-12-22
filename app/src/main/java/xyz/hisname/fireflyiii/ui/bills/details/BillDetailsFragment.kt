@@ -294,7 +294,7 @@ class BillDetailsFragment: BaseDetailFragment() {
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
                     billDetailsViewModel.deleteBill().observe(viewLifecycleOwner) { isDeleted ->
                         if(isDeleted){
-                            handleBack()
+                            parentFragmentManager.popBackStack()
                             toastSuccess(resources.getString(R.string.bill_deleted, billDetailsViewModel.billName))
                         } else {
                             toastOffline(getString(R.string.generic_delete_error))
@@ -314,10 +314,6 @@ class BillDetailsFragment: BaseDetailFragment() {
             })
             addToBackStack(null)
         }
-    }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
     }
 
     override fun onAttach(context: Context) {

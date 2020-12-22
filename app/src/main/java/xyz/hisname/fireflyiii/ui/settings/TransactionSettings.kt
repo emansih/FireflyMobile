@@ -37,8 +37,4 @@ class TransactionSettings: BaseSettings() {
         super.onResume()
         activity?.activity_toolbar?.title = "Transaction Settings"
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

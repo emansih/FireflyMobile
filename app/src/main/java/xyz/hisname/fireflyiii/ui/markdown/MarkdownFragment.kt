@@ -104,11 +104,13 @@ class MarkdownFragment: BaseFragment() {
         editableText.setText(markdownViewModel.markdownText.value)
         displayText.text = markdownViewModel.markdownText.value
         discardButton.setOnClickListener {
-            handleBack()
+            parentFragmentManager.popBackStack()
+            hideKeyboard()
         }
         doneButton.setOnClickListener {
             markdownViewModel.markdownText.postValue(editableText.getString())
-            handleBack()
+            parentFragmentManager.popBackStack()
+            hideKeyboard()
         }
         discardButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
         doneButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
@@ -244,10 +246,5 @@ class MarkdownFragment: BaseFragment() {
         } catch(e: StringIndexOutOfBoundsException){
             return false
         }
-    }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-        hideKeyboard()
     }
 }

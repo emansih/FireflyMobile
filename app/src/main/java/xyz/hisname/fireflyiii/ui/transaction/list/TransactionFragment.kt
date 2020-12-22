@@ -383,10 +383,6 @@ class TransactionFragment: BaseFragment(){
         result.onConfigurationChanged(newConfig)
     }
 
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
-
     override fun onResume() {
         super.onResume()
         val toolBarTitle = when {

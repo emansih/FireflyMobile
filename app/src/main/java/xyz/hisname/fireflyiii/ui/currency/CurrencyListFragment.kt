@@ -108,7 +108,4 @@ class CurrencyListFragment: BaseFragment() {
         activity?.activity_toolbar?.title = resources.getString(R.string.currency)
     }
 
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

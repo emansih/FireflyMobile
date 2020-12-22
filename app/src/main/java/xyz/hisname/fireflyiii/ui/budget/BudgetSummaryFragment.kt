@@ -188,10 +188,6 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
         activity?.activity_toolbar?.title = getString(R.string.budget)
     }
 
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
-
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         budgetSummaryViewModel.changeCurrency(position)
         transactionAdapter.notifyDataSetChanged()

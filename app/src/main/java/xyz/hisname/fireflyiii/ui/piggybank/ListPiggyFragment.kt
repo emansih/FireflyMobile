@@ -120,8 +120,4 @@ class ListPiggyFragment: BaseFragment(){
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.piggy_bank)
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

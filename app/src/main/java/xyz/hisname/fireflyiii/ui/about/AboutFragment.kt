@@ -35,7 +35,6 @@ class AboutFragment: MaterialAboutFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         retrieveData()
-        handleBack()
     }
 
     private fun retrieveData(){
@@ -115,13 +114,5 @@ class AboutFragment: MaterialAboutFragment() {
     override fun onAttach(context: Context){
         super.onAttach(context)
         activity?.activity_toolbar?.title = resources.getString(R.string.about)
-    }
-
-    private fun handleBack() {
-        globalViewModel.backPress.observe(viewLifecycleOwner, Observer { backPressValue ->
-            if(backPressValue == true) {
-                parentFragmentManager.popBackStack()
-            }
-        })
     }
 }

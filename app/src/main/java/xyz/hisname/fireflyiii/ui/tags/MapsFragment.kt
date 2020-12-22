@@ -87,13 +87,13 @@ class MapsFragment: BaseFragment() {
             mapsViewModel.latitude.postValue(latitude)
             mapsViewModel.longitude.postValue(longitude)
             mapsViewModel.zoomLevel.postValue(maps.zoomLevelDouble)
-            handleBack()
+            parentFragmentManager.popBackStack()
         }
         cancelButton.setOnClickListener {
             mapsViewModel.latitude.postValue(0.0)
             mapsViewModel.longitude.postValue(0.0)
             mapsViewModel.zoomLevel.postValue(0.0)
-            handleBack()
+            parentFragmentManager.popBackStack()
         }
     }
 
@@ -261,9 +261,4 @@ class MapsFragment: BaseFragment() {
             locationService.removeUpdates(locationListener)
         }
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
-
 }

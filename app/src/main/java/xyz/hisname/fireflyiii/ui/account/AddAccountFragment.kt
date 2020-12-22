@@ -492,12 +492,8 @@ class AddAccountFragment: BaseAddObjectFragment() {
         }
     }
     
-    override fun handleBack() {
-        if(accountId == 0L) {
-            unReveal(add_account_layout, true)
-        } else {
-            unReveal(add_account_layout)
-        }
+    private fun handleBack() {
+        unReveal(add_account_layout)
         markdownViewModel.markdownText.postValue("")
     }
 

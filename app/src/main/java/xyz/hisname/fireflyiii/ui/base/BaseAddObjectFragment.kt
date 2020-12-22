@@ -14,12 +14,11 @@ abstract class BaseAddObjectFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fragmentContainer.isVisible = false
         setIcons()
         setWidgets()
     }
 
-    protected fun unReveal(rootView: View, shouldShow: Boolean = false){
+    protected fun unReveal(rootView: View){
         val x = rootView.width / 2
         val y = rootView.height / 2
         val finalRadius = (max(rootView.width, rootView.height) * 1.1).toFloat()

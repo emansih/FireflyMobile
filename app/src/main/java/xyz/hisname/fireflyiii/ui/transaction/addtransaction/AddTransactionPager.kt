@@ -101,7 +101,7 @@ class AddTransactionPager: BaseFragment() {
         }
     }
 
-    override fun handleBack() {
+    private fun handleBack() {
         if(isFromFragment){
             parentFragmentManager.popBackStack()
         } else {

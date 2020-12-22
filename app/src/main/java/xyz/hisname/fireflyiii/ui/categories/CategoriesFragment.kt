@@ -128,8 +128,4 @@ class CategoriesFragment: BaseFragment() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.categories)
     }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
-    }
 }

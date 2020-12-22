@@ -27,10 +27,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.extension.toastError
-import xyz.hisname.fireflyiii.util.extension.toastInfo
-import xyz.hisname.fireflyiii.util.extension.toastSuccess
+import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -41,7 +38,7 @@ class SettingsAccountFragment: BaseSettings() {
 
     private val accManager by lazy { AuthenticatorManager(AccountManager.get(requireContext())) }
     private val authMethodPref by lazy { accManager.authMethod }
-    private val authViewModel by lazy { getViewModel(AuthViewModel::class.java) }
+    private val authViewModel by lazy { getImprovedViewModel(AuthViewModel::class.java) }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_account_settings)
@@ -158,9 +155,5 @@ class SettingsAccountFragment: BaseSettings() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().activity_toolbar.title = "Account Settings"
-    }
-
-    override fun handleBack() {
-        parentFragmentManager.popBackStack()
     }
 }

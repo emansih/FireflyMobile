@@ -37,7 +37,7 @@ abstract class BaseDetailFragment: BaseFragment(){
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId) {
         android.R.id.home -> consume {
-            handleBack()
+            parentFragmentManager.popBackStack()
         }
         R.id.menu_item_delete -> consume {
             deleteItem()

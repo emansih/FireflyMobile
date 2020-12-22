@@ -260,7 +260,7 @@ class TransactionDetailsFragment: BaseFragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun handleBack() {
+    private fun handleBack() {
         parentFragmentManager.popBackStack()
         val mainToolbar = requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
         mainToolbar.title = convertString(transactionInfo)

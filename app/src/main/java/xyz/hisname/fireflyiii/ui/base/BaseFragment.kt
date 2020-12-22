@@ -11,10 +11,8 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
-import xyz.hisname.fireflyiii.repository.account.AccountsViewModel
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -38,25 +36,7 @@ abstract class BaseFragment: Fragment() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        handleBackPress()
-    }
-
     protected fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
 
     protected fun isDarkMode() = globalViewModel.isDark
-
-    private fun handleBackPress() {
-        globalViewModel.backPress.observe(viewLifecycleOwner){ backPressValue ->
-            if(backPressValue == true) {
-                scope.launch(Dispatchers.Main) {
-                    handleBack()
-                }.invokeOnCompletion {
-                    globalViewModel.backPress.value = false
-                }
-            }
-        }
-    }
-    abstract fun handleBack()
 }

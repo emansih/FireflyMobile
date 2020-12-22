@@ -343,7 +343,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         }
     }
 
-    override fun handleBack() {
+    private fun handleBack() {
         unReveal(dialog_add_bill_layout)
         markdownViewModel.markdownText.postValue("")
     }
