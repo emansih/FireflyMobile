@@ -38,18 +38,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:hint="@string/description"
+                    android:drawablePadding="12dp"
                     style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-
-            <ImageView
-                android:id="@+id/descriptionTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/transaction_description_layout"
-                app:layout_constraintTop_toTopOf="@+id/transaction_description_layout"
-                app:layout_constraintEnd_toEndOf="@+id/transaction_description_layout"/>
 
             <!-- This is a placeholder view for showcasing calculator icon -->
             <View
@@ -83,15 +75,6 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/transactionAmountTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/transaction_amount_layout"
-                app:layout_constraintTop_toTopOf="@+id/transaction_amount_layout"
-                app:layout_constraintEnd_toEndOf="@+id/transaction_amount_layout"/>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/currency_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -112,15 +95,6 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/currencyTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/currency_layout"
-                app:layout_constraintTop_toTopOf="@+id/currency_layout"
-                app:layout_constraintEnd_toEndOf="@+id/currency_layout"/>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/transaction_date_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -139,15 +113,6 @@
                     android:focusable="false"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <ImageView
-                android:id="@+id/dateTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/transaction_date_layout"
-                app:layout_constraintTop_toTopOf="@+id/transaction_date_layout"
-                app:layout_constraintEnd_toEndOf="@+id/transaction_date_layout"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/source_layout"
@@ -169,15 +134,6 @@
                     style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/sourceTextInputTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/source_layout"
-                app:layout_constraintTop_toTopOf="@+id/source_layout"
-                app:layout_constraintEnd_toEndOf="@+id/source_layout"/>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/source_exposed_menu"
                 android:layout_width="0dp"
@@ -187,6 +143,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 app:errorEnabled="true"
                 app:helperTextEnabled="false"
+                app:endIconTint="@null"
                 app:layout_constraintEnd_toEndOf="@+id/transaction_amount_layout"
                 app:layout_constraintStart_toStartOf="@+id/transaction_amount_layout"
                 app:layout_constraintTop_toBottomOf="@+id/source_layout">
@@ -195,17 +152,8 @@
                     android:id="@+id/source_exposed_dropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:editable="false"/>
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <ImageView
-                android:id="@+id/sourceExposedTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/source_exposed_menu"
-                app:layout_constraintTop_toTopOf="@+id/source_exposed_menu"
-                app:layout_constraintEnd_toEndOf="@+id/source_exposed_menu"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/destination_layout"
@@ -226,15 +174,6 @@
                     style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/destinationTextInputTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/destination_layout"
-                app:layout_constraintTop_toTopOf="@+id/destination_layout"
-                app:layout_constraintEnd_toEndOf="@+id/destination_layout"/>
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/destination_exposed_menu"
                 android:layout_width="0dp"
@@ -243,6 +182,7 @@
                 android:layout_marginTop="12dp"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 app:errorEnabled="true"
+                app:endIconTint="@null"
                 app:helperTextEnabled="false"
                 app:layout_constraintEnd_toEndOf="@+id/transaction_amount_layout"
                 app:layout_constraintStart_toStartOf="@+id/transaction_amount_layout"
@@ -252,17 +192,8 @@
                     android:id="@+id/destination_exposed_dropdown"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:editable="false"/>
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <ImageView
-                android:id="@+id/destinationExposedTasker"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/destination_exposed_menu"
-                app:layout_constraintTop_toTopOf="@+id/destination_exposed_menu"
-                app:layout_constraintEnd_toEndOf="@+id/destination_exposed_menu"/>
 
 
             <TextView
@@ -367,15 +298,6 @@
                             android:focusable="false"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <ImageView
-                        android:id="@+id/timeTasker"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/time_layout"
-                        app:layout_constraintTop_toTopOf="@+id/time_layout"
-                        app:layout_constraintEnd_toEndOf="@+id/time_layout"/>
-
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/piggy_layout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -399,16 +321,6 @@
                             style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <ImageView
-                        android:id="@+id/piggyTasker"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:visibility="invisible"
-                        app:layout_constraintBottom_toBottomOf="@+id/piggy_layout"
-                        app:layout_constraintTop_toTopOf="@+id/piggy_layout"
-                        app:layout_constraintEnd_toEndOf="@+id/piggy_layout"/>
-
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/category_layout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -431,19 +343,10 @@
                             style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <ImageView
-                        android:id="@+id/categoryTasker"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/category_layout"
-                        app:layout_constraintTop_toTopOf="@+id/category_layout"
-                        app:layout_constraintEnd_toEndOf="@+id/category_layout"/>
-
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/tags_layout"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="64dp"
                         android:layout_marginTop="12dp"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_marginStart="30dp"
@@ -458,17 +361,10 @@
                             android:layout_height="match_parent"
                             android:hint="@string/tags"
                             android:textSize="16sp"
-                            app:chipHeight="30dp"/>
+                            android:drawablePadding="12dp"
+                            android:padding="12dp"
+                            app:chipHeight="30dp" />
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <ImageView
-                        android:id="@+id/tagsTasker"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/tags_layout"
-                        app:layout_constraintTop_toTopOf="@+id/tags_layout"
-                        app:layout_constraintEnd_toEndOf="@+id/tags_layout"/>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/budget_layout"
@@ -492,15 +388,6 @@
                             style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <ImageView
-                        android:id="@+id/budgetTasker"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/budget_layout"
-                        app:layout_constraintTop_toTopOf="@+id/budget_layout"
-                        app:layout_constraintEnd_toEndOf="@+id/budget_layout"/>
-
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/note_layout"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -523,15 +410,6 @@
                             android:textSize="16sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
-
-                    <ImageView
-                        android:id="@+id/noteTasker"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/note_layout"
-                        app:layout_constraintTop_toTopOf="@+id/note_layout"
-                        app:layout_constraintEnd_toEndOf="@+id/note_layout"/>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/add_attachment_button"

@@ -118,7 +118,9 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         if(bundle != null){
             val currencyBundle = bundle.getString("transactionCurrency")
             if(currencyBundle?.startsWith("%") == false){
-                viewModelScope.launch(Dispatchers.IO){
+                viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
+                    throwable.printStackTrace()
+                }){
                     val currencyAttributes = currencyRepository.getCurrencyByCode(currencyBundle)[0].currencyAttributes
                     transactionCurrency.postValue(currencyAttributes.name + " (" + currencyAttributes.code + ")")
                 }
@@ -128,7 +130,11 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             }
             transactionDescription.postValue(bundle.getString("transactionDescription"))
             transactionAmount.postValue(bundle.getString("transactionAmount"))
-            transactionDate.postValue(bundle.getString("transactionDate"))
+            if(bundle.getString("transactionDate") == null){
+                transactionDate.postValue(DateTimeUtil.getTodayDate())
+            } else {
+                transactionDate.postValue(bundle.getString("transactionDate"))
+            }
             transactionTime.postValue(bundle.getString("transactionTime"))
             transactionPiggyBank.postValue(bundle.getString("transactionPiggyBank"))
             transactionTags.postValue(bundle.getString("transactionTags"))
@@ -137,8 +143,8 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             transactionNote.postValue(bundle.getString("transactionNote"))
             transactionSourceAccount.postValue(bundle.getString("transactionSourceAccount"))
             transactionDestinationAccount.postValue(bundle.getString("transactionDestinationAccount"))
-            val transactionUriBundle = bundle.getSerializable("transactionUri") as List<String>
-            if(transactionUriBundle.isNotEmpty()){
+            val transactionUriBundle = bundle.getSerializable("transactionUri") as List<String>?
+            if(!transactionUriBundle.isNullOrEmpty()){
                 val uriArray = arrayListOf<Uri>()
                 transactionUriBundle.forEach { uri ->
                     uriArray.add(uri.toUri())
