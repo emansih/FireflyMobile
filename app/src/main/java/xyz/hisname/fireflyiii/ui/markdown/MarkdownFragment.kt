@@ -1,12 +1,13 @@
 package xyz.hisname.fireflyiii.ui.markdown
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import android.widget.EditText
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
@@ -20,14 +21,12 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class MarkdownFragment: BaseFragment() {
 
-    private val toolbar by lazy {requireActivity().findViewById<Toolbar>(R.id.activity_toolbar) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.create(R.layout.fragment_markdown, container)
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,10 +35,18 @@ class MarkdownFragment: BaseFragment() {
         handleClick()
     }
 
-    private fun setWidget(){
-        if(toolbar != null){
-            toolbar.visibility = View.GONE
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val callback = object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                parentFragmentManager.popBackStack()
+                hideKeyboard()
+            }
         }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    private fun setWidget(){
         discardButton.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_close

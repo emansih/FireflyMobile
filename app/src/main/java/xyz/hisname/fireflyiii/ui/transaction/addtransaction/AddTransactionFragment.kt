@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
