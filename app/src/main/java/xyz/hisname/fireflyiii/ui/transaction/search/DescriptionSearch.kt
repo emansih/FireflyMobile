@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.base_swipe_layout.*
@@ -18,6 +21,7 @@ class DescriptionSearch: BaseDialog() {
 
     private val descriptionAdapter by lazy { DescriptionAdapter { data: String -> itemClicked(data) } }
     private val descriptionViewModel by lazy { getViewModel(DescriptionViewModel::class.java) }
+    private lateinit var initialData: PagingData<String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -25,10 +29,17 @@ class DescriptionSearch: BaseDialog() {
     }
 
 
-    private fun setRecyclerView(){
+    private fun displayView(){
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
         recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = descriptionAdapter
+        descriptionViewModel.getAllDescription().observe(viewLifecycleOwner){ data ->
+            initialData = data
+            descriptionAdapter.submitData(lifecycle, data)
+        }
+        descriptionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner) { loadStates ->
+            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+        }
     }
 
     private fun searchData(){
@@ -40,8 +51,12 @@ class DescriptionSearch: BaseDialog() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                descriptionViewModel.searchTransactionName(newText).observe(viewLifecycleOwner){ data ->
-                    descriptionAdapter.submitData(lifecycle, data)
+                if(newText.isBlank() or newText.isEmpty()){
+                    descriptionAdapter.submitData(lifecycle, initialData)
+                } else {
+                    descriptionViewModel.searchTransactionName(newText).observe(viewLifecycleOwner){ data ->
+                        descriptionAdapter.submitData(lifecycle, data)
+                    }
                 }
                 return true
             }
@@ -55,7 +70,7 @@ class DescriptionSearch: BaseDialog() {
     }
 
     override fun setWidgets() {
-        setRecyclerView()
+        displayView()
         searchData()
     }
 }

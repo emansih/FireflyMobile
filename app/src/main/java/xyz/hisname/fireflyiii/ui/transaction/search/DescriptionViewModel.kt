@@ -22,4 +22,8 @@ class DescriptionViewModel(application: Application): BaseViewModel(application)
     fun searchTransactionName(searchName: String) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
         TransactionSearchPagingSource(transactionService, transactionDao, searchName)
     }.flow.cachedIn(viewModelScope).asLiveData()
+
+    fun getAllDescription() = Pager(PagingConfig(pageSize = 100)){
+        TransactionSearchPagingSource(transactionService, transactionDao, "")
+    }.flow.cachedIn(viewModelScope).asLiveData()
 }

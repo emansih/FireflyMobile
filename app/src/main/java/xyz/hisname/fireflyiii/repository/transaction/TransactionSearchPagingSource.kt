@@ -21,31 +21,35 @@ class TransactionSearchPagingSource(private val transactionService: TransactionS
         } else {
             null
         }
-        try {
-            val networkCall = transactionService.searchTransaction(query)
-            val responseBody = networkCall.body()
-            if (responseBody != null && networkCall.isSuccessful) {
-                responseBody.data.forEach { data ->
-                    data.transactionAttributes.transactions.forEach { transaction ->
-                        transactionDao.insert(transaction)
-                        transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id, 0))
+        if(query.isBlank()){
+            return LoadResult.Page(transactionDao.getTransactionByDescription(), null, null)
+        } else {
+            try {
+                val networkCall = transactionService.searchTransaction(query)
+                val responseBody = networkCall.body()
+                if (responseBody != null && networkCall.isSuccessful) {
+                    responseBody.data.forEach { data ->
+                        data.transactionAttributes.transactions.forEach { transaction ->
+                            transactionDao.insert(transaction)
+                            transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id, 0))
+                        }
                     }
                 }
-            }
-            val pagination = responseBody?.meta?.pagination
-            return if(pagination != null){
-                val nextKey = if(pagination.current_page < pagination.total_pages){
-                    pagination.current_page + 1
+                val pagination = responseBody?.meta?.pagination
+                return if(pagination != null){
+                    val nextKey = if(pagination.current_page < pagination.total_pages){
+                        pagination.current_page + 1
+                    } else {
+                        null
+                    }
+                    LoadResult.Page(transactionDao.getTransactionByDescription("%$query%"),
+                            previousKey, nextKey)
                 } else {
-                    null
+                    getOfflineData(params.key, previousKey)
                 }
-                LoadResult.Page(transactionDao.getTransactionByDescription("%$query%"),
-                        previousKey, nextKey)
-            } else {
-                getOfflineData(params.key, previousKey)
+            } catch (exception: Exception){
+                return getOfflineData(params.key, previousKey)
             }
-        } catch (exception: Exception){
-            return getOfflineData(params.key, previousKey)
         }
     }
 

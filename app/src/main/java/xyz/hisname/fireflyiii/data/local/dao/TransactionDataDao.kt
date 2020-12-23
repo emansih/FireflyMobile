@@ -108,6 +108,12 @@ abstract class TransactionDataDao {
     @Query("SELECT distinct description FROM transactionTable WHERE description LIKE :description")
     abstract suspend fun getTransactionByDescription(description: String): List<String>
 
+    @Query("SELECT distinct description FROM transactionTable")
+    abstract suspend fun getTransactionByDescription(): List<String>
+
+    @Query("SELECT distinct COUNT(description) FROM transactionTable")
+    abstract suspend fun getTransactionByDescriptionCount(): Int
+
     @Query("SELECT distinct COUNT(description) FROM transactionTable WHERE description LIKE :description")
     abstract suspend fun getTransactionByDescriptionCount(description: String): Int
 
