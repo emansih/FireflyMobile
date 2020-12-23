@@ -26,6 +26,7 @@ import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.util.extension.*
+import java.io.File
 
 class TagDetailsFragment: BaseDetailFragment() {
 
@@ -36,13 +37,15 @@ class TagDetailsFragment: BaseDetailFragment() {
     private lateinit var startMarker: Marker
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         return inflater.create(R.layout.fragment_tag_details, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+        Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
+        Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
         if(tagId != 0L) {
             tagsDetailViewModel.getTagById(tagId).observe(viewLifecycleOwner) { data ->
                 setTagData(data)
