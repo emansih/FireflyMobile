@@ -35,32 +35,30 @@ class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
         fun bind(data: AccountData, clickListener: (AccountData) -> Unit){
             val accountData = data.accountAttributes
             var currencySymbol = ""
-            if(accountData?.active != true){
+            if(!accountData.active){
                 itemView.accountNameText.setTextColor(context.getCompatColor(R.color.material_grey_600))
                 itemView.accountNumberText.setTextColor(context.getCompatColor(R.color.material_grey_600))
             }
-            if(accountData?.currency_symbol != null){
+            if(accountData.currency_symbol != null){
                 currencySymbol = accountData.currency_symbol
             }
-            if(accountData?.account_number != null){
+            if(accountData.account_number != null){
                 itemView.accountNumberText.text = accountData.account_number
             } else {
                 itemView.accountNumberText.isVisible = false
             }
-            val isPending = data.accountAttributes?.isPending
-            if(isPending != null && isPending == true){
-                itemView.accountNameText.text = accountData?.name + " (Pending)"
+            val isPending = data.accountAttributes.isPending
+            if(isPending){
+                itemView.accountNameText.text = accountData.name + " (Pending)"
                 itemView.accountNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
             } else {
-                itemView.accountNameText.text = accountData?.name
+                itemView.accountNameText.text = accountData.name
             }
-            val amount = accountData?.current_balance
-            if(amount != null){
-                if(amount > BigDecimal.ZERO){
-                    itemView.accountAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
-                }
-                itemView.accountAmountText.text = currencySymbol + " " + amount
+            val amount = accountData.current_balance
+            if(amount > BigDecimal.ZERO){
+                itemView.accountAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
             }
+            itemView.accountAmountText.text = currencySymbol + " " + amount
             itemView.accountId.text = data.accountId.toString()
             itemView.setOnClickListener { clickListener(data) }
         }

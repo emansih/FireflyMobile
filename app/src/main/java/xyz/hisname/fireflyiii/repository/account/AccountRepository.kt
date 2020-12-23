@@ -129,7 +129,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         } catch (exception: Exception){ }
     }
 
-    suspend fun getAccountByNameAndType(accountType: String, accountName: String): Flow<List<String>>{
+    suspend fun getAccountByNameAndType(accountType: String, accountName: String): List<String>{
         if(accountName.length > 3){
             val handleSearch = debounce<String>(Dispatchers.IO){ debouncedString ->
                 runBlocking {

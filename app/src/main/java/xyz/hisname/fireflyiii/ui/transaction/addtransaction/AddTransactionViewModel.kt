@@ -311,11 +311,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     fun getAccountByNameAndType(accountType: String, accountName: String): LiveData<List<String>>{
         val accountData: MutableLiveData<List<String>> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.getAccountByNameAndType(accountType, accountName)
-                    .distinctUntilChanged()
-                    .collectLatest { accountList ->
-                        accountData.postValue(accountList)
-                    }
+            accountData.postValue(accountRepository.getAccountByNameAndType(accountType, accountName))
         }
         return accountData
     }

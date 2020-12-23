@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -45,6 +46,8 @@ import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.account.search.AccountSearchDialog
+import xyz.hisname.fireflyiii.ui.account.search.AccountSearchViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSearchDialog
 import xyz.hisname.fireflyiii.ui.budget.BudgetSearchViewModel
@@ -79,6 +82,7 @@ class AddTransactionFragment: BaseFragment() {
     private val piggySearch by lazy { getViewModel(SearchPiggyViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
     private val descriptionSearch by lazy { getViewModel(DescriptionViewModel::class.java) }
+    private val accountSearchViewModel by lazy { getViewModel(AccountSearchViewModel::class.java) }
 
     private lateinit var fileUri: Uri
     private var selectedTime = ""
@@ -572,6 +576,47 @@ class AddTransactionFragment: BaseFragment() {
         budgetSearch.budgetName.observe(viewLifecycleOwner) { name ->
             budget_edittext.setText(name)
         }
+        destination_edittext.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if(event.action == MotionEvent.ACTION_UP){
+                    if(event.x <= destination_edittext.compoundDrawables[0].bounds.width() + 30){
+                        val accountDialog = AccountSearchDialog()
+                        accountDialog.arguments = bundleOf("accountType" to "expense")
+                        accountDialog.show(parentFragmentManager, "accountDialog")
+                        accountSearchViewModel.accountName.observe(viewLifecycleOwner){ account ->
+                            destination_edittext.setText(account)
+                        }
+                        return true
+                    } else if(destination_edittext.compoundDrawables[2] != null &&
+                            event.rawX >= (destination_edittext.right -
+                                    destination_edittext.compoundDrawables[2].bounds.width())){
+                        showTaskerVariable(destination_edittext)
+                    }
+                }
+                return false
+            }
+        })
+
+        source_edittext.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                if(event.action == MotionEvent.ACTION_UP){
+                    if(event.x <= source_edittext.compoundDrawables[0].bounds.width() + 30){
+                        val accountDialog = AccountSearchDialog()
+                        accountDialog.arguments = bundleOf("accountType" to "revenue")
+                        accountDialog.show(parentFragmentManager, "accountDialog")
+                        accountSearchViewModel.accountName.observe(viewLifecycleOwner){ account ->
+                            source_edittext.setText(account)
+                        }
+                        return true
+                    } else if(source_edittext.compoundDrawables[2] != null &&
+                            event.rawX >= (source_edittext.right -
+                                    source_edittext.compoundDrawables[2].bounds.width())){
+                        showTaskerVariable(source_edittext)
+                    }
+                }
+                return false
+            }
+        })
         expansionLayout.addListener { _, expanded ->
             if(expanded){
                 if (piggy_layout.isVisible){
