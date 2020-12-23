@@ -201,25 +201,25 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <TextView
+            <Button
                 android:id="@+id/addSplit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/md_green_500"
+                android:backgroundTint="@color/md_green_500"
                 android:text="@string/add_new_split"
                 android:layout_marginTop="182dp"
                 app:layout_constraintTop_toBottomOf="@+id/transaction_date_layout"
                 app:layout_constraintStart_toStartOf="@+id/transaction_amount_layout"
                 app:layout_constraintEnd_toEndOf="@+id/transaction_amount_layout" />
 
-            <TextView
+            <Button
                 android:id="@+id/removeSplit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/md_red_500"
+                android:backgroundTint="@color/md_red_500"
                 android:text="@string/delete_split"
                 android:visibility="gone"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="22dp"
                 app:layout_constraintTop_toBottomOf="@+id/addSplit"
                 app:layout_constraintStart_toStartOf="@+id/transaction_amount_layout"
                 app:layout_constraintEnd_toEndOf="@+id/transaction_amount_layout" />
@@ -228,7 +228,7 @@
                 android:id="@+id/expansionHeader"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_marginTop="280dp"
+                android:layout_marginTop="320dp"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 app:expansion_headerIndicator="@id/headerIndicator"

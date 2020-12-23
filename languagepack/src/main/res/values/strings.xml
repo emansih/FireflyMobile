@@ -181,6 +181,6 @@
     <string name="transaction_calendar_header_help_text">Quickly jump to your desired date</string>
     <string name="transaction_calendar_date_help_text">Long press 2 dates to show transactions in that range</string>
     <string name="chart_transaction_in_period">Chart for all %1$s between %2$s and %3$s</string>
-    <string name="add_new_split"><u>Add New Split</u></string>
-    <string name="delete_split"><u>Delete Split</u></string>
+    <string name="add_new_split">Add New Split</string>
+    <string name="delete_split">Delete Split</string>
 </resources>
