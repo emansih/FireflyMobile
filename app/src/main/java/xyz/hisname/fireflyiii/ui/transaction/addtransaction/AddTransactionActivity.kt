@@ -27,10 +27,6 @@ class AddTransactionActivity: BaseActivity() {
     }
 
     private fun setBottomNav(){
-        if(globalViewModel.isDark) {
-            transactionBottomView.itemTextColor = ContextCompat.getColorStateList(this, R.color.md_white_1000)
-            transactionBottomView.itemIconTintList = ContextCompat.getColorStateList(this, R.color.md_white_1000)
-        }
         transactionBottomView.setOnNavigationItemSelectedListener{ item ->
             when(item.itemId){
                 R.id.action_withdraw -> {
