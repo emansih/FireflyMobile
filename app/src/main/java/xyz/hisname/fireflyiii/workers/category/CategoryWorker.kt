@@ -56,6 +56,7 @@ class CategoryWorker(private val context: Context, workerParameters: WorkerParam
         when {
             addCategory.response != null -> {
                 context.showNotification("Category Added", context.getString(R.string.category_added, categoryName), R.drawable.app_icon)
+                cancelWorker(categoryName ?: "", context)
                 return Result.success()
             }
             addCategory.errorMessage != null -> {
