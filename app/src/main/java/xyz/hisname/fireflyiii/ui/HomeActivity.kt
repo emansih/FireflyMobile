@@ -499,9 +499,24 @@ class HomeActivity: BaseActivity(){
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 drawerToggle.isDrawerIndicatorEnabled = true
             }
+            supportFragmentManager.fragments.forEach {  fragment ->
+                fab_action.isVisible = (fragment is ListBillFragment
+                        || fragment is ListPiggyFragment
+                        || fragment is TransactionFragment
+                        || fragment is ListAccountFragment
+                        || fragment is CategoriesFragment
+                        || fragment is ListTagsFragment
+                        || fragment is CurrencyListFragment)
+            }
         }
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
-            fab_action.isVisible = !(fragment is AboutFragment || fragment is SettingsFragment || fragment is DashboardFragment)
+            fab_action.isVisible = (fragment is ListBillFragment
+                    || fragment is ListPiggyFragment
+                    || fragment is TransactionFragment
+                    || fragment is ListAccountFragment
+                    || fragment is CategoriesFragment
+                    || fragment is ListTagsFragment
+                    || fragment is CurrencyListFragment)
             addTransactionExtended.isVisible = fragment is DashboardFragment
         }
         drawerToggle.setToolbarNavigationClickListener {
