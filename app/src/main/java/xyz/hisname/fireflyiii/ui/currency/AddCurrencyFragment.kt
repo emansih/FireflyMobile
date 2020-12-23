@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -94,6 +95,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
         }
         placeHolderToolbar.setNavigationOnClickListener {
             unReveal(dialog_add_currency_layout)
+            extendedFab.isVisible = true
         }
         currencyViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
             if(loader){
@@ -111,6 +113,7 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
             if(response.first){
                 toastSuccess(resources.getString(R.string.currency_updated, name_edittext.getString()))
                 unReveal(addCurrencyFab)
+                extendedFab.isVisible = true
             } else {
                 toastInfo(response.second)
             }
