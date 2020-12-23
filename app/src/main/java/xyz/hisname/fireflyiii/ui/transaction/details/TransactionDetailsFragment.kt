@@ -31,7 +31,7 @@ import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
-import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionFragment
+import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionPager
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.openFile
@@ -248,7 +248,7 @@ class TransactionDetailsFragment: BaseFragment() {
                     .show()
         }
         R.id.menu_item_edit -> consume {
-            val addTransaction = AddTransactionFragment().apply {
+            val addTransaction = AddTransactionPager().apply {
                 arguments = bundleOf("transactionJournalId" to transactionJournalId, "SHOULD_HIDE" to true,
                         "transactionType" to convertString(transactionInfo))
             }

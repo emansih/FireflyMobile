@@ -111,6 +111,8 @@ class AddTransactionFragment: BaseFragment() {
         setIcons()
         setWidgets()
         if(transactionJournalId != 0L){
+            addSplit.isGone = true
+            removeSplit.isGone = true
             addTransactionViewModel.getTransactionFromJournalId(transactionJournalId)
         }
         setFab()
@@ -768,14 +770,17 @@ class AddTransactionFragment: BaseFragment() {
 
     private fun updateData(piggyBank: String?, sourceAccount: String, destinationAccount: String,
                            categoryName: String?, transactionTags: String?, budgetName: String?){
+        ProgressBar.animateView(addTransactionProgress, View.VISIBLE, 0.4f, 200)
         addTransactionViewModel.updateTransaction(transactionJournalId, transactionType,
                 description_edittext.getString(), transaction_date_edittext.getString(),
                 selectedTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, categoryName,
                 transactionTags, budgetName, note_edittext.getString()).observe(viewLifecycleOwner){ response ->
+            addTransactionViewModel.isLoading.postValue(false)
+            ProgressBar.animateView(addTransactionProgress, View.GONE, 0f, 200)
             if(response.first){
                 toastSuccess(response.second)
-                parentFragmentManager.popBackStack()
+                requireActivity().supportFragmentManager.popBackStack()
             } else {
                 toastInfo(response.second)
             }

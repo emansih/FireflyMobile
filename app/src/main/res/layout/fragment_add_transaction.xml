@@ -229,13 +229,13 @@
                 android:id="@+id/expansionHeader"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_marginTop="52dp"
+                android:layout_marginTop="220dp"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 app:expansion_headerIndicator="@id/headerIndicator"
                 app:expansion_layout="@id/expansionLayout"
                 app:expansion_toggleOnClick="true"
-                app:layout_constraintTop_toBottomOf="@+id/removeSplit"
+                app:layout_constraintTop_toBottomOf="@+id/transaction_date_layout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 

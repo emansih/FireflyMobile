@@ -36,8 +36,9 @@ class AddTransactionPager: BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTabs()
         setToolbar()
-        if(isTasker){
+        if(isTasker || transactionJournalId != 0L){
             tabLayout.isGone = true
+            transaction_group_layout.isGone = true
         }
     }
 
@@ -61,6 +62,11 @@ class AddTransactionPager: BaseFragment() {
                         }
                     }
                 }
+            }
+        }
+        addTransactionViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
+            if(!loading){
+                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         }
     }
