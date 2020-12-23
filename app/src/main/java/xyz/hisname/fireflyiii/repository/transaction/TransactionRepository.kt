@@ -190,6 +190,17 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         transactionDao.deleteTempMasterId(id)
     }
 
+    suspend fun removeInternalReference(apiResponses: TransactionSuccessModel){
+        val dynamicParams = HashMap<String, String>()
+        apiResponses.data.transactionAttributes.transactions.forEachIndexed { index, transactions ->
+            dynamicParams["transactions[$index][transaction_journal_id]"] = transactions.transaction_journal_id.toString()
+            dynamicParams["transactions[$index][internal_reference]"] = ""
+        }
+        apiResponses.data
+        transactionService.updateTransaction(apiResponses.data.transactionId,
+                apiResponses.data.transactionAttributes.group_title, dynamicParams)
+    }
+
     suspend fun addSplitTransaction(groupTitle: String,
                                     masterTransactionId: Long): ApiResponses<TransactionSuccessModel>{
         val dynamicParams = HashMap<String, String>()

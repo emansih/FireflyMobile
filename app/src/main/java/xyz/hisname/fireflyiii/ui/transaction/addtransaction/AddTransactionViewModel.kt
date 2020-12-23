@@ -196,6 +196,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                                         transaction.transaction_journal_id, getApplication<Application>(),
                                         AttachableType.TRANSACTION)
                             }
+                            temporaryTransactionRepository.removeInternalReference(addTransaction.response)
                         }
                         transactionRepository.insertTransaction(transaction)
                         transactionRepository.insertTransaction(TransactionIndex(addTransaction.response.data.transactionId,

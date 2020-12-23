@@ -60,6 +60,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                                         transaction.transaction_journal_id, context,
                                         AttachableType.TRANSACTION)
                             }
+                            tempRepository.removeInternalReference(addTransaction.response)
                         }
                     }
                     cancelWorker(masterTransactionId, context)
