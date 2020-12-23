@@ -10,7 +10,6 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.workers.BaseWorker
-import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
 import java.time.Duration
 
 class CategoryWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
@@ -31,7 +30,7 @@ class CategoryWorker(private val context: Context, workerParameters: WorkerParam
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
-                val deleteCategoryWork = PeriodicWorkRequestBuilder<DeleteCurrencyWorker>(Duration.ofMinutes(delay))
+                val deleteCategoryWork = PeriodicWorkRequestBuilder<CategoryWorker>(Duration.ofMinutes(delay))
                         .setInputData(categoryData)
                         .addTag("periodic_category_$categoryName")
                         .setConstraints(Constraints.Builder()
