@@ -32,6 +32,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
+import xyz.hisname.fireflyiii.ui.transaction.TransactionSeparatorAdapter
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.math.BigDecimal
@@ -41,7 +42,7 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
     private val budgetSummaryViewModel by lazy { getImprovedViewModel(BudgetSummaryViewModel::class.java) }
-    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
+    private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
     private val coloring = arrayListOf<Int>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

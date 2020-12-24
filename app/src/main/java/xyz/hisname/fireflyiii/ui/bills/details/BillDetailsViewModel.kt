@@ -5,10 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -24,6 +23,7 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
+import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 import java.io.File
@@ -97,7 +97,32 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
     fun getPaidTransactions(date: LocalDate) =
         Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
             TransactionPagingSource(billService, transactionDao, billId, date.toString())
-        }.flow.cachedIn(viewModelScope).asLiveData()
+        }.flow.map { pagingData ->
+            pagingData.map { transactions ->
+                SplitSeparator.TransactionItem(transactions)
+            }.insertSeparators { before, after ->
+                if (before == null) {
+                    if(after != null){
+                        return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                                + " " + after.transaction.date.month + " "
+                                + after.transaction.date.year)
+                    }
+                    return@insertSeparators null
+                }
+                if(after == null){
+                    return@insertSeparators null
+                }
+
+                if (after.transaction.date.isAfter(before.transaction.date)) {
+                    SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                            + " " + after.transaction.date.month + " "
+                            + after.transaction.date.year)
+                } else {
+                    null
+                }
+
+            }
+        }.cachedIn(viewModelScope).asLiveData()
 
     fun downloadAttachment(attachmentData: AttachmentData): LiveData<File>{
         isLoading.postValue(true)

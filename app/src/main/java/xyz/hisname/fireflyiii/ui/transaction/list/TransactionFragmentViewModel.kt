@@ -17,7 +17,6 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMonth
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionPagingSource
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -35,7 +34,6 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
     )
 
     // https://proandroiddev.com/how-to-use-the-paging-3-library-in-android-part-2-e2011070a37d
-/*
     fun getTransactionList(startDate: String, endDate: String,
                            transactionType: String): LiveData<PagingData<SplitSeparator>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
@@ -47,25 +45,22 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
                 if (before == null) {
                     return@insertSeparators null
                 }
+
                 if(after == null){
-                    return@insertSeparators null
+                    SplitSeparator.SeparatorItem(before.transaction.date.dayOfMonth.toString()
+                            + " " + before.transaction.date.month + " "
+                            + before.transaction.date.year)
                 }
-                if (before.transaction.index.transactionId == after.transaction.index.transactionId) {
-                    SplitSeparator.SeparatorItem(before.transaction.index.groupTitle)
+
+                if (after?.transaction?.date?.isAfter(before.transaction.date) == true) {
+                    SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                            + " " + after.transaction.date.month + " "
+                            + after.transaction.date.year)
                 } else {
                     null
                 }
             }
         }.cachedIn(viewModelScope).asLiveData()
-    }
-*/
-
-
-    fun getTransactionList(startDate: String, endDate: String,
-                           transactionType: String): LiveData<PagingData<Transactions>> {
-        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
-            TransactionPagingSource(transactionService, transactionDataDao, startDate, endDate, transactionType)
-        }.flow.cachedIn(viewModelScope).asLiveData()
     }
 
     fun getTransactionAmount(transactionType: String): LiveData<List<TransactionAmountMonth>> {

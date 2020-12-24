@@ -35,7 +35,7 @@ class TransactionMonthSummaryFragment: BaseFragment() {
     private val transactionType  by lazy { arguments?.getString("transactionType") ?: "" }
     private val monthYear by lazy { arguments?.getInt("monthYear") ?: 0}
     private val transactionMonthViewModel by lazy { getImprovedViewModel(TransactionMonthViewModel::class.java) }
-    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
+    private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)

@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.details_card.*
 import kotlinx.android.synthetic.main.fragment_account_detail.*
 import kotlinx.android.synthetic.main.fragment_account_detail.attachmentRecyclerView
 import kotlinx.android.synthetic.main.fragment_account_detail.notesCard
-import kotlinx.android.synthetic.main.fragment_bill_details.*
 import kotlinx.android.synthetic.main.fragment_markdown.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
@@ -29,7 +28,7 @@ import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
-import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
+import xyz.hisname.fireflyiii.ui.transaction.TransactionSeparatorAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -40,7 +39,7 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private val accountId: Long by lazy { arguments?.getLong("accountId") as Long  }
     private val accountType  by lazy { arguments?.getString("accountType")  }
-    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
+    private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
     private val accountDetailViewModel by lazy { getImprovedViewModel(AccountDetailViewModel::class.java) }
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
 

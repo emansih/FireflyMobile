@@ -140,40 +140,37 @@ class TransactionMonthViewModel(application: Application): BaseViewModel(applica
     }
 
 
-    fun getTransactionList(transactionType: String, monthYear: Int): LiveData<PagingData<Transactions>> {
+    fun getTransactionList(transactionType: String, monthYear: Int): LiveData<PagingData<SplitSeparator>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
             TransactionPagingSource(transactionService, transactionDataDao,
                     getStartOfMonth(monthYear), getEndOfMonth(monthYear), transactionType)
-        }.flow.cachedIn(viewModelScope).asLiveData()
-    }
-
-/*
-    fun getTransactionList(transactionType: String, monthYear: Int):LiveData<PagingData<SplitSeparator>> {
-        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
-            TransactionPagingSource(transactionService, transactionDataDao, getStartOfMonth(monthYear), getEndOfMonth(monthYear), transactionType)
         }.flow.map { pagingData ->
             pagingData.map { transactions ->
                 SplitSeparator.TransactionItem(transactions)
-            }
-        }.map { pagingData ->
-            pagingData.insertSeparators{ before, after ->
-                if(before == null){
-                    // Header
+            }.insertSeparators { before, after ->
+                if (before == null) {
+                    if(after != null){
+                        return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                                + " " + after.transaction.date.month + " "
+                                + after.transaction.date.year)
+                    }
                     return@insertSeparators null
                 }
+
                 if(after == null){
-                    // Footer
-                    return@insertSeparators null
+                  return@insertSeparators null
                 }
-                if(transactionRepository.getTransactionIdFromJournalId(before.transaction.index.transactionId) ==
-                        transactionRepository.getTransactionIdFromJournalId(after.transaction.index.transactionId)){
-                    SplitSeparator.SeparatorItem(transactionRepository.getSplitTitle(before.transaction.transactions.transaction_journal_id))
+
+                if (after.transaction.date.isAfter(before.transaction.date)) {
+                    SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                            + " " + after.transaction.date.month + " "
+                            + after.transaction.date.year)
                 } else {
                     null
                 }
+
             }
         }.cachedIn(viewModelScope).asLiveData()
     }
-*/
 
 }

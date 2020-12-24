@@ -1,12 +1,9 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.ObjectSum
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
-import xyz.hisname.fireflyiii.repository.models.transaction.TransactionList
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import java.math.BigDecimal
 
@@ -162,10 +159,6 @@ abstract class TransactionDataDao {
 
     @Query("SELECT groupTitle FROM transactionIndexTable WHERE transactionId IN (SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId =:journalId) LIMIT 1")
     abstract suspend fun getSplitTitle(journalId: Long): String
-
-    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.transactionJournalId WHERE (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType ORDER BY date ASC, transaction_journal_id ASC")
-    abstract suspend fun getTransactionSplitGroupFromJournalId(startDate: String, endDate: String, transactionType: String): List<TransactionList>
-
 
     // Temporary Database methods
     @Query("SELECT COUNT(*) FROM transactionIndexTable WHERE transactionJournalId=:id")

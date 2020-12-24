@@ -69,7 +69,7 @@ class TransactionFragment: BaseFragment(){
     private val noTransactionText by bindView<TextView>(R.id.listText)
     private val noTransactionImage by bindView<ImageView>(R.id.listImage)
     private lateinit var transactionVm: TransactionFragmentViewModel
-    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
+    private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)

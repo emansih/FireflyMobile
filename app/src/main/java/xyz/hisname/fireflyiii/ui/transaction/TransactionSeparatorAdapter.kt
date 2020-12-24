@@ -58,28 +58,28 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
                 is SplitSeparator.TransactionItem -> {
                     val viewHolder = holder as TransactionViewHolder
                     val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).timeFormat
-                    val transactionDescription = separator.transaction.transactions.description
-                    val descriptionText = if(separator.transaction.transactions.isPending){
+                    val transactionDescription = separator.transaction.description
+                    val descriptionText = if(separator.transaction.isPending){
                         viewHolder.itemView.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
                         "$transactionDescription (Pending)"
                     } else {
                         transactionDescription
                     }
                     viewHolder.itemView.transactionNameText.text = descriptionText
-                    viewHolder.itemView.sourceNameText.text = separator.transaction.transactions.source_name
-                    viewHolder.itemView.transactionJournalId.text = separator.transaction.transactions.transaction_journal_id.toString()
-                    viewHolder.itemView.dateText.text = DateTimeUtil.convertLocalDateTime(separator.transaction.transactions.date,
+                    viewHolder.itemView.sourceNameText.text = separator.transaction.source_name
+                    viewHolder.itemView.transactionJournalId.text = separator.transaction.transaction_journal_id.toString()
+                    viewHolder.itemView.dateText.text = DateTimeUtil.convertLocalDateTime(separator.transaction.date,
                             timePreference)
-                    if(separator.transaction.transactions.amount.toString().startsWith("-")){
+                    if(separator.transaction.amount.toString().startsWith("-")){
                         // Negative value means it's a withdrawal
                         viewHolder.itemView.transactionAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
-                        viewHolder.itemView.transactionAmountText.text = "-" + separator.transaction.transactions.currency_symbol +
-                                abs(separator.transaction.transactions.amount)
+                        viewHolder.itemView.transactionAmountText.text = "-" + separator.transaction.currency_symbol +
+                                abs(separator.transaction.amount)
                     } else {
-                        viewHolder.itemView.transactionAmountText.text = separator.transaction.transactions.currency_symbol +
-                                separator.transaction.transactions.amount.toString()
+                        viewHolder.itemView.transactionAmountText.text = separator.transaction.currency_symbol +
+                                separator.transaction.amount.toString()
                     }
-                    viewHolder.itemView.list_item.setOnClickListener {clickListener(separator.transaction.transactions)}
+                    viewHolder.itemView.list_item.setOnClickListener {clickListener(separator.transaction)}
                 }
             }
         }

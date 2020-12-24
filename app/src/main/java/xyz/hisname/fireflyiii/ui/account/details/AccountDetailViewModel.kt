@@ -5,10 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -23,6 +22,7 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -184,7 +184,32 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     fun getTransactionList(accountId: Long) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
         TransactionPageSource(transactionDao, accountId, accountType, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth())
-    }.flow.cachedIn(viewModelScope).asLiveData()
+    }.flow.map { pagingData ->
+        pagingData.map { transactions ->
+            SplitSeparator.TransactionItem(transactions)
+        }.insertSeparators { before, after ->
+            if (before == null) {
+                if(after != null){
+                    return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                            + " " + after.transaction.date.month + " "
+                            + after.transaction.date.year)
+                }
+                return@insertSeparators null
+            }
+            if(after == null){
+                return@insertSeparators null
+            }
+
+            if (after.transaction.date.isAfter(before.transaction.date)) {
+                SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                        + " " + after.transaction.date.month + " "
+                        + after.transaction.date.year)
+            } else {
+                null
+            }
+
+        }
+    }.cachedIn(viewModelScope).asLiveData()
 
 
     fun deleteAccountById(accountId: Long): LiveData<Boolean> {

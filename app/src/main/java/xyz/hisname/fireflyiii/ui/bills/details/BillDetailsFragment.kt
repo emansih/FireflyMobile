@@ -33,7 +33,7 @@ import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
-import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
+import xyz.hisname.fireflyiii.ui.transaction.TransactionSeparatorAdapter
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
@@ -53,7 +53,7 @@ class BillDetailsFragment: BaseDetailFragment() {
     private val monthTitleFormatter = DateTimeFormatter.ofPattern("MMMM")
     private val billDetailsViewModel by lazy { getImprovedViewModel(BillDetailsViewModel::class.java) }
     private val billId: Long by lazy { arguments?.getLong("billId") ?: 0  }
-    private val transactionAdapter by lazy { TransactionAdapter{ data -> itemClicked(data) } }
+    private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
     private var selectedDate: LocalDate? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
