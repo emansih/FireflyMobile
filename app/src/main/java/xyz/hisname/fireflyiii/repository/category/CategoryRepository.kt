@@ -64,7 +64,9 @@ class CategoryRepository(private val categoryDao: CategoryDataDao,
                 transactionData.forEach { data ->
                     data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
-                        transactionDao.insert(TransactionIndex(data.transactionId, transactions.transaction_journal_id, 0))
+                        transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                transactions.transaction_journal_id,
+                                data.transactionAttributes.group_title))
                     }
                 }
             }

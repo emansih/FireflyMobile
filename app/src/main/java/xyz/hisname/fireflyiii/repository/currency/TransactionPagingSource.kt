@@ -38,9 +38,10 @@ class TransactionPagingSource(private val currencyService: CurrencyService,
                 responseBody.data.forEach { data ->
                     data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
+                        transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                transactions.transaction_journal_id,
+                                data.transactionAttributes.group_title))
                     }
-                    transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes.transactions[0].transaction_journal_id, 0))
                 }
             }
             val pagination = responseBody?.meta?.pagination

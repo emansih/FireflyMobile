@@ -6,6 +6,7 @@ import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.ObjectSum
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionList
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import java.math.BigDecimal
 
@@ -29,7 +30,7 @@ abstract class TransactionDataDao {
 
     // Takes transaction id as parameter and return transaction journal id
     @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId =:journalId")
-    abstract fun getTransactionIdFromJournalId(journalId: Long): Long
+    abstract suspend fun getTransactionIdFromJournalId(journalId: Long): Long
 
     @Query("SELECT * FROM transactionTable WHERE transaction_journal_id =:journalId")
     abstract fun getTransactionByJournalId(journalId: Long): Transactions
@@ -78,7 +79,7 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.transactionJournalId ORDER BY transactionIndexTable.transactionJournalId DESC LIMIT :limit")
     abstract suspend fun getTransactionLimit(limit: Int): MutableList<Transactions>
 
-    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType ORDER BY date ASC")
+    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType ORDER BY date ASC, transaction_journal_id ASC")
     abstract suspend fun getTransactionByDate(startDate: String, endDate: String, transactionType: String): MutableList<Transactions>
 
     @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
@@ -156,15 +157,24 @@ abstract class TransactionDataDao {
     @Query("SELECT COUNT(*) FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate)")
     abstract suspend fun getTransactionByDestinationIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
 
+    @Query("SELECT * FROM transactionIndexTable WHERE transactionId IN (SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId =:journalId)")
+    abstract suspend fun getTransactionSplitFromJournalId(journalId: Long): List<TransactionIndex>
+
+    @Query("SELECT groupTitle FROM transactionIndexTable WHERE transactionId IN (SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId =:journalId) LIMIT 1")
+    abstract suspend fun getSplitTitle(journalId: Long): String
+
+    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.transactionJournalId WHERE (date BETWEEN :startDate AND :endDate) AND transactionType =:transactionType ORDER BY date ASC, transaction_journal_id ASC")
+    abstract suspend fun getTransactionSplitGroupFromJournalId(startDate: String, endDate: String, transactionType: String): List<TransactionList>
+
 
     // Temporary Database methods
     @Query("SELECT COUNT(*) FROM transactionIndexTable WHERE transactionJournalId=:id")
     abstract fun getPendingTransactionFromId(id: Long): LiveData<Int>
 
-    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.splitId WHERE transactionIndexTable.transactionJournalId =:id")
+    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.transactionJournalId  WHERE transactionIndexTable.transactionJournalId =:id")
     abstract suspend fun getPendingTransactionFromMasterIdId(id: Long): List<Transactions>
 
-    @Query("SELECT splitId FROM transactionIndexTable WHERE transactionJournalId=:id")
+    @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId=:id")
     abstract suspend fun getTempIdFromMasterId(id: Long): List<Long>
 
     @Query("DELETE FROM transactionIndexTable WHERE transactionJournalId=:id")

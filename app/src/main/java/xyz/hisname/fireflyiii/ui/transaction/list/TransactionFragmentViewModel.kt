@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -14,6 +15,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMonth
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionPagingSource
@@ -31,6 +33,33 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
             AppDatabase.getInstance(application).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
+
+    // https://proandroiddev.com/how-to-use-the-paging-3-library-in-android-part-2-e2011070a37d
+/*
+    fun getTransactionList(startDate: String, endDate: String,
+                           transactionType: String): LiveData<PagingData<SplitSeparator>> {
+        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
+            TransactionPagingSource(transactionService, transactionDataDao, startDate, endDate, transactionType)
+        }.flow.map { pagingData ->
+            pagingData.map { transactions ->
+                SplitSeparator.TransactionItem(transactions)
+            }.insertSeparators { before, after ->
+                if (before == null) {
+                    return@insertSeparators null
+                }
+                if(after == null){
+                    return@insertSeparators null
+                }
+                if (before.transaction.index.transactionId == after.transaction.index.transactionId) {
+                    SplitSeparator.SeparatorItem(before.transaction.index.groupTitle)
+                } else {
+                    null
+                }
+            }
+        }.cachedIn(viewModelScope).asLiveData()
+    }
+*/
+
 
     fun getTransactionList(startDate: String, endDate: String,
                            transactionType: String): LiveData<PagingData<Transactions>> {

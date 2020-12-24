@@ -199,8 +199,11 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                             temporaryTransactionRepository.removeInternalReference(addTransaction.response)
                         }
                         transactionRepository.insertTransaction(transaction)
-                        transactionRepository.insertTransaction(TransactionIndex(addTransaction.response.data.transactionId,
-                                transaction.transaction_journal_id,0))
+                        transactionRepository.insertTransaction(TransactionIndex(
+                                0,
+                                addTransaction.response.data.transactionId,
+                                transaction.transaction_journal_id,
+                                addTransaction.response.data.transactionAttributes.group_title))
                     }
                     temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
                 }

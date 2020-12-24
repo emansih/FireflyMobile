@@ -169,7 +169,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                             responseBody.data.forEach { data ->
                                 data.transactionAttributes.transactions.forEach { transaction ->
                                     transactionDao.insert(transaction)
-                                    transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id, 0))
+                                    transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                            transaction.transaction_journal_id,
+                                            data.transactionAttributes.group_title))
                                 }
                             }
                         }
@@ -290,7 +292,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 sourceName, "", "", tagsList, type, 0, piggyBankName, true, arrayOfString
         ))
         transactionDao.insert(TransactionIndex(
-                abs(Random.nextLong()), transactionMasterId, fakeId
+                0, transactionMasterId, fakeId, ""
         ))
     }
 
@@ -351,6 +353,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return attachmentDao.getAttachmentFromJournalId(transactionJournalId)
     }
 
+    suspend fun getSplitTransaction(journalId: Long) = transactionDao.getTransactionSplitFromJournalId(journalId)
+
+    suspend fun getSplitTitle(journalId: Long) = transactionDao.getSplitTitle(journalId)
 
     private suspend fun parseResponse(responseFromServer: Response<TransactionSuccessModel>): ApiResponses<TransactionSuccessModel>{
         val responseBody = responseFromServer.body()
@@ -403,9 +408,12 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 }
                 deleteTransactionsByDate(startDate, endDate, sourceName)
                 transactionData.forEach { data ->
-                    transactionDao.insert(data.transactionAttributes.transactions[0])
-                    transactionDao.insert(TransactionIndex(data.transactionId,
-                            data.transactionAttributes.transactions[0].transaction_journal_id, 0))
+                    data.transactionAttributes.transactions.forEach { transaction ->
+                        transactionDao.insert(transaction)
+                        transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                transaction.transaction_journal_id,
+                                data.transactionAttributes.group_title))
+                    }
                 }
             }
         } catch (exception: Exception){ }

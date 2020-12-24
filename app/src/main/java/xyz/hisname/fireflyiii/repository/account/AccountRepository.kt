@@ -114,8 +114,10 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                     transactionData.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
                         transactionDao.insert(TransactionIndex(
+                                0,
                                 transactionData.transactionId,
-                                transactions.transaction_journal_id, 0
+                                transactions.transaction_journal_id,
+                                transactionData.transactionAttributes.group_title
                         ))
                     }
                 }

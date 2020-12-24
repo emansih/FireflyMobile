@@ -31,7 +31,9 @@ class TransactionSearchPagingSource(private val transactionService: TransactionS
                     responseBody.data.forEach { data ->
                         data.transactionAttributes.transactions.forEach { transaction ->
                             transactionDao.insert(transaction)
-                            transactionDao.insert(TransactionIndex(data.transactionId, transaction.transaction_journal_id, 0))
+                            transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                    transaction.transaction_journal_id,
+                                    data.transactionAttributes.group_title))
                         }
                     }
                 }

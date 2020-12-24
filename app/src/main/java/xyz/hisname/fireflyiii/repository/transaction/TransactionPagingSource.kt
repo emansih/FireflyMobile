@@ -5,6 +5,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
+import xyz.hisname.fireflyiii.repository.models.transaction.TransactionList
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 
@@ -12,9 +13,9 @@ class TransactionPagingSource(private val transactionService: TransactionService
                               private val transactionDao: TransactionDataDao,
                               private val startDate: String,
                               private val endDate: String,
-                              private val transactionType: String): PagingSource<Int, Transactions>() {
+                              private val transactionType: String):PagingSource<Int, Transactions/*TransactionList*/>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Transactions> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, /*TransactionList*/Transactions> {
         val paramKey = params.key
         val previousKey = if(paramKey != null){
             if(paramKey - 1 == 0){
@@ -37,8 +38,9 @@ class TransactionPagingSource(private val transactionService: TransactionService
                 responseBody.data.forEach { data ->
                     data.transactionAttributes.transactions.forEach { transactions ->
                         transactionDao.insert(transactions)
-                        transactionDao.insert(TransactionIndex(data.transactionId,
-                                transactions.transaction_journal_id, 0))
+                        transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                transactions.transaction_journal_id,
+                                data.transactionAttributes.group_title))
                     }
                 }
             }
@@ -49,9 +51,12 @@ class TransactionPagingSource(private val transactionService: TransactionService
                 } else {
                     null
                 }
+                /*return LoadResult.Page(transactionDao.getTransactionSplitGroupFromJournalId(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                            DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType)).reversed(),
+                            previousKey, nextKey)*/
                 return LoadResult.Page(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                            DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType)),
-                            previousKey, nextKey)
+                        DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType)),
+                        previousKey, nextKey)
             } else {
                 return getOfflineData(params.key, previousKey)
             }
@@ -61,7 +66,7 @@ class TransactionPagingSource(private val transactionService: TransactionService
     }
 
 
-    private suspend fun getOfflineData(paramKey: Int?, previousKey: Int?): LoadResult<Int, Transactions>{
+    private suspend fun getOfflineData(paramKey: Int?, previousKey: Int?): LoadResult<Int, Transactions/*TransactionList*/>{
         val numberOfRows = transactionDao.getTransactionByDateCount(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType))
         val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
@@ -70,7 +75,7 @@ class TransactionPagingSource(private val transactionService: TransactionService
             null
         }
         return LoadResult.Page(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType)),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate),convertString(transactionType).reversed()),
                     previousKey, nextKey)
 
     }

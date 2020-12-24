@@ -5,11 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -18,6 +16,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionPagingSource
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
@@ -140,10 +139,41 @@ class TransactionMonthViewModel(application: Application): BaseViewModel(applica
         return uniqueAccountLiveData
     }
 
+
     fun getTransactionList(transactionType: String, monthYear: Int): LiveData<PagingData<Transactions>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
             TransactionPagingSource(transactionService, transactionDataDao,
                     getStartOfMonth(monthYear), getEndOfMonth(monthYear), transactionType)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }
+
+/*
+    fun getTransactionList(transactionType: String, monthYear: Int):LiveData<PagingData<SplitSeparator>> {
+        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
+            TransactionPagingSource(transactionService, transactionDataDao, getStartOfMonth(monthYear), getEndOfMonth(monthYear), transactionType)
+        }.flow.map { pagingData ->
+            pagingData.map { transactions ->
+                SplitSeparator.TransactionItem(transactions)
+            }
+        }.map { pagingData ->
+            pagingData.insertSeparators{ before, after ->
+                if(before == null){
+                    // Header
+                    return@insertSeparators null
+                }
+                if(after == null){
+                    // Footer
+                    return@insertSeparators null
+                }
+                if(transactionRepository.getTransactionIdFromJournalId(before.transaction.index.transactionId) ==
+                        transactionRepository.getTransactionIdFromJournalId(after.transaction.index.transactionId)){
+                    SplitSeparator.SeparatorItem(transactionRepository.getSplitTitle(before.transaction.transactions.transaction_journal_id))
+                } else {
+                    null
+                }
+            }
+        }.cachedIn(viewModelScope).asLiveData()
+    }
+*/
+
 }

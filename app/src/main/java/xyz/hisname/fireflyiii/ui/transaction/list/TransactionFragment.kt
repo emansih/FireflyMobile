@@ -45,6 +45,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthSummaryFragment
+import xyz.hisname.fireflyiii.ui.transaction.TransactionSeparatorAdapter
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionPager
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
