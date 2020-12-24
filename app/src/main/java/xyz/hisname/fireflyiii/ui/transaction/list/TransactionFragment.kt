@@ -42,7 +42,6 @@ import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionSeparatorAdapter
@@ -190,6 +189,7 @@ class TransactionFragment: BaseFragment(){
                         }
                         startDate = selectedDates[0]
                         endDate = selectedDates[1]
+                        loadTransaction()
                     }
                     transaction_calendar.notifyCalendarChanged()
                     true
@@ -334,6 +334,7 @@ class TransactionFragment: BaseFragment(){
             val picker = materialDatePicker.build()
             picker.show(parentFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
+                selectedDates.clear()
                 selectedDates.add(DateTimeUtil.convertLongToLocalDate(time))
                 transaction_calendar.smoothScrollToDate(DateTimeUtil.convertLongToLocalDate(time))
             }

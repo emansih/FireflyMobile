@@ -43,16 +43,19 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
                 SplitSeparator.TransactionItem(transactions)
             }.insertSeparators { before, after ->
                 if (before == null) {
+                    if(after != null){
+                        return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                                + " " + after.transaction.date.month + " "
+                                + after.transaction.date.year)
+                    }
                     return@insertSeparators null
                 }
 
                 if(after == null){
-                    SplitSeparator.SeparatorItem(before.transaction.date.dayOfMonth.toString()
-                            + " " + before.transaction.date.month + " "
-                            + before.transaction.date.year)
+                    return@insertSeparators null
                 }
 
-                if (after?.transaction?.date?.isAfter(before.transaction.date) == true) {
+                if (after.transaction.date.isAfter(before.transaction.date)) {
                     SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
                             + " " + after.transaction.date.month + " "
                             + after.transaction.date.year)
