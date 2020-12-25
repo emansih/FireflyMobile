@@ -5,10 +5,13 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import androidx.paging.cachedIn
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -331,14 +334,19 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         return piggyLiveData
     }
 
-    fun getBudgetByName(budgetName: String): LiveData<List<String>>{
+    fun getBudget(): LiveData<List<String>>{
         val data: MutableLiveData<List<String>> = MutableLiveData()
+        val mutatedBudgetList = arrayListOf<String>()
         viewModelScope.launch(Dispatchers.IO) {
-            val budgetList = arrayListOf<String>()
-            budgetRepository.searchBudgetList(budgetName).forEach { budget ->
-                budget.budgetListAttributes.name.let { budgetList.add(it) }
+            budgetRepository.getAllBudgetName().map {  budgetList ->
+                // Add a blank entry so that user can "unselect" budget
+                mutatedBudgetList.add("")
+                mutatedBudgetList.addAll(budgetList)
+            }.collectLatest {
+                // We need `collectLatest` otherwise data won't be posted. Don't put postValue()
+                // inside map
+                data.postValue(mutatedBudgetList)
             }
-            data.postValue(budgetList)
         }
         return data
     }

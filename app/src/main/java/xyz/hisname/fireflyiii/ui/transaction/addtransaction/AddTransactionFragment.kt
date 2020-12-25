@@ -211,7 +211,7 @@ class AddTransactionFragment: BaseFragment() {
         }
 
         addTransactionViewModel.transactionBudget.observe(viewLifecycleOwner) { transactionBudget ->
-            budget_edittext.setText(transactionBudget)
+            budget_exposed_dropdown.setText(transactionBudget)
         }
 
         addTransactionViewModel.transactionCategory.observe(viewLifecycleOwner) { transactionCategory ->
@@ -253,10 +253,10 @@ class AddTransactionFragment: BaseFragment() {
                 val beforeTags = tags_chip.allChips.toString().substring(1)
                 beforeTags.substring(0, beforeTags.length - 1)
             }
-            val budgetName = if(budget_edittext.isBlank()){
+            val budgetName = if(budget_exposed_dropdown.isBlank()){
                 null
             } else {
-                budget_edittext.getString()
+                budget_exposed_dropdown.getString()
             }
             var sourceAccount = ""
             var destinationAccount = ""
@@ -386,12 +386,6 @@ class AddTransactionFragment: BaseFragment() {
                 return ChipSpan(requireContext(), existingChip)
             }
         }, ChipSpan::class.java)
-        budget_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).apply {
-                    icon = FontAwesome.Icon.faw_gratipay
-                    colorRes = R.color.md_amber_300
-                    sizeDp = 24
-                },null, setTaskerIcons(), null)
         description_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_description
@@ -522,7 +516,10 @@ class AddTransactionFragment: BaseFragment() {
             destination_exposed_menu.setEndIconOnClickListener {
                 showTaskerVariable(destination_exposed_dropdown)
             }
-
+            budget_exposed_menu.endIconDrawable = setTaskerIcons()
+            budget_exposed_menu.setEndIconOnClickListener {
+                showTaskerVariable(budget_exposed_dropdown)
+            }
         }
         addTransactionViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             if(!isTasker){
@@ -557,24 +554,14 @@ class AddTransactionFragment: BaseFragment() {
         piggySearch.piggyName.observe(viewLifecycleOwner){ piggy ->
             piggy_edittext.setText(piggy)
         }
-        budget_edittext.setOnTouchListener(object : View.OnTouchListener{
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                if(event.action == MotionEvent.ACTION_UP){
-                    if(event.x <= budget_edittext.compoundDrawables[0].bounds.width() + 30){
-                        val budgetDialog = BudgetSearchDialog()
-                        budgetDialog.show(parentFragmentManager, "budgetDialog")
-                        return true
-                    } else if(budget_edittext.compoundDrawables[2] != null &&
-                            event.rawX >= (budget_edittext.right -
-                                    budget_edittext.compoundDrawables[2].bounds.width())){
-                        showTaskerVariable(budget_edittext)
-                    }
-                }
-                return false
-            }
-        })
+        addTransactionViewModel.getBudget().observe(viewLifecycleOwner){ budget ->
+            val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, budget)
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            budget_exposed_dropdown.setAdapter(spinnerAdapter)
+        }
+
         budgetSearch.budgetName.observe(viewLifecycleOwner) { name ->
-            budget_edittext.setText(name)
+            budget_exposed_dropdown.setText(name)
         }
         destination_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -694,12 +681,6 @@ class AddTransactionFragment: BaseFragment() {
             addTransactionViewModel.getCategory(editable.toString()).observe(viewLifecycleOwner) { dataToDisplay ->
                 val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
                 category_edittext.setAdapter(autocompleteAdapter)
-            }
-        }
-        budget_edittext.doAfterTextChanged { editable ->
-            addTransactionViewModel.getBudgetByName(editable.toString()).observe(viewLifecycleOwner){ list ->
-                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, list)
-                budget_edittext.setAdapter(autocompleteAdapter)
             }
         }
         source_edittext.doAfterTextChanged { editable ->

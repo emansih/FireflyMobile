@@ -1,6 +1,7 @@
 package xyz.hisname.fireflyiii.repository.budget
 
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
@@ -28,7 +29,7 @@ class BudgetRepository(private val budget: BudgetDataDao,
         val spentList = budgetData.budgetListAttributes.spent
         if(spentList.isNotEmpty()){
             spentList.forEach { spent ->
-                spent.spentId = budgetData.budgetListId ?: 0
+                spent.spentId = budgetData.budgetListId
                 spentDao.insert(spent)
             }
         }
@@ -109,7 +110,7 @@ class BudgetRepository(private val budget: BudgetDataDao,
 
     suspend fun getBudgetLimitByName(budgetName: String, startDate: String, endDate: String, currencyCode: String): BigDecimal{
         val budgetNameList = budgetList.searchBudgetName(budgetName)
-        val budgetId = budgetNameList[0].budgetListId ?: 0
+        val budgetId = budgetNameList[0].budgetListId
         try {
             val networkCall = budgetService.getBudgetLimit(budgetId, startDate, endDate)
             val responseBody = networkCall.body()
@@ -122,6 +123,30 @@ class BudgetRepository(private val budget: BudgetDataDao,
             }
         } catch (exception: Exception){ }
         return budgetLimitDao.getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId, currencyCode, startDate, endDate)
+    }
+
+    suspend fun getAllBudgetName(): Flow<List<String>> {
+        try {
+            val budgetListData: MutableList<BudgetListData> = arrayListOf()
+            val networkCall = budgetService.getPaginatedSpentBudget(1)
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                deleteBudgetList()
+                budgetListData.addAll(responseBody.data)
+                if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
+                    for(pagination in 2..responseBody.meta.pagination.total_pages){
+                        val networkBody = budgetService.getPaginatedSpentBudget(pagination).body()
+                        if(networkBody != null){
+                            budgetListData.addAll(networkBody.data)
+                        }
+                    }
+                }
+            }
+            budgetListData.forEach { data ->
+                insertBudgetList(data)
+            }
+        } catch (exception: Exception){  }
+        return budgetList.getAllBudgetName()
     }
 
     suspend fun getAllBudget(){
