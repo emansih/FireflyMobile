@@ -192,6 +192,7 @@ class TransactionFragment: BaseFragment(){
                         loadTransaction()
                     }
                     transaction_calendar.notifyCalendarChanged()
+                    recycler_view.scrollToPosition(1)
                     true
                 }
             }
