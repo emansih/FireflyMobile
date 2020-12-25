@@ -25,6 +25,7 @@ import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.insertDateSeparator
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 import java.io.File
@@ -184,32 +185,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     fun getTransactionList(accountId: Long) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
         TransactionPageSource(transactionDao, accountId, accountType, DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth())
-    }.flow.map { pagingData ->
-        pagingData.map { transactions ->
-            SplitSeparator.TransactionItem(transactions)
-        }.insertSeparators { before, after ->
-            if (before == null) {
-                if(after != null){
-                    return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                            + " " + after.transaction.date.month + " "
-                            + after.transaction.date.year)
-                }
-                return@insertSeparators null
-            }
-            if(after == null){
-                return@insertSeparators null
-            }
-
-            if (after.transaction.date.isAfter(before.transaction.date)) {
-                SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                        + " " + after.transaction.date.month + " "
-                        + after.transaction.date.year)
-            } else {
-                null
-            }
-
-        }
-    }.cachedIn(viewModelScope).asLiveData()
+    }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
 
 
     fun deleteAccountById(accountId: Long): LiveData<Boolean> {

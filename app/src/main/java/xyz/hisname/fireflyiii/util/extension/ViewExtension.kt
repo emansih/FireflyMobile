@@ -20,6 +20,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.paging.PagingData
+import androidx.paging.insertSeparators
+import androidx.paging.map
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import androidx.fragment.app.Fragment as SupportFragment
 
 fun ViewGroup.inflate(layoutRes: Int, attachToRoot: Boolean = false): View {
@@ -99,3 +106,32 @@ fun View.isOverlapping(secondView: View): Boolean {
     val rectSecondView = Rect(secondPosition[0], secondPosition[1], secondPosition[0] + secondView.measuredWidth, secondPosition[1] + secondView.measuredHeight)
     return rectFirstView.intersect(rectSecondView)
 }
+
+fun Flow<PagingData<Transactions>>.insertDateSeparator() =
+    this.map { pagingData ->
+        pagingData.map { transactions ->
+            SplitSeparator.TransactionItem(transactions)
+        }.insertSeparators { before, after ->
+            if (before == null) {
+                if(after != null){
+                    return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                            + " " + after.transaction.date.month + " "
+                            + after.transaction.date.year)
+                }
+                return@insertSeparators null
+            }
+
+            if(after == null){
+                return@insertSeparators null
+            }
+
+            if (after.transaction.date.isAfter(before.transaction.date)) {
+                SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
+                        + " " + after.transaction.date.month + " "
+                        + after.transaction.date.year)
+            } else {
+                null
+            }
+        }
+
+    }

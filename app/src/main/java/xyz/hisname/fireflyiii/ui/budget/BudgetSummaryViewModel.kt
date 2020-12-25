@@ -24,6 +24,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.insertDateSeparator
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.abs
@@ -144,32 +145,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
             return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
                 TransactionPagingSource(currencyService, transactionDataDao, defaultCurrency,
                         startOfMonth, endOfMonth, "withdrawal")
-            }.flow.map { pagingData ->
-                pagingData.map { transactions ->
-                    SplitSeparator.TransactionItem(transactions)
-                }.insertSeparators { before, after ->
-                    if (before == null) {
-                        if(after != null){
-                            return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                    + " " + after.transaction.date.month + " "
-                                    + after.transaction.date.year)
-                        }
-                        return@insertSeparators null
-                    }
-                    if(after == null){
-                        return@insertSeparators null
-                    }
-
-                    if (after.transaction.date.isAfter(before.transaction.date)) {
-                        SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                + " " + after.transaction.date.month + " "
-                                + after.transaction.date.year)
-                    } else {
-                        null
-                    }
-
-                }
-            }.cachedIn(viewModelScope).asLiveData()
+            }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
         } else {
             if(budget.isEmpty()){
                 balanceBudget.postValue("--.--")
@@ -182,32 +158,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                 return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
                     TransactionPagingSource(currencyService, transactionDataDao, defaultCurrency,
                             startOfMonth, endOfMonth, "withdrawal")
-                }.flow.map { pagingData ->
-                    pagingData.map { transactions ->
-                        SplitSeparator.TransactionItem(transactions)
-                    }.insertSeparators { before, after ->
-                        if (before == null) {
-                            if(after != null){
-                                return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                        + " " + after.transaction.date.month + " "
-                                        + after.transaction.date.year)
-                            }
-                            return@insertSeparators null
-                        }
-                        if(after == null){
-                            return@insertSeparators null
-                        }
-
-                        if (after.transaction.date.isAfter(before.transaction.date)) {
-                            SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                    + " " + after.transaction.date.month + " "
-                                    + after.transaction.date.year)
-                        } else {
-                            null
-                        }
-
-                    }
-                }.cachedIn(viewModelScope).asLiveData()
+                }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
             } else {
                 viewModelScope.launch(Dispatchers.IO){
                     val budgetAmount = budgetRepository.getBudgetLimitByName(budget, DateTimeUtil.getStartOfMonth(),
@@ -221,32 +172,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                     TransactionBudgetPagingSource(budgetService, transactionDataDao,
                             budgetListDao, budget, DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), defaultCurrency)
-                }.flow.map { pagingData ->
-                    pagingData.map { transactions ->
-                        SplitSeparator.TransactionItem(transactions)
-                    }.insertSeparators { before, after ->
-                        if (before == null) {
-                            if(after != null){
-                                return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                        + " " + after.transaction.date.month + " "
-                                        + after.transaction.date.year)
-                            }
-                            return@insertSeparators null
-                        }
-                        if(after == null){
-                            return@insertSeparators null
-                        }
-
-                        if (after.transaction.date.isAfter(before.transaction.date)) {
-                            SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                    + " " + after.transaction.date.month + " "
-                                    + after.transaction.date.year)
-                        } else {
-                            null
-                        }
-
-                    }
-                }.cachedIn(viewModelScope).asLiveData()
+                }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
             }
         }
     }

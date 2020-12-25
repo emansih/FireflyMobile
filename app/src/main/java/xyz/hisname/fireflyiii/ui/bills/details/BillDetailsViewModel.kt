@@ -24,6 +24,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
+import xyz.hisname.fireflyiii.util.extension.insertDateSeparator
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 import java.io.File
@@ -97,32 +98,7 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
     fun getPaidTransactions(date: LocalDate) =
         Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
             TransactionPagingSource(billService, transactionDao, billId, date.toString())
-        }.flow.map { pagingData ->
-            pagingData.map { transactions ->
-                SplitSeparator.TransactionItem(transactions)
-            }.insertSeparators { before, after ->
-                if (before == null) {
-                    if(after != null){
-                        return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                + " " + after.transaction.date.month + " "
-                                + after.transaction.date.year)
-                    }
-                    return@insertSeparators null
-                }
-                if(after == null){
-                    return@insertSeparators null
-                }
-
-                if (after.transaction.date.isAfter(before.transaction.date)) {
-                    SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                            + " " + after.transaction.date.month + " "
-                            + after.transaction.date.year)
-                } else {
-                    null
-                }
-
-            }
-        }.cachedIn(viewModelScope).asLiveData()
+        }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
 
     fun downloadAttachment(attachmentData: AttachmentData): LiveData<File>{
         isLoading.postValue(true)

@@ -20,6 +20,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMon
 import xyz.hisname.fireflyiii.repository.transaction.TransactionPagingSource
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.extension.insertDateSeparator
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.transaction.DeleteTransactionWorker
 
@@ -38,32 +39,7 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
                            transactionType: String): LiveData<PagingData<SplitSeparator>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
             TransactionPagingSource(transactionService, transactionDataDao, startDate, endDate, transactionType)
-        }.flow.map { pagingData ->
-            pagingData.map { transactions ->
-                SplitSeparator.TransactionItem(transactions)
-            }.insertSeparators { before, after ->
-                if (before == null) {
-                    if(after != null){
-                        return@insertSeparators SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                                + " " + after.transaction.date.month + " "
-                                + after.transaction.date.year)
-                    }
-                    return@insertSeparators null
-                }
-
-                if(after == null){
-                    return@insertSeparators null
-                }
-
-                if (after.transaction.date.isAfter(before.transaction.date)) {
-                    SplitSeparator.SeparatorItem(after.transaction.date.dayOfMonth.toString()
-                            + " " + after.transaction.date.month + " "
-                            + after.transaction.date.year)
-                } else {
-                    null
-                }
-            }
-        }.cachedIn(viewModelScope).asLiveData()
+        }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
     }
 
     fun getTransactionAmount(transactionType: String): LiveData<List<TransactionAmountMonth>> {
