@@ -161,16 +161,16 @@ abstract class TransactionDataDao {
     abstract suspend fun getSplitTitle(journalId: Long): String
 
     // Temporary Database methods
-    @Query("SELECT COUNT(*) FROM transactionIndexTable WHERE transactionJournalId=:id")
+    @Query("SELECT COUNT(*) FROM transactionIndexTable WHERE transactionId=:id")
     abstract fun getPendingTransactionFromId(id: Long): LiveData<Int>
 
-    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.transactionJournalId  WHERE transactionIndexTable.transactionJournalId =:id")
+    @Query("SELECT * FROM transactionTable INNER JOIN transactionIndexTable ON transactionTable.transaction_journal_id = transactionIndexTable.transactionJournalId  WHERE transactionIndexTable.transactionId =:id")
     abstract suspend fun getPendingTransactionFromMasterIdId(id: Long): List<Transactions>
 
-    @Query("SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId=:id")
+    @Query("SELECT transactionJournalId FROM transactionIndexTable WHERE transactionId=:id")
     abstract suspend fun getTempIdFromMasterId(id: Long): List<Long>
 
-    @Query("DELETE FROM transactionIndexTable WHERE transactionJournalId=:id")
+    @Query("DELETE FROM transactionIndexTable WHERE transactionId=:id")
     abstract suspend fun deleteTempMasterId(id: Long)
 
     @Query("SELECT attachment FROM transactionTable WHERE transaction_journal_id =:journalId")
