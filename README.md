@@ -2,7 +2,7 @@
 
 ### Firefly III(Android)
 
-[<img src="https://f-droid.org/badge/get-it-on.png"
+[<img src="art/get-it-on-fdroid.png"
       alt="Get it on F-Droid"
       height="80">](https://f-droid.org/packages/xyz.hisname.fireflyiii/)
            
