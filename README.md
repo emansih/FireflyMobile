@@ -1,3 +1,5 @@
+![0](art/Laptop_Android.png)
+
 ### Firefly III(Android)
 
 [<img src="https://f-droid.org/badge/get-it-on.png"
@@ -57,7 +59,7 @@ An APK is provided in the [release page](https://github.com/emansih/FireflyMobil
 are signed with the same release key, this ensure that the APK comes from me and your financial data will not be exposed to nefarious actors. The APK SHA256 public key is `40:F2:02:B8:CC:D1:68:87:56:8A:F7:9E:27:44:5B:E1:82:51:CC:B9:1E:89:08:8B:04:3D:2F:35:A2:0D:C3:8F`. All commits in this repo are signed with my GPG key and the public key can be found on [keybase](https://keybase.io/hisname/pgp_keys.asc) and [Github](https://api.github.com/users/emansih/gpg_keys)
 
 
-To get latest update notifications, add [this RSS feed](https://github.com/emansih/FireflyMobile/releases.atom). 
+To get latest update notifications, either add [this RSS feed](https://github.com/emansih/FireflyMobile/releases.atom) or click on the watch button.  
 
 It's also available via F-Droid [here](https://f-droid.org/packages/xyz.hisname.fireflyiii/). I have also added my own FDroid repo for users with Privileged Extension. For more info, take a look at the [wiki](https://github.com/emansih/FireflyMobile/wiki/FDroid)
 
@@ -65,15 +67,15 @@ If there is enough interest, I might upload it to Google Play Store.
 
 ### Screenshots
 
-| Dashboard | Piggy Bank | Adding Piggy Bank  | Piggy Bank Details |
-| :-: | :-: | :-: | :-: |
-| ![1](art/screenshot1.png) | ![3](art/screenshot3.png) | ![4](art/screenshot4.png) | ![5](art/screenshot5.png) |
+Dashboard | Monitor your accounts | Stay within your budget |
+| :-: | :-: | :-: |
+![1](art/Dashboard.png) | ![2](art/AccountDetails.png) | ![3](art/BudgetSummary.png)
 
-| Transactions | Bills | Login | Report | Bills Details
-| :-: | :-: | :-: | :-: | :-: |
-| ![2](art/screenshot2.png) | ![6](art/screenshot6.png) | ![7](art/screenshot7.png) | ![8](art/screenshot8.png) | ![9](art/screenshot9.png)
+| Track your expenses | Add transactions on the go | Pay your bills on time 
+| :-: | :-: | :-: |
+| ![5](art/TransactionList.png) | ![6](art/AddTransaction.png) | ![7](art/BillDetails.png)
 
-Thanks to [Screener - Better Screenshots](https://play.google.com/store/apps/details?id=de.toastcode.screener&hl=en) for the device frame!
+Thanks to [Device Shots](https://deviceshots.com/) for the device frame!
 
 ## Contributing
 
