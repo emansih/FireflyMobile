@@ -19,12 +19,12 @@ class DaoFactory {
 
         fun makeAccount(): AccountData {
             return AccountData(
-                    "", randomLong(),
+                    randomLong(),
                     AccountAttributes(
                             "", "", "", randomBoolean(), randomAccountType(), "" ,
-                            randomLong(), "", 0.0, "", "",
+                            randomLong(), "", 0.toBigDecimal(), "", "",
                             "", "", "", "", "",
-                            "", 0.0, "" ,"", "", "",
+                            "", 0.0, 0.toBigDecimal() ,"", "", "",
                             "","", "", randomBoolean(), false
                     )
             )
@@ -44,8 +44,7 @@ class DaoFactory {
                     CurrencyAttributes(
                             "", "", randomBoolean(), "", "", "",
                             randomInt(), randomBoolean()
-                    ),
-                    ""
+                    )
             )
         }
 
@@ -60,10 +59,7 @@ class DaoFactory {
         fun makeCategory(): CategoryData {
             return CategoryData(
                     randomLong(),
-                    CategoryAttributes(
-                          "", "", ""
-                    ),
-                    ""
+                    CategoryAttributes("", "", "", "")
             )
         }
 
@@ -81,8 +77,7 @@ class DaoFactory {
                             "", "", "", "",
                             "", "", "", ""
                     ),
-                    randomLong(),
-                    ""
+                    randomLong()
             )
         }
 
