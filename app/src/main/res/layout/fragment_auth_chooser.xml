@@ -1,92 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.core.widget.NestedScrollView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/signInText"
-        style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sign in using..."
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/accessTokenButton"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:textColor="@color/md_light_blue_300"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/personal_access_token"
-        android:layout_marginTop="44dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signInText"/>
-
-    <View
-        android:id="@+id/linedivider"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E1E1E1"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginTop="44dp"
-        app:layout_constraintTop_toBottomOf="@+id/accessTokenButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatButton
-         android:id="@+id/oauthButton"
-         style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:textColor="@color/md_red_500"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="OAuth"
-        android:layout_marginTop="44dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linedivider"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/signInText"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign in using..."
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/linedivider1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E1E1E1"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginTop="44dp"
-        app:layout_constraintTop_toBottomOf="@+id/oauthButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/accessTokenButton"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:textColor="@color/md_light_blue_300"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/personal_access_token"
+            android:layout_marginTop="44dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/signInText"/>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/demoButton"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:textColor="@color/md_pink_200"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Demo"
-        android:layout_marginTop="44dp"
-        app:layout_constraintTop_toBottomOf="@id/linedivider1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        <View
+            android:id="@+id/linedivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E1E1E1"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginTop="44dp"
+            app:layout_constraintTop_toBottomOf="@+id/accessTokenButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/helpText"
-        style="@style/Base.TextAppearance.AppCompat.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Unsure? Use OAuth"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/demoButton"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/oauthButton"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:textColor="@color/md_red_500"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OAuth"
+            android:layout_marginTop="44dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linedivider"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <View
+            android:id="@+id/linedivider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E1E1E1"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginTop="44dp"
+            app:layout_constraintTop_toBottomOf="@+id/oauthButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/demoButton"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:textColor="@color/md_pink_200"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Demo"
+            android:layout_marginTop="44dp"
+            app:layout_constraintTop_toBottomOf="@id/linedivider1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/helpText"
+            style="@style/Base.TextAppearance.AppCompat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Unsure? Use OAuth"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/demoButton"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
