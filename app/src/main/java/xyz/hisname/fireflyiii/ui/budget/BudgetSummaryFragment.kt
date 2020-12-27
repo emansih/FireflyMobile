@@ -73,12 +73,12 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
         transactionList.adapter = transactionAdapter
         budgetSummaryPieChart.isDrawHoleEnabled = false
         previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = GoogleMaterial.Icon.gmd_arrow_back
+            icon = GoogleMaterial.Icon.gmd_keyboard_arrow_left
             sizeDp = 24
             colorRes = R.color.colorPrimary
         })
         nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = GoogleMaterial.Icon.gmd_arrow_forward
+            icon = GoogleMaterial.Icon.gmd_keyboard_arrow_right
             sizeDp = 24
             colorRes = R.color.colorPrimary
         })

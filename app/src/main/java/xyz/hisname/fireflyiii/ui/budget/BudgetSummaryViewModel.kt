@@ -214,15 +214,15 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
                 // -1 -> 1 month before this month
                 // -2 -> 2 month before this month
                 data.postValue(DateTimeUtil.getMonthAndYear(DateTimeUtil.getStartOfMonth(abs(monthCount))))
-                startOfMonth = DateTimeUtil.getStartOfMonth(1)
-                endOfMonth = DateTimeUtil.getEndOfMonth(1)
+                startOfMonth = DateTimeUtil.getStartOfMonth(abs(monthCount))
+                endOfMonth = DateTimeUtil.getEndOfMonth(abs(monthCount))
             }
             else -> {
                 // +1 -> 1 month after this month
                 // +2 -> 2 month after this month
                 data.postValue(DateTimeUtil.getMonthAndYear(DateTimeUtil.getFutureStartOfMonth(monthCount)))
-                startOfMonth = DateTimeUtil.getFutureStartOfMonth(1)
-                endOfMonth = DateTimeUtil.getFutureEndOfMonth(1)
+                startOfMonth = DateTimeUtil.getFutureStartOfMonth(monthCount)
+                endOfMonth = DateTimeUtil.getFutureEndOfMonth(monthCount)
             }
         }
         viewModelScope.launch(Dispatchers.IO){
