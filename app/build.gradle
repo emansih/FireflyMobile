@@ -38,25 +38,8 @@ android {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
-   
-    signingConfigs {
-        githubRelease {
-            v1SigningEnabled true
-            v2SigningEnabled true
-			storeFile file(System.getenv("FireflyKeystoreFile"))
-            storePassword System.getenv("FireflyKeystorePassword")
-            keyAlias System.getenv("FireflyKeystoreAlias")
-            keyPassword System.getenv("FireflyKeystorePassword")
-        }
-
-        release {
-            v1SigningEnabled true
-            v2SigningEnabled true
-        }
-    }
-
     buildTypes {
-        release {
+         release {
             postprocessing {
                 removeUnusedCode true
                 removeUnusedResources true
@@ -64,31 +47,11 @@ android {
                 optimizeCode true
                 proguardFiles = ['proguard-rules.pro']
             }
-            matchingFallbacks = ['release']
         }
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
             minifyEnabled false
-            matchingFallbacks = ['debug']
-        }
-        // This build type is no different from `release` except that it run unit tests and change the apk name
-        // It's created so that it is compatible with Fdroid build system
-        githubRelease{
-            postprocessing {
-                removeUnusedCode true
-                removeUnusedResources true
-                obfuscate false
-                optimizeCode true
-                proguardFiles = ['proguard-rules.pro']
-            }
-            matchingFallbacks = ['release']
-            signingConfig signingConfigs.githubRelease
-            applicationVariants.all { variant ->
-                variant.outputs.all {
-                    outputFileName = "v${versionName}-firefly.apk"
-                }
-            }
         }
         compileOptions {
             coreLibraryDesugaringEnabled true
