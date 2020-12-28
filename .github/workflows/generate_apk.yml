@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Release APK
         id: buildRelease
-        run: ./gradlew assembleGithubRelease
+        run: ./gradlew assembleRelease
 
       - name: Sign Release APK
         id: sign
