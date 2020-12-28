@@ -34,3 +34,9 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Download APK
+          path: ${{steps.sign.outputs.signedReleaseFile}}
+    
