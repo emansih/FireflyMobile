@@ -142,11 +142,12 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             transactionNote.postValue(bundle.getString("transactionNote"))
             transactionSourceAccount.postValue(bundle.getString("transactionSourceAccount"))
             transactionDestinationAccount.postValue(bundle.getString("transactionDestinationAccount"))
-            val transactionUriBundle = bundle.getSerializable("transactionUri") as List<String>?
+            val transactionUriBundle = bundle.getString("transactionUri")
             if(!transactionUriBundle.isNullOrEmpty()){
                 val uriArray = arrayListOf<Uri>()
-                transactionUriBundle.forEach { uri ->
-                    uriArray.add(uri.toUri())
+                val arrayOfString = transactionUriBundle.split(",")
+                arrayOfString.forEach { uri ->
+                    uriArray.add(uri.trim().toUri())
                 }
                 fileUri.postValue(uriArray)
             }
