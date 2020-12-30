@@ -170,8 +170,14 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     fun getUser(): LiveData<Boolean> {
         val apiOk: MutableLiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
-            showErrorMessage.postValue(throwable.localizedMessage)
-            apiOk.postValue(false)
+            // The demo version as of writing has a bug. 
+            if(throwable.message?.contentEquals("Failed to fetch data") == true &&
+                    AppPref(sharedPref).baseUrl.contentEquals("https://demo.firefly-iii.org")){
+                apiOk.postValue(true)
+            } else {
+                showErrorMessage.postValue(throwable.localizedMessage)
+                apiOk.postValue(false)
+            }
         }) {
             systemInfoRepository.getCurrentUserInfo()
             apiOk.postValue(true)
