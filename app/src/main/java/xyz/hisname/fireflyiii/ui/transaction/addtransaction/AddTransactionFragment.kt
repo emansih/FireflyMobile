@@ -28,6 +28,7 @@ import com.hootsuite.nachos.ChipConfiguration
 import com.hootsuite.nachos.chip.ChipCreator
 import com.hootsuite.nachos.chip.ChipSpan
 import com.hootsuite.nachos.terminator.ChipTerminatorHandler
+import com.hootsuite.nachos.tokenizer.ChipTokenizer
 import com.hootsuite.nachos.tokenizer.SpanChipTokenizer
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
@@ -148,7 +149,7 @@ class AddTransactionFragment: BaseFragment() {
         }
     }
 
-    private fun showTaskerVariable(editText: EditText){
+    private fun showTaskerVariable(editText: EditText, shouldAppend: Boolean = false){
         val variablesFromHost = TaskerPlugin.getRelevantVariableList(requireActivity().intent.extras)
         val arrayAdapter = ArrayAdapter<String>(requireContext(), android.R.layout.select_dialog_item)
         variablesFromHost.forEach { variables ->
@@ -161,7 +162,11 @@ class AddTransactionFragment: BaseFragment() {
                 }
         dialog.setAdapter(arrayAdapter){ _, which ->
             val itemClicked = arrayAdapter.getItem(which)
-            editText.setText(itemClicked)
+            if(shouldAppend){
+                editText.append(itemClicked + "\n")
+            } else {
+                editText.setText(itemClicked)
+            }
         }
         dialog.show()
     }
@@ -457,6 +462,17 @@ class AddTransactionFragment: BaseFragment() {
             }
             false
         }
+        tags_chip.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                tags_chip.performClick()
+                if (tags_chip.compoundDrawables[2] != null &&
+                        event.rawX >= (tags_chip.right -
+                                tags_chip.compoundDrawables[2].bounds.width())) {
+                    showTaskerVariable(tags_chip, true)
+                }
+            }
+            false
+        }
         category_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if(event.action == MotionEvent.ACTION_UP){
@@ -651,6 +667,7 @@ class AddTransactionFragment: BaseFragment() {
         }
         description_edittext.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
+                description_edittext.performClick()
                 if (description_edittext.compoundDrawables[2] != null &&
                         event.rawX >= (description_edittext.right -
                                 description_edittext.compoundDrawables[2].bounds.width())) {
