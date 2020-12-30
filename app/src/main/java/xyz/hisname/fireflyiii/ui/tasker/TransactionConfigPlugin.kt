@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -36,7 +35,7 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
     private var transactionBudget: String? = null
     private var transactionCategory: String? = null
     private var transactionNote: String? = null
-    private var transactionUri: List<String> = listOf()
+    private var transactionUri: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,7 +145,10 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 uriArray.forEach {  uri ->
                     arrayOfString.add(uri.toString())
                 }
-                transactionUri = arrayOfString
+                // Remove [ and ] in the array
+                val beforeArray = uriArray.toString().substring(1)
+                val modifiedArray = beforeArray.substring(0, beforeArray.length - 1)
+                transactionUri = modifiedArray
             }
         }
 

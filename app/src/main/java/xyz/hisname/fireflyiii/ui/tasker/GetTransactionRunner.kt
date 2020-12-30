@@ -80,8 +80,9 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val transactionNotes = input.regular.transactionNote
         val fileUri = input.regular.transactionUri
         val uriArray = arrayListOf<Uri>()
-        fileUri.forEach { uri ->
-            uriArray.add(uri.toUri())
+        val arrayOfString = fileUri?.split(",")
+        arrayOfString?.forEach { uri ->
+            uriArray.add(uri.trim().toUri())
         }
         var taskerResult: TaskerPluginResult<GetTransactionOutput>
         runBlocking {

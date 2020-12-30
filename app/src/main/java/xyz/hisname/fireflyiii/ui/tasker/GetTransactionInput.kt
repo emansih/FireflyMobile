@@ -1,6 +1,5 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
-import android.net.Uri
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInputField
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInputRoot
 import xyz.hisname.fireflyiii.R
@@ -20,5 +19,5 @@ class GetTransactionInput @JvmOverloads constructor(
         @field:TaskerInputField("transactionBudget", R.string.budget) var transactionBudget: String? = null,
         @field:TaskerInputField("transactionCategory", R.string.categories) var transactionCategory: String? = null,
         @field:TaskerInputField("transactionNotes", R.string.notes) var transactionNote: String? = null,
-        @field:TaskerInputField("transactionUri", R.string.file) var transactionUri: List<String> = listOf()
+        @field:TaskerInputField("transactionUri", R.string.file) var transactionUri: String? = null
 )
