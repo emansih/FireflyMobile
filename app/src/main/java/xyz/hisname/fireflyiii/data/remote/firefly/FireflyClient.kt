@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.data.remote.firefly
 
+import android.net.Uri
 import android.util.Base64
 import com.squareup.moshi.Moshi
 import okhttp3.CertificatePinner
@@ -53,6 +54,7 @@ class FireflyClient {
                         .add(LocalDate::class.java, LocalDateAdapter())
                         .add(OffsetDateTime::class.java, OffsetDateTimeConverter())
                         .add(BigDecimalConverter())
+                        .add(Uri::class.java, UriConverter())
                         .build()
                 INSTANCE ?: Retrofit.Builder()
                         .baseUrl(generateUrl(baseUrl))

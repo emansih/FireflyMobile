@@ -72,4 +72,16 @@ object TypeConverterUtil{
     fun toLocalDate(value: LocalDate?): String {
         return value.toString()
     }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromUri(value: String?): Uri? {
+        return value?.toUri()
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toUri(value: Uri?): String? {
+        return value?.toString()
+    }
 }

@@ -33,7 +33,7 @@ import xyz.hisname.fireflyiii.util.TypeConverterUtil
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
     BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class,
     Spent::class, BudgetLimitData::class, BillPaidDates::class, BillPayDates::class],
-        version = 23, exportSchema = false)
+        version = 24, exportSchema = false)
 @TypeConverters(TypeConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 

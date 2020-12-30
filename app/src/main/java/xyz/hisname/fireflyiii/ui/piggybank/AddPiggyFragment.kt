@@ -79,7 +79,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
             if (success) {
                 attachment_information.isVisible = true
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                        "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
+                        "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
@@ -90,7 +90,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                            "", "", FileUtils.getFileName(requireContext(), file) ?: "",
+                            "", Uri.EMPTY, FileUtils.getFileName(requireContext(), file) ?: "",
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)

@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.models.attachment
 
+import android.net.Uri
 import androidx.room.Entity
 import com.squareup.moshi.JsonClass
 
@@ -9,7 +10,7 @@ data class Attributes(
         val attachable_id: Int,
         val attachable_type: String,
         val created_at: String,
-        val download_uri: String,
+        val download_uri: Uri,
         val filename: String,
         val md5: String,
         val mime: String,

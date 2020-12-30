@@ -1,6 +1,11 @@
 package xyz.hisname.fireflyiii.ui.bills.details
 
 import android.app.Application
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
@@ -24,6 +29,7 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
 import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
+import xyz.hisname.fireflyiii.util.extension.downloadFile
 import xyz.hisname.fireflyiii.util.extension.insertDateSeparator
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
@@ -101,18 +107,16 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
         }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
 
     fun downloadAttachment(attachmentData: AttachmentData): LiveData<File>{
-        isLoading.postValue(true)
+        val downloadedFile: MutableLiveData<File> = MutableLiveData()
         val fileName = attachmentData.attachmentAttributes.filename
         val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
                 File.separator + fileName)
-        val downloadedFile: MutableLiveData<File> = MutableLiveData()
-        viewModelScope.launch(Dispatchers.IO){
-            val attachmentRepository = AttachmentRepository(attachmentDao,
-                    genericService().create(AttachmentService::class.java))
-            downloadedFile.postValue(attachmentRepository.downloadOrOpenAttachment(
-                    attachmentData.attachmentAttributes.download_uri, fileToOpen))
-            isLoading.postValue(false)
-        }
+        getApplication<Application>().downloadFile(accManager.accessToken, attachmentData, fileToOpen)
+        getApplication<Application>().registerReceiver(object : BroadcastReceiver(){
+            override fun onReceive(context: Context, intent: Intent) {
+                downloadedFile.postValue(fileToOpen)
+            }
+        }, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
         return downloadedFile
     }
 

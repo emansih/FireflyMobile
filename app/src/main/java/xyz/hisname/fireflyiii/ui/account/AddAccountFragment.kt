@@ -76,7 +76,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                        "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
+                        "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
@@ -86,7 +86,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                            "", "", FileUtils.getFileName(requireContext(), file) ?: "",
+                            "", Uri.EMPTY, FileUtils.getFileName(requireContext(), file) ?: "",
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)

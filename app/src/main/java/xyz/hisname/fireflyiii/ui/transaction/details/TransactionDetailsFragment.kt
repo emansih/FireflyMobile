@@ -116,9 +116,8 @@ class TransactionDetailsFragment: BaseFragment() {
         detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
     }
 
-    private fun setMetaInfo(transactionData: Transactions){
+    private fun setMetaInfo(details: Transactions){
         metaDataList.clear()
-        val details = transactionData
         transactionCategory = details.category_name ?: ""
         transactionBudget = details.budget_name ?: ""
         val model = arrayListOf(DetailModel(resources.getString(R.string.categories),
@@ -195,8 +194,7 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
-        transactionDetailsViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
-            // "Refresh" the icon. From downloading to open file
+        transactionDetailsViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner){ downloadedFile ->
             attachment_information.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
                     true, { data: AttachmentData ->
                 setDownloadClickListener(data, attachmentDataAdapter)

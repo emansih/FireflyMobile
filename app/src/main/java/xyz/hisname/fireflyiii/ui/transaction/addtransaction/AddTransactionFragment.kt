@@ -129,7 +129,7 @@ class AddTransactionFragment: BaseFragment() {
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                        "", "", FileUtils.getFileName(requireContext(), fileUri) ?: "",
+                        "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
@@ -139,7 +139,7 @@ class AddTransactionFragment: BaseFragment() {
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                            "", "", FileUtils.getFileName(requireContext(), file) ?: "",
+                            "", Uri.EMPTY, FileUtils.getFileName(requireContext(), file) ?: "",
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
@@ -225,7 +225,7 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionViewModel.fileUri.observe(viewLifecycleOwner){ uri ->
             uri.forEach { uriArray ->
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
-                        "", "", FileUtils.getFileName(requireContext(), uriArray) ?: "",
+                        "", Uri.EMPTY, FileUtils.getFileName(requireContext(), uriArray) ?: "",
                         "", "", "", 0, "", "", ""), 0))
             }
             attachmentItemAdapter.addAll(uri)
