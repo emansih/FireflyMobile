@@ -21,7 +21,6 @@ import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_tags.*
 import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
 import kotlinx.android.synthetic.main.fragment_add_tags.placeHolderToolbar
-import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
@@ -109,7 +108,7 @@ class AddTagsFragment: BaseAddObjectFragment() {
             val picker = materialDatePicker.build()
             picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
-                transaction_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+                date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
         mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
