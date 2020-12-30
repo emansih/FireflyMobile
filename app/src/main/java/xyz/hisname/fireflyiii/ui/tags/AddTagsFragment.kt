@@ -117,7 +117,6 @@ class AddTagsFragment: BaseAddObjectFragment() {
                 replace(R.id.dialog_add_tags_layout, MapsFragment())
                 addToBackStack(null)
             }
-            addTagFab.isInvisible = true
         }
         mapsViewModel.latitude.observe(viewLifecycleOwner) { latitude ->
             if(latitude != 0.toDouble()){
