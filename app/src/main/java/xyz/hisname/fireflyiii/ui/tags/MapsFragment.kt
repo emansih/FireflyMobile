@@ -48,9 +48,9 @@ class MapsFragment: BaseFragment() {
     private val locationService by lazy { requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
     private val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
     private val mapController by lazy { maps.controller }
+    private val longitudeBundle by lazy { arguments?.getString("longitude") }
+    private val latitudeBundle by lazy { arguments?.getString("latitude") }
     private lateinit var startMarker: Marker
-    private var longitude: Double = 0.0
-    private var latitude: Double = 0.0
     private lateinit var cloneLocationList: List<LocationSearchModel>
     private lateinit var gpsPermission: ActivityResultLauncher<String>
 
@@ -79,13 +79,18 @@ class MapsFragment: BaseFragment() {
         Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
         Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
         startMarker = Marker(maps)
+        if(!latitudeBundle.isNullOrEmpty() && !longitudeBundle.isNullOrEmpty()){
+            setMap(GeoPoint(latitudeBundle?.toDouble() ?: 37.276675,
+                    longitudeBundle?.toDouble() ?: -115.798936))
+        } else {
+            isGpsEnabled()
+        }
         setMapClick()
-        isGpsEnabled()
         setFab()
         searchLocation()
         okButton.setOnClickListener {
-            mapsViewModel.latitude.postValue(latitude)
-            mapsViewModel.longitude.postValue(longitude)
+            mapsViewModel.latitude.postValue(startMarker.position.latitude)
+            mapsViewModel.longitude.postValue(startMarker.position.longitude)
             mapsViewModel.zoomLevel.postValue(maps.zoomLevelDouble)
             parentFragmentManager.popBackStack()
         }
@@ -135,14 +140,7 @@ class MapsFragment: BaseFragment() {
 
         })
         mapSearch.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
-            val startPoint = GeoPoint(cloneLocationList[i].lat, cloneLocationList[i].lon)
-            hideKeyboard()
-            startMarker.position = startPoint
-            startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            mapController.setZoom(15.0)
-            mapController.animateTo(startPoint)
-            longitude = cloneLocationList[i].lon
-            latitude = cloneLocationList[i].lat
+            setMap(GeoPoint(cloneLocationList[i].lat, cloneLocationList[i].lon))
         }
     }
 
@@ -158,19 +156,14 @@ class MapsFragment: BaseFragment() {
     private fun setMapClick(){
         val mapReceiver = object : MapEventsReceiver{
             override fun longPressHelper(geoPoint: GeoPoint): Boolean {
-                startMarker.position = GeoPoint(geoPoint.latitude, geoPoint.longitude)
-                longitude = geoPoint.longitude
-                latitude = geoPoint.latitude
+                setMap(geoPoint)
                 return true
             }
 
             override fun singleTapConfirmedHelper(geoPoint: GeoPoint): Boolean {
-                startMarker.position = GeoPoint(geoPoint.latitude, geoPoint.longitude)
-                longitude = geoPoint.longitude
-                latitude = geoPoint.latitude
+                setMap(geoPoint)
                 return true
             }
-
         }
         maps.overlays.add(MapEventsOverlay(mapReceiver))
     }
@@ -210,8 +203,6 @@ class MapsFragment: BaseFragment() {
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             setMap(GeoPoint(location.latitude, location.longitude))
-            latitude = location.latitude
-            longitude = location.longitude
         }
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
@@ -245,12 +236,6 @@ class MapsFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         maps.onResume()
-        if (ContextCompat.checkSelfPermission(requireContext(),
-                        Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            locationService.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
-            locationService.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
-        }
     }
 
     override fun onPause() {

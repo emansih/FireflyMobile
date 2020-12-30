@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -114,7 +115,11 @@ class AddTagsFragment: BaseAddObjectFragment() {
         mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         mapTextview.setOnClickListener {
             parentFragmentManager.commit {
-                replace(R.id.dialog_add_tags_layout, MapsFragment())
+                val longitude = longitude_edittext.getString()
+                val latitude = latitude_edittext.getString()
+                replace(R.id.dialog_add_tags_layout, MapsFragment().apply {
+                    arguments = bundleOf("longitude" to longitude, "latitude" to latitude)
+                })
                 addToBackStack(null)
             }
         }
