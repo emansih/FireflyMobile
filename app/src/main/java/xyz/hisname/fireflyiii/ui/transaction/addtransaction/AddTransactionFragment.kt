@@ -49,7 +49,6 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.search.AccountSearchDialog
 import xyz.hisname.fireflyiii.ui.account.search.AccountSearchViewModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.budget.BudgetSearchViewModel
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialog
 import xyz.hisname.fireflyiii.ui.categories.CategoriesDialogViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
@@ -77,7 +76,6 @@ class AddTransactionFragment: BaseFragment() {
     private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
-    private val budgetSearch by lazy { getViewModel(BudgetSearchViewModel::class.java) }
     private val piggySearch by lazy { getViewModel(SearchPiggyViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
     private val descriptionSearch by lazy { getViewModel(DescriptionViewModel::class.java) }
@@ -574,9 +572,6 @@ class AddTransactionFragment: BaseFragment() {
             budget_exposed_dropdown.setAdapter(spinnerAdapter)
         }
 
-        budgetSearch.budgetName.observe(viewLifecycleOwner) { name ->
-            budget_exposed_dropdown.setText(name)
-        }
         destination_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if(event.action == MotionEvent.ACTION_UP){

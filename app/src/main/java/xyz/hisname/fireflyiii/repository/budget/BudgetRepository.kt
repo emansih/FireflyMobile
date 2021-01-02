@@ -35,22 +35,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
         }
     }
 
-    suspend fun searchBudgetList(searchName: String): List<BudgetListData>{
-        try {
-            val networkCall = budgetService.searchBudget(searchName)
-            val responseBody = networkCall.body()
-            if(responseBody != null && networkCall.isSuccessful){
-                responseBody.forEach {  budgetItems ->
-                    insertBudgetList(BudgetListData(budgetItems.id,
-                            BudgetListAttributes(true, "", budgetItems.name,
-                                    0, listOf(), "")))
-                }
-            }
-        } catch (exception: Exception) { }
-        return budgetList.searchBudgetName("*$searchName*")
-    }
-
-
     suspend fun allActiveSpentList(currencyCode: String, startDate: String, endDate: String): BigDecimal{
         try {
             val budgetListData: MutableList<BudgetListData> = arrayListOf()
