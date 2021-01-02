@@ -91,8 +91,10 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
                     ))
                 }
             }
-        } catch (exception: Exception){ }
-        return tagsDataDao.searchTagByName("*$tagName*")
+        } catch (exception: Exception){
+            exception.printStackTrace()
+        }
+        return tagsDataDao.searchTagByName("%$tagName%")
     }
 
     suspend fun addTags(tagName: String, date: String?, description: String?, latitude: String?,

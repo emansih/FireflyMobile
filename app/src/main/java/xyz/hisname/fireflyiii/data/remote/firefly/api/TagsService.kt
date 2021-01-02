@@ -40,6 +40,6 @@ interface TagsService {
     @GET("$TAGS_API_ENDPOINT/{tagName}")
     suspend fun getTagByName(@Path("tagName") tagName: String): Response<TagsModel>
 
-    @GET("$AUTOCOMPLETE_API_ENDPOINT/{tags}")
+    @GET("$AUTOCOMPLETE_API_ENDPOINT/tags")
     suspend fun searchTag(@Query("query") queryString: String): Response<List<TagsItems>>
 }
