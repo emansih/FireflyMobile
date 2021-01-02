@@ -22,6 +22,7 @@ fun SupportFragment.showCase(@StringRes title: Int, showOnce: String, layout: Vi
 fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View,  fitWindow: Boolean,
                       dismissListener: DismissListener? = null): FancyShowCaseView{
     val enterAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_from_left)
+    val exitAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_to_right)
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
     val showCaseView = FancyShowCaseView.Builder(this)
             .focusOn(layout)
@@ -31,6 +32,7 @@ fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View,  fi
             .fitSystemWindows(fitWindow)
             .focusShape(FocusShape.ROUNDED_RECTANGLE)
             .enterAnimation(enterAnimation)
+            .exitAnimation(exitAnimation)
             .closeOnTouch(true)
     if(dismissListener != null){
         showCaseView.dismissListener(dismissListener)
