@@ -315,19 +315,17 @@ class DashboardFragment: BaseFragment() {
                 budget.first.toInt() >= 80 -> {
                     progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.RED,
                             BlendModeCompat.SRC_ATOP)
-                    budgetProgress.progressDrawable = progressDrawable
                 }
                 budget.first.toInt() in 50..80 -> {
                     progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.YELLOW,
                             BlendModeCompat.SRC_ATOP)
-                    budgetProgress.progressDrawable = progressDrawable
                 }
                 else -> {
                     progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GREEN,
                             BlendModeCompat.SRC_ATOP)
-                    budgetProgress.progressDrawable = progressDrawable
                 }
             }
+            budgetProgress.progressDrawable = progressDrawable
             ObjectAnimator.ofInt(budgetProgress, "progress", budget.first.toInt()).start()
         }
         dashboardView.currentMonthBudgetValue.observe(viewLifecycleOwner){ budget ->
