@@ -19,7 +19,7 @@ class AttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
                                 private val shouldShowDownload: Boolean = true,
                                 private val clickListener:(AttachmentData) -> Unit,
                                 private val removeItemListener:(position: Int) -> Unit):
-        DiffUtilAdapter<AttachmentData, AttachmentRecyclerAdapter.AttachmentAdapter>() {
+        RecyclerView.Adapter<AttachmentRecyclerAdapter.AttachmentAdapter>() {
 
     private lateinit var context: Context
 
@@ -35,7 +35,7 @@ class AttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
 
     inner class AttachmentAdapter(view: View): RecyclerView.ViewHolder(view) {
         fun bind(attachmentData: AttachmentData, clickListener: (AttachmentData) -> Unit, removeItemListener: Int){
-            val fileName = attachmentData.attachmentAttributes?.filename ?: ""
+            val fileName = attachmentData.attachmentAttributes.filename
             itemView.attachment_name.text = fileName
             if(shouldShowDownload) {
                 val downloadedFile = File(context.getExternalFilesDir(null).toString() + File.separator + fileName)

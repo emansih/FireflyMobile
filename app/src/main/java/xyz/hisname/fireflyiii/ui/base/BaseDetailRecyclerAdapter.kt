@@ -10,7 +10,7 @@ import xyz.hisname.fireflyiii.util.extension.inflate
 
 class BaseDetailRecyclerAdapter(private val data: List<DetailModel>,
                                 private val clickListener:(position: Int) -> Unit ):
-        DiffUtilAdapter<DetailModel, BaseDetailRecyclerAdapter.BaseDetailViewHolder>() {
+        RecyclerView.Adapter<BaseDetailRecyclerAdapter.BaseDetailViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseDetailViewHolder {
         return BaseDetailViewHolder(parent.inflate(R.layout.base_detail_list))

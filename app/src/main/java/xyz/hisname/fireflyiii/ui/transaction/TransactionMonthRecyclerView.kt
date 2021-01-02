@@ -7,13 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.transaction_card_details.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionAmountMonth
-import xyz.hisname.fireflyiii.ui.base.DiffUtilAdapter
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
 
 class TransactionMonthRecyclerView(private val items: List<TransactionAmountMonth>,
                                    private val clickListener:(Int) -> Unit):
-        DiffUtilAdapter<TransactionAmountMonth, TransactionMonthRecyclerView.TransactionAdapter>() {
+        RecyclerView.Adapter<TransactionMonthRecyclerView.TransactionAdapter>() {
 
     private lateinit var context: Context
 
