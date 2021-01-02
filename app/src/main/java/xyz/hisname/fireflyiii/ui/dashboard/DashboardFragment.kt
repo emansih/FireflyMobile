@@ -393,7 +393,7 @@ class DashboardFragment: BaseFragment() {
             frames.animate()
                     .translationY(0f)
                     .setInterpolator(DecelerateInterpolator(5f))
-                    .setDuration(2000)
+                    .setDuration(1100)
                     .withEndAction {
                         if(frames == budgetCard){
                             val helpText = showCase(R.string.dashboard_balance_help_text,
