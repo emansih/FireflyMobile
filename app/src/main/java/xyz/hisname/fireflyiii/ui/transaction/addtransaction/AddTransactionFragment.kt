@@ -548,7 +548,7 @@ class AddTransactionFragment: BaseFragment() {
         piggy_edittext.setOnTouchListener(object : View.OnTouchListener{
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 if(event.action == MotionEvent.ACTION_UP){
-                    if(event.x <= category_edittext.compoundDrawables[0].bounds.width() + 30){
+                    if(event.x <= piggy_edittext.compoundDrawables[0].bounds.width() + 30){
                         val piggyBankDialog = SearchPiggyDialog()
                         piggyBankDialog.show(parentFragmentManager, "piggyDialog")
                         return true
@@ -672,7 +672,7 @@ class AddTransactionFragment: BaseFragment() {
                         event.rawX >= (description_edittext.right -
                                 description_edittext.compoundDrawables[2].bounds.width())) {
                     showTaskerVariable(description_edittext)
-                } else if(event.x <= category_edittext.compoundDrawables[0].bounds.width() + 30){
+                } else if(event.x <= description_edittext.compoundDrawables[0].bounds.width() + 30){
                     val transactionDescription = DescriptionSearch()
                     transactionDescription.show(parentFragmentManager, "descriptionDialog")
                     descriptionSearch.transactionName.observe(viewLifecycleOwner){ search ->
