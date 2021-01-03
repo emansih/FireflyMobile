@@ -732,6 +732,7 @@ class AddTransactionFragment: BaseFragment() {
                 destination_layout.isGone = true
                 destination_exposed_menu.isVisible = true
                 piggy_exposed_menu.isVisible = true
+                budget_exposed_menu.isGone = true
                 val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, accounts)
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)
