@@ -749,6 +749,7 @@ class AddTransactionFragment: BaseFragment() {
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)
                 destination_layout.isGone = true
                 source_exposed_menu.isGone = true
+                budget_exposed_menu.isGone = true
                 addTransactionViewModel.transactionDestinationAccount.observe(viewLifecycleOwner){ transactionDestinationAccount ->
                     destination_exposed_dropdown.setText(transactionDestinationAccount)
                 }
