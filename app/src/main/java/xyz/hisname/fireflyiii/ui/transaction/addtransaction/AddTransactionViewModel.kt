@@ -117,9 +117,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         if(bundle != null){
             val currencyBundle = bundle.getString("transactionCurrency")
             if(currencyBundle?.startsWith("%") == false){
-                viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
-                    throwable.printStackTrace()
-                }){
+                viewModelScope.launch(Dispatchers.IO){
                     val currencyAttributes = currencyRepository.getCurrencyByCode(currencyBundle)[0].currencyAttributes
                     transactionCurrency.postValue(currencyAttributes.name + " (" + currencyAttributes.code + ")")
                 }
@@ -323,14 +321,19 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         return accountData
     }
 
-    fun getPiggyBank(piggyBankName: String): LiveData<List<String>>{
+    fun getPiggyBank(): LiveData<List<String>>{
         val piggyLiveData: MutableLiveData<List<String>> = MutableLiveData()
-        val piggyList = arrayListOf<String>()
+        val mutatedPiggyListList = arrayListOf<String>()
         viewModelScope.launch(Dispatchers.IO){
-            piggyRepository.searchPiggyBank(piggyBankName).forEach { piggyData ->
-                piggyList.add(piggyData.piggyAttributes.name)
+            piggyRepository.getPiggyNames().map { piggyList ->
+                // Add a blank entry so that user can "unselect" piggy bank
+                mutatedPiggyListList.add("")
+                mutatedPiggyListList.addAll(piggyList)
+            }.collectLatest {
+                // We need `collectLatest` otherwise data won't be posted. Don't put postValue()
+                // inside map
+                piggyLiveData.postValue(mutatedPiggyListList)
             }
-            piggyLiveData.postValue(piggyList)
         }
         return piggyLiveData
     }

@@ -303,8 +303,8 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/piggy_layout"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:id="@+id/piggy_exposed_menu"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
@@ -315,14 +315,14 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/time_layout">
 
-                        <xyz.hisname.fireflyiii.ui.base.TextInputAutoCompleteTextView
-                            android:id="@+id/piggy_edittext"
+                        <AutoCompleteTextView
+                            android:id="@+id/piggy_exposed_dropdown"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:drawablePadding="12dp"
                             android:hint="@string/piggy_bank"
                             android:textSize="16sp"
-                            style="@style/Base.V7.Widget.AppCompat.AutoCompleteTextView" />
+                            android:inputType="none" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -335,7 +335,7 @@
                         android:layout_marginEnd="30dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/piggy_layout">
+                        app:layout_constraintTop_toBottomOf="@+id/piggy_exposed_menu">
 
                         <xyz.hisname.fireflyiii.ui.base.TextInputAutoCompleteTextView
                             android:id="@+id/category_edittext"

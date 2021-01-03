@@ -54,8 +54,6 @@ import xyz.hisname.fireflyiii.ui.categories.CategoriesDialogViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownFragment
-import xyz.hisname.fireflyiii.ui.piggybank.search.SearchPiggyDialog
-import xyz.hisname.fireflyiii.ui.piggybank.search.SearchPiggyViewModel
 import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.transaction.search.DescriptionSearch
 import xyz.hisname.fireflyiii.ui.transaction.search.DescriptionViewModel
@@ -76,7 +74,6 @@ class AddTransactionFragment: BaseFragment() {
     private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
-    private val piggySearch by lazy { getViewModel(SearchPiggyViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
     private val descriptionSearch by lazy { getViewModel(DescriptionViewModel::class.java) }
     private val accountSearchViewModel by lazy { getViewModel(AccountSearchViewModel::class.java) }
@@ -200,9 +197,9 @@ class AddTransactionFragment: BaseFragment() {
             time_edittext.setText(transactionTime)
         }
 
-        if (piggy_layout.isVisible) {
+        if (piggy_exposed_menu.isVisible) {
             addTransactionViewModel.transactionPiggyBank.observe(viewLifecycleOwner) { transactionPiggyBank ->
-                piggy_edittext.setText(transactionPiggyBank)
+                piggy_exposed_dropdown.setText(transactionPiggyBank)
 
             }
         }
@@ -237,10 +234,10 @@ class AddTransactionFragment: BaseFragment() {
     private fun setFab(){
         addTransactionViewModel.saveData.observe(viewLifecycleOwner){
             hideKeyboard()
-            val piggyBank = if(piggy_edittext.isBlank()){
+            val piggyBank = if(piggy_exposed_dropdown.isBlank()){
                 null
             } else {
-                piggy_edittext.getString()
+                piggy_exposed_dropdown.getString()
             }
             val categoryName = if(category_edittext.isBlank()){
                 null
@@ -359,12 +356,6 @@ class AddTransactionFragment: BaseFragment() {
             colorRes = R.color.md_deep_purple_400
             sizeDp = 24
         }, null, setTaskerIcons(), null)
-        piggy_edittext.setCompoundDrawablesWithIntrinsicBounds(
-                IconicsDrawable(requireContext()).apply{
-                    icon = FontAwesome.Icon.faw_piggy_bank
-                    colorRes = R.color.md_pink_200
-                    sizeDp = 24
-                },null, setTaskerIcons(), null)
         time_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_clock
@@ -532,6 +523,10 @@ class AddTransactionFragment: BaseFragment() {
             budget_exposed_menu.setEndIconOnClickListener {
                 showTaskerVariable(budget_exposed_dropdown)
             }
+            piggy_exposed_menu.endIconDrawable = setTaskerIcons()
+            piggy_exposed_menu.setEndIconOnClickListener {
+                showTaskerVariable(piggy_exposed_dropdown)
+            }
         }
         addTransactionViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             if(!isTasker){
@@ -541,31 +536,13 @@ class AddTransactionFragment: BaseFragment() {
                 currency_edittext.setText(defaultCurrency)
             }
         }
-        piggy_edittext.setOnTouchListener(object : View.OnTouchListener{
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                if(event.action == MotionEvent.ACTION_UP){
-                    if(event.x <= piggy_edittext.compoundDrawables[0].bounds.width() + 30){
-                        val piggyBankDialog = SearchPiggyDialog()
-                        piggyBankDialog.show(parentFragmentManager, "piggyDialog")
-                        return true
-                    } else if(piggy_edittext.compoundDrawables[2] != null &&
-                            event.rawX >= (piggy_edittext.right -
-                                    piggy_edittext.compoundDrawables[2].bounds.width())){
-                        showTaskerVariable(piggy_edittext)
-                    }
-                }
-                return false
-            }
-        })
-        piggy_edittext.doAfterTextChanged { editable ->
-            addTransactionViewModel.getPiggyBank(editable.toString()).observe(viewLifecycleOwner){ dataToDisplay ->
-                val autocompleteAdapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, dataToDisplay)
-                piggy_edittext.setAdapter(autocompleteAdapter)
-            }
+
+        addTransactionViewModel.getPiggyBank().observe(viewLifecycleOwner){ budget ->
+            val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, budget)
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            piggy_exposed_dropdown.setAdapter(spinnerAdapter)
         }
-        piggySearch.piggyName.observe(viewLifecycleOwner){ piggy ->
-            piggy_edittext.setText(piggy)
-        }
+
         addTransactionViewModel.getBudget().observe(viewLifecycleOwner){ budget ->
             val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, budget)
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -615,14 +592,14 @@ class AddTransactionFragment: BaseFragment() {
         })
         expansionLayout.addListener { _, expanded ->
             if(expanded){
-                if (piggy_layout.isVisible){
+                if (piggy_exposed_menu.isVisible){
                     dialog_add_transaction_layout.post {
-                        dialog_add_transaction_layout.smoothScrollTo(0, piggy_layout.bottom)
+                        dialog_add_transaction_layout.smoothScrollTo(0, piggy_exposed_menu.bottom)
                     }
                     dialog_add_transaction_layout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                        if(scrollY == piggy_layout.bottom){
+                        if(scrollY == piggy_exposed_menu.bottom){
                             showCase(R.string.transactions_create_transfer_ffInput_piggy_bank_id,
-                                    "transactionPiggyShowCase", piggy_layout, false).show()
+                                    "transactionPiggyShowCase", piggy_exposed_menu, false).show()
                         }
                     }
                 }
@@ -754,7 +731,7 @@ class AddTransactionFragment: BaseFragment() {
                 source_layout.isGone = true
                 destination_layout.isGone = true
                 destination_exposed_menu.isVisible = true
-                piggy_layout.isVisible = true
+                piggy_exposed_menu.isVisible = true
                 val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, accounts)
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 destination_exposed_dropdown.setAdapter(spinnerAdapter)

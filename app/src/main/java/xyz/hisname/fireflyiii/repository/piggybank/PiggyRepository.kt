@@ -1,6 +1,10 @@
 package xyz.hisname.fireflyiii.repository.piggybank
 
+import androidx.paging.PagingSource
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
@@ -8,7 +12,10 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
+import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
+import xyz.hisname.fireflyiii.util.extension.debounce
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 
 @Suppress("RedundantSuspendModifier")
@@ -48,8 +55,29 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
 
     suspend fun getPiggyById(piggyId: Long) =  piggyDao.getPiggyFromId(piggyId)
 
-    // Since there is no API to search piggy bank, we simply do a query in the piggy bank
-    suspend fun searchPiggyBank(searchQuery: String) = piggyDao.searchPiggyName("*$searchQuery*")
+    suspend fun getPiggyNames(): Flow<List<String>>{
+        try {
+            val networkCall = piggyService.getPaginatedPiggyBank(1)
+            val responseBody = networkCall.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                piggyDao.deleteAllPiggyBank()
+                responseBody.data.forEach { data ->
+                    piggyDao.insert(data)
+                }
+                val pagination = responseBody.meta.pagination
+                if (pagination.total_pages != pagination.current_page) {
+                    for (items in 2..pagination.total_pages) {
+                        val service = piggyService.getPaginatedPiggyBank(items).body()
+                        service?.data?.forEach { dataToBeAdded ->
+                            piggyDao.insert(dataToBeAdded)
+                        }
+                    }
+                }
+            }
+        } catch (exception: Exception){ }
+        return piggyDao.getAllPiggyName()
+    }
+
 
     suspend fun addPiggyBank(name: String, accountId: Long, targetAmount: String,
                              currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel> {
