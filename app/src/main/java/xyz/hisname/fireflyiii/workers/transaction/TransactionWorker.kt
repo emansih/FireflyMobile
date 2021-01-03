@@ -95,13 +95,14 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
             val category = inputData.getString("categoryName")
             val tags = inputData.getString("tags")
             val budget = inputData.getString("budgetName")
+            val billName = inputData.getString("billName")
             val notes = inputData.getString("notes")
             val fileArray = inputData.getString("filesToUpload") ?: ""
             val transactionWorkManagerId = inputData.getLong("transactionWorkManagerId", 0)
 
             val addTransaction = transactionRepository.addTransaction(transactionType, transactionDescription, transactionDate,
                     transactionTime, piggyBank, transactionAmount, sourceName,
-                    destinationName, transactionCurrency, category, tags, budget, notes)
+                    destinationName, transactionCurrency, category, tags, budget, billName, notes)
 
             when {
                 addTransaction.response != null -> {

@@ -240,6 +240,10 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             if(budgetName != null){
                 dynamicParams["transactions[$index][budget_name]"] = budgetName
             }
+            val billName = latest.bill_name
+            if(billName != null){
+                dynamicParams["transactions[$index][bill_name]"] = billName
+            }
             val note = latest.notes
             if(!note.isNullOrEmpty()){
                 dynamicParams["transactions[$index][notes]"] = note
@@ -262,7 +266,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun storeSplitTransaction(type: String, description: String,
                                       date: String, time: String?, piggyBankName: String?, amount: String,
                                       sourceName: String?, destinationName: String?, currencyName: String,
-                                      category: String?, tags: String?, budgetName: String?,
+                                      category: String?, tags: String?, budgetName: String?, billName: String?,
                                       notes: String?, fileUri: ArrayList<Uri>, transactionMasterId: Long){
         val dateTime = if(time.isNullOrEmpty()){
             DateTimeUtil.offsetDateTimeWithoutTime(date)
@@ -287,7 +291,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 fakeId, transactionAmount, 0, budgetName,
                 0, category, currencyName, 0, 0, "",
                 "", OffsetDateTime.parse(dateTime), description, 0, destinationName ?: "",
-                "", 0, "", "", 0.0, "",
+                "", 0, billName, "", 0.0, "",
                 "", 0, "", notes, 0, "", 0,
                 sourceName, "", "", tagsList, type, 0, piggyBankName, true, arrayOfString
         ))
@@ -300,7 +304,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun addTransaction(type: String, description: String,
                                date: String, time: String?, piggyBankName: String?, amount: String,
                                sourceName: String?, destinationName: String?, currencyName: String,
-                               category: String?, tags: String?, budgetName: String?,
+                               category: String?, tags: String?, budgetName: String?, billName: String?,
                                notes: String?): ApiResponses<TransactionSuccessModel> {
         val dateTime = if (time == null) {
             date
@@ -311,7 +315,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val networkCall = transactionService.addTransaction(convertString(type), description, dateTime,
                     piggyBankName, amount.replace(',', '.'), sourceName,
                     destinationName, currencyName,
-                    category, tags, budgetName, notes)
+                    category, tags, budgetName, billName, notes)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -321,7 +325,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
     suspend fun updateTransaction(transactionId: Long, type: String, description: String,
                                   date: String, time: String?, piggyBankName: String?, amount: String,
                                   sourceName: String?, destinationName: String?, currencyName: String,
-                                  category: String?, tags: String?, budgetName: String?,
+                                  category: String?, tags: String?, budgetName: String?, billName: String?,
                                   notes: String): ApiResponses<TransactionSuccessModel> {
         val dateTime = if (time == null) {
             date
@@ -332,7 +336,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val networkCall = transactionService.updateTransaction(getTransactionIdFromJournalId(transactionId),
                     convertString(type), description, dateTime, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currencyName,
-                    category, tags, budgetName, notes)
+                    category, tags, budgetName, billName, notes)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -352,10 +356,6 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         } catch (exception: Exception) { }
         return attachmentDao.getAttachmentFromJournalId(transactionJournalId)
     }
-
-    suspend fun getSplitTransaction(journalId: Long) = transactionDao.getTransactionSplitFromJournalId(journalId)
-
-    suspend fun getSplitTitle(journalId: Long) = transactionDao.getSplitTitle(journalId)
 
     private suspend fun parseResponse(responseFromServer: Response<TransactionSuccessModel>): ApiResponses<TransactionSuccessModel>{
         val responseBody = responseFromServer.body()

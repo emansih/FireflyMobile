@@ -45,6 +45,7 @@ interface TransactionService {
                                @Field("transactions[0][category_name]") category: String?,
                                @Field("transactions[0][tags]") tags: String?,
                                @Field("transactions[0][budget_name]") budgetName: String?,
+                               @Field("transactions[0][bill_name]") billName: String?,
                                @Field("transactions[0][notes]") notes: String?): Response<TransactionSuccessModel>
 
     @FormUrlEncoded
@@ -61,6 +62,7 @@ interface TransactionService {
                                   @Field("transactions[0][category_name]") category: String?,
                                   @Field("transactions[0][tags]") tags: String?,
                                   @Field("transactions[0][budget_name]") budgetName: String?,
+                                  @Field("transactions[0][bill_name]") billName: String?,
                                   @Field("transactions[0][notes]") notes: String?): Response<TransactionSuccessModel>
 
     @GET("$TRANSACTION_API_ENDPOINT/{id}/attachments")

@@ -1,12 +1,14 @@
 package xyz.hisname.fireflyiii.repository.bills
 
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -109,5 +111,29 @@ class BillRepository(private val billDao: BillDataDao,
             }
         } catch (exception: Exception) { }
         return attachmentDao.getAttachmentFromJournalId(billId)
+    }
+
+    suspend fun getAllBills(): Flow<List<String>> {
+        try {
+            val networkCall = billService.getPaginatedBills(1)
+            val billList = arrayListOf<BillData>()
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                billList.addAll(responseBody.data)
+                billDao.deleteAllBills()
+                if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
+                    for(pagination in 2..responseBody.meta.pagination.total_pages){
+                        val networkBody = billService.getPaginatedBills(pagination).body()
+                        if(networkBody != null){
+                            billList.addAll(networkBody.data)
+                        }
+                    }
+                }
+            }
+            billList.forEach { data ->
+                billDao.insert(data)
+            }
+        } catch (exception: Exception){  }
+        return billDao.getAllBillName()
     }
 }

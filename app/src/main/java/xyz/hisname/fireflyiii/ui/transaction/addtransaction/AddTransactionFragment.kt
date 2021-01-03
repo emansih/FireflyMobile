@@ -216,6 +216,10 @@ class AddTransactionFragment: BaseFragment() {
             category_edittext.setText(transactionCategory)
         }
 
+        addTransactionViewModel.transactionBill.observe(viewLifecycleOwner){ transactionBill ->
+            bill_exposed_dropdown.setText(transactionBill)
+        }
+
         addTransactionViewModel.transactionNote.observe(viewLifecycleOwner) { transactionNote ->
             note_edittext.setText(transactionNote)
         }
@@ -256,6 +260,11 @@ class AddTransactionFragment: BaseFragment() {
             } else {
                 budget_exposed_dropdown.getString()
             }
+            val billName = if(bill_exposed_menu.isGone && bill_exposed_dropdown.isBlank()){
+                null
+            } else {
+                bill_exposed_dropdown.getString()
+            }
             var sourceAccount = ""
             var destinationAccount = ""
             when {
@@ -273,12 +282,15 @@ class AddTransactionFragment: BaseFragment() {
                 }
             }
             if(transactionJournalId != 0L){
-                updateData(piggyBank, sourceAccount, destinationAccount, categoryName, transactionTags, budgetName)
+                updateData(piggyBank, sourceAccount, destinationAccount, categoryName,
+                        transactionTags, billName, budgetName)
             } else {
                 if(isTasker){
-                    taskerPlugin(piggyBank, sourceAccount, destinationAccount, categoryName, transactionTags, budgetName)
+                    taskerPlugin(piggyBank, sourceAccount, destinationAccount, categoryName, transactionTags,
+                            billName, budgetName)
                 } else {
-                    submitData(piggyBank, sourceAccount, destinationAccount, categoryName, transactionTags, budgetName)
+                    submitData(piggyBank, sourceAccount, destinationAccount, categoryName,
+                            transactionTags, billName, budgetName)
                 }
 
             }
@@ -286,7 +298,7 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun taskerPlugin(piggyBank: String?, sourceAccount: String, destinationAccount: String,
-                             categoryName: String?, transactionTags: String?, budgetName: String?){
+                             categoryName: String?, transactionTags: String?, billName: String?, budgetName: String?){
         val currencyText = currency_edittext.getString()
         if(currencyText.startsWith("%")){
             addTransactionViewModel.currency = currency_edittext.getString()
@@ -313,6 +325,7 @@ class AddTransactionFragment: BaseFragment() {
         addTransactionViewModel.transactionTags.postValue(transactionTags)
         addTransactionViewModel.transactionBudget.postValue(budgetName)
         addTransactionViewModel.transactionCategory.postValue(categoryName)
+        addTransactionViewModel.transactionBill.postValue(billName)
         addTransactionViewModel.transactionNote.postValue(note_edittext.getString())
         addTransactionViewModel.fileUri.postValue(attachmentItemAdapter)
         addTransactionViewModel.removeFragment.postValue(true)
@@ -527,6 +540,10 @@ class AddTransactionFragment: BaseFragment() {
             piggy_exposed_menu.setEndIconOnClickListener {
                 showTaskerVariable(piggy_exposed_dropdown)
             }
+            bill_exposed_menu.endIconDrawable = setTaskerIcons()
+            bill_exposed_menu.setEndIconOnClickListener{
+                showTaskerVariable(bill_exposed_dropdown)
+            }
         }
         addTransactionViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             if(!isTasker){
@@ -535,6 +552,12 @@ class AddTransactionFragment: BaseFragment() {
                 // Is not a tasker variable
                 currency_edittext.setText(defaultCurrency)
             }
+        }
+
+        addTransactionViewModel.getAllBills().observe(viewLifecycleOwner){ budget ->
+            val spinnerAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, budget)
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            bill_exposed_dropdown.setAdapter(spinnerAdapter)
         }
 
         addTransactionViewModel.getPiggyBank().observe(viewLifecycleOwner){ budget ->
@@ -750,6 +773,7 @@ class AddTransactionFragment: BaseFragment() {
                 destination_layout.isGone = true
                 source_exposed_menu.isGone = true
                 budget_exposed_menu.isGone = true
+                bill_exposed_menu.isGone = true
                 addTransactionViewModel.transactionDestinationAccount.observe(viewLifecycleOwner){ transactionDestinationAccount ->
                     destination_exposed_dropdown.setText(transactionDestinationAccount)
                 }
@@ -776,21 +800,21 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun submitData(piggyBank: String?, sourceAccount: String, destinationAccount: String,
-                           categoryName: String?, transactionTags: String?, budgetName: String?) {
+                           categoryName: String?, transactionTags: String?, billName: String?, budgetName: String?) {
         addTransactionViewModel.addTransaction(transactionType, description_edittext.getString(),
                 transaction_date_edittext.getString(), selectedTime, piggyBank, transaction_amount_edittext.getString(),
-                sourceAccount, destinationAccount, categoryName, transactionTags, budgetName, attachmentItemAdapter,
-                note_edittext.getString())
+                sourceAccount, destinationAccount, categoryName, transactionTags, budgetName, billName,
+                attachmentItemAdapter, note_edittext.getString())
     }
 
     private fun updateData(piggyBank: String?, sourceAccount: String, destinationAccount: String,
-                           categoryName: String?, transactionTags: String?, budgetName: String?){
+                           categoryName: String?, transactionTags: String?, billName: String?, budgetName: String?){
         ProgressBar.animateView(addTransactionProgress, View.VISIBLE, 0.4f, 200)
         addTransactionViewModel.updateTransaction(transactionJournalId, transactionType,
                 description_edittext.getString(), transaction_date_edittext.getString(),
                 selectedTime, piggyBank, transaction_amount_edittext.getString(),
                 sourceAccount, destinationAccount, categoryName,
-                transactionTags, budgetName, note_edittext.getString()).observe(viewLifecycleOwner){ response ->
+                transactionTags, budgetName, billName, note_edittext.getString()).observe(viewLifecycleOwner){ response ->
             addTransactionViewModel.isLoading.postValue(false)
             ProgressBar.animateView(addTransactionProgress, View.GONE, 0f, 200)
             if(response.first){

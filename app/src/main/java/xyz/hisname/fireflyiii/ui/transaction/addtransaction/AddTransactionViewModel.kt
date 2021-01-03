@@ -21,6 +21,7 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
+import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
@@ -67,6 +68,11 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                 genericService().create(PiggybankService::class.java))
     }
 
+    private val billRepository by lazy {
+        BillRepository(AppDatabase.getInstance(application).billDataDao(),
+            genericService().create(BillsService::class.java))
+    }
+
     private val budgetService by lazy { genericService().create(BudgetService::class.java) }
     private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
     private val budgetLimitDao by lazy { AppDatabase.getInstance(application).budgetLimitDao() }
@@ -95,6 +101,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val transactionCategory = MutableLiveData<String>()
     val transactionTags = MutableLiveData<String?>()
     val transactionBudget = MutableLiveData<String>()
+    val transactionBill = MutableLiveData<String>()
     val transactionNote = MutableLiveData<String>()
     val fileUri = MutableLiveData<List<Uri>>()
     val removeFragment = MutableLiveData<Boolean>()
@@ -167,6 +174,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             if(transactionList.tags.isNotEmpty()){
                 transactionTags.postValue(transactionList.tags.toString())
             }
+            transactionBill.postValue(transactionList.bill_name)
             transactionSourceAccount.postValue(transactionList.source_name)
             transactionDestinationAccount.postValue(transactionList.destination_name)
         }
@@ -237,26 +245,26 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     fun addTransaction(type: String, description: String,
                        date: String, time: String, piggyBankName: String?, amount: String,
                        sourceName: String?, destinationName: String?,
-                       category: String?, tags: String?, budgetName: String?,
+                       category: String?, tags: String?, budgetName: String?, billName: String?,
                        fileUri: ArrayList<Uri>, notes: String){
         viewModelScope.launch(Dispatchers.IO){
             temporaryTransactionRepository.storeSplitTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
-                    category, tags, budgetName, notes, fileUri, transactionMasterId)
+                    category, tags, budgetName, billName, notes, fileUri, transactionMasterId)
         }
     }
 
     fun updateTransaction(transactionId: Long, type: String, description: String,
-                       date: String, time: String, piggyBankName: String?, amount: String,
-                       sourceName: String?, destinationName: String?,
-                       category: String?, tags: String?, budgetName: String?,
+                          date: String, time: String, piggyBankName: String?, amount: String,
+                          sourceName: String?, destinationName: String?,
+                          category: String?, tags: String?, budgetName: String?, billName: String?,
                           notes: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
             val addTransaction = transactionRepository.updateTransaction(transactionId, type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
-                    category, tags, budgetName, notes)
+                    category, tags, budgetName, billName, notes)
             when {
                 addTransaction.response != null -> {
                     apiResponse.postValue(Pair(true,
@@ -371,5 +379,22 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             tagsLiveData.postValue(tagsRepository.searchTag(tagName))
         }
         return tagsLiveData
+    }
+
+    fun getAllBills(): LiveData<List<String>>{
+        val billsLiveData = MutableLiveData<List<String>>()
+        val mutatedBillList = arrayListOf<String>()
+        viewModelScope.launch(Dispatchers.IO) {
+            billRepository.getAllBills().map {  billList ->
+                // Add a blank entry so that user can "unselect" bill
+                mutatedBillList.add("")
+                mutatedBillList.addAll(billList)
+            }.collectLatest {
+                // We need `collectLatest` otherwise data won't be posted. Don't put postValue()
+                // inside map
+                billsLiveData.postValue(mutatedBillList)
+            }
+        }
+        return billsLiveData
     }
 }

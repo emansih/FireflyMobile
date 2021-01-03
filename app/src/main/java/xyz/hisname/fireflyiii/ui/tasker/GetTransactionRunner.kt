@@ -55,7 +55,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                      "transactionDescription", "transactionAmount", "transactionDate", "transactionTime",
                      "transactionPiggyBank", "transactionSourceAccount",
                      "transactionDestinationAccount", "transactionCurrency", "transactionTags",
-                     "transactionBudget", "transactionCategory", "transactionNote", "transactionUri"))
+                     "transactionBudget", "transactionCategory", "transactionBill", "transactionNote", "transactionUri"))
     }
 
     override fun run(context: Context, input: TaskerInput<GetTransactionInput>): TaskerPluginResult<GetTransactionOutput> {
@@ -77,6 +77,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         val transactionTags = input.regular.transactionTags
         val transactionBudget = input.regular.transactionBudget
         val transactionCategory = input.regular.transactionCategory
+        val transactionBill = input.regular.transactionBill
         val transactionNotes = input.regular.transactionNote
         val fileUri = input.regular.transactionUri
         val uriArray = arrayListOf<Uri>()
@@ -89,7 +90,8 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
             taskerResult = addTransaction(transactionType, transactionDescription, transactionDate, transactionTime,
                     transactionPiggyBank, transactionAmount, transactionSourceAccount,
                     transactionDestinationAccount, transactionCurrency, transactionCategory,
-                    transactionTags, transactionBudget, transactionNotes, uriArray, context) as TaskerPluginResult<GetTransactionOutput>
+                    transactionTags, transactionBudget, transactionBill,
+                    transactionNotes, uriArray, context) as TaskerPluginResult<GetTransactionOutput>
         }
         return taskerResult
     }
@@ -97,12 +99,12 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
     private suspend fun addTransaction(type: String, description: String,
                                        date: String, time: String?, piggyBankName: String?, amount: String,
                                        sourceName: String?, destinationName: String?, currencyName: String,
-                                       category: String?, tags: String?, budgetName: String?,
+                                       category: String?, tags: String?, budgetName: String?, billName: String?,
                                        notes: String?, fileUri: List<Uri>, context: Context): TaskerPluginResult<Unit>{
 
         val transactionRepository = TransactionRepository(transactionDatabase, genericService().create(TransactionService::class.java))
         val addTransaction = transactionRepository.addTransaction(type,description, date, time,
-                piggyBankName, amount, sourceName, destinationName, currencyName, category, tags, budgetName, notes)
+                piggyBankName, amount, sourceName, destinationName, currencyName, category, tags, budgetName, billName, notes)
         return when {
             addTransaction.response != null -> {
                 if(fileUri.isNotEmpty()){

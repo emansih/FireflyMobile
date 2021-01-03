@@ -21,4 +21,7 @@ abstract class BillDataDao: BaseDao<BillData>{
 
     @Query("DELETE FROM bills")
     abstract suspend fun deleteAllBills(): Int
+
+    @Query("SELECT DISTINCT(name) FROM bills")
+    abstract fun getAllBillName(): Flow<List<String>>
 }

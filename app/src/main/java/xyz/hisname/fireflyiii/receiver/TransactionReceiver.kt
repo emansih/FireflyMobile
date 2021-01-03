@@ -56,6 +56,7 @@ class TransactionReceiver: BroadcastReceiver()  {
             val time = intent.getStringExtra("time")
             val date = intent.getStringExtra("date")
             val piggyBank = intent.getStringExtra("piggybank")
+            val bill = intent.getStringExtra("bill")
             val notes = intent.getStringExtra("notes")
             val transactionData = Data.Builder()
                     .putString("description", description)
@@ -65,6 +66,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                     .putString("currency", intent.getStringExtra("currency"))
                     .putString("tags", tags)
                     .putString("categoryName", category)
+                    .putString("bill", bill)
                     .putString("budgetName", budget)
                     .putLong("transactionWorkManagerId", transactionWorkManagerId)
                     .putString("sourceName", sourceName)
@@ -119,7 +121,7 @@ class TransactionReceiver: BroadcastReceiver()  {
                                 currencyAttributes.decimal_places ?: 0, currency.currencyId ?: 0,
                                 currencyAttributes.name ?: "", currencyAttributes.symbol ?: "",
                                 OffsetDateTime.parse(dateTime), description, 0, destinationName,
-                                "", 0, "", "",  0.0, "","", 0,
+                                "", 0, bill, "",  0.0, "","", 0,
                                 "", notes, 0, "", 0,
                                 sourceName, "", "",
                                 tagsList, transactionType, 0, piggyBank,true, arrayListOf())
