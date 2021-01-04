@@ -22,6 +22,11 @@ jobs:
       - name: Grant rights
         run: chmod +x gradlew
         
+      - name: Release Information
+        run: |
+          versionName=`grep "versionName\s" app/build.gradle | awk '{ print $2 }'  | tr -d \''"\'` 
+          echo "VERSION_NAME=v$versionName" >> $GITHUB_ENV  
+        
       - name: Build with Gradle
         run: ./gradlew assemble
 
@@ -34,9 +39,40 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
-          
-      - uses: actions/upload-artifact@v2
+      
+      - name: Create new release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          name: Download APK
-          path: ${{steps.sign.outputs.signedReleaseFile}}
-    
+         tag_name: ${{ env.VERSION_NAME }}
+         release_name: ${{ env.VERSION_NAME }}
+         body: ""
+         draft: true
+         prerelease: false
+
+      - name: Rename APK
+        run: |
+          mv app/build/outputs/apk/release/app-release-unsigned-signed.apk app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk
+          asset_name: ${{ env.VERSION_NAME }}-firefly.apk
+          asset_content_type: application/vnd.android.package-archive
+          
+      - name: Set up SDK   
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+          export_default_credentials: true
+          
+      - name: Upload APK 
+        run: gsutil cp app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk gs://${{ secrets.PROJECT_ID }}.appspot.com/firefly    
