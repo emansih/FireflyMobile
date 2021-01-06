@@ -1,0 +1,11 @@
+Firefly III Mobile is an unofficial Android client for Firefly III. It is designed for users to add / view their financial data on the go. 
+It provides several features to interact with Firefly III backend. 
+ 
+<ul>
+	<li>Manage your finances on the go: Access your Firefly III data even when it is unreachable from the outside world.</li>
+
+	<li>Automation: Automate adding transactions</li>
+
+	<li>Meaningful Reports: Financial reports give you overview of your spending and income within the app</li>
+
+</u>
