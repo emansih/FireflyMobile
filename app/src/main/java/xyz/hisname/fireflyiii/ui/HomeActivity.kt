@@ -117,7 +117,6 @@ class HomeActivity: BaseActivity(){
 
     private fun setup(savedInstanceState: Bundle?){
         animateToolbar()
-        setProfileImage()
         setUpHeader(savedInstanceState)
         setSupportActionBar(activity_toolbar)
         setUpDrawer(savedInstanceState)
@@ -152,8 +151,8 @@ class HomeActivity: BaseActivity(){
         val profile = ProfileDrawerItem().apply {
             nameText = AuthenticatorManager(AccountManager.get(this@HomeActivity)).userEmail
             isNameShown = true
+            
             descriptionText = sharedPref(this@HomeActivity).userRole
-            iconUrl = Constants.PROFILE_URL
         }
         headerResult = AccountHeaderView(this).apply {
             addProfile(profile,0)
@@ -163,40 +162,6 @@ class HomeActivity: BaseActivity(){
 
     }
 
-
-    private fun setProfileImage(){
-        DrawerImageLoader.init(object : AbstractDrawerImageLoader() {
-            override fun cancel(imageView: ImageView) {
-                Glide.with(imageView.context).clear(imageView)
-            }
-
-            override fun placeholder(ctx: Context, tag: String?): Drawable {
-                return when (tag) {
-                    DrawerImageLoader.Tags.PROFILE.name -> getPlaceHolder(ctx)
-                    DrawerImageLoader.Tags.ACCOUNT_HEADER.name -> IconicsDrawable(ctx).apply {
-                        iconText = " "
-                        backgroundColorRes = R.color.md_orange_500
-                        sizeDp = 56
-                    }
-                    "customUrlItem" -> IconicsDrawable(ctx).apply {
-                        iconText = " "
-                        backgroundColorRes = R.color.md_orange_500
-                        sizeDp = 56
-                    }
-                    else -> super.placeholder(ctx, tag)
-                }
-            }
-
-            override fun set(imageView: ImageView, uri: Uri, placeholder: Drawable, tag: String?) {
-                Glide.with(imageView.context)
-                        .load(Constants.PROFILE_URL)
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop())
-                        .into(imageView)
-            }
-
-        })
-    }
 
     private fun setUpDrawer(savedInstanceState: Bundle?){
         val dashboard = PrimaryDrawerItem().apply {
