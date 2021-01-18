@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <permission android:name="xyz.hisname.fireflyiii.READ_FIREFLY_ACCOUNT"
+        android:protectionLevel="signature"
+        android:label="Allow apps with this permission to read your Firefly III accounts" />
 
     <application
         android:name=".CustomApp"
@@ -145,6 +148,16 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"/>
+        </provider>
+
+
+        <provider
+            android:name=".data.provider.AccountListProvider"
+            android:authorities="xyz.hisname.fireflyiii.provider"
+            android:protectionLevel="signature"
+            android:readPermission="xyz.hisname.fireflyiii.READ_FIREFLY_ACCOUNT"
+            android:enabled="true"
+            android:exported="true">
         </provider>
 
     </application>

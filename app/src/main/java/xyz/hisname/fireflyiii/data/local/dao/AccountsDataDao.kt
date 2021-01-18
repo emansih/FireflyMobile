@@ -1,8 +1,8 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
+import android.database.Cursor
 import androidx.room.Dao
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 
 @Dao
@@ -42,4 +42,9 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
 
     @Query("SELECT COUNT(*) FROM accounts WHERE name LIKE :name AND type =:type")
     abstract suspend fun searchAccountDataByNameAndTypeCount(type: String, name: String): Int
+
+    // Send minimal data over the wire instead of the whole data set
+    @Query("SELECT accountId, name, current_balance, currency_symbol FROM accounts WHERE type ='asset'")
+    abstract fun getAssetAccountCursor(): Cursor
+
 }
