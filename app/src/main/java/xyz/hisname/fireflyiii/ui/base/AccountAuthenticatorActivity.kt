@@ -1,5 +1,3 @@
-package xyz.hisname.fireflyiii.ui.base
-
 /*
  * Copyright (C) 2009 The Android Open Source Project
  *
@@ -16,13 +14,12 @@ package xyz.hisname.fireflyiii.ui.base
  * limitations under the License.
  */
 
+package xyz.hisname.fireflyiii.ui.base
+
 import android.accounts.AccountAuthenticatorResponse
 import android.accounts.AccountManager
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
-
 
 /**
  * Base class for implementing an Activity that is used to help implement an

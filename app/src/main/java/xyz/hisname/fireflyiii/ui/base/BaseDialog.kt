@@ -1,16 +1,28 @@
+/*
+ * Copyright (c)  2018 - 2021 Daniel Quah
+ * Copyright (c)  2021 ASDF Dev Pte. Ltd.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package xyz.hisname.fireflyiii.ui.base
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.os.Build
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.util.animation.BakedBezierInterpolator
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 
 abstract class BaseDialog: DialogFragment() {
@@ -55,7 +67,7 @@ abstract class BaseDialog: DialogFragment() {
         }
     }*/
 
-    fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
+    //fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
 
 
     abstract fun setWidgets()

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c)  2018 - 2021 Daniel Quah and SimpleMobileTools
+ * Copyright (c)  2021 ASDF Dev Pte. Ltd.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package xyz.hisname.fireflyiii.util.calculator
 
 import android.content.Context
@@ -9,35 +27,35 @@ class CalculatorImpl(val calculator: Calculator, val context: Context,
 
 
     private var lastKey: String? = null
-    private var mLastOperation: String = ""
+    private var lastOperation: String = ""
 
-    private var mIsFirstOperation = false
-    private var mResetValue = false
-    private var mWasPercentLast = false
-    private var mBaseValue = 0.0
-    private var mSecondValue = 0.0
+    private var isFirstOperation = false
+    private var resetValue = false
+    private var wasPercentLast = false
+    private var baseValue = 0.0
+    private var secondValue = 0.0
 
     init {
-        mBaseValue = displayedNumber.toDouble()
+        baseValue = displayedNumber.toDouble()
     }
 
     fun handleOperation(operation: String) {
-        mWasPercentLast = operation == PERCENT
+        wasPercentLast = operation == PERCENT
         if (lastKey == DIGIT && operation != ROOT && operation != FACTORIAL) {
             handleResult()
         }
 
-        mResetValue = true
+        resetValue = true
         lastKey = operation
-        mLastOperation = operation
+        lastOperation = operation
 
         if (operation == ROOT) {
             handleRoot()
-            mResetValue = false
+            resetValue = false
         }
         if (operation == FACTORIAL) {
             handleFactorial()
-            mResetValue = false
+            resetValue = false
         }
     }
 
@@ -59,7 +77,7 @@ class CalculatorImpl(val calculator: Calculator, val context: Context,
             newValue = newValue.replace("\\.$".toRegex(), "")
             newValue = formatString(newValue)
             setValue(newValue)
-            mBaseValue = Formatter.stringToDouble(newValue)
+            baseValue = Formatter.stringToDouble(newValue)
         }
     }
 
@@ -76,7 +94,7 @@ class CalculatorImpl(val calculator: Calculator, val context: Context,
         if (lastKey != DIGIT)
             return
 
-        mSecondValue = getDisplayedNumberAsDouble()
+        secondValue = getDisplayedNumberAsDouble()
         calculateResult()
         lastKey = EQUALS
     }
@@ -89,17 +107,17 @@ class CalculatorImpl(val calculator: Calculator, val context: Context,
     }
 
     private fun resetValueIfNeeded() {
-        if (mResetValue)
+        if (resetValue)
             displayedNumber = "0"
 
-        mResetValue = false
+        resetValue = false
     }
 
     private fun resetValues() {
-        mResetValue = false
-        mLastOperation = ""
+        resetValue = false
+        lastOperation = ""
         displayedNumber = ""
-        mIsFirstOperation = true
+        isFirstOperation = true
         lastKey = ""
     }
 
@@ -108,16 +126,16 @@ class CalculatorImpl(val calculator: Calculator, val context: Context,
     }
 
     private fun updateFormula() {
-        val first = Formatter.doubleToString(mBaseValue)
-        val second = Formatter.doubleToString(mSecondValue)
-        val sign = getSign(mLastOperation)
+        val first = Formatter.doubleToString(baseValue)
+        val second = Formatter.doubleToString(secondValue)
+        val sign = getSign(lastOperation)
 
         when {
             sign == "√" -> setFormula(sign + first)
             sign == "!" -> setFormula(first + sign)
             sign.isNotEmpty() -> {
                 var formula = first + sign + second
-                if (mWasPercentLast) {
+                if (wasPercentLast) {
                     formula += "%"
                 }
                 setFormula(formula)
@@ -141,39 +159,39 @@ class CalculatorImpl(val calculator: Calculator, val context: Context,
 
     private fun updateResult(value: Double) {
         setValue(Formatter.doubleToString(value))
-        mBaseValue = value
+        baseValue = value
     }
 
     private fun getDisplayedNumberAsDouble() = Formatter.stringToDouble(displayedNumber)
 
     private fun handleResult() {
-        mSecondValue = getDisplayedNumberAsDouble()
+        secondValue = getDisplayedNumberAsDouble()
         calculateResult()
-        mBaseValue = getDisplayedNumberAsDouble()
+        baseValue = getDisplayedNumberAsDouble()
     }
 
     private fun handleRoot() {
-        mBaseValue = getDisplayedNumberAsDouble()
+        baseValue = getDisplayedNumberAsDouble()
         calculateResult()
     }
 
     private fun handleFactorial() {
-        mBaseValue = getDisplayedNumberAsDouble()
+        baseValue = getDisplayedNumberAsDouble()
         calculateResult()
     }
 
     private fun calculateResult() {
         updateFormula()
-        if (mWasPercentLast) {
-            mSecondValue *= mBaseValue / 100
+        if (wasPercentLast) {
+            secondValue *= baseValue / 100
         }
 
-        val operation = OperationFactory.forId(mLastOperation, mBaseValue, mSecondValue)
+        val operation = OperationFactory.forId(lastOperation, baseValue, secondValue)
         if (operation != null) {
             updateResult(operation.getResult())
         }
 
-        mIsFirstOperation = false
+        isFirstOperation = false
     }
 
     private fun decimalClicked() {
@@ -205,7 +223,7 @@ class CalculatorImpl(val calculator: Calculator, val context: Context,
 
     fun numpadClicked(id: Int) {
         if (lastKey == EQUALS) {
-            mLastOperation = EQUALS
+            lastOperation = EQUALS
         }
 
         lastKey = DIGIT
