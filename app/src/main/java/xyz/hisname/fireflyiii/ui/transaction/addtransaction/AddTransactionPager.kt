@@ -126,6 +126,7 @@ class AddTransactionPager: BaseFragment() {
     }
 
     private fun handleBack() {
+        addTransactionViewModel.numTabs = 0
         if(isFromFragment){
             parentFragmentManager.popBackStack()
         } else {
@@ -135,5 +136,10 @@ class AddTransactionPager: BaseFragment() {
                 requireActivity().finish()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        addTransactionViewModel.numTabs = 0
     }
 }
