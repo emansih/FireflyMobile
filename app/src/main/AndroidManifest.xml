@@ -29,6 +29,9 @@
     <permission android:name="xyz.hisname.fireflyiii.READ_FIREFLY_ACCOUNT"
         android:protectionLevel="signature"
         android:label="Allow apps with this permission to read your Firefly III accounts" />
+    <permission android:name="xyz.hisname.fireflyiii.READ_SIMPLE_DATA"
+        android:protectionLevel="signature"
+        android:label="Allow apps with this permission to read your Firefly III dashboard data" />
 
     <application
         android:name=".CustomApp"
@@ -174,6 +177,15 @@
             android:authorities="xyz.hisname.fireflyiii.provider"
             android:protectionLevel="signature"
             android:readPermission="xyz.hisname.fireflyiii.READ_FIREFLY_ACCOUNT"
+            android:enabled="true"
+            android:exported="true">
+        </provider>
+
+        <provider
+            android:name=".data.provider.SimpleDataProvider"
+            android:authorities="xyz.hisname.fireflyiii.provider.simpleData"
+            android:protectionLevel="signature"
+            android:readPermission="xyz.hisname.fireflyiii.READ_SIMPLE_DATA"
             android:enabled="true"
             android:exported="true">
         </provider>
