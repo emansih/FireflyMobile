@@ -10,7 +10,7 @@
         <item>Еженедельно</item>
         <item>Ежемесячно</item>
         <item>Ежеквартально</item>
-        <item>Раз в пол года</item>
+        <item>Раз в полгода</item>
         <item>Ежегодно</item>
     </string-array>
 
@@ -19,7 +19,7 @@
         <item>Общий основной счёт</item>
         <item>Сберегательный счет</item>
         <item>Кредитная карта</item>
-        <item>Кошелёк с наличными</item>
+        <item>Наличные</item>
     </string-array>
 
     <string-array name="liability_type">
