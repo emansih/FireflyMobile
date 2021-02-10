@@ -4,7 +4,7 @@
 
 [<img src="art/get-it-on-fdroid.png"
       alt="Get it on F-Droid"
-      height="80">](https://f-droid.org/packages/xyz.hisname.fireflyiii/)
+      height="80">](https://foss.hisname.xyz/fdroid/firefly/)
            
 [<img src="art/appGallery_badge.png"
 	  alt="Get it on App Gallery"
