@@ -6,7 +6,10 @@
       alt="Get it on F-Droid"
       height="80">](https://f-droid.org/packages/xyz.hisname.fireflyiii/)
            
-               
+[<img src="art/appGallery_badge.png"
+	  alt="Get it on App Gallery"
+      height="80">](https://appgallery.cloud.huawei.com/ag/n/app/C103828127?channelId=Github&referrer=github&id=7763ad17e2094e4b9271c7da25c16cba&s=6FEF9547A0C4F0B10A8E4ABB775633E77BE6EB822E07108BDBA09CBC1E9F02D8&detailType=0&v=)
+					
 [<img src="https://img.shields.io/github/license/emansih/FireflyMobile.svg"
       alt="GPLv3"
       height="20"
