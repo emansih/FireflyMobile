@@ -70,7 +70,7 @@ class FireflyGlideModule: AppGlideModule() {
                         icon = GoogleMaterial.Icon.gmd_error
                         sizeDp = 24
                     })
-                    .encodeFormat(Bitmap.CompressFormat.WEBP)
+                    .encodeFormat(Bitmap.CompressFormat.PNG)
                     .encodeQuality(70)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .format(DecodeFormat.PREFER_ARGB_8888)
