@@ -54,22 +54,20 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
     inner class PiggyHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(piggyData: PiggyData, clickListener: (PiggyData) -> Unit){
             val piggyBankData = piggyData.piggyAttributes
-            var piggyBankName = piggyBankData?.name
-            val isPending = piggyBankData?.isPending
-            if(piggyBankName != null){
-                if(piggyBankName.length >= 17){
-                    piggyBankName = piggyBankName.substring(0,17) + "..."
-                }
-                if(isPending == true){
-                    itemView.piggyName.setTextColor(context.getCompatColor(R.color.md_red_500))
-                    piggyBankName = "$piggyBankName (Pending)"
-                }
+            var piggyBankName = piggyBankData.name
+            val isPending = piggyBankData.isPending
+            if(piggyBankName.length >= 17){
+                piggyBankName = piggyBankName.substring(0,17) + "..."
+            }
+            if(isPending){
+                itemView.piggyName.setTextColor(context.getCompatColor(R.color.md_red_500))
+                piggyBankName = "$piggyBankName (Pending)"
             }
             itemView.piggyName.text = piggyBankName
 
             itemView.goal_save.text = piggyBankData?.currency_symbol + " " + piggyBankData?.target_amount
             itemView.currently_saved.text = piggyBankData?.currency_symbol + " " + piggyBankData?.current_amount.toString()
-            val percentage = piggyBankData?.percentage ?: 0
+            val percentage = piggyBankData.percentage ?: 0
             if(percentage <= 15){
                 itemView.goal_progress_bar.progressDrawable.colorFilter =
                         BlendModeColorFilterCompat.createBlendModeColorFilterCompat(context.getCompatColor(R.color.md_red_700),
@@ -80,7 +78,7 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
                         BlendModeCompat.SRC_ATOP)
             }
             itemView.goal_progress_bar.progress = percentage
-            val targetDate = piggyBankData?.target_date
+            val targetDate = piggyBankData.target_date
             itemView.timeLeft.let {
                 if(!targetDate.isNullOrBlank()){
                     if(piggyBankData.percentage != 100){

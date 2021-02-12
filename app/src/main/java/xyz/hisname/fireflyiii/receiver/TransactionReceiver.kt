@@ -135,9 +135,9 @@ class TransactionReceiver: BroadcastReceiver()  {
                 transactionDatabase.insert(
                         Transactions(
                                 transactionWorkManagerId, amount,  0,
-                                 budget, 0,  category, currencyAttributes.code ?: "",
-                                currencyAttributes.decimal_places ?: 0, currency.currencyId ?: 0,
-                                currencyAttributes.name ?: "", currencyAttributes.symbol ?: "",
+                                 budget, 0,  category, currencyAttributes.code,
+                                currencyAttributes.decimal_places, currency.currencyId,
+                                currencyAttributes.name, currencyAttributes.symbol,
                                 OffsetDateTime.parse(dateTime), description, 0, destinationName,
                                 "", 0, bill, "",  0.0, "","", 0,
                                 "", notes, 0, "", 0,

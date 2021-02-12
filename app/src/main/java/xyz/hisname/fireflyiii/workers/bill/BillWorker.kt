@@ -143,8 +143,8 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                             BillData(
                                     billWorkManagerId, BillAttributes("","",
                                     name, currency.currencyId, currencyCode,
-                                    currency.currencyAttributes?.symbol ?: "",
-                                    currency.currencyAttributes?.decimal_places ?: 0,
+                                    currency.currencyAttributes.symbol,
+                                    currency.currencyAttributes.decimal_places,
                                     minAmount.toBigDecimal(), maxAmount.toBigDecimal(), LocalDate.parse(billDate),
                                     repeatFreq, skip.toInt(), true, 0, listOf(),
                                     listOf(), notes, null, true)

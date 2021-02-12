@@ -71,7 +71,7 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
             if(isThumbnailEnabled) {
                 itemView.flagImage.isVisible = true
                 Glide.with(context)
-                        .load(Flags.getFlagByIso(currency.code ?: ""))
+                        .load(Flags.getFlagByIso(currency.code))
                         .error(R.drawable.unknown)
                         .into(itemView.flagImage)
             }

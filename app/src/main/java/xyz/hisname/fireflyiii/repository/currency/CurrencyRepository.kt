@@ -91,7 +91,7 @@ class CurrencyRepository(private val currencyDao: CurrencyDataDao,
                      */
                     deleteDefaultCurrency()
                     insertCurrency(responseBody.data)
-                    currencyDao.changeDefaultCurrency(responseBody.data.currencyAttributes?.name ?: "")
+                    currencyDao.changeDefaultCurrency(responseBody.data.currencyAttributes.name)
                 }
 
             }

@@ -121,10 +121,10 @@ class TransactionDetailsFragment: BaseFragment() {
             transactionAmount = details.currency_symbol + details.amount
             transactionList.add(DetailModel(resources.getString(R.string.amount),details.currency_symbol + details.amount.toString()))
         }
-        transactionDescription = details.description ?: ""
+        transactionDescription = details.description
         sourceAccountId = details.source_id ?: 0L
         destinationAccountId = details.destination_id
-        transactionInfo = details.transactionType ?: ""
+        transactionInfo = details.transactionType
         transactionDate = details.date.toString()
         downloadAttachment()
         transactionList.addAll(model)

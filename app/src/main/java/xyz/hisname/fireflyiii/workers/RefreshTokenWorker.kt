@@ -35,7 +35,7 @@ class RefreshTokenWorker(private val context: Context, workerParameters: WorkerP
         val networkCall: Response<AuthModel>?
         var workResult: Result
         try {
-            networkCall = genericService?.create(OAuthService::class.java)?.getRefreshToken("refresh_token",
+            networkCall = genericService.create(OAuthService::class.java)?.getRefreshToken("refresh_token",
                     accManager.refreshToken, accManager.clientId,
                     accManager.secretKey)
             val authResponse = networkCall?.body()

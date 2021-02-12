@@ -48,7 +48,7 @@ class TransactionPagingSource(private val budgetService: BudgetService,
             null
         }
         try {
-            val budgetId = budgetDao.searchBudgetName(budgetName)[0].budgetListId ?: 0
+            val budgetId = budgetDao.searchBudgetName(budgetName)[0].budgetListId
             val networkCall = budgetService.getPaginatedTransactionByBudget(budgetId,
                     params.key ?: 1, startDate, endDate, "all")
             val responseBody = networkCall.body()
