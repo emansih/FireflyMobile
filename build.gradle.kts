@@ -1,10 +1,8 @@
 buildscript {
     repositories {
         google()
-        jcenter()
-        maven("https://dl.bintray.com/florent37/maven")
-        gradlePluginPortal()
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.1.2")
@@ -24,11 +22,18 @@ allprojects {
                 includeGroup("com.google.android.material")
             }
         }
+        mavenCentral()
         maven("https://jitpack.io")
-        jcenter()
+        // TODO: Remove by end of Dec 2021
+        // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
         maven("https://dl.bintray.com/florent37/maven") {
             content{
                 includeGroup("com.github.florent37")
+            }
+        }
+        jcenter {
+            content {
+                includeGroup("com.joaomgcd")
             }
         }
         dependencies{
