@@ -57,6 +57,7 @@ import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
@@ -108,6 +109,16 @@ class DashboardFragment: BaseFragment() {
         setIcon()
         dashboardView.apiResponse.observe(viewLifecycleOwner){ response ->
             Snackbar.make(coordinatorlayout, response, Snackbar.LENGTH_LONG).show()
+        }
+        setDashboardDataClick()
+    }
+
+    private fun setDashboardDataClick(){
+        billsCard.setOnClickListener {
+            parentFragmentManager.commit {
+                replace(R.id.fragment_container, ListBillFragment())
+                addToBackStack(null)
+            }
         }
     }
 
