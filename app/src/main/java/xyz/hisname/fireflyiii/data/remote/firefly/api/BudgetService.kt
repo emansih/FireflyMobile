@@ -20,15 +20,14 @@ package xyz.hisname.fireflyiii.data.remote.firefly.api
 
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.AVAILABLE_BUDGET_API_ENDPOINT
 import xyz.hisname.fireflyiii.Constants.Companion.BUDGET_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.autocomplete.BudgetItems
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetModel
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListModel
+import xyz.hisname.fireflyiii.repository.models.budget.UpdateBudgetModel
 import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 
@@ -48,6 +47,13 @@ interface BudgetService {
                                    @Query("start") start: String,
                                    @Query("end") end: String): Response<BudgetModel>
 
+    @PUT("$AVAILABLE_BUDGET_API_ENDPOINT/{id}")
+    suspend fun updateAvailableBudget(@Path("id") budgetId: Long,
+                                      @Query("currency_code") currencyCode: String,
+                                      @Query("amount") amount: String,
+                                      @Query("start") startDate: String,
+                                      @Query("end") endDate: String): Response<UpdateBudgetModel>
+
     @GET(BUDGET_API_ENDPOINT)
     suspend fun getPaginatedSpentBudget(@Query("page") page: Int, @Query("start") start: String,
                                 @Query("end") end: String): Response<BudgetListModel>
@@ -66,6 +72,5 @@ interface BudgetService {
             @Query("start") start: String,
             @Query("end") end: String,
             @Query("type") transactionType: String): Response<TransactionModel>
-
 
 }

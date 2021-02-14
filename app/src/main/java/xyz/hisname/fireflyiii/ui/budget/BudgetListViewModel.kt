@@ -21,6 +21,7 @@ package xyz.hisname.fireflyiii.ui.budget
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -110,11 +111,11 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                                       startOfMonth: String, endOfMonth: String){
         val budgetSpent = budgetRepository.allActiveSpentList(currencyCode,
                 startOfMonth, endOfMonth)
-        spentValue.postValue(currencySymbol + budgetSpent)
+        spentValue.postValue(currencySymbol + budgetSpent.toPlainString())
         budgetRepository.getAllBudget()
-        val budgeted = budgetRepository.retrieveConstraintBudgetWithCurrency(
+        val budgeted = budgetRepository.getConstraintBudgetWithCurrency(
                 startOfMonth, endOfMonth, currencyCode)
-        budgetValue.postValue(currencySymbol + budgeted)
+        budgetValue.postValue(currencySymbol + budgeted.toPlainString())
         if(budgetSpent == BigDecimal.ZERO){
             budgetPercentage.postValue(BigDecimal.ZERO)
         } else {
@@ -162,5 +163,20 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
         budgetValue.postValue("")
         budgetPercentage.postValue(BigDecimal.ZERO)
         setDisplayDate()
+    }
+
+    fun setBudget(amount: String, currencyCode: String){
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
+            apiResponse.postValue(throwable.localizedMessage)
+        }){
+            if(amount.isBlank()){
+                apiResponse.postValue("Please enter some values!")
+            } else {
+                val budget = budgetRepository.getBudgetByCurrencyAndStartEndDate(startOfMonth, endOfMonth, currencyCode)
+                val budgetData = budgetRepository.updateBudget(budget.budgetId, currencyCode, amount, startOfMonth, endOfMonth)
+                budgetValue.postValue(budgetData.budgetAttributes.amount.toPlainString())
+            }
+        }
+
     }
 }

@@ -250,7 +250,7 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
             currentMonthSpentValue.postValue(currencySymbol + budgetSpent)
         }
         budgetRepository.getAllBudget()
-        val budgeted = budgetRepository.retrieveConstraintBudgetWithCurrency(
+        val budgeted = budgetRepository.getConstraintBudgetWithCurrency(
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode)
         if(currencySymbolLocationIsAtEnd){

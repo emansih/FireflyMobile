@@ -33,4 +33,8 @@ abstract class BudgetDataDao: BaseDao<BudgetData> {
 
     @Query("DELETE FROM budget")
     abstract fun deleteAllBudget(): Int
+
+    @Query("SELECT * FROM budget WHERE (start_date =:startDate AND end_date =:endDate) AND currency_code =:currencyCode")
+    abstract fun getBudgetByCurrencyAndStartEndDate(startDate: String, endDate: String,
+                                                    currencyCode: String): BudgetData
 }

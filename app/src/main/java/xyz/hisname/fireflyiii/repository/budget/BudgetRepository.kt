@@ -79,9 +79,13 @@ class BudgetRepository(private val budget: BudgetDataDao,
 
     suspend fun deleteBudgetList() = budgetList.deleteAllBudgetList()
 
-    suspend fun retrieveConstraintBudgetWithCurrency(startDate: String, endDate: String,
-                                                     currencyCode: String) =
+    suspend fun getConstraintBudgetWithCurrency(startDate: String, endDate: String,
+                                                currencyCode: String) =
             budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
+
+    suspend fun getBudgetByCurrencyAndStartEndDate(startDate: String, endDate: String,
+                                                   currencyCode: String) =
+            budget.getBudgetByCurrencyAndStartEndDate(startDate, endDate, currencyCode)
 
     suspend fun getAllAvailableBudget(startDate: String, endDate: String,
                                       currencyCode: String): BigDecimal {
@@ -107,6 +111,18 @@ class BudgetRepository(private val budget: BudgetDataDao,
             }
         } catch (exception: Exception){ }
         return budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
+    }
+
+    suspend fun updateBudget(budgetId: Long, currencyCode: String, amount: String,
+                             startDate: String, endDate: String): BudgetData{
+        val networkCall = budgetService.updateAvailableBudget(budgetId, currencyCode, amount, startDate, endDate)
+        val responseBody = networkCall.body()
+        if (responseBody != null && networkCall.isSuccessful) {
+            insertBudget(responseBody.data)
+            return responseBody.data
+        } else {
+            throw Exception("There was an issue updating your budget")
+        }
     }
 
     suspend fun getBudgetLimitByName(budgetName: String, startDate: String, endDate: String, currencyCode: String): BigDecimal{

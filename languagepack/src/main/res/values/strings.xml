@@ -202,4 +202,5 @@
     <string name="add_new_split">Add New Split</string>
     <string name="delete_split">Delete Split</string>
     <string name="total_available_in_currency">Total Available In %1$s</string>
+    <string name="expected_budget">Use this form to indicate how much you expect to be able to budget (in total, in %1$s) in the indicated period.</string>
 </resources>

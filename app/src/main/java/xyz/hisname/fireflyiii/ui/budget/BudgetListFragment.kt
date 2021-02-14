@@ -21,13 +21,17 @@ package xyz.hisname.fireflyiii.ui.budget
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.textfield.TextInputEditText
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
@@ -36,7 +40,7 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.fragment_budget_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 
 class BudgetListFragment: BaseFragment(){
@@ -46,13 +50,16 @@ class BudgetListFragment: BaseFragment(){
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_budget_list,container)
+        return inflater.create(R.layout.fragment_budget_list, container)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setWidget()
         activity?.activity_toolbar?.title = resources.getString(R.string.budget)
+        setWidget()
+        budgetListViewModel.apiResponse.observe(viewLifecycleOwner){
+            toastError(it)
+        }
     }
 
     private fun setWidget(){
@@ -100,11 +107,27 @@ class BudgetListFragment: BaseFragment(){
             ObjectAnimator.ofInt(budgetProgress, "progress", budgetPercentage.toInt()).start()
         }
         setRecyclerView()
-        budgetListViewModel.currencyName.observe(viewLifecycleOwner){ currency ->
-            totalAvailableBudget.text = getString(R.string.total_available_in_currency, currency)
-        }
-        budgetListViewModel.displayMonth.observe(viewLifecycleOwner){ date ->
-            monthAndYearText.text = date
+        zipLiveData(budgetListViewModel.currencyName,
+                budgetListViewModel.displayMonth).observe(viewLifecycleOwner){ data ->
+            totalAvailableBudget.text = getString(R.string.total_available_in_currency, data.first)
+            monthAndYearText.text = data.second
+            availableBudget.setOnClickListener {
+                val input = TextInputEditText(requireContext())
+                val layoutParam = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT)
+                input.layoutParams = layoutParam
+                input.setRawInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                        or InputType.TYPE_NUMBER_FLAG_SIGNED)
+                AlertDialog.Builder(requireContext())
+                        .setTitle(data.second)
+                        .setMessage(getString(R.string.expected_budget, data.first))
+                        .setView(input)
+                        .setPositiveButton(android.R.string.ok) { _,_ ->
+                            budgetListViewModel.setBudget(input.getString(), data.first)
+                        }
+                        .show()
+            }
         }
     }
 
