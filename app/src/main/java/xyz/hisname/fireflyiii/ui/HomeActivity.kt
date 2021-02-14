@@ -502,7 +502,8 @@ class HomeActivity: BaseActivity(){
                         || fragment is ListAccountFragment
                         || fragment is CategoriesFragment
                         || fragment is ListTagsFragment
-                        || fragment is CurrencyListFragment)
+                        || fragment is CurrencyListFragment
+                        || fragment is BudgetListFragment)
             }
         }
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
@@ -512,7 +513,8 @@ class HomeActivity: BaseActivity(){
                     || fragment is ListAccountFragment
                     || fragment is CategoriesFragment
                     || fragment is ListTagsFragment
-                    || fragment is CurrencyListFragment)
+                    || fragment is CurrencyListFragment
+                    || fragment is BudgetListFragment)
             addTransactionExtended.isVisible = fragment is DashboardFragment
         }
         drawerToggle.setToolbarNavigationClickListener {

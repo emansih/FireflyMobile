@@ -50,7 +50,6 @@ import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 class BudgetListFragment: BaseFragment(){
 
     private val budgetListViewModel by lazy { getImprovedViewModel(BudgetListViewModel::class.java) }
-    private val isSummary by lazy { arguments?.getBoolean("isSummary") }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -72,24 +71,25 @@ class BudgetListFragment: BaseFragment(){
     }
 
     private fun setWidget(){
-        if (isSummary != true){
-            previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
-                icon = GoogleMaterial.Icon.gmd_keyboard_arrow_left
-                sizeDp = 24
-                colorRes = R.color.colorPrimary
-            })
-            nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
-                icon = GoogleMaterial.Icon.gmd_keyboard_arrow_right
-                sizeDp = 24
-                colorRes = R.color.colorPrimary
-            })
-            previousMonthArrow.setOnClickListener {
-                budgetListViewModel.minusMonth()
-            }
-            nextMonthArrow.setOnClickListener {
-                budgetListViewModel.addMonth()
-            }
+        previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_keyboard_arrow_left
+            sizeDp = 24
+            colorRes = R.color.colorPrimary
+        })
+
+        nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_keyboard_arrow_right
+            sizeDp = 24
+            colorRes = R.color.colorPrimary
+        })
+
+        previousMonthArrow.setOnClickListener {
+            budgetListViewModel.minusMonth()
         }
+        nextMonthArrow.setOnClickListener {
+            budgetListViewModel.addMonth()
+        }
+
         budgetListViewModel.spentValue.observe(viewLifecycleOwner){ spent ->
             spentAmount.text = spent
         }
@@ -146,21 +146,22 @@ class BudgetListFragment: BaseFragment(){
             recycler_view.layoutManager = LinearLayoutManager(requireContext())
             recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             recycler_view.adapter = budgetRecyclerAdapter
-            recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-                if (viewHolder.itemView.budgetItemList.isOverlapping(extendedFab)) {
-                    extendedFab.dropToRemove()
-                    if (!isCurrentlyActive) {
-                        val budgetName = viewHolder.itemView.budgetNameText.text.toString()
-                        budgetListViewModel.deleteBudget(viewHolder.itemView.budgetNameText.text.toString()).observe(viewLifecycleOwner){ isDeleted ->
-                            if(!isDeleted){
-                                toastOffline("Error deleting $budgetName", Toast.LENGTH_LONG)
-                            } else {
-                                budgetListViewModel.setDisplayDate()
+                recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+                    if (viewHolder.itemView.budgetItemList.isOverlapping(extendedFab)) {
+                        extendedFab.dropToRemove()
+                        if (!isCurrentlyActive) {
+                            val budgetName = viewHolder.itemView.budgetNameText.text.toString()
+                            budgetListViewModel.deleteBudget(viewHolder.itemView.budgetNameText.text.toString()).observe(viewLifecycleOwner){ isDeleted ->
+                                if(!isDeleted){
+                                    toastOffline("Error deleting $budgetName", Toast.LENGTH_LONG)
+                                } else {
+                                    budgetListViewModel.setDisplayDate()
+                                }
                             }
                         }
                     }
                 }
-            }
+
         }
     }
 

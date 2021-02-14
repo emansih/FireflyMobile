@@ -117,9 +117,7 @@ class DashboardFragment: BaseFragment() {
     private fun setDashboardDataClick(){
         leftToSpendCard.setOnClickListener {
             parentFragmentManager.commit {
-                replace(R.id.fragment_container, BudgetListFragment().apply {
-                    arguments = bundleOf("isSummary" to true)
-                })
+                replace(R.id.fragment_container, BudgetListFragment())
                 addToBackStack(null)
             }
         }
