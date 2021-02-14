@@ -24,6 +24,7 @@ import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
 
@@ -194,5 +195,36 @@ class BudgetRepository(private val budget: BudgetDataDao,
             }
 
         } catch (exception: Exception){ }
+    }
+
+    suspend fun getBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)
+
+    suspend fun deleteBudgetByName(budgetId: Long): Int{
+        try {
+            val networkResponse = budgetService.deleteBudgetLimit(budgetId)
+            when (networkResponse.code()) {
+                204 -> {
+                    budgetList.deleteBudgetById(budgetId)
+                    return HttpConstants.NO_CONTENT_SUCCESS
+                }
+                401 -> {
+                    /*   User is unauthenticated. We will retain user's data as we are
+                     *   now in inconsistent state. This use case is unlikely to happen unless user
+                     *   deletes their token from the web interface without updating the mobile client
+                     */
+                    return HttpConstants.UNAUTHORISED
+                }
+                404 -> {
+                    // User probably deleted this on the web interface and tried to do it using mobile client
+                    budgetList.deleteBudgetById(budgetId)
+                    return HttpConstants.NOT_FOUND
+                }
+                else -> {
+                    return HttpConstants.FAILED
+                }
+            }
+        } catch (exception: Exception){
+            return HttpConstants.FAILED
+        }
     }
 }

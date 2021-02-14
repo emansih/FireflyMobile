@@ -26,9 +26,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputEditText
@@ -37,6 +39,8 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
+import kotlinx.android.synthetic.main.base_swipe_layout.*
+import kotlinx.android.synthetic.main.budget_list_item.view.*
 import kotlinx.android.synthetic.main.fragment_budget_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -59,6 +63,11 @@ class BudgetListFragment: BaseFragment(){
         setWidget()
         budgetListViewModel.apiResponse.observe(viewLifecycleOwner){
             toastError(it)
+        }
+        extendedFab.isVisible = true
+        swipeContainer.isEnabled = false
+        budgetListViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
+            swipeContainer.isRefreshing = loading
         }
     }
 
@@ -134,9 +143,24 @@ class BudgetListFragment: BaseFragment(){
     private fun setRecyclerView(){
         budgetListViewModel.individualBudget.observe(viewLifecycleOwner){ budgetData ->
             val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData){ }
-            budgetRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            budgetRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            budgetRecyclerView.adapter = budgetRecyclerAdapter
+            recycler_view.layoutManager = LinearLayoutManager(requireContext())
+            recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            recycler_view.adapter = budgetRecyclerAdapter
+            recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+                if (viewHolder.itemView.budgetItemList.isOverlapping(extendedFab)) {
+                    extendedFab.dropToRemove()
+                    if (!isCurrentlyActive) {
+                        val budgetName = viewHolder.itemView.budgetNameText.text.toString()
+                        budgetListViewModel.deleteBudget(viewHolder.itemView.budgetNameText.text.toString()).observe(viewLifecycleOwner){ isDeleted ->
+                            if(!isDeleted){
+                                toastOffline("Error deleting $budgetName", Toast.LENGTH_LONG)
+                            } else {
+                                budgetListViewModel.setDisplayDate()
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

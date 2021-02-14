@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.budget
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -34,6 +35,7 @@ import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.budget.IndividualBudget
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.math.BigDecimal
 import kotlin.math.abs
 
@@ -71,7 +73,8 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
         setDisplayDate()
     }
 
-    private fun setDisplayDate(){
+    fun setDisplayDate(){
+        isLoading.postValue(true)
         when {
             monthCount == 0L -> {
                 // 0 -> current month
@@ -145,6 +148,7 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
             }
         }
         individualBudget.postValue(individualBudgetList)
+        isLoading.postValue(false)
     }
 
     fun minusMonth(){
@@ -178,5 +182,27 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
             }
         }
 
+    }
+
+    fun deleteBudget(name: String): LiveData<Boolean> {
+        val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
+        viewModelScope.launch(Dispatchers.IO){
+            val budgetAttributes = budgetRepository.getBudgetByName(name)
+            if (budgetAttributes.isNotEmpty() && budgetAttributes[0].budgetListId != 0L) {
+                when (budgetRepository.deleteBudgetByName(budgetAttributes[0].budgetListId)) {
+                    HttpConstants.FAILED -> {
+                        isDeleted.postValue(false)
+                    }
+                    HttpConstants.UNAUTHORISED -> {
+                        isDeleted.postValue(false)
+                    }
+                    HttpConstants.NO_CONTENT_SUCCESS -> {
+                        isDeleted.postValue(true)
+
+                    }
+                }
+            }
+        }
+        return isDeleted
     }
 }

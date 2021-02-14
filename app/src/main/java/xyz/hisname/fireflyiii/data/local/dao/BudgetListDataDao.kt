@@ -29,6 +29,9 @@ abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
     @Query("DELETE FROM budget_list")
     abstract suspend fun deleteAllBudgetList(): Int
 
+    @Query("DELETE FROM budget_list WHERE budgetListId =:budgetId")
+    abstract suspend fun deleteBudgetById(budgetId: Long): Int
+
     @Query("SELECT budget_list.name, budget_list.budgetListId FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId) WHERE budgetListFts MATCH :budgetName")
     abstract suspend fun searchBudgetName(budgetName: String): List<BudgetListData>
 

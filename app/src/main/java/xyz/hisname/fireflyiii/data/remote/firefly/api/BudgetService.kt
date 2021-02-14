@@ -65,6 +65,9 @@ interface BudgetService {
     suspend fun getBudgetLimit(@Path("id") budgetId: Long, @Query("start") start: String,
                                @Query("end") end: String): Response<BudgetLimitModel>
 
+    @DELETE("$BUDGET_API_ENDPOINT/{id}")
+    suspend fun deleteBudgetLimit(@Path("id") budgetId: Long): Response<BudgetLimitModel>
+
     @GET("$BUDGET_API_ENDPOINT/{id}/transactions")
     suspend fun getPaginatedTransactionByBudget(
             @Path("id") budgetId: Long,
