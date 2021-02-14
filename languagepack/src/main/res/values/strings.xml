@@ -201,4 +201,5 @@
     <string name="chart_transaction_in_period">Chart for all %1$s between %2$s and %3$s</string>
     <string name="add_new_split">Add New Split</string>
     <string name="delete_split">Delete Split</string>
+    <string name="total_available_in_currency">Total Available In %1$s</string>
 </resources>

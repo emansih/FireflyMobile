@@ -58,6 +58,7 @@ import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
+import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
@@ -232,7 +233,15 @@ class HomeActivity: BaseActivity(){
 
         val budgets = PrimaryDrawerItem().apply {
             identifier = 6
-            name = StringHolder("Budgets")
+            nameRes = R.string.budget
+            selectedIcon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_chart_pie).apply {
+                sizeDp = 24
+                colorRes = R.color.md_blue_grey_400
+            })
+            isIconTinted = true
+            icon = ImageHolder(IconicsDrawable(this@HomeActivity, FontAwesome.Icon.faw_chart_pie).apply {
+                sizeDp = 24
+            })
         }
 
         val classification = ExpandableDrawerItem().apply {
@@ -364,8 +373,9 @@ class HomeActivity: BaseActivity(){
         val othersSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.others }
 
         slider.apply {
-            itemAdapter.add(dashboard, financialControlSectionHeader, bills, piggyBank, accountingSectionHeader,
-                    transactions, othersSectionHeader, account, classification, options, about)
+            itemAdapter.add(dashboard, financialControlSectionHeader, budgets, bills, piggyBank,
+                    accountingSectionHeader, transactions, othersSectionHeader, account,
+                    classification, options, about)
             accountHeader = headerResult
             onDrawerItemClickListener = { v: View?, drawerItem: IDrawerItem<*>, position: Int ->
                 when (drawerItem.identifier) {
@@ -386,6 +396,9 @@ class HomeActivity: BaseActivity(){
                     5L -> {
                         val bundle = bundleOf("accountType" to "revenue")
                         changeFragment(ListAccountFragment().apply { arguments = bundle })
+                    }
+                    6L -> {
+                        changeFragment(BudgetListFragment())
                     }
                     7L -> {
                         changeFragment(CategoriesFragment())

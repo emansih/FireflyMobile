@@ -58,6 +58,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
+import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
@@ -114,6 +115,14 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setDashboardDataClick(){
+        leftToSpendCard.setOnClickListener {
+            parentFragmentManager.commit {
+                replace(R.id.fragment_container, BudgetListFragment().apply {
+                    arguments = bundleOf("isSummary" to true)
+                })
+                addToBackStack(null)
+            }
+        }
         billsCard.setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.fragment_container, ListBillFragment())

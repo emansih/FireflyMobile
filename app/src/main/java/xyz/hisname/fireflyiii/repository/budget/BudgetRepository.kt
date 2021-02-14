@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.Flow
 import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
-import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListAttributes
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
