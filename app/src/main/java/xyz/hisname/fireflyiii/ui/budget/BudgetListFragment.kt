@@ -30,7 +30,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.textfield.TextInputEditText
@@ -44,6 +46,7 @@ import kotlinx.android.synthetic.main.budget_list_item.view.*
 import kotlinx.android.synthetic.main.fragment_budget_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 
@@ -63,7 +66,6 @@ class BudgetListFragment: BaseFragment(){
         budgetListViewModel.apiResponse.observe(viewLifecycleOwner){
             toastError(it)
         }
-        extendedFab.isVisible = true
         swipeContainer.isEnabled = false
         budgetListViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
             swipeContainer.isRefreshing = loading
@@ -137,6 +139,20 @@ class BudgetListFragment: BaseFragment(){
                         }
                         .show()
             }
+        }
+        initFab()
+    }
+
+    private fun initFab(){
+        extendedFab.display {
+            extendedFab.isClickable = false
+            parentFragmentManager.commit {
+                replace(R.id.bigger_fragment_container, AddBudgetFragment().apply {
+                    arguments = bundleOf("revealX" to extendedFab.width / 2, "revealY" to extendedFab.height / 2)
+                })
+                addToBackStack(null)
+            }
+            extendedFab.isClickable = true
         }
     }
 

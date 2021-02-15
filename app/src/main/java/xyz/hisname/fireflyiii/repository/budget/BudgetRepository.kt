@@ -19,11 +19,19 @@
 package xyz.hisname.fireflyiii.repository.budget
 
 import androidx.annotation.WorkerThread
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
+import xyz.hisname.fireflyiii.repository.models.ApiResponses
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListModel
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListSuccessModel
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetType
+import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
@@ -226,5 +234,37 @@ class BudgetRepository(private val budget: BudgetDataDao,
         } catch (exception: Exception){
             return HttpConstants.FAILED
         }
+    }
+
+    suspend fun addBudget(name: String, budgetType: BudgetType, currencyCode: String?,
+                          budgetAmount: String?, budgetPeriod: String?): ApiResponses<BudgetListSuccessModel>{
+        return try {
+            val networkCall = budgetService.addBudget(name, budgetType.toString(), currencyCode, budgetAmount, budgetPeriod)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
+    private suspend fun parseResponse(responseFromServer: Response<BudgetListSuccessModel>): ApiResponses<BudgetListSuccessModel> {
+        val responseBody = responseFromServer.body()
+        val responseErrorBody = responseFromServer.errorBody()
+        if(responseBody != null && responseFromServer.isSuccessful){
+            insertBudgetList(responseBody.data)
+            return ApiResponses(response = responseBody)
+        } else {
+            if (responseErrorBody != null) {
+                // Ignore lint warning. False positive
+                // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
+                val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(responseErrorBody.source())
+                val errorMessage = when {
+                    moshi?.errors?.name != null -> moshi.errors.name[0]
+                    else -> moshi?.message ?: "Error occurred while saving budget"
+                }
+                return ApiResponses(errorMessage = errorMessage)
+            }
+            return ApiResponses(errorMessage = "Error occurred while saving budget")
+        }
+
     }
 }

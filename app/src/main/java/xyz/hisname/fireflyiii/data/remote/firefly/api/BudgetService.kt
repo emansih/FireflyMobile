@@ -28,6 +28,7 @@ import xyz.hisname.fireflyiii.repository.models.autocomplete.BudgetItems
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetModel
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListModel
 import xyz.hisname.fireflyiii.repository.models.budget.UpdateBudgetModel
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListSuccessModel
 import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitModel
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionModel
 
@@ -75,5 +76,17 @@ interface BudgetService {
             @Query("start") start: String,
             @Query("end") end: String,
             @Query("type") transactionType: String): Response<TransactionModel>
+
+    @FormUrlEncoded
+    @POST(BUDGET_API_ENDPOINT)
+    suspend fun addBudget(@Field("name") name: String): Response<BudgetListSuccessModel>
+
+    @FormUrlEncoded
+    @POST(BUDGET_API_ENDPOINT)
+    suspend fun addBudget(@Field("name") name: String,
+                          @Field("auto_budget_type") budgetType: String?,
+                          @Field("auto_budget_currency_code") currencyCode: String?,
+                          @Field("auto_budget_amount") budgetAmount: String?,
+                          @Field("auto_budget_period") budgetPeriod: String?): Response<BudgetListSuccessModel>
 
 }

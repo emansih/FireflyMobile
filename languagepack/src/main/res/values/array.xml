@@ -47,4 +47,10 @@
         <item>Mortgage</item>
     </string-array>
 
+    <string-array name="auto_budget">
+        <item>No auto-budget</item>
+        <item>Set a fixed amount every period</item>
+        <item>Add an amount every period</item>
+    </string-array>
+
 </resources>
