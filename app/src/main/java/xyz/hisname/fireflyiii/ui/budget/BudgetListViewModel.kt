@@ -24,16 +24,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.budget.IndividualBudget
-import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import java.math.BigDecimal
@@ -55,10 +54,6 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
     private val currencyRepository = CurrencyRepository(
             AppDatabase.getInstance(application).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
-    )
-    private val transactionRepository = TransactionRepository(
-            AppDatabase.getInstance(application).transactionDataDao(),
-            genericService().create(TransactionService::class.java)
     )
     private var monthCount: Long = 0
 
@@ -101,8 +96,6 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
         viewModelScope.launch(Dispatchers.IO){
             val defaultCurrency = currencyRepository.defaultCurrency()
             currencyName.postValue(defaultCurrency.currencyAttributes.code)
-            transactionRepository.getTransactionByDateAndCurrencyCode(startOfMonth, endOfMonth,
-                    defaultCurrency.currencyAttributes.code, "withdrawal", true)
             getBudgetData(defaultCurrency.currencyAttributes.code,
                     defaultCurrency.currencyAttributes.symbol, startOfMonth, endOfMonth)
             getRecyclerviewData(defaultCurrency.currencyAttributes.code,
@@ -115,7 +108,6 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
         val budgetSpent = budgetRepository.allActiveSpentList(currencyCode,
                 startOfMonth, endOfMonth)
         spentValue.postValue(currencySymbol + budgetSpent.toPlainString())
-        budgetRepository.getAllBudget()
         val budgeted = budgetRepository.getConstraintBudgetWithCurrency(
                 startOfMonth, endOfMonth, currencyCode)
         budgetValue.postValue(currencySymbol + budgeted.toPlainString())
@@ -135,20 +127,30 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
 
     private suspend fun getRecyclerviewData(currencyCode: String, currencySymbol: String,
                                             startOfMonth: String, endOfMonth: String){
-        val uniqueBudget = transactionRepository.getUniqueBudgetByDate(startOfMonth, endOfMonth,
-                currencyCode, "withdrawal")
         val individualBudgetList = arrayListOf<IndividualBudget>()
-        uniqueBudget.forEach { budget ->
-            if(budget.isNotBlank()){
-                val spentAmount = transactionRepository.getTransactionByDateAndBudgetAndCurrency(startOfMonth, endOfMonth,
-                        currencyCode, "withdrawal", budget)
-                val budgetAmount = budgetRepository.getBudgetLimitByName(budget, startOfMonth,
-                        endOfMonth, currencyCode)
-                individualBudgetList.add(IndividualBudget(budget, spentAmount, budgetAmount, currencySymbol))
+        budgetRepository.getAllBudgetName().collectLatest { uniqueBudget ->
+            uniqueBudget.forEach { budget ->
+                if(budget.isNotBlank()){
+                    val spentAmountByName = budgetRepository.getSpentByBudgetName(budget)
+                    val spentAmount = if(spentAmountByName == null){
+                        0.toBigDecimal()
+                    } else {
+                        spentAmountByName
+                    }
+                    val budgetAmount = budgetRepository.getBudgetLimitByName(budget, startOfMonth,
+                            endOfMonth, currencyCode)
+                    // No! It's not always false
+                    val userBudgetAmount = if(budgetAmount == null){
+                        0.toBigDecimal()
+                    } else {
+                        budgetAmount
+                    }
+                    individualBudgetList.add(IndividualBudget(budget, spentAmount, userBudgetAmount, currencySymbol))
+                }
             }
+            individualBudget.postValue(individualBudgetList)
+            isLoading.postValue(false)
         }
-        individualBudget.postValue(individualBudgetList)
-        isLoading.postValue(false)
     }
 
     fun minusMonth(){

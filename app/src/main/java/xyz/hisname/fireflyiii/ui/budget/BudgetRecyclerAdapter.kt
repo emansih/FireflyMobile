@@ -50,7 +50,11 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
             itemView.budgetSpent.text = budget.currencySymbol + budget.budgetSpent
             itemView.budgetText.text = budget.currencySymbol + budget.budgetAmount
             val progressDrawable = itemView.budgetProgress.progressDrawable.mutate()
-            val budgetPercentage = (budget.budgetSpent / budget.budgetAmount).multiply(100.toBigDecimal()).toInt()
+            val budgetPercentage = if(budget.budgetAmount == 0.toBigDecimal()){
+                0
+            } else {
+                (budget.budgetSpent / budget.budgetAmount).multiply(100.toBigDecimal()).toInt()
+            }
             when {
                 budgetPercentage >= 80 -> {
                     progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.RED,

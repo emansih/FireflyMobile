@@ -22,6 +22,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.math.BigDecimal
 
 @JsonClass(generateAdapter = true)
 @Entity(tableName = "spentList"/*, foreignKeys = [ForeignKey(entity = BudgetListData::class,
@@ -32,7 +33,7 @@ data class Spent(
         @PrimaryKey(autoGenerate = false)
         var spentId: Long = 0,
         @Json(name ="sum")
-        var amount: Double,
+        var amount: BigDecimal,
         var currency_code: String,
         var currency_decimal_places: Int,
         var currency_id: Int,

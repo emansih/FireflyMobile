@@ -31,10 +31,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -46,7 +46,6 @@ import kotlinx.android.synthetic.main.budget_list_item.view.*
 import kotlinx.android.synthetic.main.fragment_budget_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
-import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 
@@ -66,9 +65,11 @@ class BudgetListFragment: BaseFragment(){
         budgetListViewModel.apiResponse.observe(viewLifecycleOwner){
             toastError(it)
         }
-        swipeContainer.isEnabled = false
         budgetListViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
             swipeContainer.isRefreshing = loading
+        }
+        swipeContainer.setOnRefreshListener {
+            budgetListViewModel.setDisplayDate()
         }
     }
 
@@ -141,6 +142,20 @@ class BudgetListFragment: BaseFragment(){
             }
         }
         initFab()
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && extendedFab.isShown) {
+                    extendedFab.hide()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    extendedFab.show()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
     private fun initFab(){

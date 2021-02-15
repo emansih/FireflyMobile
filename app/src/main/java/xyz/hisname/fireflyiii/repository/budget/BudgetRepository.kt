@@ -267,4 +267,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
         }
 
     }
+
+    suspend fun getSpentByBudgetName(budgetName: String) = spentDao.getSpentAmountByBudgetName(budgetName)
 }
