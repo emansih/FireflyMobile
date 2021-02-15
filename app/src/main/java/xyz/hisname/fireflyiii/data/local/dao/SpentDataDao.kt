@@ -32,6 +32,6 @@ abstract class SpentDataDao: BaseDao<Spent>  {
     @Query("SELECT ABS(SUM(amount)) FROM budget_list INNER JOIN spentList ON spentList.spentId = budget_list.budgetListId WHERE active = 1 AND currency_code =:currencyCode AND budgetListId =:budgetLimitId")
     abstract fun getBudgetListByIdAndCurrencyCode(budgetLimitId: Long, currencyCode: String): BigDecimal
 
-    @Query("SELECT amount FROM budget_list INNER JOIN spentList ON spentList.spentId = budget_list.budgetListId WHERE name=:budgetName")
+    @Query("SELECT ABS(amount) FROM budget_list INNER JOIN spentList ON spentList.spentId = budget_list.budgetListId WHERE name=:budgetName")
     abstract fun getSpentAmountByBudgetName(budgetName: String): BigDecimal?
 }

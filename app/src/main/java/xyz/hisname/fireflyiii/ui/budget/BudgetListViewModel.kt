@@ -129,6 +129,8 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                                             startOfMonth: String, endOfMonth: String){
         val individualBudgetList = arrayListOf<IndividualBudget>()
         budgetRepository.getAllBudgetName().collectLatest { uniqueBudget ->
+            individualBudgetList.clear()
+            individualBudget.postValue(individualBudgetList)
             uniqueBudget.forEach { budget ->
                 if(budget.isNotBlank()){
                     val spentAmountByName = budgetRepository.getSpentByBudgetName(budget)

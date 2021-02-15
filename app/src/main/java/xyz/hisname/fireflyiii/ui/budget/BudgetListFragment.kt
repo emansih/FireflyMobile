@@ -142,20 +142,6 @@ class BudgetListFragment: BaseFragment(){
             }
         }
         initFab()
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0 || dy < 0 && extendedFab.isShown) {
-                    extendedFab.hide()
-                }
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    extendedFab.show()
-                }
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-        })
     }
 
     private fun initFab(){
@@ -172,28 +158,40 @@ class BudgetListFragment: BaseFragment(){
     }
 
     private fun setRecyclerView(){
+        recycler_view.layoutManager = LinearLayoutManager(requireContext())
         budgetListViewModel.individualBudget.observe(viewLifecycleOwner){ budgetData ->
             val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData){ }
-            recycler_view.layoutManager = LinearLayoutManager(requireContext())
-            recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             recycler_view.adapter = budgetRecyclerAdapter
-                recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-                    if (viewHolder.itemView.budgetItemList.isOverlapping(extendedFab)) {
-                        extendedFab.dropToRemove()
-                        if (!isCurrentlyActive) {
-                            val budgetName = viewHolder.itemView.budgetNameText.text.toString()
-                            budgetListViewModel.deleteBudget(viewHolder.itemView.budgetNameText.text.toString()).observe(viewLifecycleOwner){ isDeleted ->
-                                if(!isDeleted){
-                                    toastOffline("Error deleting $budgetName", Toast.LENGTH_LONG)
-                                } else {
-                                    budgetListViewModel.setDisplayDate()
-                                }
-                            }
+        }
+        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            if (viewHolder.itemView.budgetItemList.isOverlapping(extendedFab)) {
+                extendedFab.dropToRemove()
+                if (!isCurrentlyActive) {
+                    val budgetName = viewHolder.itemView.budgetNameText.text.toString()
+                    budgetListViewModel.deleteBudget(viewHolder.itemView.budgetNameText.text.toString()).observe(viewLifecycleOwner){ isDeleted ->
+                        if(!isDeleted){
+                            toastOffline("Error deleting $budgetName", Toast.LENGTH_LONG)
+                        } else {
+                            budgetListViewModel.setDisplayDate()
                         }
                     }
                 }
-
+            }
         }
+        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && extendedFab.isShown) {
+                    extendedFab.hide()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    extendedFab.show()
+                }
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+        })
     }
 
 }
