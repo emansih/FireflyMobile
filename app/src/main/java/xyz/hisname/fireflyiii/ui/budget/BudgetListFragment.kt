@@ -21,18 +21,15 @@ package xyz.hisname.fireflyiii.ui.budget
 import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
@@ -124,17 +121,13 @@ class BudgetListFragment: BaseFragment(){
             totalAvailableBudget.text = getString(R.string.total_available_in_currency, data.first)
             monthAndYearText.text = data.second
             availableBudget.setOnClickListener {
-                val input = TextInputEditText(requireContext())
-                val layoutParam = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT)
-                input.layoutParams = layoutParam
-                input.setRawInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-                        or InputType.TYPE_NUMBER_FLAG_SIGNED)
+                val layoutInflater = LayoutInflater.from(requireContext())
+                val availableLayout = layoutInflater.inflate(R.layout.available_budget_layout, null)
+                val input = availableLayout.findViewById<TextInputEditText>(R.id.availableBudgetEditText)
                 AlertDialog.Builder(requireContext())
                         .setTitle(data.second)
                         .setMessage(getString(R.string.expected_budget, data.first))
-                        .setView(input)
+                        .setView(availableLayout)
                         .setPositiveButton(android.R.string.ok) { _,_ ->
                             budgetListViewModel.setBudget(input.getString(), data.first)
                         }

@@ -56,6 +56,7 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
             genericService().create(CurrencyService::class.java)
     )
     private var monthCount: Long = 0
+    private var currencySymbol = ""
 
     val spentValue: MutableLiveData<String> = MutableLiveData()
     val budgetValue: MutableLiveData<String> = MutableLiveData()
@@ -95,11 +96,10 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
         }
         viewModelScope.launch(Dispatchers.IO){
             val defaultCurrency = currencyRepository.defaultCurrency()
+            currencySymbol = defaultCurrency.currencyAttributes.symbol
             currencyName.postValue(defaultCurrency.currencyAttributes.code)
-            getBudgetData(defaultCurrency.currencyAttributes.code,
-                    defaultCurrency.currencyAttributes.symbol, startOfMonth, endOfMonth)
-            getRecyclerviewData(defaultCurrency.currencyAttributes.code,
-                    defaultCurrency.currencyAttributes.symbol, startOfMonth, endOfMonth)
+            getBudgetData(defaultCurrency.currencyAttributes.code, currencySymbol, startOfMonth, endOfMonth)
+            getRecyclerviewData(defaultCurrency.currencyAttributes.code, currencySymbol, startOfMonth, endOfMonth)
         }
     }
 
@@ -182,7 +182,7 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
             } else {
                 val budget = budgetRepository.getBudgetByCurrencyAndStartEndDate(startOfMonth, endOfMonth, currencyCode)
                 val budgetData = budgetRepository.updateBudget(budget.budgetId, currencyCode, amount, startOfMonth, endOfMonth)
-                budgetValue.postValue(budgetData.budgetAttributes.amount.toPlainString())
+                budgetValue.postValue(currencySymbol + budgetData.budgetAttributes.amount.toPlainString())
             }
         }
 
