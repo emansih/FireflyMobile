@@ -2,6 +2,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        jcenter()
         gradlePluginPortal()
     }
     dependencies {
@@ -31,11 +32,7 @@ allprojects {
                 includeGroup("com.github.florent37")
             }
         }
-        jcenter {
-            content {
-                includeGroup("com.joaomgcd")
-            }
-        }
+        jcenter()
         dependencies{
             apply("$rootDir/buildSrc/src/main/java/Version.gradle")
         }
