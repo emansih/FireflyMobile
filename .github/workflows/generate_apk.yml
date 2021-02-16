@@ -55,17 +55,6 @@ jobs:
       - name: Rename APK
         run: |
           mv app/build/outputs/apk/release/app-release-unsigned-signed.apk app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk
-
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk
-          asset_name: ${{ env.VERSION_NAME }}-firefly.apk
-          asset_content_type: application/vnd.android.package-archive
           
       - name: Set up SDK   
         uses: google-github-actions/setup-gcloud@master
@@ -85,5 +74,5 @@ jobs:
           releaseFile: app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk
           track: production
           inAppUpdatePriority: 5
-          userFraction: 1.0
+          userFraction: 0.9
           whatsNewDirectory: whatsnew
