@@ -1,7 +1,0 @@
-pull_request_rules:
-  - name: Pull request on master branch will be closed immediately. 
-    conditions:
-      - base=master
-    actions:
-      close:
-        message: Thank you for your contribution. Unfortunately, I am unable to accept this pull request as it is not done in the `dev` branch
