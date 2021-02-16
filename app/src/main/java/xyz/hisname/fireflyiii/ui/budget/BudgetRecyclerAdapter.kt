@@ -41,7 +41,9 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
     override fun getItemCount() = budgetData.size
 
     override fun onBindViewHolder(holder: BudgetHolder, position: Int){
-        holder.bind(budgetData[position], clickListener)
+        if(budgetData.isNotEmpty()){
+            holder.bind(budgetData[position], clickListener)
+        }
     }
 
     inner class BudgetHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
