@@ -39,14 +39,7 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
-      
-      - name: Create changelog
-        run: echo whatsnew/whatsnew-en-UK > CHANGELOG.md
-        
-      - name: Extract release notes
-        id: extract-release-notes
-        uses: ffurrer2/extract-release-notes@v1
-      
+            
       - name: Create new release
         id: create_release
         uses: actions/create-release@v1
@@ -55,7 +48,7 @@ jobs:
         with:
          tag_name: ${{ env.VERSION_NAME }}
          release_name: ${{ env.VERSION_NAME }}
-         body: ${{ steps.extract-release-notes.outputs.release_notes }}
+         body_path: whatsnew/whatsnew-en-UK
          draft: false
          prerelease: false
 
