@@ -2,7 +2,7 @@
 	<img src="art/Laptop_Android.png"/>
 </p>
 
-### Firefly III(Android)
+### Photuris III
 
 [<img src="art/get-it-on-fdroid.png"
       alt="Get it on F-Droid"
@@ -26,7 +26,7 @@
       alt="Liberapay">](https://liberapay.com/hisname/donate)
 [<img src="https://img.shields.io/github/release/emansih/FireflyMobile.svg">](https://github.com/emansih/FireflyMobile/releases/latest)
             
-Firefly Mobile is an **unofficial** Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
+Photuris III is an **unofficial** Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 
 ### Authentication
 
@@ -84,7 +84,7 @@ Thanks to [Device Shots](https://deviceshots.com/) for the device frame!
 Found a bug? Before reporting it, check the [issue page](https://github.com/emansih/FireflyMobile/issues) to see if I am aware of it. If not, simply open up the [issue form](https://github.com/emansih/FireflyMobile/issues/new?template=ISSUE_TEMPLATE.md) and fill it up. Please attach a stacktrace together with the bug report. 
 
 
-On MIUI devices, please enable Autostart by going to Settings -> Apps -> Manage apps -> Firefly III Mobile -> Toggle Autostart
+On MIUI devices, please enable Autostart by going to Settings -> Apps -> Manage apps -> Photuris III -> Toggle Autostart
 
 Why is it needed? 
 
@@ -100,7 +100,7 @@ Please see this website for more info: https://dontkillmyapp.com/
 
 ### Contributing
 
-How do I join/contribute to Firefly Mobile? I am open to any kind of suggestions/feature request! Open an issue or drop me an email(Can be found on my Github profile). 
+How do I join/contribute to Photuris III? I am open to any kind of suggestions/feature request! Open an issue or drop me an email(Can be found on my Github profile). 
 
 ### Contributors
 This project exists thanks to all the people who [contributed](https://github.com/emansih/FireflyMobile/graphs/contributors).
