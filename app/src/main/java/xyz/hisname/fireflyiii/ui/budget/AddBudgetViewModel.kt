@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.budget
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -31,11 +32,13 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetType
 import xyz.hisname.fireflyiii.repository.userinfo.SystemInfoRepository
 import xyz.hisname.fireflyiii.util.Version
+import xyz.hisname.fireflyiii.workers.AttachmentWorker
 
 class AddBudgetViewModel(application: Application): BaseViewModel(application) {
 
@@ -71,7 +74,7 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
 
 
     fun addBudget(budgetName: String, budgetType: BudgetType, currencyCode: String?,
-                  budgetAmount: String?, budgetPeriod: String?): LiveData<Pair<Boolean,String>>{
+                  budgetAmount: String?, budgetPeriod: String?, fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ -> }){
@@ -80,6 +83,10 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
             when {
                 addBudget.response != null -> {
                     apiResponse.postValue(Pair(true, "Stored new budget"))
+                    if(fileToUpload.isNotEmpty()) {
+                        AttachmentWorker.initWorker(fileToUpload,
+                                addBudget.response.data.budgetListId, getApplication<Application>(), AttachableType.BUDGET)
+                    }
                 }
                 addBudget.errorMessage != null -> {
                     apiResponse.postValue(Pair(false,addBudget.errorMessage))

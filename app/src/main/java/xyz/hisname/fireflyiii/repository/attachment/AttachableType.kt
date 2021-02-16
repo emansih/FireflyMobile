@@ -42,5 +42,11 @@ enum class AttachableType {
         override fun toString(): String {
             return "Account"
         }
+    },
+
+    BUDGET{
+        override fun toString(): String {
+            return "Budget"
+        }
     }
 }

@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.ui.budget
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
@@ -27,27 +28,47 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
+import kotlinx.android.synthetic.main.fragment_add_bill.*
 import kotlinx.android.synthetic.main.fragment_add_budget.*
+import kotlinx.android.synthetic.main.fragment_add_budget.add_attachment_button
+import kotlinx.android.synthetic.main.fragment_add_budget.attachment_information
+import kotlinx.android.synthetic.main.fragment_add_budget.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
+import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetType
 import xyz.hisname.fireflyiii.ui.ProgressBar
+import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyBottomSheetViewModel
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListBottomSheet
+import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import java.io.File
+import java.util.*
 
 class AddBudgetFragment: BaseAddObjectFragment() {
 
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val addBudgetViewModel by lazy { getImprovedViewModel(AddBudgetViewModel::class.java) }
+    private lateinit var fileUri: Uri
+    private lateinit var takePicture: ActivityResultLauncher<Uri>
+    private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
+    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -72,6 +93,32 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                         }
                         .show()
                 dialog.findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                attachment_information.isVisible = true
+                attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                        "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
+                        "", "", "", 0, "", "", ""), 0))
+                attachmentItemAdapter.add(fileUri)
+                attachment_information.adapter?.notifyDataSetChanged()
+            }
+        }
+        chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
+            attachment_information.isVisible = true
+            if(fileChoosen != null){
+                fileChoosen.forEach { file ->
+                    attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
+                            "", Uri.EMPTY, FileUtils.getFileName(requireContext(), file) ?: "",
+                            "", "", "", 0, "", "", ""), 0))
+                }
+                attachmentItemAdapter.addAll(fileChoosen)
+                attachment_information.adapter?.notifyDataSetChanged()
             }
         }
     }
@@ -118,6 +165,41 @@ class AddBudgetFragment: BaseAddObjectFragment() {
         addBudgetFab.setOnClickListener {
             submitData()
         }
+        add_attachment_button.setOnClickListener {
+            val listItems = arrayOf("Capture image from camera", "Choose File")
+            AlertDialog.Builder(requireContext())
+                    .setItems(listItems) { dialog, which ->
+                        when (which) {
+                            0 -> {
+                                val createTempDir = File(requireContext().getExternalFilesDir(null).toString() +
+                                        File.separator + "temp")
+                                if(!createTempDir.exists()){
+                                    createTempDir.mkdir()
+                                }
+                                val randomId = UUID.randomUUID().toString().substring(0, 7)
+                                val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() +
+                                        File.separator + "temp" + File.separator + "${randomId}-firefly.png")
+                                if(fileToOpen.exists()){
+                                    fileToOpen.delete()
+                                }
+                                fileUri = FileProvider.getUriForFile(requireContext(),
+                                        requireContext().packageName + ".provider", fileToOpen)
+                                takePicture.launch(fileUri)
+                            }
+                            1 -> {
+                                chooseDocument.launch(arrayOf("*/*"))
+                            }
+                        }
+                    }
+                    .show()
+        }
+        attachment_information.layoutManager = LinearLayoutManager(requireContext())
+        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                false, { data: AttachmentData ->
+            attachmentDataAdapter.remove(data)
+            attachment_information.adapter?.notifyDataSetChanged()
+        }) { another: Int -> }
     }
 
     override fun submitData() {
@@ -149,7 +231,7 @@ class AddBudgetFragment: BaseAddObjectFragment() {
             }
         }
         addBudgetViewModel.addBudget(budgetNameEditText.getString(), budgetType, currency,
-                amount, freq).observe(viewLifecycleOwner) { response ->
+                amount, freq, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                 toastSuccess(response.second)
