@@ -66,10 +66,13 @@ jobs:
       - name: Upload APK 
         run: gsutil cp app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk gs://${{ secrets.PROJECT_ID }}.appspot.com/firefly
       
+      - name: Create service_account.json FROM secrets.SERVICE_ACCOUNT_JSON
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+        
       - name: Release on Google Play
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          serviceAccountJson: service_account.json
           packageName: xyz.hisname.fireflyiii
           releaseFile: app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk
           track: production
