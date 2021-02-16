@@ -96,22 +96,27 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
+    fun doNotShowAgain(status: Boolean){
+        AppPref(sharedPref).budgetIssue4394 = status
+    }
 
     private fun checkVersion(){
-        val systemInfoRepository = SystemInfoRepository(
-                genericService().create(SystemInfoService::class.java),
-                sharedPref,
-                accManager)
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->  }){
-            systemInfoRepository.getUserSystem()
-        }
-        val fireflyVersion = AppPref(sharedPref).serverVersion
-        if(fireflyVersion.contentEquals("5.5.0-beta.1")){
-            unSupportedVersion.postValue(true)
-        } else {
-            if(Version(fireflyVersion) == Version("5.4.6") ||
-                    Version(fireflyVersion).compareTo(Version("5.5.0")) == -1){
+        if(!AppPref(sharedPref).budgetIssue4394){
+            val systemInfoRepository = SystemInfoRepository(
+                    genericService().create(SystemInfoService::class.java),
+                    sharedPref,
+                    accManager)
+            viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->  }){
+                systemInfoRepository.getUserSystem()
+            }
+            val fireflyVersion = AppPref(sharedPref).serverVersion
+            if(fireflyVersion.contentEquals("5.5.0-beta.1")){
                 unSupportedVersion.postValue(true)
+            } else {
+                if(Version(fireflyVersion) == Version("5.4.6") ||
+                        Version(fireflyVersion).compareTo(Version("5.5.0")) == -1){
+                    unSupportedVersion.postValue(true)
+                }
             }
         }
     }

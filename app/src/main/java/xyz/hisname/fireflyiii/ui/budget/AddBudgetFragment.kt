@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
@@ -59,10 +60,16 @@ class AddBudgetFragment: BaseAddObjectFragment() {
         addBudgetViewModel.unSupportedVersion.observe(viewLifecycleOwner){ unSupported ->
             if(unSupported){
                 val message = Html.fromHtml("You are using an unsupported version of Firefly III which contains a bug. Proceed at your own risk. Follow <a href=\"https://github.com/firefly-iii/firefly-iii/issues/4394\">this issue</a> for more info")
+                val layoutInflater = LayoutInflater.from(requireContext())
+                val checkbox = layoutInflater.inflate(R.layout.dialog_checkbox, null)
                 val dialog = AlertDialog.Builder(requireContext())
                         .setTitle("Uh oh...")
                         .setMessage(message)
-                        .setPositiveButton("OK"){ _ , _ -> }
+                        .setView(checkbox)
+                        .setPositiveButton("OK"){ _ , _ ->
+                            val checkBox = checkbox.findViewById<CheckBox>(R.id.doNotShow)
+                            addBudgetViewModel.doNotShowAgain(checkBox.isChecked)
+                        }
                         .show()
                 dialog.findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
             }

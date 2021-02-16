@@ -118,6 +118,10 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("workManagerCharging", false)
         set(value) = sharedPref.edit{ putBoolean("workManagerCharging", value) }
 
+    override var budgetIssue4394: Boolean
+        get() = sharedPref.getBoolean("budgetIssue4394", false)
+        set(value) = sharedPref.edit{ putBoolean("budgetIssue4394", value) }
+
     private fun toNetworkType(networkType: String): NetworkType {
         return try {
             enumValueOf(networkType)

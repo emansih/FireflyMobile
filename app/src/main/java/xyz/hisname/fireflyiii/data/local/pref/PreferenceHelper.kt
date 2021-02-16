@@ -39,5 +39,6 @@ interface PreferenceHelper {
     var workManagerLowBattery: Boolean
     var workManagerNetworkType: NetworkType
     var workManagerRequireCharging: Boolean
+    var budgetIssue4394: Boolean
     fun clearPref()
 }
