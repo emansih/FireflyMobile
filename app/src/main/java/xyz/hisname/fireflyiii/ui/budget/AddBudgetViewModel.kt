@@ -102,18 +102,17 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
                 genericService().create(SystemInfoService::class.java),
                 sharedPref,
                 accManager)
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->  }){
             systemInfoRepository.getUserSystem()
-            val fireflyVersion = AppPref(sharedPref).serverVersion
-            if(fireflyVersion.contentEquals("5.5.0-beta.1")){
+        }
+        val fireflyVersion = AppPref(sharedPref).serverVersion
+        if(fireflyVersion.contentEquals("5.5.0-beta.1")){
+            unSupportedVersion.postValue(true)
+        } else {
+            if(Version(fireflyVersion) == Version("5.4.6") ||
+                    Version(fireflyVersion).compareTo(Version("5.5.0")) == -1){
                 unSupportedVersion.postValue(true)
-            } else {
-                if(Version(fireflyVersion) == Version("5.4.6") ||
-                        Version(fireflyVersion).compareTo(Version("5.5.0")) == -1){
-                    unSupportedVersion.postValue(true)
-                }
             }
-
         }
     }
 }
