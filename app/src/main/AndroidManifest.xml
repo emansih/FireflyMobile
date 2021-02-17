@@ -26,10 +26,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <!--<permission android:name="xyz.hisname.fireflyiii.READ_FIREFLY_ACCOUNT"
+    <permission android:name="xyz.hisname.fireflyiii.READ_FIREFLY_ACCOUNT"
         android:protectionLevel="signature"
         android:label="Allow apps with this permission to read your Firefly III accounts" />
-    <permission android:name="xyz.hisname.fireflyiii.READ_SIMPLE_DATA"
+    <!--<permission android:name="xyz.hisname.fireflyiii.READ_SIMPLE_DATA"
         android:protectionLevel="signature"
         android:label="Allow apps with this permission to read your Firefly III dashboard data" />-->
 
@@ -172,7 +172,7 @@
         </provider>
 
 
-        <!--<provider
+        <provider
             android:name=".data.provider.AccountListProvider"
             android:authorities="xyz.hisname.fireflyiii.provider"
             android:protectionLevel="signature"
@@ -181,7 +181,7 @@
             android:exported="true">
         </provider>
 
-        <provider
+        <!--<provider
             android:name=".data.provider.SimpleDataProvider"
             android:authorities="xyz.hisname.fireflyiii.provider.simpleData"
             android:protectionLevel="signature"
