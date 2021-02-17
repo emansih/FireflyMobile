@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.budget_list_item.view.*
+import kotlinx.android.synthetic.main.description_list_item.view.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.util.extension.inflate
 
@@ -35,8 +35,7 @@ class DescriptionAdapter(private val clickListener:(String) -> Unit):
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DescriptionViewHolder {
         context = parent.context
-        // TODO: Rename the layout
-        return DescriptionViewHolder(parent.inflate(R.layout.budget_list_item))
+        return DescriptionViewHolder(parent.inflate(R.layout.description_list_item))
     }
 
     override fun onBindViewHolder(holder: DescriptionViewHolder, position: Int){
@@ -47,7 +46,7 @@ class DescriptionAdapter(private val clickListener:(String) -> Unit):
 
     inner class DescriptionViewHolder(view: View): RecyclerView.ViewHolder(view) {
         fun bind(description: String, clickListener: (String) -> Unit){
-            itemView.budgetNameText.text = description
+            itemView.description.text = description
             itemView.setOnClickListener {clickListener(description)}
         }
     }
