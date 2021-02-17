@@ -1,19 +1,2 @@
 What's new:
-- Changed app name to `Photuris III`
-- It is now possible to view and delete individual budgets
-
-
-Fixes:
-- Fix bug where transaction cannot be updated #145
-
-
-Library updates:
-- build tools to 4.1.2
-- Lifecycle libs to 2.3.0
-- Material Design lib to 1.3.0
-- AndroidX Work to 2.5.0
-- Glide to 4.12.0
-- OSMDroid to 6.1.10
-- Markdown version to 0.17.0
-- CalendarView to 1.0.1
-- desugar library to 1.1.1
+- Update locale

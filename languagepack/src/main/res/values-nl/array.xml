@@ -46,4 +46,9 @@
         <item>Schuld</item>
     </string-array>
 
+    <string-array name="auto_budget">
+        <item>Geen auto-budget</item>
+        <item>Vast bedrag elke periode</item>
+        <item>Voeg elke periode een bedrag toe</item>
+    </string-array>
 </resources>

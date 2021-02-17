@@ -47,4 +47,10 @@
         <item>Prêt hypothécaire</item>
     </string-array>
 
+    <string-array name="auto_budget">
+        <item>Pas de budget automatique</item>
+        <item>Définir un montant fixe à chaque période</item>
+        <item>Ajouter un montant à chaque période</item>
+    </string-array>
+
 </resources>

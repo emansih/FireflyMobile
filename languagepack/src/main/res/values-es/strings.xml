@@ -164,4 +164,7 @@
     <string name="delete_all_tags">Eliminar todas sus etiquetas</string>
     <string name="delete_all_object_groups">Borrar TODOS sus grupos de objetos</string>
     <string name="earned">Ganado</string>
+    <string name="add_new_split">Añadir otra división</string>
+    <string name="total_available_in_currency">Presupuesto total disponible en %1$s</string>
+    <string name="expected_budget">Utilice este formulario para indicar cuánto espera poder presupuestar (en total, en %1$s) en el período indicado.</string>
 </resources>

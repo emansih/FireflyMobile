@@ -163,5 +163,8 @@
     <string name="delete_all_categories">Verwijder ALLE categorieën</string>
     <string name="delete_all_object_groups">Verwijder AL je objectgroepen</string>
     <string name="earned">Verdiend</string>
+    <string name="add_new_split">Voeg een split toe</string>
+    <string name="total_available_in_currency">Totaal beschikbare budget in %1$s</string>
+    <string name="expected_budget">Gebruik dit formulier om aan te geven hoeveel je verwacht in de aangegeven periode (in totaal, in %1$s) te kunnen begroten.</string>
 
 </resources>

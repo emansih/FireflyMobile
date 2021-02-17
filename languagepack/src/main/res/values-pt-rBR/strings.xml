@@ -170,4 +170,6 @@
     <string name="delete_all_tags">Excluir TODAS as suas tags</string>
     <string name="delete_all_object_groups">Excluir TODOS os seus grupos de objetos</string>
     <string name="earned">Ganho</string>
+    <string name="add_new_split">Adicionar outra divisão</string>
+    <string name="total_available_in_currency">Orçamentos disponíveis em %1$s</string>
 </resources>

@@ -302,7 +302,7 @@ class AddBillFragment: BaseAddObjectFragment() {
     }
 
     private fun attachmentDialog(){
-        val listItems = arrayOf("Capture image from camera", "Choose File")
+        val listItems = arrayOf(getString(R.string.capture_image_from_camera), getString(R.string.choose_file))
         AlertDialog.Builder(requireContext())
                 .setItems(listItems) { dialog, which ->
                     when (which) {

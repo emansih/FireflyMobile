@@ -156,5 +156,8 @@
     <string name="delete_all_tags">删除您的所有标签</string>
     <string name="earned">已赚得</string>
     <string name="spent">支出</string>
+    <string name="add_new_split">增加拆分</string>
+    <string name="total_available_in_currency">可用预算总额 以%1$s为单位</string>
+    <string name="expected_budget">使用此表单来显示您期望在指定时间内花费多少预算(总共，以%1$s为单位)</string>
 
 </resources>

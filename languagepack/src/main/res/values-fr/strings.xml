@@ -161,4 +161,7 @@
     <string name="delete_all_tags">Tous les étiquettes ont été supprimés</string>
     <string name="delete_all_categories">Toutes les catégories ont été supprimées</string>
     <string name="earned">Gagné</string>
+    <string name="add_new_split">Ajouter une autre fraction</string>
+    <string name="total_available_in_currency">Budget total disponible en %1$s</string>
+    <string name="expected_budget">Utilisez ce formulaire pour indiquer combien vous vous attendez à pouvoir budgéter (au total, en %1$s) dans la période indiquée.</string>
 </resources>

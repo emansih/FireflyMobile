@@ -163,5 +163,8 @@
     <string name="delete_all_tags">Elimina TUTTE le etichette</string>
     <string name="delete_all_object_groups">Elimina TUTTI i gruppi di oggetti</string>
     <string name="earned">Guadagnato</string>
+    <string name="add_new_split">Aggiungi un\'altra divisione</string>
+    <string name="total_available_in_currency">Budget totale disponibile in %1$s</string>
+    <string name="expected_budget">Usa questo modulo per indicare quanto ti aspetti di mettere a budget (in totale, in %1$s) nel periodo indicato.</string>
 
 </resources>

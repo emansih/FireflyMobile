@@ -46,4 +46,10 @@
         <item>Schuld</item>
     </string-array>
 
+    <string-array name="auto_budget">
+        <item>Kein Auto-Budget</item>
+        <item>Festbetrag für jeden Zeitraum festlegen</item>
+        <item>Betrag pro Zeitraum hinzufügen</item>
+    </string-array>
+
 </resources>

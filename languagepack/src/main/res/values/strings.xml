@@ -199,9 +199,11 @@
     <string name="transaction_calendar_header_help_text">Quickly jump to your desired date</string>
     <string name="transaction_calendar_date_help_text">Long press 2 dates to show transactions in that range</string>
     <string name="chart_transaction_in_period">Chart for all %1$s between %2$s and %3$s</string>
-    <string name="add_new_split">Add New Split</string>
+    <string name="add_new_split">Add another split</string>
     <string name="delete_split">Delete Split</string>
-    <string name="total_available_in_currency">Total Available In %1$s</string>
+    <string name="total_available_in_currency">Total available budget in %1$s</string>
     <string name="expected_budget">Use this form to indicate how much you expect to be able to budget (in total, in %1$s) in the indicated period.</string>
     <string name="auto_budget_amount">Auto-budget amount</string>
+    <string name="capture_image_from_camera">Capture image from camera</string>
+    <string name="choose_file">Choose file</string>
 </resources>

@@ -46,4 +46,10 @@
         <item>Prestito</item>
     </string-array>
 
+    <string-array name="auto_budget">
+        <item>Nessun budget automatico</item>
+        <item>Imposta un importo fisso per ogni periodo</item>
+        <item>Aggiungi un importo per ogni periodo</item>
+    </string-array>
+
 </resources>

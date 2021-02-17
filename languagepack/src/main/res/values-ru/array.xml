@@ -46,4 +46,10 @@
         <item>Ипотека</item>
     </string-array>
 
+    <string-array name="auto_budget">
+        <item>Без автобюджета</item>
+        <item>Задать фиксированную сумму на каждый период</item>
+        <item>Добавить сумму на каждый период</item>
+    </string-array>
+
 </resources>
