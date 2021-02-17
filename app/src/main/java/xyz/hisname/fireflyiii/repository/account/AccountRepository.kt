@@ -18,12 +18,12 @@
 
 package xyz.hisname.fireflyiii.repository.account
 
-import androidx.lifecycle.MutableLiveData
+import androidx.paging.PagingSource
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
@@ -244,6 +244,108 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         } catch (exception: Exception) { }
         return attachmentDao.getAttachmentFromJournalId(accountId)
     }
+
+    fun accountSearchPageSource(query: String, accountType: String) = object : PagingSource<Int, AccountData>(){
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AccountData> {
+            val paramKey = params.key
+            val previousKey = if(paramKey != null){
+                if(paramKey - 1 == 0){
+                    null
+                } else {
+                    paramKey - 1
+                }
+            } else {
+                null
+            }
+            try {
+                val networkCall = accountsService.searchAccount(query, accountType)
+                val responseBody = networkCall.body()
+                if (responseBody != null && networkCall.isSuccessful) {
+                    responseBody.data.forEach { account ->
+                        accountDao.insert(account)
+                    }
+                }
+                val pagination = responseBody?.meta?.pagination
+                if(pagination != null){
+                    val nextKey = if(pagination.current_page < pagination.total_pages){
+                        pagination.current_page + 1
+                    } else {
+                        null
+                    }
+                    return LoadResult.Page(accountDao.searchAccountDataByNameAndType(accountType, "%$query%"), previousKey, nextKey)
+                } else {
+                    return getOfflineData(accountType, query, params.key, previousKey)
+                }
+            } catch (exception: Exception){
+                return getOfflineData(accountType, query, params.key, previousKey)
+            }
+        }
+
+        override val keyReuseSupported = true
+    }
+
+    private suspend fun getOfflineData(accountType:String, query: String, paramKey: Int?, previousKey: Int?): PagingSource.LoadResult<Int, AccountData> {
+        val numberOfRows = accountDao.searchAccountDataByNameAndTypeCount(accountType, "%$query%")
+        val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
+            paramKey ?: 1 + 1
+        } else {
+            null
+        }
+        return PagingSource.LoadResult.Page(accountDao.searchAccountDataByNameAndType(accountType,
+                "%$query%"), previousKey, nextKey)
+    }
+
+    fun getAccountList(accountType: String) = object : PagingSource<Int, AccountData>(){
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AccountData> {
+            val paramKey = params.key
+            val previousKey = if(paramKey != null){
+                if(paramKey - 1 == 0){
+                    null
+                } else {
+                    paramKey - 1
+                }
+            } else {
+                null
+            }
+            try {
+                val networkCall = accountsService.getPaginatedAccountType(accountType, params.key ?: 1)
+                val responseBody = networkCall.body()
+                if (responseBody != null && networkCall.isSuccessful) {
+                    if (params.key == null) {
+                        accountDao.deleteAccountByType(accountType)
+                    }
+                    responseBody.data.forEach { data ->
+                        accountDao.insert(data)
+                    }
+                }
+                val pagination = responseBody?.meta?.pagination
+                if(pagination != null){
+                    val nextKey = if(pagination.current_page < pagination.total_pages){
+                        pagination.current_page + 1
+                    } else {
+                        null
+                    }
+                    return LoadResult.Page(accountDao.getAccountsByType(accountType), previousKey, nextKey)
+                } else {
+                    return getAccountList(params.key, previousKey, accountType)
+                }
+            } catch (exception: Exception){
+                return getAccountList(params.key, previousKey, accountType)
+            }
+        }
+        override val keyReuseSupported = true
+    }
+
+    private suspend fun getAccountList(paramKey: Int?, previousKey: Int?, accountType: String): PagingSource.LoadResult<Int, AccountData> {
+        val numberOfRows = accountDao.getAccountsByTypeCount(accountType)
+        val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
+            paramKey ?: 1 + 1
+        } else {
+            null
+        }
+        return PagingSource.LoadResult.Page(accountDao.getAccountsByType(accountType), previousKey, nextKey)
+    }
+
 
     private suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)
 

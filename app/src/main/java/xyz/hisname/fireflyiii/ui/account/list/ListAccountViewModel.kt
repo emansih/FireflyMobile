@@ -33,7 +33,6 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.account.AccountPageSource
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -47,7 +46,7 @@ class ListAccountViewModel(application: Application): BaseViewModel(application)
 
     fun getAccountList(accountType: String): LiveData<PagingData<AccountData>>{
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-            AccountPageSource(accountType, accountsDataDao, accountService)
+            accountRepository.getAccountList(accountType)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }
 

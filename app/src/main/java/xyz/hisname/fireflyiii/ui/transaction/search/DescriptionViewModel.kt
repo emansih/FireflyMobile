@@ -29,19 +29,21 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.transaction.TransactionSearchPagingSource
+import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 
 class DescriptionViewModel(application: Application): BaseViewModel(application) {
 
     private val transactionService = genericService().create(TransactionService::class.java)
     private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val transactionRepository = TransactionRepository(transactionDao, transactionService)
+
     val transactionName = MutableLiveData<String>()
 
     fun searchTransactionName(searchName: String) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-        TransactionSearchPagingSource(transactionService, transactionDao, searchName)
+        transactionRepository.searchDescription(searchName)
     }.flow.cachedIn(viewModelScope).asLiveData()
 
     fun getAllDescription() = Pager(PagingConfig(pageSize = 100)){
-        TransactionSearchPagingSource(transactionService, transactionDao, "")
+        transactionRepository.searchDescription("")
     }.flow.cachedIn(viewModelScope).asLiveData()
 }

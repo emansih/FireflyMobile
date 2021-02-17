@@ -19,10 +19,12 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
 import android.net.Uri
+import androidx.paging.PagingSource
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import retrofit2.Response
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
@@ -373,6 +375,67 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             }
         } catch (exception: Exception) { }
         return attachmentDao.getAttachmentFromJournalId(transactionJournalId)
+    }
+
+    fun searchDescription(query: String) = object : PagingSource<Int, String>(){
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, String> {
+            val paramKey = params.key
+            val previousKey = if(paramKey != null){
+                if(paramKey - 1 == 0){
+                    null
+                } else {
+                    paramKey - 1
+                }
+            } else {
+                null
+            }
+            if(query.isBlank()){
+                return LoadResult.Page(transactionDao.getTransactionByDescription(), null, null)
+            } else {
+                try {
+                    val networkCall = transactionService.searchTransaction(query)
+                    val responseBody = networkCall.body()
+                    if (responseBody != null && networkCall.isSuccessful) {
+                        responseBody.data.forEach { data ->
+                            data.transactionAttributes.transactions.forEach { transaction ->
+                                transactionDao.insert(transaction)
+                                transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                        transaction.transaction_journal_id,
+                                        data.transactionAttributes.group_title))
+                            }
+                        }
+                    }
+                    val pagination = responseBody?.meta?.pagination
+                    return if(pagination != null){
+                        val nextKey = if(pagination.current_page < pagination.total_pages){
+                            pagination.current_page + 1
+                        } else {
+                            null
+                        }
+                        LoadResult.Page(transactionDao.getTransactionByDescription("%$query%"),
+                                previousKey, nextKey)
+                    } else {
+                        getDescriptionFromDatabase(params.key, previousKey, query)
+                    }
+                } catch (exception: Exception){
+                    return getDescriptionFromDatabase(params.key, previousKey, query)
+                }
+            }
+        }
+        override val keyReuseSupported = true
+
+    }
+
+    private suspend fun getDescriptionFromDatabase(paramKey: Int?, previousKey: Int?, query: String): PagingSource.LoadResult<Int, String> {
+        val numberOfRows = transactionDao.getTransactionByDescriptionCount("%$query%")
+        val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
+            paramKey ?: 1 + 1
+        } else {
+            null
+        }
+        return PagingSource.LoadResult.Page(transactionDao.getTransactionByDescription("%$query%"),
+                previousKey, nextKey)
+
     }
 
     private suspend fun parseResponse(responseFromServer: Response<TransactionSuccessModel>): ApiResponses<TransactionSuccessModel>{
