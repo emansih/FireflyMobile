@@ -70,6 +70,13 @@ android {
         ignoreAssetsPattern "NOTICE.txt"
     }
 
+    bundle {
+        // Never set this to true otherwise we will have to depend on proprietary Play Core library
+        language {
+            enableSplit = false
+        }
+    }
+
     configurations {all*.exclude group: 'com.android.support'}
 }
 
