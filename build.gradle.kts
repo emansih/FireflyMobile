@@ -10,7 +10,7 @@ buildscript {
         classpath(kotlin("gradle-plugin", Dependencies.kotlinVersion))
         classpath("com.project.starter:easylauncher:3.2.1")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.36.0")
-        classpath("de.mannodermaus.gradle.plugins:android-junit5:1.6.2.0")
+        classpath("de.mannodermaus.gradle.plugins:android-junit5:1.7.1.1")
     }
 }
 
