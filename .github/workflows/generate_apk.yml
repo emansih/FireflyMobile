@@ -28,7 +28,11 @@ jobs:
         
       - name: Build with Gradle
         run: ./gradlew assemble
-
+        
+      - name: Copy APK
+        run: |
+          cp -r app/build/outputs/apk/release/ app/build/outputs/apk/google-play
+          
       - name: Sign Release APK
         id: sign
         uses: r0adkll/sign-android-release@v1
@@ -38,7 +42,17 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
-            
+      
+      - name: Sign Google Play APK
+        id: sign_google_play
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/google-play
+          signingKeyBase64: ${{ secrets.GOOGLE_PLAY_UPLOAD_KEY }}
+          alias: ${{ secrets.GOOGLE_PLAY_ALIAS }}
+          keyStorePassword: ${{ secrets.GOOGLE_PLAY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.GOOGLE_PLAY_STORE_PASSWORD }}
+
       - name: Create new release
         id: create_release
         uses: actions/create-release@v1
@@ -73,7 +87,7 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: xyz.hisname.fireflyiii
-          releaseFile: app/build/outputs/apk/release/${{ env.VERSION_NAME }}-firefly.apk
+          releaseFiles: ${{steps.sign_google_play.outputs.signedReleaseFile}}
           track: production
           inAppUpdatePriority: 5
           userFraction: 0.9
