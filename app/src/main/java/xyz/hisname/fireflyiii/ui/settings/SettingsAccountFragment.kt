@@ -76,16 +76,22 @@ class SettingsAccountFragment: BaseSettings() {
             summary = accManager.secretKey
         }
         val authMethod = findPreference<Preference>("auth_method") as Preference
+        val tokenValidity = findPreference<Preference>("auth_token_time") as Preference
+        val refreshToken = findPreference<Preference>("refresh_token") as Preference
+        val refreshTokenInterval = findPreference<ListPreference>("refresh_token_interval") as ListPreference
+        val autoRefreshToken = findPreference<SwitchPreference>("auto_refresh_token") as SwitchPreference
 
         if(Objects.equals(authMethodPref, "oauth")){
             authMethod.summary = "Open Authentication"
+            tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager.tokenExpiry)
         } else {
+            autoRefreshToken.isVisible = false
+            refreshTokenInterval.isVisible = false
+            refreshToken.isVisible = false
+            tokenValidity.isVisible = false
+            accessTokenPref.summary = AuthenticatorManager(AccountManager.get(requireContext())).accessToken
             authMethod.summary = resources.getString(R.string.personal_access_token)
         }
-
-        val tokenValidity = findPreference<Preference>("auth_token_time") as Preference
-        tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager.tokenExpiry)
-
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->
             preference.summary = newValue.toString()
             FireflyClient.destroyInstance()
@@ -96,7 +102,6 @@ class SettingsAccountFragment: BaseSettings() {
             FireflyClient.destroyInstance()
             true
         }
-        val refreshToken = findPreference<Preference>("refresh_token") as Preference
         refreshToken.setOnPreferenceClickListener {
             toastInfo("Refreshing your token...")
             authViewModel.getRefreshToken().observe(viewLifecycleOwner) { success ->
@@ -125,8 +130,6 @@ class SettingsAccountFragment: BaseSettings() {
             FireflyClient.destroyInstance()
             true
         }
-        val autoRefreshToken = findPreference<SwitchPreference>("auto_refresh_token") as SwitchPreference
-        val refreshTokenInterval = findPreference<ListPreference>("refresh_token_interval") as ListPreference
         autoRefreshToken.setOnPreferenceChangeListener { _, newValue ->
             if(newValue == false){
                 WorkManager.getInstance(requireContext()).cancelAllWorkByTag("refresh_worker")
