@@ -49,8 +49,8 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
     inner class BudgetHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(budget: IndividualBudget, clickListener: (IndividualBudget) -> Unit) {
             itemView.budgetNameText.text = budget.budgetName
-            itemView.budgetSpent.text = budget.currencySymbol + budget.budgetSpent
-            itemView.budgetText.text = budget.currencySymbol + budget.budgetAmount
+            itemView.userBudget.text = budget.currencySymbol + budget.budgetSpent + " / " +
+                    budget.currencySymbol + budget.budgetAmount
             val progressDrawable = itemView.budgetProgress.progressDrawable.mutate()
             val budgetPercentage = if(budget.budgetAmount == 0.toBigDecimal()){
                 0
@@ -71,6 +71,7 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
                             BlendModeCompat.SRC_ATOP)
                 }
             }
+            itemView.budgetPercentage.text = "$budgetPercentage%"
             itemView.budgetProgress.progressDrawable = progressDrawable
             ObjectAnimator.ofInt(itemView.budgetProgress, "progress", budgetPercentage).start()
         }

@@ -54,7 +54,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/budgetSpent"
+            android:id="@+id/budgetPercentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -62,25 +62,23 @@
             app:layout_constraintTop_toBottomOf="@+id/budgetNameText"/>
 
         <TextView
-            android:id="@+id/budgetText"
+            android:id="@+id/userBudget"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/budgetSpent"
-            app:layout_constraintTop_toTopOf="@+id/budgetSpent"/>
+            app:layout_constraintTop_toTopOf="@+id/budgetPercentage"/>
 
         <androidx.core.widget.ContentLoadingProgressBar
             android:id="@+id/budgetProgress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
             style="?android:attr/progressBarStyleHorizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/budgetSpent"
-            app:layout_constraintEnd_toEndOf="@+id/budgetText"
-            app:layout_constraintStart_toStartOf="@+id/budgetSpent"/>
+            app:layout_constraintTop_toBottomOf="@+id/userBudget"
+            app:layout_constraintEnd_toEndOf="@+id/userBudget"
+            app:layout_constraintStart_toStartOf="@+id/budgetNameText"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
