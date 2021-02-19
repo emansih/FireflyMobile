@@ -90,12 +90,10 @@ class BudgetListFragment: BaseFragment(){
             budgetListViewModel.addMonth()
         }
 
-        budgetListViewModel.spentValue.observe(viewLifecycleOwner){ spent ->
-            spentAmount.text = spent
+        zipLiveData(budgetListViewModel.spentValue, budgetListViewModel.budgetValue).observe(viewLifecycleOwner){ money ->
+            userBudget.text = money.first + " / " + money.second
         }
-        budgetListViewModel.budgetValue.observe(viewLifecycleOwner){ budgetValue ->
-            budgetAmount.text = budgetValue
-        }
+
         budgetListViewModel.budgetPercentage.observe(viewLifecycleOwner){ budgetPercentage ->
             val progressDrawable = budgetProgress.progressDrawable.mutate()
             when {
@@ -113,6 +111,7 @@ class BudgetListFragment: BaseFragment(){
                 }
             }
             budgetProgress.progressDrawable = progressDrawable
+            userBudgetPercentage.text = budgetPercentage.toString() + "%"
             ObjectAnimator.ofInt(budgetProgress, "progress", budgetPercentage.toInt()).start()
         }
         setRecyclerView()
