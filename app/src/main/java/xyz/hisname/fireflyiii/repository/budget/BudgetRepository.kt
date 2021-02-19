@@ -77,7 +77,7 @@ class BudgetRepository(private val budget: BudgetDataDao,
                         }
                     }
                 }
-                deleteBudgetList()
+                budgetList.deleteAllBudgetList()
                 budgetListData.forEach { budgetList ->
                     insertBudgetList(budgetList)
                 }
@@ -85,8 +85,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
         } catch (exception: Exception){ }
         return spentDao.getAllActiveBudgetList(currencyCode)
     }
-
-    suspend fun deleteBudgetList() = budgetList.deleteAllBudgetList()
 
     suspend fun getConstraintBudgetWithCurrency(startDate: String, endDate: String,
                                                 currencyCode: String) =
@@ -142,9 +140,8 @@ class BudgetRepository(private val budget: BudgetDataDao,
             val responseBody = networkCall.body()
             // There is no pagination in API
             if (responseBody != null && networkCall.isSuccessful) {
-                budgetLimitDao.deleteAllBudgetLimit()
-                responseBody.budgetLimitData.forEach { limitData ->
-                    budgetLimitDao.insert(limitData)
+                responseBody.budgetLimitData.forEach {  budgetLimitData ->
+                    budgetLimitDao.insert(budgetLimitData)
                 }
             }
         } catch (exception: Exception){ }
@@ -157,7 +154,6 @@ class BudgetRepository(private val budget: BudgetDataDao,
             val networkCall = budgetService.getPaginatedSpentBudget(1)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
-                deleteBudgetList()
                 budgetListData.addAll(responseBody.data)
                 if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
                     for(pagination in 2..responseBody.meta.pagination.total_pages){
