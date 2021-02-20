@@ -368,7 +368,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         val data: MutableLiveData<List<String>> = MutableLiveData()
         val mutatedBudgetList = arrayListOf<String>()
         viewModelScope.launch(Dispatchers.IO) {
-            budgetRepository.getAllBudgetName().map {  budgetList ->
+            budgetRepository.getAllBudgetName("", "").map {  budgetList ->
                 // Add a blank entry so that user can "unselect" budget
                 mutatedBudgetList.add("")
                 mutatedBudgetList.addAll(budgetList)

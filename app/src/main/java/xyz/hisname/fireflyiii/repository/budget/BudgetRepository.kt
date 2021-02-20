@@ -55,7 +55,7 @@ class BudgetRepository(private val budget: BudgetDataDao,
         val spentList = budgetData.budgetListAttributes.spent
         if(spentList.isNotEmpty()){
             spentList.forEach { spent ->
-                spent.spentId = budgetData.budgetListId
+                spent.budgetId = budgetData.budgetListId
                 spentDao.insert(spent)
             }
         }
@@ -148,16 +148,16 @@ class BudgetRepository(private val budget: BudgetDataDao,
         return budgetLimitDao.getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId, currencyCode, startDate, endDate)
     }
 
-    suspend fun getAllBudgetName(): Flow<List<String>> {
+    suspend fun getAllBudgetName(startDate: String, endDate: String): Flow<List<String>> {
         try {
             val budgetListData: MutableList<BudgetListData> = arrayListOf()
-            val networkCall = budgetService.getPaginatedSpentBudget(1)
+            val networkCall = budgetService.getPaginatedSpentBudget(1, startDate, endDate)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
                 budgetListData.addAll(responseBody.data)
                 if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
                     for(pagination in 2..responseBody.meta.pagination.total_pages){
-                        val networkBody = budgetService.getPaginatedSpentBudget(pagination).body()
+                        val networkBody = budgetService.getPaginatedSpentBudget(pagination, startDate, endDate).body()
                         if(networkBody != null){
                             budgetListData.addAll(networkBody.data)
                         }

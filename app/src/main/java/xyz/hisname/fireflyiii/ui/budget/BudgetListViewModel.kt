@@ -128,7 +128,7 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
     private suspend fun getRecyclerviewData(currencyCode: String, currencySymbol: String,
                                             startOfMonth: String, endOfMonth: String){
         val individualBudgetList = arrayListOf<IndividualBudget>()
-        budgetRepository.getAllBudgetName().collectLatest { uniqueBudget ->
+        budgetRepository.getAllBudgetName(startOfMonth, endOfMonth).collectLatest { uniqueBudget ->
             individualBudgetList.clear()
             individualBudget.postValue(individualBudgetList)
             uniqueBudget.forEach { budget ->

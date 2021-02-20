@@ -59,9 +59,6 @@ interface BudgetService {
     suspend fun getPaginatedSpentBudget(@Query("page") page: Int, @Query("start") start: String,
                                 @Query("end") end: String): Response<BudgetListModel>
 
-    @GET(BUDGET_API_ENDPOINT)
-    suspend fun getPaginatedSpentBudget(@Query("page") page: Int): Response<BudgetListModel>
-
     @GET("$BUDGET_API_ENDPOINT/{id}/limits")
     suspend fun getBudgetLimit(@Path("id") budgetId: Long, @Query("start") start: String,
                                @Query("end") end: String): Response<BudgetLimitModel>

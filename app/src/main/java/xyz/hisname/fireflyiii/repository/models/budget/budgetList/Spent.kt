@@ -19,19 +19,20 @@
 package xyz.hisname.fireflyiii.repository.models.budget.budgetList
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
 
 @JsonClass(generateAdapter = true)
-@Entity(tableName = "spentList"/*, foreignKeys = [ForeignKey(entity = BudgetListData::class,
-        parentColumns = arrayOf("budgetListId"), childColumns = arrayOf("spentFK"), onUpdate = ForeignKey.CASCADE,
-        onDelete = ForeignKey.CASCADE)]*/)
+@Entity(tableName = "spentList", foreignKeys = [ForeignKey(entity = BudgetListData::class,
+        parentColumns = arrayOf("budgetListId"), childColumns = arrayOf("budgetId"), onUpdate = ForeignKey.CASCADE,
+        onDelete = ForeignKey.CASCADE)])
 data class Spent(
-// For some reason, foreign keys does not work. will have to settle with a hack :(
-        @PrimaryKey(autoGenerate = false)
+        @PrimaryKey(autoGenerate = true)
         var spentId: Long = 0,
+        var budgetId: Long = 0,
         @Json(name ="sum")
         var amount: BigDecimal,
         var currency_code: String,
