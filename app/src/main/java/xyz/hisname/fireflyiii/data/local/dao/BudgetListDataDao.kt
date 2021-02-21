@@ -35,7 +35,6 @@ abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
     @Query("SELECT budget_list.name, budget_list.budgetListId FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId) WHERE budgetListFts MATCH :budgetName")
     abstract suspend fun searchBudgetName(budgetName: String): List<BudgetListData>
 
-    @Query("SELECT distinct budget_list.name FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId)")
-    abstract fun getAllBudgetName(): Flow<List<String>>
-
+    @Query("SELECT * FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId)")
+    abstract fun getAllBudget(): Flow<List<BudgetListData>>
 }

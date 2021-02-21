@@ -128,26 +128,31 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
     private suspend fun getRecyclerviewData(currencyCode: String, currencySymbol: String,
                                             startOfMonth: String, endOfMonth: String){
         val individualBudgetList = arrayListOf<IndividualBudget>()
-        budgetRepository.getAllBudgetName(startOfMonth, endOfMonth).collectLatest { uniqueBudget ->
+        budgetRepository.getAllBudget(startOfMonth, endOfMonth).collectLatest { uniqueBudget ->
             individualBudgetList.clear()
             individualBudget.postValue(individualBudgetList)
             uniqueBudget.forEach { budget ->
-                if(budget.isNotBlank()){
-                    val spentAmountByName = budgetRepository.getSpentByBudgetName(budget)
-                    val spentAmount = if(spentAmountByName == null){
-                        0.toBigDecimal()
-                    } else {
-                        spentAmountByName
+                val budgetName = budget.budgetListAttributes.name
+                val budgetId = budget.budgetListId
+                val uniqueSymbolList = budgetRepository.getUniqueCurrencySymbolInSpentByBudgetId(budgetId)
+                uniqueSymbolList.forEach { uniqueSymbol ->
+                    if(budgetName.isNotBlank()){
+                        val spentAmountByName = budgetRepository.getSpentByBudgetName(budgetName, uniqueSymbol)
+                        val spentAmount = if(spentAmountByName == null){
+                            0.toBigDecimal()
+                        } else {
+                            spentAmountByName
+                        }
+                        val budgetAmount = budgetRepository.getBudgetLimitByName(budgetName, startOfMonth,
+                                endOfMonth, uniqueSymbol)
+                        // No! It's not always false
+                        val userBudgetAmount = if(budgetAmount == null){
+                            0.toBigDecimal()
+                        } else {
+                            budgetAmount
+                        }
+                        individualBudgetList.add(IndividualBudget(budgetName, spentAmount, userBudgetAmount, uniqueSymbol))
                     }
-                    val budgetAmount = budgetRepository.getBudgetLimitByName(budget, startOfMonth,
-                            endOfMonth, currencyCode)
-                    // No! It's not always false
-                    val userBudgetAmount = if(budgetAmount == null){
-                        0.toBigDecimal()
-                    } else {
-                        budgetAmount
-                    }
-                    individualBudgetList.add(IndividualBudget(budget, spentAmount, userBudgetAmount, currencySymbol))
                 }
             }
             individualBudget.postValue(individualBudgetList)
