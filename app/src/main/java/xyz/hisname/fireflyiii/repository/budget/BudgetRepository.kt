@@ -25,10 +25,8 @@ import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountSuccessModel
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
-import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListModel
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListSuccessModel
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetType
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
@@ -301,4 +299,8 @@ class BudgetRepository(private val budget: BudgetDataDao,
 
     suspend fun getUniqueCurrencySymbolInSpentByBudgetId(budgetId: Long) =
             budgetLimitDao.getUniqueCurrencySymbolInSpentByBudgetId(budgetId)
+
+    suspend fun getBudgetLimitIdByNameAndCurrencyCodeAndDate(budgetName: String, currencySymbol: String,
+                                                           startDate: String, endDate: String) =
+            budgetLimitDao.getBudgetLimitIdByNameAndCurrencyCodeAndDate(budgetName, currencySymbol, startDate, endDate)
 }

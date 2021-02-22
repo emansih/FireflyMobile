@@ -152,7 +152,9 @@ class BudgetListFragment: BaseFragment(){
     private fun setRecyclerView(){
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
         budgetListViewModel.individualBudget.observe(viewLifecycleOwner){ budgetData ->
-            val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData){ }
+            val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData){ cid ->
+                
+            }
             recycler_view.adapter = budgetRecyclerAdapter
         }
         recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->

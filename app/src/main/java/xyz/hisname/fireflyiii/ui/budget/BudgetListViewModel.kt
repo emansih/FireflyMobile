@@ -24,7 +24,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
@@ -150,7 +149,8 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                     } else {
                         budgetAmount
                     }
-                    childBudgetList.add(ChildIndividualBudget(spentAmount, userBudgetAmount, uniqueSymbol))
+                    val budgetLimitId = budgetRepository.getBudgetLimitIdByNameAndCurrencyCodeAndDate(budgetName, uniqueSymbol, startOfMonth, endOfMonth)
+                    childBudgetList.add(ChildIndividualBudget(budgetLimitId, spentAmount, userBudgetAmount, uniqueSymbol))
                 }
             }
             if(childBudgetList.isNotEmpty()){

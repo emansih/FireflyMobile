@@ -30,7 +30,8 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.budget.ChildIndividualBudget
 import xyz.hisname.fireflyiii.util.extension.inflate
 
-class BudgetChildRecyclerAdapter(private val budgetData: List<ChildIndividualBudget>):
+class BudgetChildRecyclerAdapter(private val budgetData: List<ChildIndividualBudget>,
+                                 private val clickListener:(ChildIndividualBudget) -> Unit):
         RecyclerView.Adapter<BudgetChildRecyclerAdapter.BudgetChildHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetChildHolder {
@@ -71,6 +72,7 @@ class BudgetChildRecyclerAdapter(private val budgetData: List<ChildIndividualBud
             itemView.budgetPercentage.text = "$budgetPercentage%"
             itemView.budgetProgress.progressDrawable = progressDrawable
             ObjectAnimator.ofInt(itemView.budgetProgress, "progress", budgetPercentage).start()
+            itemView.setOnClickListener { clickListener(budget) }
         }
     }
 }

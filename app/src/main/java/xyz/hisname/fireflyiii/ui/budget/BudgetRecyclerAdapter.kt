@@ -20,15 +20,17 @@ package xyz.hisname.fireflyiii.ui.budget
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.budget_list_item.view.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.repository.models.budget.ChildIndividualBudget
 import xyz.hisname.fireflyiii.repository.models.budget.IndividualBudget
 import xyz.hisname.fireflyiii.util.extension.inflate
 
 class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
-                            private val clickListener:(IndividualBudget) -> Unit):
+                            private val clickListener:(ChildIndividualBudget) -> Unit):
         RecyclerView.Adapter<BudgetRecyclerAdapter.BudgetHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetHolder {
@@ -39,16 +41,20 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
 
     override fun onBindViewHolder(holder: BudgetHolder, position: Int){
         if(budgetData.isNotEmpty()){
-            holder.bind(budgetData[position], clickListener)
-            val layoutManager = LinearLayoutManager(holder.itemView.budgetChildRecyclerView.context)
-            val childItemAdapter = BudgetChildRecyclerAdapter(budgetData[position].listOfChildIndividualBudget)
-            holder.itemView.budgetChildRecyclerView.layoutManager = layoutManager
-            holder.itemView.budgetChildRecyclerView.adapter = childItemAdapter
+            holder.bind(budgetData[position])
+            val childRecyclerView = holder.itemView.budgetChildRecyclerView
+            val layoutManager = LinearLayoutManager(childRecyclerView.context)
+            val childItemAdapter = BudgetChildRecyclerAdapter(budgetData[position].listOfChildIndividualBudget, clickListener)
+            if(budgetData[position].listOfChildIndividualBudget.size > 1){
+                childRecyclerView.addItemDecoration(DividerItemDecoration(childRecyclerView.context, DividerItemDecoration.VERTICAL))
+            }
+            childRecyclerView.layoutManager = layoutManager
+            childRecyclerView.adapter = childItemAdapter
         }
     }
 
     inner class BudgetHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        fun bind(budget: IndividualBudget, clickListener: (IndividualBudget) -> Unit) {
+        fun bind(budget: IndividualBudget) {
             itemView.budgetNameText.text = budget.budgetName
         }
     }

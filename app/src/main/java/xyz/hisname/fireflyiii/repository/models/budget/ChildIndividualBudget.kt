@@ -21,6 +21,7 @@ package xyz.hisname.fireflyiii.repository.models.budget
 import java.math.BigDecimal
 
 data class ChildIndividualBudget(
+        val budgetLimitId: Long,
         val budgetSpent: BigDecimal,
         val budgetAmount: BigDecimal,
         val currencySymbol: String

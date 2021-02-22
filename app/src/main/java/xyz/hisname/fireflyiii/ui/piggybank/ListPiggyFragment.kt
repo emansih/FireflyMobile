@@ -60,7 +60,6 @@ class ListPiggyFragment: BaseFragment(){
 
     private fun displayView(){
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recycler_view.adapter = piggyRecyclerAdapter
         piggyViewModel.getPiggyBank().observe(viewLifecycleOwner){ pagingData ->
             piggyRecyclerAdapter.submitData(lifecycle, pagingData)

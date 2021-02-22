@@ -33,6 +33,10 @@ abstract class BudgetLimitDao: BaseDao<BudgetLimitData> {
     abstract fun getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId: Long, currencySymbol: String,
                                                           startDate: String, endDate: String): BigDecimal
 
+    @Query("SELECT budgetLimitId FROM budgetlimit INNER JOIN budget_list ON (budget_list.budgetListId = budgetlimit.budget_id) WHERE budget_list.name =:budgetName AND currency_symbol =:currencySymbol AND start =:startDate AND `end` =:endDate")
+    abstract fun getBudgetLimitIdByNameAndCurrencyCodeAndDate(budgetName: String, currencySymbol: String,
+                                                          startDate: String, endDate: String): Long
+
     @Query("SELECT DISTINCT(currency_symbol) FROM budgetLimit WHERE budget_Id =:budgetId")
     abstract fun getUniqueCurrencySymbolInSpentByBudgetId(budgetId: Long): List<String>
 

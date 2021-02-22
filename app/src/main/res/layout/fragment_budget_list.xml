@@ -102,10 +102,11 @@
                 android:id="@+id/budgetProgress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="12dp"
                 style="?android:attr/progressBarStyleHorizontal"
                 app:layout_constraintTop_toBottomOf="@+id/userBudget"
                 app:layout_constraintEnd_toEndOf="@+id/userBudget"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/totalAvailableBudget"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
