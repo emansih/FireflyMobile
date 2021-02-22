@@ -18,12 +18,9 @@
 
 package xyz.hisname.fireflyiii.ui.budget
 
-import android.animation.ObjectAnimator
-import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.graphics.BlendModeColorFilterCompat
-import androidx.core.graphics.BlendModeCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.budget_list_item.view.*
 import xyz.hisname.fireflyiii.R
@@ -43,37 +40,16 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
     override fun onBindViewHolder(holder: BudgetHolder, position: Int){
         if(budgetData.isNotEmpty()){
             holder.bind(budgetData[position], clickListener)
+            val layoutManager = LinearLayoutManager(holder.itemView.budgetChildRecyclerView.context)
+            val childItemAdapter = BudgetChildRecyclerAdapter(budgetData[position].listOfChildIndividualBudget)
+            holder.itemView.budgetChildRecyclerView.layoutManager = layoutManager
+            holder.itemView.budgetChildRecyclerView.adapter = childItemAdapter
         }
     }
 
     inner class BudgetHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(budget: IndividualBudget, clickListener: (IndividualBudget) -> Unit) {
             itemView.budgetNameText.text = budget.budgetName
-            itemView.userBudget.text = budget.currencySymbol + budget.budgetSpent + " / " +
-                    budget.currencySymbol + budget.budgetAmount
-            val progressDrawable = itemView.budgetProgress.progressDrawable.mutate()
-            val budgetPercentage = if(budget.budgetAmount == 0.toBigDecimal()){
-                0
-            } else {
-                (budget.budgetSpent / budget.budgetAmount).multiply(100.toBigDecimal()).toInt()
-            }
-            when {
-                budgetPercentage >= 80 -> {
-                    progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.RED,
-                            BlendModeCompat.SRC_ATOP)
-                }
-                budgetPercentage in 50..80 -> {
-                    progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.YELLOW,
-                            BlendModeCompat.SRC_ATOP)
-                }
-                else -> {
-                    progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.GREEN,
-                            BlendModeCompat.SRC_ATOP)
-                }
-            }
-            itemView.budgetPercentage.text = "$budgetPercentage%"
-            itemView.budgetProgress.progressDrawable = progressDrawable
-            ObjectAnimator.ofInt(itemView.budgetProgress, "progress", budgetPercentage).start()
         }
     }
 }

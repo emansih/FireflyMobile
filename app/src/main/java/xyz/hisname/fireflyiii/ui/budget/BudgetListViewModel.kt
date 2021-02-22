@@ -32,6 +32,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.models.budget.ChildIndividualBudget
 import xyz.hisname.fireflyiii.repository.models.budget.IndividualBudget
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -94,12 +95,14 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                 endOfMonth = DateTimeUtil.getFutureEndOfMonth(monthCount)
             }
         }
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
+            throwable.printStackTrace()
+        }){
             val defaultCurrency = currencyRepository.defaultCurrency()
             currencySymbol = defaultCurrency.currencyAttributes.symbol
             currencyName.postValue(defaultCurrency.currencyAttributes.code)
             getBudgetData(defaultCurrency.currencyAttributes.code, currencySymbol, startOfMonth, endOfMonth)
-            getRecyclerviewData(defaultCurrency.currencyAttributes.code, currencySymbol, startOfMonth, endOfMonth)
+            getRecyclerviewData(startOfMonth, endOfMonth)
         }
     }
 
@@ -125,39 +128,37 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
         }
     }
 
-    private suspend fun getRecyclerviewData(currencyCode: String, currencySymbol: String,
-                                            startOfMonth: String, endOfMonth: String){
+    private suspend fun getRecyclerviewData(startOfMonth: String, endOfMonth: String){
         val individualBudgetList = arrayListOf<IndividualBudget>()
-        budgetRepository.getAllBudget(startOfMonth, endOfMonth).collectLatest { uniqueBudget ->
-            individualBudgetList.clear()
-            individualBudget.postValue(individualBudgetList)
-            uniqueBudget.forEach { budget ->
-                val budgetName = budget.budgetListAttributes.name
-                val budgetId = budget.budgetListId
-                val uniqueSymbolList = budgetRepository.getUniqueCurrencySymbolInSpentByBudgetId(budgetId)
-                uniqueSymbolList.forEach { uniqueSymbol ->
-                    if(budgetName.isNotBlank()){
-                        val spentAmountByName = budgetRepository.getSpentByBudgetName(budgetName, uniqueSymbol)
-                        val spentAmount = if(spentAmountByName == null){
-                            0.toBigDecimal()
-                        } else {
-                            spentAmountByName
-                        }
-                        val budgetAmount = budgetRepository.getBudgetLimitByName(budgetName, startOfMonth,
-                                endOfMonth, uniqueSymbol)
-                        // No! It's not always false
-                        val userBudgetAmount = if(budgetAmount == null){
-                            0.toBigDecimal()
-                        } else {
-                            budgetAmount
-                        }
-                        individualBudgetList.add(IndividualBudget(budgetName, spentAmount, userBudgetAmount, uniqueSymbol))
+        individualBudgetList.clear()
+        individualBudget.postValue(individualBudgetList)
+        budgetRepository.getAllBudgetList(startOfMonth, endOfMonth).forEach { uniqueBudget ->
+            val budgetName = uniqueBudget.budgetListAttributes.name
+            val budgetId = uniqueBudget.budgetListId
+            budgetRepository.getBudgetLimit(budgetId, startOfMonth, endOfMonth)
+            val uniqueSymbolList = budgetRepository.getUniqueCurrencySymbolInSpentByBudgetId(budgetId)
+            val childBudgetList = arrayListOf<ChildIndividualBudget>()
+            uniqueSymbolList.forEach { uniqueSymbol ->
+                if (budgetName.isNotBlank()) {
+                    val spentAmountByName = budgetRepository.getSpentByBudgetName(budgetName, uniqueSymbol)
+                    val spentAmount = spentAmountByName ?: 0.toBigDecimal()
+                    val budgetAmount = budgetRepository.getBudgetLimitByName(budgetName, startOfMonth,
+                            endOfMonth, uniqueSymbol)
+                    // No! It's not always false
+                    val userBudgetAmount = if (budgetAmount == null) {
+                        0.toBigDecimal()
+                    } else {
+                        budgetAmount
                     }
+                    childBudgetList.add(ChildIndividualBudget(spentAmount, userBudgetAmount, uniqueSymbol))
                 }
             }
-            individualBudget.postValue(individualBudgetList)
-            isLoading.postValue(false)
+            if(childBudgetList.isNotEmpty()){
+                individualBudgetList.add(IndividualBudget(budgetName, childBudgetList))
+            }
         }
+        individualBudget.postValue(individualBudgetList)
+        isLoading.postValue(false)
     }
 
     fun minusMonth(){

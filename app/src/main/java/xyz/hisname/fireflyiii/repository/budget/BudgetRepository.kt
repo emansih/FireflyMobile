@@ -148,7 +148,20 @@ class BudgetRepository(private val budget: BudgetDataDao,
         return budgetLimitDao.getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId, currencySymbol, startDate, endDate)
     }
 
-    suspend fun getAllBudget(startDate: String, endDate: String): Flow<List<BudgetListData>> {
+    suspend fun getBudgetLimit(budgetId: Long, startDate: String, endDate: String){
+        try {
+            val networkCall = budgetService.getBudgetLimit(budgetId, startDate, endDate)
+            val responseBody = networkCall.body()
+            // There is no pagination in API
+            if (responseBody != null && networkCall.isSuccessful) {
+                responseBody.budgetLimitData.forEach {  budgetLimitData ->
+                    budgetLimitDao.insert(budgetLimitData)
+                }
+            }
+        } catch (exception: Exception){ }
+    }
+
+    suspend fun getAllBudgetFlow(startDate: String, endDate: String): Flow<List<BudgetListData>> {
         try {
             val budgetListData: MutableList<BudgetListData> = arrayListOf()
             val networkCall = budgetService.getPaginatedSpentBudget(1, startDate, endDate)
@@ -167,7 +180,30 @@ class BudgetRepository(private val budget: BudgetDataDao,
             budgetListData.forEach { data ->
                 insertBudgetList(data)
             }
-        } catch (exception: Exception){  }
+        } catch (exception: Exception){ }
+        return budgetList.getAllBudgetFlow()
+    }
+
+    suspend fun getAllBudgetList(startDate: String, endDate: String): List<BudgetListData> {
+        try {
+            val budgetListData: MutableList<BudgetListData> = arrayListOf()
+            val networkCall = budgetService.getPaginatedSpentBudget(1, startDate, endDate)
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                budgetListData.addAll(responseBody.data)
+                if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
+                    for(pagination in 2..responseBody.meta.pagination.total_pages){
+                        val networkBody = budgetService.getPaginatedSpentBudget(pagination, startDate, endDate).body()
+                        if(networkBody != null){
+                            budgetListData.addAll(networkBody.data)
+                        }
+                    }
+                }
+            }
+            budgetListData.forEach { data ->
+                insertBudgetList(data)
+            }
+        } catch (exception: Exception){ }
         return budgetList.getAllBudget()
     }
 
@@ -194,9 +230,7 @@ class BudgetRepository(private val budget: BudgetDataDao,
                 }
             }
 
-        } catch (exception: Exception){
-            exception.printStackTrace()
-        }
+        } catch (exception: Exception){ }
     }
 
     suspend fun getBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)

@@ -367,7 +367,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         viewModelScope.launch(Dispatchers.IO) {
             // Add a blank entry so that user can "unselect" budget
             mutatedBudgetList.add("")
-            budgetRepository.getAllBudget("", "").map { budgetList ->
+            budgetRepository.getAllBudgetFlow("", "").map { budgetList ->
                 budgetList.forEach { data ->
                     mutatedBudgetList.add(data.budgetListAttributes.name)
                 }
