@@ -1,6 +1,7 @@
 What's new:
 - Update locale
 - Budget percentage is now shown budget listing screen
+- Budget list now shows multiple currencies
 
 Fix:
 - Fix crash when going to setting screen when user is using PAT #151 
