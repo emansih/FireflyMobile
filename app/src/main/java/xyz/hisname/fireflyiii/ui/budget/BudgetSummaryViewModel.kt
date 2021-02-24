@@ -25,7 +25,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -39,7 +38,6 @@ import xyz.hisname.fireflyiii.repository.budget.TransactionPagingSource as Trans
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.currency.TransactionPagingSource
 import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.insertDateSeparator
@@ -180,7 +178,7 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
             } else {
                 viewModelScope.launch(Dispatchers.IO){
                     val budgetAmount = budgetRepository.getBudgetLimitByName(budget, DateTimeUtil.getStartOfMonth(),
-                            DateTimeUtil.getEndOfMonth(), defaultCurrency)
+                            DateTimeUtil.getEndOfMonth(), currencySymbol)
                     availableBudget.postValue("$currencySymbol $budgetAmount")
                     val balance = budgetAmount.minus(getBudget(DateTimeUtil.getStartOfMonth(),
                             DateTimeUtil.getEndOfMonth(), defaultCurrency, budget))
