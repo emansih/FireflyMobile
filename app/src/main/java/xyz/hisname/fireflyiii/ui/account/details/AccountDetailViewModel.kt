@@ -107,7 +107,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
                         accountAttributes.interest + "% (" + accountAttributes.interest_period + ")"))
             }
             accountData.postValue(arrayListOfDetails)
-            notes.postValue(accountAttributes.notes)
+            notes.postValue(accountAttributes.notes ?: "")
             getTransactions(accountId, accountType)
             accountDataLiveData.postValue(accountList)
         }

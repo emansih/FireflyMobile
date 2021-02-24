@@ -145,7 +145,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                 }
             } else {
                 // Is tasker variable
-                transactionCurrency.postValue(currencyBundle)
+                transactionCurrency.postValue(currencyBundle ?: "")
             }
             transactionDescription.postValue(bundle.getString("transactionDescription"))
             transactionAmount.postValue(bundle.getString("transactionAmount"))
@@ -178,19 +178,19 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         viewModelScope.launch(Dispatchers.IO){
             val transactionList = transactionRepository.getTransactionByJournalId(transactionJournalId)
             transactionDescription.postValue(transactionList.description)
-            transactionBudget.postValue(transactionList.budget_name)
+            transactionBudget.postValue(transactionList.budget_name ?: "")
             transactionAmount.postValue(transactionList.amount.toString())
             transactionCurrency.postValue(transactionList.currency_name +
                     " (" + transactionList.currency_code + " )")
             transactionDate.postValue(DateTimeUtil.convertIso8601ToHumanDate(transactionList.date))
-            transactionCategory.postValue(transactionList.category_name)
+            transactionCategory.postValue(transactionList.category_name ?: "")
             transactionTime.postValue(DateTimeUtil.convertIso8601ToHumanTime(transactionList.date))
-            transactionNote.postValue(transactionList.notes)
+            transactionNote.postValue(transactionList.notes ?: "")
             if(transactionList.tags.isNotEmpty()){
                 transactionTags.postValue(transactionList.tags.toString())
             }
-            transactionBill.postValue(transactionList.bill_name)
-            transactionSourceAccount.postValue(transactionList.source_name)
+            transactionBill.postValue(transactionList.bill_name ?: "")
+            transactionSourceAccount.postValue(transactionList.source_name ?: "")
             transactionDestinationAccount.postValue(transactionList.destination_name)
         }
     }

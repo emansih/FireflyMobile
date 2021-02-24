@@ -34,11 +34,6 @@ android {
         buildConfigField("String", "HOSTNAME", hostName)
     }
 
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
-
     testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
