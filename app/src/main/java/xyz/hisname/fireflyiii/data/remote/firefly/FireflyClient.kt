@@ -27,6 +27,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import xyz.hisname.fireflyiii.data.remote.firefly.moshi.*
+import xyz.hisname.fireflyiii.repository.budget.BudgetType
 import xyz.hisname.fireflyiii.util.network.HeaderInterceptor
 import java.net.MalformedURLException
 import java.net.URL
@@ -73,6 +74,7 @@ class FireflyClient {
                         .add(OffsetDateTime::class.java, OffsetDateTimeConverter())
                         .add(BigDecimalConverter())
                         .add(Uri::class.java, UriConverter())
+                        .add(BudgetTypeAdapter)
                         .build()
                 INSTANCE ?: Retrofit.Builder()
                         .baseUrl(generateUrl(baseUrl))

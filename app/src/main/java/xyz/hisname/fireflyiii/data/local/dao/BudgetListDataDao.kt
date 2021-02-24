@@ -32,13 +32,19 @@ abstract class BudgetListDataDao: BaseDao<BudgetListData>  {
     @Query("DELETE FROM budget_list WHERE budgetListId =:budgetId")
     abstract suspend fun deleteBudgetById(budgetId: Long): Int
 
-    @Query("SELECT budget_list.name, budget_list.budgetListId FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId) WHERE budgetListFts MATCH :budgetName")
+    @Query("SELECT * FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId) WHERE budgetListFts MATCH :budgetName")
     abstract suspend fun searchBudgetName(budgetName: String): List<BudgetListData>
 
-    @Query("SELECT * FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId)")
+    @Query("SELECT * FROM budget_list")
     abstract fun getAllBudgetFlow(): Flow<List<BudgetListData>>
 
-    @Query("SELECT * FROM budget_list JOIN budgetListFts ON (budget_list.budgetListId = budgetListFts.budgetListId)")
+    @Query("SELECT * FROM budget_list")
     abstract fun getAllBudget(): List<BudgetListData>
+
+    @Query("SELECT budgetListId FROM budget_list WHERE name =:budgetListName")
+    abstract fun getBudgetListIdByName(budgetListName: String): Long
+
+    @Query("SELECT * FROM budget_list WHERE budgetListId =:budgetListId")
+    abstract fun getBudgetListIdById(budgetListId: Long): BudgetListData
 
 }

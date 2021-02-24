@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.hisname.fireflyiii.repository.models.budget.budgetList
+package xyz.hisname.fireflyiii.repository.budget
 
 enum class BudgetType {
 

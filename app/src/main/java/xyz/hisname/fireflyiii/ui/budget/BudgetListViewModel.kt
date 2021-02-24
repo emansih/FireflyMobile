@@ -149,8 +149,8 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                     } else {
                         budgetAmount
                     }
-                    val budgetLimitId = budgetRepository.getBudgetLimitIdByNameAndCurrencyCodeAndDate(budgetName, uniqueSymbol, startOfMonth, endOfMonth)
-                    childBudgetList.add(ChildIndividualBudget(budgetLimitId, spentAmount, userBudgetAmount, uniqueSymbol))
+                    val budgetListId = budgetRepository.getBudgetListIdByName(budgetName)
+                    childBudgetList.add(ChildIndividualBudget(budgetListId, spentAmount, userBudgetAmount, uniqueSymbol))
                 }
             }
             if(childBudgetList.isNotEmpty()){

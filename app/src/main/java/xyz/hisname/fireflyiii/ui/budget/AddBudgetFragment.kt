@@ -37,9 +37,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_add_bill.*
 import kotlinx.android.synthetic.main.fragment_add_budget.*
 import kotlinx.android.synthetic.main.fragment_add_budget.add_attachment_button
 import kotlinx.android.synthetic.main.fragment_add_budget.attachment_information
@@ -47,7 +47,7 @@ import kotlinx.android.synthetic.main.fragment_add_budget.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
-import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetType
+import xyz.hisname.fireflyiii.repository.budget.BudgetType
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
@@ -69,6 +69,8 @@ class AddBudgetFragment: BaseAddObjectFragment() {
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
+    private val budgetId by lazy { arguments?.getLong("budgetId") ?: 0L }
+    private val currencySymbol by lazy { arguments?.getString("currencySymbol") ?:"" }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -94,6 +96,45 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                         .show()
                 dialog.findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
             }
+        }
+        if(budgetId != 0L){
+            updateBudgetUi()
+        }
+    }
+
+    private fun updateBudgetUi(){
+        zipLiveData(addBudgetViewModel.getBudgetById(budgetId, currencySymbol),
+                addBudgetViewModel.budgetLimitAttributesLiveData).observe(viewLifecycleOwner) { budget ->
+            val budgetAttributes = budget.first.budgetListAttributes
+            budgetNameEditText.setText(budgetAttributes.name)
+            when (budgetAttributes.auto_budget_type) {
+                BudgetType.NONE -> {
+                    autoBudget.setSelection(0, true)
+                }
+                BudgetType.ROLLOVER -> {
+                    autoBudget.setSelection(1, true)
+                }
+                else -> {
+                    autoBudget.setSelection(2, true)
+                }
+            }
+            val budgetPeriod = budgetAttributes.auto_budget_period
+            if (budgetPeriod.contentEquals("weekly")) {
+                autoBudgetPeriod.setSelection(0, true)
+            } else if (budgetPeriod.contentEquals("monthly")) {
+                autoBudgetPeriod.setSelection(1, true)
+            } else if (budgetPeriod.contentEquals("quarterly")) {
+                autoBudgetPeriod.setSelection(2, true)
+            } else if (budgetPeriod.contentEquals("half-yearly")) {
+                autoBudgetPeriod.setSelection(3, true)
+            } else {
+                autoBudgetPeriod.setSelection(4, true)
+            }
+
+            val budgetLimitAttribute = budget.second.attributes
+            amountEdittext.setText(budgetLimitAttribute.amount.toString())
+            addBudgetViewModel.currency = budgetLimitAttribute.currency_code
+            currencyEdittext.setText(budgetLimitAttribute.currency_name + " (" + budgetLimitAttribute.currency_code + ")")
         }
     }
 
@@ -136,11 +177,20 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                     colorRes = R.color.md_yellow_A700
                     sizeDp = 24
                 },null, null, null)
-        addBudgetFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
-            icon = FontAwesome.Icon.faw_plus
-            colorRes = R.color.md_black_1000
-            sizeDp = 24
-        })
+        if(budgetId == 0L){
+            addBudgetFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                icon = FontAwesome.Icon.faw_plus
+                colorRes = R.color.md_black_1000
+                sizeDp = 24
+            })
+        } else {
+            addBudgetFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                icon = GoogleMaterial.Icon.gmd_update
+                colorRes = R.color.md_black_1000
+                sizeDp = 24
+            })
+        }
+
     }
 
     override fun setWidgets() {
@@ -230,17 +280,32 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                 BudgetType.NONE
             }
         }
-        addBudgetViewModel.addBudget(budgetNameEditText.getString(), budgetType, currency,
-                amount, freq, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
-            if(response.first){
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                toastSuccess(response.second)
-                handleBack()
-            } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
-                toastInfo(response.second)
+        if(budgetId == 0L){
+            addBudgetViewModel.addBudget(budgetNameEditText.getString(), budgetType, currency,
+                    amount, freq, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
+                if(response.first){
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                    toastSuccess(response.second)
+                    handleBack()
+                } else {
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                    toastInfo(response.second)
+                }
+            }
+        } else {
+            addBudgetViewModel.updateBudget(budgetId, budgetNameEditText.getString(), budgetType, currency,
+                    amount, freq).observe(viewLifecycleOwner) { response ->
+                if(response.first){
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                    toastSuccess(response.second)
+                    handleBack()
+                } else {
+                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                    toastInfo(response.second)
+                }
             }
         }
+
     }
 
     private fun setCurrency(){
@@ -258,9 +323,12 @@ class AddBudgetFragment: BaseAddObjectFragment() {
             currencyEdittext.setText(currency)
 
         }
-        addBudgetViewModel.getDefaultCurrency().observe(viewLifecycleOwner){ currency ->
-            currencyEdittext.setText(currency)
+        if(budgetId == 0L){
+            addBudgetViewModel.getDefaultCurrency().observe(viewLifecycleOwner){ currency ->
+                currencyEdittext.setText(currency)
+            }
         }
+
     }
 
     private fun disableField(){

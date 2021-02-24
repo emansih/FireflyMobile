@@ -28,7 +28,6 @@ import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListSuccessModel
-import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetType
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
@@ -272,6 +271,16 @@ class BudgetRepository(private val budget: BudgetDataDao,
         }
     }
 
+    suspend fun updateBudget(budgetId: Long, name: String, budgetType: BudgetType, currencyCode: String?,
+                          budgetAmount: String?, budgetPeriod: String?): ApiResponses<BudgetListSuccessModel>{
+        return try {
+            val networkCall = budgetService.updateBudget(budgetId, name, budgetType.toString(), currencyCode, budgetAmount, budgetPeriod)
+            parseResponse(networkCall)
+        } catch (exception: Exception){
+            ApiResponses(error = exception)
+        }
+    }
+
     private suspend fun parseResponse(responseFromServer: Response<BudgetListSuccessModel>): ApiResponses<BudgetListSuccessModel> {
         val responseBody = responseFromServer.body()
         val responseErrorBody = responseFromServer.errorBody()
@@ -300,7 +309,9 @@ class BudgetRepository(private val budget: BudgetDataDao,
     suspend fun getUniqueCurrencySymbolInSpentByBudgetId(budgetId: Long) =
             budgetLimitDao.getUniqueCurrencySymbolInSpentByBudgetId(budgetId)
 
-    suspend fun getBudgetLimitIdByNameAndCurrencyCodeAndDate(budgetName: String, currencySymbol: String,
-                                                           startDate: String, endDate: String) =
-            budgetLimitDao.getBudgetLimitIdByNameAndCurrencyCodeAndDate(budgetName, currencySymbol, startDate, endDate)
+    suspend fun getBudgetListIdByName(budgetName: String) = budgetList.getBudgetListIdByName(budgetName)
+
+    suspend fun getBudgetListIdById(budgetId: Long) = budgetList.getBudgetListIdById(budgetId)
+
+    suspend fun getBudgetLimitById(budgetId: Long, currencySymbol: String) = budgetLimitDao.getBudgetLimitById(budgetId, currencySymbol)
 }

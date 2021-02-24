@@ -76,14 +76,19 @@ interface BudgetService {
 
     @FormUrlEncoded
     @POST(BUDGET_API_ENDPOINT)
-    suspend fun addBudget(@Field("name") name: String): Response<BudgetListSuccessModel>
-
-    @FormUrlEncoded
-    @POST(BUDGET_API_ENDPOINT)
     suspend fun addBudget(@Field("name") name: String,
                           @Field("auto_budget_type") budgetType: String?,
                           @Field("auto_budget_currency_code") currencyCode: String?,
                           @Field("auto_budget_amount") budgetAmount: String?,
                           @Field("auto_budget_period") budgetPeriod: String?): Response<BudgetListSuccessModel>
 
+    @FormUrlEncoded
+    @PUT("$BUDGET_API_ENDPOINT/{id}")
+    suspend fun updateBudget(
+            @Path("id") budgetId: Long,
+            @Field("name") name: String,
+            @Field("auto_budget_type") budgetType: String?,
+            @Field("auto_budget_currency_code") currencyCode: String?,
+            @Field("auto_budget_amount") budgetAmount: String?,
+            @Field("auto_budget_period") budgetPeriod: String?): Response<BudgetListSuccessModel>
 }

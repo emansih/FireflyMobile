@@ -22,6 +22,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.room.TypeConverter
 import com.squareup.moshi.*
+import xyz.hisname.fireflyiii.repository.budget.BudgetType
 import java.math.BigDecimal
 import java.time.*
 
@@ -41,14 +42,17 @@ object TypeConverterUtil{
 
     @TypeConverter
     @JvmStatic
-    fun fromBigDecimal(value: BigDecimal): String{
-        return value.toPlainString()
+    fun fromBigDecimal(value: BigDecimal?): String{
+        return value?.toPlainString() ?: ""
     }
 
     @TypeConverter
     @JvmStatic
     fun toBigDecimal(value: String?): BigDecimal{
-        return value?.toBigDecimal() ?: 0.toBigDecimal()
+        if(value.isNullOrEmpty()){
+            return 0.toBigDecimal()
+        }
+        return value.toBigDecimal()
     }
 
     @TypeConverter
@@ -101,5 +105,34 @@ object TypeConverterUtil{
     @JvmStatic
     fun toUri(value: Uri?): String? {
         return value?.toString()
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromBudgetType(value: String?): BudgetType? {
+        if(value == null){
+            return null
+        }
+        if(value.contentEquals("none")){
+            return BudgetType.NONE
+        } else if(value.contentEquals("rollover")){
+            return BudgetType.ROLLOVER
+        } else if(value.contentEquals("reset")){
+            return BudgetType.RESET
+        }
+        return null
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toBudgetType(value: BudgetType?): String? {
+        // Leave this as is
+        // when `value` is `null` and we use #toString() ,"null" will be returned and we don't want that.
+        // we really want NULL not "null"
+        if(value == null){
+            return null
+        } else {
+            return value.toString()
+        }
     }
 }

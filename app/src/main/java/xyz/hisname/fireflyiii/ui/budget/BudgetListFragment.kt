@@ -153,7 +153,13 @@ class BudgetListFragment: BaseFragment(){
         recycler_view.layoutManager = LinearLayoutManager(requireContext())
         budgetListViewModel.individualBudget.observe(viewLifecycleOwner){ budgetData ->
             val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData){ cid ->
-                
+                parentFragmentManager.commit {
+                    replace(R.id.bigger_fragment_container, AddBudgetFragment().apply {
+                        arguments = bundleOf("budgetId" to cid.budgetLimitId,
+                                "currencySymbol" to cid.currencySymbol)
+                    })
+                    addToBackStack(null)
+                }
             }
             recycler_view.adapter = budgetRecyclerAdapter
         }

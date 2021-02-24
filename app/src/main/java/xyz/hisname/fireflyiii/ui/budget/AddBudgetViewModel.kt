@@ -35,7 +35,9 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
-import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetType
+import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
+import xyz.hisname.fireflyiii.repository.budget.BudgetType
+import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitData
 import xyz.hisname.fireflyiii.repository.userinfo.SystemInfoRepository
 import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
@@ -56,6 +58,7 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
     val unSupportedVersion: MutableLiveData<Boolean> = MutableLiveData()
 
     var currency = ""
+    val budgetLimitAttributesLiveData = MutableLiveData<BudgetLimitData>()
 
     init {
         checkVersion()
@@ -103,8 +106,45 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
+    fun updateBudget(budgetId: Long, budgetName: String, budgetType: BudgetType, currencyCode: String?,
+                  budgetAmount: String?, budgetPeriod: String?): LiveData<Pair<Boolean,String>>{
+        val apiResponse = MutableLiveData<Pair<Boolean,String>>()
+        isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, _ -> }){
+            val addBudget = budgetRepository.updateBudget(budgetId, budgetName, budgetType, currencyCode,
+                    budgetAmount, budgetPeriod)
+            when {
+                addBudget.response != null -> {
+                    apiResponse.postValue(Pair(true, "Updated $budgetName"))
+                }
+                addBudget.errorMessage != null -> {
+                    apiResponse.postValue(Pair(false,addBudget.errorMessage))
+                }
+                addBudget.error != null -> {
+                    apiResponse.postValue(Pair(false, addBudget.error.localizedMessage))
+                }
+                else -> {
+                    apiResponse.postValue(Pair(false, "Error saving budget"))
+                }
+            }
+            isLoading.postValue(false)
+        }
+        return apiResponse
+    }
+
     fun doNotShowAgain(status: Boolean){
         AppPref(sharedPref).budgetIssue4394 = status
+    }
+
+    fun getBudgetById(budgetId: Long, currencySymbol: String): LiveData<BudgetListData>{
+        val budgetAttributesLiveData = MutableLiveData<BudgetListData>()
+        viewModelScope.launch(Dispatchers.IO){
+            val budgetLimitAttributes = budgetRepository.getBudgetLimitById(budgetId, currencySymbol)
+            budgetLimitAttributesLiveData.postValue(budgetLimitAttributes)
+            val budgetAttributes = budgetRepository.getBudgetListIdById(budgetId)
+            budgetAttributesLiveData.postValue(budgetAttributes)
+        }
+        return budgetAttributesLiveData
     }
 
     private fun checkVersion(){

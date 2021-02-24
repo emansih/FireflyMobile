@@ -16,30 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.hisname.fireflyiii.repository.models.budget.budgetList
+package xyz.hisname.fireflyiii.data.remote.firefly.moshi
 
-import androidx.room.Entity
-import androidx.room.Ignore
-import com.squareup.moshi.JsonClass
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.JsonReader
 import xyz.hisname.fireflyiii.repository.budget.BudgetType
-import java.math.BigDecimal
 
-@Entity
-@JsonClass(generateAdapter = true)
-data class BudgetListAttributes(
-        var active: Boolean?,
-        var created_at: String?,
-        var name: String,
-        var order: Int?,
-        @Ignore
-        var spent: List<Spent> = listOf(),
-        var updated_at: String?,
-        var auto_budget_type: BudgetType?,
-        var auto_budget_currency_id: Long?,
-        var auto_budget_currency_code: String?,
-        var auto_budget_amount: BigDecimal?,
-        var auto_budget_period: String
-){
-        constructor() : this(true,"","",1, listOf(),"", null,
-                0, "", BigDecimal.ZERO, "")
+object BudgetTypeAdapter {
+
+    @FromJson
+    fun fromJson(reader: JsonReader): BudgetType? {
+        if (reader.peek() != JsonReader.Token.NULL) {
+            val nextString = reader.nextString()
+            when {
+                nextString.contentEquals("reset") -> {
+                    return BudgetType.RESET
+                }
+                nextString.contentEquals("rollover") -> {
+                    return BudgetType.ROLLOVER
+                }
+                nextString.contentEquals("none") -> {
+                    return BudgetType.NONE
+                }
+            }
+        }
+        reader.nextNull<BudgetType>()
+        return null
+    }
 }
