@@ -167,15 +167,20 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
                 attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                         false, { data: AttachmentData ->
-                    piggyViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
-                        if(isSuccessful){
-                            attachmentDataAdapter.remove(data)
-                            attachment_information.adapter?.notifyDataSetChanged()
-                            toastSuccess("Deleted " + data.attachmentAttributes.filename)
-                        } else {
-                            toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
-                        }
-                    }
+                    AlertDialog.Builder(requireContext())
+                            .setTitle(getString(R.string.are_you_sure))
+                            .setPositiveButton(android.R.string.ok){ _, _ ->
+                                piggyViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
+                                    if(isSuccessful){
+                                        attachmentDataAdapter.remove(data)
+                                        attachment_information.adapter?.notifyDataSetChanged()
+                                        toastSuccess("Deleted " + data.attachmentAttributes.filename)
+                                    } else {
+                                        toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
+                                    }
+                                }
+                            }
+                            .show()
                 }) { another: Int -> }
             }
         }
