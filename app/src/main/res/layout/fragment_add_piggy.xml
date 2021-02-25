@@ -289,7 +289,6 @@
                         android:layout_height="wrap_content"
                         android:overScrollMode="never"
                         android:layout_marginTop="12dp"
-                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/add_attachment_button"/>

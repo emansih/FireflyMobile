@@ -95,7 +95,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         super.onCreate(savedInstanceState)
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                attachment_information.isVisible = true
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
                         "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
@@ -104,7 +103,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
-            attachment_information.isVisible = true
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
