@@ -1,5 +1,7 @@
 
 
+Fixes:
+- Fix attachment not showing in piggy bank details screen
 
 Library updates:
 - AppCompat to 1.3.0-beta01

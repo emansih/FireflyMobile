@@ -57,6 +57,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupWidgets()
+        downloadAttachment()
     }
 
 
