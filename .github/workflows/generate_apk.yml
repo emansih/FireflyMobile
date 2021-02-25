@@ -27,12 +27,11 @@ jobs:
           versionName=`grep "versionName\s" app/build.gradle | awk '{ print $2 }'  | tr -d \''"\'` 
           echo "VERSION_NAME=v$versionName" >> $GITHUB_ENV  
         
-      - name: Build with Gradle
-        run: ./gradlew assemble
-        
-      - name: Copy APK
-        run: |
-          cp -r app/build/outputs/apk/release/ app/build/outputs/apk/google-play
+      - name: Build Bundle
+        run: ./gradlew bundleRelease
+          
+      - name: Build APK
+        run: ./gradlew assembleRelease
           
       - name: Sign Release APK
         id: sign
@@ -44,11 +43,11 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
       
-      - name: Sign Google Play APK
+      - name: Sign Release Bundle
         id: sign_google_play
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: app/build/outputs/apk/google-play
+          releaseDirectory: app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.GOOGLE_PLAY_UPLOAD_KEY }}
           alias: ${{ secrets.GOOGLE_PLAY_ALIAS }}
           keyStorePassword: ${{ secrets.GOOGLE_PLAY_STORE_PASSWORD }}
