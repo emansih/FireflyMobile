@@ -40,8 +40,7 @@ interface AttachmentService {
                         @Field("title") title: String,
                         @Field("notes") notes: String): Response<Attachment>
 
-    @Streaming
-    @GET
-    suspend fun downloadFile(@Url fileUrl: String?): Response<ResponseBody>
+    @DELETE("$ATTACHMENT_API_ENDPOINT/{id}")
+    suspend fun deleteAttachment(@Path("id") id: Long): Response<Void>
 
 }

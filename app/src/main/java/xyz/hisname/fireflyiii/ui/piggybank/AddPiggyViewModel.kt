@@ -29,14 +29,18 @@ import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.piggybank.PiggyBankWorker
+import java.io.File
 import java.net.UnknownHostException
 
 class AddPiggyViewModel(application: Application): BaseViewModel(application) {
@@ -50,6 +54,11 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
             AppDatabase.getInstance(application).accountDataDao(),
             genericService().create(AccountsService::class.java)
     )
+    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentService = genericService().create(AttachmentService::class.java)
+    private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
+
+    val piggyAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun getPiggyById(piggyId: Long): LiveData<PiggyData>{
         val piggyListLiveData = MutableLiveData<PiggyData>()
@@ -58,8 +67,21 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
             accountRepository.getAccountById(piggyList.piggyAttributes.account_id ?: 0)
             piggyList.piggyAttributes.account_id
             piggyListLiveData.postValue(piggyList)
+            piggyAttachment.postValue(piggyRepository.getAttachment(piggyId, attachmentDao))
         }
         return piggyListLiveData
+    }
+
+    fun deleteAttachment(data: AttachmentData): LiveData<Boolean>{
+        val isSuccessful = MutableLiveData<Boolean>()
+        isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO){
+            isLoading.postValue(false)
+            val fileName = getApplication<Application>().getExternalFilesDir(null).toString() +
+                    File.separator + data.attachmentAttributes.filename
+            attachmentRepository.deleteAttachment(data, fileName)
+        }
+        return isSuccessful
     }
 
     fun getAccount(): LiveData<List<String>>{

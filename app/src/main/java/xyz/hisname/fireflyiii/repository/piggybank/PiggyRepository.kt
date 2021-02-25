@@ -141,6 +141,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
             val networkCall = piggyService.getPiggyBankAttachment(piggyId)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
+                attachmentDao.deleteAttachmentFromJournalId(piggyId)
                 responseBody.data.forEach { attachmentData ->
                     attachmentDao.insert(attachmentData)
                 }

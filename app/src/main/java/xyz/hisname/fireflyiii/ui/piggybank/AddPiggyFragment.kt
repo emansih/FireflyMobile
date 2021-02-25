@@ -26,11 +26,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -44,10 +44,6 @@ import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
-import kotlinx.android.synthetic.main.fragment_add_piggy.attachment_information
-import kotlinx.android.synthetic.main.fragment_add_piggy.description_edittext
-import kotlinx.android.synthetic.main.fragment_add_piggy.expansionLayout
-import kotlinx.android.synthetic.main.fragment_add_piggy.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
@@ -74,7 +70,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private lateinit var fileUri: Uri
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
-    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
 
@@ -158,6 +154,29 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 date_target_edittext.setText(piggyAttributes.target_date)
                 note_edittext.setText(piggyAttributes.notes)
                 account_exposed_dropdown.setText(piggyData.piggyAttributes.account_name)
+                displayAttachment()
+            }
+        }
+    }
+
+    private fun displayAttachment(){
+        piggyViewModel.piggyAttachment.observe(viewLifecycleOwner) { attachment ->
+            if (attachment.isNotEmpty()) {
+                attachmentDataAdapter = ArrayList(attachment)
+                attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                        false, { data: AttachmentData ->
+                    piggyViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
+                        if(isSuccessful){
+                            attachmentDataAdapter.remove(data)
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("Deleted " + data.attachmentAttributes.filename)
+                        } else {
+                            toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
+                        }
+                    }
+                }) { another: Int -> }
             }
         }
     }

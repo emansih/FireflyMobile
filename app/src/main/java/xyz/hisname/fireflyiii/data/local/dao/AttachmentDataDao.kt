@@ -28,4 +28,6 @@ abstract class AttachmentDataDao: BaseDao<AttachmentData> {
     @Query("SELECT * FROM attachment_info WHERE attachable_id =:journalId")
     abstract fun getAttachmentFromJournalId(journalId: Long): List<AttachmentData>
 
+    @Query("DELETE FROM attachment_info WHERE attachable_id =:journalId")
+    abstract fun deleteAttachmentFromJournalId(journalId: Long): Int
 }

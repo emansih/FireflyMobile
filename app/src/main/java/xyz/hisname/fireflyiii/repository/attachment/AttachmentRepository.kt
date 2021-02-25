@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.repository.attachment
 
+import android.app.Application
 import com.squareup.moshi.Moshi
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -37,6 +38,17 @@ class AttachmentRepository(private val attachmentDao: AttachmentDataDao,
 
 
     suspend fun insertAttachmentInfo(attachment: AttachmentData) = attachmentDao.insert(attachment)
+
+    suspend fun deleteAttachment(data: AttachmentData, fileName: String): Boolean{
+        val networkCall = attachmentService.deleteAttachment(data.attachmentId)
+        return if(networkCall.isSuccessful){
+            File(fileName).delete()
+            attachmentDao.deleteAttachmentFromJournalId(data.attachmentId)
+            true
+        } else {
+            false
+        }
+    }
 
     suspend fun uploadFile(objectId: Long, fileName: String, tempDir: String,
                            inputStream: InputStream?, attachableType: AttachableType) {
