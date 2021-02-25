@@ -101,6 +101,10 @@ class AddBillFragment: BaseAddObjectFragment() {
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (billId != 0L){
+                    toastInfo("Uploading...")
+                    billViewModel.uploadFile(billId, attachmentItemAdapter)
+                }
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
@@ -112,6 +116,10 @@ class AddBillFragment: BaseAddObjectFragment() {
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (billId != 0L){
+                    toastInfo("Uploading...")
+                    billViewModel.uploadFile(billId, attachmentItemAdapter)
+                }
             }
         }
     }

@@ -106,6 +106,10 @@ class AddAccountFragment: BaseAddObjectFragment() {
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (accountId != 0L){
+                    toastInfo("Uploading...")
+                    accountViewModel.uploadFile(accountId, attachmentItemAdapter)
+                }
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
@@ -117,6 +121,10 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (accountId != 0L){
+                    toastInfo("Uploading...")
+                    accountViewModel.uploadFile(accountId, attachmentItemAdapter)
+                }
             }
         }
     }

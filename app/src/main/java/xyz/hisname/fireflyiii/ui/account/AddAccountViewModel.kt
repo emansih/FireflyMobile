@@ -102,7 +102,11 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
         return apiResponse
     }
 
-    fun addAccount(accountName: String, accountType: String,
+    fun uploadFile(accountId: Long, fileToUpload: ArrayList<Uri>) {
+        AttachmentWorker.initWorker(fileToUpload, accountId, getApplication<Application>(), AttachableType.Account)
+    }
+
+        fun addAccount(accountName: String, accountType: String,
                    currencyCode: String?, iban: String?, bic: String?, accountNumber: String?,
                    openingBalance: String?, openingBalanceDate: String?, accountRole: String?,
                    virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
@@ -119,9 +123,7 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
                 addAccount.response != null -> {
                     apiResponse.postValue(Pair(true, "Account saved"))
                     if(fileToUpload.isNotEmpty()){
-                        AttachmentWorker.initWorker(fileToUpload,
-                                addAccount.response.data.accountId,
-                                getApplication<Application>(), AttachableType.Account)
+                        uploadFile(addAccount.response.data.accountId, fileToUpload)
                     }
                 }
                 addAccount.error != null -> {

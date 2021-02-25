@@ -204,6 +204,11 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         }
     }
 
+    fun uploadFile(transactionJournalId: Long, fileToUpload: ArrayList<Uri>){
+        AttachmentWorker.initWorker(fileToUpload, transactionJournalId,
+                getApplication<Application>(), AttachableType.TRANSACTION)
+    }
+
     fun deleteAttachment(data: AttachmentData): LiveData<Boolean>{
         val isSuccessful = MutableLiveData<Boolean>()
         isLoading.postValue(true)
@@ -238,9 +243,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                                 arrayOfString.forEach { array ->
                                     arrayOfUri.add(array.toUri())
                                 }
-                                AttachmentWorker.initWorker(arrayOfUri,
-                                        transaction.transaction_journal_id, getApplication<Application>(),
-                                        AttachableType.TRANSACTION)
+                                uploadFile(transaction.transaction_journal_id, arrayOfUri)
                             }
                             temporaryTransactionRepository.removeInternalReference(addTransaction.response)
                         }

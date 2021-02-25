@@ -87,7 +87,11 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
         return isSuccessful
     }
 
-    fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,
+    fun uploadFile(billId: Long, fileToUpload: ArrayList<Uri>) {
+        AttachmentWorker.initWorker(fileToUpload, billId, getApplication<Application>(), AttachableType.BILL)
+    }
+
+        fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,
                 skip: String, active: String, currencyCode: String,notes: String?, fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
@@ -99,8 +103,7 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
                     apiResponse.postValue(Pair(true,
                             getApplication<Application>().getString(R.string.stored_new_bill, name)))
                     if(fileToUpload.isNotEmpty()) {
-                        AttachmentWorker.initWorker(fileToUpload,
-                                addBill.response.data.billId, getApplication<Application>(), AttachableType.BILL)
+                        uploadFile(addBill.response.data.billId, fileToUpload)
                     }
                 }
                 addBill.errorMessage != null -> {

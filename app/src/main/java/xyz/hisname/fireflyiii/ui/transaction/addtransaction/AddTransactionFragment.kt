@@ -171,6 +171,10 @@ class AddTransactionFragment: BaseFragment() {
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (transactionJournalId != 0L){
+                    toastInfo("Uploading...")
+                    addTransactionViewModel.uploadFile(transactionJournalId, attachmentItemAdapter)
+                }
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
@@ -182,6 +186,10 @@ class AddTransactionFragment: BaseFragment() {
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (transactionJournalId != 0L){
+                    toastInfo("Uploading...")
+                    addTransactionViewModel.uploadFile(transactionJournalId, attachmentItemAdapter)
+                }
             }
         }
     }

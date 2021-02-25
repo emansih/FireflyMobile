@@ -96,6 +96,10 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (piggyId != 0L){
+                    toastInfo("Uploading...")
+                    piggyViewModel.uploadFile(piggyId, attachmentItemAdapter)
+                }
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
@@ -107,6 +111,10 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
                 attachment_information.adapter?.notifyDataSetChanged()
+                if (piggyId != 0L){
+                    toastInfo("Uploading...")
+                    piggyViewModel.uploadFile(piggyId, attachmentItemAdapter)
+                }
             }
         }
     }

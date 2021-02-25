@@ -96,6 +96,11 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         return accountListLiveData
     }
 
+    fun uploadFile(piggyBankId: Long, fileToUpload: ArrayList<Uri>){
+        AttachmentWorker.initWorker(fileToUpload, piggyBankId, getApplication<Application>(),
+                AttachableType.PIGGYBANK)
+    }
+
     fun addPiggyBank(piggyName: String, accountName: String, currentAmount: String?, notes: String?,
                      startDate: String?, targetAmount: String, targetDate: String?,
                      fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
@@ -113,9 +118,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                     addPiggyBank.response != null -> {
                         apiResponse.postValue(Pair(true, "Piggy bank saved"))
                         if(fileToUpload.isNotEmpty()) {
-                            AttachmentWorker.initWorker(fileToUpload,
-                                    addPiggyBank.response.data.piggyId,
-                                    getApplication<Application>(), AttachableType.PIGGYBANK)
+                            uploadFile(addPiggyBank.response.data.piggyId, fileToUpload)
                         }
                     }
                     addPiggyBank.errorMessage != null -> {
