@@ -36,10 +36,12 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.bill.BillWorker
+import java.io.File
 import java.net.UnknownHostException
 
 class AddBillViewModel(application: Application): BaseViewModel(application) {
@@ -53,8 +55,12 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
             AppDatabase.getInstance(application).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
+    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentService = genericService().create(AttachmentService::class.java)
+    private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
 
     private var currencyCode: String = ""
+    val billAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun getBillById(billId: Long): LiveData<BillData>{
         isLoading.postValue(true)
@@ -64,10 +70,22 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
             currencyCode =  billList.billAttributes.currency_code
             billLiveData.postValue(billList)
             isLoading.postValue(false)
+            billAttachment.postValue(billRepository.getAttachment(billId, attachmentDao))
         }
         return billLiveData
     }
 
+    fun deleteAttachment(data: AttachmentData): LiveData<Boolean>{
+        val isSuccessful = MutableLiveData<Boolean>()
+        isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO){
+            isLoading.postValue(false)
+            val fileName = getApplication<Application>().getExternalFilesDir(null).toString() +
+                    File.separator + data.attachmentAttributes.filename
+            attachmentRepository.deleteAttachment(data, fileName)
+        }
+        return isSuccessful
+    }
 
     fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,
                 skip: String, active: String, currencyCode: String,notes: String?, fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{

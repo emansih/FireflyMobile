@@ -27,6 +27,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -54,9 +55,6 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
 import kotlinx.android.synthetic.main.activity_add_transaction.*
 import kotlinx.android.synthetic.main.fragment_add_transaction.*
-import kotlinx.android.synthetic.main.fragment_add_transaction.currency_edittext
-import kotlinx.android.synthetic.main.fragment_add_transaction.description_edittext
-import kotlinx.android.synthetic.main.fragment_add_transaction.expansionLayout
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
@@ -100,7 +98,7 @@ class AddTransactionFragment: BaseFragment() {
     private var selectedTime = ""
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
-    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -130,10 +128,33 @@ class AddTransactionFragment: BaseFragment() {
             addSplit.isGone = true
             removeSplit.isGone = true
             addTransactionViewModel.getTransactionFromJournalId(transactionJournalId)
+            displayAttachment()
         }
         setFab()
         setCalculator()
         contextSwitch()
+    }
+
+    private fun displayAttachment(){
+        addTransactionViewModel.transactionAttachment.observe(viewLifecycleOwner) { attachment ->
+            if (attachment.isNotEmpty()) {
+                attachmentDataAdapter = ArrayList(attachment)
+                attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                        false, { data: AttachmentData ->
+                    addTransactionViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
+                        if(isSuccessful){
+                            attachmentDataAdapter.remove(data)
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("Deleted " + data.attachmentAttributes.filename)
+                        } else {
+                            toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
+                        }
+                    }
+                }) { another: Int -> }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

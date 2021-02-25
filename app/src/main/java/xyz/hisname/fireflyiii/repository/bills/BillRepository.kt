@@ -123,6 +123,7 @@ class BillRepository(private val billDao: BillDataDao,
             val networkCall = billService.getBillAttachment(billId)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
+                attachmentDao.deleteAttachmentFromJournalId(billId)
                 responseBody.data.forEach { attachmentData ->
                     attachmentDao.insert(attachmentData)
                 }

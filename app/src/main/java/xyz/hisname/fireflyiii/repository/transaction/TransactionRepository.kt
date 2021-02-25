@@ -369,6 +369,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             val networkCall = transactionService.getTransactionAttachment(transactionId)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
+                attachmentDao.deleteAttachmentFromJournalId(transactionJournalId)
                 responseBody.data.forEach { attachmentData ->
                     attachmentDao.insert(attachmentData)
                 }

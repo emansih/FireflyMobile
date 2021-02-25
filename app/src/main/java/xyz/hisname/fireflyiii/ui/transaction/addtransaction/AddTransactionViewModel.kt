@@ -40,6 +40,7 @@ import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.repository.tags.TagsRepository
@@ -47,6 +48,7 @@ import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
+import java.io.File
 import java.net.UnknownHostException
 
 class AddTransactionViewModel(application: Application): BaseViewModel(application) {
@@ -72,6 +74,11 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             AppDatabase.getInstance(application).accountDataDao(),
             genericService().create(AccountsService::class.java)
     )
+
+    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentService = genericService().create(AttachmentService::class.java)
+    private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
+
 
     // We do lazy init here because a user might not type anything inside category edit text
     private val categoryRepository by lazy {
@@ -126,6 +133,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     val increaseTab = MutableLiveData<Boolean>()
     val decreaseTab = MutableLiveData<Boolean>()
     var numTabs = 0
+    val transactionAttachment = MutableLiveData<List<AttachmentData>>()
 
     private var transactionMasterId = 0L
 
@@ -192,7 +200,20 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             transactionBill.postValue(transactionList.bill_name ?: "")
             transactionSourceAccount.postValue(transactionList.source_name ?: "")
             transactionDestinationAccount.postValue(transactionList.destination_name)
+            transactionAttachment.postValue(transactionRepository.getAttachment(transactionJournalId, attachmentDao))
         }
+    }
+
+    fun deleteAttachment(data: AttachmentData): LiveData<Boolean>{
+        val isSuccessful = MutableLiveData<Boolean>()
+        isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO){
+            isLoading.postValue(false)
+            val fileName = getApplication<Application>().getExternalFilesDir(null).toString() +
+                    File.separator + data.attachmentAttributes.filename
+            attachmentRepository.deleteAttachment(data, fileName)
+        }
+        return isSuccessful
     }
 
     fun memoryCount() = temporaryTransactionRepository.getPendingTransactionFromId(transactionMasterId)

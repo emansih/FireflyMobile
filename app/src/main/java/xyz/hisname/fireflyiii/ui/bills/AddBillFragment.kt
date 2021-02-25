@@ -30,7 +30,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -77,7 +76,7 @@ class AddBillFragment: BaseAddObjectFragment() {
     private lateinit var fileUri: Uri
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
-    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -97,7 +96,6 @@ class AddBillFragment: BaseAddObjectFragment() {
         super.onCreate(savedInstanceState)
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                attachment_information.isVisible = true
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
                         "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
@@ -106,7 +104,6 @@ class AddBillFragment: BaseAddObjectFragment() {
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
-            attachment_information.isVisible = true
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
@@ -143,6 +140,29 @@ class AddBillFragment: BaseAddObjectFragment() {
                         R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 frequency_exposed_dropdown.setAdapter(spinnerAdapter)
+                displayAttachment()
+            }
+        }
+    }
+
+    private fun displayAttachment(){
+        billViewModel.billAttachment.observe(viewLifecycleOwner) { attachment ->
+            if (attachment.isNotEmpty()) {
+                attachmentDataAdapter = ArrayList(attachment)
+                attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                        false, { data: AttachmentData ->
+                    billViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
+                        if(isSuccessful){
+                            attachmentDataAdapter.remove(data)
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("Deleted " + data.attachmentAttributes.filename)
+                        } else {
+                            toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
+                        }
+                    }
+                }) { another: Int -> }
             }
         }
     }

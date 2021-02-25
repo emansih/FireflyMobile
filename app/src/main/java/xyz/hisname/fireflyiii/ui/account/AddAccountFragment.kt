@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -39,6 +40,13 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import kotlinx.android.synthetic.main.fragment_add_account.*
+import kotlinx.android.synthetic.main.fragment_add_account.add_attachment_button
+import kotlinx.android.synthetic.main.fragment_add_account.attachment_information
+import kotlinx.android.synthetic.main.fragment_add_account.description_edittext
+import kotlinx.android.synthetic.main.fragment_add_account.expansionLayout
+import kotlinx.android.synthetic.main.fragment_add_account.note_edittext
+import kotlinx.android.synthetic.main.fragment_add_account.placeHolderToolbar
+import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
@@ -66,7 +74,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private lateinit var fileUri: Uri
     private lateinit var takePicture: ActivityResultLauncher<Uri>
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
-    private val attachmentDataAdapter by lazy { arrayListOf<AttachmentData>() }
+    private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -484,8 +492,31 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 virtual_balance_edittext.setText(accountAttributes.virtual_balance.toString())
                 note_edittext.setText(accountAttributes.notes)
             }
+            displayAttachment()
         } else {
             showHelpText()
+        }
+    }
+
+    private fun displayAttachment(){
+        accountViewModel.accountAttachment.observe(viewLifecycleOwner) { attachment ->
+            if (attachment.isNotEmpty()) {
+                attachmentDataAdapter = ArrayList(attachment)
+                attachment_information.layoutManager = LinearLayoutManager(requireContext())
+                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                        false, { data: AttachmentData ->
+                    accountViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
+                        if(isSuccessful){
+                            attachmentDataAdapter.remove(data)
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("Deleted " + data.attachmentAttributes.filename)
+                        } else {
+                            toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
+                        }
+                    }
+                }) { another: Int -> }
+            }
         }
     }
 

@@ -27,15 +27,19 @@ import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
+import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
+import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.account.AccountWorker
+import java.io.File
 import java.net.UnknownHostException
 
 class AddAccountViewModel(application: Application): BaseViewModel(application) {
@@ -49,7 +53,13 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
             genericService().create(AccountsService::class.java)
     )
 
+    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentService = genericService().create(AttachmentService::class.java)
+    private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
+
+
     var currency = ""
+    val accountAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun getDefaultCurrency(): LiveData<CurrencyData>{
         val currencyListLiveData = MutableLiveData<CurrencyData>()
@@ -144,7 +154,20 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
         val accountListLiveData = MutableLiveData<AccountData>()
         viewModelScope.launch(Dispatchers.IO){
             accountListLiveData.postValue(accountRepository.getAccountById(accountId))
+            accountAttachment.postValue(accountRepository.getAttachment(accountId, attachmentDao))
         }
         return accountListLiveData
+    }
+
+    fun deleteAttachment(data: AttachmentData): LiveData<Boolean>{
+        val isSuccessful = MutableLiveData<Boolean>()
+        isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO){
+            isLoading.postValue(false)
+            val fileName = getApplication<Application>().getExternalFilesDir(null).toString() +
+                    File.separator + data.attachmentAttributes.filename
+            attachmentRepository.deleteAttachment(data, fileName)
+        }
+        return isSuccessful
     }
 }

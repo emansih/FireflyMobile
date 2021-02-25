@@ -237,6 +237,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
             val networkCall = accountsService.getAccountAttachment(accountId)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
+                attachmentDao.deleteAttachmentFromJournalId(accountId)
                 responseBody.data.forEach { attachmentData ->
                     attachmentDao.insert(attachmentData)
                 }
