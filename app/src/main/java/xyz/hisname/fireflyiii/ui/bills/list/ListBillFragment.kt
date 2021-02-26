@@ -110,7 +110,7 @@ class ListBillFragment: BaseFragment() {
         }
         billViewModel.getBillDue().observe(viewLifecycleOwner){ bills ->
             if(bills.isEmpty()){
-                billsDueToday.isGone = true
+                billsDueTodayCard.isGone = true
             } else {
                 numOfBills.text = bills.size.toString()
                 val linearLayoutManager = LinearLayoutManager(requireContext())
