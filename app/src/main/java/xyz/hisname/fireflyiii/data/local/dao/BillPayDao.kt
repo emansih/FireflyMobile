@@ -35,6 +35,6 @@ abstract class BillPayDao: BaseDao<BillPayDates> {
     @Query("SELECT * FROM billPayList WHERE id =:billId AND strftime('%s', payDates) BETWEEN strftime('%s', :startDate) AND strftime('%s', :endDate)")
     abstract suspend fun getBillByDateAndId(billId: Long, startDate: String, endDate: String): List<BillPayDates>
 
-    @Query("SELECT COUNT(payDates) FROM billPayList WHERE  (payDates BETWEEN :startDate AND :endDate)")
-    abstract suspend fun getBillCountByDate(startDate: String, endDate: String): Int
+    @Query("SELECT DISTINCT(id) FROM billPayList WHERE (payDates BETWEEN :startDate AND :endDate)")
+    abstract suspend fun getBillCountByDate(startDate: String, endDate: String): Int?
 }

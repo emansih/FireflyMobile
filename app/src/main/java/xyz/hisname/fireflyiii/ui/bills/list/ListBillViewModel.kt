@@ -36,6 +36,7 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillPageSource
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 
@@ -45,10 +46,19 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
     private val billDataDao = AppDatabase.getInstance(application).billDataDao()
     private val billRepository = BillRepository(billDataDao, billService)
 
+
     fun getBillList(): LiveData<PagingData<BillData>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
             BillPageSource(billService, billDataDao)
         }.flow.cachedIn(viewModelScope).asLiveData()
+    }
+
+    fun getBillDue(): LiveData<List<BillData>>{
+        val billList = MutableLiveData<List<BillData>>()
+        viewModelScope.launch(Dispatchers.IO){
+            billList.postValue(billRepository.getBillDueFromDate(DateTimeUtil.getTodayDate()))
+        }
+        return billList
     }
 
     fun deleteBillById(billId: String): LiveData<Boolean>{

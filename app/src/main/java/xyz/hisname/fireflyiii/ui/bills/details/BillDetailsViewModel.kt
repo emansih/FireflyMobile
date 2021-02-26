@@ -63,7 +63,7 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
     private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
     private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
     private val billService = genericService().create(BillsService::class.java)
-    private val billPayRepository = BillPayRepository(billPayDao, billService)
+    private val billPayRepository = BillPayRepository(billPayDao, null, billService)
     private val billRepository = BillRepository(billDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
 

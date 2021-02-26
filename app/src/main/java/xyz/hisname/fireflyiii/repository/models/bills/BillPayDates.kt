@@ -26,7 +26,7 @@ import java.time.LocalDate
 
 @Entity(tableName = "billPayList", foreignKeys = [ForeignKey(entity = BillData::class,
         parentColumns = arrayOf("billId"), childColumns = arrayOf("id"),
-        onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE, deferred = true)],
+        onUpdate = ForeignKey.CASCADE, deferred = true)],
         indices = [Index("id")])
 data class BillPayDates(
         @PrimaryKey(autoGenerate = true)

@@ -25,10 +25,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsDrawable
@@ -38,12 +40,14 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.base_swipe_layout.*
 import kotlinx.android.synthetic.main.bills_list_item.view.*
 import kotlinx.android.synthetic.main.fragment_base_list.*
+import kotlinx.android.synthetic.main.fragment_bill_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
 import xyz.hisname.fireflyiii.ui.bills.details.BillDetailsFragment
 import xyz.hisname.fireflyiii.ui.bills.BillsRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.bills.BillsToPayRecyclerView
 import xyz.hisname.fireflyiii.util.extension.*
 
 class ListBillFragment: BaseFragment() {
@@ -103,6 +107,19 @@ class ListBillFragment: BaseFragment() {
     private fun loadBill(){
         billViewModel.getBillList().observe(viewLifecycleOwner){
             billAdapter.submitData(lifecycle, it)
+        }
+        billViewModel.getBillDue().observe(viewLifecycleOwner){ bills ->
+            if(bills.isEmpty()){
+                billsDueToday.isGone = true
+            } else {
+                val linearLayoutManager = LinearLayoutManager(requireContext())
+                billsDueTodayRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                billsDueTodayRecyclerView.layoutManager = linearLayoutManager
+                val itemAdapter = BillsToPayRecyclerView(bills){ data ->
+                    itemClicked(data)
+                }
+                billsDueTodayRecyclerView.adapter = itemAdapter
+            }
         }
     }
 

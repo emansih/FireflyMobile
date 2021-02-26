@@ -18,6 +18,8 @@
 
 package xyz.hisname.fireflyiii.repository.bills
 
+import timber.log.Timber
+import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.local.dao.BillPayDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
@@ -26,6 +28,7 @@ import java.lang.Exception
 import java.time.LocalDate
 
 class BillPayRepository(private val billPayDao: BillPayDao,
+                        private val billDao: BillDataDao? = null,
                         private val billsService: BillsService) {
 
 
@@ -43,11 +46,13 @@ class BillPayRepository(private val billPayDao: BillPayDao,
     }
 
     suspend fun getBillCountByDateRange(startDate: String, endDate: String): Int{
+        checkNotNull(billDao)
         try {
             val networkCall = billsService.getPaginatedBills(1, startDate, endDate)
             val billList = arrayListOf<BillData>()
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
+                Timber.d("response: $responseBody")
                 billPayDao.deletePayListByDate(startDate, endDate)
                 billList.addAll(responseBody.data)
                 if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
@@ -58,14 +63,15 @@ class BillPayRepository(private val billPayDao: BillPayDao,
                         }
                     }
                 }
-            }
-            billList.forEach { data ->
-                data.billAttributes.pay_dates.forEach { localDate ->
-                    billPayDao.insert(BillPayDates(id = data.billId, payDates = LocalDate.parse(localDate)))
+                billList.forEach { data ->
+                    billDao.insert(data)
+                    data.billAttributes.pay_dates.forEach { localDate ->
+                        billPayDao.insert(BillPayDates(id = data.billId, payDates = LocalDate.parse(localDate)))
+                    }
                 }
             }
-        } catch (exception: Exception){  }
-        return billPayDao.getBillCountByDate(startDate, endDate)
+        } catch (exception: Exception){ }
+        return billPayDao.getBillCountByDate(startDate, endDate) ?: 0
     }
 
 }

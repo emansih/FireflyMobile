@@ -42,4 +42,7 @@ abstract class BillDataDao: BaseDao<BillData>{
 
     @Query("SELECT DISTINCT(name) FROM bills")
     abstract fun getAllBillName(): Flow<List<String>>
+
+    @Query("SELECT * FROM bills WHERE billId IN (SELECT id FROM billPayList WHERE payDates =:date)")
+    abstract fun getBillDueFromDate(date: String): List<BillData>
 }

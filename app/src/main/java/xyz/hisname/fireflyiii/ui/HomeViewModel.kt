@@ -22,8 +22,10 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -33,7 +35,8 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 class HomeViewModel(application: Application): BaseViewModel(application) {
 
     private val billsService = genericService().create(BillsService::class.java)
-    private val billPayRepository = BillPayRepository(AppDatabase.getInstance(application).billPayDao(), billsService)
+    private val billPayRepository = BillPayRepository(AppDatabase.getInstance(application).billPayDao(),
+            AppDatabase.getInstance(application).billDataDao(), billsService)
 
     fun getNoOfBillsDueToday(): LiveData<Int> {
         val count = MutableLiveData<Int>()

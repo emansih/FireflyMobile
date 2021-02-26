@@ -155,4 +155,6 @@ class BillRepository(private val billDao: BillDataDao,
         } catch (exception: Exception){  }
         return billDao.getAllBillName()
     }
+
+    suspend fun getBillDueFromDate(date: String) = billDao.getBillDueFromDate(date)
 }
