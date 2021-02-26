@@ -82,7 +82,6 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                     context.filesDir.path, context.contentResolver.openInputStream(fileUri?.toUri()  ?: Uri.EMPTY),
                     attachableType)
         } catch (exception: Exception){
-            exception.printStackTrace()
             context.showNotification("Failed to upload $fileName",
                     exception.localizedMessage, R.drawable.app_icon)
             return Result.failure()

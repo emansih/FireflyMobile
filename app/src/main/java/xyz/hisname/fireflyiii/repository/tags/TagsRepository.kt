@@ -109,9 +109,7 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
                     ))
                 }
             }
-        } catch (exception: Exception){
-            exception.printStackTrace()
-        }
+        } catch (exception: Exception){ }
         return tagsDataDao.searchTagByName("%$tagName%")
     }
 

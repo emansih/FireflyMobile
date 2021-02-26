@@ -1,5 +1,6 @@
 What's new:
 - It is now possible to delete / add new attachments
+- Removed a few loggings
 
 Fixes:
 - Fix attachment not showing in piggy bank details screen

@@ -94,9 +94,7 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                 endOfMonth = DateTimeUtil.getFutureEndOfMonth(monthCount)
             }
         }
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
-            throwable.printStackTrace()
-        }){
+        viewModelScope.launch(Dispatchers.IO){
             val defaultCurrency = currencyRepository.defaultCurrency()
             currencySymbol = defaultCurrency.currencyAttributes.symbol
             currencyName.postValue(defaultCurrency.currencyAttributes.code)
