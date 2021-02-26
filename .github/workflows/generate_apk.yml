@@ -61,7 +61,7 @@ jobs:
         with:
          tag_name: ${{ env.VERSION_NAME }}
          release_name: ${{ env.VERSION_NAME }}
-         body_path: whatsnew/whatsnew-en-UK
+         body_path: whatsnew/whatsnew-en_github.txt
          draft: false
          prerelease: false
 
