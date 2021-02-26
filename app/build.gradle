@@ -107,6 +107,7 @@ dependencies {
     implementation Dependencies.notificationLib
     implementation Dependencies.calendarView
     implementation Dependencies.taskerPluginLib
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     // Project Lib
     implementation project(path: ":languagepack")

@@ -25,6 +25,7 @@ import org.acra.annotation.AcraCore
 import org.acra.annotation.AcraMailSender
 import org.acra.data.StringFormat
 import org.acra.sender.EmailIntentSenderFactory
+import timber.log.Timber
 
 @AcraCore(reportFormat = StringFormat.KEY_VALUE_LIST,
         reportSenderFactoryClasses = [EmailIntentSenderFactory::class], buildConfigClass = BuildConfig::class,
@@ -41,10 +42,12 @@ class CustomApp: Application() {
     }
 
     private fun newThread(){
-        Thread(Runnable {
-            if(BuildConfig.DEBUG == false) {
+        Thread {
+            if (BuildConfig.DEBUG == false) {
                 ACRA.init(this)
+            } else {
+                Timber.plant(Timber.DebugTree())
             }
-        }).start()
+        }.start()
     }
 }
