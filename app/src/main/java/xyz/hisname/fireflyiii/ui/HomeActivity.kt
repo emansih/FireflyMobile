@@ -19,39 +19,28 @@
 package xyz.hisname.fireflyiii.ui
 
 import android.accounts.AccountManager
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.*
+import com.mikepenz.materialdrawer.holder.BadgeStyle
 import com.mikepenz.materialdrawer.holder.ImageHolder
 import com.mikepenz.materialdrawer.holder.StringHolder
 import com.mikepenz.materialdrawer.model.*
 import com.mikepenz.materialdrawer.model.interfaces.*
-import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader
-import com.mikepenz.materialdrawer.util.DrawerImageLoader
-import com.mikepenz.materialdrawer.util.getPlaceHolder
 import com.mikepenz.materialdrawer.widget.AccountHeaderView
 import kotlinx.android.synthetic.main.activity_base.*
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
@@ -85,6 +74,7 @@ class HomeActivity: BaseActivity(){
     private val keyguardUtil by lazy { KeyguardUtil(this) }
     private var instanceState: Bundle? = null
     private lateinit var authenticator: Authenticator
+    private val homeViewModel by lazy { getViewModel(HomeViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -268,7 +258,6 @@ class HomeActivity: BaseActivity(){
                     }
             )
         }
-
         val reported = PrimaryDrawerItem().apply {
             identifier = 9
             name = StringHolder("Reports")
@@ -326,6 +315,13 @@ class HomeActivity: BaseActivity(){
                 sizeDp = 24
             })
             identifier = 16
+            badgeStyle = BadgeStyle(getColor(R.color.md_red_700), getColor(R.color.md_red_700))
+        }
+        homeViewModel.getNoOfBillsDueToday().observe(this){ numOfBill ->
+            if(numOfBill > 0){
+                bills.badge = StringHolder(numOfBill.toString())
+                slider.adapter.notifyAdapterDataSetChanged()
+            }
         }
         val rules = PrimaryDrawerItem().apply {
             name = StringHolder("Rules")
@@ -371,7 +367,6 @@ class HomeActivity: BaseActivity(){
         val financialControlSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.financial_control }
         val accountingSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.accounting }
         val othersSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.others }
-
         slider.apply {
             itemAdapter.add(dashboard, financialControlSectionHeader, budgets, bills, piggyBank,
                     accountingSectionHeader, transactions, othersSectionHeader, account,

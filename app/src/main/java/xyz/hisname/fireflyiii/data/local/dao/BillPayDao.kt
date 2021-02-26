@@ -29,7 +29,12 @@ abstract class BillPayDao: BaseDao<BillPayDates> {
     @Query("DELETE FROM billPayList")
     abstract suspend fun deleteAllPayList(): Int
 
+    @Query("DELETE FROM billPayList WHERE (payDates BETWEEN :startDate AND :endDate)")
+    abstract suspend fun deletePayListByDate(startDate: String, endDate: String): Int
+
     @Query("SELECT * FROM billPayList WHERE id =:billId AND strftime('%s', payDates) BETWEEN strftime('%s', :startDate) AND strftime('%s', :endDate)")
     abstract suspend fun getBillByDateAndId(billId: Long, startDate: String, endDate: String): List<BillPayDates>
 
+    @Query("SELECT COUNT(payDates) FROM billPayList WHERE  (payDates BETWEEN :startDate AND :endDate)")
+    abstract suspend fun getBillCountByDate(startDate: String, endDate: String): Int
 }

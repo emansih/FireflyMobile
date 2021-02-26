@@ -33,6 +33,11 @@ interface BillsService {
     @GET(BILL_API_ENDPONT)
     suspend fun getPaginatedBills(@Query("page") type: Int): Response<BillsModel>
 
+    @GET(BILL_API_ENDPONT)
+    suspend fun getPaginatedBills(@Query("page") type: Int,
+                                  @Query("start") startDate: String,
+                                  @Query("end") endDate: String): Response<BillsModel>
+
     @GET("$BILL_API_ENDPONT/{id}")
     suspend fun getBillById(@Path("id") id: Long): Response<BillsModel>
 
@@ -74,7 +79,7 @@ interface BillsService {
                            @Field("currency_code") currencyCode: String,
                            @Field("notes") notes: String?): Response<BillSuccessModel>
 
-    @GET("${Constants.BILL_API_ENDPONT}/{id}/attachments")
+    @GET("${BILL_API_ENDPONT}/{id}/attachments")
     suspend fun getBillAttachment(@Path("id") billId: Long): Response<AttachmentModel>
 
 }
