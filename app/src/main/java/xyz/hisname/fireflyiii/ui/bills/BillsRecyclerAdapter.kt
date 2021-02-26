@@ -29,6 +29,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.inflate
+import java.math.BigDecimal
 
 class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
         PagingDataAdapter<BillData, BillsRecyclerAdapter.BillsHolder>(DIFF_CALLBACK) {
@@ -56,8 +57,11 @@ class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
                 itemView.billName.setTextColor(context.getCompatColor(R.color.md_red_500))
             }
             itemView.billName.text = billName
+            val amountToDisplay = billResponse.amount_max
+                    .plus(billResponse.amount_min)
+                    .div(BigDecimal.valueOf(2))
             itemView.billAmount.text = context.getString(R.string.bill_amount,
-                    billResponse.currency_symbol, billResponse.amount_max)
+                    billResponse.currency_symbol, amountToDisplay)
             val freq = billResponse.repeat_freq
             itemView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
 
