@@ -21,6 +21,7 @@ package xyz.hisname.fireflyiii.workers
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import xyz.hisname.fireflyiii.R
@@ -37,7 +38,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
 
 
     companion object {
-        fun initWorker(fileUri: List<Uri>, objectId: Long, context: Context, attachableType: AttachableType){
+        fun initWorker(fileUri: List<Uri>, objectId: Long, context: Context, attachableType: AttachableType): LiveData<List<WorkInfo>> {
             val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
             val battery = appPref.workManagerLowBattery
             val networkType = appPref.workManagerNetworkType
@@ -62,7 +63,9 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                     arrayOfRequest.add(attachmentWork)
                 }
             }
-            WorkManager.getInstance(context).beginWith(arrayOfRequest).enqueue()
+            val workManager = WorkManager.getInstance(context).beginWith(arrayOfRequest)
+            workManager.enqueue()
+            return workManager.workInfosLiveData
         }
     }
 

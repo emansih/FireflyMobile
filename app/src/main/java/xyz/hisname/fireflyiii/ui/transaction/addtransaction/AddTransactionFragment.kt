@@ -40,6 +40,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkInfo
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -173,7 +174,17 @@ class AddTransactionFragment: BaseFragment() {
                 attachment_information.adapter?.notifyDataSetChanged()
                 if (transactionJournalId != 0L){
                     toastInfo("Uploading...")
-                    addTransactionViewModel.uploadFile(transactionJournalId, attachmentItemAdapter)
+                    addTransactionViewModel.uploadFile(transactionJournalId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
+                        // Only show the updated files array if upload succeeds
+                        if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("File uploaded")
+                        } else {
+                            toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
+                        }
+                    }
+                } else {
+                    attachment_information.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -185,10 +196,19 @@ class AddTransactionFragment: BaseFragment() {
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
-                attachment_information.adapter?.notifyDataSetChanged()
                 if (transactionJournalId != 0L){
                     toastInfo("Uploading...")
-                    addTransactionViewModel.uploadFile(transactionJournalId, attachmentItemAdapter)
+                    addTransactionViewModel.uploadFile(transactionJournalId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
+                        // Only show the updated files array if upload succeeds
+                        if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("File uploaded")
+                        } else {
+                            toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
+                        }
+                    }
+                } else {
+                    attachment_information.adapter?.notifyDataSetChanged()
                 }
             }
         }

@@ -33,6 +33,7 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkInfo
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
@@ -100,10 +101,19 @@ class AddBillFragment: BaseAddObjectFragment() {
                         "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
-                attachment_information.adapter?.notifyDataSetChanged()
                 if (billId != 0L){
                     toastInfo("Uploading...")
-                    billViewModel.uploadFile(billId, attachmentItemAdapter)
+                    billViewModel.uploadFile(billId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
+                        // Only show the updated files array if upload succeeds
+                        if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("File uploaded")
+                        } else {
+                            toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
+                        }
+                    }
+                } else {
+                    attachment_information.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -115,10 +125,19 @@ class AddBillFragment: BaseAddObjectFragment() {
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
-                attachment_information.adapter?.notifyDataSetChanged()
                 if (billId != 0L){
                     toastInfo("Uploading...")
-                    billViewModel.uploadFile(billId, attachmentItemAdapter)
+                    billViewModel.uploadFile(billId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
+                        // Only show the updated files array if upload succeeds
+                        if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("File uploaded")
+                        } else {
+                            toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
+                        }
+                    }
+                } else {
+                    attachment_information.adapter?.notifyDataSetChanged()
                 }
             }
         }

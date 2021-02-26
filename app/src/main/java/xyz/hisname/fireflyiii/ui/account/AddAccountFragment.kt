@@ -32,6 +32,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkInfo
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -40,13 +41,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import kotlinx.android.synthetic.main.fragment_add_account.*
-import kotlinx.android.synthetic.main.fragment_add_account.add_attachment_button
-import kotlinx.android.synthetic.main.fragment_add_account.attachment_information
-import kotlinx.android.synthetic.main.fragment_add_account.description_edittext
-import kotlinx.android.synthetic.main.fragment_add_account.expansionLayout
-import kotlinx.android.synthetic.main.fragment_add_account.note_edittext
-import kotlinx.android.synthetic.main.fragment_add_account.placeHolderToolbar
-import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
@@ -105,10 +99,19 @@ class AddAccountFragment: BaseAddObjectFragment() {
                         "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
-                attachment_information.adapter?.notifyDataSetChanged()
                 if (accountId != 0L){
                     toastInfo("Uploading...")
-                    accountViewModel.uploadFile(accountId, attachmentItemAdapter)
+                    accountViewModel.uploadFile(accountId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
+                        // Only show the updated files array if upload succeeds
+                        if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("File uploaded")
+                        } else {
+                            toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
+                        }
+                    }
+                } else {
+                    attachment_information.adapter?.notifyDataSetChanged()
                 }
             }
         }

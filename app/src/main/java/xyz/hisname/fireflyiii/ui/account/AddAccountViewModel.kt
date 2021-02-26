@@ -23,6 +23,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -102,8 +103,9 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
         return apiResponse
     }
 
-    fun uploadFile(accountId: Long, fileToUpload: ArrayList<Uri>) {
-        AttachmentWorker.initWorker(fileToUpload, accountId, getApplication<Application>(), AttachableType.Account)
+    fun uploadFile(accountId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>> {
+        return AttachmentWorker.initWorker(fileToUpload, accountId,
+                getApplication<Application>(), AttachableType.Account)
     }
 
         fun addAccount(accountName: String, accountType: String,

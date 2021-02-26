@@ -23,6 +23,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -96,8 +97,8 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         return accountListLiveData
     }
 
-    fun uploadFile(piggyBankId: Long, fileToUpload: ArrayList<Uri>){
-        AttachmentWorker.initWorker(fileToUpload, piggyBankId, getApplication<Application>(),
+    fun uploadFile(piggyBankId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>>{
+        return AttachmentWorker.initWorker(fileToUpload, piggyBankId, getApplication<Application>(),
                 AttachableType.PIGGYBANK)
     }
 

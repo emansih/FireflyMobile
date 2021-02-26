@@ -24,6 +24,7 @@ import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.paging.cachedIn
+import androidx.work.WorkInfo
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -204,8 +205,8 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
         }
     }
 
-    fun uploadFile(transactionJournalId: Long, fileToUpload: ArrayList<Uri>){
-        AttachmentWorker.initWorker(fileToUpload, transactionJournalId,
+    fun uploadFile(transactionJournalId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>>{
+        return AttachmentWorker.initWorker(fileToUpload, transactionJournalId,
                 getApplication<Application>(), AttachableType.TRANSACTION)
     }
 

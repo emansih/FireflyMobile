@@ -23,6 +23,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,8 +88,9 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
         return isSuccessful
     }
 
-    fun uploadFile(billId: Long, fileToUpload: ArrayList<Uri>) {
-        AttachmentWorker.initWorker(fileToUpload, billId, getApplication<Application>(), AttachableType.BILL)
+    fun uploadFile(billId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>> {
+        return AttachmentWorker.initWorker(fileToUpload, billId,
+                getApplication<Application>(), AttachableType.BILL)
     }
 
         fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,

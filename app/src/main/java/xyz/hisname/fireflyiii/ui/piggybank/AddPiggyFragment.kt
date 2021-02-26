@@ -34,6 +34,7 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkInfo
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
 import com.mikepenz.iconics.IconicsDrawable
@@ -95,10 +96,19 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                         "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
-                attachment_information.adapter?.notifyDataSetChanged()
                 if (piggyId != 0L){
                     toastInfo("Uploading...")
-                    piggyViewModel.uploadFile(piggyId, attachmentItemAdapter)
+                    piggyViewModel.uploadFile(piggyId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
+                        // Only show the updated files array if upload succeeds
+                        if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("File uploaded")
+                        } else {
+                            toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
+                        }
+                    }
+                } else {
+                    attachment_information.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -110,10 +120,19 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
-                attachment_information.adapter?.notifyDataSetChanged()
                 if (piggyId != 0L){
                     toastInfo("Uploading...")
-                    piggyViewModel.uploadFile(piggyId, attachmentItemAdapter)
+                    piggyViewModel.uploadFile(piggyId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
+                        // Only show the updated files array if upload succeeds
+                        if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
+                            attachment_information.adapter?.notifyDataSetChanged()
+                            toastSuccess("File uploaded")
+                        } else {
+                            toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
+                        }
+                    }
+                } else {
+                    attachment_information.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -127,13 +146,13 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                         0 -> {
                             val createTempDir = File(requireContext().getExternalFilesDir(null).toString() +
                                     File.separator + "temp")
-                            if(!createTempDir.exists()){
+                            if (!createTempDir.exists()) {
                                 createTempDir.mkdir()
                             }
                             val randomId = UUID.randomUUID().toString().substring(0, 7)
                             val fileToOpen = File(requireContext().getExternalFilesDir(null).toString() +
                                     File.separator + "temp" + File.separator + "${randomId}-firefly.png")
-                            if(fileToOpen.exists()){
+                            if (fileToOpen.exists()) {
                                 fileToOpen.delete()
                             }
                             fileUri = FileProvider.getUriForFile(requireContext(),
@@ -149,7 +168,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun showHelpText() = showCase(R.string.piggy_bank_description_help_text,
-                "descriptionCaseView", description_edittext).show()
+            "descriptionCaseView", description_edittext).show()
 
     private fun updateEditText(){
         if(piggyId != 0L){
@@ -177,9 +196,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                         false, { data: AttachmentData ->
                     AlertDialog.Builder(requireContext())
                             .setTitle(getString(R.string.are_you_sure))
-                            .setPositiveButton(android.R.string.ok){ _, _ ->
-                                piggyViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
-                                    if(isSuccessful){
+                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                piggyViewModel.deleteAttachment(data).observe(viewLifecycleOwner) { isSuccessful ->
+                                    if (isSuccessful) {
                                         attachmentDataAdapter.remove(data)
                                         attachment_information.adapter?.notifyDataSetChanged()
                                         toastSuccess("Deleted " + data.attachmentAttributes.filename)
@@ -243,23 +262,23 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                     icon = FontAwesome.Icon.faw_money_bill
                     colorRes = R.color.md_green_400
                     sizeDp = 24
-                },null, null, null)
+                }, null, null, null)
         current_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_money_bill
                     colorRes = R.color.md_green_400
                     sizeDp = 24
-                },null, null, null)
+                }, null, null, null)
         date_started_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_calendar
             color = colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
             sizeDp = 24
-        },null, null, null)
+        }, null, null, null)
         date_target_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_calendar
             color = colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
             sizeDp = 24
-        },null, null, null)
+        }, null, null, null)
         addPiggyFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
         addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_plus
