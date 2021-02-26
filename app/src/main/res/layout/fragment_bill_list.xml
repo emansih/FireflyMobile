@@ -55,13 +55,34 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <TextView
-                    android:id="@+id/billsDueTodayText"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="@string/bill_due_today"
-                    android:layout_gravity="center_vertical|start"
-                    style="@style/TextAppearance.MaterialComponents.Headline6" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/billsDueTodayText"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:text="@string/bill_due_today"
+                        style="@style/TextAppearance.MaterialComponents.Headline6"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/numOfBills"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/circle_shape"
+                        android:gravity="center"
+                        android:textColor="@color/md_red_500"
+                        android:textSize="18sp"
+                        android:layout_marginStart="15dp"
+                        app:layout_constraintStart_toEndOf="@+id/billsDueTodayText"
+                        app:layout_constraintTop_toTopOf="@+id/billsDueTodayText"
+                        app:layout_constraintBottom_toBottomOf="@+id/billsDueTodayText"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <ImageView
                     android:id="@+id/headerIndicator"

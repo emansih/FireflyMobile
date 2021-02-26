@@ -112,6 +112,7 @@ class ListBillFragment: BaseFragment() {
             if(bills.isEmpty()){
                 billsDueToday.isGone = true
             } else {
+                numOfBills.text = bills.size.toString()
                 val linearLayoutManager = LinearLayoutManager(requireContext())
                 billsDueTodayRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
                 billsDueTodayRecyclerView.layoutManager = linearLayoutManager
