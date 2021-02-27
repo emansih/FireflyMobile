@@ -147,7 +147,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 app:layout_constraintEnd_toEndOf="@+id/max_amount_layout"
                 app:layout_constraintStart_toStartOf="@+id/min_amount_layout"
                 app:layout_constraintTop_toBottomOf="@+id/max_amount_layout">
@@ -167,7 +167,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 app:layout_constraintEnd_toEndOf="@+id/currency_layout"
                 app:layout_constraintStart_toStartOf="@+id/currency_layout"
                 app:layout_constraintTop_toBottomOf="@+id/currency_layout">
@@ -187,7 +187,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 app:layout_constraintEnd_toEndOf="@+id/bill_date_layout"
                 app:layout_constraintStart_toStartOf="@+id/bill_date_layout"
                 app:layout_constraintTop_toBottomOf="@+id/bill_date_layout">
@@ -206,7 +206,7 @@
                 android:id="@+id/frequency_menu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 app:errorEnabled="true"
                 app:helperTextEnabled="false"
@@ -283,7 +283,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="300dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="12dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
