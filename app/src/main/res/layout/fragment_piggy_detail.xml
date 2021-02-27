@@ -86,19 +86,19 @@
         <include
             layout="@layout/details_card"
             android:id="@+id/piggy_bank_details_card"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/progressLayout"/>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/notesCard"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
             android:layout_marginTop="12dp"
             app:layout_constraintStart_toStartOf="@+id/piggy_bank_details_card"
             app:layout_constraintEnd_toEndOf="@+id/piggy_bank_details_card"
@@ -116,10 +116,10 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/attachmentRecyclerView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            app:layout_constraintTop_toBottomOf="@+id/piggy_bank_details_card"
+            app:layout_constraintTop_toBottomOf="@+id/notesCard"
             app:layout_constraintStart_toStartOf="@+id/piggy_bank_details_card"
             app:layout_constraintEnd_toEndOf="@+id/piggy_bank_details_card"/>
 
