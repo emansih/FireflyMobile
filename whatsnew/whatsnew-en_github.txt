@@ -3,7 +3,7 @@ What's new:
 - Smaller margin in between edit text in add piggy bank screen 
 - Smaller margin in add bill screen
 - Show notes in piggy bank details
-
+- Show percentage in piggy bank list
 
 
 
