@@ -115,7 +115,7 @@
                 android:id="@+id/account_menu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 app:errorEnabled="true"
                 app:helperTextEnabled="false"
@@ -192,7 +192,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="30dp"
                         android:layout_marginEnd="30dp"
-                        android:layout_marginTop="36dp"
+                        android:layout_marginTop="12dp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
@@ -213,9 +213,9 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="36dp"
                         android:layout_marginStart="30dp"
                         android:layout_marginEnd="30dp"
+                        android:layout_marginTop="12dp"
                         app:layout_constraintTop_toBottomOf="@+id/current_amount_layout"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent">
@@ -235,7 +235,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="36dp"
+                        android:layout_marginTop="12dp"
                         app:layout_constraintTop_toBottomOf="@+id/date_started_layout"
                         app:layout_constraintStart_toStartOf="@+id/date_started_layout"
                         app:layout_constraintEnd_toEndOf="@+id/date_started_layout">
@@ -255,7 +255,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="36dp"
+                        android:layout_marginTop="12dp"
                         app:layout_constraintTop_toBottomOf="@+id/date_target_layout"
                         app:layout_constraintStart_toStartOf="@+id/date_started_layout"
                         app:layout_constraintEnd_toEndOf="@+id/date_started_layout">
