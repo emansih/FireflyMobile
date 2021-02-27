@@ -1,7 +1,3 @@
-<p align="center">
-	<img src="art/Laptop_Android.png"/>
-</p>
-
 ### Photuris III
 
 [<img src="art/get-it-on-fdroid.png"
