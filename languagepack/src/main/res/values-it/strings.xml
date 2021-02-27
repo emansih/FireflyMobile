@@ -166,5 +166,6 @@
     <string name="add_new_split">Aggiungi un\'altra divisione</string>
     <string name="total_available_in_currency">Budget totale disponibile in %1$s</string>
     <string name="expected_budget">Usa questo modulo per indicare quanto ti aspetti di mettere a budget (in totale, in %1$s) nel periodo indicato.</string>
+    <string name="group">Gruppo</string>
 
 </resources>

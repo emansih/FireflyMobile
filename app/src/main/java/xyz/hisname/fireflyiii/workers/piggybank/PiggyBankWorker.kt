@@ -51,12 +51,13 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val startDate = inputData.getString("startDate") ?: ""
         val endDate = inputData.getString("endDate") ?: ""
         val notes = inputData.getString("notes") ?: ""
+        val group = inputData.getString("group") ?: ""
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val piggyWorkManagerId = inputData.getLong("piggyWorkManagerId", 0)
         val piggyRepository = PiggyRepository(AppDatabase.getInstance(context).piggyDataDao(),
                 genericService.create(PiggybankService::class.java))
         val addPiggy = piggyRepository.addPiggyBank(name, accountId.toLong(), targetAmount,
-                currentAmount, startDate, endDate, notes)
+                currentAmount, startDate, endDate, notes, group)
         when {
             addPiggy.response != null -> {
                 // Delete old data that we inserted when worker is being init
@@ -98,7 +99,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
     companion object {
         fun initWorker(context: Context, name: String, accountId: String, targetAmount: String,
                        currentAmount: String?, startDate: String?, endDate: String?,
-                       notes: String?, fileArray: ArrayList<Uri>){
+                       notes: String?,  group: String?, fileArray: ArrayList<Uri>){
             val piggyWorkManagerId = ThreadLocalRandom.current().nextLong()
             val piggyData = Data.Builder()
                     .putString("name", name)
@@ -108,6 +109,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                     .putString("startDate", startDate)
                     .putString("endDate", endDate)
                     .putString("notes", notes)
+                    .putString("group", group)
                     .putLong("piggyWorkManagerId", piggyWorkManagerId)
             if(fileArray.isNotEmpty()){
                 piggyData.putString("filesToUpload", fileArray.toString())
@@ -146,7 +148,8 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                                    account.accountAttributes.name, defaultCurrency.currencyId, currencyCode, currencySymbol,
                                    currencyDp, targetAmount.toBigDecimal(),  percentage,
                                    currentAmount?.toBigDecimal() ?: 0.toBigDecimal(),
-                                   leftToSave.toBigDecimal(), 0.toBigDecimal(), startDate, endDate, 0, true, notes, true
+                                   leftToSave.toBigDecimal(), 0.toBigDecimal(), startDate, endDate,
+                                   0, true, notes, true, 0L, 0L, ""
                            ))
                     )
                 }

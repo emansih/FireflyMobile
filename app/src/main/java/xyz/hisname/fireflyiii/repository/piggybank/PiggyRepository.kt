@@ -21,6 +21,7 @@ package xyz.hisname.fireflyiii.repository.piggybank
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
+import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
@@ -92,19 +93,24 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
 
 
     suspend fun addPiggyBank(name: String, accountId: Long, targetAmount: String,
-                             currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel> {
+                             currentAmount: String?, startDate: String?, endDate: String?,
+                             notes: String?, group: String?): ApiResponses<PiggySuccessModel> {
         return try {
-            val networkCall = piggyService.addPiggyBank(name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
+            val networkCall = piggyService.addPiggyBank(name, accountId, targetAmount, currentAmount,
+                    startDate, endDate, notes, group)
             parseResponse(networkCall)
         } catch (exception: Exception){
+            Timber.d(exception)
             ApiResponses(error = exception)
         }
     }
 
     suspend fun updatePiggyBank(piggyId: Long, name: String, accountId: Long, targetAmount: String,
-                                currentAmount: String?, startDate: String?, endDate: String?, notes: String?): ApiResponses<PiggySuccessModel>{
+                                currentAmount: String?, startDate: String?, endDate: String?,
+                                notes: String?, group: String?): ApiResponses<PiggySuccessModel>{
         return try {
-            val networkCall = piggyService.updatePiggyBank(piggyId, name, accountId, targetAmount, currentAmount, startDate, endDate, notes)
+            val networkCall = piggyService.updatePiggyBank(piggyId, name, accountId, targetAmount,
+                    currentAmount, startDate, endDate, notes, group)
             parseResponse(networkCall)
         } catch (exception: Exception){
             ApiResponses(error = exception)
@@ -119,6 +125,7 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
             return ApiResponses(response = responseBody)
         } else {
             if(responseErrorBody != null){
+                Timber.d(responseErrorBody.source().toString())
                 // Ignore lint warning. False positive
                 // https://github.com/square/retrofit/issues/3255#issuecomment-557734546
                 val moshi = Moshi.Builder().build().adapter(ErrorModel::class.java).fromJson(responseErrorBody.source())

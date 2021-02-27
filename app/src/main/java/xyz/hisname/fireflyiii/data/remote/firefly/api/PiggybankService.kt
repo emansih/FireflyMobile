@@ -38,22 +38,24 @@ interface PiggybankService {
     @FormUrlEncoded
     @POST(PIGGY_BANK_API_ENDPOINT)
     suspend fun addPiggyBank(@Field("name") name: String,
-                     @Field("account_id") accountId: Long,
-                     @Field("target_amount") targetAmount: String,
-                     @Field("current_amount") currentAmount: String?,
-                     @Field("start_date") startDate: String?,
-                     @Field("target_date") targetDate: String?,
-                     @Field("notes") notes: String?): Response<PiggySuccessModel>
+                             @Field("account_id") accountId: Long,
+                             @Field("target_amount") targetAmount: String,
+                             @Field("current_amount") currentAmount: String?,
+                             @Field("start_date") startDate: String?,
+                             @Field("target_date") targetDate: String?,
+                             @Field("notes") notes: String?,
+                             @Field("group") group: String?): Response<PiggySuccessModel>
     @FormUrlEncoded
     @PUT("$PIGGY_BANK_API_ENDPOINT/{piggyId}")
     suspend fun updatePiggyBank(@Path("piggyId") piggyId: Long,
-                        @Field("name") name: String,
-                        @Field("account_id") accountId: Long,
-                        @Field("target_amount") targetAmount: String,
-                        @Field("current_amount") currentAmount: String?,
-                        @Field("start_date") startDate: String?,
-                        @Field("target_date") targetDate: String?,
-                        @Field("notes") notes: String?): Response<PiggySuccessModel>
+                                @Field("name") name: String,
+                                @Field("account_id") accountId: Long,
+                                @Field("target_amount") targetAmount: String,
+                                @Field("current_amount") currentAmount: String?,
+                                @Field("start_date") startDate: String?,
+                                @Field("target_date") targetDate: String?,
+                                @Field("notes") notes: String?,
+                                @Field("group") group: String?): Response<PiggySuccessModel>
 
     @GET("${Constants.SEARCH_API_ENDPOINT}/piggy-banks")
     suspend fun searchPiggybank(query: String): Response<List<PiggybankItems>>

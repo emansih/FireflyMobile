@@ -44,5 +44,8 @@ data class PiggyAttributes(
         val order: Int?,
         val active: Boolean?,
         val notes: String?,
-        val isPending: Boolean = false
+        val isPending: Boolean = false,
+        val object_group_id: Long?,
+        val object_group_order: Long?,
+        val object_group_title: String?
 )

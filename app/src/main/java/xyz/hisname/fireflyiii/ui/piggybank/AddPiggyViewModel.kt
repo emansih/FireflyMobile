@@ -103,7 +103,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun addPiggyBank(piggyName: String, accountName: String, currentAmount: String?, notes: String?,
-                     startDate: String?, targetAmount: String, targetDate: String?,
+                     startDate: String?, targetAmount: String, targetDate: String?, group: String?,
                      fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
@@ -114,7 +114,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
             val accountId = accountRepository.getAccountByName(accountName, "asset").accountId
             if(accountId != 0L) {
                 val addPiggyBank = piggyRepository.addPiggyBank(piggyName, accountId, targetAmount,
-                        currentAmount, startDate, targetDate, notes)
+                        currentAmount, startDate, targetDate, notes, group)
                 when {
                     addPiggyBank.response != null -> {
                         apiResponse.postValue(Pair(true, "Piggy bank saved"))
@@ -128,7 +128,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                     addPiggyBank.error != null -> {
                         if (addPiggyBank.error is UnknownHostException) {
                             PiggyBankWorker.initWorker(getApplication(), piggyName, accountId.toString(), targetAmount,
-                                    currentAmount, startDate, targetDate, notes, fileToUpload)
+                                    currentAmount, startDate, targetDate, notes, group, fileToUpload)
                             apiResponse.postValue(Pair(true, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
                         } else {
                             apiResponse.postValue(Pair(false, addPiggyBank.error.localizedMessage))
@@ -145,7 +145,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun updatePiggyBank(piggyId: Long, piggyName: String, accountName: String, currentAmount: String?, notes: String?,
-                        startDate: String?, targetAmount: String, targetDate: String?): LiveData<Pair<Boolean,String>>{
+                        startDate: String?, targetAmount: String, targetDate: String?, group: String?): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
@@ -159,7 +159,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
             }
             if(accountId != null && accountId != 0L){
                 val updatePiggyBank = piggyRepository.updatePiggyBank(piggyId, piggyName, accountId, targetAmount,
-                        currentAmount, startDate, targetDate, notes)
+                        currentAmount, startDate, targetDate, notes, group)
                 when {
                     updatePiggyBank.response != null -> {
                         apiResponse.postValue(Pair(true, "Piggy bank updated"))

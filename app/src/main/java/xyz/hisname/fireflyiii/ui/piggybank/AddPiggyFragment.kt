@@ -65,6 +65,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private var startDate: String? = null
     private var targetDate: String? = null
     private var notes: String? = null
+    private var groupTitle: String? = null
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val piggyViewModel by lazy { getImprovedViewModel(AddPiggyViewModel::class.java) }
     private val piggyId by lazy { arguments?.getLong("piggyId") ?: 0 }
@@ -248,6 +249,11 @@ class AddPiggyFragment: BaseAddObjectFragment() {
             } else {
                 note_edittext.getString()
             }
+            groupTitle = if(groupEdittext.isBlank()){
+                null
+            } else {
+                groupEdittext.getString()
+            }
             if(piggyId == 0L) {
                 submitData()
             } else {
@@ -346,7 +352,8 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     override fun submitData(){
         piggyViewModel.addPiggyBank(description_edittext.getString(),
                 account_exposed_dropdown.getString(), currentAmount, notes, startDate,
-                target_amount_edittext.getString(), targetDate, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
+                target_amount_edittext.getString(), targetDate, groupTitle,
+                attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
                 handleBack()
@@ -359,7 +366,8 @@ class AddPiggyFragment: BaseAddObjectFragment() {
 
     private fun updatePiggyBank(){
         piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), account_exposed_dropdown.getString(),
-                currentAmount, notes, startDate, target_amount_edittext.getString(), targetDate).observe(viewLifecycleOwner) { response ->
+                currentAmount, notes, startDate, target_amount_edittext.getString(),
+                targetDate, groupTitle).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
                 handleBack()

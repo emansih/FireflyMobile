@@ -172,4 +172,6 @@
     <string name="earned">Ganho</string>
     <string name="add_new_split">Adicionar outra divisão</string>
     <string name="total_available_in_currency">Orçamentos disponíveis em %1$s</string>
+    <string name="group">Grupo</string>
+
 </resources>
