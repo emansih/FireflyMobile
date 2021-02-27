@@ -64,9 +64,8 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
                 piggyBankName = "$piggyBankName (Pending)"
             }
             itemView.piggyName.text = piggyBankName
-
-            itemView.goal_save.text = piggyBankData?.currency_symbol + " " + piggyBankData?.target_amount
-            itemView.currently_saved.text = piggyBankData?.currency_symbol + " " + piggyBankData?.current_amount.toString()
+            itemView.goal_save.text = piggyBankData.currency_symbol + " " + piggyBankData?.current_amount + " / "  +
+                    piggyBankData.currency_symbol + " " + piggyBankData?.target_amount.toString()
             val percentage = piggyBankData.percentage ?: 0
             if(percentage <= 15){
                 itemView.goal_progress_bar.progressDrawable.colorFilter =
@@ -77,6 +76,7 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
                         BlendModeColorFilterCompat.createBlendModeColorFilterCompat(context.getCompatColor(R.color.md_green_500),
                         BlendModeCompat.SRC_ATOP)
             }
+            itemView.currently_saved.text = percentage.toString() + "%"
             itemView.goal_progress_bar.progress = percentage
             val targetDate = piggyBankData.target_date
             itemView.timeLeft.let {
