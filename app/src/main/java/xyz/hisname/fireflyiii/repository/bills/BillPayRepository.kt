@@ -52,7 +52,6 @@ class BillPayRepository(private val billPayDao: BillPayDao,
             val billList = arrayListOf<BillData>()
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
-                Timber.d("response: $responseBody")
                 billPayDao.deletePayListByDate(startDate, endDate)
                 billList.addAll(responseBody.data)
                 if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {

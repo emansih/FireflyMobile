@@ -25,10 +25,7 @@ import com.squareup.moshi.JsonClass
 import java.time.LocalDate
 
 @JsonClass(generateAdapter = true)
-@Entity(tableName = "billPaidList",
-        foreignKeys = [ForeignKey(entity = BillData::class,
-                parentColumns = arrayOf("billId"), childColumns = arrayOf("id"),
-                onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE)])
+@Entity(tableName = "billPaidList")
 data class BillPaidDates(
         @PrimaryKey(autoGenerate = true)
         val billPaidPrimaryKey: Long = 0L,

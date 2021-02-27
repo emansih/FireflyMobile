@@ -105,9 +105,6 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun loadBill(){
-        billViewModel.getBillList().observe(viewLifecycleOwner){
-            billAdapter.submitData(lifecycle, it)
-        }
         billViewModel.getBillDue().observe(viewLifecycleOwner){ bills ->
             if(bills.isEmpty()){
                 billsDueTodayCard.isGone = true
@@ -120,6 +117,9 @@ class ListBillFragment: BaseFragment() {
                     itemClicked(data)
                 }
                 billsDueTodayRecyclerView.adapter = itemAdapter
+            }
+            billViewModel.getBillList().observe(viewLifecycleOwner){
+                billAdapter.submitData(lifecycle, it)
             }
         }
     }

@@ -18,18 +18,20 @@
 
 package xyz.hisname.fireflyiii.repository.bills
 
+import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.BillPaidDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
+import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 import java.lang.Exception
 
 class BillsPaidRepository(private val billsPaidDao: BillPaidDao,
-                          private val billsService: BillsService?) {
+                          private val billsService: BillsService) {
 
     suspend fun getBillPaidById(billId: Long, startDate: String, endDate: String): List<BillPaidDates>{
         try {
-            val networkCall = billsService?.getBillById(billId, startDate, endDate)
-            val responseBody = networkCall?.body()
+            val networkCall = billsService.getBillById(billId, startDate, endDate)
+            val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
                 billsPaidDao.deleteByBillId(billId)
                 responseBody.data.billAttributes.paid_dates.forEach {  billPaid ->
@@ -42,5 +44,26 @@ class BillsPaidRepository(private val billsPaidDao: BillPaidDao,
             }
         } catch (exception: Exception){ }
         return billsPaidDao.getBillsPaidFromIdAndDate(billId, startDate, endDate)
+    }
+
+    suspend fun getBillPaidByDate(startDate: String, endDate: String): List<Long>{
+        try {
+            val billList = arrayListOf<BillData>()
+            val networkCall = billsService.getPaginatedBills(1, startDate, endDate)
+            val responseBody = networkCall.body()
+            if(responseBody != null && networkCall.isSuccessful){
+                billList.addAll(responseBody.data)
+                if (responseBody.meta.pagination.current_page != responseBody.meta.pagination.total_pages) {
+                    for(pagination in 2..responseBody.meta.pagination.total_pages){
+                        val networkBody = billsService.getPaginatedBills(pagination).body()
+                        if(networkBody != null){
+                            billList.addAll(networkBody.data)
+                        }
+                    }
+                }
+                billsPaidDao.deleteAndInsert(startDate, endDate, billList)
+            }
+        } catch (exception: Exception){ }
+        return billsPaidDao.getBillsPaidFromAndDate(startDate, endDate)
     }
 }

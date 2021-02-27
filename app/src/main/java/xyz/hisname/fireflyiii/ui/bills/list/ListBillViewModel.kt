@@ -27,14 +27,17 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillPageSource
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
+import xyz.hisname.fireflyiii.repository.bills.BillsPaidRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
@@ -44,8 +47,9 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
 
     private val billService = genericService().create(BillsService::class.java)
     private val billDataDao = AppDatabase.getInstance(application).billDataDao()
+    private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
     private val billRepository = BillRepository(billDataDao, billService)
-
+    private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
 
     fun getBillList(): LiveData<PagingData<BillData>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
@@ -56,7 +60,18 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
     fun getBillDue(): LiveData<List<BillData>>{
         val billList = MutableLiveData<List<BillData>>()
         viewModelScope.launch(Dispatchers.IO){
-            billList.postValue(billRepository.getBillDueFromDate(DateTimeUtil.getTodayDate()))
+            val billDue = billRepository.getBillDueFromDate(DateTimeUtil.getTodayDate())
+            val billPaidId = billPaidRepository.getBillPaidByDate(DateTimeUtil.getTodayDate(), DateTimeUtil.getTodayDate())
+            val billDueId = arrayListOf<Long>()
+            billDue.forEach {  billData ->
+                billDueId.add(billData.billId)
+            }
+            val billIdDifference = billDueId.minus(billPaidId)
+            val billDifference = arrayListOf<BillData>()
+            billIdDifference.forEach {  billId ->
+                billDifference.add(billRepository.getBillById(billId))
+            }
+            billList.postValue(billDifference)
         }
         return billList
     }

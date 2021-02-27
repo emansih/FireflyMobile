@@ -20,6 +20,8 @@ package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
+import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
 
 @Dao
@@ -33,4 +35,25 @@ abstract class BillPaidDao: BaseDao<BillPaidDates> {
 
     @Query("SELECT * FROM billPaidList WHERE id =:billId  AND strftime('%s', date) BETWEEN strftime('%s', :startDate) AND strftime('%s', :endDate)")
     abstract suspend fun getBillsPaidFromIdAndDate(billId: Long, startDate: String, endDate: String): List<BillPaidDates>
+
+    @Query("SELECT id FROM billPaidList WHERE strftime('%s', date) BETWEEN strftime('%s', :startDate) AND strftime('%s', :endDate)")
+    abstract suspend fun getBillsPaidFromAndDate(startDate: String, endDate: String): List<Long>
+
+    @Query("DELETE FROM billPaidList WHERE  (date BETWEEN :startDate AND :endDate)")
+    abstract suspend fun deletePaidByDate(startDate: String, endDate: String): Int
+
+
+    @Transaction
+    open suspend fun deleteAndInsert(startDate: String, endDate: String, list: List<BillData>){
+        deletePaidByDate(startDate, endDate)
+        list.forEach {  billData ->
+            billData.billAttributes.paid_dates.forEach { billPaid ->
+                insert(BillPaidDates(
+                        id = billData.billId, transaction_group_id = billPaid.transaction_group_id,
+                        transaction_journal_id = billPaid.transaction_journal_id,
+                        date = billPaid.date
+                ))
+            }
+        }
+    }
 }
