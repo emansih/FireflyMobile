@@ -183,7 +183,11 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 date_started_edittext.setText(piggyAttributes.start_date)
                 date_target_edittext.setText(piggyAttributes.target_date)
                 note_edittext.setText(piggyAttributes.notes)
-                account_exposed_dropdown.setText(piggyData.piggyAttributes.account_name)
+                piggyViewModel.getAccountById(piggyData.piggyAttributes.account_id ?: 0).observe(viewLifecycleOwner){ accountData ->
+                    val accountAttributes = accountData.accountAttributes
+                    account_exposed_dropdown.setText(accountAttributes.name + " (" +
+                            accountAttributes.currency_symbol + accountAttributes.current_balance + ")")
+                }
                 displayAttachment()
             }
         }
@@ -318,6 +322,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
             accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             account_exposed_dropdown.setAdapter(accountAdapter)
         }
+        account_exposed_dropdown.setOnItemClickListener { parent, view, position, id ->
+            piggyViewModel.getCurrentSelectedAccount(position)
+        }
         placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
@@ -359,8 +366,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        piggyViewModel.addPiggyBank(description_edittext.getString(),
-                account_exposed_dropdown.getString(), currentAmount, notes, startDate,
+        piggyViewModel.addPiggyBank(description_edittext.getString(), currentAmount, notes, startDate,
                 target_amount_edittext.getString(), targetDate, groupTitle,
                 attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
             if(response.first){
@@ -374,7 +380,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun updatePiggyBank(){
-        piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(), account_exposed_dropdown.getString(),
+        piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(),
                 currentAmount, notes, startDate, target_amount_edittext.getString(),
                 targetDate, groupTitle).observe(viewLifecycleOwner) { response ->
             if(response.first){

@@ -38,6 +38,7 @@ import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
+import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
@@ -62,6 +63,8 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
     private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
     private val attachmentService = genericService().create(AttachmentService::class.java)
     private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
+    private val shadowAccountList = arrayListOf<String>()
+    private var currentSelectedAccount = ""
 
     val piggyAttachment = MutableLiveData<List<AttachmentData>>()
     val unSupportedVersion: MutableLiveData<Boolean> = MutableLiveData()
@@ -75,9 +78,9 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         viewModelScope.launch(Dispatchers.IO){
             val piggyList = piggyRepository.getPiggyById(piggyId)
             accountRepository.getAccountById(piggyList.piggyAttributes.account_id ?: 0)
-            piggyList.piggyAttributes.account_id
             piggyListLiveData.postValue(piggyList)
             piggyAttachment.postValue(piggyRepository.getAttachment(piggyId, attachmentDao))
+            currentSelectedAccount = piggyList.piggyAttributes.account_name ?: ""
         }
         return piggyListLiveData
     }
@@ -94,16 +97,30 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         return isSuccessful
     }
 
+    fun getAccountById(accountId: Long): LiveData<AccountData>{
+        val accountLiveData = MutableLiveData<AccountData>()
+        viewModelScope.launch(Dispatchers.IO) {
+            accountLiveData.postValue(accountRepository.getAccountById(accountId))
+        }
+        return accountLiveData
+    }
+
     fun getAccount(): LiveData<List<String>>{
         val accountListLiveData = MutableLiveData<List<String>>()
         viewModelScope.launch(Dispatchers.IO){
             val accountList = arrayListOf<String>()
             accountRepository.getAccountByType("asset").forEach {  data ->
-                data.accountAttributes.name.let { accountList.add(it) }
+                accountList.add(data.accountAttributes.name + "  (" + data.accountAttributes.currency_symbol
+                        + data.accountAttributes.current_balance + ")")
+                shadowAccountList.add(data.accountAttributes.name)
             }
             accountListLiveData.postValue(accountList)
         }
         return accountListLiveData
+    }
+
+    fun getCurrentSelectedAccount(position: Int){
+        currentSelectedAccount = shadowAccountList[position]
     }
 
     fun uploadFile(piggyBankId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>>{
@@ -111,7 +128,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                 AttachableType.PIGGYBANK)
     }
 
-    fun addPiggyBank(piggyName: String, accountName: String, currentAmount: String?, notes: String?,
+    fun addPiggyBank(piggyName: String, currentAmount: String?, notes: String?,
                      startDate: String?, targetAmount: String, targetDate: String?, group: String?,
                      fileToUpload: ArrayList<Uri>): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
@@ -120,7 +137,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
             apiResponse.postValue(Pair(false, "There was an error getting account data"))
             isLoading.postValue(false)
         }){
-            val accountId = accountRepository.getAccountByName(accountName, "asset").accountId
+            val accountId = accountRepository.getAccountByName(currentSelectedAccount, "asset").accountId
             if(accountId != 0L) {
                 val addPiggyBank = piggyRepository.addPiggyBank(piggyName, accountId, targetAmount,
                         currentAmount, startDate, targetDate, notes, group)
@@ -153,15 +170,15 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
         return apiResponse
     }
 
-    fun updatePiggyBank(piggyId: Long, piggyName: String, accountName: String, currentAmount: String?, notes: String?,
+    fun updatePiggyBank(piggyId: Long, piggyName: String, currentAmount: String?, notes: String?,
                         startDate: String?, targetAmount: String, targetDate: String?, group: String?): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
             val originalAccountName = piggyRepository.getPiggyById(piggyId).piggyAttributes.account_name ?: ""
-            val accountIdFromRepo = accountRepository.getAccountByName(accountName, "asset").accountId
+            val accountIdFromRepo = accountRepository.getAccountByName(currentSelectedAccount, "asset").accountId
 
-            val accountId = if(accountName.contentEquals(originalAccountName)){
+            val accountId = if(currentSelectedAccount.contentEquals(originalAccountName)){
                 piggyRepository.getPiggyById(piggyId).piggyAttributes.account_id
             } else {
                 accountIdFromRepo

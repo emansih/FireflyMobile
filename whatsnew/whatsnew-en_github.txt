@@ -4,7 +4,7 @@ What's new:
 - Smaller margin in add bill screen
 - Show notes in piggy bank details
 - Show percentage in piggy bank list
-
+- When adding / updating a piggy bank, the account drop down menu will show the currently in your asset account.
 
 
 Fixes:
