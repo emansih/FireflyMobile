@@ -9,3 +9,6 @@ What's new:
 
 Fixes:
 - Fix incorrect number of bills shown in nav drawer
+
+
+Stay tuned to the Google Play App page as I will be enabling beta testing on it soon. 
