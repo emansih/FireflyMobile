@@ -22,27 +22,34 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.bills.BillPayRepository
+import xyz.hisname.fireflyiii.repository.bills.BillRepository
+import xyz.hisname.fireflyiii.repository.bills.BillsPaidRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 
 class HomeViewModel(application: Application): BaseViewModel(application) {
 
     private val billsService = genericService().create(BillsService::class.java)
-    private val billPayRepository = BillPayRepository(AppDatabase.getInstance(application).billPayDao(),
-            AppDatabase.getInstance(application).billDataDao(), billsService)
+    private val billDataDao = AppDatabase.getInstance(application).billDataDao()
+    private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
+    private val billRepository = BillRepository(billDataDao, billsService)
+    private val billPaidRepository = BillsPaidRepository(billPaidDao, billsService)
 
     fun getNoOfBillsDueToday(): LiveData<Int> {
         val count = MutableLiveData<Int>()
         viewModelScope.launch(Dispatchers.IO){
-            count.postValue(billPayRepository.getBillCountByDateRange(DateTimeUtil.getTodayDate(),
-                    DateTimeUtil.getTodayDate()))
+            val billDue = billRepository.getBillDueFromDate(DateTimeUtil.getTodayDate())
+            val billPaidId = billPaidRepository.getBillPaidByDate(DateTimeUtil.getTodayDate(), DateTimeUtil.getTodayDate())
+            val billDueId = arrayListOf<Long>()
+            billDue.forEach {  billData ->
+                billDueId.add(billData.billId)
+            }
+            val billIdDifference = billDueId.minus(billPaidId)
+            count.postValue(billIdDifference.size)
         }
         return count
     }

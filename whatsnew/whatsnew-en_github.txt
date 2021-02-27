@@ -1,2 +1,6 @@
 What's new:
 - Only show bills that are not paid instead of all bills 
+
+
+Fixes:
+- Fix incorrect number of bills shown in nav drawer
