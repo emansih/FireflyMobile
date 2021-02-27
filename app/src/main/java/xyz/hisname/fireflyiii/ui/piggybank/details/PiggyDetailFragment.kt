@@ -104,10 +104,10 @@ class PiggyDetailFragment: BaseDetailFragment() {
             currencyCodeTextView.text = piggyAttribute.currency_code
             piggyBankName.text = piggyAttribute.name
             val notes = piggyAttribute.notes
-            if(notes != null){
-                notesText.text = notes.toMarkDown()
-            } else {
+            if(notes.isNullOrEmpty()){
                 notesCard.isGone = true
+            } else {
+                notesText.text = notes.toMarkDown()
             }
             setupProgressBar(percentage)
         }
