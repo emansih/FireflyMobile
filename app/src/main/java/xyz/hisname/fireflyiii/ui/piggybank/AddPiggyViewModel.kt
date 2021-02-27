@@ -29,9 +29,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
@@ -39,6 +41,8 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
+import xyz.hisname.fireflyiii.repository.userinfo.SystemInfoRepository
+import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.piggybank.PiggyBankWorker
 import java.io.File
@@ -60,6 +64,11 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
     private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
 
     val piggyAttachment = MutableLiveData<List<AttachmentData>>()
+    val unSupportedVersion: MutableLiveData<Boolean> = MutableLiveData()
+
+    init {
+        checkVersion()
+    }
 
     fun getPiggyById(piggyId: Long): LiveData<PiggyData>{
         val piggyListLiveData = MutableLiveData<PiggyData>()
@@ -180,5 +189,25 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
             isLoading.postValue(false)
         }
         return apiResponse
+    }
+
+    private fun checkVersion(){
+        if(!AppPref(sharedPref).budgetIssue4394){
+            val systemInfoRepository = SystemInfoRepository(
+                    genericService().create(SystemInfoService::class.java),
+                    sharedPref,
+                    accManager)
+            viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->  }){
+                systemInfoRepository.getUserSystem()
+            }
+            val fireflyVersion = AppPref(sharedPref).serverVersion
+            if(fireflyVersion.contentEquals("5.5.0-beta.1")){
+                unSupportedVersion.postValue(true)
+            } else {
+                if(Version(fireflyVersion).compareTo(Version("5.5.0")) == -1){
+                    unSupportedVersion.postValue(true)
+                }
+            }
+        }
     }
 }

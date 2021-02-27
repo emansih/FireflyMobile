@@ -31,6 +31,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -346,7 +348,14 @@ class AddPiggyFragment: BaseAddObjectFragment() {
             attachmentDataAdapter.remove(data)
             attachment_information.adapter?.notifyDataSetChanged()
         }) { another: Int -> }
-
+        // https://github.com/firefly-iii/firefly-iii/issues/4435
+        piggyViewModel.unSupportedVersion.observe(viewLifecycleOwner){ isNotSupported ->
+            if(isNotSupported){
+                 groupLayout.isGone = true
+            } else {
+                groupLayout.isVisible = true
+            }
+        }
     }
 
     override fun submitData(){

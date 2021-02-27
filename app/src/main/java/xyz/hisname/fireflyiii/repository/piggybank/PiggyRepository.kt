@@ -100,7 +100,6 @@ class PiggyRepository(private val piggyDao: PiggyDataDao,
                     startDate, endDate, notes, group)
             parseResponse(networkCall)
         } catch (exception: Exception){
-            Timber.d(exception)
             ApiResponses(error = exception)
         }
     }
