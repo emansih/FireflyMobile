@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -102,6 +103,12 @@ class PiggyDetailFragment: BaseDetailFragment() {
             amountPercentage.text = percentage.toString() + "%"
             currencyCodeTextView.text = piggyAttribute.currency_code
             piggyBankName.text = piggyAttribute.name
+            val notes = piggyAttribute.notes
+            if(notes != null){
+                notesText.text = notes.toMarkDown()
+            } else {
+                notesCard.isGone = true
+            }
             setupProgressBar(percentage)
         }
         piggyDetailViewModel.isLoading.observe(viewLifecycleOwner){ loader ->

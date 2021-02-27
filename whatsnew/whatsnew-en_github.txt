@@ -2,5 +2,10 @@ What's new:
 - Only show bills that are not paid instead of all bills 
 - Smaller margin in between edit text in add piggy bank screen 
 - Smaller margin in add bill screen
+- Show notes in piggy bank details
+
+
+
+
 Fixes:
 - Fix incorrect number of bills shown in nav drawer
