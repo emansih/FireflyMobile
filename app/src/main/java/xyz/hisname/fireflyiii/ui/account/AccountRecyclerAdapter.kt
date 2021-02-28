@@ -19,27 +19,29 @@
 package xyz.hisname.fireflyiii.ui.account
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.account_list_item.view.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.AccountListItemBinding
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
-import xyz.hisname.fireflyiii.util.extension.inflate
 import java.math.BigDecimal
 
 class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
         PagingDataAdapter<AccountData, AccountRecyclerAdapter.AccountViewHolder>(DIFF_CALLBACK){
 
     private lateinit var context: Context
+    private var accountListItemBinding: AccountListItemBinding? = null
+    private val binding get() = accountListItemBinding!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
         context = parent.context
-        return AccountViewHolder(parent.inflate(R.layout.account_list_item))
+        accountListItemBinding = AccountListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return AccountViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int){
@@ -49,35 +51,37 @@ class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
     }
 
 
-    inner class AccountViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class AccountViewHolder(itemView: AccountListItemBinding): RecyclerView.ViewHolder(itemView.root) {
         fun bind(data: AccountData, clickListener: (AccountData) -> Unit){
             val accountData = data.accountAttributes
             var currencySymbol = ""
             if(!accountData.active){
-                itemView.accountNameText.setTextColor(context.getCompatColor(R.color.material_grey_600))
-                itemView.accountNumberText.setTextColor(context.getCompatColor(R.color.material_grey_600))
+                binding.accountNameText.setTextColor(context.getCompatColor(R.color.material_grey_600))
+                binding.accountNumberText.setTextColor(context.getCompatColor(R.color.material_grey_600))
             }
             if(accountData.currency_symbol != null){
                 currencySymbol = accountData.currency_symbol
             }
             if(accountData.account_number != null){
-                itemView.accountNumberText.text = accountData.account_number
+                binding.accountNumberText.text = accountData.account_number
             } else {
-                itemView.accountNumberText.isVisible = false
+                binding.accountNumberText.isVisible = false
             }
             val isPending = data.accountAttributes.isPending
             if(isPending){
-                itemView.accountNameText.text = accountData.name + " (Pending)"
-                itemView.accountNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
+                binding.accountNameText.text = accountData.name + " (Pending)"
+                binding.accountNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
             } else {
-                itemView.accountNameText.text = accountData.name
+                binding.accountNameText.text = accountData.name
             }
             val amount = accountData.current_balance
-            if(amount > BigDecimal.ZERO){
-                itemView.accountAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
+            if(amount < BigDecimal.ZERO){
+                binding.accountAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))
+            } else if(amount > BigDecimal.ZERO){
+                binding.accountAmountText.setTextColor(context.getCompatColor(R.color.md_green_500))
             }
-            itemView.accountAmountText.text = currencySymbol + " " + amount
-            itemView.accountId.text = data.accountId.toString()
+            binding.accountAmountText.text = currencySymbol + " " + amount
+            binding.accountId.text = data.accountId.toString()
             itemView.setOnClickListener { clickListener(data) }
         }
     }
