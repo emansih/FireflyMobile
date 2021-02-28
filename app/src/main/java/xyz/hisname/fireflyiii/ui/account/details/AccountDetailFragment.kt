@@ -33,12 +33,9 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
-import kotlinx.android.synthetic.main.details_card.*
-import kotlinx.android.synthetic.main.fragment_account_detail.*
-import kotlinx.android.synthetic.main.fragment_account_detail.attachmentRecyclerView
-import kotlinx.android.synthetic.main.fragment_account_detail.notesCard
-import kotlinx.android.synthetic.main.fragment_markdown.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.DetailsCardBinding
+import xyz.hisname.fireflyiii.databinding.FragmentAccountDetailBinding
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -60,12 +57,17 @@ class AccountDetailFragment: BaseDetailFragment() {
     private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
     private val accountDetailViewModel by lazy { getImprovedViewModel(AccountDetailViewModel::class.java) }
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
-
     private val coloring = arrayListOf<Int>()
+    private var fragmentAccountDetailBinding: FragmentAccountDetailBinding? = null
+    private var detailsCardBinding: DetailsCardBinding? = null
+    private val binding get() = fragmentAccountDetailBinding!!
+    private val detailBinding get() = detailsCardBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_account_detail, container)
+        fragmentAccountDetailBinding = FragmentAccountDetailBinding.inflate(inflater, container, false)
+        detailsCardBinding = binding.accountInfoCard
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -96,19 +98,19 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setAccountData(){
         accountDetailViewModel.accountData.observe(viewLifecycleOwner){ list ->
-            detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(list){ }
+            detailBinding.detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            detailBinding.detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            detailBinding.detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(list){ }
             downloadAttachment()
         }
         accountDetailViewModel.notes.observe(viewLifecycleOwner){ notes ->
             if(notes.isEmpty()){
-                notesCard.isGone = true
+                binding.notesCard.isGone = true
             } else {
-                displayText.text = notes.toMarkDown()
+                binding.notesText.text = notes.toMarkDown()
             }
         }
-        balanceHistoryCardText.text = resources.getString(R.string.account_chart_description,
+        binding.balanceHistoryCardText.text = resources.getString(R.string.account_chart_description,
                 accountDetailViewModel.accountName, DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
     }
 
@@ -116,9 +118,9 @@ class AccountDetailFragment: BaseDetailFragment() {
         accountDetailViewModel.accountAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
-                attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                binding.attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                binding.attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                         true, { data: AttachmentData ->
                     setDownloadClickListener(data, attachmentDataAdapter)
                 }) { another: Int -> }
@@ -129,7 +131,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
         accountDetailViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
             // "Refresh" the icon. From downloading to open file
-            attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+            binding.attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
                     true, { data: AttachmentData ->
                 setDownloadClickListener(data, attachmentDataAdapter)
             }){ another: Int -> }
@@ -140,7 +142,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private fun setExpensesByCategory(){
         accountDetailViewModel.uniqueExpensesCategoryLiveData.observe(viewLifecycleOwner){ categorySumList ->
             if(categorySumList.isEmpty()){
-                categoryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
+                binding.categoryPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
             } else {
                 val pieEntryArray = arrayListOf<PieEntry>()
                 categorySumList.forEach { categorySum ->
@@ -149,12 +151,12 @@ class AccountDetailFragment: BaseDetailFragment() {
                 val pieDataSet = PieDataSet(pieEntryArray, "").apply {
                     colors = coloring
                     valueTextSize = 15f
-                    valueFormatter = PercentFormatter(categoryPieChart)
+                    valueFormatter = PercentFormatter(binding.categoryPieChart)
                 }
-                categoryPieChart.description.isEnabled = false
-                categoryPieChart.invalidate()
-                categoryPieChart.data = PieData(pieDataSet)
-                categoryPieChart.setData {
+                binding.categoryPieChart.description.isEnabled = false
+                binding.categoryPieChart.invalidate()
+                binding.categoryPieChart.data = PieData(pieDataSet)
+                binding.categoryPieChart.setData {
                     setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                         override fun onValueSelected(entry: Entry?, h: Highlight?) {
                             val pe = entry as PieEntry
@@ -177,7 +179,7 @@ class AccountDetailFragment: BaseDetailFragment() {
     private fun setExpensesByBudget(){
         accountDetailViewModel.uniqueBudgetLiveData.observe(viewLifecycleOwner){ budgetSumList ->
             if(budgetSumList.isEmpty()){
-                budgetPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
+                binding.budgetPieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
             } else {
                 val pieEntryArray = arrayListOf<PieEntry>()
                 budgetSumList.forEach { budgetSum ->
@@ -186,12 +188,12 @@ class AccountDetailFragment: BaseDetailFragment() {
                 val pieDataSet = PieDataSet(pieEntryArray, "").apply {
                     colors = coloring
                     valueTextSize = 15f
-                    valueFormatter = PercentFormatter(budgetPieChart)
+                    valueFormatter = PercentFormatter(binding.budgetPieChart)
                 }
-                budgetPieChart.description.isEnabled = false
-                budgetPieChart.invalidate()
-                budgetPieChart.data = PieData(pieDataSet)
-                budgetPieChart.setData {
+                binding.budgetPieChart.description.isEnabled = false
+                binding.budgetPieChart.invalidate()
+                binding.budgetPieChart.data = PieData(pieDataSet)
+                binding.budgetPieChart.setData {
                     setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                         override fun onValueSelected(entry: Entry?, h: Highlight?) {
                             val pe = entry as PieEntry
@@ -212,15 +214,15 @@ class AccountDetailFragment: BaseDetailFragment() {
 
     private fun setDarkMode(){
         if(isDarkMode()){
-            categoryPieChart.legend.textColor = getCompatColor(R.color.md_white_1000)
-            budgetPieChart.legend.textColor = getCompatColor(R.color.md_white_1000)
+            binding.categoryPieChart.legend.textColor = getCompatColor(R.color.md_white_1000)
+            binding.budgetPieChart.legend.textColor = getCompatColor(R.color.md_white_1000)
         }
     }
 
     private fun setIncomeByCategory(){
         accountDetailViewModel.uniqueIncomeCategoryLiveData.observe(viewLifecycleOwner) { categorySumList ->
             if (categorySumList.isEmpty()) {
-                incomePieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
+                binding.incomePieChart.setNoDataText(resources.getString(R.string.no_data_to_generate_chart))
             } else {
                 val pieEntryArray = arrayListOf<PieEntry>()
                 categorySumList.forEach { categorySum ->
@@ -229,12 +231,12 @@ class AccountDetailFragment: BaseDetailFragment() {
                 val pieDataSet = PieDataSet(pieEntryArray, "").apply {
                     colors = coloring
                     valueTextSize = 15f
-                    valueFormatter = PercentFormatter(incomePieChart)
+                    valueFormatter = PercentFormatter(binding.incomePieChart)
                 }
-                incomePieChart.description.isEnabled = false
-                incomePieChart.invalidate()
-                incomePieChart.data = PieData(pieDataSet)
-                incomePieChart.setData {
+                binding.incomePieChart.description.isEnabled = false
+                binding.incomePieChart.invalidate()
+                binding.incomePieChart.data = PieData(pieDataSet)
+                binding.incomePieChart.setData {
                     setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                         override fun onValueSelected(entry: Entry?, h: Highlight?) {
                             val pe = entry as PieEntry
@@ -255,9 +257,9 @@ class AccountDetailFragment: BaseDetailFragment() {
     }
 
     private fun getAccountTransaction(){
-        accountTransactionList.layoutManager = LinearLayoutManager(requireContext())
-        accountTransactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        accountTransactionList.adapter = transactionAdapter
+        binding.accountTransactionList.layoutManager = LinearLayoutManager(requireContext())
+        binding.accountTransactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.accountTransactionList.adapter = transactionAdapter
         accountDetailViewModel.getTransactionList(accountId).observe(viewLifecycleOwner){ list ->
             transactionAdapter.submitData(lifecycle, list)
         }
@@ -310,5 +312,11 @@ class AccountDetailFragment: BaseDetailFragment() {
             })
             addToBackStack(null)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAccountDetailBinding = null
+        detailsCardBinding = null
     }
 }
