@@ -115,7 +115,7 @@
                     android:layout_marginBottom="12dp"/>
 
                 <include
-                    android:id="@+id/legendLayout"
+                    android:id="@+id/payDatesLegendLayout"
                     layout="@layout/calendar_day_legend"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -189,7 +189,7 @@
                     android:layout_marginBottom="12dp"/>
 
                 <include
-                    android:id="@+id/legendLayout"
+                    android:id="@+id/paidDatesLegendLayout"
                     layout="@layout/calendar_day_legend"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

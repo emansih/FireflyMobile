@@ -62,6 +62,10 @@ android {
         kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
     }
 
+    buildFeatures {
+        viewBinding true
+    }
+
     aaptOptions {
         ignoreAssetsPattern "NOTICE.txt"
     }

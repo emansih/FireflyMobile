@@ -23,8 +23,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
@@ -38,8 +36,8 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import kotlinx.android.synthetic.main.account_list_item.view.*
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.base_swipe_layout.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.account.AccountRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
@@ -51,14 +49,17 @@ import java.util.*
 class ListAccountFragment: BaseFragment() {
 
     private val accountType by lazy { arguments?.getString("accountType") ?: "" }
-    private val noAccountImage by lazy { requireActivity().findViewById<ImageView>(R.id.listImage) }
-    private val noAccountText by lazy { requireActivity().findViewById<TextView>(R.id.listText) }
     private val accountVm by lazy { getImprovedViewModel(ListAccountViewModel::class.java) }
     private val accountAdapter by lazy { AccountRecyclerAdapter { data: AccountData -> itemClicked(data) } }
 
+    private var fragmentBaseListBinding: FragmentBaseListBinding? = null
+    // Code smell !!
+    private val binding get() = fragmentBaseListBinding!!
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_base_list, container)
+        fragmentBaseListBinding = FragmentBaseListBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,7 +72,7 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun enableDragAndDrop(){
-        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+        binding.baseSwipeLayout.recyclerView.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
             if (viewHolder.itemView.accountList.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
@@ -103,38 +104,38 @@ class ListAccountFragment: BaseFragment() {
 
 
     private fun setRecyclerView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = accountAdapter
+        binding.baseSwipeLayout.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.baseSwipeLayout.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.baseSwipeLayout.recyclerView.adapter = accountAdapter
         accountAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            binding.baseSwipeLayout.swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
             if(loadStates.refresh !is LoadState.Loading) {
                 if(accountAdapter.itemCount < 1){
-                    recycler_view.isGone = true
-                    noAccountImage.isVisible = true
-                    noAccountText.isVisible = true
+                    binding.baseSwipeLayout.recyclerView.isGone = true
+                    binding.listImage.isVisible = true
+                    binding.listText.isVisible = true
                     when (accountType) {
                         "asset" -> {
-                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill))
-                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
+                            binding.listImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_money_bill))
+                            binding.listText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.asset_account))
                         }
                         "expense" -> {
-                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_shopping_cart))
-                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
+                            binding.listImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_shopping_cart))
+                            binding.listText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.expense_account))
                         }
                         "revenue" -> {
-                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_download))
-                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
+                            binding.listImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_download))
+                            binding.listText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.revenue_account))
                         }
                         "liabilities" -> {
-                            noAccountImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_ticket_alt))
-                            noAccountText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.liability_account))
+                            binding.listImage.setImageDrawable(IconicsDrawable(requireContext(), FontAwesome.Icon.faw_ticket_alt))
+                            binding.listText.text = resources.getString(R.string.no_account_found, resources.getString(R.string.liability_account))
                         }
                     }
                 } else {
-                    recycler_view.isVisible = true
-                    noAccountImage.isGone = true
-                    noAccountText.isGone = true
+                    binding.baseSwipeLayout.recyclerView.isVisible = true
+                    binding.listImage.isGone = true
+                    binding.listText.isGone = true
                 }
             }
         }
@@ -149,7 +150,7 @@ class ListAccountFragment: BaseFragment() {
     }
 
     private fun pullToRefresh(){
-        swipeContainer.setOnRefreshListener {
+        binding.baseSwipeLayout.swipeContainer.setOnRefreshListener {
             displayView()
         }
     }
@@ -186,5 +187,11 @@ class ListAccountFragment: BaseFragment() {
         super.onResume()
         activity?.activity_toolbar?.title = convertString()
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentBaseListBinding = null
+    }
+
 
 }
