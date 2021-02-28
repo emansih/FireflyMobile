@@ -40,9 +40,9 @@ import com.mikepenz.iconics.utils.sizeDp
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
-import kotlinx.android.synthetic.main.fragment_add_account.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentAddAccountBinding
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
@@ -70,23 +70,26 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
+    private var fragmentAddAccountBinding: FragmentAddAccountBinding? = null
+    private val binding get() = fragmentAddAccountBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_add_account, container)
+        fragmentAddAccountBinding = FragmentAddAccountBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        showReveal(add_account_layout)
+        showReveal(binding.addAccountLayout)
         updateData()
-        placeHolderToolbar.setNavigationOnClickListener {
+        binding.placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
         if(accountId != 0L){
-            addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+            binding.addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
-        addAccountFab.setOnClickListener {
+        binding.addAccountFab.setOnClickListener {
             submitData()
         }
     }
@@ -104,14 +107,14 @@ class AddAccountFragment: BaseAddObjectFragment() {
                     accountViewModel.uploadFile(accountId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
                         // Only show the updated files array if upload succeeds
                         if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
-                            attachment_information.adapter?.notifyDataSetChanged()
+                            binding.attachmentInformation.adapter?.notifyDataSetChanged()
                             toastSuccess("File uploaded")
                         } else {
                             toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
                         }
                     }
                 } else {
-                    attachment_information.adapter?.notifyDataSetChanged()
+                    binding.attachmentInformation.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -123,7 +126,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
-                attachment_information.adapter?.notifyDataSetChanged()
+                binding.attachmentInformation.adapter?.notifyDataSetChanged()
                 if (accountId != 0L){
                     toastInfo("Uploading...")
                     accountViewModel.uploadFile(accountId, attachmentItemAdapter)
@@ -133,81 +136,81 @@ class AddAccountFragment: BaseAddObjectFragment() {
     }
 
     override fun setIcons() {
-        currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.currencyEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_money_bill
                     colorRes = R.color.md_green_400
                     sizeDp = 24
                 },null, null, null)
-        start_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.startAmountEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_hourglass_start
                     sizeDp = 24
                     colorRes = R.color.md_red_400
                 },null, null, null)
-        start_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.startDateEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_calendar
                     colorRes = R.color.md_blue_400
                     sizeDp = 24
                 },null, null, null)
-        interest_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.interestEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_percent
                     colorRes = R.color.md_amber_700
                     sizeDp = 24
                 },null, null, null)
-        iban_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.ibanEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_list_numbered
                     colorRes = R.color.md_deep_orange_900
                     sizeDp = 24
                 },null, null, null)
-        bic_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.bicEdittext.setCompoundDrawablesWithIntrinsicBounds(
                             IconicsDrawable(requireContext()).apply {
                                 icon = GoogleMaterial.Icon.gmd_transfer_within_a_station
                                 colorRes = R.color.md_deep_orange_400
                                 sizeDp = 24
                             },null, null, null)
-        account_number_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.accountNumberEdittext.setCompoundDrawablesWithIntrinsicBounds(
                             IconicsDrawable(requireContext()).apply {
                                 icon = GoogleMaterial.Icon.gmd_confirmation_number
                                 colorRes = R.color.md_brown_600
                                 sizeDp = 24
                             },null, null, null)
-        opening_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.openingBalanceEdittext.setCompoundDrawablesWithIntrinsicBounds(
                             IconicsDrawable(requireContext()).apply {
                                 icon = GoogleMaterial.Icon.gmd_open_with
                                 colorRes = R.color.md_red_A100
                                 sizeDp = 24
                             },null, null, null)
-        opening_balance_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.openingBalanceDateEdittext.setCompoundDrawablesWithIntrinsicBounds(
                             IconicsDrawable(requireContext()).apply {
                                 icon = FontAwesome.Icon.faw_calendar
                                 colorRes = R.color.md_blue_400
                                 sizeDp = 24
                             },null, null, null)
-        virtual_balance_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.virtualBalanceEdittext.setCompoundDrawablesWithIntrinsicBounds(
                             IconicsDrawable(requireContext()).apply {
                                 icon = FontAwesome.Icon.faw_balance_scale
                                 colorRes = R.color.md_light_blue_A200
                                 sizeDp = 24
                             },null, null, null)
-        addAccountFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
-        addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.addAccountFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
+        binding.addAccountFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
-        add_attachment_button.setOnClickListener {
+        binding.addAttachmentButton.setOnClickListener {
             attachmentDialog()
         }
-        attachment_information.layoutManager = LinearLayoutManager(requireContext())
-        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+        binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+        binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                 false, { data: AttachmentData ->
             attachmentDataAdapter.remove(data)
-            attachment_information.adapter?.notifyDataSetChanged()
+            binding.attachmentInformation.adapter?.notifyDataSetChanged()
         }) { another: Int -> }
     }
 
@@ -241,7 +244,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
     }
 
     private fun setAccordion(){
-        expansionLayout.addListener { _, expanded ->
+        binding.expansionLayout.addListener { _, expanded ->
             if(expanded){
                 showHiddenHelpText()
             }
@@ -254,52 +257,52 @@ class AddAccountFragment: BaseAddObjectFragment() {
             accountViewModel.currency = currency
         }
         currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
-            currency_edittext.setText(it)
+            binding.currencyEdittext.setText(it)
         }
-        currency_edittext.setOnClickListener{
+        binding.currencyEdittext.setOnClickListener{
             val currencyListFragment = CurrencyListBottomSheet()
             currencyListFragment.show(childFragmentManager, "currencyList" )
         }
         if(accountId == 0L) {
             accountViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
                 val currencyData = defaultCurrency.currencyAttributes
-                currency_edittext.setText(currencyData.name + " (" + currencyData.code + ")")
+                binding.currencyEdittext.setText(currencyData.name + " (" + currencyData.code + ")")
             }
         }
         if(accountType == "asset"){
-            opening_balance_date_layout.isVisible = true
-            opening_balance_date_edittext.setOnClickListener {
+            binding.openingBalanceDateLayout.isVisible = true
+            binding.openingBalanceDateEdittext.setOnClickListener {
                 val materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 val picker = materialDatePicker.build()
                 picker.show(childFragmentManager, picker.toString())
                 picker.addOnPositiveButtonClickListener { time ->
-                    opening_balance_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+                    binding.openingBalanceDateEdittext.setText(DateTimeUtil.getCalToString(time.toString()))
                 }
             }
-            virtual_balance_layout.isVisible = true
-            opening_balance_layout.isVisible = true
-            accountRoleSpinner.isVisible = true
-            currency_layout.isVisible = true
+            binding.virtualBalanceLayout.isVisible = true
+            binding.openingBalanceLayout.isVisible = true
+            binding.accountRoleSpinner.isVisible = true
+            binding.currencyLayout.isVisible = true
         }
         if(accountType == "liabilities"){
-            currency_layout.isVisible = true
-            liabilityTypeSpinner.isVisible = true
-            start_amount_layout.isVisible = true
-            start_date_layout.isVisible = true
-            start_amount_text.isVisible = true
-            start_date_edittext.setOnClickListener {
+            binding.currencyLayout.isVisible = true
+            binding.liabilityTypeSpinner.isVisible = true
+            binding.startAmountLayout.isVisible = true
+            binding.startDateLayout.isVisible = true
+            binding.startAmountText.isVisible = true
+            binding.startDateEdittext.setOnClickListener {
                 val materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 val picker = materialDatePicker.build()
                 picker.show(childFragmentManager, picker.toString())
                 picker.addOnPositiveButtonClickListener { time ->
-                    start_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+                    binding.startDateEdittext.setText(DateTimeUtil.getCalToString(time.toString()))
                 }
             }
-            interest_layout.isVisible = true
-            interestPeriodSpinner.isVisible = true
+            binding.interestLayout.isVisible = true
+            binding.interestPeriodSpinner.isVisible = true
         }
-        includeInNetWorthText.setOnClickListener {
-            includeInNetWorthCheck.performClick()
+        binding.includeInNetWorthText.setOnClickListener {
+            binding.includeInNetWorthCheck.performClick()
         }
         accountViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
             if(loader){
@@ -308,111 +311,111 @@ class AddAccountFragment: BaseAddObjectFragment() {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         }
-        note_edittext.setOnClickListener {
-            markdownViewModel.markdownText.postValue(note_edittext.getString())
+        binding.noteEdittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(binding.noteEdittext.getString())
             parentFragmentManager.commit {
                 add(R.id.bigger_fragment_container, MarkdownFragment())
                 addToBackStack(null)
             }
         }
         markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
-            note_edittext.setText(markdownText)
+            binding.noteEdittext.setText(markdownText)
         }
     }
 
     override fun submitData() {
-        val netWorth = includeInNetWorthCheck.isChecked
-        val accountRoleSpinner: String? = if(accountRoleSpinner.isVisible){
+        val netWorth = binding.includeInNetWorthCheck.isChecked
+        val accountRoleSpinner: String? = if(binding.accountRoleSpinner.isVisible){
             when {
-                accountRoleSpinner.selectedItemPosition == 0 -> "defaultAsset"
-                accountRoleSpinner.selectedItemPosition == 1 -> "sharedAsset"
-                accountRoleSpinner.selectedItemPosition == 2 -> "savingAsset"
-                accountRoleSpinner.selectedItemPosition == 3 -> "ccAsset"
+                binding.accountRoleSpinner.selectedItemPosition == 0 -> "defaultAsset"
+                binding.accountRoleSpinner.selectedItemPosition == 1 -> "sharedAsset"
+                binding.accountRoleSpinner.selectedItemPosition == 2 -> "savingAsset"
+                binding.accountRoleSpinner.selectedItemPosition == 3 -> "ccAsset"
                 else -> "cashWalletAsset "
             }
         } else {
             null
         }
-        val iBanString = if (iban_edittext.isBlank()) {
+        val iBanString = if (binding.ibanEdittext.isBlank()) {
             null
         } else {
-            iban_edittext.getString()
+            binding.ibanEdittext.getString()
         }
-        val bicString = if (bic_edittext.isBlank()) {
+        val bicString = if (binding.bicEdittext.isBlank()) {
             null
         } else {
-            bic_edittext.getString()
+            binding.bicEdittext.getString()
         }
-        val accountNumberString = if (account_number_edittext.isBlank()) {
+        val accountNumberString = if (binding.accountNumberEdittext.isBlank()) {
             null
         } else {
-            account_number_edittext.getString()
+            binding.accountNumberEdittext.getString()
         }
-        val openingBalanceValue: String? = if(opening_balance_layout.isVisible){
-            opening_balance_edittext.getString()
-        } else {
-            null
-        }
-        val openingBalanceDate: String? = if(opening_balance_date_layout.isVisible){
-            opening_balance_date_edittext.getString()
+        val openingBalanceValue: String? = if(binding.openingBalanceLayout.isVisible){
+            binding.openingBalanceEdittext.getString()
         } else {
             null
         }
-        val virtualBalanceString: String? = if(virtual_balance_layout.isVisible){
-            virtual_balance_edittext.getString()
+        val openingBalanceDate: String? = if(binding.openingBalanceDateLayout.isVisible){
+            binding.openingBalanceDateEdittext.getString()
         } else {
             null
         }
-        val notesText = if (note_edittext.isBlank()) {
+        val virtualBalanceString: String? = if(binding.virtualBalanceLayout.isVisible){
+            binding.virtualBalanceEdittext.getString()
+        } else {
+            null
+        }
+        val notesText = if (binding.noteEdittext.isBlank()) {
             null
         } else {
-            note_edittext.getString()
+            binding.noteEdittext.getString()
         }
-        val currencyToBeSubmitted = if(currency_layout.isVisible && accountViewModel.currency.isNotBlank()){
+        val currencyToBeSubmitted = if(binding.currencyLayout.isVisible && accountViewModel.currency.isNotBlank()){
             accountViewModel.currency
         } else {
             null
         }
-        val liabilityType: String? = if(liabilityTypeSpinner.isVisible){
+        val liabilityType: String? = if(binding.liabilityTypeSpinner.isVisible){
             when {
-                liabilityTypeSpinner.selectedItemPosition == 0 -> "debt"
-                liabilityTypeSpinner.selectedItemPosition == 1 -> "loan"
+                binding.liabilityTypeSpinner.selectedItemPosition == 0 -> "debt"
+                binding.liabilityTypeSpinner.selectedItemPosition == 1 -> "loan"
                 else -> "mortgage"
             }
         } else {
             null
         }
-        val startAmountOfDebt: String? = if(start_amount_layout.isVisible){
-            start_amount_edittext.getString()
+        val startAmountOfDebt: String? = if(binding.startAmountLayout.isVisible){
+            binding.startAmountEdittext.getString()
         } else {
             null
         }
-        val startAmountDay: String? = if(start_date_layout.isVisible){
-            start_date_edittext.getString()
+        val startAmountDay: String? = if(binding.startDateLayout.isVisible){
+            binding.startDateEdittext.getString()
         } else {
             null
         }
-        val interestAmount: String? = if(interest_layout.isVisible){
-            interest_edittext.getString()
+        val interestAmount: String? = if(binding.interestLayout.isVisible){
+            binding.interestEdittext.getString()
         } else {
             null
         }
-        val interestPeriod: String? = if(interestPeriodSpinner.isVisible){
+        val interestPeriod: String? = if(binding.interestPeriodSpinner.isVisible){
             when {
-                interestPeriodSpinner.selectedItemPosition == 0 -> "daily"
-                interestPeriodSpinner.selectedItemPosition == 1 -> "monthly"
+                binding.interestPeriodSpinner.selectedItemPosition == 0 -> "daily"
+                binding.interestPeriodSpinner.selectedItemPosition == 1 -> "monthly"
                 else -> "yearly"
             }
         } else {
             null
         }
         if(accountId == 0L){
-            addAccount(description_edittext.getString(), accountType, currencyToBeSubmitted,
+            addAccount(binding.descriptionEdittext.getString(), accountType, currencyToBeSubmitted,
                     iBanString, bicString, accountNumberString, openingBalanceValue, openingBalanceDate,
                     accountRoleSpinner, virtualBalanceString, netWorth, notesText, liabilityType, startAmountOfDebt,
                     startAmountDay, interestAmount, interestPeriod)
         } else {
-            updateAccount(description_edittext.getString(), accountType, currencyToBeSubmitted,
+            updateAccount(binding.descriptionEdittext.getString(), accountType, currencyToBeSubmitted,
                     iBanString, bicString, accountNumberString, openingBalanceValue, openingBalanceDate,
                     accountRoleSpinner, virtualBalanceString, netWorth, notesText, liabilityType, startAmountOfDebt,
                     startAmountDay, interestAmount, interestPeriod)
@@ -460,48 +463,48 @@ class AddAccountFragment: BaseAddObjectFragment() {
         if(accountId != 0L){
             accountViewModel.getAccountById(accountId).observe(viewLifecycleOwner) { accountData ->
                 val accountAttributes = accountData.accountAttributes
-                description_edittext.setText(accountAttributes.name)
-                currency_edittext.setText(accountAttributes.currency_code + " (" + accountAttributes.currency_symbol + " )")
+                binding.descriptionEdittext.setText(accountAttributes.name)
+                binding.currencyEdittext.setText(accountAttributes.currency_code + " (" + accountAttributes.currency_symbol + " )")
                 accountViewModel.currency = accountAttributes.currency_code ?: ""
                 val liabilityType = accountAttributes.liability_type
                 if(liabilityType != null){
                     when (liabilityType) {
-                        "debt" -> liabilityTypeSpinner.setSelection(0)
-                        "loan" -> liabilityTypeSpinner.setSelection(1)
-                        "mortgage" -> liabilityTypeSpinner.setSelection(2)
+                        "debt" -> binding.liabilityTypeSpinner.setSelection(0)
+                        "loan" -> binding.liabilityTypeSpinner.setSelection(1)
+                        "mortgage" -> binding.liabilityTypeSpinner.setSelection(2)
                     }
                 }
-                start_amount_edittext.setText(accountAttributes.liability_amount)
-                start_date_edittext.setText(accountAttributes.liability_start_date)
-                interest_edittext.setText(accountAttributes.interest)
+                binding.startAmountEdittext.setText(accountAttributes.liability_amount)
+                binding.startDateEdittext.setText(accountAttributes.liability_start_date)
+                binding.interestEdittext.setText(accountAttributes.interest)
                 val interestPeriod = accountAttributes.interest_period
                 if(interestPeriod != null){
                     when(interestPeriod){
-                        "daily" -> interestPeriodSpinner.setSelection(0)
-                        "monthly" -> interestPeriodSpinner.setSelection(1)
-                        "yearly" -> interestPeriodSpinner.setSelection(2)
+                        "daily" -> binding.interestPeriodSpinner.setSelection(0)
+                        "monthly" -> binding.interestPeriodSpinner.setSelection(1)
+                        "yearly" -> binding.interestPeriodSpinner.setSelection(2)
                     }
                 }
-                iban_edittext.setText(accountAttributes.iban)
-                bic_edittext.setText(accountAttributes.bic)
-                account_number_edittext.setText(accountAttributes.account_number)
+                binding.ibanEdittext.setText(accountAttributes.iban)
+                binding.bicEdittext.setText(accountAttributes.bic)
+                binding.accountNumberEdittext.setText(accountAttributes.account_number)
                 if(accountAttributes.include_net_worth){
-                    includeInNetWorthCheck.performClick()
+                    binding.includeInNetWorthCheck.performClick()
                 }
-                opening_balance_edittext.setText(accountAttributes.opening_balance.toString())
-                opening_balance_date_edittext.setText(accountAttributes.opening_balance_date)
+                binding.openingBalanceEdittext.setText(accountAttributes.opening_balance.toString())
+                binding.openingBalanceDateEdittext.setText(accountAttributes.opening_balance_date)
                 val accountRole = accountAttributes.account_role
                 if(accountRole != null){
                     when(accountRole){
-                        "defaultAsset" -> accountRoleSpinner.setSelection(0)
-                        "sharedAsset" -> accountRoleSpinner.setSelection(1)
-                        "savingAsset" -> accountRoleSpinner.setSelection(2)
-                        "ccAsset" -> accountRoleSpinner.setSelection(3)
-                        "cashWalletAsset" -> accountRoleSpinner.setSelection(4)
+                        "defaultAsset" -> binding.accountRoleSpinner.setSelection(0)
+                        "sharedAsset" -> binding.accountRoleSpinner.setSelection(1)
+                        "savingAsset" -> binding.accountRoleSpinner.setSelection(2)
+                        "ccAsset" -> binding.accountRoleSpinner.setSelection(3)
+                        "cashWalletAsset" -> binding.accountRoleSpinner.setSelection(4)
                     }
                 }
-                virtual_balance_edittext.setText(accountAttributes.virtual_balance.toString())
-                note_edittext.setText(accountAttributes.notes)
+                binding.virtualBalanceEdittext.setText(accountAttributes.virtual_balance.toString())
+                binding.noteEdittext.setText(accountAttributes.notes)
             }
             displayAttachment()
         } else {
@@ -513,9 +516,9 @@ class AddAccountFragment: BaseAddObjectFragment() {
         accountViewModel.accountAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
-                attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+                binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                         false, { data: AttachmentData ->
                     AlertDialog.Builder(requireContext())
                             .setTitle(getString(R.string.are_you_sure))
@@ -523,7 +526,7 @@ class AddAccountFragment: BaseAddObjectFragment() {
                                 accountViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
                                     if(isSuccessful){
                                         attachmentDataAdapter.remove(data)
-                                        attachment_information.adapter?.notifyDataSetChanged()
+                                        binding.attachmentInformation.adapter?.notifyDataSetChanged()
                                         toastSuccess("Deleted " + data.attachmentAttributes.filename)
                                     } else {
                                         toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
@@ -539,27 +542,33 @@ class AddAccountFragment: BaseAddObjectFragment() {
     private fun showHelpText(){
         FancyShowCaseQueue()
                 .add(showCase(R.string.add_account_currency_help_text,
-                        "addAccountCurrencyCaseView", currency_layout)).show()
+                        "addAccountCurrencyCaseView", binding.currencyLayout)).show()
     }
 
     private fun showHiddenHelpText(){
-        if(iban_layout.isVisible && expansionLayout.isExpanded) {
+        if(binding.ibanLayout.isVisible && binding.expansionLayout.isExpanded) {
             val queue = FancyShowCaseQueue()
-            queue.add(showCase(R.string.iban_help_text, "ibanCaseView", iban_layout, true))
-            if(opening_balance_layout.isVisible){
-                queue.add(showCase(R.string.opening_balance_help_text, "openingBalanceCaseView", opening_balance_layout))
+            queue.add(showCase(R.string.iban_help_text, "ibanCaseView",
+                    binding.ibanLayout, true))
+            if(binding.openingBalanceLayout.isVisible){
+                queue.add(showCase(R.string.opening_balance_help_text, "openingBalanceCaseView",
+                        binding.openingBalanceLayout))
             }
-            if(virtual_balance_layout.isVisible) {
+            if(binding.virtualBalanceLayout.isVisible) {
                 queue.add(showCase(R.string.virtual_balance_help_text, "virtualBalanceCaseView",
-                        virtual_balance_layout))
+                        binding.virtualBalanceLayout))
             }
             queue.show()
         }
     }
     
     private fun handleBack() {
-        unReveal(add_account_layout)
+        unReveal(binding.addAccountLayout)
         markdownViewModel.markdownText.postValue("")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAddAccountBinding = null
+    }
 }

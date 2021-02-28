@@ -100,4 +100,10 @@ class AccountSearchDialog: BaseDialog() {
         displayView()
         searchData()
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        baseSwipe = null
+        dialogSearchBinding = null
+    }
 }
