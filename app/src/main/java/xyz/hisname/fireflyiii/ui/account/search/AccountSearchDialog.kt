@@ -28,13 +28,11 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.dialog_search.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.DialogSearchBinding
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.account.AccountRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
-import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class AccountSearchDialog: BaseDialog() {
@@ -43,27 +41,33 @@ class AccountSearchDialog: BaseDialog() {
     private val accountSearchViewModel by lazy { getViewModel(AccountSearchViewModel::class.java) }
     private val accountAdapter by lazy { AccountRecyclerAdapter { data: AccountData -> itemClicked(data)} }
     private lateinit var initialData: PagingData<AccountData>
+    private var dialogSearchBinding: DialogSearchBinding? = null
+    private val binding get() = dialogSearchBinding!!
+    private var baseSwipe: BaseSwipeLayoutBinding? = null
+    private val baseSwipeBinding get() = baseSwipe!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.dialog_search, container)
+        dialogSearchBinding = DialogSearchBinding.inflate(inflater, container, false)
+        baseSwipe = binding.dialogSearchSwipeLayout
+        val view = binding.root
+        return view
     }
 
     private fun displayView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = accountAdapter
+        baseSwipeBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        baseSwipeBinding.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        baseSwipeBinding.recyclerView.adapter = accountAdapter
         accountSearchViewModel.getAccountList(accountType).observe(viewLifecycleOwner){ pagingData ->
             initialData = pagingData
             accountAdapter.submitData(lifecycle, pagingData)
         }
         accountAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner) { loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            baseSwipeBinding.swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
         }
     }
 
     private fun searchData(){
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean{
                 accountSearchViewModel.accountName.postValue(query)
                 dialog?.dismiss()
