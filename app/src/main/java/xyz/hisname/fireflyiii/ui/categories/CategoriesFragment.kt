@@ -32,8 +32,6 @@ import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.fragment_base_list.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
@@ -41,7 +39,9 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.category_list_item.view.*
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.CategoryListItemBinding
+import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
 import xyz.hisname.fireflyiii.util.extension.*
 
 
@@ -49,10 +49,15 @@ class CategoriesFragment: BaseFragment() {
 
     private val categoryAdapter by lazy { CategoriesRecyclerAdapter { data: CategoryData -> itemClicked(data) }  }
     private val categoryViewModel by lazy { getImprovedViewModel(CategoryListViewModel::class.java) }
+    private var fragmentBaseListBinding: FragmentBaseListBinding? = null
+    private val binding get() = fragmentBaseListBinding!!
+    private var baseSwipeLayoutBinding: BaseSwipeLayoutBinding? = null
+    private val baseSwipeBinding get() = baseSwipeLayoutBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_base_list, container)
+        fragmentBaseListBinding = FragmentBaseListBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,19 +65,20 @@ class CategoriesFragment: BaseFragment() {
         displayView()
         initFab()
         pullToRefresh()
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = categoryAdapter
+        baseSwipeBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        baseSwipeBinding.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        baseSwipeBinding.recyclerView.adapter = categoryAdapter
         enableDragAndDrop()
     }
 
     private fun enableDragAndDrop(){
-        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-            if (viewHolder.itemView.categoryList.isOverlapping(extendedFab)){
+        baseSwipeBinding.recyclerView.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            val categoryListBinding = CategoryListItemBinding.bind(viewHolder.itemView)
+            if (categoryListBinding.categoryList.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
-                    val categoryName = viewHolder.itemView.categoryName.text.toString()
-                    val categoryId = viewHolder.itemView.categoryId.text.toString()
+                    val categoryName = categoryListBinding.categoryName.text.toString()
+                    val categoryId = categoryListBinding.categoryId.text.toString()
                     categoryViewModel.deleteCategory(categoryId).observe(viewLifecycleOwner){ isDeleted ->
                         categoryAdapter.refresh()
                         if(isDeleted){
@@ -91,21 +97,21 @@ class CategoriesFragment: BaseFragment() {
             categoryAdapter.submitData(lifecycle, pagingData)
         }
         categoryAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner) { loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            baseSwipeBinding.swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
             if(loadStates.refresh !is LoadState.Loading) {
                 if (categoryAdapter.itemCount < 1) {
-                    recycler_view.isGone = true
-                    listImage.isVisible = true
-                    listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                    baseSwipeBinding.recyclerView.isGone = true
+                    binding.listImage.isVisible = true
+                    binding.listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
                         icon = FontAwesome.Icon.faw_list
                         sizeDp = 24
                     })
-                    listText.isVisible = true
-                    listText.text = "No Categories Found"
+                    binding.listText.isVisible = true
+                    binding.listText.text = "No Categories Found"
                 } else {
-                    recycler_view.isVisible = true
-                    listImage.isGone = true
-                    listText.isGone = true
+                    baseSwipeBinding.recyclerView.isVisible = true
+                    binding.listImage.isGone = true
+                    binding.listText.isGone = true
                 }
             }
         }
@@ -131,7 +137,7 @@ class CategoriesFragment: BaseFragment() {
     }
 
     private fun pullToRefresh(){
-        swipeContainer.setOnRefreshListener {
+        baseSwipeBinding.swipeContainer.setOnRefreshListener {
             categoryAdapter.refresh()
         }
     }

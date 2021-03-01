@@ -31,9 +31,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
-import kotlinx.android.synthetic.main.fragment_category_detail.*
-import kotlinx.android.synthetic.main.fragment_category_detail.transactionList
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentCategoryDetailBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionSeparatorAdapter
@@ -47,10 +46,13 @@ class CategoryDetailsFragment: BaseDetailFragment() {
     private val categoryDetailViewModel by lazy { getImprovedViewModel(CategoryDetailViewModel::class.java) }
     private lateinit var categoryName: String
     private val categoryId by lazy { arguments?.getLong("categoryId")  ?: 0 }
+    private var fragmentCategoryDetailBinding: FragmentCategoryDetailBinding? = null
+    private val binding get() = fragmentCategoryDetailBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_category_detail, container)
+        fragmentCategoryDetailBinding = FragmentCategoryDetailBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,12 +63,12 @@ class CategoryDetailsFragment: BaseDetailFragment() {
     private fun setWidget(){
         categoryDetailViewModel.getCategoryById(categoryId).observe(viewLifecycleOwner){ categoryData ->
             categoryName = categoryData.categoryAttributes.name
-            durationText.text = getString(R.string.chart_category_in_period, categoryName,
+            binding.durationText.text = getString(R.string.chart_category_in_period, categoryName,
                     DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
             if(categoryData.categoryAttributes.notes.isNullOrEmpty()){
-                notesCard.isGone = true
+                binding.notesCard.isGone = true
             } else {
-                notesText.text = categoryData.categoryAttributes.notes.toMarkDown()
+                binding.notesText.text = categoryData.categoryAttributes.notes.toMarkDown()
             }
         }
         setBarChart()
@@ -98,7 +100,7 @@ class CategoryDetailsFragment: BaseDetailFragment() {
                 color = Color.GREEN
                 valueTextSize = 12f
             }
-            categoryChart.apply {
+            binding.categoryChart.apply {
                 description.isEnabled = false
                 /*
                  * 20 Nov 2020,  MPAndroidChart(v3.1.0)
@@ -135,9 +137,9 @@ class CategoryDetailsFragment: BaseDetailFragment() {
 
     private fun loadTransactionList(){
         val transactionAdapter = TransactionSeparatorAdapter{ data -> itemClicked(data) }
-        transactionList.layoutManager = LinearLayoutManager(requireContext())
-        transactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        transactionList.adapter = transactionAdapter
+        binding.transactionList.layoutManager = LinearLayoutManager(requireContext())
+        binding.transactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.transactionList.adapter = transactionAdapter
         categoryDetailViewModel.getTransactionList().observe(viewLifecycleOwner){ transactionList ->
             transactionAdapter.submitData(lifecycle, transactionList)
         }
@@ -154,10 +156,10 @@ class CategoryDetailsFragment: BaseDetailFragment() {
 
     private fun setColor(){
         if(globalViewModel.isDark){
-            categoryChart.legend.textColor = getCompatColor(R.color.md_white_1000)
-            categoryChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
-            categoryChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
-            categoryChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
+            binding.categoryChart.legend.textColor = getCompatColor(R.color.md_white_1000)
+            binding.categoryChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
+            binding.categoryChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
+            binding.categoryChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
         }
 
     }

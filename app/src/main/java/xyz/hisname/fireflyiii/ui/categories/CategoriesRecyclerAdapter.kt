@@ -19,24 +19,23 @@
 package xyz.hisname.fireflyiii.ui.categories
 
 import android.content.Context
-import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.category_list_item.view.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.CategoryListItemBinding
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
-import xyz.hisname.fireflyiii.util.extension.inflate
 
 class CategoriesRecyclerAdapter(private val clickListener:(CategoryData) -> Unit):
         PagingDataAdapter<CategoryData, CategoriesRecyclerAdapter.CategoryHolder>(DIFF_CALLBACK) {
 
     private lateinit var context: Context
+    private var categoryListItemBinding: CategoryListItemBinding? = null
+    private val binding get() = categoryListItemBinding!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryHolder {
         context = parent.context
-        return CategoryHolder(parent.inflate(R.layout.category_list_item))
+        return CategoryHolder(binding)
     }
 
     override fun onBindViewHolder(holder: CategoryHolder, position: Int){
@@ -45,12 +44,12 @@ class CategoriesRecyclerAdapter(private val clickListener:(CategoryData) -> Unit
         }
     }
 
-    inner class CategoryHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class CategoryHolder(itemView: CategoryListItemBinding): RecyclerView.ViewHolder(itemView.root) {
         fun bind(categoryData: CategoryData, clickListener: (CategoryData) -> Unit) {
             val categoryDataSet = categoryData.categoryAttributes
-            itemView.categoryName.text = categoryDataSet.name
-            itemView.categoryId.text = categoryData.categoryId.toString()
-            itemView.setOnClickListener { clickListener(categoryData) }
+            binding.categoryName.text = categoryDataSet.name
+            binding.categoryId.text = categoryData.categoryId.toString()
+            binding.root.setOnClickListener { clickListener(categoryData) }
         }
     }
 

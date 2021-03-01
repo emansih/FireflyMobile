@@ -26,12 +26,10 @@ import android.widget.SearchView
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.dialog_search.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.DialogSearchBinding
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
-import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class CategoriesDialog: BaseDialog(){
@@ -39,16 +37,22 @@ class CategoriesDialog: BaseDialog(){
     private val categoryAdapter by lazy { CategoriesRecyclerAdapter { data: CategoryData -> itemClicked(data) }  }
     private val categoryViewModel by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
     private lateinit var initialData: PagingData<CategoryData>
+    private var dialogSearchBinding: DialogSearchBinding? = null
+    private val binding get() = dialogSearchBinding!!
+    private var swipeLayoutBinding: BaseSwipeLayoutBinding? = null
+    private val swipeBinding get() = swipeLayoutBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.dialog_search, container)
+        dialogSearchBinding = DialogSearchBinding.inflate(inflater, container, false)
+        val view = binding.root
+        swipeLayoutBinding = binding.dialogSearchSwipeLayout
+        return view
     }
 
     private fun setRecyclerView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = categoryAdapter
+        swipeBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        swipeBinding.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        swipeBinding.recyclerView.adapter = categoryAdapter
     }
 
     private fun displayView(){
@@ -59,7 +63,7 @@ class CategoriesDialog: BaseDialog(){
     }
 
     private fun searchData(){
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean{
                 categoryViewModel.categoryName.postValue(query)
                 dialog?.dismiss()
@@ -91,4 +95,9 @@ class CategoriesDialog: BaseDialog(){
         displayView()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        dialogSearchBinding = null
+        swipeLayoutBinding = null
+    }
 }

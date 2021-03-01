@@ -23,8 +23,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.fragment_add_category.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentAddCategoryBinding
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.util.extension.*
 
@@ -34,10 +34,13 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
     private val categoryViewModel by lazy { getImprovedViewModel(AddCategoryViewModel::class.java) }
     private val categoryId by lazy { arguments?.getLong("categoryId")  ?: 0 }
     private val progressLayout by bindView<View>(R.id.progress_overlay)
+    private var fragmentAddCategoryBinding: FragmentAddCategoryBinding? = null
+    private val binding get() = fragmentAddCategoryBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_add_category, container)
+        fragmentAddCategoryBinding = FragmentAddCategoryBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,7 +48,7 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
         setWidgets()
         if(categoryId != 0L){
             categoryViewModel.getCategoryById(categoryId).observe(viewLifecycleOwner){ categoryData ->
-                category_name.setText(categoryData.categoryAttributes.name)
+                binding.categoryName.setText(categoryData.categoryAttributes.name)
             }
         }
     }
@@ -60,7 +63,7 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
     }
 
     private fun setWidgets(){
-        submitCategory.setOnClickListener {
+        binding.submitCategory.setOnClickListener {
             hideKeyboard()
             if(categoryId != 0L){
                 updateData()
@@ -79,7 +82,7 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
     }
 
     private fun updateData(){
-        categoryViewModel.updateCategory(categoryId, category_name.getString()).observe(viewLifecycleOwner){ response ->
+        categoryViewModel.updateCategory(categoryId, binding.categoryName.getString()).observe(viewLifecycleOwner){ response ->
             if(response.first){
                 toastSuccess(response.second)
                 dismiss()
@@ -90,7 +93,7 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
     }
 
     private fun submitData(){
-        categoryViewModel.addCategory(category_name.getString()).observe(viewLifecycleOwner) { response ->
+        categoryViewModel.addCategory(binding.categoryName.getString()).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
                 dismiss()
@@ -98,5 +101,10 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
                 toastInfo(response.second)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAddCategoryBinding = null
     }
 }
