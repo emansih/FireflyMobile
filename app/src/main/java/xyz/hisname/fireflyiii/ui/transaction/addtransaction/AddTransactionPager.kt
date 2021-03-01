@@ -140,6 +140,6 @@ class AddTransactionPager: BaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        addTransactionViewModel.numTabs = 0
+        requireActivity().viewModelStore.clear()
     }
 }

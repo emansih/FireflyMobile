@@ -3,3 +3,4 @@
 
 Fix:
 - Fix transaction screen not going back to dashboard when clicking back button
+- Fix an issue where old data will appear when adding transaction
