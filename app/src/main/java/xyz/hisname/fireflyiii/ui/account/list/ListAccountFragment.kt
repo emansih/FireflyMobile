@@ -34,9 +34,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import kotlinx.android.synthetic.main.account_list_item.view.*
 import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.AccountListItemBinding
 import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.ui.account.AccountRecyclerAdapter
@@ -53,7 +53,6 @@ class ListAccountFragment: BaseFragment() {
     private val accountAdapter by lazy { AccountRecyclerAdapter { data: AccountData -> itemClicked(data) } }
 
     private var fragmentBaseListBinding: FragmentBaseListBinding? = null
-    // Code smell !!
     private val binding get() = fragmentBaseListBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -73,11 +72,12 @@ class ListAccountFragment: BaseFragment() {
 
     private fun enableDragAndDrop(){
         binding.baseSwipeLayout.recyclerView.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-            if (viewHolder.itemView.accountList.isOverlapping(extendedFab)){
+            val accountListBinding = AccountListItemBinding.bind(viewHolder.itemView)
+            if (accountListBinding.accountList.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
-                    val accountName = viewHolder.itemView.accountNameText.text.toString()
-                    val accountId = viewHolder.itemView.accountId.text.toString()
+                    val accountName = accountListBinding.accountNameText.text.toString()
+                    val accountId = accountListBinding.accountId.text.toString()
                     accountVm.deleteAccountByName(accountId).observe(viewLifecycleOwner){ isDeleted ->
                         accountAdapter.refresh()
                         if(isDeleted){
