@@ -1,14 +1,5 @@
-What's new:
-- Only show bills that are not paid instead of all bills 
-- Smaller margin in between edit text in add piggy bank screen 
-- Smaller margin in add bill screen
-- Show notes in piggy bank details
-- Show percentage in piggy bank list
-- When adding / updating a piggy bank, the account drop down menu will show the currently in your asset account.
 
 
-Fixes:
-- Fix incorrect number of bills shown in nav drawer
 
-
-Stay tuned to the Google Play App page as I will be enabling beta testing on it soon. 
+Fix:
+- Fix transaction screen not going back to dashboard when clicking back button

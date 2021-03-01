@@ -469,6 +469,15 @@ class HomeActivity: BaseActivity(){
                     if (supportFragmentManager.findFragmentByTag("dash") is DashboardFragment) {
                         finish()
                     } else {
+                        // This is a dirty hack!
+                        supportFragmentManager.fragments.forEach { fragment ->
+                            if(fragment is TransactionFragment){
+                                supportFragmentManager.beginTransaction()
+                                        .replace(R.id.fragment_container,
+                                                DashboardFragment(), "dash")
+                                        .commit()
+                            }
+                        }
                         slider.setSelection(1)
                     }
                 }
