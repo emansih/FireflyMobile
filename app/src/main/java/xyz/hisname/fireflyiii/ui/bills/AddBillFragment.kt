@@ -422,4 +422,8 @@ class AddBillFragment: BaseAddObjectFragment() {
         markdownViewModel.markdownText.postValue("")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAddBillBinding = null
+    }
 }

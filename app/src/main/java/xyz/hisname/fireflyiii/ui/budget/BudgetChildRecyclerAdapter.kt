@@ -20,22 +20,24 @@ package xyz.hisname.fireflyiii.ui.budget
 
 import android.animation.ObjectAnimator
 import android.graphics.Color
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.child_budget_list_item.view.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.ChildBudgetListItemBinding
 import xyz.hisname.fireflyiii.repository.models.budget.ChildIndividualBudget
-import xyz.hisname.fireflyiii.util.extension.inflate
 
 class BudgetChildRecyclerAdapter(private val budgetData: List<ChildIndividualBudget>,
                                  private val clickListener:(ChildIndividualBudget) -> Unit):
         RecyclerView.Adapter<BudgetChildRecyclerAdapter.BudgetChildHolder>() {
 
+    private var childBudgetListItemBinding: ChildBudgetListItemBinding? = null
+    private val binding get() = childBudgetListItemBinding!!
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetChildHolder {
-        return BudgetChildHolder(parent.inflate(R.layout.child_budget_list_item))
+        childBudgetListItemBinding = ChildBudgetListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return BudgetChildHolder(binding)
     }
 
     override fun onBindViewHolder(holder: BudgetChildHolder, position: Int) {
@@ -45,11 +47,11 @@ class BudgetChildRecyclerAdapter(private val budgetData: List<ChildIndividualBud
     override fun getItemCount() = budgetData.size
 
 
-    inner class BudgetChildHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class BudgetChildHolder(itemView: ChildBudgetListItemBinding): RecyclerView.ViewHolder(itemView.root) {
         fun bind(budget: ChildIndividualBudget) {
-            itemView.userBudget.text = budget.currencySymbol + budget.budgetSpent + " / " +
+            binding.userBudget.text = budget.currencySymbol + budget.budgetSpent + " / " +
                     budget.currencySymbol + budget.budgetAmount
-            val progressDrawable = itemView.budgetProgress.progressDrawable.mutate()
+            val progressDrawable = binding.budgetProgress.progressDrawable.mutate()
             val budgetPercentage = if(budget.budgetAmount == 0.toBigDecimal()){
                 0
             } else {
@@ -69,10 +71,10 @@ class BudgetChildRecyclerAdapter(private val budgetData: List<ChildIndividualBud
                             BlendModeCompat.SRC_ATOP)
                 }
             }
-            itemView.budgetPercentage.text = "$budgetPercentage%"
-            itemView.budgetProgress.progressDrawable = progressDrawable
-            ObjectAnimator.ofInt(itemView.budgetProgress, "progress", budgetPercentage).start()
-            itemView.setOnClickListener { clickListener(budget) }
+            binding.budgetPercentage.text = "$budgetPercentage%"
+            binding.budgetProgress.progressDrawable = progressDrawable
+            ObjectAnimator.ofInt(binding.budgetProgress, "progress", budgetPercentage).start()
+            binding.root.setOnClickListener { clickListener(budget) }
         }
     }
 }

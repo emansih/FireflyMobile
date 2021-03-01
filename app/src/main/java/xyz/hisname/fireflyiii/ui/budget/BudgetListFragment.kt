@@ -38,10 +38,10 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.budget_list_item.view.*
-import kotlinx.android.synthetic.main.fragment_budget_list.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.BudgetListItemBinding
+import xyz.hisname.fireflyiii.databinding.FragmentBudgetListBinding
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
@@ -49,10 +49,16 @@ import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 class BudgetListFragment: BaseFragment(){
 
     private val budgetListViewModel by lazy { getImprovedViewModel(BudgetListViewModel::class.java) }
+    private var fragmentBudgetListBinding: FragmentBudgetListBinding? = null
+    private val binding get() = fragmentBudgetListBinding!!
+    private var baseSwipeLayout: BaseSwipeLayoutBinding? = null
+    private val baseSwipeBinding get() = baseSwipeLayout!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_budget_list, container)
+        fragmentBudgetListBinding = FragmentBudgetListBinding.inflate(inflater, container, false)
+        baseSwipeLayout = binding.baseLayout.baseSwipeLayout
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,39 +69,39 @@ class BudgetListFragment: BaseFragment(){
             toastError(it)
         }
         budgetListViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
-            swipeContainer.isRefreshing = loading
+            baseSwipeBinding.swipeContainer.isRefreshing = loading
         }
-        swipeContainer.setOnRefreshListener {
+        baseSwipeBinding.swipeContainer.setOnRefreshListener {
             budgetListViewModel.setDisplayDate()
         }
     }
 
     private fun setWidget(){
-        previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_keyboard_arrow_left
             sizeDp = 24
             colorRes = R.color.colorPrimary
         })
 
-        nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_keyboard_arrow_right
             sizeDp = 24
             colorRes = R.color.colorPrimary
         })
 
-        previousMonthArrow.setOnClickListener {
+        binding.previousMonthArrow.setOnClickListener {
             budgetListViewModel.minusMonth()
         }
-        nextMonthArrow.setOnClickListener {
+        binding.nextMonthArrow.setOnClickListener {
             budgetListViewModel.addMonth()
         }
 
         zipLiveData(budgetListViewModel.spentValue, budgetListViewModel.budgetValue).observe(viewLifecycleOwner){ money ->
-            userBudget.text = money.first + " / " + money.second
+            binding.userBudget.text = money.first + " / " + money.second
         }
 
         budgetListViewModel.budgetPercentage.observe(viewLifecycleOwner){ budgetPercentage ->
-            val progressDrawable = budgetProgress.progressDrawable.mutate()
+            val progressDrawable = binding.budgetProgress.progressDrawable.mutate()
             when {
                 budgetPercentage.toInt() >= 80 -> {
                     progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.RED,
@@ -110,16 +116,16 @@ class BudgetListFragment: BaseFragment(){
                             BlendModeCompat.SRC_ATOP)
                 }
             }
-            budgetProgress.progressDrawable = progressDrawable
-            userBudgetPercentage.text = budgetPercentage.toString() + "%"
-            ObjectAnimator.ofInt(budgetProgress, "progress", budgetPercentage.toInt()).start()
+            binding.budgetProgress.progressDrawable = progressDrawable
+            binding.userBudgetPercentage.text = budgetPercentage.toString() + "%"
+            ObjectAnimator.ofInt(binding.budgetProgress, "progress", budgetPercentage.toInt()).start()
         }
         setRecyclerView()
         zipLiveData(budgetListViewModel.currencyName,
                 budgetListViewModel.displayMonth).observe(viewLifecycleOwner){ data ->
-            totalAvailableBudget.text = getString(R.string.total_available_in_currency, data.first)
-            monthAndYearText.text = data.second
-            availableBudget.setOnClickListener {
+            binding.totalAvailableBudget.text = getString(R.string.total_available_in_currency, data.first)
+            binding.monthAndYearText.text = data.second
+            binding.availableBudget.setOnClickListener {
                 val layoutInflater = LayoutInflater.from(requireContext())
                 val availableLayout = layoutInflater.inflate(R.layout.available_budget_layout, null)
                 val input = availableLayout.findViewById<TextInputEditText>(R.id.availableBudgetEditText)
@@ -150,7 +156,7 @@ class BudgetListFragment: BaseFragment(){
     }
 
     private fun setRecyclerView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
+        baseSwipeBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         budgetListViewModel.individualBudget.observe(viewLifecycleOwner){ budgetData ->
             val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData){ cid ->
                 parentFragmentManager.commit {
@@ -161,14 +167,15 @@ class BudgetListFragment: BaseFragment(){
                     addToBackStack(null)
                 }
             }
-            recycler_view.adapter = budgetRecyclerAdapter
+            baseSwipeBinding.recyclerView.adapter = budgetRecyclerAdapter
         }
-        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-            if (viewHolder.itemView.budgetItemList.isOverlapping(extendedFab)) {
+        baseSwipeBinding.recyclerView.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            val budgetItemListBinding = BudgetListItemBinding.bind(viewHolder.itemView)
+            if (budgetItemListBinding.budgetItemList.isOverlapping(extendedFab)) {
                 extendedFab.dropToRemove()
                 if (!isCurrentlyActive) {
-                    val budgetName = viewHolder.itemView.budgetNameText.text.toString()
-                    budgetListViewModel.deleteBudget(viewHolder.itemView.budgetNameText.text.toString()).observe(viewLifecycleOwner){ isDeleted ->
+                    val budgetName = budgetItemListBinding.budgetNameText.text.toString()
+                    budgetListViewModel.deleteBudget(budgetItemListBinding.budgetNameText.text.toString()).observe(viewLifecycleOwner){ isDeleted ->
                         if(!isDeleted){
                             toastOffline("Error deleting $budgetName", Toast.LENGTH_LONG)
                         } else {
@@ -178,7 +185,7 @@ class BudgetListFragment: BaseFragment(){
                 }
             }
         }
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        baseSwipeBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0 || dy < 0 && extendedFab.isShown) {
                     extendedFab.hide()
@@ -194,4 +201,9 @@ class BudgetListFragment: BaseFragment(){
         })
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        baseSwipeLayout = null
+        fragmentBudgetListBinding = null
+    }
 }

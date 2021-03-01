@@ -40,11 +40,8 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_add_budget.*
-import kotlinx.android.synthetic.main.fragment_add_budget.add_attachment_button
-import kotlinx.android.synthetic.main.fragment_add_budget.attachment_information
-import kotlinx.android.synthetic.main.fragment_add_budget.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentAddBudgetBinding
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.repository.budget.BudgetType
@@ -71,10 +68,13 @@ class AddBudgetFragment: BaseAddObjectFragment() {
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
     private val budgetId by lazy { arguments?.getLong("budgetId") ?: 0L }
     private val currencySymbol by lazy { arguments?.getString("currencySymbol") ?:"" }
+    private var fragmentAddBudgetBinding: FragmentAddBudgetBinding? = null
+    private val binding get() = fragmentAddBudgetBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_add_budget, container)
+        fragmentAddBudgetBinding = FragmentAddBudgetBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,35 +106,35 @@ class AddBudgetFragment: BaseAddObjectFragment() {
         zipLiveData(addBudgetViewModel.getBudgetById(budgetId, currencySymbol),
                 addBudgetViewModel.budgetLimitAttributesLiveData).observe(viewLifecycleOwner) { budget ->
             val budgetAttributes = budget.first.budgetListAttributes
-            budgetNameEditText.setText(budgetAttributes.name)
+            binding.budgetNameEditText.setText(budgetAttributes.name)
             when (budgetAttributes.auto_budget_type) {
                 BudgetType.NONE -> {
-                    autoBudget.setSelection(0, true)
+                    binding.autoBudget.setSelection(0, true)
                 }
                 BudgetType.ROLLOVER -> {
-                    autoBudget.setSelection(1, true)
+                    binding.autoBudget.setSelection(1, true)
                 }
                 else -> {
-                    autoBudget.setSelection(2, true)
+                    binding.autoBudget.setSelection(2, true)
                 }
             }
             val budgetPeriod = budgetAttributes.auto_budget_period
             if (budgetPeriod.contentEquals("weekly")) {
-                autoBudgetPeriod.setSelection(0, true)
+                binding.autoBudgetPeriod.setSelection(0, true)
             } else if (budgetPeriod.contentEquals("monthly")) {
-                autoBudgetPeriod.setSelection(1, true)
+                binding.autoBudgetPeriod.setSelection(1, true)
             } else if (budgetPeriod.contentEquals("quarterly")) {
-                autoBudgetPeriod.setSelection(2, true)
+                binding.autoBudgetPeriod.setSelection(2, true)
             } else if (budgetPeriod.contentEquals("half-yearly")) {
-                autoBudgetPeriod.setSelection(3, true)
+                binding.autoBudgetPeriod.setSelection(3, true)
             } else {
-                autoBudgetPeriod.setSelection(4, true)
+                binding.autoBudgetPeriod.setSelection(4, true)
             }
 
             val budgetLimitAttribute = budget.second.attributes
-            amountEdittext.setText(budgetLimitAttribute.amount.toString())
+            binding.amountEdittext.setText(budgetLimitAttribute.amount.toString())
             addBudgetViewModel.currency = budgetLimitAttribute.currency_code
-            currencyEdittext.setText(budgetLimitAttribute.currency_name + " (" + budgetLimitAttribute.currency_code + ")")
+            binding.currencyEdittext.setText(budgetLimitAttribute.currency_name + " (" + budgetLimitAttribute.currency_code + ")")
         }
     }
 
@@ -142,16 +142,16 @@ class AddBudgetFragment: BaseAddObjectFragment() {
         super.onCreate(savedInstanceState)
         takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                attachment_information.isVisible = true
+                binding.attachmentInformation.isVisible = true
                 attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
                         "", Uri.EMPTY, FileUtils.getFileName(requireContext(), fileUri) ?: "",
                         "", "", "", 0, "", "", ""), 0))
                 attachmentItemAdapter.add(fileUri)
-                attachment_information.adapter?.notifyDataSetChanged()
+                binding.attachmentInformation.adapter?.notifyDataSetChanged()
             }
         }
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){ fileChoosen ->
-            attachment_information.isVisible = true
+            binding.attachmentInformation.isVisible = true
             if(fileChoosen != null){
                 fileChoosen.forEach { file ->
                     attachmentDataAdapter.add(AttachmentData(Attributes(0, "",
@@ -159,32 +159,32 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                             "", "", "", 0, "", "", ""), 0))
                 }
                 attachmentItemAdapter.addAll(fileChoosen)
-                attachment_information.adapter?.notifyDataSetChanged()
+                binding.attachmentInformation.adapter?.notifyDataSetChanged()
             }
         }
     }
 
     override fun setIcons() {
-        currencyEdittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.currencyEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_money_bill
                     colorRes = R.color.md_green_400
                     sizeDp = 24
                 },null, null, null)
-        amountEdittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.amountEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_dollar_sign
                     colorRes = R.color.md_yellow_A700
                     sizeDp = 24
                 },null, null, null)
         if(budgetId == 0L){
-            addBudgetFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            binding.addBudgetFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
                 icon = FontAwesome.Icon.faw_plus
                 colorRes = R.color.md_black_1000
                 sizeDp = 24
             })
         } else {
-            addBudgetFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+            binding.addBudgetFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
                 icon = GoogleMaterial.Icon.gmd_update
                 colorRes = R.color.md_black_1000
                 sizeDp = 24
@@ -195,12 +195,12 @@ class AddBudgetFragment: BaseAddObjectFragment() {
 
     override fun setWidgets() {
         disableField()
-        autoBudget.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+        binding.autoBudget.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if(position != 0){
-                    autoBudgetPeriod.isVisible = true
-                    amountLayout.isVisible = true
-                    currencyLayout.isVisible = true
+                    binding.autoBudgetPeriod.isVisible = true
+                    binding.amountLayout.isVisible = true
+                    binding.currencyLayout.isVisible = true
                 } else {
                     disableField()
                 }
@@ -211,11 +211,11 @@ class AddBudgetFragment: BaseAddObjectFragment() {
             }
         }
         setCurrency()
-        placeHolderToolbar.setNavigationOnClickListener { handleBack() }
-        addBudgetFab.setOnClickListener {
+        binding.placeHolderToolbar.setNavigationOnClickListener { handleBack() }
+        binding.addBudgetFab.setOnClickListener {
             submitData()
         }
-        add_attachment_button.setOnClickListener {
+        binding.addAttachmentButton.setOnClickListener {
             val listItems = arrayOf(getString(R.string.capture_image_from_camera), getString(R.string.choose_file))
             AlertDialog.Builder(requireContext())
                     .setItems(listItems) { dialog, which ->
@@ -243,12 +243,12 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                     }
                     .show()
         }
-        attachment_information.layoutManager = LinearLayoutManager(requireContext())
-        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+        binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+        binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                 false, { data: AttachmentData ->
             attachmentDataAdapter.remove(data)
-            attachment_information.adapter?.notifyDataSetChanged()
+            binding.attachmentInformation.adapter?.notifyDataSetChanged()
         }) { another: Int -> }
     }
 
@@ -257,10 +257,10 @@ class AddBudgetFragment: BaseAddObjectFragment() {
         var amount: String? = null
         var currency: String? = null
         var freq: String? = null
-        if(autoBudget.selectedItemPosition != 0){
-            amount =  amountEdittext.getString()
+        if(binding.autoBudget.selectedItemPosition != 0){
+            amount =  binding.amountEdittext.getString()
             currency = addBudgetViewModel.currency
-            freq = when(autoBudgetPeriod.selectedItemPosition){
+            freq = when(binding.autoBudgetPeriod.selectedItemPosition){
                 0 -> "weekly"
                 1 -> "monthly"
                 2 -> "quarterly"
@@ -269,7 +269,7 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                 else -> ""
             }
         }
-        val budgetType = when (autoBudget.selectedItemPosition) {
+        val budgetType = when (binding.autoBudget.selectedItemPosition) {
             1 -> {
                 BudgetType.RESET
             }
@@ -281,7 +281,7 @@ class AddBudgetFragment: BaseAddObjectFragment() {
             }
         }
         if(budgetId == 0L){
-            addBudgetViewModel.addBudget(budgetNameEditText.getString(), budgetType, currency,
+            addBudgetViewModel.addBudget(binding.budgetNameEditText.getString(), budgetType, currency,
                     amount, freq, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
                 if(response.first){
                     ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
@@ -293,7 +293,7 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                 }
             }
         } else {
-            addBudgetViewModel.updateBudget(budgetId, budgetNameEditText.getString(), budgetType, currency,
+            addBudgetViewModel.updateBudget(budgetId, binding.budgetNameEditText.getString(), budgetType, currency,
                     amount, freq).observe(viewLifecycleOwner) { response ->
                 if(response.first){
                     ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
@@ -309,8 +309,8 @@ class AddBudgetFragment: BaseAddObjectFragment() {
     }
 
     private fun setCurrency(){
-        currencyEdittext.setOnClickListener {
-            if(autoBudget.selectedItemPosition != 0){
+        binding.currencyEdittext.setOnClickListener {
+            if(binding.autoBudget.selectedItemPosition != 0){
                 CurrencyListBottomSheet().show(childFragmentManager, "currencyList" )
             }
         }
@@ -320,24 +320,29 @@ class AddBudgetFragment: BaseAddObjectFragment() {
         }
 
         currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) { currency ->
-            currencyEdittext.setText(currency)
+            binding.currencyEdittext.setText(currency)
 
         }
         if(budgetId == 0L){
             addBudgetViewModel.getDefaultCurrency().observe(viewLifecycleOwner){ currency ->
-                currencyEdittext.setText(currency)
+                binding.currencyEdittext.setText(currency)
             }
         }
 
     }
 
     private fun disableField(){
-        autoBudgetPeriod.isVisible = false
-        amountLayout.isVisible = false
-        currencyLayout.isVisible = false
+        binding.autoBudgetPeriod.isVisible = false
+        binding.amountLayout.isVisible = false
+        binding.currencyLayout.isVisible = false
     }
 
     private fun handleBack() {
-        unReveal(addBudgetLayout)
+        unReveal(binding.addBudgetLayout)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAddBudgetBinding = null
     }
 }

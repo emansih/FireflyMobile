@@ -18,23 +18,26 @@
 
 package xyz.hisname.fireflyiii.ui.budget
 
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.budget_list_item.view.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BudgetListItemBinding
 import xyz.hisname.fireflyiii.repository.models.budget.ChildIndividualBudget
 import xyz.hisname.fireflyiii.repository.models.budget.IndividualBudget
-import xyz.hisname.fireflyiii.util.extension.inflate
 
 class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
                             private val clickListener:(ChildIndividualBudget) -> Unit):
         RecyclerView.Adapter<BudgetRecyclerAdapter.BudgetHolder>() {
 
+    private var budgetListItemBinding: BudgetListItemBinding? = null
+    private val binding get() = budgetListItemBinding!!
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetHolder {
-        return BudgetHolder(parent.inflate(R.layout.budget_list_item))
+        budgetListItemBinding = BudgetListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return BudgetHolder(binding)
     }
 
     override fun getItemCount() = budgetData.size
@@ -42,7 +45,7 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
     override fun onBindViewHolder(holder: BudgetHolder, position: Int){
         if(budgetData.isNotEmpty()){
             holder.bind(budgetData[position])
-            val childRecyclerView = holder.itemView.budgetChildRecyclerView
+            val childRecyclerView = binding.budgetChildRecyclerView
             val layoutManager = LinearLayoutManager(childRecyclerView.context)
             val childItemAdapter = BudgetChildRecyclerAdapter(budgetData[position].listOfChildIndividualBudget, clickListener)
             if(budgetData[position].listOfChildIndividualBudget.size > 1){
@@ -53,9 +56,9 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
         }
     }
 
-    inner class BudgetHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class BudgetHolder(itemView: BudgetListItemBinding): RecyclerView.ViewHolder(itemView.root) {
         fun bind(budget: IndividualBudget) {
-            itemView.budgetNameText.text = budget.budgetName
+            binding.budgetNameText.text = budget.budgetName
         }
     }
 }

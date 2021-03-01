@@ -44,8 +44,8 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.fragment_budget_summary.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentBudgetSummaryBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
@@ -61,9 +61,13 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
     private val budgetSummaryViewModel by lazy { getImprovedViewModel(BudgetSummaryViewModel::class.java) }
     private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
     private val coloring = arrayListOf<Int>()
+    private var fragmentBudgetSummary: FragmentBudgetSummaryBinding? = null
+    private val binding get() = fragmentBudgetSummary!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.create(R.layout.fragment_budget_summary, container)
+        fragmentBudgetSummary = FragmentBudgetSummaryBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -85,59 +89,59 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
         for (col in ColorTemplate.JOYFUL_COLORS){
             coloring.add(col)
         }
-        monthAndYearText.text = DateTimeUtil.getMonthAndYear(DateTimeUtil.getTodayDate())
-        transactionList.layoutManager = LinearLayoutManager(requireContext())
-        transactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        transactionList.adapter = transactionAdapter
-        budgetSummaryPieChart.isDrawHoleEnabled = false
-        previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.monthAndYearText.text = DateTimeUtil.getMonthAndYear(DateTimeUtil.getTodayDate())
+        binding.transactionList.layoutManager = LinearLayoutManager(requireContext())
+        binding.transactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.transactionList.adapter = transactionAdapter
+        binding.budgetSummaryPieChart.isDrawHoleEnabled = false
+        binding.previousMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_keyboard_arrow_left
             sizeDp = 24
             colorRes = R.color.colorPrimary
         })
-        nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.nextMonthArrow.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_keyboard_arrow_right
             sizeDp = 24
             colorRes = R.color.colorPrimary
         })
-        previousMonthArrow.setOnClickListener {
+        binding.previousMonthArrow.setOnClickListener {
             budgetSummaryViewModel.monthCount -=1
             setDate()
             transactionAdapter.notifyDataSetChanged()
-            budgetSummaryPieChart.clear()
+            binding.budgetSummaryPieChart.clear()
         }
-        nextMonthArrow.setOnClickListener {
+        binding.nextMonthArrow.setOnClickListener {
             budgetSummaryViewModel.monthCount +=1
             setDate()
             transactionAdapter.notifyDataSetChanged()
-            budgetSummaryPieChart.clear()
+            binding.budgetSummaryPieChart.clear()
         }
         setDate()
     }
 
     private fun setDate(){
         budgetSummaryViewModel.setDisplayDate().observe(viewLifecycleOwner){ dateToDisplay ->
-            monthAndYearText.text = dateToDisplay
+            binding.monthAndYearText.text = dateToDisplay
         }
     }
 
     private fun setSpinner(){
-        currencySpinner.onItemSelectedListener = this
+        binding.currencySpinner.onItemSelectedListener = this
         budgetSummaryViewModel.getCurrency().observe(viewLifecycleOwner){ currencyDataList ->
             val arrayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, currencyDataList)
-            currencySpinner.adapter = arrayAdapter
+            binding.currencySpinner.adapter = arrayAdapter
         }
     }
 
     private fun setText(){
         budgetSummaryViewModel.availableBudget.observe(viewLifecycleOwner){ available ->
-            budgetAmountValue.text = available
+            binding.budgetAmountValue.text = available
         }
         budgetSummaryViewModel.totalTransaction.observe(viewLifecycleOwner){ total ->
-            actualAmountValue.text = total
+            binding.actualAmountValue.text = total
         }
         budgetSummaryViewModel.balanceBudget.observe(viewLifecycleOwner){ balance ->
-            remainingAmountValue.text = balance.toString()
+            binding.remainingAmountValue.text = balance.toString()
         }
     }
 
@@ -149,14 +153,14 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
         val pieDataSet = PieDataSet(pieEntryArray, "")
 
-        pieDataSet.valueFormatter = PercentFormatter(budgetSummaryPieChart)
+        pieDataSet.valueFormatter = PercentFormatter(binding.budgetSummaryPieChart)
         pieDataSet.colors = coloring
         pieDataSet.valueTextSize = 15f
-        budgetSummaryPieChart.description.isEnabled = false
-        budgetSummaryPieChart.invalidate()
-        budgetSummaryPieChart.data = PieData(pieDataSet)
+        binding.budgetSummaryPieChart.description.isEnabled = false
+        binding.budgetSummaryPieChart.invalidate()
+        binding.budgetSummaryPieChart.data = PieData(pieDataSet)
 
-        budgetSummaryPieChart.setData {
+        binding.budgetSummaryPieChart.setData {
             setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                 override fun onValueSelected(entry: Entry, h: Highlight) {
                     val pe = entry as PieEntry
@@ -214,5 +218,9 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
     override fun onNothingSelected(parent: AdapterView<*>?) {
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentBudgetSummary = null
+    }
 
 }
