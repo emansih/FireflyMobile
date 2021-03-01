@@ -43,9 +43,9 @@ import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_add_bill.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentAddBillBinding
 import xyz.hisname.fireflyiii.repository.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
@@ -79,15 +79,19 @@ class AddBillFragment: BaseAddObjectFragment() {
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
+    private var fragmentAddBillBinding: FragmentAddBillBinding? = null
+    private val binding get() = fragmentAddBillBinding!!
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_add_bill, container)
+        fragmentAddBillBinding = FragmentAddBillBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        showReveal(dialog_add_bill_layout)
+        showReveal(binding.dialogAddBillLayout)
         updateEditText()
         showHelpText()
         setFab()
@@ -106,14 +110,14 @@ class AddBillFragment: BaseAddObjectFragment() {
                     billViewModel.uploadFile(billId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
                         // Only show the updated files array if upload succeeds
                         if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
-                            attachment_information.adapter?.notifyDataSetChanged()
+                            binding.attachmentInformation.adapter?.notifyDataSetChanged()
                             toastSuccess("File uploaded")
                         } else {
                             toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
                         }
                     }
                 } else {
-                    attachment_information.adapter?.notifyDataSetChanged()
+                    binding.attachmentInformation.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -130,14 +134,14 @@ class AddBillFragment: BaseAddObjectFragment() {
                     billViewModel.uploadFile(billId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
                         // Only show the updated files array if upload succeeds
                         if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
-                            attachment_information.adapter?.notifyDataSetChanged()
+                            binding.attachmentInformation.adapter?.notifyDataSetChanged()
                             toastSuccess("File uploaded")
                         } else {
                             toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
                         }
                     }
                 } else {
-                    attachment_information.adapter?.notifyDataSetChanged()
+                    binding.attachmentInformation.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -148,25 +152,25 @@ class AddBillFragment: BaseAddObjectFragment() {
         if(billId != 0L){
             billViewModel.getBillById(billId).observe(viewLifecycleOwner) { billData ->
                 billAttribute = billData.billAttributes
-                description_edittext.setText(billAttribute?.name)
+                binding.descriptionEdittext.setText(billAttribute?.name)
                 billDescription = billAttribute?.name
-                min_amount_edittext.setText(billAttribute?.amount_min.toString())
-                max_amount_edittext.setText(billAttribute?.amount_max.toString())
+                binding.minAmountEdittext.setText(billAttribute?.amount_min.toString())
+                binding.maxAmountEdittext.setText(billAttribute?.amount_max.toString())
                 currency = billAttribute?.currency_code ?: ""
                 billViewModel.getBillCurrencyDetails(billId).observe(viewLifecycleOwner){ currencyDetails ->
-                    currency_edittext.setText(currencyDetails)
+                    binding.currencyEdittext.setText(currencyDetails)
                 }
-                bill_date_edittext.setText(billAttribute?.date.toString())
-                skip_edittext.setText(billAttribute?.skip.toString())
-                notes_edittext.setText(billAttribute?.notes)
-                frequency_exposed_dropdown.setText(billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase()
+                binding.billDateEdittext.setText(billAttribute?.date.toString())
+                binding.skipEdittext.setText(billAttribute?.skip.toString())
+                binding.notesEdittext.setText(billAttribute?.notes)
+                binding.frequencyExposedDropdown.setText(billAttribute?.repeat_freq?.substring(0, 1)?.toUpperCase()
                         + billAttribute?.repeat_freq?.substring(1))
 
                 // Weird bug where only 1 value will show in the array if I don't use this
                 val spinnerAdapter = ArrayAdapter(requireContext(),
                         R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                frequency_exposed_dropdown.setAdapter(spinnerAdapter)
+                binding.frequencyExposedDropdown.setAdapter(spinnerAdapter)
                 displayAttachment()
             }
         }
@@ -176,9 +180,9 @@ class AddBillFragment: BaseAddObjectFragment() {
         billViewModel.billAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
-                attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+                binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                         false, { data: AttachmentData ->
                     AlertDialog.Builder(requireContext())
                             .setTitle(getString(R.string.are_you_sure))
@@ -186,7 +190,7 @@ class AddBillFragment: BaseAddObjectFragment() {
                                 billViewModel.deleteAttachment(data).observe(viewLifecycleOwner){ isSuccessful ->
                                     if(isSuccessful){
                                         attachmentDataAdapter.remove(data)
-                                        attachment_information.adapter?.notifyDataSetChanged()
+                                        binding.attachmentInformation.adapter?.notifyDataSetChanged()
                                         toastSuccess("Deleted " + data.attachmentAttributes.filename)
                                     } else {
                                         toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
@@ -201,14 +205,14 @@ class AddBillFragment: BaseAddObjectFragment() {
 
     private fun setFab(){
         if(billId != 0L){
-            addBillFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+            binding.addBillFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
-        addBillFab.setOnClickListener {
+        binding.addBillFab.setOnClickListener {
             hideKeyboard()
-            notes = if(notes_edittext.isBlank()){
+            notes = if(binding.notesEdittext.isBlank()){
                 null
             } else {
-                notes_edittext.getString()
+                binding.notesEdittext.getString()
             }
             if(billId == 0L){
                 submitData()
@@ -219,61 +223,61 @@ class AddBillFragment: BaseAddObjectFragment() {
     }
 
     override fun setIcons(){
-        currency_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.currencyEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_money_bill
                     colorRes = R.color.md_green_400
                     sizeDp = 24
                 },null, null, null)
-        min_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.minAmountEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_dollar_sign
                     colorRes = R.color.md_yellow_A700
                     sizeDp = 16
                 },null, null, null)
-        max_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.maxAmountEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_dollar_sign
                     colorRes = R.color.md_yellow_A700
                     sizeDp = 16
                 },null, null, null)
-        bill_date_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.billDateEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_calendar
                     color = colorList(ColorStateList.valueOf(rgb(18, 122, 190)))
                     sizeDp = 24
                 },null, null, null)
-        skip_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.skipEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_sort_numeric_up
                     colorRes = R.color.md_red_500
                     sizeDp = 24
                 },null, null, null)
-        addBillFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
-        addBillFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.addBillFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
+        binding.addBillFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
         })
-        attachment_information.layoutManager = LinearLayoutManager(requireContext())
-        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+        binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+        binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                 false, { data: AttachmentData ->
             attachmentDataAdapter.remove(data)
-            attachment_information.adapter?.notifyDataSetChanged()
+            binding.attachmentInformation.adapter?.notifyDataSetChanged()
         }) { another: Int -> }
 
     }
 
     private fun showHelpText(){
         queue = FancyShowCaseQueue()
-                .add(showCase(R.string.bills_create_intro, "addBillDescriptionCaseView", appbar))
-                .add(showCase(R.string.bills_create_name, "descriptionCaseView", description_edittext))
+                .add(showCase(R.string.bills_create_intro, "addBillDescriptionCaseView", binding.appbar))
+                .add(showCase(R.string.bills_create_name, "descriptionCaseView", binding.descriptionEdittext))
                 .add(showCase(R.string.bills_create_amount_min_holder, "minMaxAmountCaseView",
-                        min_amount_layout))
-                .add(showCase(R.string.bills_create_skip_holder, "skipCaseView", skip_layout))
+                        binding.minAmountLayout))
+                .add(showCase(R.string.bills_create_skip_holder, "skipCaseView", binding.skipLayout))
                 .add(showCase(R.string.bills_create_repeat_freq_holder,
-                        "freqCaseView", frequency_menu))
+                        "freqCaseView", binding.frequencyMenu))
 
         queue.show()
     }
@@ -293,8 +297,8 @@ class AddBillFragment: BaseAddObjectFragment() {
         val spinnerAdapter = ArrayAdapter(requireContext(),
                 R.layout.cat_exposed_dropdown_popup_item, resources.getStringArray(R.array.repeat_frequency))
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        frequency_exposed_dropdown.setAdapter(spinnerAdapter)
-        frequency_exposed_dropdown.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+        binding.frequencyExposedDropdown.setAdapter(spinnerAdapter)
+        binding.frequencyExposedDropdown.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             repeatFreq = when (position) {
                 0 -> "weekly"
                 1 -> "monthly"
@@ -304,15 +308,15 @@ class AddBillFragment: BaseAddObjectFragment() {
                 else -> ""
             }
         }
-        bill_date_edittext.setOnClickListener {
+        binding.billDateEdittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
             picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
-                bill_date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+                binding.billDateEdittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
-        currency_edittext.setOnClickListener{
+        binding.currencyEdittext.setOnClickListener{
             CurrencyListBottomSheet().show(childFragmentManager, "currencyList" )
         }
         currencyViewModel.currencyCode.observe(viewLifecycleOwner) { currencyCode ->
@@ -320,19 +324,19 @@ class AddBillFragment: BaseAddObjectFragment() {
         }
 
         currencyViewModel.currencyFullDetails.observe(viewLifecycleOwner) {
-            currency_edittext.setText(it)
+            binding.currencyEdittext.setText(it)
         }
-        placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
+        binding.placeHolderToolbar.setNavigationOnClickListener{ handleBack() }
         billViewModel.getDefaultCurrency().observe(viewLifecycleOwner) { defaultCurrency ->
             val currencyData = defaultCurrency.currencyAttributes
-            currency_edittext.setText(currencyData.name + " (" + currencyData.code + ")")
+            binding.currencyEdittext.setText(currencyData.name + " (" + currencyData.code + ")")
             currency = currencyData.code
         }
         markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
-            notes_edittext.setText(markdownText)
+            binding.notesEdittext.setText(markdownText)
         }
-        notes_edittext.setOnClickListener {
-            markdownViewModel.markdownText.postValue(notes_edittext.getString())
+        binding.notesEdittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(binding.notesEdittext.getString())
             parentFragmentManager.commit {
                 add(R.id.bigger_fragment_container, MarkdownFragment())
                 addToBackStack(null)
@@ -348,7 +352,7 @@ class AddBillFragment: BaseAddObjectFragment() {
         billViewModel.apiResponse.observe(viewLifecycleOwner){ response ->
             toastInfo(response, Toast.LENGTH_LONG)
         }
-        add_attachment_button.setOnClickListener {
+        binding.addAttachmentButton.setOnClickListener {
             attachmentDialog()
         }
     }
@@ -384,9 +388,9 @@ class AddBillFragment: BaseAddObjectFragment() {
 
 
     override fun submitData(){
-        billViewModel.addBill(description_edittext.getString(),
-                min_amount_edittext.getString(), max_amount_edittext.getString(),
-                bill_date_edittext.getString(), repeatFreq, skip_edittext.getString(), "1",
+        billViewModel.addBill(binding.descriptionEdittext.getString(),
+                binding.minAmountEdittext.getString(), binding.maxAmountEdittext.getString(),
+                binding.billDateEdittext.getString(), repeatFreq, binding.skipEdittext.getString(), "1",
                     currency, notes, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
@@ -400,10 +404,10 @@ class AddBillFragment: BaseAddObjectFragment() {
     }
 
     private fun updateBill(){
-        billViewModel.updateBill(billId, description_edittext.getString(),
-                min_amount_edittext.getString(), max_amount_edittext.getString(),
-                bill_date_edittext.getString(), getFreq(frequency_exposed_dropdown.getString()),
-                skip_edittext.getString(), "1", currency, notes).observe(viewLifecycleOwner) { response ->
+        billViewModel.updateBill(billId, binding.descriptionEdittext.getString(),
+                binding.minAmountEdittext.getString(), binding.maxAmountEdittext.getString(),
+                binding.billDateEdittext.getString(), getFreq(binding.frequencyExposedDropdown.getString()),
+                binding.skipEdittext.getString(), "1", currency, notes).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
                 handleBack()
@@ -414,7 +418,7 @@ class AddBillFragment: BaseAddObjectFragment() {
     }
 
     private fun handleBack() {
-        unReveal(dialog_add_bill_layout)
+        unReveal(binding.dialogAddBillLayout)
         markdownViewModel.markdownText.postValue("")
     }
 

@@ -19,13 +19,12 @@
 package xyz.hisname.fireflyiii.ui.bills
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.bills_to_pay_item.view.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BillsToPayItemBinding
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
-import xyz.hisname.fireflyiii.util.extension.inflate
 import java.math.BigDecimal
 
 class BillsToPayRecyclerView(private val budgetData: List<BillData>,
@@ -33,10 +32,14 @@ class BillsToPayRecyclerView(private val budgetData: List<BillData>,
         RecyclerView.Adapter<BillsToPayRecyclerView.BillsToPayHolder>() {
 
     private lateinit var context: Context
+    private var billsToPayItemBinding: BillsToPayItemBinding? = null
+    private val binding get() = billsToPayItemBinding!!
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BillsToPayHolder {
         context = parent.context
-        return BillsToPayHolder(parent.inflate(R.layout.bills_to_pay_item))
+        billsToPayItemBinding = BillsToPayItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return BillsToPayHolder(binding)
     }
 
     override fun onBindViewHolder(holder: BillsToPayHolder, position: Int) {
@@ -45,17 +48,17 @@ class BillsToPayRecyclerView(private val budgetData: List<BillData>,
 
     override fun getItemCount() = budgetData.size
 
-    inner class BillsToPayHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class BillsToPayHolder(itemView: BillsToPayItemBinding): RecyclerView.ViewHolder(itemView.root) {
         fun bind(billData: BillData, clickListener: (BillData) -> Unit){
             val billResponse = billData.billAttributes
             val billName = billResponse.name
             val amountToDisplay = billResponse.amount_max
                     .plus(billResponse.amount_min)
                     .div(BigDecimal.valueOf(2))
-            itemView.billName.text = billName
-            itemView.billAmount.text = context.getString(R.string.bill_amount,
+            binding.billName.text = billName
+            binding.billAmount.text = context.getString(R.string.bill_amount,
                     billResponse.currency_symbol, amountToDisplay)
-            itemView.setOnClickListener{clickListener(billData)}
+            binding.root.setOnClickListener{clickListener(billData)}
         }
     }
 }
