@@ -37,11 +37,11 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.bills_list_item.view.*
-import kotlinx.android.synthetic.main.fragment_base_list.*
-import kotlinx.android.synthetic.main.fragment_bill_list.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.BillsListItemBinding
+import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
+import xyz.hisname.fireflyiii.databinding.FragmentBillListBinding
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.bills.AddBillFragment
@@ -54,10 +54,19 @@ class ListBillFragment: BaseFragment() {
 
     private val billAdapter by lazy { BillsRecyclerAdapter { data: BillData -> itemClicked(data)}  }
     private val billViewModel by lazy { getImprovedViewModel(ListBillViewModel::class.java) }
+    private var fragmentBillListBinding: FragmentBillListBinding? = null
+    private val binding get() = fragmentBillListBinding!!
+    private var fragmentBaseListBinding: FragmentBaseListBinding? = null
+    private val baseBinding get() = fragmentBaseListBinding!!
+    private var baseSwipeLayout: BaseSwipeLayoutBinding? = null
+    private val baseSwipeBinding get() = baseSwipeLayout!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_bill_list, container)
+        fragmentBillListBinding = FragmentBillListBinding.inflate(inflater, container, false)
+        fragmentBaseListBinding = binding.baseLayout
+        baseSwipeLayout = binding.baseLayout.baseSwipeLayout
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,14 +78,15 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun setRecyclerView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.adapter = billAdapter
-        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-            if (viewHolder.itemView.billCard.isOverlapping(extendedFab)){
+        baseSwipeBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        baseSwipeBinding.recyclerView.adapter = billAdapter
+        baseSwipeBinding.recyclerView.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            val billListBinding = BillsListItemBinding.bind(viewHolder.itemView)
+            if (billListBinding.billCard.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
-                    val billId = viewHolder.itemView.billId.text.toString()
-                    val billName = viewHolder.itemView.billName.text.toString()
+                    val billId = billListBinding.billId.text.toString()
+                    val billName = billListBinding.billName.text.toString()
                     billViewModel.deleteBillById(billId).observe(viewLifecycleOwner){ isDeleted ->
                         billAdapter.refresh()
                         if(isDeleted){
@@ -88,7 +98,7 @@ class ListBillFragment: BaseFragment() {
                 }
             }
         }
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        baseSwipeBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0 || dy < 0 && extendedFab.isShown) {
                     extendedFab.hide()
@@ -107,17 +117,17 @@ class ListBillFragment: BaseFragment() {
     private fun loadBill(){
         billViewModel.getBillDue().observe(viewLifecycleOwner){ bills ->
             if(bills.isEmpty()){
-                billsDueTodayCard.isGone = true
+                binding.billsDueTodayCard.isGone = true
             } else {
-                billsDueTodayCard.isVisible = true
-                numOfBills.text = bills.size.toString()
+                binding.billsDueTodayCard.isVisible = true
+                binding.numOfBills.text = bills.size.toString()
                 val linearLayoutManager = LinearLayoutManager(requireContext())
-                billsDueTodayRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                billsDueTodayRecyclerView.layoutManager = linearLayoutManager
+                binding.billsDueTodayRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.billsDueTodayRecyclerView.layoutManager = linearLayoutManager
                 val itemAdapter = BillsToPayRecyclerView(bills){ data ->
                     itemClicked(data)
                 }
-                billsDueTodayRecyclerView.adapter = itemAdapter
+                binding.billsDueTodayRecyclerView.adapter = itemAdapter
             }
             billViewModel.getBillList().observe(viewLifecycleOwner){
                 billAdapter.submitData(lifecycle, it)
@@ -148,24 +158,24 @@ class ListBillFragment: BaseFragment() {
     }
 
     private fun pullToRefresh(){
-        swipeContainer.setOnRefreshListener {
+        baseSwipeBinding.swipeContainer.setOnRefreshListener {
             billAdapter.refresh()
         }
         billAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            baseSwipeBinding.swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
             if(loadStates.refresh !is LoadState.Loading) {
                 if(billAdapter.itemCount < 1){
-                    listText.text = resources.getString(R.string.no_bills)
-                    listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                    baseBinding.listText.text = resources.getString(R.string.no_bills)
+                    baseBinding.listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
                         icon = GoogleMaterial.Icon.gmd_insert_emoticon
                         sizeDp = 24
                     })
-                    listText.isVisible = true
-                    listImage.isVisible = true
+                    baseBinding.listText.isVisible = true
+                    baseBinding.listImage.isVisible = true
                 } else {
-                    listText.isVisible = false
-                    listImage.isVisible = false
-                    recycler_view.isVisible = true
+                    baseBinding.listText.isVisible = false
+                    baseBinding.listImage.isVisible = false
+                    baseSwipeBinding.recyclerView.isVisible = true
                 }
             }
         }
@@ -179,5 +189,12 @@ class ListBillFragment: BaseFragment() {
     override fun onResume() {
         super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.bill)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentBillListBinding = null
+        fragmentBaseListBinding = null
+        baseSwipeLayout = null
     }
 }

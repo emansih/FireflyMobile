@@ -18,7 +18,6 @@
 
 package xyz.hisname.fireflyiii.ui.bills.details
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,13 +35,10 @@ import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
-import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.calendar_day.view.*
-import kotlinx.android.synthetic.main.details_card.*
-import kotlinx.android.synthetic.main.fragment_bill_details.*
-import kotlinx.android.synthetic.main.fragment_bill_details.notesCard
-import kotlinx.android.synthetic.main.fragment_bill_details.notesText
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.CalendarDayBinding
+import xyz.hisname.fireflyiii.databinding.DetailsCardBinding
+import xyz.hisname.fireflyiii.databinding.FragmentBillDetailsBinding
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -73,10 +69,17 @@ class BillDetailsFragment: BaseDetailFragment() {
     private val billId: Long by lazy { arguments?.getLong("billId") ?: 0  }
     private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
     private var selectedDate: LocalDate? = null
+    private var fragmentBillDetailBinding: FragmentBillDetailsBinding? = null
+    private val binding get() = fragmentBillDetailBinding!!
+    private var detailsCardBinding: DetailsCardBinding? = null
+    private val detailBinding get() = detailsCardBinding!!
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_bill_details, container)
+        fragmentBillDetailBinding = FragmentBillDetailsBinding.inflate(inflater, container, false)
+        detailsCardBinding = binding.billInfoCard
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -85,14 +88,14 @@ class BillDetailsFragment: BaseDetailFragment() {
         setBillInfo()
         setPayCalendar()
         setPaidCalendar()
-        setCalendarWidgets(payDatesCalendarView)
-        setCalendarWidgets(paidDatesCalendarView)
+        setCalendarWidgets(binding.payDatesCalendarView)
+        setCalendarWidgets(binding.paidDatesCalendarView)
         getPayDates(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
         getPaidDates(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
         progressCircle()
-        transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        transactionRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        transactionRecyclerView.adapter = transactionAdapter
+        binding.transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.transactionRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.transactionRecyclerView.adapter = transactionAdapter
     }
 
     private fun setBillInfo(){
@@ -106,14 +109,14 @@ class BillDetailsFragment: BaseDetailFragment() {
                     DetailModel("Is Active", attributes.active.toString())
             )
             if(attributes.notes.isNullOrEmpty()){
-                notesCard.isGone = true
+                binding.notesCard.isGone = true
             } else {
-                notesText.text = attributes.notes?.toMarkDown()
+                binding.notesText.text = attributes.notes?.toMarkDown()
             }
             downloadAttachment()
-            detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }
+            detailBinding.detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            detailBinding.detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            detailBinding.detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(bill){ }
         }
     }
 
@@ -122,7 +125,7 @@ class BillDetailsFragment: BaseDetailFragment() {
             billPayList.forEach {  billPayDates ->
                 selectedPayDays.add(billPayDates.payDates)
             }
-            payDatesCalendarView.notifyCalendarChanged()
+            binding.payDatesCalendarView.notifyCalendarChanged()
         }
     }
 
@@ -131,17 +134,17 @@ class BillDetailsFragment: BaseDetailFragment() {
             billPaidList.forEach {  billPaidDates ->
                 selectedPaidDays.add(billPaidDates.date)
             }
-            paidDatesCalendarView.notifyCalendarChanged()
+            binding.paidDatesCalendarView.notifyCalendarChanged()
         }
     }
 
     private fun setPayCalendar(){
         class DayViewContainer(view: View): ViewContainer(view) {
             lateinit var day: CalendarDay
-            val onDayText = view.dayText
+            val onDayText = CalendarDayBinding.bind(view).dayText
         }
 
-        payDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
+        binding.payDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.day = day
                 val textView = container.onDayText
@@ -169,10 +172,10 @@ class BillDetailsFragment: BaseDetailFragment() {
 
             override fun create(view: View): DayViewContainer = DayViewContainer(view)
         }
-        payDatesCalendarView.monthScrollListener = { month ->
+        binding.payDatesCalendarView.monthScrollListener = { month ->
             getPayDates(month.yearMonth.atDay(1).toString(), month.yearMonth.atEndOfMonth().toString())
             val title = "${monthTitleFormatter.format(month.yearMonth)} ${month.yearMonth.year}"
-            payDatesHeaderText.text = title
+            binding.payDatesHeaderText.text = title
         }
 
     }
@@ -187,20 +190,20 @@ class BillDetailsFragment: BaseDetailFragment() {
     private fun setPaidCalendar(){
         class DayViewContainer(view: View): ViewContainer(view) {
             lateinit var day: CalendarDay
-            val onDayText = view.dayText
-            val legendDivider = view.legendDivider
+            val onDayText = CalendarDayBinding.bind(view).dayText
+            val legendDivider = CalendarDayBinding.bind(view).legendDivider
             init {
                 view.setOnClickListener {
                     if (selectedPaidDays.contains(day.date)){
                         selectedDate = day.date
                         getPaidTransactions(day.date)
                     }
-                    paidDatesCalendarView.notifyCalendarChanged()
+                    binding.paidDatesCalendarView.notifyCalendarChanged()
                 }
             }
         }
 
-        paidDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
+        binding.paidDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.day = day
                 val textView = container.onDayText
@@ -229,9 +232,9 @@ class BillDetailsFragment: BaseDetailFragment() {
 
             override fun create(view: View): DayViewContainer = DayViewContainer(view)
         }
-        paidDatesCalendarView.monthScrollListener = { month ->
+        binding.paidDatesCalendarView.monthScrollListener = { month ->
             val title = "${monthTitleFormatter.format(month.yearMonth)} ${month.yearMonth.year}"
-            paidDatesHeaderText.text = title
+            binding.paidDatesHeaderText.text = title
             getPaidDates(month.yearMonth.atDay(1).toString(), month.yearMonth.atEndOfMonth().toString())
         }
     }
@@ -256,9 +259,9 @@ class BillDetailsFragment: BaseDetailFragment() {
         }
         transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
             if(loadStates.refresh !is LoadState.Loading) {
-                transactionLoader.hide()
+                binding.transactionLoader.hide()
             } else {
-                transactionLoader.show()
+                binding.transactionLoader.show()
             }
         }
     }
@@ -266,7 +269,7 @@ class BillDetailsFragment: BaseDetailFragment() {
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
         billDetailsViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
             // "Refresh" the icon. From downloading to open file
-            attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+            binding.attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
                     true, { data: AttachmentData ->
                 setDownloadClickListener(data, attachmentDataAdapter)
                     }){ another: Int -> }
@@ -278,9 +281,9 @@ class BillDetailsFragment: BaseDetailFragment() {
         billDetailsViewModel.billAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
-                attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                binding.attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                binding.attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                         true, { data: AttachmentData ->
                     setDownloadClickListener(data, attachmentDataAdapter)
                 }) { another: Int -> }
@@ -334,9 +337,10 @@ class BillDetailsFragment: BaseDetailFragment() {
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.details)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentBillDetailBinding = null
+        detailsCardBinding = null
     }
 
 }
