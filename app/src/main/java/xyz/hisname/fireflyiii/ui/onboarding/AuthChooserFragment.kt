@@ -26,32 +26,35 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import kotlinx.android.synthetic.main.fragment_auth_chooser.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.util.extension.create
+import xyz.hisname.fireflyiii.databinding.FragmentAuthChooserBinding
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.toastError
 
 class AuthChooserFragment: Fragment(){
 
     private lateinit var authActivityViewModel: AuthActivityViewModel
+    private var fragmentAuthChooserBinding: FragmentAuthChooserBinding? = null
+    private val binding get() = fragmentAuthChooserBinding!!
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_auth_chooser, container)
+        fragmentAuthChooserBinding = FragmentAuthChooserBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         authActivityViewModel = getViewModel(AuthActivityViewModel::class.java)
-        oauthButton.setOnClickListener {
+        binding.oauthButton.setOnClickListener {
             flipCard(LoginFragment())
         }
-        accessTokenButton.setOnClickListener {
+        binding.accessTokenButton.setOnClickListener {
             flipCard(PatFragment())
         }
-        demoButton.setOnClickListener {
+        binding.demoButton.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, ("https://demo.firefly-iii.org/${Constants.OAUTH_API_ENDPOINT}" +
                     "/authorize?client_id=2&redirect_uri=${Constants.DEMO_REDIRECT_URI}" +
                     "&scope=&response_type=code&state=").toUri())
@@ -77,5 +80,10 @@ class AuthChooserFragment: Fragment(){
             addToBackStack(null)
             replace(R.id.container, fragment)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAuthChooserBinding = null
     }
 }

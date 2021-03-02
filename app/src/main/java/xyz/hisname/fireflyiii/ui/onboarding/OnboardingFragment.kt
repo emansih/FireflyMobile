@@ -25,39 +25,41 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_onboarding.*
-import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
+import xyz.hisname.fireflyiii.databinding.FragmentOnboardingBinding
 import xyz.hisname.fireflyiii.ui.HomeActivity
 import xyz.hisname.fireflyiii.util.extension.*
 
 class OnboardingFragment: Fragment() {
 
     private val authActivityViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
+    private var fragmentOnboardingBinding: FragmentOnboardingBinding? = null
+    private val binding get() = fragmentOnboardingBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_onboarding, container)
+        fragmentOnboardingBinding = FragmentOnboardingBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        onboarding_text.text = "Hang on..."
+        binding.onboardingText.text = "Hang on..."
         hideKeyboard()
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 10).start()
+        ObjectAnimator.ofInt(binding.onboardingProgress,"progress", 10).start()
         FireflyClient.destroyInstance()
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 30).start()
+        ObjectAnimator.ofInt(binding.onboardingProgress,"progress", 30).start()
         getUser()
     }
 
 
     private fun getUser(){
-        onboarding_text.text = "Retrieving your data..."
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 45).start()
-        ObjectAnimator.ofInt(onboarding_progress,"progress", 60).start()
+        binding.onboardingText.text = "Retrieving your data..."
+        ObjectAnimator.ofInt(binding.onboardingProgress,"progress", 45).start()
+        ObjectAnimator.ofInt(binding.onboardingProgress,"progress", 60).start()
         zipLiveData(authActivityViewModel.getUser(),authActivityViewModel.userSystem()).observe(viewLifecycleOwner) { multipleLiveData ->
-            ObjectAnimator.ofInt(onboarding_progress,"progress", 90).start()
-            onboarding_text.text = "Almost there!"
+            ObjectAnimator.ofInt(binding.onboardingProgress,"progress", 90).start()
+            binding.onboardingText.text = "Almost there!"
             if(multipleLiveData.first && multipleLiveData.second){
                 startActivity(Intent(requireActivity(), HomeActivity::class.java))
                 requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)

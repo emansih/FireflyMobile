@@ -32,10 +32,10 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import kotlinx.android.synthetic.main.fragment_login.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.databinding.FragmentLoginBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
 
@@ -46,11 +46,13 @@ class LoginFragment: Fragment() {
     private val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(requireContext()) }
     private var fileUri: Uri? = null
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
+    private var fragmentLoginBinding: FragmentLoginBinding? = null
+    private val binding get() = fragmentLoginBinding!!
 
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_login, container)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        fragmentLoginBinding = FragmentLoginBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,35 +66,35 @@ class LoginFragment: Fragment() {
         chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()){ fileChoosen ->
             if(fileChoosen != null){
                 fileUri = fileChoosen
-                cert_path.isVisible = true
-                cert_path.text = FileUtils.getPathFromUri(requireContext(), fileChoosen)
+                binding.certPath.isVisible = true
+                binding.certPath.text = FileUtils.getPathFromUri(requireContext(), fileChoosen)
             } else {
-                self_signed_checkbox.isChecked = false
+                binding.selfSignedCheckbox.isChecked = false
             }
 
         }
     }
 
     private fun setWidget(){
-        self_signed_checkbox.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.selfSignedCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
             AppPref(sharedPref).isCustomCa = isChecked
             if(isChecked){
                 openSaf()
             } else {
-                cert_path.isInvisible = true
+                binding.certPath.isInvisible = true
             }
         }
-        cert_path.setOnClickListener {
+        binding.certPath.setOnClickListener {
             openSaf()
         }
     }
 
     private fun getAccessCode(){
-        firefly_submit_button.setOnClickListener {
+        binding.fireflySubmitButton.setOnClickListener {
             hideKeyboard()
-            var fireflyUrl = firefly_url_edittext.getString()
-            val fireflyId = firefly_id_edittext.getString()
-            val fireflySecretKey =  firefly_secret_edittext.getString()
+            var fireflyUrl = binding.fireflyUrlEdittext.getString()
+            val fireflyId = binding.fireflyIdEdittext.getString()
+            val fireflySecretKey =  binding.fireflySecretEdittext.getString()
             val isSuccessful = authViewModel.authViaOauth(fireflyUrl, fireflySecretKey, fireflyId, fileUri)
             if(isSuccessful){
                 if (!fireflyUrl.startsWith("http")) {

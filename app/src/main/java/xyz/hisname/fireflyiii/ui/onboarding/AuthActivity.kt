@@ -32,12 +32,12 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_auth.*
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
+import xyz.hisname.fireflyiii.databinding.ActivityAuthBinding
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.util.extension.*
@@ -48,11 +48,14 @@ class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackC
     private lateinit var authActivityViewModel: AuthActivityViewModel
     private val progressOverlay by bindView<View>(R.id.progress_overlay)
     private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
+    private lateinit var binding: ActivityAuthBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme_LoginTheme)
-        setContentView(R.layout.activity_auth)
+        binding = ActivityAuthBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         authActivityViewModel = getViewModel(AuthActivityViewModel::class.java)
         if(savedInstanceState == null){
             val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
@@ -72,12 +75,12 @@ class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackC
     }
 
     private fun setHelpImage(){
-        helpImage.setImageDrawable(
+        binding.helpImage.setImageDrawable(
                 IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_help).apply {
                     sizeDp = 24
                 }
         )
-        helpImage.setOnClickListener {
+        binding.helpImage.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, "https://github.com/emansih/FireflyMobile/wiki/Authentication".toUri())
             if (browserIntent.resolveActivity(packageManager) != null){
                 startActivity(browserIntent)
