@@ -59,7 +59,7 @@ import kotlinx.android.synthetic.main.fragment_add_transaction.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar

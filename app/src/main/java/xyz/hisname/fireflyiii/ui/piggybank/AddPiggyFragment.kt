@@ -48,7 +48,7 @@ import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -394,6 +394,5 @@ class AddPiggyFragment: BaseAddObjectFragment() {
 
     private fun handleBack() {
         unReveal(dialog_add_piggy_layout)
-        markdownViewModel.markdownText.postValue("")
     }
 }

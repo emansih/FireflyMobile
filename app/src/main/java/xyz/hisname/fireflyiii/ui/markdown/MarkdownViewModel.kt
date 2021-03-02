@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.hisname.fireflyiii.repository
+package xyz.hisname.fireflyiii.ui.markdown
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

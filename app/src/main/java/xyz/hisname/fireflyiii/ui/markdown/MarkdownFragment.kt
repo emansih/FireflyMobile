@@ -30,9 +30,8 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_markdown.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.databinding.FragmentMarkdownBinding
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -40,10 +39,13 @@ import xyz.hisname.fireflyiii.util.extension.getViewModel
 class MarkdownFragment: BaseFragment() {
 
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
+    private var fragmentMarkdownBinding: FragmentMarkdownBinding? = null
+    private val binding get() = fragmentMarkdownBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_markdown, container)
+        fragmentMarkdownBinding = FragmentMarkdownBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,73 +67,73 @@ class MarkdownFragment: BaseFragment() {
     }
 
     private fun setWidget(){
-        discardButton.setCompoundDrawablesWithIntrinsicBounds(
+        binding.discardButton.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_close
                     colorRes = R.color.md_white_1000
                     sizeDp = 12
                 },null, null, null)
-        doneButton.setCompoundDrawablesWithIntrinsicBounds(
+        binding.doneButton.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_done
                     colorRes = R.color.md_white_1000
                     sizeDp =12
                 },null, null, null)
-        boldMarkdown.setImageDrawable(
+        binding.boldMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_bold
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
-        italicMarkdown.setImageDrawable(
+        binding.italicMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_italic
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
-        hyperlinkMarkdown.setImageDrawable(
+        binding.hyperlinkMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_insert_link
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
-        strikeThroughMarkdown.setImageDrawable(
+        binding.strikeThroughMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_strikethrough
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
-        quoteMarkdown.setImageDrawable(
+        binding.quoteMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_quote
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
-        bulletMarkdown.setImageDrawable(
+        binding.bulletMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_list_bulleted
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
-        numberedListMarkdown.setImageDrawable(
+        binding.numberedListMarkdown.setImageDrawable(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_format_list_numbered
                     colorRes = setIconColor()
                     sizeDp = 18
                 })
-        editableText.setText(markdownViewModel.markdownText.value)
-        displayText.text = markdownViewModel.markdownText.value
-        discardButton.setOnClickListener {
+        binding.editableText.setText(markdownViewModel.markdownText.value)
+        binding.displayText.text = markdownViewModel.markdownText.value
+        binding.discardButton.setOnClickListener {
             parentFragmentManager.popBackStack()
             hideKeyboard()
         }
-        doneButton.setOnClickListener {
-            markdownViewModel.markdownText.postValue(editableText.getString())
+        binding.doneButton.setOnClickListener {
+            markdownViewModel.markdownText.postValue(binding.editableText.getString())
             parentFragmentManager.popBackStack()
             hideKeyboard()
         }
-        discardButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
-        doneButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
+        binding.discardButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
+        binding.doneButton.setBackgroundColor(getCompatColor(R.color.colorPrimary))
     }
 
     private fun setIconColor(): Int{
@@ -143,7 +145,7 @@ class MarkdownFragment: BaseFragment() {
     }
 
     private fun parseText(){
-        editableText.addTextChangedListener(object : TextWatcher{
+        binding.editableText.addTextChangedListener(object : TextWatcher{
             override fun afterTextChanged(editable: Editable) {
 
             }
@@ -152,7 +154,7 @@ class MarkdownFragment: BaseFragment() {
             }
 
             override fun onTextChanged(charsequence: CharSequence, start: Int, before: Int, count: Int) {
-                displayText.text = charsequence.toString().toMarkDown()
+                binding.displayText.text = charsequence.toString().toMarkDown()
             }
 
         })
@@ -161,60 +163,60 @@ class MarkdownFragment: BaseFragment() {
 
     // https://github.com/k0shk0sh/FastHub/blob/eb13021b9a45ac1ae29815b48247647005a661bd/app/src/main/java/com/fastaccess/provider/markdown/MarkDownProvider.java
     private fun handleClick(){
-        boldMarkdown.setOnClickListener {
-            val markdownText = editableText.getString()
-            val markdownTextStart = editableText.selectionStart
-            val markdownTextEnd = editableText.selectionEnd
+        binding.boldMarkdown.setOnClickListener {
+            val markdownText = binding.editableText.getString()
+            val markdownTextStart = binding.editableText.selectionStart
+            val markdownTextEnd = binding.editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = "**$markdownSubString** "
-            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
-            editableText.setSelection(result.length + markdownTextStart - 3)
+            binding.editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            binding.editableText.setSelection(result.length + markdownTextStart - 3)
         }
-        italicMarkdown.setOnClickListener {
-            val markdownText = editableText.getString()
-            val markdownTextStart = editableText.selectionStart
-            val markdownTextEnd = editableText.selectionEnd
+        binding.italicMarkdown.setOnClickListener {
+            val markdownText = binding.editableText.getString()
+            val markdownTextStart = binding.editableText.selectionStart
+            val markdownTextEnd = binding.editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = "_" + markdownSubString + "_ "
-            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
-            editableText.setSelection(result.length + markdownTextStart - 2)
+            binding.editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            binding.editableText.setSelection(result.length + markdownTextStart - 2)
         }
-        strikeThroughMarkdown.setOnClickListener {
-            val markdownText = editableText.getString()
-            val markdownTextStart = editableText.selectionStart
-            val markdownTextEnd = editableText.selectionEnd
+        binding.strikeThroughMarkdown.setOnClickListener {
+            val markdownText = binding.editableText.getString()
+            val markdownTextStart = binding.editableText.selectionStart
+            val markdownTextEnd = binding.editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = "~~$markdownSubString~~ "
-            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
-            editableText.setSelection(result.length + markdownTextStart - 3)
+            binding.editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            binding.editableText.setSelection(result.length + markdownTextStart - 3)
         }
-        quoteMarkdown.setOnClickListener {
-            val markdownText = editableText.getString()
-            val markdownTextStart = editableText.selectionStart
-            val markdownTextEnd = editableText.selectionEnd
+        binding.quoteMarkdown.setOnClickListener {
+            val markdownText = binding.editableText.getString()
+            val markdownTextStart = binding.editableText.selectionStart
+            val markdownTextEnd = binding.editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = if (hasNewLine(markdownText, markdownTextStart)) {
                 "> $markdownSubString"
             } else {
                 "\n> $markdownSubString"
             }
-            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
-            editableText.setSelection(result.length + markdownTextStart)
+            binding.editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            binding.editableText.setSelection(result.length + markdownTextStart)
         }
-        bulletMarkdown.setOnClickListener {
-            val markdownText = editableText.getString()
-            val markdownTextStart = editableText.selectionStart
-            val markdownTextEnd = editableText.selectionEnd
+        binding.bulletMarkdown.setOnClickListener {
+            val markdownText = binding.editableText.getString()
+            val markdownTextStart = binding.editableText.selectionStart
+            val markdownTextEnd = binding.editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = if (hasNewLine(markdownText, markdownTextStart)) {
                 "• $markdownSubString"
             } else {
                 "\n• $markdownSubString"
             }
-            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
-            editableText.setSelection(result.length + markdownTextStart)
+            binding.editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            binding.editableText.setSelection(result.length + markdownTextStart)
         }
-        hyperlinkMarkdown.setOnClickListener {
+        binding.hyperlinkMarkdown.setOnClickListener {
             val layoutView = layoutInflater.inflate(R.layout.dialog_hyperlink, null)
             val urlText = layoutView.findViewById<EditText>(R.id.linktextEditText)
             urlText.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
@@ -231,7 +233,7 @@ class MarkdownFragment: BaseFragment() {
                 setTitle(R.string.insert_link)
                 setView(layoutView)
                 setPositiveButton(android.R.string.ok) { dialogInterface, which ->
-                    editableText.append("[" + urlText.getString() + "]" + "(" + url.getString() + ")")
+                    binding.editableText.append("[" + urlText.getString() + "]" + "(" + url.getString() + ")")
                 }
                 setNegativeButton(android.R.string.cancel){ dialogInterface, which ->
 
@@ -239,18 +241,18 @@ class MarkdownFragment: BaseFragment() {
                 show()
             }
         }
-        numberedListMarkdown.setOnClickListener {
-            val markdownText = editableText.getString()
-            val markdownTextStart = editableText.selectionStart
-            val markdownTextEnd = editableText.selectionEnd
+        binding.numberedListMarkdown.setOnClickListener {
+            val markdownText = binding.editableText.getString()
+            val markdownTextStart = binding.editableText.selectionStart
+            val markdownTextEnd = binding.editableText.selectionEnd
             val markdownSubString = markdownText.substring(markdownTextStart, markdownTextEnd)
             val result = if (hasNewLine(markdownText, markdownTextStart)) {
                 "1. $markdownSubString"
             } else {
                 "\n1. $markdownSubString"
             }
-            editableText.text.replace(markdownTextStart, markdownTextEnd, result)
-            editableText.setSelection(result.length + markdownTextStart)
+            binding.editableText.text.replace(markdownTextStart, markdownTextEnd, result)
+            binding.editableText.setSelection(result.length + markdownTextStart)
         }
     }
 
@@ -264,5 +266,10 @@ class MarkdownFragment: BaseFragment() {
         } catch(e: StringIndexOutOfBoundsException){
             return false
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().viewModelStore.clear()
     }
 }

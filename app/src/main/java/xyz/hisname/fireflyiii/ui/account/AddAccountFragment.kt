@@ -43,7 +43,7 @@ import com.mikepenz.iconics.utils.icon
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentAddAccountBinding
-import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -564,7 +564,6 @@ class AddAccountFragment: BaseAddObjectFragment() {
     
     private fun handleBack() {
         unReveal(binding.addAccountLayout)
-        markdownViewModel.markdownText.postValue("")
     }
 
     override fun onDestroyView() {

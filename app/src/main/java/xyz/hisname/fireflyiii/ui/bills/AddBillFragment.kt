@@ -46,7 +46,7 @@ import com.mikepenz.iconics.utils.sizeDp
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentAddBillBinding
-import xyz.hisname.fireflyiii.repository.MarkdownViewModel
+import xyz.hisname.fireflyiii.ui.markdown.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
 import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
@@ -419,7 +419,6 @@ class AddBillFragment: BaseAddObjectFragment() {
 
     private fun handleBack() {
         unReveal(binding.dialogAddBillLayout)
-        markdownViewModel.markdownText.postValue("")
     }
 
     override fun onDestroyView() {
