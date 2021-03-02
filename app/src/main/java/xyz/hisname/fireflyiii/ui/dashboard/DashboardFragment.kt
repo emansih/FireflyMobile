@@ -53,8 +53,8 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.fragment_dashboard.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentDashboardBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
@@ -74,34 +74,37 @@ class DashboardFragment: BaseFragment() {
 
     private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
     private val dashboardView by lazy { getImprovedViewModel(DashboardViewModel::class.java) }
+    private var fragmentDashboardBinding: FragmentDashboardBinding? = null
+    private val binding get() = fragmentDashboardBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_dashboard,container)
+        fragmentDashboardBinding = FragmentDashboardBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dashboardView.getDefaultCurrency()
-        animateCard(balanceCard, billsCard, netEarningsCard, dailySummaryCard,
-                leftToSpendCard, networthCard, recentTransactionCard, budgetCard)
-        twoMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(2)
-        oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
-        currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
+        animateCard(binding.balanceCard, binding.billsCard, binding.netEarningsCard, binding.dailySummaryCard,
+                binding.leftToSpendCard, binding.networthCard, binding.recentTransactionCard, binding.budgetCard)
+        binding.twoMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(2)
+        binding.oneMonthBefore.text = DateTimeUtil.getPreviousMonthShortName(1)
+        binding.currentMonthTextView.text = DateTimeUtil.getCurrentMonthShortName()
         changeTheme()
-        balanceCard.layoutParams.width = (getScreenWidth() - 425)
-        billsCard.layoutParams.width = (getScreenWidth() - 425)
-        leftToSpendCard.layoutParams.width = (getScreenWidth() - 425)
-        networthCard.layoutParams.width = (getScreenWidth() - 425)
+        binding.balanceCard.layoutParams.width = (getScreenWidth() - 425)
+        binding.billsCard.layoutParams.width = (getScreenWidth() - 425)
+        binding.leftToSpendCard.layoutParams.width = (getScreenWidth() - 425)
+        binding.networthCard.layoutParams.width = (getScreenWidth() - 425)
         setSummary()
-        dashboardView.currencySymbol.observe(viewLifecycleOwner){ symbol ->
+        dashboardView.currencySymbol.observe(viewLifecycleOwner){ _ ->
             setPieChart()
-            setNetIncome(symbol)
+            setNetIncome()
             setAverage()
             loadRecentTransaction()
         }
         setExtendedFab()
-        budgetCard.setOnClickListener {
+        binding.budgetCard.setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.fragment_container, BudgetSummaryFragment())
                 addToBackStack(null)
@@ -115,13 +118,13 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setDashboardDataClick(){
-        leftToSpendCard.setOnClickListener {
+        binding.leftToSpendCard.setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.fragment_container, BudgetListFragment())
                 addToBackStack(null)
             }
         }
-        billsCard.setOnClickListener {
+        binding.billsCard.setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.fragment_container, ListBillFragment())
                 addToBackStack(null)
@@ -131,7 +134,7 @@ class DashboardFragment: BaseFragment() {
 
     private fun setExtendedFab(){
         transactionExtendedFab.isVisible = true
-        dashboardNested.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+        binding.dashboardNested.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (scrollY > oldScrollY) {
                 transactionExtendedFab.shrink()
             } else {
@@ -145,33 +148,33 @@ class DashboardFragment: BaseFragment() {
 
     private fun setSummary(){
         dashboardView.networthValue.observe(viewLifecycleOwner){ money ->
-             networthAmount.text = money
+            binding.networthAmount.text = money
         }
 
         dashboardView.leftToSpendValue.observe(viewLifecycleOwner){ money ->
-            leftToSpendAmountText.text = money
+            binding.leftToSpendAmountText.text = money
         }
         dashboardView.balanceValue.observe(viewLifecycleOwner){ money ->
-            balanceText.text = money
+            binding.balanceText.text = money
             updateHomeScreenWidget(BalanceWidget::class.java)
         }
         dashboardView.earnedValue.observe(viewLifecycleOwner){ money ->
-            balanceEarnedText.text = money + " + "
+            binding.balanceEarnedText.text = money + " + "
         }
         dashboardView.spentValue.observe(viewLifecycleOwner){ money ->
-            balanceSpentText.text = money
+            binding.balanceSpentText.text = money
         }
         dashboardView.billsToPay.observe(viewLifecycleOwner){ money ->
-            billsText.text = money
+            binding.billsText.text = money
             updateHomeScreenWidget(BillsToPayWidget::class.java)
         }
 
         dashboardView.billsPaid.observe(viewLifecycleOwner){ money ->
-            billsPaidText.text = money
+            binding.billsPaidText.text = money
         }
 
         dashboardView.leftToSpendDay.observe(viewLifecycleOwner){ money ->
-            leftToSpendAmount.text = money
+            binding.leftToSpendAmount.text = money
         }
     }
 
@@ -185,56 +188,56 @@ class DashboardFragment: BaseFragment() {
     }
 
     private fun setIcon(){
-        balanceIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.balanceIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_balance_scale
             colorRes = R.color.md_white_1000
             sizeDp = 32
         })
-        billsIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.billsIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_calendar
             colorRes =R.color.md_white_1000
             sizeDp = 32
         })
-        leftToSpendIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.leftToSpendIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_money_bill
             colorRes = R.color.md_white_1000
             sizeDp = 32
         })
-        networthIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.networthIcon.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_chart_line
             colorRes = R.color.md_white_1000
             sizeDp = 32
         })
     }
 
-    private fun setNetIncome(currencySymbol: String){
+    private fun setNetIncome(){
         zipLiveData(dashboardView.currentMonthDepositLiveData, dashboardView.currentMonthWithdrawalLiveData,
                 dashboardView.lastMonthDepositLiveData, dashboardView.lastMonthWithdrawalLiveData,
                 dashboardView.twoMonthsAgoDepositLiveData,
                 dashboardView.twoMonthsAgoWithdrawalLiveData).observe(viewLifecycleOwner){ value ->
-            currentMonthIncome.text = dashboardView.currentMonthDeposit
-            currentExpense.text = dashboardView.currentMonthWithdrawal
+            binding.currentMonthIncome.text = dashboardView.currentMonthDeposit
+            binding.currentExpense.text = dashboardView.currentMonthWithdrawal
             if(dashboardView.currentMonthNetBigDecimal < BigDecimal.ZERO){
-                currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
+                binding.currentNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
-            currentNetIncome.text = dashboardView.currentMonthNetString
+            binding.currentNetIncome.text = dashboardView.currentMonthNetString
 
-            oneMonthBeforeIncome.text = dashboardView.lastMonthDeposit
-            oneMonthBeforeExpense.text = dashboardView.lastMonthWithdrawal
+            binding.oneMonthBeforeIncome.text = dashboardView.lastMonthDeposit
+            binding.oneMonthBeforeExpense.text = dashboardView.lastMonthWithdrawal
 
             if(dashboardView.lastMonthNetBigDecimal < BigDecimal.ZERO){
-                oneMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
+                binding.oneMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
-            oneMonthBeforeNetIncome.text = dashboardView.lastMonthNetString
+            binding.oneMonthBeforeNetIncome.text = dashboardView.lastMonthNetString
 
 
-            twoMonthBeforeIncome.text = dashboardView.twoMonthsAgoDeposit
-            twoMonthBeforeExpense.text = dashboardView.twoMonthsAgoWithdrawal
+            binding.twoMonthBeforeIncome.text = dashboardView.twoMonthsAgoDeposit
+            binding.twoMonthBeforeExpense.text = dashboardView.twoMonthsAgoWithdrawal
             if(dashboardView.twoMonthAgoNetBigDecimal < BigDecimal.ZERO){
-                twoMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
+                binding.twoMonthBeforeNetIncome.setTextColor(getCompatColor(R.color.md_red_700))
             }
 
-            twoMonthBeforeNetIncome.text = dashboardView.twoMonthAgoNetString
+            binding.twoMonthBeforeNetIncome.text = dashboardView.twoMonthAgoNetString
 
             val withDrawalHistory = arrayListOf(
                     BarEntry(0f, value.sixth.toFloat()),
@@ -259,7 +262,7 @@ class DashboardFragment: BaseFragment() {
                 valueFormatter = LargeValueFormatter()
                 valueTextSize = 12f
             }
-            netEarningsChart.apply {
+            binding.netEarningsChart.apply {
                 description.isEnabled = false
                 isScaleXEnabled = false
                 setDrawBarShadow(false)
@@ -270,7 +273,7 @@ class DashboardFragment: BaseFragment() {
                         DateTimeUtil.getCurrentMonthShortName()))
                 data = BarData(depositSets, withDrawalSets)
                 barData.barWidth = 0.3f
-                xAxis.axisMaximum = netEarningsChart.barData.getGroupWidth(0.4f, 0f) * 3
+                xAxis.axisMaximum = binding.netEarningsChart.barData.getGroupWidth(0.4f, 0f) * 3
                 groupBars(0f, 0.4f, 0f)
                 xAxis.setCenterAxisLabels(true)
                 data.isHighlightEnabled = false
@@ -297,7 +300,7 @@ class DashboardFragment: BaseFragment() {
                 color = Color.RED
                 valueTextSize = 15f
             }
-            dailySummaryChart.apply {
+            binding.dailySummaryChart.apply {
                 description.isEnabled = false
                 isScaleXEnabled = false
                 setDrawBarShadow(false)
@@ -315,13 +318,13 @@ class DashboardFragment: BaseFragment() {
                 animateY(1000)
                 setTouchEnabled(true)
             }
-            sixDaysAverage.text = dashboardView.sixDaysAverage
-            thirtyDaysAverage.text = dashboardView.thirtyDayAverage
+            binding.sixDaysAverage.text = dashboardView.sixDaysAverage
+            binding.thirtyDaysAverage.text = dashboardView.thirtyDayAverage
         }
     }
 
     private fun setPieChart() {
-        monthText.text = DateTimeUtil.getCurrentMonth()
+        binding.monthText.text = DateTimeUtil.getCurrentMonth()
         val dataColor = arrayListOf(getCompatColor(R.color.md_red_700), getCompatColor(R.color.md_green_500))
         zipLiveData(dashboardView.budgetLeftPercentage,
                 dashboardView.budgetSpentPercentage).observe(viewLifecycleOwner){ budget ->
@@ -333,9 +336,9 @@ class DashboardFragment: BaseFragment() {
                 iconsOffset = MPPointF(0f, 40f)
                 colors = dataColor
                 valueTextSize = 15f
-                valueFormatter = PercentFormatter(budgetChart)
+                valueFormatter = PercentFormatter(binding.budgetChart)
             }
-            budgetChart.setData {
+            binding.budgetChart.setData {
                 data = PieData(dataSet)
                 description.isEnabled = false
                 setUsePercentValues(true)
@@ -346,7 +349,7 @@ class DashboardFragment: BaseFragment() {
                     }
                 }
             }
-            val progressDrawable = budgetProgress.progressDrawable.mutate()
+            val progressDrawable = binding.budgetProgress.progressDrawable.mutate()
             when {
                 budget.first.toInt() >= 80 -> {
                     progressDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(Color.RED,
@@ -361,36 +364,36 @@ class DashboardFragment: BaseFragment() {
                             BlendModeCompat.SRC_ATOP)
                 }
             }
-            budgetProgress.progressDrawable = progressDrawable
-            ObjectAnimator.ofInt(budgetProgress, "progress", budget.first.toInt()).start()
+            binding.budgetProgress.progressDrawable = progressDrawable
+            ObjectAnimator.ofInt(binding.budgetProgress, "progress", budget.first.toInt()).start()
         }
         dashboardView.currentMonthBudgetValue.observe(viewLifecycleOwner){ budget ->
-            budgetAmount.text = budget
+            binding.budgetAmount.text = budget
         }
         dashboardView.currentMonthSpentValue.observe(viewLifecycleOwner){ budget ->
-            spentAmount.text = budget
+            binding.spentAmount.text = budget
         }
     }
 
     private fun loadRecentTransaction(){
         val recyclerAdapter = TransactionAdapter{ data -> itemClicked(data) }
-        recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
-        recentTransactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recentTransactionList.adapter = recyclerAdapter
-        transactionLoader.show()
+        binding.recentTransactionList.layoutManager = LinearLayoutManager(requireContext())
+        binding.recentTransactionList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.recentTransactionList.adapter = recyclerAdapter
+        binding.transactionLoader.show()
         dashboardView.getRecentTransactions().observe(viewLifecycleOwner){ pagingData ->
             recyclerAdapter.submitData(lifecycle, pagingData)
         }
 
         recyclerAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
             if(loadStates.refresh !is LoadState.Loading) {
-                transactionLoader.hide()
+                binding.transactionLoader.hide()
                 if(recyclerAdapter.itemCount < 1) {
-                    recentTransactionList.isGone = true
-                    noTransactionText.isVisible = true
+                    binding.recentTransactionList.isGone = true
+                    binding.noTransactionText.isVisible = true
                 } else {
-                    recentTransactionList.isVisible = true
-                    noTransactionText.isGone = true
+                    binding.recentTransactionList.isVisible = true
+                    binding.noTransactionText.isGone = true
                 }
             }
         }
@@ -407,17 +410,17 @@ class DashboardFragment: BaseFragment() {
 
     private fun changeTheme(){
         if (isDarkMode()){
-            netEarningsExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
-            netEarningsChart.legend.textColor = getCompatColor(R.color.md_white_1000)
-            netEarningsChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
-            netEarningsChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
-            netEarningsChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
-            dailySummaryExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
-            dailySummaryChart.legend.textColor = getCompatColor(R.color.md_white_1000)
-            dailySummaryChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
-            dailySummaryChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
-            dailySummaryChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
-            budgetExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
+            binding.netEarningsExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
+            binding.netEarningsChart.legend.textColor = getCompatColor(R.color.md_white_1000)
+            binding.netEarningsChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
+            binding.netEarningsChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
+            binding.netEarningsChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
+            binding.dailySummaryExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
+            binding.dailySummaryChart.legend.textColor = getCompatColor(R.color.md_white_1000)
+            binding.dailySummaryChart.axisLeft.textColor = getCompatColor(R.color.md_white_1000)
+            binding.dailySummaryChart.axisRight.textColor = getCompatColor(R.color.md_white_1000)
+            binding.dailySummaryChart.xAxis.textColor = getCompatColor(R.color.md_white_1000)
+            binding.budgetExtraInfoLayout.setBackgroundColor(getCompatColor(R.color.md_black_1000))
         }
     }
 
@@ -429,9 +432,9 @@ class DashboardFragment: BaseFragment() {
                     .setInterpolator(DecelerateInterpolator(5f))
                     .setDuration(1234)
                     .withEndAction {
-                        if(frames == billsCard){
+                        if(frames == binding.billsCard){
                             showCase(R.string.dashboard_balance_help_text,
-                                    "balanceLayoutCaseView", balanceLayout).show()
+                                    "balanceLayoutCaseView", binding.balanceLayout).show()
                         }
                     }
         }
