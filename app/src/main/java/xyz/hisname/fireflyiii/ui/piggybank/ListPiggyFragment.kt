@@ -28,13 +28,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.fragment_base_list.*
-import kotlinx.android.synthetic.main.piggy_list_item.view.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
+import xyz.hisname.fireflyiii.databinding.PiggyListItemBinding
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.piggybank.details.PiggyDetailFragment
@@ -44,10 +43,16 @@ class ListPiggyFragment: BaseFragment(){
 
     private val piggyViewModel by lazy { getImprovedViewModel(ListPiggyViewModel::class.java) }
     private val piggyRecyclerAdapter by lazy { PiggyRecyclerAdapter { data: PiggyData -> itemClicked(data) } }
+    private var fragmentBaseListBinding: FragmentBaseListBinding? = null
+    private val binding get() = fragmentBaseListBinding!!
+    private var baseSwipeLayoutBinding: BaseSwipeLayoutBinding? = null
+    private val baseBinding get() = baseSwipeLayoutBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_base_list, container)
+        fragmentBaseListBinding = FragmentBaseListBinding.inflate(inflater, container, false)
+        baseSwipeLayoutBinding = binding.baseSwipeLayout
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,22 +64,22 @@ class ListPiggyFragment: BaseFragment(){
     }
 
     private fun displayView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.adapter = piggyRecyclerAdapter
+        baseBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        baseBinding.recyclerView.adapter = piggyRecyclerAdapter
         piggyViewModel.getPiggyBank().observe(viewLifecycleOwner){ pagingData ->
             piggyRecyclerAdapter.submitData(lifecycle, pagingData)
         }
         piggyRecyclerAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            baseBinding.swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
             if(loadStates.refresh !is LoadState.Loading) {
                 if (piggyRecyclerAdapter.itemCount < 1) {
-                    listText.text = resources.getString(R.string.no_piggy_bank)
-                    listText.isVisible = true
-                    listImage.isVisible = true
-                    listImage.setImageDrawable(getCompatDrawable(R.drawable.ic_piggy_bank))
+                    binding.listText.text = resources.getString(R.string.no_piggy_bank)
+                    binding.listText.isVisible = true
+                    binding.listImage.isVisible = true
+                    binding.listImage.setImageDrawable(getCompatDrawable(R.drawable.ic_piggy_bank))
                 } else {
-                    listImage.isGone = true
-                    listText.isGone = true
+                    binding.listImage.isGone = true
+                    binding.listText.isGone = true
                 }
             }
         }
@@ -90,18 +95,19 @@ class ListPiggyFragment: BaseFragment(){
     }
 
     private fun pullToRefresh(){
-        swipeContainer.setOnRefreshListener {
+        baseBinding.swipeContainer.setOnRefreshListener {
             piggyRecyclerAdapter.refresh()
         }
     }
 
     private fun enableDragDrop(){
-        recycler_view.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
-            if (viewHolder.itemView.piggyCard.isOverlapping(extendedFab)){
+        baseBinding.recyclerView.enableDragDrop(extendedFab) { viewHolder, isCurrentlyActive ->
+            val piggyListItemBinding = PiggyListItemBinding.bind(viewHolder.itemView)
+            if (piggyListItemBinding.piggyCard.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive){
-                    val piggyName = viewHolder.itemView.piggyName.text.toString()
-                    val piggyId = viewHolder.itemView.piggyId.text.toString()
+                    val piggyName = piggyListItemBinding.piggyName.text.toString()
+                    val piggyId = piggyListItemBinding.piggyId.text.toString()
                     piggyViewModel.deletePiggybank(piggyId).observe(viewLifecycleOwner){ isDeleted ->
                         piggyRecyclerAdapter.refresh()
                         if(isDeleted){

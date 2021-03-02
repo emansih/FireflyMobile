@@ -30,9 +30,9 @@ import androidx.core.view.isGone
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.details_card.*
-import kotlinx.android.synthetic.main.fragment_piggy_detail.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.DetailsCardBinding
+import xyz.hisname.fireflyiii.databinding.FragmentPiggyDetailBinding
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.ui.ProgressBar
@@ -50,10 +50,16 @@ class PiggyDetailFragment: BaseDetailFragment() {
     private val piggyId: Long by lazy { arguments?.getLong("piggyId") as Long  }
     private val piggyDetailViewModel by lazy { getImprovedViewModel(PiggyDetailViewModel::class.java) }
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
+    private var fragmentPiggyDetailBinding: FragmentPiggyDetailBinding? = null
+    private val binding get() = fragmentPiggyDetailBinding!!
+    private var detailsCardBinding: DetailsCardBinding? = null
+    private val detailBinding get() = detailsCardBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_piggy_detail,container)
+        fragmentPiggyDetailBinding = FragmentPiggyDetailBinding.inflate(inflater, container, false)
+        detailsCardBinding = binding.piggyBankDetailsCard
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,37 +83,37 @@ class PiggyDetailFragment: BaseDetailFragment() {
                         DetailModel(resources.getString(R.string.target_date), piggyAttribute.target_date)
                     }
             )
-            detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-            detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-            detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
+            detailBinding.detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            detailBinding.detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            detailBinding.detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(piggy){ position: Int -> setClickListener(position)}
             val percentage = piggyData.piggyAttributes.percentage ?: 0
             when {
                 percentage <= 15 -> {
-                    piggyBankProgressBar.progressDrawable.colorFilter =
+                    binding.piggyBankProgressBar.progressDrawable.colorFilter =
                             BlendModeColorFilterCompat.createBlendModeColorFilterCompat(R.color.md_red_700,
                                     BlendModeCompat.SRC_ATOP)
                 }
                 percentage in 16..75 -> {
-                    piggyBankProgressBar.progressDrawable.colorFilter =
+                    binding.piggyBankProgressBar.progressDrawable.colorFilter =
                             BlendModeColorFilterCompat.createBlendModeColorFilterCompat(R.color.md_deep_orange_500,
                                     BlendModeCompat.SRC_ATOP)
                 }
                 percentage <= 76 -> {
-                    piggyBankProgressBar.progressDrawable.colorFilter =
+                    binding.piggyBankProgressBar.progressDrawable.colorFilter =
                             BlendModeColorFilterCompat.createBlendModeColorFilterCompat(R.color.md_green_500,
                                     BlendModeCompat.SRC_ATOP)
                 }
             }
 
-            amount.text = piggyAttribute.current_amount.toString()
-            amountPercentage.text = percentage.toString() + "%"
-            currencyCodeTextView.text = piggyAttribute.currency_code
-            piggyBankName.text = piggyAttribute.name
+            binding.amount.text = piggyAttribute.current_amount.toString()
+            binding.amountPercentage.text = percentage.toString() + "%"
+            binding.currencyCodeTextView.text = piggyAttribute.currency_code
+            binding.piggyBankName.text = piggyAttribute.name
             val notes = piggyAttribute.notes
             if(notes.isNullOrEmpty()){
-                notesCard.isGone = true
+                binding.notesCard.isGone = true
             } else {
-                notesText.text = notes.toMarkDown()
+                binding.notesText.text = notes.toMarkDown()
             }
             setupProgressBar(percentage)
         }
@@ -123,7 +129,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
         piggyDetailViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner) { downloadedFile ->
             // "Refresh" the icon. From downloading to open file
-            attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+            binding.attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
                     true, { data: AttachmentData ->
                 setDownloadClickListener(data, attachmentDataAdapter)
             }){ another: Int -> }
@@ -135,9 +141,9 @@ class PiggyDetailFragment: BaseDetailFragment() {
         piggyDetailViewModel.piggyAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
-                attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                binding.attachmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                binding.attachmentRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.attachmentRecyclerView.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                         true, { data: AttachmentData ->
                     setDownloadClickListener(data, attachmentDataAdapter)
                 }) { another: Int -> }
@@ -180,7 +186,7 @@ class PiggyDetailFragment: BaseDetailFragment() {
 
 
     private fun setupProgressBar(percentage: Int){
-        ObjectAnimator.ofInt(piggyBankProgressBar, "progress", 0, percentage).apply {
+        ObjectAnimator.ofInt(binding.piggyBankProgressBar, "progress", 0, percentage).apply {
             // 1000ms = 1s
             duration = 1000
             interpolator = AccelerateInterpolator()
@@ -194,5 +200,10 @@ class PiggyDetailFragment: BaseDetailFragment() {
             })
             addToBackStack(null)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentPiggyDetailBinding = null
     }
 }

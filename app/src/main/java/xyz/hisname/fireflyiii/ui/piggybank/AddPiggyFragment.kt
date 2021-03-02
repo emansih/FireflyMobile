@@ -46,8 +46,8 @@ import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_add_piggy.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentAddPiggyBinding
 import xyz.hisname.fireflyiii.ui.markdown.MarkdownViewModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.attachment.Attributes
@@ -76,16 +76,18 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var attachmentDataAdapter = arrayListOf<AttachmentData>()
     private val attachmentItemAdapter by lazy { arrayListOf<Uri>() }
-
+    private var fragmentAddPiggyBinding: FragmentAddPiggyBinding? = null
+    private val binding get() = fragmentAddPiggyBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_add_piggy, container)
+        fragmentAddPiggyBinding = FragmentAddPiggyBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        showReveal(dialog_add_piggy_layout)
+        showReveal(binding.dialogAddPiggyLayout)
         updateEditText()
         setFab()
         showHelpText()
@@ -104,14 +106,14 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                     piggyViewModel.uploadFile(piggyId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
                         // Only show the updated files array if upload succeeds
                         if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
-                            attachment_information.adapter?.notifyDataSetChanged()
+                            binding.attachmentInformation.adapter?.notifyDataSetChanged()
                             toastSuccess("File uploaded")
                         } else {
                             toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
                         }
                     }
                 } else {
-                    attachment_information.adapter?.notifyDataSetChanged()
+                    binding.attachmentInformation.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -128,14 +130,14 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                     piggyViewModel.uploadFile(piggyId, attachmentItemAdapter).observe(viewLifecycleOwner){ workInfo ->
                         // Only show the updated files array if upload succeeds
                         if(workInfo[0].state == WorkInfo.State.SUCCEEDED){
-                            attachment_information.adapter?.notifyDataSetChanged()
+                            binding.attachmentInformation.adapter?.notifyDataSetChanged()
                             toastSuccess("File uploaded")
                         } else {
                             toastError("There was an issue uploading your file", Toast.LENGTH_LONG)
                         }
                     }
                 } else {
-                    attachment_information.adapter?.notifyDataSetChanged()
+                    binding.attachmentInformation.adapter?.notifyDataSetChanged()
                 }
             }
         }
@@ -171,21 +173,21 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun showHelpText() = showCase(R.string.piggy_bank_description_help_text,
-            "descriptionCaseView", description_edittext).show()
+            "descriptionCaseView", binding.descriptionEdittext).show()
 
     private fun updateEditText(){
         if(piggyId != 0L){
             piggyViewModel.getPiggyById(piggyId).observe(viewLifecycleOwner) { piggyData ->
                 val piggyAttributes = piggyData.piggyAttributes
-                description_edittext.setText(piggyAttributes.name)
-                target_amount_edittext.setText(piggyAttributes.target_amount.toString())
-                current_amount_edittext.setText(piggyAttributes.current_amount.toString())
-                date_started_edittext.setText(piggyAttributes.start_date)
-                date_target_edittext.setText(piggyAttributes.target_date)
-                note_edittext.setText(piggyAttributes.notes)
+                binding.descriptionEdittext.setText(piggyAttributes.name)
+                binding.targetAmountEdittext.setText(piggyAttributes.target_amount.toString())
+                binding.currentAmountEdittext.setText(piggyAttributes.current_amount.toString())
+                binding.dateStartedEdittext.setText(piggyAttributes.start_date)
+                binding.dateTargetEdittext.setText(piggyAttributes.target_date)
+                binding.noteEdittext.setText(piggyAttributes.notes)
                 piggyViewModel.getAccountById(piggyData.piggyAttributes.account_id ?: 0).observe(viewLifecycleOwner){ accountData ->
                     val accountAttributes = accountData.accountAttributes
-                    account_exposed_dropdown.setText(accountAttributes.name + " (" +
+                    binding.accountExposedDropdown.setText(accountAttributes.name + " (" +
                             accountAttributes.currency_symbol + accountAttributes.current_balance + ")")
                 }
                 displayAttachment()
@@ -197,9 +199,9 @@ class AddPiggyFragment: BaseAddObjectFragment() {
         piggyViewModel.piggyAttachment.observe(viewLifecycleOwner) { attachment ->
             if (attachment.isNotEmpty()) {
                 attachmentDataAdapter = ArrayList(attachment)
-                attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+                binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                         false, { data: AttachmentData ->
                     AlertDialog.Builder(requireContext())
                             .setTitle(getString(R.string.are_you_sure))
@@ -207,7 +209,7 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                                 piggyViewModel.deleteAttachment(data).observe(viewLifecycleOwner) { isSuccessful ->
                                     if (isSuccessful) {
                                         attachmentDataAdapter.remove(data)
-                                        attachment_information.adapter?.notifyDataSetChanged()
+                                        binding.attachmentInformation.adapter?.notifyDataSetChanged()
                                         toastSuccess("Deleted " + data.attachmentAttributes.filename)
                                     } else {
                                         toastError("There was an issue deleting " + data.attachmentAttributes.filename, Toast.LENGTH_LONG)
@@ -221,44 +223,44 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun setAccordion(){
-        expansionLayout.addListener { _, expanded ->
+        binding.expansionLayout.addListener { _, expanded ->
             if(expanded){
                 showCase(R.string.piggy_bank_date_help_text,
-                        "dateStartedCaseView", date_started_edittext).show()
+                        "dateStartedCaseView", binding.dateStartedEdittext).show()
             }
         }
     }
 
     private fun setFab(){
         if(piggyId != 0L){
-            addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+            binding.addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
-        addPiggyFab.setOnClickListener {
+        binding.addPiggyFab.setOnClickListener {
             hideKeyboard()
-            currentAmount = if (current_amount_edittext.isBlank()) {
+            currentAmount = if (binding.currentAmountEdittext.isBlank()) {
                 null
             } else {
-                current_amount_edittext.getString()
+                binding.currentAmountEdittext.getString()
             }
-            startDate = if (date_started_edittext.isBlank()) {
+            startDate = if (binding.dateStartedEdittext.isBlank()) {
                 null
             } else {
-                date_started_edittext.getString()
+                binding.dateStartedEdittext.getString()
             }
-            targetDate = if (date_target_edittext.isBlank()) {
+            targetDate = if (binding.dateTargetEdittext.isBlank()) {
                 null
             } else {
-                date_target_edittext.getString()
+                binding.dateTargetEdittext.getString()
             }
-            notes = if (note_edittext.isBlank()) {
+            notes = if (binding.noteEdittext.isBlank()) {
                 null
             } else {
-                note_edittext.getString()
+                binding.noteEdittext.getString()
             }
-            groupTitle = if(groupEdittext.isBlank()){
+            groupTitle = if(binding.groupEdittext.isBlank()){
                 null
             } else {
-                groupEdittext.getString()
+                binding.groupEdittext.getString()
             }
             if(piggyId == 0L) {
                 submitData()
@@ -269,30 +271,30 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     override fun setIcons(){
-        target_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.targetAmountEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_money_bill
                     colorRes = R.color.md_green_400
                     sizeDp = 24
                 }, null, null, null)
-        current_amount_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.currentAmountEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_money_bill
                     colorRes = R.color.md_green_400
                     sizeDp = 24
                 }, null, null, null)
-        date_started_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+        binding.dateStartedEdittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_calendar
             color = colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
             sizeDp = 24
         }, null, null, null)
-        date_target_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+        binding.dateTargetEdittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_calendar
             color = colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
             sizeDp = 24
         }, null, null, null)
-        addPiggyFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
-        addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.addPiggyFab.setBackgroundColor(getCompatColor(R.color.colorPrimaryDark))
+        binding.addPiggyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
@@ -301,42 +303,42 @@ class AddPiggyFragment: BaseAddObjectFragment() {
 
     override fun setWidgets(){
         setAccordion()
-        date_target_edittext.setOnClickListener {
+        binding.dateTargetEdittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
             picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
-                date_target_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+                binding.dateTargetEdittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
-        date_started_edittext.setOnClickListener {
+        binding.dateStartedEdittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
             picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
-                date_started_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+                binding.dateStartedEdittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
         piggyViewModel.getAccount().observe(viewLifecycleOwner) { list ->
             val accountAdapter = ArrayAdapter(requireContext(), R.layout.cat_exposed_dropdown_popup_item, list)
             accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            account_exposed_dropdown.setAdapter(accountAdapter)
+            binding.accountExposedDropdown.setAdapter(accountAdapter)
         }
-        account_exposed_dropdown.setOnItemClickListener { parent, view, position, id ->
+        binding.accountExposedDropdown.setOnItemClickListener { parent, view, position, id ->
             piggyViewModel.getCurrentSelectedAccount(position)
         }
-        placeHolderToolbar.setNavigationOnClickListener {
+        binding.placeHolderToolbar.setNavigationOnClickListener {
             handleBack()
         }
-        note_edittext.setOnClickListener {
-            markdownViewModel.markdownText.postValue(note_edittext.getString())
+        binding.noteEdittext.setOnClickListener {
+            markdownViewModel.markdownText.postValue(binding.noteEdittext.getString())
             parentFragmentManager.commit {
                 replace(R.id.bigger_fragment_container, MarkdownFragment())
                 addToBackStack(null)
             }
         }
         markdownViewModel.markdownText.observe(viewLifecycleOwner){ markdownText ->
-            note_edittext.setText(markdownText)
+            binding.noteEdittext.setText(markdownText)
         }
         piggyViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
             if(loader){
@@ -345,29 +347,29 @@ class AddPiggyFragment: BaseAddObjectFragment() {
                 ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
             }
         }
-        add_attachment_button.setOnClickListener {
+        binding.addAttachmentButton.setOnClickListener {
             attachmentDialog()
         }
-        attachment_information.layoutManager = LinearLayoutManager(requireContext())
-        attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+        binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+        binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                 false, { data: AttachmentData ->
             attachmentDataAdapter.remove(data)
-            attachment_information.adapter?.notifyDataSetChanged()
+            binding.attachmentInformation.adapter?.notifyDataSetChanged()
         }) { another: Int -> }
         // https://github.com/firefly-iii/firefly-iii/issues/4435
         piggyViewModel.unSupportedVersion.observe(viewLifecycleOwner){ isNotSupported ->
             if(isNotSupported){
-                 groupLayout.isGone = true
+                binding.groupLayout.isGone = true
             } else {
-                groupLayout.isVisible = true
+                binding.groupLayout.isVisible = true
             }
         }
     }
 
     override fun submitData(){
-        piggyViewModel.addPiggyBank(description_edittext.getString(), currentAmount, notes, startDate,
-                target_amount_edittext.getString(), targetDate, groupTitle,
+        piggyViewModel.addPiggyBank(binding.descriptionEdittext.getString(), currentAmount, notes, startDate,
+                binding.targetAmountEdittext.getString(), targetDate, groupTitle,
                 attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
@@ -380,8 +382,8 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun updatePiggyBank(){
-        piggyViewModel.updatePiggyBank(piggyId, description_edittext.getString(),
-                currentAmount, notes, startDate, target_amount_edittext.getString(),
+        piggyViewModel.updatePiggyBank(piggyId, binding.descriptionEdittext.getString(),
+                currentAmount, notes, startDate, binding.targetAmountEdittext.getString(),
                 targetDate, groupTitle).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
@@ -393,6 +395,11 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     }
 
     private fun handleBack() {
-        unReveal(dialog_add_piggy_layout)
+        unReveal(binding.dialogAddPiggyLayout)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAddPiggyBinding = null
     }
 }
