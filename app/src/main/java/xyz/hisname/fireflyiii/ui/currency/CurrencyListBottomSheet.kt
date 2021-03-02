@@ -25,10 +25,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.currency_bottom_sheet.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.CurrencyBottomSheetBinding
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
-import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 
@@ -36,18 +34,21 @@ class CurrencyListBottomSheet: BottomSheetDialogFragment() {
 
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val currencyAdapter by lazy { CurrencyRecyclerAdapter(false) { data: CurrencyData -> itemClicked(data)}}
+    private var currencyBottomSheetBinding: CurrencyBottomSheetBinding? = null
+    private val binding get() = currencyBottomSheetBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.currency_bottom_sheet, container)
+        currencyBottomSheetBinding = CurrencyBottomSheetBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         hideKeyboard()
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
-        recycler_view.adapter = currencyAdapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
+        binding.recyclerView.adapter = currencyAdapter
         currencyViewModel.getCurrencyList().observe(viewLifecycleOwner){ pagingData ->
             currencyAdapter.submitData(lifecycle, pagingData)
         }

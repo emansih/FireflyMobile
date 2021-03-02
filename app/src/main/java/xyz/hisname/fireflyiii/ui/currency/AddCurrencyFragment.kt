@@ -29,8 +29,8 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_add_currency.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentAddCurrencyBinding
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -39,27 +39,30 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
 
     private val currencyId by lazy { arguments?.getLong("currencyId") ?: 0L }
     private val currencyViewModel by lazy { getImprovedViewModel(AddCurrencyViewModel::class.java) }
+    private var fragmentAddCurrencyBinding: FragmentAddCurrencyBinding? = null
+    private val binding get() = fragmentAddCurrencyBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_add_currency, container)
+        fragmentAddCurrencyBinding = FragmentAddCurrencyBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        showReveal(dialog_add_currency_layout)
+        showReveal(binding.dialogAddCurrencyLayout)
         if(currencyId != 0L){
             currencyViewModel.getCurrencyById(currencyId).observe(viewLifecycleOwner) {
                 val currencyAttributes = it[0].currencyAttributes
-                name_edittext.setText(currencyAttributes.name)
-                decimal_places_edittext.setText(currencyAttributes.decimal_places.toString())
-                symbol_edittext.setText(currencyAttributes.symbol)
-                code_edittext.setText(currencyAttributes.code)
+                binding.nameEdittext.setText(currencyAttributes.name)
+                binding.decimalPlacesEdittext.setText(currencyAttributes.decimal_places.toString())
+                binding.symbolEdittext.setText(currencyAttributes.symbol)
+                binding.codeEdittext.setText(currencyAttributes.code)
                 if(currencyAttributes.enabled){
-                    enabled_checkbox.isChecked = true
+                    binding.enabledCheckbox.isChecked = true
                 }
                 if(currencyAttributes.currencyDefault){
-                    default_checkbox.isChecked = true
+                    binding.defaultCheckbox.isChecked = true
                 }
             }
         }
@@ -68,9 +71,9 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
 
     private fun setFab(){
         if(currencyId != 0L){
-            addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+            binding.addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
-        addCurrencyFab.setOnClickListener {
+        binding.addCurrencyFab.setOnClickListener {
             hideKeyboard()
             if(currencyId != 0L){
                 updateData()
@@ -81,23 +84,23 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     }
 
     override fun setIcons(){
-        decimal_places_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+        binding.decimalPlacesEdittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_dot_circle
             colorRes = R.color.md_amber_500
             sizeDp = 24
         },null, null, null)
-        symbol_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+        binding.symbolEdittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_euro_symbol
             colorRes = R.color.md_pink_800
             sizeDp = 24
         },null, null, null)
-        code_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+        binding.codeEdittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_code
             colorRes = R.color.md_deep_purple_400
             sizeDp = 24
         },null, null, null)
-        addCurrencyFab.setBackgroundColor(getCompatColor( R.color.colorPrimaryDark))
-        addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.addCurrencyFab.setBackgroundColor(getCompatColor( R.color.colorPrimaryDark))
+        binding.addCurrencyFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
@@ -105,14 +108,14 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     }
 
     override fun setWidgets(){
-        enabled_textview.setOnClickListener {
-            enabled_checkbox.performClick()
+        binding.enabledTextview.setOnClickListener {
+            binding.enabledCheckbox.performClick()
         }
-        default_textview.setOnClickListener {
-            default_checkbox.performClick()
+        binding.defaultTextview.setOnClickListener {
+            binding.defaultCheckbox.performClick()
         }
-        placeHolderToolbar.setNavigationOnClickListener {
-            unReveal(dialog_add_currency_layout)
+        binding.placeHolderToolbar.setNavigationOnClickListener {
+            unReveal(binding.dialogAddCurrencyLayout)
             extendedFab.isVisible = true
         }
         currencyViewModel.isLoading.observe(viewLifecycleOwner) { loader ->
@@ -125,12 +128,12 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     }
 
     private fun updateData(){
-        currencyViewModel.updateCurrency(name_edittext.getString(), code_edittext.getString(),
-                symbol_edittext.getString(), decimal_places_edittext.getString(),
-                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(viewLifecycleOwner) { response ->
+        currencyViewModel.updateCurrency(binding.nameEdittext.getString(), binding.codeEdittext.getString(),
+                binding.symbolEdittext.getString(), binding.decimalPlacesEdittext.getString(),
+                binding.enabledCheckbox.isChecked, binding.defaultCheckbox.isChecked).observe(viewLifecycleOwner) { response ->
             if(response.first){
-                toastSuccess(resources.getString(R.string.currency_updated, name_edittext.getString()))
-                unReveal(addCurrencyFab)
+                toastSuccess(resources.getString(R.string.currency_updated, binding.nameEdittext.getString()))
+                unReveal(binding.addCurrencyFab)
                 extendedFab.isVisible = true
             } else {
                 toastInfo(response.second)
@@ -139,15 +142,20 @@ class AddCurrencyFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        currencyViewModel.addCurrency(name_edittext.getString(), code_edittext.getString(),
-                symbol_edittext.getString(), decimal_places_edittext.getString(),
-                enabled_checkbox.isChecked, default_checkbox.isChecked).observe(viewLifecycleOwner) { response ->
+        currencyViewModel.addCurrency(binding.nameEdittext.getString(), binding.codeEdittext.getString(),
+                binding.symbolEdittext.getString(), binding.decimalPlacesEdittext.getString(),
+                binding.enabledCheckbox.isChecked, binding.defaultCheckbox.isChecked).observe(viewLifecycleOwner) { response ->
             if(response.first){
-                toastSuccess(resources.getString(R.string.currency_created, name_edittext.getString()))
-                unReveal(addCurrencyFab)
+                toastSuccess(resources.getString(R.string.currency_created, binding.nameEdittext.getString()))
+                unReveal(binding.addCurrencyFab)
             } else {
                 toastInfo(response.second)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentAddCurrencyBinding = null
     }
 }
