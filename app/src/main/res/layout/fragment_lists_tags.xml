@@ -85,6 +85,8 @@
 
     </ScrollView>
 
-    <include layout="@layout/fragment_base_list"/>
+    <include
+        android:id="@+id/tagsBaseList"
+        layout="@layout/fragment_base_list"/>
 
 </LinearLayout>

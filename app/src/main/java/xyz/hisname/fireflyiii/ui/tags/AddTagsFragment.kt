@@ -26,7 +26,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
 import androidx.fragment.app.commit
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mikepenz.iconics.IconicsColor.Companion.colorList
@@ -37,10 +36,8 @@ import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_add_tags.*
-import kotlinx.android.synthetic.main.fragment_add_tags.description_edittext
-import kotlinx.android.synthetic.main.fragment_add_tags.placeHolderToolbar
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentAddTagsBinding
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseAddObjectFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -56,14 +53,18 @@ class AddTagsFragment: BaseAddObjectFragment() {
     private val tagId by lazy { arguments?.getLong("tagId") ?: 0 }
     private val addTagViewModel by lazy { getImprovedViewModel(AddTagsViewModel::class.java) }
     private val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
+    private var fragmentAddTagsBinding: FragmentAddTagsBinding? = null
+    private val binding get() = fragmentAddTagsBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.create(R.layout.fragment_add_tags, container)
+        fragmentAddTagsBinding = FragmentAddTagsBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        showReveal(dialog_add_tags_layout)
+        showReveal(binding.dialogAddTagsLayout)
         if(tagId != 0L){
             updateData()
         }
@@ -72,34 +73,34 @@ class AddTagsFragment: BaseAddObjectFragment() {
 
     private fun setFab(){
         if(tagId != 0L){
-            addTagFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
+            binding.addTagFab.setImageDrawable(IconicsDrawable(requireContext()).icon(GoogleMaterial.Icon.gmd_update))
         }
-        addTagFab.setOnClickListener {
+        binding.addTagFab.setOnClickListener {
             hideKeyboard()
-            date = if(date_edittext.isBlank()){
+            date = if(binding.dateEdittext.isBlank()){
                 null
             } else {
-                date_edittext.getString()
+                binding.dateEdittext.getString()
             }
-            description = if(description_edittext.isBlank()){
+            description = if(binding.descriptionEdittext.isBlank()){
                 null
             } else {
-                description_edittext.getString()
+                binding.descriptionEdittext.getString()
             }
-            latitude = if(latitude_edittext.isBlank()){
+            latitude = if(binding.latitudeEdittext.isBlank()){
                 null
             } else {
-                latitude_edittext.getString()
+                binding.latitudeEdittext.getString()
             }
-            longitude = if(longitude_edittext.isBlank()){
+            longitude = if(binding.longitudeEdittext.isBlank()){
                 null
             } else {
-                longitude_edittext.getString()
+                binding.longitudeEdittext.getString()
             }
-            zoomLevel = if(zoom_edittext.isBlank()){
+            zoomLevel = if(binding.zoomEdittext.isBlank()){
                 null
             } else {
-                zoom_edittext.getString()
+                binding.zoomEdittext.getString()
             }
             if(tagId == 0L){
                 submitData()
@@ -112,29 +113,29 @@ class AddTagsFragment: BaseAddObjectFragment() {
     private fun updateData(){
         addTagViewModel.getTagById(tagId).observe(viewLifecycleOwner) { tagsData ->
             val tagData = tagsData.tagsAttributes
-            tag_edittext.setText(tagData.tag)
-            date_edittext.setText(tagData.date)
-            description_edittext.setText(tagData.description)
-            latitude_edittext.setText(tagData.latitude)
-            longitude_edittext.setText(tagData.longitude)
-            zoom_edittext.setText(tagData.zoom_level)
+            binding.tagEdittext.setText(tagData.tag)
+            binding.dateEdittext.setText(tagData.date)
+            binding.descriptionEdittext.setText(tagData.description)
+            binding.latitudeEdittext.setText(tagData.latitude)
+            binding.longitudeEdittext.setText(tagData.longitude)
+            binding.zoomEdittext.setText(tagData.zoom_level)
         }
     }
 
     override fun setWidgets(){
-        date_edittext.setOnClickListener {
+        binding.dateEdittext.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder.datePicker()
             val picker = materialDatePicker.build()
             picker.show(childFragmentManager, picker.toString())
             picker.addOnPositiveButtonClickListener { time ->
-                date_edittext.setText(DateTimeUtil.getCalToString(time.toString()))
+                binding.dateEdittext.setText(DateTimeUtil.getCalToString(time.toString()))
             }
         }
-        mapTextview.paintFlags = mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        mapTextview.setOnClickListener {
+        binding.mapTextview.paintFlags = binding.mapTextview.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        binding.mapTextview.setOnClickListener {
             parentFragmentManager.commit {
-                val longitude = longitude_edittext.getString()
-                val latitude = latitude_edittext.getString()
+                val longitude = binding.longitudeEdittext.getString()
+                val latitude = binding.latitudeEdittext.getString()
                 replace(R.id.dialog_add_tags_layout, MapsFragment().apply {
                     arguments = bundleOf("longitude" to longitude, "latitude" to latitude)
                 })
@@ -143,21 +144,21 @@ class AddTagsFragment: BaseAddObjectFragment() {
         }
         mapsViewModel.latitude.observe(viewLifecycleOwner) { latitude ->
             if(latitude != 0.toDouble()){
-                latitude_edittext.setText(latitude.toString())
+                binding.latitudeEdittext.setText(latitude.toString())
             }
         }
         mapsViewModel.longitude.observe(viewLifecycleOwner) { longitude ->
             if(longitude != 0.toDouble()){
-                longitude_edittext.setText(longitude.toString())
+                binding.longitudeEdittext.setText(longitude.toString())
             }
         }
         mapsViewModel.zoomLevel.observe(viewLifecycleOwner) { zoom ->
             if(zoom != 0.toDouble()){
-                zoom_edittext.setText(zoom.toString())
+                binding.zoomEdittext.setText(zoom.toString())
             }
         }
-        placeHolderToolbar.setOnClickListener {
-            unReveal(dialog_add_tags_layout)
+        binding.placeHolderToolbar.setOnClickListener {
+            unReveal(binding.dialogAddTagsLayout)
         }
         addTagViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
             if(loader){
@@ -169,36 +170,36 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun setIcons(){
-        date_edittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
+        binding.dateEdittext.setCompoundDrawablesWithIntrinsicBounds(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_calendar
             color = colorList(ColorStateList.valueOf(Color.rgb(18, 122, 190)))
             sizeDp = 24
         },null, null, null)
-        description_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.descriptionEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_audio_description
                     colorRes = R.color.md_amber_800
                     sizeDp =24
                 },null, null, null)
-        latitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.latitudeEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply{
                     icon = GoogleMaterial.Icon.gmd_map
                     colorRes = R.color.md_green_800
                     sizeDp = 24
                 },null, null, null)
-        longitude_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.longitudeEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply{
                     icon = GoogleMaterial.Icon.gmd_map
                     colorRes = R.color.md_green_800
                     sizeDp = 24
                 },null, null, null)
-        zoom_edittext.setCompoundDrawablesWithIntrinsicBounds(
+        binding.zoomEdittext.setCompoundDrawablesWithIntrinsicBounds(
                 IconicsDrawable(requireContext()).apply {
                     icon = GoogleMaterial.Icon.gmd_zoom_in
                     colorRes = R.color.md_black_1000
                     sizeDp = 24
                 },null, null, null)
-        addTagFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.addTagFab.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_plus
             colorRes = R.color.md_black_1000
             sizeDp = 24
@@ -206,10 +207,10 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     override fun submitData(){
-        addTagViewModel.addTag(tag_edittext.getString(), date, description, latitude, longitude, zoomLevel).observe(viewLifecycleOwner) { response ->
+        addTagViewModel.addTag(binding.tagEdittext.getString(), date, description, latitude, longitude, zoomLevel).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
-                unReveal(dialog_add_tags_layout)
+                unReveal(binding.dialogAddTagsLayout)
             } else {
                 toastInfo(response.second)
             }
@@ -217,11 +218,11 @@ class AddTagsFragment: BaseAddObjectFragment() {
     }
 
     private fun updateTag(){
-        addTagViewModel.updateTag(tagId, tag_edittext.getString(), date, description, latitude,
+        addTagViewModel.updateTag(tagId, binding.tagEdittext.getString(), date, description, latitude,
                 longitude, zoomLevel).observe(viewLifecycleOwner) { response ->
             if(response.first){
                 toastSuccess(response.second)
-                unReveal(dialog_add_tags_layout)
+                unReveal(binding.dialogAddTagsLayout)
             } else {
                 toastInfo(response.second)
             }

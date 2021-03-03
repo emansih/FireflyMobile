@@ -265,4 +265,9 @@ class MapsFragment: BaseFragment() {
             locationService.removeUpdates(locationListener)
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().viewModelStore.clear()
+    }
 }

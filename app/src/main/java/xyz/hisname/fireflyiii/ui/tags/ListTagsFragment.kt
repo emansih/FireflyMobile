@@ -39,30 +39,36 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.fragment_base_list.*
-import kotlinx.android.synthetic.main.fragment_lists_tags.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
+import xyz.hisname.fireflyiii.databinding.FragmentListsTagsBinding
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 
 class ListTagsFragment: BaseFragment() {
 
     private val tagViewModel by lazy { getImprovedViewModel(ListTagsViewModel::class.java) }
+    private var fragmentListTagsBinding: FragmentListsTagsBinding? = null
+    private val binding get() = fragmentListTagsBinding!!
+    private var fragmentBaseBinding: FragmentBaseListBinding? = null
+    private val baseListBinding get() = fragmentBaseBinding!!
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_lists_tags, container)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        fragmentListTagsBinding = FragmentListsTagsBinding.inflate(inflater, container, false)
+        fragmentBaseBinding = binding.tagsBaseList
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        baseSwipeLayout.isGone = true
-        all_tags.setChipSpacing(16)
+        baseListBinding.baseSwipeLayout.swipeContainer.isGone = true
+        binding.allTags.setChipSpacing(16)
         setResponse()
         displayView()
         setFab()
         pullToRefresh()
-        tagsNestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        binding.tagsNestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (scrollY > oldScrollY) {
                 extendedFab.hide()
             } else {
@@ -76,24 +82,24 @@ class ListTagsFragment: BaseFragment() {
             toastError(it)
         }
         tagViewModel.isLoading.observe(viewLifecycleOwner){ isLoading ->
-            swipe_tags.isRefreshing = isLoading
+            binding.swipeTags.isRefreshing = isLoading
         }
     }
 
     private fun displayView(){
         tagViewModel.getAllTags().observe(viewLifecycleOwner) { tags ->
-            all_tags.removeAllViewsInLayout()
+            binding.allTags.removeAllViewsInLayout()
             if(tags.isEmpty()){
-                listImage.isVisible = true
-                listText.isVisible = true
-                listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
+                baseListBinding.listImage.isVisible = true
+                baseListBinding.listText.isVisible = true
+                baseListBinding.listImage.setImageDrawable(IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_tag
                     sizeDp = 24
                 })
-                listText.text = "No Tags Found! Start tagging now?"
+                baseListBinding.listText.text = "No Tags Found! Start tagging now?"
             } else {
-                listImage.isGone = true
-                listText.isGone = true
+                baseListBinding.listImage.isGone = true
+                baseListBinding.listText.isGone = true
                 tags.forEach { tagsData ->
                     val chipTags = Chip(requireContext(), null, R.attr.chipStyle)
                     chipTags.apply {
@@ -113,7 +119,7 @@ class ListTagsFragment: BaseFragment() {
                             }
                         }
                     }
-                    all_tags.addView(chipTags)
+                    binding.allTags.addView(chipTags)
                 }
             }
         }
@@ -146,7 +152,7 @@ class ListTagsFragment: BaseFragment() {
         anim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationRepeat(animation: Animation?) {}
             override fun onAnimationEnd(animation: Animation) {
-                all_tags.removeView(it)
+                binding.allTags.removeView(it)
             }
             override fun onAnimationStart(animation: Animation?) {}
         })
@@ -169,23 +175,13 @@ class ListTagsFragment: BaseFragment() {
     }
 
     private fun pullToRefresh(){
-        swipe_tags.setOnRefreshListener {
+        binding.swipeTags.setOnRefreshListener {
             displayView()
         }
     }
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.tags)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        activity?.activity_toolbar?.title = resources.getString(R.string.tags)
-    }
-    
-    override fun onResume() {
-        super.onResume()
         activity?.activity_toolbar?.title = resources.getString(R.string.tags)
     }
 }
