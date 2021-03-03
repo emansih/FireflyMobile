@@ -40,9 +40,9 @@ import com.mikepenz.materialdrawer.holder.StringHolder
 import com.mikepenz.materialdrawer.model.*
 import com.mikepenz.materialdrawer.model.interfaces.*
 import com.mikepenz.materialdrawer.widget.AccountHeaderView
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.databinding.ActivityBaseBinding
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -65,16 +65,17 @@ import xyz.hisname.fireflyiii.util.extension.*
 
 class HomeActivity: BaseActivity(){
 
-    private val drawerToggle by lazy { ActionBarDrawerToggle(this,
-            activity_base_root, activity_toolbar,
-            com.mikepenz.materialdrawer.R.string.material_drawer_open,
-            com.mikepenz.materialdrawer.R.string.material_drawer_close) }
     private lateinit var headerResult: AccountHeaderView
     private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
     private val keyguardUtil by lazy { KeyguardUtil(this) }
     private var instanceState: Bundle? = null
     private lateinit var authenticator: Authenticator
     private val homeViewModel by lazy { getViewModel(HomeViewModel::class.java) }
+    private lateinit var binding: ActivityBaseBinding
+    private val drawerToggle by lazy { ActionBarDrawerToggle(this,
+            binding.activityBaseRoot, binding.activityToolbar,
+            com.mikepenz.materialdrawer.R.string.material_drawer_open,
+            com.mikepenz.materialdrawer.R.string.material_drawer_close) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,7 +86,9 @@ class HomeActivity: BaseActivity(){
             finish()
         } else {
             instanceState = savedInstanceState
-            setContentView(R.layout.activity_base)
+            binding = ActivityBaseBinding.inflate(layoutInflater)
+            val view = binding.root
+            setContentView(view)
             if(keyguardUtil.isAppKeyguardEnabled()){
                 authenticator = Authenticator(this, ::handleResult)
                 authenticator.authenticate()
@@ -117,7 +120,7 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun displaySnackbar(text: CharSequence) {
-        Snackbar.make(bigger_fragment_container, text, Snackbar.LENGTH_INDEFINITE)
+        Snackbar.make(binding.biggerFragmentContainer, text, Snackbar.LENGTH_INDEFINITE)
                 .setAction("Retry") {
                     authenticator.authenticate()
                 }
@@ -127,7 +130,7 @@ class HomeActivity: BaseActivity(){
     private fun setup(savedInstanceState: Bundle?){
         animateToolbar()
         setUpHeader(savedInstanceState)
-        setSupportActionBar(activity_toolbar)
+        setSupportActionBar(binding.activityToolbar)
         setUpDrawer(savedInstanceState)
         supportActionBar?.title = ""
         setNavIcon()
@@ -320,7 +323,7 @@ class HomeActivity: BaseActivity(){
         homeViewModel.getNoOfBillsDueToday().observe(this){ numOfBill ->
             if(numOfBill > 0){
                 bills.badge = StringHolder(numOfBill.toString())
-                slider.adapter.notifyAdapterDataSetChanged()
+                binding.slider.adapter.notifyAdapterDataSetChanged()
             }
         }
         val rules = PrimaryDrawerItem().apply {
@@ -367,7 +370,7 @@ class HomeActivity: BaseActivity(){
         val financialControlSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.financial_control }
         val accountingSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.accounting }
         val othersSectionHeader = SecondaryDrawerItem().apply { nameRes = R.string.others }
-        slider.apply {
+        binding.slider.apply {
             itemAdapter.add(dashboard, financialControlSectionHeader, budgets, bills, piggyBank,
                     accountingSectionHeader, transactions, othersSectionHeader, account,
                     classification, options, about)
@@ -444,14 +447,14 @@ class HomeActivity: BaseActivity(){
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         drawerToggle.isDrawerIndicatorEnabled = true
-        activity_base_root.addDrawerListener(drawerToggle)
+        binding.activityBaseRoot.addDrawerListener(drawerToggle)
     }
 
     // sick animation stolen from here: http://frogermcs.github.io/Instagram-with-Material-Design-concept-is-getting-real/
     private fun animateToolbar(){
         val toolbarSize = dpToPx(56)
-        activity_appbar.translationY = -toolbarSize.toFloat()
-        activity_appbar.animate().translationY(0f).setDuration(300).startDelay = 300
+        binding.activityAppbar.translationY = -toolbarSize.toFloat()
+        binding.activityAppbar.animate().translationY(0f).setDuration(300).startDelay = 300
     }
 
     private fun changeFragment(fragment: Fragment){
@@ -461,8 +464,8 @@ class HomeActivity: BaseActivity(){
     }
 
     override fun onBackPressed() {
-        if(activity_base_root.isDrawerOpen(slider)) {
-            activity_base_root.closeDrawer(slider)
+        if(binding.activityBaseRoot.isDrawerOpen(binding.slider)) {
+            binding.activityBaseRoot.closeDrawer(binding.slider)
         } else {
             when (supportFragmentManager.backStackEntryCount) {
                 0 -> {
@@ -478,7 +481,7 @@ class HomeActivity: BaseActivity(){
                                         .commit()
                             }
                         }
-                        slider.setSelection(1)
+                        binding.slider.setSelection(1)
                     }
                 }
                 else -> supportFragmentManager.popBackStack()
@@ -490,17 +493,17 @@ class HomeActivity: BaseActivity(){
         supportFragmentManager.addOnBackStackChangedListener {
             if(supportFragmentManager.backStackEntryCount >= 1){
                 // show back icon and lock nav drawer
-                activity_base_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                binding.activityBaseRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                 drawerToggle.isDrawerIndicatorEnabled = false
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                fab_action.isVisible = false
+                binding.fabAction.isVisible = false
             } else {
-                activity_base_root.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                binding.activityBaseRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 drawerToggle.isDrawerIndicatorEnabled = true
             }
             supportFragmentManager.fragments.forEach {  fragment ->
-                fab_action.isVisible = (fragment is ListBillFragment
+                binding.fabAction.isVisible = (fragment is ListBillFragment
                         || fragment is ListPiggyFragment
                         || fragment is TransactionFragment
                         || fragment is ListAccountFragment
@@ -511,7 +514,7 @@ class HomeActivity: BaseActivity(){
             }
         }
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
-            fab_action.isVisible = (fragment is ListBillFragment
+            binding.fabAction.isVisible = (fragment is ListBillFragment
                     || fragment is ListPiggyFragment
                     || fragment is TransactionFragment
                     || fragment is ListAccountFragment
@@ -519,7 +522,7 @@ class HomeActivity: BaseActivity(){
                     || fragment is ListTagsFragment
                     || fragment is CurrencyListFragment
                     || fragment is BudgetListFragment)
-            addTransactionExtended.isVisible = fragment is DashboardFragment
+            binding.addTransactionExtended.isVisible = fragment is DashboardFragment
         }
         drawerToggle.setToolbarNavigationClickListener {
             onBackPressed()
@@ -537,7 +540,7 @@ class HomeActivity: BaseActivity(){
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(slider?.saveInstanceState(outState) ?: outState)
+        super.onSaveInstanceState(binding.slider?.saveInstanceState(outState) ?: outState)
     }
 
 }
