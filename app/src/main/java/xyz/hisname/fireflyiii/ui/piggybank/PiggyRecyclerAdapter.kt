@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.piggybank
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -42,6 +43,7 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PiggyHolder {
         context = parent.context
+        piggyListItemBinding = PiggyListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PiggyHolder(binding)
     }
 
