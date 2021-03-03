@@ -36,13 +36,12 @@ import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
-import kotlinx.android.synthetic.main.fragment_transaction_month_summary.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentTransactionMonthSummaryBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.DateTimeUtil
-import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
 import xyz.hisname.fireflyiii.util.extension.setData
 import xyz.hisname.fireflyiii.util.extension.toastInfo
@@ -54,10 +53,13 @@ class TransactionMonthSummaryFragment: BaseFragment() {
     private val monthYear by lazy { arguments?.getInt("monthYear") ?: 0}
     private val transactionMonthViewModel by lazy { getImprovedViewModel(TransactionMonthViewModel::class.java) }
     private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
+    private var fragmentTransactionMonthSummaryBinding: FragmentTransactionMonthSummaryBinding? = null
+    private val binding get() = fragmentTransactionMonthSummaryBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_transaction_month_summary, container)
+        fragmentTransactionMonthSummaryBinding = FragmentTransactionMonthSummaryBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +70,7 @@ class TransactionMonthSummaryFragment: BaseFragment() {
         for (col in ColorTemplate.JOYFUL_COLORS){
             coloring.add(col)
         }
-        monthlySummaryText.text = getString(R.string.chart_transaction_in_period, transactionType,
+        binding.monthlySummaryText.text = getString(R.string.chart_transaction_in_period, transactionType,
                 getStartOfMonth(monthYear), getEndOfMonth(monthYear))
         setCategoryChart()
         setRecyclerView()
@@ -99,12 +101,12 @@ class TransactionMonthSummaryFragment: BaseFragment() {
             val pieDataSet = PieDataSet(pieEntryArray, "").apply {
                 colors = coloring
                 valueTextSize = 15f
-                valueFormatter = PercentFormatter(categoryPieChart)
+                valueFormatter = PercentFormatter(binding.categoryPieChart)
             }
-            categoryPieChart.description.isEnabled = false
-            categoryPieChart.invalidate()
-            categoryPieChart.data = PieData(pieDataSet)
-            categoryPieChart.setData {
+            binding.categoryPieChart.description.isEnabled = false
+            binding.categoryPieChart.invalidate()
+            binding.categoryPieChart.data = PieData(pieDataSet)
+            binding.categoryPieChart.setData {
                 setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                     override fun onValueSelected(entry: Entry?, h: Highlight?) {
                         val pe = entry as PieEntry
@@ -125,7 +127,7 @@ class TransactionMonthSummaryFragment: BaseFragment() {
         }
 
         transactionMonthViewModel.totalSumLiveData.observe(viewLifecycleOwner){ total ->
-            monthlyTotalText.text = "Total: " +  transactionMonthViewModel.currencySymbol + total
+            binding.monthlyTotalText.text = "Total: " +  transactionMonthViewModel.currencySymbol + total
         }
 
     }
@@ -139,12 +141,12 @@ class TransactionMonthSummaryFragment: BaseFragment() {
             val pieDataSet = PieDataSet(pieEntryArray, "").apply {
                 colors = coloring
                 valueTextSize = 15f
-                valueFormatter = PercentFormatter(budgetPieChart)
+                valueFormatter = PercentFormatter(binding.budgetPieChart)
             }
-            budgetPieChart.description.isEnabled = false
-            budgetPieChart.invalidate()
-            budgetPieChart.data = PieData(pieDataSet)
-            budgetPieChart.setData {
+            binding.budgetPieChart.description.isEnabled = false
+            binding.budgetPieChart.invalidate()
+            binding.budgetPieChart.data = PieData(pieDataSet)
+            binding.budgetPieChart.setData {
                 setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                     override fun onValueSelected(entry: Entry?, h: Highlight?) {
                         val pe = entry as PieEntry
@@ -170,12 +172,12 @@ class TransactionMonthSummaryFragment: BaseFragment() {
             val pieDataSet = PieDataSet(pieEntryArray, "").apply {
                 colors = coloring
                 valueTextSize = 15f
-                valueFormatter = PercentFormatter(accountPieChart)
+                valueFormatter = PercentFormatter(binding.accountPieChart)
             }
-            accountPieChart.description.isEnabled = false
-            accountPieChart.invalidate()
-            accountPieChart.data = PieData(pieDataSet)
-            accountPieChart.setData {
+            binding.accountPieChart.description.isEnabled = false
+            binding.accountPieChart.invalidate()
+            binding.accountPieChart.data = PieData(pieDataSet)
+            binding.accountPieChart.setData {
                 setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                     override fun onValueSelected(entry: Entry?, h: Highlight?) {
                         val pe = entry as PieEntry
@@ -193,9 +195,9 @@ class TransactionMonthSummaryFragment: BaseFragment() {
     }
 
     private fun setRecyclerView(){
-        transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        transactionRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        transactionRecyclerView.adapter = transactionAdapter
+        binding.transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.transactionRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.transactionRecyclerView.adapter = transactionAdapter
         transactionMonthViewModel.getTransactionList(transactionType, monthYear).observe(viewLifecycleOwner){ pagingData ->
             transactionAdapter.submitData(lifecycle, pagingData)
         }

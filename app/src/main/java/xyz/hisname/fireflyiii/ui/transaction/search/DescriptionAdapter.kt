@@ -19,23 +19,24 @@
 package xyz.hisname.fireflyiii.ui.transaction.search
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.description_list_item.view.*
-import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.util.extension.inflate
+import xyz.hisname.fireflyiii.databinding.DescriptionListItemBinding
 
 class DescriptionAdapter(private val clickListener:(String) -> Unit):
         PagingDataAdapter<String, DescriptionAdapter.DescriptionViewHolder>(DIFF_CALLBACK) {
 
     private lateinit var context: Context
+    private var descriptionListItemBinding: DescriptionListItemBinding? = null
+    private val binding get() = descriptionListItemBinding!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DescriptionViewHolder {
         context = parent.context
-        return DescriptionViewHolder(parent.inflate(R.layout.description_list_item))
+        descriptionListItemBinding = DescriptionListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return DescriptionViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: DescriptionViewHolder, position: Int){
@@ -44,10 +45,10 @@ class DescriptionAdapter(private val clickListener:(String) -> Unit):
         }
     }
 
-    inner class DescriptionViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    inner class DescriptionViewHolder(view: DescriptionListItemBinding): RecyclerView.ViewHolder(view.root) {
         fun bind(description: String, clickListener: (String) -> Unit){
-            itemView.description.text = description
-            itemView.setOnClickListener {clickListener(description)}
+            binding.description.text = description
+            binding.root.setOnClickListener {clickListener(description)}
         }
     }
 

@@ -28,11 +28,9 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.dialog_search.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.DialogSearchBinding
 import xyz.hisname.fireflyiii.ui.base.BaseDialog
-import xyz.hisname.fireflyiii.util.extension.create
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class DescriptionSearch: BaseDialog() {
@@ -40,28 +38,34 @@ class DescriptionSearch: BaseDialog() {
     private val descriptionAdapter by lazy { DescriptionAdapter { data: String -> itemClicked(data) } }
     private val descriptionViewModel by lazy { getViewModel(DescriptionViewModel::class.java) }
     private lateinit var initialData: PagingData<String>
+    private var dialogSearchBinding: DialogSearchBinding? = null
+    private val binding get() = dialogSearchBinding!!
+    private var baseSwipeBinding: BaseSwipeLayoutBinding? = null
+    private val baseBinding get() = baseSwipeBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.dialog_search, container)
+        dialogSearchBinding = DialogSearchBinding.inflate(inflater, container, false)
+        baseSwipeBinding = binding.dialogSearchSwipeLayout
+        val view = binding.root
+        return view
     }
 
 
     private fun displayView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = descriptionAdapter
+        baseBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        baseBinding.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        baseBinding.recyclerView.adapter = descriptionAdapter
         descriptionViewModel.getAllDescription().observe(viewLifecycleOwner){ data ->
             initialData = data
             descriptionAdapter.submitData(lifecycle, data)
         }
         descriptionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner) { loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            baseBinding.swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
         }
     }
 
     private fun searchData(){
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean{
                 descriptionViewModel.transactionName.postValue(query)
                 dialog?.dismiss()
@@ -90,5 +94,11 @@ class DescriptionSearch: BaseDialog() {
     override fun setWidgets() {
         displayView()
         searchData()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        dialogSearchBinding = null
+        baseSwipeBinding = null
     }
 }

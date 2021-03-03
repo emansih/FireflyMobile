@@ -24,45 +24,47 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import kotlinx.android.synthetic.main.fragment_calculator.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentCalculatorBinding
 import xyz.hisname.fireflyiii.util.calculator.*
 import xyz.hisname.fireflyiii.util.extension.*
 
 class TransactionCalculatorDialog: DialogFragment(), Calculator {
 
     private val transactionsViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
+    private var fragmentCalculatorBinding: FragmentCalculatorBinding? = null
+    private val binding get() = fragmentCalculatorBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_calculator, container)
+        fragmentCalculatorBinding = FragmentCalculatorBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         hideKeyboard()
         setCalculator()
-        result.text = transactionsViewModel.transactionAmount.value
-        formula.text = transactionsViewModel.transactionAmount.value
+        binding.result.text = transactionsViewModel.transactionAmount.value
+        binding.formula.text = transactionsViewModel.transactionAmount.value
     }
 
     private fun setCalculator(){
         val calc = CalculatorImpl(this, requireContext(),
                 transactionsViewModel.transactionAmount.value ?: "0")
-        btn_plus.setOnClickListener { calc.handleOperation(PLUS) }
-        btn_minus.setOnClickListener { calc.handleOperation(MINUS) }
-        btn_multiply.setOnClickListener { calc.handleOperation(MULTIPLY) }
-        btn_divide.setOnClickListener { calc.handleOperation(DIVIDE) }
-        btn_percent.setOnClickListener { calc.handleOperation(PERCENT) }
-        btn_power.setOnClickListener { calc.handleOperation(POWER) }
-        btn_root.setOnClickListener { calc.handleOperation(ROOT) }
-
-        btn_clear.setOnClickListener { calc.handleClear() }
-        btn_clear.setOnLongClickListener {
+        binding.btnPlus.setOnClickListener { calc.handleOperation(PLUS) }
+        binding.btnMinus.setOnClickListener { calc.handleOperation(MINUS) }
+        binding.btnMultiply.setOnClickListener { calc.handleOperation(MULTIPLY) }
+        binding.btnDivide.setOnClickListener { calc.handleOperation(DIVIDE) }
+        binding.btnPercent.setOnClickListener { calc.handleOperation(PERCENT) }
+        binding.btnPower.setOnClickListener { calc.handleOperation(POWER) }
+        binding.btnRoot.setOnClickListener { calc.handleOperation(ROOT) }
+        binding.btnClear.setOnClickListener { calc.handleClear() }
+        binding.btnClear.setOnLongClickListener {
             calc.handleReset()
             true
         }
-        btn_equals.setOnClickListener { calc.handleEquals() }
-        arrayOf(btn_decimal, btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9).forEach { button ->
+        binding.btnEquals.setOnClickListener { calc.handleEquals() }
+        arrayOf(binding.btnDecimal, binding.btn0, binding.btn1, binding.btn2, binding.btn3, binding.btn4,
+                binding.btn5, binding.btn6, binding.btn7, binding.btn8, binding.btn9).forEach { button ->
             button.setOnClickListener {
                 calc.numpadClicked(it.id)
             }
@@ -70,15 +72,15 @@ class TransactionCalculatorDialog: DialogFragment(), Calculator {
     }
 
     override fun setValue(value: String, context: Context) {
-        result.text = value
-        calculatorFab.setOnClickListener {
+        binding.result.text = value
+        binding.calculatorFab.setOnClickListener {
             transactionsViewModel.transactionAmount.value = value
             dismiss()
         }
     }
 
     override fun setFormula(value: String, context: Context) {
-        formula.text = value
+        binding.formula.text = value
     }
 
     override fun onResume() {

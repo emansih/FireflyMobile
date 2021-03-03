@@ -36,10 +36,9 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.details_card.*
-import kotlinx.android.synthetic.main.fragment_transaction_details.*
-import kotlinx.android.synthetic.main.fragment_transaction_details.attachment_information
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.DetailsCardBinding
+import xyz.hisname.fireflyiii.databinding.FragmentTransactionDetailsBinding
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -72,9 +71,16 @@ class TransactionDetailsFragment: BaseFragment() {
     private var transactionAmount = ""
     private lateinit var chipTags: Chip
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_transaction_details, container)
+    private var fragmentTransactionDetailsBinding: FragmentTransactionDetailsBinding? = null
+    private val binding get() = fragmentTransactionDetailsBinding!!
+    private var detailsCardBinding: DetailsCardBinding? = null
+    private val cardBinding get() = detailsCardBinding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        fragmentTransactionDetailsBinding = FragmentTransactionDetailsBinding.inflate(inflater, container, false)
+        detailsCardBinding = binding.transactionInfoCard
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -128,10 +134,10 @@ class TransactionDetailsFragment: BaseFragment() {
         transactionDate = details.date.toString()
         downloadAttachment()
         transactionList.addAll(model)
-        info_text.text = getString(R.string.transaction_information)
-        detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
+        cardBinding.infoText.text = getString(R.string.transaction_information)
+        cardBinding.detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        cardBinding.detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        cardBinding.detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(transactionList){ position: Int -> setTransactionInfoClick(position)}
     }
 
     private fun setMetaInfo(details: Transactions){
@@ -143,7 +149,7 @@ class TransactionDetailsFragment: BaseFragment() {
         metaDataList.addAll(model)
         val tagsInTransaction = details.tags
         if(tagsInTransaction.isNotEmpty()){
-            transaction_tags.setChipSpacing(16)
+            binding.transactionTags.setChipSpacing(16)
             tagsInTransaction.forEach { nameOfTag ->
                 chipTags = Chip(requireContext())
                 chipTags.apply {
@@ -158,13 +164,13 @@ class TransactionDetailsFragment: BaseFragment() {
                         }
                     }
                 }
-                transaction_tags.addView(chipTags)
+                binding.transactionTags.addView(chipTags)
             }
-            transaction_tags_card.isVisible = true
+            binding.transactionTagsCard.isVisible = true
         }
-        meta_information.layoutManager = LinearLayoutManager(requireContext())
-        meta_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        meta_information.adapter = BaseDetailRecyclerAdapter(metaDataList){  }
+        binding.metaInformation.layoutManager = LinearLayoutManager(requireContext())
+        binding.metaInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.metaInformation.adapter = BaseDetailRecyclerAdapter(metaDataList){  }
     }
 
     private fun setTransactionInfoClick(position: Int){
@@ -191,11 +197,11 @@ class TransactionDetailsFragment: BaseFragment() {
     private fun downloadAttachment(){
         transactionDetailsViewModel.transactionAttachment.observe(viewLifecycleOwner){ attachment ->
             if(attachment.isNotEmpty()){
-                attachment_information_card.isVisible = true
+                binding.attachmentInformationCard.isVisible = true
                 attachmentDataAdapter = ArrayList(attachment)
-                attachment_information.layoutManager = LinearLayoutManager(requireContext())
-                attachment_information.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-                attachment_information.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
+                binding.attachmentInformation.layoutManager = LinearLayoutManager(requireContext())
+                binding.attachmentInformation.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentDataAdapter,
                     true, { data: AttachmentData ->
                     setDownloadClickListener(data, attachmentDataAdapter)
                     }){ another: Int -> }
@@ -205,15 +211,15 @@ class TransactionDetailsFragment: BaseFragment() {
 
     private fun setNotes(notes: String?){
         if(notes.isNullOrEmpty()){
-            notesCard.isGone = true
+            binding.notesCard.isGone = true
         } else {
-            notesText.text = notes.toMarkDown()
+            binding.notesText.text = notes.toMarkDown()
         }
     }
 
     private fun setDownloadClickListener(attachmentData: AttachmentData, attachmentAdapter: ArrayList<AttachmentData>){
         transactionDetailsViewModel.downloadAttachment(attachmentData).observe(viewLifecycleOwner){ downloadedFile ->
-            attachment_information.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
+            binding.attachmentInformation.adapter = AttachmentRecyclerAdapter(attachmentAdapter,
                     true, { data: AttachmentData ->
                 setDownloadClickListener(data, attachmentDataAdapter)
             }){ another: Int -> }
@@ -283,5 +289,11 @@ class TransactionDetailsFragment: BaseFragment() {
     }
 
     private fun convertString(type: String) = type.substring(0,1).toUpperCase() + type.substring(1).toLowerCase()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        detailsCardBinding = null
+        fragmentTransactionDetailsBinding = null
+    }
 
 }

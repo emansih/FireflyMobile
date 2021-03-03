@@ -51,13 +51,12 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.base_swipe_layout.*
-import kotlinx.android.synthetic.main.calendar_day.view.*
-import kotlinx.android.synthetic.main.fragment_transaction.*
-import kotlinx.android.synthetic.main.fragment_transaction.slider
-import kotlinx.android.synthetic.main.recent_transaction_list.view.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
+import xyz.hisname.fireflyiii.databinding.CalendarDayBinding
+import xyz.hisname.fireflyiii.databinding.FragmentTransactionBinding
+import xyz.hisname.fireflyiii.databinding.RecentTransactionListBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionMonthRecyclerView
@@ -87,10 +86,16 @@ class TransactionFragment: BaseFragment(){
     private val noTransactionImage by bindView<ImageView>(R.id.listImage)
     private lateinit var transactionVm: TransactionFragmentViewModel
     private val transactionAdapter by lazy { TransactionSeparatorAdapter{ data -> itemClicked(data) } }
+    private var fragmentTransactionBinding: FragmentTransactionBinding? = null
+    private val binding get() = fragmentTransactionBinding!!
+    private var baseSwipeLayoutBinding: BaseSwipeLayoutBinding? = null
+    private val baseBinding get() = baseSwipeLayoutBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.fragment_transaction, container)
+        fragmentTransactionBinding = FragmentTransactionBinding.inflate(inflater, container, false)
+        baseSwipeLayoutBinding = binding.baseLayout.baseSwipeLayout
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -99,10 +104,10 @@ class TransactionFragment: BaseFragment(){
         setupFab()
         transactionVm = getImprovedViewModel(TransactionFragmentViewModel::class.java)
         result = ActionBarDrawerToggle(requireActivity(),
-                fragment_transaction_root, invisibleToolbar,
+                binding.fragmentTransactionRoot, binding.invisibleToolbar,
                 com.mikepenz.materialdrawer.R.string.material_drawer_open,
                 com.mikepenz.materialdrawer.R.string.material_drawer_close)
-        fragment_transaction_root.addDrawerListener(result)
+        binding.fragmentTransactionRoot.addDrawerListener(result)
         displayResult()
         setWidgets()
         setCalendar()
@@ -114,7 +119,7 @@ class TransactionFragment: BaseFragment(){
 
     private fun setWidgets(){
         loadTransaction()
-        recycler_view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        baseBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0 || dy < 0 && extendedFab.isShown) {
                     extendedFab.hide()
@@ -128,12 +133,12 @@ class TransactionFragment: BaseFragment(){
                 super.onScrollStateChanged(recyclerView, newState)
             }
         })
-        swipeContainer.setOnRefreshListener {
+        baseBinding.swipeContainer.setOnRefreshListener {
             transactionAdapter.refresh()
         }
-        buttonSummaryPanel.setOnClickListener {
+        binding.buttonSummaryPanel.setOnClickListener {
             extendedFab.hide()
-            fragment_transaction_root.openDrawer(slider)
+            binding.fragmentTransactionRoot.openDrawer(slider)
         }
     }
 
@@ -155,7 +160,8 @@ class TransactionFragment: BaseFragment(){
 
     private fun setCalendar(){
         class DayViewContainer(view: View): ViewContainer(view) {
-            val onDayText = view.dayText
+            val calendarDayBinding = CalendarDayBinding.bind(view)
+            val onDayText = calendarDayBinding.dayText
             lateinit var day: CalendarDay
             init {
                 selectedDate = today
@@ -165,7 +171,7 @@ class TransactionFragment: BaseFragment(){
                     if (day.owner == DayOwner.THIS_MONTH) {
                         selectedDate = day.date
                         selectedDates.clear()
-                        transaction_calendar.notifyCalendarChanged()
+                        binding.transactionCalendar.notifyCalendarChanged()
                         startDate = selectedDate
                         endDate = selectedDate
                         loadTransaction()
@@ -209,13 +215,13 @@ class TransactionFragment: BaseFragment(){
                         endDate = selectedDates[1]
                         loadTransaction()
                     }
-                    transaction_calendar.notifyCalendarChanged()
-                    recycler_view.scrollToPosition(1)
+                    binding.transactionCalendar.notifyCalendarChanged()
+                    baseBinding.recyclerView.scrollToPosition(1)
                     true
                 }
             }
         }
-        transaction_calendar.dayBinder = object: DayBinder<DayViewContainer>{
+        binding.transactionCalendar.dayBinder = object: DayBinder<DayViewContainer>{
             override fun bind(container: DayViewContainer, day: CalendarDay) {
                 container.day = day
                 val textView = container.onDayText
@@ -257,26 +263,27 @@ class TransactionFragment: BaseFragment(){
             override fun create(view: View) = DayViewContainer(view)
         }
 
-        transaction_calendar.monthScrollListener = { calendarMonth ->
-            headerText.text = monthTitleFormatter.format(calendarMonth.yearMonth) + " " + calendarMonth.yearMonth.year
+        binding.transactionCalendar.monthScrollListener = { calendarMonth ->
+            binding.headerText.text = monthTitleFormatter.format(calendarMonth.yearMonth) + " " + calendarMonth.yearMonth.year
         }
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusYears(80)
         val endMonth = currentMonth.plusYears(20)
-        transaction_calendar.setupAsync(startMonth, endMonth, DayOfWeek.SUNDAY){
-            transaction_calendar.scrollToMonth(currentMonth)
-            transaction_calendar.updateMonthConfiguration()
+        binding.transactionCalendar.setupAsync(startMonth, endMonth, DayOfWeek.SUNDAY){
+            binding.transactionCalendar.scrollToMonth(currentMonth)
+            binding.transactionCalendar.updateMonthConfiguration()
         }
     }
 
     private fun dragAndDrop(){
-        recycler_view.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
-            if(viewHolder.itemView.list_item.isOverlapping(extendedFab)){
+        baseBinding.recyclerView.enableDragDrop(extendedFab){ viewHolder, isCurrentlyActive ->
+            val transactionListBinding = RecentTransactionListBinding.bind(viewHolder.itemView)
+            if(transactionListBinding.listItem.isOverlapping(extendedFab)){
                 extendedFab.dropToRemove()
                 if(!isCurrentlyActive) {
-                    swipeContainer.isRefreshing = true
-                    val transactionJournalId = viewHolder.itemView.transactionJournalId.text.toString()
-                    val transactionName = viewHolder.itemView.transactionNameText.text
+                    baseBinding.swipeContainer.isRefreshing = true
+                    val transactionJournalId = transactionListBinding.transactionJournalId.text.toString()
+                    val transactionName = transactionListBinding.transactionNameText.text
                     transactionVm.deleteTransaction(transactionJournalId).observe(viewLifecycleOwner){ isDeleted ->
                         transactionAdapter.refresh()
                         if(isDeleted){
@@ -300,13 +307,13 @@ class TransactionFragment: BaseFragment(){
     }
 
     private fun setTransactionCard(){
-        transactionCardLoader.show()
+        binding.transactionCardLoader.show()
         result.drawerArrowDrawable.color = setDayNightTheme()
         slider.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         transactionVm.getTransactionAmount(transactionType).observe(viewLifecycleOwner){ transactionArray ->
-            transactionCardLoader.hide()
+            binding.transactionCardLoader.hide()
             slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){ data: Int ->
-                fragment_transaction_root.closeDrawer(slider)
+                binding.fragmentTransactionRoot.closeDrawer(slider)
                 parentFragmentManager.commit {
                     replace(R.id.fragment_container, TransactionMonthSummaryFragment().apply {
                         arguments = bundleOf("monthYear" to data, "transactionType" to transactionType)
@@ -315,7 +322,7 @@ class TransactionFragment: BaseFragment(){
                 }
             }
         }
-        fragment_transaction_root.addDrawerListener(object : DrawerLayout.DrawerListener {
+        binding.fragmentTransactionRoot.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             }
 
@@ -331,7 +338,7 @@ class TransactionFragment: BaseFragment(){
                 if (newState == ViewDragHelper.STATE_DRAGGING){
                     extendedFab.hide()
                 }
-                if(newState == ViewDragHelper.STATE_IDLE && !fragment_transaction_root.isDrawerOpen(slider)){
+                if(newState == ViewDragHelper.STATE_IDLE && !binding.fragmentTransactionRoot.isDrawerOpen(slider)){
                     extendedFab.show()
                 }
             }
@@ -340,13 +347,13 @@ class TransactionFragment: BaseFragment(){
     }
 
     private fun setRecyclerView(){
-        recycler_view.layoutManager = LinearLayoutManager(requireContext())
-        recycler_view.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        recycler_view.adapter = transactionAdapter
+        baseBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        baseBinding.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        baseBinding.recyclerView.adapter = transactionAdapter
     }
 
     private fun jumpToDate(){
-        headerText.setOnClickListener {
+        binding.headerText.setOnClickListener {
             val materialDatePicker = MaterialDatePicker.Builder
                     .datePicker()
                     .setInputMode(MaterialDatePicker.INPUT_MODE_TEXT)
@@ -355,7 +362,7 @@ class TransactionFragment: BaseFragment(){
             picker.addOnPositiveButtonClickListener { time ->
                 selectedDates.clear()
                 selectedDates.add(DateTimeUtil.convertLongToLocalDate(time))
-                transaction_calendar.smoothScrollToDate(DateTimeUtil.convertLongToLocalDate(time))
+                binding.transactionCalendar.smoothScrollToDate(DateTimeUtil.convertLongToLocalDate(time))
             }
         }
     }
@@ -374,13 +381,13 @@ class TransactionFragment: BaseFragment(){
     private fun setShowCase(textView: TextView){
         FancyShowCaseQueue()
                 .add(showCase(R.string.transaction_calendar_date_help_text, "longClickDate", textView))
-                .add(showCase(R.string.transaction_calendar_header_help_text, "jumpDates", headerText, true))
+                .add(showCase(R.string.transaction_calendar_header_help_text, "jumpDates", binding.headerText, true))
                 .show()
     }
 
     private fun displayResult(){
         transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->
-            swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
+            baseBinding.swipeContainer.isRefreshing = loadStates.refresh is LoadState.Loading
             if(loadStates.refresh !is LoadState.Loading){
                 if(transactionAdapter.itemCount < 1){
                     noTransactionText.isVisible = true
@@ -391,7 +398,7 @@ class TransactionFragment: BaseFragment(){
                         sizeDp = 24
                     })
                 } else {
-                    recycler_view.isVisible = true
+                    baseBinding.recyclerView.isVisible = true
                     noTransactionText.isGone = true
                     noTransactionImage.isGone = true
                 }
@@ -424,5 +431,11 @@ class TransactionFragment: BaseFragment(){
             else -> ""
         }
         activity?.activity_toolbar?.title = toolBarTitle
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentTransactionBinding = null
+        baseSwipeLayoutBinding = null
     }
 }

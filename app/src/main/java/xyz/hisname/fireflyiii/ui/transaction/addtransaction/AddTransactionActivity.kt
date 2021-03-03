@@ -19,33 +19,35 @@
 package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
-import kotlinx.android.synthetic.main.activity_add_transaction.*
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.ActivityAddTransactionBinding
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 
 class AddTransactionActivity: BaseActivity() {
 
     private val transactionType by lazy { intent.getStringExtra("transactionType") }
+    private lateinit var binding: ActivityAddTransactionBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_transaction)
+        binding = ActivityAddTransactionBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         hideKeyboard()
         setBottomNav()
         when (transactionType) {
-            "Withdrawal" -> transactionBottomView.selectedItemId = R.id.action_withdraw
-            "Deposit" -> transactionBottomView.selectedItemId = R.id.action_deposit
-            "Transfer" -> transactionBottomView.selectedItemId = R.id.action_transfer
-            else -> transactionBottomView.selectedItemId = R.id.action_withdraw
+            "Withdrawal" -> binding.transactionBottomView.selectedItemId = R.id.action_withdraw
+            "Deposit" -> binding.transactionBottomView.selectedItemId = R.id.action_deposit
+            "Transfer" -> binding.transactionBottomView.selectedItemId = R.id.action_transfer
+            else -> binding.transactionBottomView.selectedItemId = R.id.action_withdraw
         }
     }
 
     private fun setBottomNav(){
-        transactionBottomView.setOnNavigationItemSelectedListener{ item ->
+        binding.transactionBottomView.setOnNavigationItemSelectedListener{ item ->
             when(item.itemId){
                 R.id.action_withdraw -> {
                     supportFragmentManager.commit {
