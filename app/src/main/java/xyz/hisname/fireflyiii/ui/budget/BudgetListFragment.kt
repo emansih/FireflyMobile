@@ -26,6 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.bundleOf
@@ -37,7 +38,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
 import xyz.hisname.fireflyiii.databinding.BudgetListItemBinding
@@ -63,7 +63,7 @@ class BudgetListFragment: BaseFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity?.activity_toolbar?.title = resources.getString(R.string.budget)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.budget)
         setWidget()
         budgetListViewModel.apiResponse.observe(viewLifecycleOwner){
             toastError(it)

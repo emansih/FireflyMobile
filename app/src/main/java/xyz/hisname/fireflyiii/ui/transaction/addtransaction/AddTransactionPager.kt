@@ -26,8 +26,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.add_transaction.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.AddTransactionBinding
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -45,9 +44,13 @@ class AddTransactionPager: BaseFragment() {
     private lateinit var adapter: AddTransactionAdapter
     private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
 
+    private var addTransactionBinding: AddTransactionBinding? = null
+    private val binding get() = addTransactionBinding!!
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.create(R.layout.add_transaction, container)
+        addTransactionBinding = AddTransactionBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,22 +58,22 @@ class AddTransactionPager: BaseFragment() {
         setTabs()
         setToolbar()
         if(isTasker || transactionJournalId != 0L){
-            tabLayout.isGone = true
-            transaction_group_layout.isGone = true
+            binding.tabLayout.isGone = true
+            binding.transactionGroupLayout.isGone = true
         }
     }
 
     private fun setToolbar(){
-        materialToolbar.setNavigationOnClickListener {
+        binding.materialToolbar.setNavigationOnClickListener {
            handleBack()
         }
-        addTransactionText.setOnClickListener {
+        binding.addTransactionText.setOnClickListener {
             ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
             val masterId = Random.nextLong()
             addTransactionViewModel.saveData(masterId)
             addTransactionViewModel.memoryCount().observe(viewLifecycleOwner){ count ->
                 if(adapter.itemCount == count){
-                    addTransactionViewModel.uploadTransaction(group_edittext.getString()).observe(viewLifecycleOwner){ response ->
+                    addTransactionViewModel.uploadTransaction(binding.groupEdittext.getString()).observe(viewLifecycleOwner){ response ->
                         ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                         if(response.first){
                             toastSuccess(response.second)
@@ -90,20 +93,20 @@ class AddTransactionPager: BaseFragment() {
     }
 
     private fun setTabs(){
-        addTransactionViewModel.numTabs = tabLayout.tabCount + 1
+        addTransactionViewModel.numTabs = binding.tabLayout.tabCount + 1
         adapter = AddTransactionAdapter(this,
                 bundleOf("transactionJournalId" to transactionJournalId,
                         "FROM_TRANSACTION_ACTIVITY" to transactionActivity,
                         "transactionType" to transactionType,
                         "SHOULD_HIDE" to isFromFragment,
                         "isFromNotification" to isFromNotification, "isTasker" to isTasker))
-        viewPagerLayout.adapter = adapter
+        binding.viewPagerLayout.adapter = adapter
 
-        TabLayoutMediator(tabLayout, viewPagerLayout){ tab, position ->
+        TabLayoutMediator(binding.tabLayout, binding.viewPagerLayout){ tab, position ->
             if(addTransactionViewModel.numTabs == 1){
                 tab.text = "No split"
             } else {
-                transaction_group_layout.isVisible = true
+                binding.transactionGroupLayout.isVisible = true
                 tab.text = "Split " + (position + 1)
             }
         }.attach()
@@ -112,14 +115,14 @@ class AddTransactionPager: BaseFragment() {
             adapter.setFragmentCount(addTransactionViewModel.numTabs)
         }
         addTransactionViewModel.decreaseTab.observe(viewLifecycleOwner){
-            if(tabLayout.selectedTabPosition == 0){
+            if(binding.tabLayout.selectedTabPosition == 0){
                 toastInfo("Unable to remove first split")
             } else {
                 addTransactionViewModel.numTabs--
-                tabLayout.removeTabAt(tabLayout.selectedTabPosition)
+                binding.tabLayout.removeTabAt(binding.tabLayout.selectedTabPosition)
                 adapter.setFragmentCount(addTransactionViewModel.numTabs)
                 if(addTransactionViewModel.numTabs == 1){
-                    transaction_group_layout.isGone = true
+                    binding.transactionGroupLayout.isGone = true
                 }
             }
         }

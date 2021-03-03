@@ -25,8 +25,7 @@ import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelper
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginRunner
-import kotlinx.android.synthetic.main.activity_add_transaction.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.ActivityAddTransactionBinding
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -54,11 +53,14 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
     private var transactionCategory: String? = null
     private var transactionNote: String? = null
     private var transactionUri: String? = null
+    private lateinit var binding: ActivityAddTransactionBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_transaction)
-        transactionBottomView.isGone = true
+        binding = ActivityAddTransactionBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+        binding.transactionBottomView.isGone = true
         navigateFragment()
         observeText()
     }

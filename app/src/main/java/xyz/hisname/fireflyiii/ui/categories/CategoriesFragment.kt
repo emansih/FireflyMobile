@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -38,7 +39,6 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
 import xyz.hisname.fireflyiii.databinding.CategoryListItemBinding
 import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
@@ -145,11 +145,11 @@ class CategoriesFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.categories)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.categories)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.categories)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.categories)
     }
 }

@@ -24,6 +24,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -32,7 +33,6 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -175,6 +175,6 @@ class SettingsAccountFragment: BaseSettings() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        requireActivity().activity_toolbar.title = "Account Settings"
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = "Account Settings"
     }
 }

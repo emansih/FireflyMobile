@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.DialogFragment
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.util.animation.CircularReveal
 
 
 abstract class BaseDialog: DialogFragment() {

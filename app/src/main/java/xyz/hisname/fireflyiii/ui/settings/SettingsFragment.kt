@@ -21,6 +21,7 @@ package xyz.hisname.fireflyiii.ui.settings
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import androidx.appcompat.widget.Toolbar
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.core.app.ActivityCompat
@@ -33,7 +34,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
 import xyz.hisname.languagepack.LanguageChanger
@@ -164,12 +164,12 @@ class SettingsFragment: BaseSettings() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.settings)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.settings)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.settings)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.settings)
     }
 
     private fun setIconColor(): Int{

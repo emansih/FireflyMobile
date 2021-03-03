@@ -18,20 +18,21 @@
 
 package xyz.hisname.fireflyiii.ui.base
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.base_detail_list.view.*
-import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.BaseDetailListBinding
 import xyz.hisname.fireflyiii.repository.models.DetailModel
-import xyz.hisname.fireflyiii.util.extension.inflate
 
 class BaseDetailRecyclerAdapter(private val data: List<DetailModel>,
                                 private val clickListener:(position: Int) -> Unit ):
         RecyclerView.Adapter<BaseDetailRecyclerAdapter.BaseDetailViewHolder>() {
 
+    private var baseDetailListBinding: BaseDetailListBinding? = null
+    private val binding get() = baseDetailListBinding!!
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseDetailViewHolder {
-        return BaseDetailViewHolder(parent.inflate(R.layout.base_detail_list))
+        return BaseDetailViewHolder(binding)
     }
 
     override fun getItemCount() = data.size
@@ -39,10 +40,10 @@ class BaseDetailRecyclerAdapter(private val data: List<DetailModel>,
     override fun onBindViewHolder(holder: BaseDetailViewHolder, position: Int) = holder.bind(data[position], position)
 
 
-    inner class BaseDetailViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    inner class BaseDetailViewHolder(itemView: BaseDetailListBinding): RecyclerView.ViewHolder(itemView.root){
         fun bind(baseData: DetailModel, clickListener: Int){
-            itemView.detailTitle.text = baseData.title
-            itemView.detailSubtext.text = baseData.subTitle
+            binding.detailTitle.text = baseData.title
+            binding.detailSubtext.text = baseData.subTitle
             itemView.setOnClickListener { clickListener(clickListener) }
         }
     }

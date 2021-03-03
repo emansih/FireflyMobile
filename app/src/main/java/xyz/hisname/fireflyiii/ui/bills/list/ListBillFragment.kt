@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -36,7 +37,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
 import xyz.hisname.fireflyiii.databinding.BillsListItemBinding
@@ -183,12 +183,12 @@ class ListBillFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.bill)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.bill)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.bill)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.bill)
     }
 
     override fun onDestroyView() {

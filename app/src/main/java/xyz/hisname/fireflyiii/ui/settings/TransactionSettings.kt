@@ -20,9 +20,9 @@ package xyz.hisname.fireflyiii.ui.settings
 
 import android.content.Context
 import android.os.Bundle
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.CheckBoxPreference
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
 
@@ -48,11 +48,11 @@ class TransactionSettings: BaseSettings() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Transaction Settings"
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = "Transaction Settings"
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = "Transaction Settings"
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = "Transaction Settings"
     }
 }

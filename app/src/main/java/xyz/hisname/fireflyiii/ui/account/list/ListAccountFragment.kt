@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -34,7 +35,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.AccountListItemBinding
 import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
@@ -180,12 +180,12 @@ class ListAccountFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = convertString()
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = convertString()
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = convertString()
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = convertString()
     }
 
     override fun onDestroyView() {

@@ -21,8 +21,8 @@ package xyz.hisname.fireflyiii.ui.settings
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import androidx.appcompat.widget.Toolbar
 import androidx.preference.EditTextPreference
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 
@@ -48,11 +48,11 @@ class DeveloperSettings: BaseSettings() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activity?.activity_toolbar?.title = "Let There Be Dragons"
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = "Let There Be Dragons"
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = "Let There Be Dragons"
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = "Let There Be Dragons"
     }
 }

@@ -23,7 +23,6 @@ import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.view.View
 import android.view.ViewAnimationUtils
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import xyz.hisname.fireflyiii.util.animation.BakedBezierInterpolator
 import kotlin.math.max

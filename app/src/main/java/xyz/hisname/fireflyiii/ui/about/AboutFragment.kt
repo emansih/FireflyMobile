@@ -23,8 +23,8 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
-import androidx.lifecycle.Observer
 import com.danielstone.materialaboutlibrary.ConvenienceBuilder
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem
@@ -34,12 +34,9 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getCompatDrawable
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 
 class AboutFragment: MaterialAboutFragment() {
 
@@ -130,6 +127,6 @@ class AboutFragment: MaterialAboutFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.about)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.about)
     }
 }

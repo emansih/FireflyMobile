@@ -24,13 +24,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
 import xyz.hisname.fireflyiii.databinding.CurrencyListBinding
@@ -122,12 +122,12 @@ class CurrencyListFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.currency)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.currency)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.currency)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.currency)
     }
 
 }

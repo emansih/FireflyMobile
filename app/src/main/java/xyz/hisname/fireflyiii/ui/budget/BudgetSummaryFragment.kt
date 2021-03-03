@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.fragment.app.commit
@@ -43,7 +44,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentBudgetSummaryBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -202,12 +202,12 @@ class BudgetSummaryFragment: BaseFragment(), AdapterView.OnItemSelectedListener 
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = getString(R.string.budget)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.budget)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = getString(R.string.budget)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.budget)
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

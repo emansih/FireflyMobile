@@ -46,7 +46,6 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.fragment_map.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -55,6 +54,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.*
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.FragmentMapBinding
 import xyz.hisname.fireflyiii.repository.models.nominatim.LocationSearchModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
@@ -65,15 +65,19 @@ class MapsFragment: BaseFragment() {
 
     private val locationService by lazy { requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
     private val mapsViewModel by lazy { getViewModel(MapsViewModel::class.java) }
-    private val mapController by lazy { maps.controller }
     private val longitudeBundle by lazy { arguments?.getString("longitude") }
     private val latitudeBundle by lazy { arguments?.getString("latitude") }
     private lateinit var startMarker: Marker
     private lateinit var cloneLocationList: List<LocationSearchModel>
     private lateinit var gpsPermission: ActivityResultLauncher<String>
+    private var fragmentMapBinding: FragmentMapBinding? = null
+    private val binding get() = fragmentMapBinding!!
+    private val mapController by lazy { binding.maps.controller }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.create(R.layout.fragment_map, container)
+        fragmentMapBinding = FragmentMapBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,7 +100,7 @@ class MapsFragment: BaseFragment() {
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
         Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
-        startMarker = Marker(maps)
+        startMarker = Marker(binding.maps)
         if(!latitudeBundle.isNullOrEmpty() && !longitudeBundle.isNullOrEmpty()){
             setMap(GeoPoint(latitudeBundle?.toDouble() ?: 37.276675,
                     longitudeBundle?.toDouble() ?: -115.798936))
@@ -106,13 +110,13 @@ class MapsFragment: BaseFragment() {
         setMapClick()
         setFab()
         searchLocation()
-        okButton.setOnClickListener {
+        binding.okButton.setOnClickListener {
             mapsViewModel.latitude.postValue(startMarker.position.latitude)
             mapsViewModel.longitude.postValue(startMarker.position.longitude)
-            mapsViewModel.zoomLevel.postValue(maps.zoomLevelDouble)
+            mapsViewModel.zoomLevel.postValue(binding.maps.zoomLevelDouble)
             parentFragmentManager.popBackStack()
         }
-        cancelButton.setOnClickListener {
+        binding.cancelButton.setOnClickListener {
             mapsViewModel.latitude.postValue(0.0)
             mapsViewModel.longitude.postValue(0.0)
             mapsViewModel.zoomLevel.postValue(0.0)
@@ -123,10 +127,10 @@ class MapsFragment: BaseFragment() {
     private fun setMap(location: GeoPoint){
         startMarker.position = location
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        maps.setMultiTouchControls(true)
-        maps.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        maps.overlays.add(startMarker)
-        maps.setTileSource(TileSourceFactory.MAPNIK)
+        binding.maps.setMultiTouchControls(true)
+        binding.maps.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+        binding.maps.overlays.add(startMarker)
+        binding.maps.setTileSource(TileSourceFactory.MAPNIK)
         startMarker.icon = IconicsDrawable(requireContext()).apply {
             icon = FontAwesome.Icon.faw_map_marker
             colorRes = R.color.md_red_700
@@ -137,14 +141,14 @@ class MapsFragment: BaseFragment() {
     }
 
     private fun searchLocation(){
-        mapSearch.setOnKeyListener { v, keyCode, event ->
+        binding.mapSearch.setOnKeyListener { v, keyCode, event ->
             if(event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
-                location(mapSearch.text.toString())
+                location(binding.mapSearch.text.toString())
                 hideKeyboard()
             }
             false
         }
-        mapSearch.addTextChangedListener(object : TextWatcher{
+        binding.mapSearch.addTextChangedListener(object : TextWatcher{
             override fun afterTextChanged(editable: Editable) {
                 if(editable.isNotBlank()) {
                     location(editable.toString())
@@ -157,7 +161,7 @@ class MapsFragment: BaseFragment() {
             override fun onTextChanged(charSequence: CharSequence, p1: Int, p2: Int, p3: Int) {}
 
         })
-        mapSearch.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
+        binding.mapSearch.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
             setMap(GeoPoint(cloneLocationList[i].lat, cloneLocationList[i].lon))
         }
     }
@@ -166,7 +170,7 @@ class MapsFragment: BaseFragment() {
         mapsViewModel.getLocationFromQuery(query).observe(viewLifecycleOwner){ data ->
             if(data.isNotEmpty()){
                 val adapter = ArrayAdapter(requireContext(), android.R.layout.select_dialog_item, data)
-                mapSearch.setAdapter(adapter)
+                binding.mapSearch.setAdapter(adapter)
             }
         }
     }
@@ -183,16 +187,16 @@ class MapsFragment: BaseFragment() {
                 return true
             }
         }
-        maps.overlays.add(MapEventsOverlay(mapReceiver))
+        binding.maps.overlays.add(MapEventsOverlay(mapReceiver))
     }
 
     private fun setFab(){
-        fab_map.setImageDrawable(IconicsDrawable(requireContext()).apply {
+        binding.fabMap.setImageDrawable(IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_my_location
             colorRes = R.color.md_black_1000
             sizeDp = 16
         })
-        fab_map.setOnClickListener {
+        binding.fabMap.setOnClickListener {
             if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED){
                 if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
@@ -253,12 +257,12 @@ class MapsFragment: BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        maps.onResume()
+        binding.maps.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        maps.onPause()
+        binding.maps.onPause()
         if (ContextCompat.checkSelfPermission(requireContext(),
                         Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {

@@ -28,6 +28,7 @@ import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -38,7 +39,6 @@ import com.google.android.material.chip.Chip
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
 import xyz.hisname.fireflyiii.databinding.FragmentListsTagsBinding
@@ -182,6 +182,6 @@ class ListTagsFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.tags)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.tags)
     }
 }

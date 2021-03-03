@@ -27,6 +27,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -54,7 +55,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
-import kotlinx.android.synthetic.main.activity_add_transaction.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import net.dinglisch.android.tasker.TaskerPlugin
 import xyz.hisname.fireflyiii.R
@@ -789,7 +789,8 @@ class AddTransactionFragment: BaseFragment() {
                 } else {
                     markdownViewModel.markdownText.postValue(binding.noteEdittext.getString())
                     // This is called when in activity
-                    if(bigger_fragment_container != null){
+                    val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
+                    if(frameLayout != null){
                         parentFragmentManager.commit {
                             replace(R.id.bigger_fragment_container, MarkdownFragment())
                             addToBackStack(null)

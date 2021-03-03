@@ -30,6 +30,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.os.bundleOf
@@ -52,7 +54,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentDashboardBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -112,7 +113,8 @@ class DashboardFragment: BaseFragment() {
         }
         setIcon()
         dashboardView.apiResponse.observe(viewLifecycleOwner){ response ->
-            Snackbar.make(coordinatorlayout, response, Snackbar.LENGTH_LONG).show()
+            val coordinatorLayout = requireActivity().findViewById<CoordinatorLayout>(R.id.coordinatorlayout)
+            Snackbar.make(coordinatorLayout, response, Snackbar.LENGTH_LONG).show()
         }
         setDashboardDataClick()
     }
@@ -442,11 +444,11 @@ class DashboardFragment: BaseFragment() {
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.dashboard)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.dashboard)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.dashboard)
     }
 }

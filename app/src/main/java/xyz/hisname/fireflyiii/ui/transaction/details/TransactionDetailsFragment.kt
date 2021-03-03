@@ -35,7 +35,6 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.DetailsCardBinding
 import xyz.hisname.fireflyiii.databinding.FragmentTransactionDetailsBinding
@@ -45,8 +44,8 @@ import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.account.details.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.AttachmentRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
-import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.tags.TagDetailsFragment
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionPager
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -54,7 +53,7 @@ import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.openFile
 
 
-class TransactionDetailsFragment: BaseFragment() {
+class TransactionDetailsFragment: BaseDetailFragment() {
 
     private val transactionJournalId by lazy { arguments?.getLong("transactionJournalId", 0) ?: 0 }
     private val transactionDetailsViewModel by lazy { getImprovedViewModel(TransactionDetailsViewModel::class.java) }
@@ -232,52 +231,45 @@ class TransactionDetailsFragment: BaseFragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.details)
+    override fun deleteItem() {
+        AlertDialog.Builder(requireContext())
+                .setTitle(resources.getString(R.string.delete_account_title, transactionDescription))
+                .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
+                .setIcon(IconicsDrawable(requireContext()).apply {
+                    icon = FontAwesome.Icon.faw_trash
+                    sizeDp = 24
+                    colorRes = R.color.md_green_600
+                })
+                .setPositiveButton(R.string.delete_permanently) { _, _ ->
+                    transactionDetailsViewModel.deleteTransaction(transactionJournalId).observe(this) {
+                        if (it) {
+                            toastSuccess(resources.getString(R.string.transaction_deleted))
+                            handleBack()
+                        } else {
+                            toastOffline(getString(R.string.data_will_be_deleted_later, transactionDescription),
+                                    Toast.LENGTH_LONG)
+                        }
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .show()
     }
 
-    override fun onResume() {
-        super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.details)
+    override fun editItem() {
+        val addTransaction = AddTransactionPager().apply {
+            arguments = bundleOf("transactionJournalId" to transactionJournalId, "SHOULD_HIDE" to true,
+                    "transactionType" to convertString(transactionInfo))
+        }
+        parentFragmentManager.commit {
+            replace(R.id.bigger_fragment_container, addTransaction)
+            addToBackStack(null)
+        }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem) = when(item.itemId){
         android.R.id.home -> consume {
             parentFragmentManager.popBackStack()
-        }
-        R.id.menu_item_delete -> consume {
-            AlertDialog.Builder(requireContext())
-                    .setTitle(resources.getString(R.string.delete_account_title, transactionDescription))
-                    .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
-                    .setIcon(IconicsDrawable(requireContext()).apply {
-                        icon = FontAwesome.Icon.faw_trash
-                        sizeDp = 24
-                        colorRes = R.color.md_green_600
-                    })
-                    .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                        transactionDetailsViewModel.deleteTransaction(transactionJournalId).observe(this) {
-                            if (it) {
-                                toastSuccess(resources.getString(R.string.transaction_deleted))
-                                handleBack()
-                            } else {
-                                toastOffline(getString(R.string.data_will_be_deleted_later, transactionDescription),
-                                        Toast.LENGTH_LONG)
-                            }
-                        }
-                    }
-                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
-                    .show()
-        }
-        R.id.menu_item_edit -> consume {
-            val addTransaction = AddTransactionPager().apply {
-                arguments = bundleOf("transactionJournalId" to transactionJournalId, "SHOULD_HIDE" to true,
-                        "transactionType" to convertString(transactionInfo))
-            }
-            parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, addTransaction)
-                addToBackStack(null)
-            }
         }
         else -> super.onOptionsItemSelected(item)
     }

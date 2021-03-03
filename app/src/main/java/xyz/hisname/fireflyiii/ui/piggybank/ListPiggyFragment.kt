@@ -22,6 +22,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -29,7 +30,6 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_base.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
 import xyz.hisname.fireflyiii.databinding.FragmentBaseListBinding
@@ -136,11 +136,11 @@ class ListPiggyFragment: BaseFragment(){
 
     override fun onAttach(context: Context){
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.piggy_bank)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.piggy_bank)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.piggy_bank)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.piggy_bank)
     }
 }

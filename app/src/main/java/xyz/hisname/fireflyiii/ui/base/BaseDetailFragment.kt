@@ -23,8 +23,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import androidx.core.view.isVisible
-import kotlinx.android.synthetic.main.activity_base.*
+import androidx.appcompat.widget.Toolbar
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.util.extension.consume
 
@@ -42,12 +41,12 @@ abstract class BaseDetailFragment: BaseFragment(){
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activity?.activity_toolbar?.title = resources.getString(R.string.details)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.details)
     }
 
     override fun onResume() {
         super.onResume()
-        activity?.activity_toolbar?.title = resources.getString(R.string.details)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.details)
     }
 
     abstract fun deleteItem()

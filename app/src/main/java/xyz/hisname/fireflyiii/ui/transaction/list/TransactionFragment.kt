@@ -31,6 +31,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -50,7 +51,6 @@ import com.kizitonwose.calendarview.ui.ViewContainer
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
-import kotlinx.android.synthetic.main.activity_base.*
 import me.toptas.fancyshowcase.FancyShowCaseQueue
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
@@ -138,7 +138,7 @@ class TransactionFragment: BaseFragment(){
         }
         binding.buttonSummaryPanel.setOnClickListener {
             extendedFab.hide()
-            binding.fragmentTransactionRoot.openDrawer(slider)
+            binding.fragmentTransactionRoot.openDrawer(binding.slider)
         }
     }
 
@@ -309,11 +309,11 @@ class TransactionFragment: BaseFragment(){
     private fun setTransactionCard(){
         binding.transactionCardLoader.show()
         result.drawerArrowDrawable.color = setDayNightTheme()
-        slider.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.slider.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         transactionVm.getTransactionAmount(transactionType).observe(viewLifecycleOwner){ transactionArray ->
             binding.transactionCardLoader.hide()
-            slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){ data: Int ->
-                binding.fragmentTransactionRoot.closeDrawer(slider)
+            binding.slider.recyclerView.adapter = TransactionMonthRecyclerView(transactionArray){ data: Int ->
+                binding.fragmentTransactionRoot.closeDrawer(binding.slider)
                 parentFragmentManager.commit {
                     replace(R.id.fragment_container, TransactionMonthSummaryFragment().apply {
                         arguments = bundleOf("monthYear" to data, "transactionType" to transactionType)
@@ -338,7 +338,7 @@ class TransactionFragment: BaseFragment(){
                 if (newState == ViewDragHelper.STATE_DRAGGING){
                     extendedFab.hide()
                 }
-                if(newState == ViewDragHelper.STATE_IDLE && !binding.fragmentTransactionRoot.isDrawerOpen(slider)){
+                if(newState == ViewDragHelper.STATE_IDLE && !binding.fragmentTransactionRoot.isDrawerOpen(binding.slider)){
                     extendedFab.show()
                 }
             }
@@ -419,7 +419,7 @@ class TransactionFragment: BaseFragment(){
             transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
             else -> ""
         }
-        activity?.activity_toolbar?.title = toolBarTitle
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = toolBarTitle
     }
 
     override fun onAttach(context: Context){
@@ -430,7 +430,7 @@ class TransactionFragment: BaseFragment(){
             transactionType.contains("Transfer") -> resources.getString(R.string.transfer)
             else -> ""
         }
-        activity?.activity_toolbar?.title = toolBarTitle
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = toolBarTitle
     }
 
     override fun onDestroyView() {
