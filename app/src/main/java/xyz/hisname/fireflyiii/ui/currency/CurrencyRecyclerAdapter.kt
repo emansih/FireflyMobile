@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.currency
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
@@ -46,6 +47,7 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyHolder {
         context = parent.context
+        currencyListBinding = CurrencyListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CurrencyHolder(binding)
     }
 

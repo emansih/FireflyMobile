@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.categories
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -35,6 +36,7 @@ class CategoriesRecyclerAdapter(private val clickListener:(CategoryData) -> Unit
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryHolder {
         context = parent.context
+        categoryListItemBinding = CategoryListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CategoryHolder(binding)
     }
 

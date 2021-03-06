@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.preference.PreferenceManager
@@ -48,9 +49,11 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
         context = parent.context
         return when(viewType){
             R.layout.recent_transaction_list -> {
+                recentTransactionListBinding = RecentTransactionListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 TransactionViewHolder(binding)
             }
             else -> {
+                transactionItemSeparatorBinding = TransactionItemSeparatorBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 SplitSeparatorViewHolder(separatorBinding)
             }
         }

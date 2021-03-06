@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.ui.base
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import xyz.hisname.fireflyiii.databinding.BaseDetailListBinding
@@ -32,6 +33,7 @@ class BaseDetailRecyclerAdapter(private val data: List<DetailModel>,
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseDetailViewHolder {
+        baseDetailListBinding = BaseDetailListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return BaseDetailViewHolder(binding)
     }
 

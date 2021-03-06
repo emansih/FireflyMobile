@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import xyz.hisname.fireflyiii.R
@@ -37,6 +38,7 @@ class TransactionMonthRecyclerView(private val items: List<TransactionAmountMont
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionAdapter {
         context = parent.context
+        transactionCardDetails = TransactionCardDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TransactionAdapter(binding)
     }
 

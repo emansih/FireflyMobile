@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.base
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -43,6 +44,7 @@ class AttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentAdapter {
         context = parent.context
+        transactionAttachmentItemsBinding = TransactionAttachmentItemsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AttachmentAdapter(binding)
 
     }

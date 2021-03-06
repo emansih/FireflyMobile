@@ -56,6 +56,7 @@ class CategoriesFragment: BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         fragmentBaseListBinding = FragmentBaseListBinding.inflate(inflater, container, false)
+        baseSwipeLayoutBinding = binding.baseSwipeLayout
         val view = binding.root
         return view
     }
