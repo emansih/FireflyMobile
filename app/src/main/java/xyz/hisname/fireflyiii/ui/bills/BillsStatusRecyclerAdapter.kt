@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mikepenz.iconics.IconicsColor
 import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.color
 import com.mikepenz.iconics.utils.sizeDp
@@ -62,7 +63,7 @@ class BillsStatusRecyclerAdapter(private val billStatus: List<BillsStatusModel>)
                 })
             } else {
                 binding.billStatusImage.setImageDrawable(IconicsDrawable(context).apply {
-                    icon = GoogleMaterial.Icon.gmd_add_alert
+                    icon = FontAwesome.Icon.faw_info_circle
                     color = IconicsColor.colorInt(context.getColor(R.color.md_red_500))
                     sizeDp = 24
                 })
