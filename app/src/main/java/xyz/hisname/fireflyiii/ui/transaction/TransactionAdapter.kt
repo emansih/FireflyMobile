@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.transaction
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.preference.PreferenceManager
@@ -40,6 +41,7 @@ class TransactionAdapter(private val clickListener:(Transactions) -> Unit):
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
         context = parent.context
+        recentTransactionListBinding = RecentTransactionListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TransactionViewHolder(binding)
     }
 
