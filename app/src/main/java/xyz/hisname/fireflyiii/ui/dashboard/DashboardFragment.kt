@@ -118,6 +118,9 @@ class DashboardFragment: BaseFragment() {
             Snackbar.make(coordinatorLayout, response, Snackbar.LENGTH_LONG).show()
         }
         setDashboardDataClick()
+        showCase(R.string.dashboard_balance_help_text,
+                "balanceLayoutCaseView", binding.balanceLayout).show()
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.dashboard)
     }
 
     private fun setDashboardDataClick(){
@@ -432,22 +435,6 @@ class DashboardFragment: BaseFragment() {
                     .translationY(0f)
                     .setInterpolator(DecelerateInterpolator(5f))
                     .setDuration(1234)
-                    .withEndAction {
-                        if(frames == binding.billsCard){
-                            showCase(R.string.dashboard_balance_help_text,
-                                    "balanceLayoutCaseView", binding.balanceLayout).show()
-                        }
-                    }
         }
-    }
-
-    override fun onAttach(context: Context){
-        super.onAttach(context)
-        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.dashboard)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.dashboard)
     }
 }
