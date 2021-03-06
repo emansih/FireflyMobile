@@ -58,6 +58,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentDashboardBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.bills.BillsBottomSheet
 import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
@@ -127,10 +128,8 @@ class DashboardFragment: BaseFragment() {
             }
         }
         binding.billsCard.setOnClickListener {
-            parentFragmentManager.commit {
-                replace(R.id.fragment_container, ListBillFragment())
-                addToBackStack(null)
-            }
+            val billsBottomSheet = BillsBottomSheet()
+            billsBottomSheet.show(childFragmentManager, "billsList")
         }
     }
 
