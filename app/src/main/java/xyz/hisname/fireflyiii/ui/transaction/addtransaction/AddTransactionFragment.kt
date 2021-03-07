@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -27,7 +28,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -508,6 +508,7 @@ class AddTransactionFragment: BaseFragment() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setWidgets(){
         val queue = FancyShowCaseQueue()
         if(transactionActivity == true){
@@ -788,19 +789,9 @@ class AddTransactionFragment: BaseFragment() {
                     showTaskerVariable(binding.noteEdittext)
                 } else {
                     markdownViewModel.markdownText.postValue(binding.noteEdittext.getString())
-                    // This is called when in activity
-                    val frameLayout = requireActivity().findViewById<FrameLayout>(R.id.bigger_fragment_container)
-                    if(frameLayout != null){
-                        parentFragmentManager.commit {
-                            replace(R.id.bigger_fragment_container, MarkdownFragment())
-                            addToBackStack(null)
-                        }
-                    } else {
-                        // This is called in fragment / tasker
-                        parentFragmentManager.commit {
-                            replace(R.id.transactionPagerRoot, MarkdownFragment())
-                            addToBackStack(null)
-                        }
+                    parentFragmentManager.commit {
+                        replace(R.id.transactionPagerRoot, MarkdownFragment())
+                        addToBackStack(null)
                     }
                 }
             }
