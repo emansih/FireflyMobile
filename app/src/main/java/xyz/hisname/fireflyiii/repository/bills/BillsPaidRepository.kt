@@ -20,6 +20,7 @@ package xyz.hisname.fireflyiii.repository.bills
 
 import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.BillPaidDao
+import xyz.hisname.fireflyiii.data.local.dao.BillPayDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
@@ -46,7 +47,7 @@ class BillsPaidRepository(private val billsPaidDao: BillPaidDao,
         return billsPaidDao.getBillsPaidFromIdAndDate(billId, startDate, endDate)
     }
 
-    suspend fun getBillPaidByDate(startDate: String, endDate: String): List<Long>{
+    suspend fun getBillPaidByDate(startDate: String, endDate: String, billPayDao: BillPayDao): List<Long>{
         try {
             val billList = arrayListOf<BillData>()
             val networkCall = billsService.getPaginatedBills(1, startDate, endDate)
@@ -61,7 +62,7 @@ class BillsPaidRepository(private val billsPaidDao: BillPaidDao,
                         }
                     }
                 }
-                billsPaidDao.deleteAndInsert(startDate, endDate, billList)
+                billsPaidDao.deleteAndInsert(startDate, endDate, billList, billPayDao)
             }
         } catch (exception: Exception){ }
         return billsPaidDao.getBillsPaidFromAndDate(startDate, endDate)

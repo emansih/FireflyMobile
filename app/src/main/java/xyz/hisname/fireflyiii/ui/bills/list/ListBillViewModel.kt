@@ -50,6 +50,7 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
     private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
     private val billRepository = BillRepository(billDataDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
+    private val billPayDao = AppDatabase.getInstance(application).billPayDao()
 
     fun getBillList(): LiveData<PagingData<BillData>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
@@ -61,7 +62,8 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
         val billList = MutableLiveData<List<BillData>>()
         viewModelScope.launch(Dispatchers.IO){
             val billDue = billRepository.getBillDueFromDate(DateTimeUtil.getTodayDate())
-            val billPaidId = billPaidRepository.getBillPaidByDate(DateTimeUtil.getTodayDate(), DateTimeUtil.getTodayDate())
+            val billPaidId = billPaidRepository.getBillPaidByDate(DateTimeUtil.getTodayDate(),
+                    DateTimeUtil.getTodayDate(), billPayDao)
             val billDueId = arrayListOf<Long>()
             billDue.forEach {  billData ->
                 billDueId.add(billData.billId)

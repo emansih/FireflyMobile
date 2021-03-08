@@ -24,11 +24,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.bills.BillsPaidRepository
+import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.bills.BillsStatusModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import java.math.BigDecimal
@@ -38,20 +41,31 @@ class BillsBottomSheetViewModel(application: Application): BaseViewModel(applica
     private val billService = genericService().create(BillsService::class.java)
     private val billDataDao = AppDatabase.getInstance(application).billDataDao()
     private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
+    private val billPayDao = AppDatabase.getInstance(application).billPayDao()
     private val billRepository = BillRepository(billDataDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
+
+    private val currencyRepository = CurrencyRepository(
+            AppDatabase.getInstance(application).currencyDataDao(),
+            genericService().create(CurrencyService::class.java))
+    val billPayableToday = MutableLiveData<String>()
 
     fun getBills(): LiveData<List<BillsStatusModel>>{
         val billList = MutableLiveData<List<BillsStatusModel>>()
         viewModelScope.launch(Dispatchers.IO){
+            val defaultSymbol = currencyRepository.defaultCurrency().currencyAttributes.symbol
+            var totalPayableTodayInDefault = 0.toBigDecimal()
             val billDue = billRepository.getBillDueFromDate(DateTimeUtil.getTodayDate())
             val billPaidId = billPaidRepository.getBillPaidByDate(DateTimeUtil.getTodayDate(),
-                    DateTimeUtil.getTodayDate())
+                    DateTimeUtil.getTodayDate(), billPayDao)
             val billStatusModel = arrayListOf<BillsStatusModel>()
             billDue.forEach { billData ->
                 val amountToDisplay = billData.billAttributes.amount_max
                         .plus(billData.billAttributes.amount_min)
                         .div(BigDecimal.valueOf(2))
+                if(defaultSymbol.contentEquals(billData.billAttributes.currency_symbol)){
+                    totalPayableTodayInDefault += amountToDisplay
+                }
                 billStatusModel.add(
                         BillsStatusModel(
                                 billData.billId,
@@ -62,6 +76,7 @@ class BillsBottomSheetViewModel(application: Application): BaseViewModel(applica
                         )
                 )
             }
+            billPayableToday.postValue("~" + defaultSymbol + "" + totalPayableTodayInDefault)
             billList.postValue(billStatusModel)
         }
         return billList

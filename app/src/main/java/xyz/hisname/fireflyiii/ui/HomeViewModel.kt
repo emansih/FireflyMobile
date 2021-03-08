@@ -36,6 +36,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     private val billsService = genericService().create(BillsService::class.java)
     private val billDataDao = AppDatabase.getInstance(application).billDataDao()
     private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
+    private val billPayDao = AppDatabase.getInstance(application).billPayDao()
     private val billRepository = BillRepository(billDataDao, billsService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billsService)
 
@@ -43,7 +44,8 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
         val count = MutableLiveData<Int>()
         viewModelScope.launch(Dispatchers.IO){
             val billDue = billRepository.getBillDueFromDate(DateTimeUtil.getTodayDate())
-            val billPaidId = billPaidRepository.getBillPaidByDate(DateTimeUtil.getTodayDate(), DateTimeUtil.getTodayDate())
+            val billPaidId = billPaidRepository.getBillPaidByDate(DateTimeUtil.getTodayDate(),
+                    DateTimeUtil.getTodayDate(), billPayDao)
             val billDueId = arrayListOf<Long>()
             billDue.forEach {  billData ->
                 billDueId.add(billData.billId)

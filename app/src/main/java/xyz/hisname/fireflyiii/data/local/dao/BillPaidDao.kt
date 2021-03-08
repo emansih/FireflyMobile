@@ -23,6 +23,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.repository.models.bills.BillPaidDates
+import xyz.hisname.fireflyiii.repository.models.bills.BillPayDates
+import java.time.LocalDate
 
 @Dao
 abstract class BillPaidDao: BaseDao<BillPaidDates> {
@@ -44,9 +46,13 @@ abstract class BillPaidDao: BaseDao<BillPaidDates> {
 
 
     @Transaction
-    open suspend fun deleteAndInsert(startDate: String, endDate: String, list: List<BillData>){
+    open suspend fun deleteAndInsert(startDate: String, endDate: String, list: List<BillData>, billPayDao: BillPayDao){
         deletePaidByDate(startDate, endDate)
+        billPayDao.deletePayListByDate(startDate, endDate)
         list.forEach {  billData ->
+            billData.billAttributes.pay_dates.forEach {  billPay ->
+                billPayDao.insert(BillPayDates(0, billData.billId, LocalDate.parse(billPay)))
+            }
             billData.billAttributes.paid_dates.forEach { billPaid ->
                 insert(BillPaidDates(
                         id = billData.billId, transaction_group_id = billPaid.transaction_group_id,

@@ -46,7 +46,9 @@ class BillsBottomSheet: BottomSheetDialogFragment() {
         binding.billDialogRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.billDialogRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(),
                 DividerItemDecoration.VERTICAL))
-
+        billsBottomSheetViewModel.billPayableToday.observe(viewLifecycleOwner){ value ->
+            binding.amountDueToday.text = value
+        }
         billsBottomSheetViewModel.getBills().observe(viewLifecycleOwner){ billStatus ->
             if(billStatus.isEmpty()){
                 toastInfo("No payable bills today!")
