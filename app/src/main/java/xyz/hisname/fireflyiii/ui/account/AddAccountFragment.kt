@@ -569,5 +569,6 @@ class AddAccountFragment: BaseAddObjectFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         fragmentAddAccountBinding = null
+        markdownViewModel.markdownText.postValue("")
     }
 }

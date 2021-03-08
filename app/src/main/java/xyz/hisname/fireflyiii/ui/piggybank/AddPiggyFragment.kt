@@ -401,5 +401,6 @@ class AddPiggyFragment: BaseAddObjectFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         fragmentAddPiggyBinding = null
+        markdownViewModel.markdownText.postValue("")
     }
 }

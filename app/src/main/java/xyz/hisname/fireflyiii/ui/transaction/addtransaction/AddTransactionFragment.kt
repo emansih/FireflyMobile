@@ -924,4 +924,9 @@ class AddTransactionFragment: BaseFragment() {
                 }
                 .show()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        markdownViewModel.markdownText.postValue("")
+    }
 }

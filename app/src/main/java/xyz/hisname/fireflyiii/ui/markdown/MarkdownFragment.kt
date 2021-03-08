@@ -124,6 +124,7 @@ class MarkdownFragment: BaseFragment() {
         binding.editableText.setText(markdownViewModel.markdownText.value)
         binding.displayText.text = markdownViewModel.markdownText.value
         binding.discardButton.setOnClickListener {
+            markdownViewModel.markdownText.postValue("")
             parentFragmentManager.popBackStack()
             hideKeyboard()
         }
@@ -266,10 +267,5 @@ class MarkdownFragment: BaseFragment() {
         } catch(e: StringIndexOutOfBoundsException){
             return false
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().viewModelStore.clear()
     }
 }
