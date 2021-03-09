@@ -53,14 +53,14 @@ class DeveloperSettings: BaseSettings() {
     private fun setCustomDateTime(){
         val customDateTime = findPreference<EditTextPreference>("userDefinedDateTimeFormat") as EditTextPreference
         customDateTime.setOnPreferenceChangeListener { _, newValue ->
-            customDateTime.summary = AppPref(sharedPref).userDefinedDateTimeFormat
+            customDateTime.summary = newValue.toString()
             try {
                 val dateToTest = OffsetDateTime.now()
-                dateToTest.format(DateTimeFormatter.ofPattern(AppPref(sharedPref).userDefinedDateTimeFormat))
+                dateToTest.format(DateTimeFormatter.ofPattern(newValue.toString()))
             } catch (exception: Exception){
                 AlertDialog.Builder(requireContext())
                         .setTitle("Invalid date time format!")
-                        .setMessage("The format you have chosen " + AppPref(sharedPref).userDefinedDateTimeFormat + " is not a valid java date time formatter. Falling back to dd MM yyyy hh:mm a")
+                        .setMessage("The format you have chosen " + newValue.toString() + " is not a valid java date time formatter. Falling back to dd MM yyyy hh:mm a")
                         .setPositiveButton("OK"){ _, _ -> }
                         .show()
             }
