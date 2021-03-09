@@ -31,6 +31,7 @@ class DeveloperSettings: BaseSettings() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.developer_settings)
         setDelay()
+        setCustomDateTime()
     }
 
     private fun setDelay(){
@@ -44,6 +45,11 @@ class DeveloperSettings: BaseSettings() {
             workManagerDelay.summary = AppPref(sharedPref).workManagerDelay.toString() + "mins"
             true
         }
+    }
+
+    private fun setCustomDateTime(){
+        val customDateTime = findPreference<EditTextPreference>("userDefinedDateTimeFormat") as EditTextPreference
+        customDateTime.summary = AppPref(sharedPref).userDefinedDateTimeFormat
     }
 
     override fun onAttach(context: Context) {

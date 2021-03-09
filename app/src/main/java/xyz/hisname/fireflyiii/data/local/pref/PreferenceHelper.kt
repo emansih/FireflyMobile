@@ -32,7 +32,6 @@ interface PreferenceHelper {
     var languagePref: String
     var nightModeEnabled: Boolean
     var isKeyguardEnabled: Boolean
-    var timeFormat: Boolean
     var isCustomCa: Boolean
     var isCurrencyThumbnailEnabled: Boolean
     var workManagerDelay: Long
@@ -40,5 +39,7 @@ interface PreferenceHelper {
     var workManagerNetworkType: NetworkType
     var workManagerRequireCharging: Boolean
     var budgetIssue4394: Boolean
+    var dateTimeFormat: Int
+    var userDefinedDateTimeFormat: String
     fun clearPref()
 }

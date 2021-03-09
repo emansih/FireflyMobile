@@ -77,7 +77,8 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
                 }
                 is SplitSeparator.TransactionItem -> {
                     val viewHolder = holder as TransactionViewHolder
-                    val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).timeFormat
+                    val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).dateTimeFormat
+                    val userDefinedTimePref = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).userDefinedDateTimeFormat
                     val transactionDescription = separator.transaction.description
                     val descriptionText = if(separator.transaction.isPending){
                         binding.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
@@ -89,7 +90,7 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
                     binding.sourceNameText.text = separator.transaction.source_name
                     binding.transactionJournalId.text = separator.transaction.transaction_journal_id.toString()
                     binding.dateText.text = DateTimeUtil.convertLocalDateTime(separator.transaction.date,
-                            timePreference)
+                            timePreference, userDefinedTimePref)
                     if(separator.transaction.amount.toString().startsWith("-")){
                         // Negative value means it's a withdrawal
                         binding.transactionAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))

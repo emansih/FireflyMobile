@@ -64,10 +64,6 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("keyguard", false)
         set(value) = sharedPref.edit{ putBoolean("keyguard", value)}
 
-    override var timeFormat: Boolean
-        get() = sharedPref.getBoolean("timeFormat", false)
-        set(value) = sharedPref.edit{ putBoolean("timeFormat", value)}
-
     override var isCustomCa: Boolean
         get() = sharedPref.getBoolean("customCa", false)
         set(value) = sharedPref.edit{ putBoolean("customCa", value)}
@@ -114,6 +110,14 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
             putString("workManagerType", value.toString())
         }
 
+    private fun toNetworkType(networkType: String): NetworkType {
+        return try {
+            enumValueOf(networkType)
+        } catch (ex: Exception) {
+            NetworkType.CONNECTED
+        }
+    }
+
     override var workManagerRequireCharging: Boolean
         get() = sharedPref.getBoolean("workManagerCharging", false)
         set(value) = sharedPref.edit{ putBoolean("workManagerCharging", value) }
@@ -122,13 +126,23 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getBoolean("budgetIssue4394", false)
         set(value) = sharedPref.edit{ putBoolean("budgetIssue4394", value) }
 
-    private fun toNetworkType(networkType: String): NetworkType {
-        return try {
-            enumValueOf(networkType)
-        } catch (ex: Exception) {
-            NetworkType.CONNECTED
-        }
-    }
+
+    /* 0 -> dd MM yyyy hh:mm a   (08:30am)
+     * 1 -> dd MM yyyy HH:mm (15:30)
+     * 2 -> MM dd yyyy hh:mm a
+     * 3 -> MM dd yyyy HH:mm
+     * 4 -> dd MMM yyyy hh:mm a
+     * 5 -> dd MMM yyyy HH:mm
+     * 6 -> MMM dd yyyy hh:mm a
+     * 7 -> MMM dd yyyy HH:mm
+     */
+    override var dateTimeFormat: Int
+        get() = (sharedPref.getString("dateTimeFormat", "") ?: "0").toInt()
+        set(value) = sharedPref.edit{ putInt("dateTimeFormat", value) }
+
+    override var userDefinedDateTimeFormat: String
+        get() = sharedPref.getString("userDefinedDateTimeFormat", "") ?: ""
+        set(value) = sharedPref.edit{ putString("userDefinedDateTimeFormat", value) }
 
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

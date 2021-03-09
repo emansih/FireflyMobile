@@ -165,26 +165,56 @@ object DateTimeUtil {
                 " " + localDate.year.toString()
     }
 
-    // Input LocalDateTime(yyyy-MM-dd T HH:mm)
-    // Output String(yyyy-MM-dd @ HH:mm OR hh:mm)
-    fun convertLocalDateTime(timeToParse: OffsetDateTime, shouldUse24HourFormat: Boolean): String {
-        val timeFormat = if (!shouldUse24HourFormat){
-            timeToParse.format(DateTimeFormatter.ofPattern("hh:mm a"))
+
+    /* Input LocalDateTime(yyyy-MM-dd T HH:mm)
+     * 0 -> dd MM yyyy hh:mm a   (08:30am)
+     * 1 -> dd MM yyyy HH:mm (15:30)
+     * 2 -> MM dd yyyy hh:mm a
+     * 3 -> MM dd yyyy HH:mm
+     * 4 -> dd MMM yyyy hh:mm a
+     * 5 -> dd MMM yyyy HH:mm
+     * 6 -> MMM dd yyyy hh:mm a
+     * 7 -> MMM dd yyyy HH:mm
+     */
+    fun convertLocalDateTime(timeToParse: OffsetDateTime, dateTimeFormatPref: Int,
+                             customDateTimeFormat: String): String {
+        val timeFormat: String
+        if(customDateTimeFormat.isBlank()){
+            timeFormat = when (dateTimeFormatPref) {
+                0 -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("dd MM yyyy hh:mm a"))
+                }
+                1 -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("dd MM yyyy HH:mm"))
+                }
+                2 -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("MM dd yyyy hh:mm a"))
+                }
+                3 -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("dd MMM yyyy hh:mm a"))
+                }
+                4 -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("dd MMM yyyy hh:mm a"))
+                }
+                5 -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm"))
+                }
+                6 -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("MMM dd yyyy hh:mm a"))
+                }
+                else -> {
+                    timeToParse.format(DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm"))
+                }
+            }
         } else {
-            timeToParse.format(DateTimeFormatter.ofPattern("HH:mm"))
+            timeFormat = try {
+                timeToParse.format(DateTimeFormatter.ofPattern(customDateTimeFormat))
+            } catch (exception: Exception){
+                timeToParse.format(DateTimeFormatter.ofPattern("dd MM yyyy hh:mm a"))
+            }
         }
-        val month = if (timeToParse.monthValue < 10){
-            "0${timeToParse.monthValue}"
-        } else {
-            timeToParse.monthValue.toString()
-        }
-        val dayOfMonth = if(timeToParse.dayOfMonth < 10){
-            "0${timeToParse.dayOfMonth}"
-        } else {
-            timeToParse.dayOfMonth.toString()
-        }
-        return timeToParse.year.toString() + "-" + month + "-" + dayOfMonth + " @ " +
-                timeFormat
+
+        return timeFormat
     }
 
     fun convertIso8601ToHumanDate(timeToParse: OffsetDateTime): String {

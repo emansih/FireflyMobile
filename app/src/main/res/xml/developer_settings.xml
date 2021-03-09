@@ -33,4 +33,12 @@
         app:title="Network Constraints"
         app:summary="Requires device to be in certain network conditions"/>
 
+    <EditTextPreference
+        app:iconSpaceReserved="false"
+        app:key="userDefinedDateTimeFormat"
+        app:title="Custom Date Time Format"
+        app:useSimpleSummaryProvider="false"
+        app:dialogMessage="This setting will override the date time format you choose in the normal setting menu. Leave this blank to disable.">
+    </EditTextPreference>
+
 </PreferenceScreen>

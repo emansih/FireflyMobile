@@ -78,5 +78,25 @@
         <item>NetworkType.NOT_ROAMING</item>
     </string-array>
 
+    <string-array name="dateTimeFormat">
+        <item>dd MM yyyy hh:mm a</item>
+        <item>dd MM yyyy HH:mm</item>
+        <item>MM dd yyyy hh:mm a</item>
+        <item>MM dd yyyy HH:mm</item>
+        <item>dd MMM yyyy hh:mm a</item>
+        <item>dd MMM yyyy HH:mm</item>
+        <item>MMM dd yyyy hh:mm a</item>
+        <item>MMM dd yyyy HH:mm</item>
+    </string-array>
 
+    <string-array name="dateTimeFormat_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
 </resources>

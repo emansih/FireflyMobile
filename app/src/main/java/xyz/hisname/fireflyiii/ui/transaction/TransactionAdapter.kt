@@ -53,7 +53,8 @@ class TransactionAdapter(private val clickListener:(Transactions) -> Unit):
 
     inner class TransactionViewHolder(view: RecentTransactionListBinding): RecyclerView.ViewHolder(view.root) {
         fun bind(transactionAttributes: Transactions, clickListener: (Transactions) -> Unit){
-            val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).timeFormat
+            val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).dateTimeFormat
+            val userDefinedDateTime = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).userDefinedDateTimeFormat
             val transactionDescription = transactionAttributes.description
             val descriptionText = if(transactionAttributes.isPending){
                 binding.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))
@@ -64,7 +65,7 @@ class TransactionAdapter(private val clickListener:(Transactions) -> Unit):
             binding.transactionNameText.text = descriptionText
             binding.sourceNameText.text = transactionAttributes.source_name
             binding.transactionJournalId.text = transactionAttributes.transaction_journal_id.toString()
-            binding.dateText.text = DateTimeUtil.convertLocalDateTime(transactionAttributes.date , timePreference)
+            binding.dateText.text = DateTimeUtil.convertLocalDateTime(transactionAttributes.date , timePreference, userDefinedDateTime)
             if(transactionAttributes.amount.toString().startsWith("-")){
                 // Negative value means it's a withdrawal
                 binding.transactionAmountText.setTextColor(context.getCompatColor(R.color.md_red_500))

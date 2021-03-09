@@ -9,10 +9,13 @@
         app:iconSpaceReserved="false">
     </CheckBoxPreference>
 
-    <CheckBoxPreference
-        app:key="timeFormat"
-        app:title="Toggle between 24 hour or 12 hour"
-        app:summary="Check to use 24 hour time by default"
-        app:iconSpaceReserved="false">
-    </CheckBoxPreference>
+    <ListPreference
+        app:iconSpaceReserved="false"
+        app:key="dateTimeFormat"
+        app:entries="@array/dateTimeFormat"
+        app:useSimpleSummaryProvider="true"
+        app:entryValues="@array/dateTimeFormat_values"
+        app:title="Date Time Format"
+        app:summary="Display a date time format of your choosing"/>
+
 </PreferenceScreen>

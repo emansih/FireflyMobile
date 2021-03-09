@@ -23,14 +23,18 @@ import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.CheckBoxPreference
+import androidx.preference.ListPreference
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.ui.notifications.NotificationUtils
+import xyz.hisname.fireflyiii.util.extension.toastInfo
 
 class TransactionSettings: BaseSettings() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_transaction_settings)
         addPermNotif()
+        setDateTimeFormat()
     }
 
     private fun addPermNotif(){
@@ -43,6 +47,14 @@ class TransactionSettings: BaseSettings() {
                 NotificationManagerCompat.from(requireContext()).cancel("transaction_notif",12345)
             }
             true
+        }
+    }
+
+
+    private fun setDateTimeFormat(){
+        val dateTimeFormat = findPreference<ListPreference>("dateTimeFormat") as ListPreference
+        if(AppPref(sharedPref).userDefinedDateTimeFormat.isNotEmpty()){
+            dateTimeFormat.isEnabled = false
         }
     }
 
