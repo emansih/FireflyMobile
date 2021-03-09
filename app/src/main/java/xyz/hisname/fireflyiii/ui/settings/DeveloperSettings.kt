@@ -21,10 +21,13 @@ package xyz.hisname.fireflyiii.ui.settings
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.preference.EditTextPreference
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 class DeveloperSettings: BaseSettings() {
 
@@ -49,7 +52,20 @@ class DeveloperSettings: BaseSettings() {
 
     private fun setCustomDateTime(){
         val customDateTime = findPreference<EditTextPreference>("userDefinedDateTimeFormat") as EditTextPreference
-        customDateTime.summary = AppPref(sharedPref).userDefinedDateTimeFormat
+        customDateTime.setOnPreferenceChangeListener { _, newValue ->
+            customDateTime.summary = AppPref(sharedPref).userDefinedDateTimeFormat
+            try {
+                val dateToTest = OffsetDateTime.now()
+                dateToTest.format(DateTimeFormatter.ofPattern(AppPref(sharedPref).userDefinedDateTimeFormat))
+            } catch (exception: Exception){
+                AlertDialog.Builder(requireContext())
+                        .setTitle("Invalid date time format!")
+                        .setMessage("The format you have chosen " + AppPref(sharedPref).userDefinedDateTimeFormat + " is not a valid java date time formatter. Falling back to dd MM yyyy hh:mm a")
+                        .setPositiveButton("OK"){ _, _ -> }
+                        .show()
+            }
+            true
+        }
     }
 
     override fun onAttach(context: Context) {
