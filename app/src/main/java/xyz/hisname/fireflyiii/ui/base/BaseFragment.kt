@@ -38,7 +38,6 @@ import kotlin.coroutines.CoroutineContext
 
 abstract class BaseFragment: Fragment() {
 
-    protected val progressLayout by bindView<View>(R.id.progress_overlay)
     protected val extendedFab by bindView<ExtendedFloatingActionButton>(R.id.fab_action)
     protected val fragmentContainer by bindView<FrameLayout>(R.id.fragment_container)
     protected val revealX by lazy { arguments?.getInt("revealX") ?: 0 }

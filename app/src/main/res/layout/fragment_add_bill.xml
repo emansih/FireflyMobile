@@ -334,6 +334,10 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
+    <include
+        android:id="@+id/progressLayout"
+        layout="@layout/progress_overlay"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addBillFab"
         android:layout_width="wrap_content"

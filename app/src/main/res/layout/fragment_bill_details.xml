@@ -240,6 +240,11 @@
             app:layout_constraintStart_toStartOf="@+id/attachmentRecyclerView"
             app:layout_constraintEnd_toEndOf="@+id/attachmentRecyclerView"/>
 
+        <include
+            android:id="@+id/progressLayout"
+            layout="@layout/progress_overlay"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.core.widget.NestedScrollView>
 

@@ -250,10 +250,16 @@ class AddBudgetFragment: BaseAddObjectFragment() {
             attachmentDataAdapter.remove(data)
             binding.attachmentInformation.adapter?.notifyDataSetChanged()
         }) { another: Int -> }
+        addBudgetViewModel.isLoading.observe(viewLifecycleOwner){ isLoading ->
+            if(isLoading){
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
+            } else {
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
+            }
+        }
     }
 
     override fun submitData() {
-        ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
         var amount: String? = null
         var currency: String? = null
         var freq: String? = null
@@ -284,11 +290,9 @@ class AddBudgetFragment: BaseAddObjectFragment() {
             addBudgetViewModel.addBudget(binding.budgetNameEditText.getString(), budgetType, currency,
                     amount, freq, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
                 if(response.first){
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     toastSuccess(response.second)
                     handleBack()
                 } else {
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     toastInfo(response.second)
                 }
             }
@@ -296,11 +300,9 @@ class AddBudgetFragment: BaseAddObjectFragment() {
             addBudgetViewModel.updateBudget(budgetId, binding.budgetNameEditText.getString(), budgetType, currency,
                     amount, freq).observe(viewLifecycleOwner) { response ->
                 if(response.first){
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     toastSuccess(response.second)
                     handleBack()
                 } else {
-                    ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
                     toastInfo(response.second)
                 }
             }

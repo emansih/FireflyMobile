@@ -480,5 +480,8 @@
         app:layout_anchor="@id/accountToolbar"
         app:layout_anchorGravity="bottom|right|end" />
 
+    <include
+        android:id="@+id/progressLayout"
+        layout="@layout/progress_overlay"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

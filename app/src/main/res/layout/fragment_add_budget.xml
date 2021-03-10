@@ -230,7 +230,9 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <include
+        android:id="@+id/progressLayout"
+        layout="@layout/progress_overlay"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addBudgetFab"

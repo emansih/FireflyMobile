@@ -252,9 +252,9 @@ class BillDetailsFragment: BaseDetailFragment() {
     private fun progressCircle(){
         billDetailsViewModel.isLoading.observe(viewLifecycleOwner){ isloading ->
             if(isloading){
-                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
             }
         }
         transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner){ loadStates ->

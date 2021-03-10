@@ -87,8 +87,6 @@
                 app:backgroundTint="@color/md_orange_500"
                 app:icon="@android:drawable/ic_input_add" />
 
-            <include layout="@layout/progress_overlay"/>
-
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </FrameLayout>

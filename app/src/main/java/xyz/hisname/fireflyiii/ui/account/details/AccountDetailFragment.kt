@@ -87,9 +87,9 @@ class AccountDetailFragment: BaseDetailFragment() {
         }
         accountDetailViewModel.isLoading.observe(viewLifecycleOwner){ isLoading ->
             if(isLoading == true){
-                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
             }
         }
 

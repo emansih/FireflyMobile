@@ -225,5 +225,10 @@
             app:layout_constraintStart_toStartOf="@+id/accountTransactionList"
             app:layout_constraintEnd_toEndOf="@+id/accountTransactionList"/>
 
+        <include
+            android:id="@+id/progressLayout"
+            layout="@layout/progress_overlay"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.core.widget.NestedScrollView>

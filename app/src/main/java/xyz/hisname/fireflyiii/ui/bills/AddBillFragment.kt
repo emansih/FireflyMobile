@@ -344,9 +344,9 @@ class AddBillFragment: BaseAddObjectFragment() {
         }
         billViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
             if(loader){
-                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
             }
         }
         billViewModel.apiResponse.observe(viewLifecycleOwner){ response ->
@@ -393,11 +393,11 @@ class AddBillFragment: BaseAddObjectFragment() {
                 binding.billDateEdittext.getString(), repeatFreq, binding.skipEdittext.getString(), "1",
                     currency, notes, attachmentItemAdapter).observe(viewLifecycleOwner) { response ->
             if(response.first){
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
                 toastSuccess(response.second)
                 handleBack()
             } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
                 toastInfo(response.second)
             }
         }

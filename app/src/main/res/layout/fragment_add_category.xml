@@ -63,4 +63,8 @@
         app:layout_constraintTop_toBottomOf="@+id/category_name_layout"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <include
+        android:id="@+id/progressLayout"
+        layout="@layout/progress_overlay"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

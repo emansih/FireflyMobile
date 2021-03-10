@@ -123,5 +123,8 @@
             app:layout_constraintStart_toStartOf="@+id/piggy_bank_details_card"
             app:layout_constraintEnd_toEndOf="@+id/piggy_bank_details_card"/>
 
+        <include
+            android:id="@+id/loadingProgressLayout"
+            layout="@layout/progress_overlay"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

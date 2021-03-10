@@ -175,5 +175,9 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <include
+            android:id="@+id/progressLayout"
+            layout="@layout/progress_overlay"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

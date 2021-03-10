@@ -33,7 +33,6 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
 
     private val categoryViewModel by lazy { getImprovedViewModel(AddCategoryViewModel::class.java) }
     private val categoryId by lazy { arguments?.getLong("categoryId")  ?: 0 }
-    private val progressLayout by bindView<View>(R.id.progress_overlay)
     private var fragmentAddCategoryBinding: FragmentAddCategoryBinding? = null
     private val binding get() = fragmentAddCategoryBinding!!
 
@@ -73,9 +72,9 @@ class AddCategoriesFragment: BottomSheetDialogFragment() {
         }
         categoryViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
             if(loader){
-                ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
             }
 
         }

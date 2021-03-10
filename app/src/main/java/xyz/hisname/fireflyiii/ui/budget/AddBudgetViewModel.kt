@@ -67,10 +67,12 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
     fun getDefaultCurrency(): LiveData<String>{
         val currencyToDisplay = MutableLiveData<String>()
         viewModelScope.launch(Dispatchers.IO){
+            isLoading.postValue(true)
             val defaultCurrency = currencyRepository.defaultCurrency()
             currency = defaultCurrency.currencyAttributes.code
             currencyToDisplay.postValue(defaultCurrency.currencyAttributes.name + " (" +
                     defaultCurrency.currencyAttributes.code + ")")
+            isLoading.postValue(false)
         }
         return currencyToDisplay
     }

@@ -140,5 +140,8 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <include
+        android:id="@+id/progressLayout"
+        layout="@layout/progress_overlay"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

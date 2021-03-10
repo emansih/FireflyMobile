@@ -7,3 +7,4 @@ I have removed the option and added a more comprehensive list. If you are much m
 Fix:
 - Fix transaction screen not going back to dashboard when clicking back button
 - Fix an issue where old data will appear when adding transaction
+- Fix an issue where progress circle will not appear 

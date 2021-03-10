@@ -68,13 +68,13 @@ class AddTransactionPager: BaseFragment() {
            handleBack()
         }
         binding.addTransactionText.setOnClickListener {
-            ProgressBar.animateView(progressLayout, View.VISIBLE, 0.4f, 200)
+            ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
             val masterId = Random.nextLong()
             addTransactionViewModel.saveData(masterId)
             addTransactionViewModel.memoryCount().observe(viewLifecycleOwner){ count ->
                 if(adapter.itemCount == count){
                     addTransactionViewModel.uploadTransaction(binding.groupEdittext.getString()).observe(viewLifecycleOwner){ response ->
-                        ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                        ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
                         if(response.first){
                             toastSuccess(response.second)
                             handleBack()
@@ -87,7 +87,7 @@ class AddTransactionPager: BaseFragment() {
         }
         addTransactionViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
             if(!loading){
-                ProgressBar.animateView(progressLayout, View.GONE, 0f, 200)
+                ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
             }
         }
     }
