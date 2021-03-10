@@ -11,8 +11,8 @@ android {
         applicationId "xyz.hisname.fireflyiii"
         minSdkVersion(Dependencies.minSdk)
         targetSdkVersion(Dependencies.targetSdk)
-        versionCode 88
-        versionName "4.3.2"
+        versionCode 89
+        versionName "4.4.0"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
