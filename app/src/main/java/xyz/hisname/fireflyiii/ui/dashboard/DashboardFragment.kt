@@ -21,13 +21,13 @@ package xyz.hisname.fireflyiii.ui.dashboard
 import android.animation.ObjectAnimator
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.appcompat.widget.Toolbar
@@ -59,7 +59,6 @@ import xyz.hisname.fireflyiii.databinding.FragmentDashboardBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.bills.BillsBottomSheet
-import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetSummaryFragment
 import xyz.hisname.fireflyiii.ui.transaction.TransactionAdapter
@@ -118,8 +117,6 @@ class DashboardFragment: BaseFragment() {
             Snackbar.make(coordinatorLayout, response, Snackbar.LENGTH_LONG).show()
         }
         setDashboardDataClick()
-        showCase(R.string.dashboard_balance_help_text,
-                "balanceLayoutCaseView", binding.balanceLayout).show()
         requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.dashboard)
     }
 
@@ -435,6 +432,16 @@ class DashboardFragment: BaseFragment() {
                     .translationY(0f)
                     .setInterpolator(DecelerateInterpolator(5f))
                     .setDuration(1234)
+                    .onAnimationEnd {
+                        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener{
+                            override fun onGlobalLayout() {
+                                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                                showCase(R.string.dashboard_balance_help_text,
+                                        "balanceLayoutCaseView", binding.balanceCard).show()
+                            }
+
+                        })
+                    }
         }
     }
 }
