@@ -2,6 +2,7 @@ What's new:
 - Minor breaking change. If you have changed the date time format in the settings before, it will no longer work as expected. 
 I have removed the option and added a more comprehensive list. If you are much more adventurous,  there is an option to fill in your own date time format. 
 
+- When changing language or theme, you will be prompted to restart instead of restarting immediately 
 
 Fix:
 - Fix transaction screen not going back to dashboard when clicking back button

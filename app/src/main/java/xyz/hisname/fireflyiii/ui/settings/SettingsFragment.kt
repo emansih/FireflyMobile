@@ -18,18 +18,19 @@
 
 package xyz.hisname.fireflyiii.ui.settings
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -60,7 +61,12 @@ class SettingsFragment: BaseSettings() {
         languagePref.setOnPreferenceChangeListener { _, newValue ->
             AppPref(sharedPref).languagePref = newValue.toString()
             LanguageChanger.init(requireContext(), AppPref(sharedPref).languagePref)
-            ActivityCompat.recreate(requireActivity())
+            val coordinatorLayout = requireActivity().findViewById<CoordinatorLayout>(R.id.coordinatorlayout)
+            Snackbar.make(coordinatorLayout, "Restart to apply changes", Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok){
+                        ActivityCompat.recreate(requireActivity())
+                    }
+                    .show()
             true
         }
         languagePref.icon = IconicsDrawable(requireContext()).apply {
@@ -110,6 +116,12 @@ class SettingsFragment: BaseSettings() {
         nightModePref.setOnPreferenceChangeListener { preference, newValue ->
             val nightMode = newValue as Boolean
             AppPref(sharedPref).nightModeEnabled = nightMode
+            val coordinatorLayout = requireActivity().findViewById<CoordinatorLayout>(R.id.coordinatorlayout)
+            Snackbar.make(coordinatorLayout, "Restart to apply changes", Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok){
+                        ActivityCompat.recreate(requireActivity())
+                    }
+                    .show()
             true
         }
         nightModePref.icon = IconicsDrawable(requireContext()).apply {
@@ -139,7 +151,6 @@ class SettingsFragment: BaseSettings() {
             }
             tutorialSetting.setOnPreferenceClickListener {
                 requireContext().deleteSharedPreferences("PrefShowCaseView")
-                ActivityCompat.recreate(requireActivity())
                 true
             }
         }
@@ -160,11 +171,6 @@ class SettingsFragment: BaseSettings() {
             sizeDp = 24
             colorRes = setIconColor()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.settings)
     }
 
     override fun onResume() {
