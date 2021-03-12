@@ -225,8 +225,12 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
 
     fun uploadTransaction(groupTitle: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
-        viewModelScope.launch(CoroutineExceptionHandler { _, _ -> }){
+        viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
+            isLoading.postValue(false)
+            apiResponse.postValue(Pair(false, throwable.localizedMessage))
+        }){
             val addTransaction = temporaryTransactionRepository.addSplitTransaction(groupTitle, transactionMasterId)
+            isLoading.postValue(false)
             when {
                 addTransaction.response != null -> {
                     apiResponse.postValue(Pair(true,
