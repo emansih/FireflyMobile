@@ -197,7 +197,7 @@ abstract class TransactionDataDao {
     @Query("SELECT attachment FROM transactionTable WHERE transaction_journal_id =:journalId")
     abstract suspend fun getAttachmentByJournalId(journalId: Long): List<String>
 
-    @Query("SELECT sum(amount) FROM transactionTable WHERE tags =:tags AND transactionType =:transactionType AND (date BETWEEN :startDate AND :endDate) AND currency_code =:currencyCode")
+    @Query("SELECT sum(amount) FROM transactionTable WHERE tags LIKE :tags AND transactionType =:transactionType AND (date BETWEEN :startDate AND :endDate) AND currency_code =:currencyCode")
     abstract suspend fun getTransactionSumByTagsAndTypeAndDateAndCurrency(tags: String, transactionType: String,
                                                                startDate: String, endDate: String, currencyCode: String): BigDecimal
 

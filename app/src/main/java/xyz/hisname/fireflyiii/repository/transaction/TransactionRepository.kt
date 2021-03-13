@@ -73,7 +73,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     suspend fun getTransactionSumByTagsAndTypeAndDateAndCurrency(tags: String, transactionType: String,
                                         startDate: String, endDate: String, currencyCode: String) =
-            transactionDao.getTransactionSumByTagsAndTypeAndDateAndCurrency("%$tags%", convertString(transactionType),
+            transactionDao.getTransactionSumByTagsAndTypeAndDateAndCurrency("%$tags%", transactionType,
                     DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode)
 
@@ -396,7 +396,13 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                     }
                 }
                 } catch (exception: Exception){ }
-                return LoadResult.Page(transactionList, params.key, 2)
+
+            val nextKey = if(params.key ?: 1 < (transactionList.size / Constants.PAGE_SIZE)){
+                params.key ?: 1 + 1
+            } else {
+                null
+            }
+            return LoadResult.Page(transactionList, params.key, nextKey)
             }
         override val keyReuseSupported = true
     }

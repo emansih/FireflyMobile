@@ -132,12 +132,12 @@ class TagDetailsViewModel(application: Application): BaseViewModel(application) 
         val defaultCurrency = currencyRepository.defaultCurrency().currencyAttributes
         val currencyCode = defaultCurrency.code
         val withdrawalSum = transactionRepository.getTransactionSumByTagsAndTypeAndDateAndCurrency(
-                tagName, "Withdrawal",
+                tagName, "withdrawal",
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode
         )
         val depositSum = transactionRepository.getTransactionSumByTagsAndTypeAndDateAndCurrency(
-                tagName, "Deposit",
+                tagName, "deposit",
                 DateTimeUtil.getStartOfMonth(),
                 DateTimeUtil.getEndOfMonth(), currencyCode
         )
