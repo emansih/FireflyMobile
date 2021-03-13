@@ -97,6 +97,9 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType ORDER BY date ASC, transaction_journal_id ASC")
     abstract suspend fun getTransactionByDate(startDate: String, endDate: String, transactionType: String): MutableList<Transactions>
 
+    @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) ORDER BY date ASC, transaction_journal_id ASC")
+    abstract suspend fun getTransactionByDate(startDate: String, endDate: String): MutableList<Transactions>
+
     @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract suspend fun getTransactionByDateCount(startDate: String, endDate: String, transactionType: String): Int
 
@@ -193,5 +196,9 @@ abstract class TransactionDataDao {
 
     @Query("SELECT attachment FROM transactionTable WHERE transaction_journal_id =:journalId")
     abstract suspend fun getAttachmentByJournalId(journalId: Long): List<String>
+
+    @Query("SELECT sum(amount) FROM transactionTable WHERE tags =:tags AND transactionType =:transactionType AND (date BETWEEN :startDate AND :endDate) AND currency_code =:currencyCode")
+    abstract suspend fun getTransactionSumByTagsAndTypeAndDateAndCurrency(tags: String, transactionType: String,
+                                                               startDate: String, endDate: String, currencyCode: String): BigDecimal
 
 }

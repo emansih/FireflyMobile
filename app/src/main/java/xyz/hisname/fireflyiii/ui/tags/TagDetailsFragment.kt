@@ -23,27 +23,33 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.preference.PreferenceManager
+import androidx.lifecycle.asLiveData
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.Marker
-import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.databinding.DetailsCardBinding
 import xyz.hisname.fireflyiii.databinding.FragmentTagDetailsBinding
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
+import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseDetailFragment
+import xyz.hisname.fireflyiii.ui.base.BaseDetailRecyclerAdapter
+import xyz.hisname.fireflyiii.ui.transaction.TransactionSeparatorAdapter
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.extension.*
-import java.io.File
 
 class TagDetailsFragment: BaseDetailFragment() {
 
@@ -54,19 +60,18 @@ class TagDetailsFragment: BaseDetailFragment() {
     private lateinit var startMarker: Marker
     private var fragmentTagDetailsBinding: FragmentTagDetailsBinding? = null
     private val binding get() = fragmentTagDetailsBinding!!
+    private var detailsCardBinding: DetailsCardBinding? = null
+    private val detailBinding get() = detailsCardBinding!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         fragmentTagDetailsBinding = FragmentTagDetailsBinding.inflate(inflater, container, false)
+        detailsCardBinding = binding.tagSumCard
         val view = binding.root
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
-        Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
-        Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")
         if(tagId != 0L) {
             tagsDetailViewModel.getTagById(tagId).observe(viewLifecycleOwner) { data ->
                 setTagData(data)
@@ -76,12 +81,45 @@ class TagDetailsFragment: BaseDetailFragment() {
                 setTagData(data)
             }
         }
+        setTagRecycleView()
         tagsDetailViewModel.isLoading.observe(viewLifecycleOwner){ loader ->
             if(loader){
                 ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
             } else {
                 ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
             }
+        }
+    }
+
+    private fun setTagRecycleView(){
+        val transactionAdapter = TransactionSeparatorAdapter{ data -> itemClicked(data) }
+        tagsDetailViewModel.transactionList.observe(viewLifecycleOwner){ transactionList ->
+            binding.tagsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            binding.tagsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            binding.tagsRecyclerView.adapter = transactionAdapter
+            transactionAdapter.submitData(lifecycle, transactionList)
+        }
+        transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner) { loadStates ->
+            if(loadStates.refresh !is LoadState.Loading) {
+                if (transactionAdapter.itemCount < 1) {
+                    binding.tagsDetailsCard.isGone = true
+                    binding.tagSumCard.root.isGone = true
+                }
+            }
+        }
+        tagsDetailViewModel.transactionSum.observe(viewLifecycleOwner){ detailModel ->
+            detailBinding.detailsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            detailBinding.detailsRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            detailBinding.detailsRecyclerView.adapter = BaseDetailRecyclerAdapter(detailModel){ }
+        }
+    }
+
+    private fun itemClicked(data: Transactions){
+        parentFragmentManager.commit {
+            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
+                arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
+            })
+            addToBackStack(null)
         }
     }
 

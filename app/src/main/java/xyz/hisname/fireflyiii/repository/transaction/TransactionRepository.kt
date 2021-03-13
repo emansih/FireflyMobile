@@ -71,6 +71,11 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), convertString(transactionType), currencyCode)
     }
 
+    suspend fun getTransactionSumByTagsAndTypeAndDateAndCurrency(tags: String, transactionType: String,
+                                        startDate: String, endDate: String, currencyCode: String) =
+            transactionDao.getTransactionSumByTagsAndTypeAndDateAndCurrency("%$tags%", convertString(transactionType),
+                    DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                    DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode)
 
     suspend fun getTransactionByDateAndBudgetAndCurrency(startDate: String, endDate: String,
                                                          currencyCode: String,
@@ -377,6 +382,23 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         } catch (exception: Exception) { }
         return attachmentDao.getAttachmentFromJournalId(transactionJournalId)
     }
+
+    fun getTransactionByTagAndDate(startDate: String, endDate: String, tagName: String) = object : PagingSource<Int, Transactions>(){
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Transactions> {
+            val transactionList = mutableListOf<Transactions>()
+            try {
+                loadRemoteData(startDate, endDate, "all")
+                transactionList.addAll(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                        DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate)))
+                transactionList.removeIf { transaction ->
+                    !transaction.tags.contains(tagName)
+                }
+            } catch (exception: Exception){ }
+            return LoadResult.Page(transactionList, params.key, 2)
+        }
+        override val keyReuseSupported = true
+    }
+
 
     fun searchDescription(query: String) = object : PagingSource<Int, String>(){
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, String> {
