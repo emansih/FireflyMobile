@@ -23,7 +23,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -102,8 +101,11 @@ class TagDetailsFragment: BaseDetailFragment() {
         transactionAdapter.loadStateFlow.asLiveData().observe(viewLifecycleOwner) { loadStates ->
             if(loadStates.refresh !is LoadState.Loading) {
                 if (transactionAdapter.itemCount < 1) {
-                    binding.tagsDetailsCard.isGone = true
-                    binding.tagSumCard.root.isGone = true
+                    binding.tagsDetailsCard.isVisible = false
+                    binding.tagSumCard.root.isVisible = false
+                } else {
+                    binding.tagsDetailsCard.isVisible = true
+                    binding.tagSumCard.root.isVisible = true
                 }
             }
         }

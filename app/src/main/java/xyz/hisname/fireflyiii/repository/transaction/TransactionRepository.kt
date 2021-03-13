@@ -383,19 +383,21 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return attachmentDao.getAttachmentFromJournalId(transactionJournalId)
     }
 
-    fun getTransactionByTagAndDate(startDate: String, endDate: String, tagName: String) = object : PagingSource<Int, Transactions>(){
+    fun getTransactionByTagAndDate(startDate: String, endDate: String, tagName: String) = object : PagingSource<Int, Transactions>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Transactions> {
             val transactionList = mutableListOf<Transactions>()
             try {
                 loadRemoteData(startDate, endDate, "all")
                 transactionList.addAll(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
                         DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate)))
-                transactionList.removeIf { transaction ->
-                    !transaction.tags.contains(tagName)
+                transactionList.forEachIndexed { index, transactions ->
+                    if(!transactions.tags.contains(tagName)){
+                        transactionList.removeAt(index)
+                    }
                 }
-            } catch (exception: Exception){ }
-            return LoadResult.Page(transactionList, params.key, 2)
-        }
+                } catch (exception: Exception){ }
+                return LoadResult.Page(transactionList, params.key, 2)
+            }
         override val keyReuseSupported = true
     }
 
