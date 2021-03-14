@@ -21,15 +21,18 @@ package xyz.hisname.fireflyiii.ui.transaction.addtransaction
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
+import com.google.android.material.tabs.TabLayout
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.ActivityAddTransactionBinding
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
+import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.extension.hideKeyboard
 
 class AddTransactionActivity: BaseActivity() {
 
     private val transactionType by lazy { intent.getStringExtra("transactionType") }
     private lateinit var binding: ActivityAddTransactionBinding
+    private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +53,7 @@ class AddTransactionActivity: BaseActivity() {
         binding.transactionBottomView.setOnNavigationItemSelectedListener{ item ->
             when(item.itemId){
                 R.id.action_withdraw -> {
+                    addTransactionViewModel.numTabs = 0
                     supportFragmentManager.commit {
                         replace(R.id.addTransactionFrame, AddTransactionPager().apply {
                             arguments = bundleOf("transactionType" to "Withdrawal", "FROM_TRANSACTION_ACTIVITY" to true)
@@ -58,6 +62,7 @@ class AddTransactionActivity: BaseActivity() {
                     true
                 }
                 R.id.action_deposit -> {
+                    addTransactionViewModel.numTabs = 0
                     supportFragmentManager.commit {
                         replace(R.id.addTransactionFrame, AddTransactionPager().apply {
                             arguments = bundleOf("transactionType" to "Deposit", "FROM_TRANSACTION_ACTIVITY" to true)
@@ -66,6 +71,7 @@ class AddTransactionActivity: BaseActivity() {
                     true
                 }
                 R.id.action_transfer -> {
+                    addTransactionViewModel.numTabs = 0
                     supportFragmentManager.commit {
                         replace(R.id.addTransactionFrame, AddTransactionPager().apply {
                             arguments = bundleOf("transactionType" to "Transfer", "FROM_TRANSACTION_ACTIVITY" to true)

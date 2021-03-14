@@ -372,7 +372,7 @@ class TransactionFragment: BaseFragment(){
             val addTransaction = AddTransactionPager()
             addTransaction.arguments = bundleOf("transactionType" to transactionType, "SHOULD_HIDE" to true)
             parentFragmentManager.commit {
-                replace(R.id.bigger_fragment_container, addTransaction)
+                add(R.id.bigger_fragment_container, addTransaction)
                 addToBackStack(null)
             }
         }

@@ -225,11 +225,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
 
     fun uploadTransaction(groupTitle: String): LiveData<Pair<Boolean,String>>{
         val apiResponse = MutableLiveData<Pair<Boolean,String>>()
-        viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            isLoading.postValue(false)
-            apiResponse.postValue(Pair(false, throwable.localizedMessage))
-            throw Exception(throwable)
-        }){
+        viewModelScope.launch{
             val addTransaction = temporaryTransactionRepository.addSplitTransaction(groupTitle, transactionMasterId)
             isLoading.postValue(false)
             when {
@@ -264,7 +260,6 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                 addTransaction.errorMessage != null -> {
                     apiResponse.postValue(Pair(false, addTransaction.errorMessage))
                     temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
-                    throw Exception(addTransaction.errorMessage)
                 }
                 addTransaction.error != null -> {
                     if(addTransaction.error is UnknownHostException){
@@ -277,7 +272,6 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                         apiResponse.postValue(Pair(false, addTransaction.error.localizedMessage))
                         temporaryTransactionRepository.deletePendingTransactionFromId(transactionMasterId)
                     }
-                    throw Exception(addTransaction.error)
                 }
                 else -> {
                     apiResponse.postValue(Pair(false, "Error adding transaction"))
@@ -293,9 +287,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                        sourceName: String?, destinationName: String?,
                        category: String?, tags: String?, budgetName: String?, billName: String?,
                        fileUri: ArrayList<Uri>, notes: String){
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
-            throw Exception(throwable)
-        }){
+        viewModelScope.launch(Dispatchers.IO){
             temporaryTransactionRepository.storeSplitTransaction(type,description, date, time, piggyBankName,
                     amount.replace(',', '.'), sourceName, destinationName, currency,
                     category, tags, budgetName, billName, notes, fileUri, transactionMasterId)

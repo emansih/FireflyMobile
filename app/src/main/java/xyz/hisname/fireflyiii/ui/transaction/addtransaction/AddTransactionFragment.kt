@@ -39,6 +39,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commit
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkInfo
@@ -88,7 +89,7 @@ class AddTransactionFragment: BaseFragment() {
     private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
 
-    private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
+    private val addTransactionViewModel by lazy { ViewModelProvider(requireParentFragment()).get(AddTransactionViewModel::class.java) }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }
@@ -267,7 +268,11 @@ class AddTransactionFragment: BaseFragment() {
         }
 
         addTransactionViewModel.transactionDate.observe(viewLifecycleOwner) { transactionDate ->
-            binding.transactionDateEdittext.setText(transactionDate)
+            if(transactionDate.isEmpty()){
+                binding.transactionDateEdittext.setText(DateTimeUtil.getTodayDate())
+            } else {
+                binding.transactionDateEdittext.setText(transactionDate)
+            }
         }
 
         addTransactionViewModel.transactionTime.observe(viewLifecycleOwner) { transactionTime ->

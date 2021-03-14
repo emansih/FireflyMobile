@@ -25,12 +25,12 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayoutMediator
 import xyz.hisname.fireflyiii.databinding.AddTransactionBinding
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.extension.getViewModel
 import kotlin.random.Random
 
 class AddTransactionPager: BaseFragment() {
@@ -41,8 +41,15 @@ class AddTransactionPager: BaseFragment() {
     private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
     private val isFromFragment by lazy { arguments?.getBoolean("SHOULD_HIDE") ?: false }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
-    private lateinit var adapter: AddTransactionAdapter
-    private val addTransactionViewModel by lazy { getViewModel(AddTransactionViewModel::class.java) }
+    private val adapter by lazy { AddTransactionAdapter(this,
+            bundleOf("transactionJournalId" to transactionJournalId,
+                    "FROM_TRANSACTION_ACTIVITY" to transactionActivity,
+                    "transactionType" to transactionType,
+                    "SHOULD_HIDE" to isFromFragment,
+                    "isFromNotification" to isFromNotification, "isTasker" to isTasker)) }
+    private val addTransactionViewModel by lazy {
+        ViewModelProvider(this).get(AddTransactionViewModel::class.java)
+    }
 
     private var addTransactionBinding: AddTransactionBinding? = null
     private val binding get() = addTransactionBinding!!
@@ -94,14 +101,7 @@ class AddTransactionPager: BaseFragment() {
 
     private fun setTabs(){
         addTransactionViewModel.numTabs = binding.tabLayout.tabCount + 1
-        adapter = AddTransactionAdapter(this,
-                bundleOf("transactionJournalId" to transactionJournalId,
-                        "FROM_TRANSACTION_ACTIVITY" to transactionActivity,
-                        "transactionType" to transactionType,
-                        "SHOULD_HIDE" to isFromFragment,
-                        "isFromNotification" to isFromNotification, "isTasker" to isTasker))
         binding.viewPagerLayout.adapter = adapter
-
         TabLayoutMediator(binding.tabLayout, binding.viewPagerLayout){ tab, position ->
             if(addTransactionViewModel.numTabs == 1){
                 tab.text = "No split"
@@ -129,7 +129,6 @@ class AddTransactionPager: BaseFragment() {
     }
 
     private fun handleBack() {
-        addTransactionViewModel.numTabs = 0
         if(isFromFragment){
             parentFragmentManager.popBackStack()
         } else {
@@ -139,10 +138,5 @@ class AddTransactionPager: BaseFragment() {
                 requireActivity().finish()
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().viewModelStore.clear()
     }
 }
