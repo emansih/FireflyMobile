@@ -279,9 +279,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 dynamicParams["transactions[$index][internal_reference]"] = latest.transaction_journal_id.toString()
             }
         }
-        val network = transactionService.addSplitTransaction(groupTitle, dynamicParams)
         return try {
-             parseResponse(network)
+            val network = transactionService.addSplitTransaction(groupTitle, dynamicParams)
+            parseResponse(network)
         } catch (exception: Exception){
             ApiResponses(error = exception)
         }
