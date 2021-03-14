@@ -184,4 +184,9 @@ class ListTagsFragment: BaseFragment() {
         super.onAttach(context)
         requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.tags)
     }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.tags)
+    }
 }

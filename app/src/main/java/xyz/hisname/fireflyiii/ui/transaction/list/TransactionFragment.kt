@@ -151,7 +151,7 @@ class TransactionFragment: BaseFragment(){
 
     private fun itemClicked(data: Transactions){
         parentFragmentManager.commit {
-            add(R.id.fragment_container, TransactionDetailsFragment().apply {
+            replace(R.id.fragment_container, TransactionDetailsFragment().apply {
                 arguments = bundleOf("transactionJournalId" to data.transaction_journal_id)
             })
             addToBackStack(null)
