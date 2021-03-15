@@ -1,10 +1,6 @@
-Another week, another release.
 
 What's new:
-- Tags Details screen will now show more information(transaction list and amount)
 
 
 Fix:
-- Fix an issue where transaction will not be added in some instance (#155)
-- Fix crash when submitting transaction while offline
-- Fix wrong title displayed on certain screens
+- Fix bug where transaction will not be added when offline(#158)

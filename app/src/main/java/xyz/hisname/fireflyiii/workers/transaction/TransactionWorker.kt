@@ -43,6 +43,7 @@ import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivi
 import xyz.hisname.fireflyiii.util.extension.showNotification
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.BaseWorker
+import java.net.UnknownHostException
 import java.time.Duration
 
 class TransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
@@ -57,16 +58,13 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                 TmpDatabase.getInstance(context).transactionDataDao(), transactionService)
         val masterTransactionId = inputData.getLong("masterTransactionId", 0)
         val groupTitle = inputData.getString("groupTitle")
-        if(masterTransactionId != 0L && !groupTitle.isNullOrEmpty()){
+        if(masterTransactionId != 0L){
             val addTransaction = tempRepository.addSplitTransaction(groupTitle, masterTransactionId)
             when {
                 addTransaction.response != null -> {
-                    // Ewww nasty code
-                    var transactionType = ""
                     addTransaction.response.data.transactionAttributes.transactions.forEach { transaction ->
-                        transactionType = transaction.transactionType
                         val internalRef = transaction.internal_reference
-                        if (internalRef != null){
+                        if (!internalRef.isNullOrBlank()){
                             val attributes = tempRepository.getTransactionByJournalId(transaction.internal_reference.toLong())
                             val attributeAttachment = attributes.attachment
                             if(!attributeAttachment.isNullOrEmpty()){
@@ -83,7 +81,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     }
                     cancelWorker(masterTransactionId, context)
                     tempRepository.deletePendingTransactionFromId(masterTransactionId)
-                    context.showNotification(transactionType, context.resources.getString(R.string.transaction_added), channelIcon)
+                    context.showNotification(context.resources.getString(R.string.transaction_added), groupTitle ?: "", channelIcon)
                     return Result.success()
                 }
                 addTransaction.errorMessage != null -> {
@@ -92,9 +90,13 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     return Result.failure()
                 }
                 addTransaction.error != null -> {
-                    context.showNotification("Error Adding $groupTitle", "Please try again later", channelIcon)
-                    cancelWorker(masterTransactionId, context)
-                    return Result.retry()
+                    return if(addTransaction.error is UnknownHostException){
+                        Result.retry()
+                    } else {
+                        context.showNotification("Error Adding $groupTitle", addTransaction.error.localizedMessage, channelIcon)
+                        cancelWorker(masterTransactionId, context)
+                        Result.failure()
+                    }
                 }
                 else -> {
                     return Result.failure()
@@ -126,7 +128,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                 addTransaction.response != null -> {
                     // Delete old data that we inserted when worker is being init
                     transactionRepository.deleteTransactionById(transactionWorkManagerId)
-                    context.showNotification(transactionType, context.resources.getString(R.string.transaction_added), channelIcon)
+                    context.showNotification(context.resources.getString(R.string.transaction_added), transactionDescription, channelIcon)
                     if(fileArray.isNotEmpty()){
                         // Remove [ and ] in the string
                         val beforeArray = fileArray.substring(1)
@@ -177,9 +179,13 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                     return Result.failure()
                 }
                 addTransaction.error != null -> {
-                    context.showNotification("Error Adding $transactionDescription", "Please try again later", channelIcon)
-                    cancelWorker(transactionWorkManagerId, context)
-                    return Result.retry()
+                    return if(addTransaction.error is UnknownHostException){
+                        Result.retry()
+                    } else {
+                        context.showNotification("Error Adding $groupTitle", addTransaction.error.localizedMessage, channelIcon)
+                        cancelWorker(masterTransactionId, context)
+                        Result.failure()
+                    }
                 }
                 else -> {
                     return Result.failure()

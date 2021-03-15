@@ -228,7 +228,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                 apiResponses.data.transactionAttributes.group_title, dynamicParams)
     }
 
-    suspend fun addSplitTransaction(groupTitle: String,
+    suspend fun addSplitTransaction(groupTitle: String?,
                                     masterTransactionId: Long): ApiResponses<TransactionSuccessModel>{
         val dynamicParams = HashMap<String, String>()
         val tempTransactionList = transactionDao.getPendingTransactionFromMasterIdId(masterTransactionId)
@@ -280,7 +280,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             }
         }
         return try {
-            val network = transactionService.addSplitTransaction(groupTitle, dynamicParams)
+            val network = transactionService.addSplitTransaction(groupTitle ?: "", dynamicParams)
             parseResponse(network)
         } catch (exception: Exception){
             ApiResponses(error = exception)
