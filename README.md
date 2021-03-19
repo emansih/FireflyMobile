@@ -23,6 +23,11 @@
 [<img src="https://img.shields.io/github/release/emansih/FireflyMobile.svg">](https://github.com/emansih/FireflyMobile/releases/latest)
             
 Photuris III is an **unofficial** Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
+"Firefly III" is a (self-hosted) manager for your personal finances. It can help you keep track of your expenses and income, so you can spend less and save more. 
+Firefly III supports the use of budgets, categories and tags. Using a bunch of external tools, you can import data. It also has many neat financial reports available.
+Firefly III should give you insight into and control over your finances. Money should be useful, not scary. You should be able to see where it is going, to feel your expenses and to... wow, I'm going overboard with this aren't I?
+
+
 
 ### Authentication
 
@@ -42,16 +47,6 @@ Check the [wiki page](https://github.com/emansih/FireflyMobile/wiki/Authenticati
 ✔ Enhanced Features: Attach multiple attachments 📎 / add time 🕐 to your transactions 
 
 
-### Running the Software
-
-#### Building
-
-With your device plugged into your PC and ADB enabled
-```bash
-git clone https://github.com/emansih/FireflyMobile.git
-cd FireflyMobile
-./gradlew clean installDebug
-```
 
 #### Downloads
 
@@ -79,20 +74,6 @@ Thanks to [Device Shots](https://deviceshots.com/) for the device frame!
 
 Found a bug? Before reporting it, check the [issue page](https://github.com/emansih/FireflyMobile/issues) to see if I am aware of it. If not, simply open up the [issue form](https://github.com/emansih/FireflyMobile/issues/new?template=ISSUE_TEMPLATE.md) and fill it up. Please attach a stacktrace together with the bug report. 
 
-
-On MIUI devices, please enable Autostart by going to Settings -> Apps -> Manage apps -> Photuris III -> Toggle Autostart
-
-Why is it needed? 
-
-XiaoMi blocks JobScheduler by default and [ACRA](https://github.com/ACRA/acra), our bug reporting system, uses [JobScheduler](https://github.com/ACRA/acra/issues/732) to open the email intent with attachment. 
-
-
-What can you as a user do about it? 
-
-1. Ask Google to add a test in the [CTS](https://source.android.com/compatibility/cts) and avoid these behaviours by the OEMs. 
-2. Ask XiaoMi to avoid this kind of breaking changes. 
-
-Please see this website for more info: https://dontkillmyapp.com/
 
 ### Contributing
 
