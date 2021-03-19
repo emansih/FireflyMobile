@@ -166,6 +166,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
             transactionTags.postValue(bundle.getString("transactionTags"))
             transactionBudget.postValue(bundle.getString("transactionBudget"))
             transactionCategory.postValue(bundle.getString("transactionCategory"))
+            transactionBill.postValue(bundle.getString("transactionBill"))
             transactionNote.postValue(bundle.getString("transactionNote"))
             transactionSourceAccount.postValue(bundle.getString("transactionSourceAccount"))
             transactionDestinationAccount.postValue(bundle.getString("transactionDestinationAccount"))

@@ -89,7 +89,13 @@ class AddTransactionFragment: BaseFragment() {
     private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
 
-    private val addTransactionViewModel by lazy { ViewModelProvider(requireParentFragment()).get(AddTransactionViewModel::class.java) }
+    private val addTransactionViewModel by lazy {
+        if(isTasker){
+            getViewModel(AddTransactionViewModel::class.java)
+        } else {
+            ViewModelProvider(requireParentFragment()).get(AddTransactionViewModel::class.java)
+        }
+    }
     private val currencyViewModel by lazy { getViewModel(CurrencyBottomSheetViewModel::class.java) }
     private val markdownViewModel by lazy { getViewModel(MarkdownViewModel::class.java) }
     private val categorySearch by lazy { getViewModel(CategoriesDialogViewModel::class.java) }

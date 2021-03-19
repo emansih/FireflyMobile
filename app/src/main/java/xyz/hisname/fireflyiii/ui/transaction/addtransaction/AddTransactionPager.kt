@@ -48,7 +48,11 @@ class AddTransactionPager: BaseFragment() {
                     "SHOULD_HIDE" to isFromFragment,
                     "isFromNotification" to isFromNotification, "isTasker" to isTasker)) }
     private val addTransactionViewModel by lazy {
-        ViewModelProvider(this).get(AddTransactionViewModel::class.java)
+        if(isTasker){
+            getViewModel(AddTransactionViewModel::class.java)
+        } else {
+            ViewModelProvider(this).get(AddTransactionViewModel::class.java)
+        }
     }
 
     private var addTransactionBinding: AddTransactionBinding? = null
@@ -76,20 +80,24 @@ class AddTransactionPager: BaseFragment() {
         }
         binding.addTransactionText.setOnClickListener {
             ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
-            val masterId = Random.nextLong()
-            addTransactionViewModel.saveData(masterId)
-            addTransactionViewModel.memoryCount().observe(viewLifecycleOwner){ count ->
-                if(adapter.itemCount == count){
-                    addTransactionViewModel.uploadTransaction(binding.groupEdittext.getString()).observe(viewLifecycleOwner){ response ->
-                        ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
-                        if(response.first){
-                            toastSuccess(response.second)
-                            handleBack()
-                        } else {
-                            toastInfo(response.second)
+            if(!isTasker){
+                val masterId = Random.nextLong()
+                addTransactionViewModel.saveData(masterId)
+                addTransactionViewModel.memoryCount().observe(viewLifecycleOwner){ count ->
+                    if(adapter.itemCount == count){
+                        addTransactionViewModel.uploadTransaction(binding.groupEdittext.getString()).observe(viewLifecycleOwner){ response ->
+                            ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
+                            if(response.first){
+                                toastSuccess(response.second)
+                                handleBack()
+                            } else {
+                                toastInfo(response.second)
+                            }
                         }
                     }
                 }
+            } else {
+                addTransactionViewModel.saveData.postValue(true)
             }
         }
         addTransactionViewModel.isLoading.observe(viewLifecycleOwner){ loading ->

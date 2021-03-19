@@ -51,6 +51,7 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
     private var transactionTags: String? = null
     private var transactionBudget: String? = null
     private var transactionCategory: String? = null
+    private var transactionBill: String? = null
     private var transactionNote: String? = null
     private var transactionUri: String? = null
     private lateinit var binding: ActivityAddTransactionBinding
@@ -78,6 +79,7 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 "transactionTags" to taskerHelper.config.getIntent()?.getStringExtra("transactionTags"),
                 "transactionBudget"  to taskerHelper.config.getIntent()?.getStringExtra("transactionBudget"),
                 "transactionPiggyBank" to taskerHelper.config.getIntent()?.getStringExtra("transactionPiggyBank"),
+                "transactionBill" to taskerHelper.config.getIntent()?.getStringExtra("transactionBill"),
                 "transactionNote" to taskerHelper.config.getIntent()?.getStringExtra("transactionNote"),
                 "transactionUri" to taskerHelper.config.getIntent()?.getSerializableExtra("transactionUri")
         ))
@@ -153,6 +155,12 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
             }
         }
 
+        addTransactionViewModel.transactionBill.observe(this){ bill ->
+            if(bill != null && bill.isNotBlank()){
+                transactionBill = bill
+            }
+        }
+
         addTransactionViewModel.transactionNote.observe(this){ note ->
             if (note != null && note.isNotBlank()) {
                 transactionNote = note
@@ -190,5 +198,5 @@ abstract class TransactionConfigPlugin<TInput : Any, TOutput : Any,
                 transactionType, transactionDescription, transactionAmount,
                 transactionDate, transactionSourceAccount, transactionDestinationAccount,
                 transactionPiggyBank, transactionTime, transactionCurrency, transactionTags,
-                transactionBudget, transactionCategory, transactionNote, transactionUri))
+                transactionBudget, transactionCategory, transactionBill, transactionNote, transactionUri))
 }
