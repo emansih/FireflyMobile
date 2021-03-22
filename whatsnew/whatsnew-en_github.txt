@@ -1,6 +1,4 @@
-
-What's new:
-
+Small release
 
 Fix:
-- Fix bug where transaction will not be added when offline(#158)
+- Fix bug where notes field is not correctly assigned in Tasker Plugin #160
