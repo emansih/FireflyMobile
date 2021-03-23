@@ -171,8 +171,7 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-
-        <!--<provider
+        <provider
             android:name=".data.provider.AccountListProvider"
             android:authorities="xyz.hisname.fireflyiii.provider"
             android:protectionLevel="signature"
@@ -181,6 +180,7 @@
             android:exported="true">
         </provider>
 
+        <!--
         <provider
             android:name=".data.provider.SimpleDataProvider"
             android:authorities="xyz.hisname.fireflyiii.provider.simpleData"
