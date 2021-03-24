@@ -25,7 +25,7 @@
 Photuris III is an **unofficial** Android client for [Firefly III](https://github.com/firefly-iii/firefly-iii), written in Kotlin. 
 "Firefly III" is a (self-hosted) manager for your personal finances. It can help you keep track of your expenses and income, so you can spend less and save more. 
 Firefly III supports the use of budgets, categories and tags. Using a bunch of external tools, you can import data. It also has many neat financial reports available.
-Firefly III should give you insight into and control over your finances. Money should be useful, not scary. You should be able to see where it is going, to feel your expenses and to... wow, I'm going overboard with this aren't I?
+Firefly III should give you insight into and control over your finances. Money should be useful, not scary.
 
 
 
