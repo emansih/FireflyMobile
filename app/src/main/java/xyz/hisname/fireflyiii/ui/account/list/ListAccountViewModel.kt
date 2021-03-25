@@ -43,8 +43,7 @@ class ListAccountViewModel(application: Application): BaseViewModel(application)
     private val accountRepository = AccountRepository(accountsDataDao, accountService)
 
     fun getAccountList(accountType: String): LiveData<PagingData<AccountData>>{
-        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE, enablePlaceholders = false, initialLoadSize = Constants.PAGE_SIZE),
-                remoteMediator = accountRepository.loadRemote(accountType)){
+        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE, enablePlaceholders = false)){
             accountRepository.getAccountList(accountType)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }

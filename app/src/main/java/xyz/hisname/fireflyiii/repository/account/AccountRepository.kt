@@ -246,101 +246,65 @@ class AccountRepository(private val accountDao: AccountsDataDao,
         return attachmentDao.getAttachmentFromJournalId(accountId)
     }
 
-    fun accountSearchPageSource(query: String, accountType: String) = object : PagingSource<Int, AccountData>(){
-        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AccountData> {
-            val paramKey = params.key
-            val previousKey = if(paramKey != null){
-                if(paramKey - 1 == 0){
-                    null
-                } else {
-                    paramKey - 1
-                }
-            } else {
-                null
-            }
-            try {
-                val networkCall = accountsService.searchAccount(query, accountType)
-                val responseBody = networkCall.body()
-                if (responseBody != null && networkCall.isSuccessful) {
-                    responseBody.data.forEach { account ->
-                        accountDao.insert(account)
+    @OptIn(ExperimentalPagingApi::class)
+    fun accountSearchPageSource(query: String, accountType: String): PagingSource<Int, AccountData>{
+        object : RemoteMediator<Int, AccountData>() {
+            override suspend fun load(loadType: LoadType, state: PagingState<Int, AccountData>): MediatorResult {
+                return try {
+                    val networkCall = accountsService.searchAccount(query, accountType)
+                    val responseBody = networkCall.body()
+                    if (responseBody != null && networkCall.isSuccessful) {
+                        accountDao.deleteAccountByType(accountType)
+                        responseBody.data.forEach { data ->
+                            accountDao.insert(data)
+                        }
                     }
+                    MediatorResult.Success(responseBody?.meta?.pagination?.total_pages ==
+                            responseBody?.meta?.pagination?.current_page)
+                } catch (exception: Exception) {
+                    MediatorResult.Error(exception)
                 }
-                val pagination = responseBody?.meta?.pagination
-                if(pagination != null){
-                    val nextKey = if(pagination.current_page < pagination.total_pages){
-                        pagination.current_page + 1
-                    } else {
-                        null
-                    }
-                    return LoadResult.Page(accountDao.searchAccountDataByNameAndType(accountType, "%$query%"), previousKey, nextKey)
-                } else {
-                    return getOfflineData(accountType, query, params.key, previousKey)
-                }
-            } catch (exception: Exception){
-                return getOfflineData(accountType, query, params.key, previousKey)
             }
         }
-
-        override val keyReuseSupported = true
-        override fun getRefreshKey(state: PagingState<Int, AccountData>): Int {
-            return 1
-        }
-    }
-
-    private suspend fun getOfflineData(accountType:String, query: String, paramKey: Int?, previousKey: Int?): PagingSource.LoadResult<Int, AccountData> {
-        val numberOfRows = accountDao.searchAccountDataByNameAndTypeCount(accountType, "%$query%")
-        val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
-            paramKey ?: 1 + 1
-        } else {
-            null
-        }
-        return PagingSource.LoadResult.Page(accountDao.searchAccountDataByNameAndType(accountType,
-                "%$query%"), previousKey, nextKey)
-    }
-
-    fun getAccountList(accountType: String): PagingSource<Int, AccountData>{
-        return accountDao.getAccountsByType(accountType)
+        return accountDao.searchAccountDataByNameAndType(accountType, "%$query%")
     }
 
     @OptIn(ExperimentalPagingApi::class)
-    fun loadRemote(accountType: String) = object : RemoteMediator<Int, AccountData>(){
-        override suspend fun initialize(): InitializeAction {
-            return InitializeAction.LAUNCH_INITIAL_REFRESH
-        }
-
-        override suspend fun load(loadType: LoadType, state: PagingState<Int, AccountData>): MediatorResult {
-            var pageKey = 1
-            try {
-                when (loadType) {
-                    LoadType.REFRESH -> {
-                        pageKey = 1
+    fun getAccountList(accountType: String): PagingSource<Int, AccountData>{
+        object : RemoteMediator<Int, AccountData>(){
+            override suspend fun load(loadType: LoadType, state: PagingState<Int, AccountData>): MediatorResult {
+                var pageKey = 1
+                try {
+                    when (loadType) {
+                        LoadType.REFRESH -> {
+                            pageKey = 1
+                        }
+                        LoadType.PREPEND -> {
+                            return MediatorResult.Success(true)
+                        }
+                        LoadType.APPEND -> {
+                            pageKey++
+                        }
                     }
-                    LoadType.PREPEND -> {
-                        return MediatorResult.Success(true)
+                    val networkCall = accountsService.getPaginatedAccountType(accountType, pageKey)
+                    val responseBody = networkCall.body()
+                    if (responseBody != null && networkCall.isSuccessful) {
+                        if(pageKey == 1){
+                            accountDao.deleteAccountByType(accountType)
+                        }
+                        responseBody.data.forEach { data ->
+                            accountDao.insert(data)
+                        }
                     }
-                    LoadType.APPEND -> {
-                        pageKey++
-                    }
+                    return MediatorResult.Success(responseBody?.meta?.pagination?.total_pages ==
+                            responseBody?.meta?.pagination?.current_page)
+                } catch(exception: Exception){
+                    return MediatorResult.Error(exception)
                 }
-                val networkCall = accountsService.getPaginatedAccountType(accountType, pageKey)
-                val responseBody = networkCall.body()
-                if (responseBody != null && networkCall.isSuccessful) {
-                    if(pageKey == 1){
-                        accountDao.deleteAccountByType(accountType)
-                    }
-                    responseBody.data.forEach { data ->
-                        accountDao.insert(data)
-                    }
-                }
-                return MediatorResult.Success(responseBody?.meta?.pagination?.total_pages ==
-                        responseBody?.meta?.pagination?.current_page)
-            } catch(exception: Exception){
-                return MediatorResult.Error(exception)
             }
         }
+        return accountDao.getAccountsByType(accountType)
     }
-
 
     private suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)
 

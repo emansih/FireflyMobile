@@ -43,7 +43,7 @@ class AccountSearchViewModel(application: Application): BaseViewModel(applicatio
     val accountName = MutableLiveData<String>()
 
     fun searchAccount(query: String, accountType: String): LiveData<PagingData<AccountData>>{
-        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
+        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE, enablePlaceholders = false)){
             accountRepository.accountSearchPageSource(query, accountType)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }
