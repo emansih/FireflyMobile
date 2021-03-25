@@ -30,22 +30,17 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
-import xyz.hisname.fireflyiii.repository.account.TransactionPageSource
-import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.models.DetailModel
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
-import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.downloadFile
@@ -58,10 +53,10 @@ import java.math.RoundingMode
 
 class AccountDetailViewModel(application: Application): BaseViewModel(application) {
 
-    private val accountRepository = AccountRepository(
-            AppDatabase.getInstance(application).accountDataDao(),
-            genericService().create(AccountsService::class.java)
-    )
+    private val accountService = genericService().create(AccountsService::class.java)
+
+    private val accountRepository = AccountRepository(AppDatabase.getInstance(application).accountDataDao(), accountService)
+
     private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
 
     private val transactionRepository = TransactionRepository(
@@ -206,9 +201,10 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
         uniqueIncomeCategoryLiveData.postValue(pieChartData)
     }
 
-    fun getTransactionList(accountId: Long) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-        TransactionPageSource(transactionDao, accountId, accountType, DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth())
+    fun getTransactionList(accountId: Long) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE,
+            enablePlaceholders = false)){
+        transactionRepository.getTransactionByAccountAndDate(accountType, accountId, DateTimeUtil.getStartOfMonth(),
+                DateTimeUtil.getEndOfMonth(), accountService)
     }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
 
 

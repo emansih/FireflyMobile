@@ -55,7 +55,7 @@ class DescriptionSearch: BaseDialog() {
         baseBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         baseBinding.recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         baseBinding.recyclerView.adapter = descriptionAdapter
-        descriptionViewModel.getAllDescription().observe(viewLifecycleOwner){ data ->
+        descriptionViewModel.searchTransactionName("").observe(viewLifecycleOwner){ data ->
             initialData = data
             descriptionAdapter.submitData(lifecycle, data)
         }

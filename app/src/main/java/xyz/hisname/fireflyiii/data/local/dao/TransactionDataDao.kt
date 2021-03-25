@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.*
 import xyz.hisname.fireflyiii.repository.models.ObjectSum
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
@@ -125,16 +126,10 @@ abstract class TransactionDataDao {
     abstract fun deleteTransaction(isPending: Boolean = true): Int
 
     @Query("SELECT distinct description FROM transactionTable WHERE description LIKE :description")
-    abstract suspend fun getTransactionByDescription(description: String): List<String>
+    abstract fun getTransactionByDescription(description: String): PagingSource<Int, String>
 
-    @Query("SELECT distinct description FROM transactionTable")
-    abstract suspend fun getTransactionByDescription(): List<String>
-
-    @Query("SELECT distinct COUNT(description) FROM transactionTable")
-    abstract suspend fun getTransactionByDescriptionCount(): Int
-
-    @Query("SELECT distinct COUNT(description) FROM transactionTable WHERE description LIKE :description")
-    abstract suspend fun getTransactionByDescriptionCount(description: String): Int
+    @Query("SELECT distinct description FROM transactionTable WHERE description LIKE :description")
+    abstract fun getTransactionListByDescription(description: String): List<String>
 
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND bill_id = :billId ORDER BY date ASC")
     abstract suspend fun getTransactionListByDateAndBill(billId: Long, startDate: String, endDate: String): MutableList<Transactions>
@@ -164,16 +159,10 @@ abstract class TransactionDataDao {
     abstract suspend fun getDestinationAccountByTypeAndDate(startDate: String, endDate: String, currencyCode: String, transactionType: String): List<ObjectSum>
 
     @Query("SELECT * FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate) ORDER BY date ASC")
-    abstract suspend fun getTransactionBySourceIdAndDate(accountId: Long, startDate: String, endDate: String): List<Transactions>
-
-    @Query("SELECT COUNT(*) FROM transactionTable WHERE source_id =:accountId AND (date BETWEEN :startDate AND :endDate)")
-    abstract suspend fun getTransactionBySourceIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
+    abstract fun getTransactionBySourceIdAndDate(accountId: Long, startDate: String, endDate: String): PagingSource<Int, Transactions>
 
     @Query("SELECT * FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate) ORDER BY date ASC")
-    abstract suspend fun getTransactionByDestinationIdAndDate(accountId: Long, startDate: String, endDate: String): List<Transactions>
-
-    @Query("SELECT COUNT(*) FROM transactionTable WHERE destination_id =:accountId AND (date BETWEEN :startDate AND :endDate)")
-    abstract suspend fun getTransactionByDestinationIdAndDateCount(accountId: Long, startDate: String, endDate: String): Int
+    abstract fun getTransactionByDestinationIdAndDate(accountId: Long, startDate: String, endDate: String): PagingSource<Int, Transactions>
 
     @Query("SELECT * FROM transactionIndexTable WHERE transactionId IN (SELECT transactionId FROM transactionIndexTable WHERE transactionJournalId =:journalId)")
     abstract suspend fun getTransactionSplitFromJournalId(journalId: Long): List<TransactionIndex>

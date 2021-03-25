@@ -39,11 +39,8 @@ class DescriptionViewModel(application: Application): BaseViewModel(application)
 
     val transactionName = MutableLiveData<String>()
 
-    fun searchTransactionName(searchName: String) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
+    fun searchTransactionName(searchName: String) =
+            Pager(PagingConfig(pageSize = Constants.PAGE_SIZE, enablePlaceholders = false)){
         transactionRepository.searchDescription(searchName)
-    }.flow.cachedIn(viewModelScope).asLiveData()
-
-    fun getAllDescription() = Pager(PagingConfig(pageSize = 100)){
-        transactionRepository.searchDescription("")
     }.flow.cachedIn(viewModelScope).asLiveData()
 }
