@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.category
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
@@ -78,4 +79,7 @@ class CategoryPageSource(private val categoryDataDao: CategoryDataDao,
     }
 
     override val keyReuseSupported = true
+    override fun getRefreshKey(state: PagingState<Int, CategoryData>): Int? {
+        return 1
+    }
 }

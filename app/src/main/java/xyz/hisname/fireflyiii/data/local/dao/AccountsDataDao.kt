@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.data.local.dao
 
 import android.database.Cursor
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
@@ -29,8 +30,11 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("SELECT * FROM accounts WHERE name =:accountName AND type =:accountType")
     abstract suspend fun getAccountByNameAndType(accountName: String, accountType: String): AccountData
 
+    @Query("SELECT * FROM accounts WHERE type =:accountType ORDER BY accountId ASC")
+    abstract fun getAccountsByType(accountType: String): PagingSource<Int, AccountData>
+
     @Query("SELECT * FROM accounts WHERE type =:accountType")
-    abstract suspend fun getAccountsByType(accountType: String): List<AccountData>
+    abstract suspend fun getAccountsListByType(accountType: String): List<AccountData>
 
     @Query("SELECT COUNT(*) FROM accounts WHERE type =:accountType")
     abstract suspend fun getAccountsByTypeCount(accountType: String): Int

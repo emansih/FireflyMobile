@@ -23,10 +23,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
@@ -38,6 +35,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 
+@ExperimentalPagingApi
 class ListAccountViewModel(application: Application): BaseViewModel(application) {
 
     private val accountService = genericService().create(AccountsService::class.java)
@@ -45,7 +43,8 @@ class ListAccountViewModel(application: Application): BaseViewModel(application)
     private val accountRepository = AccountRepository(accountsDataDao, accountService)
 
     fun getAccountList(accountType: String): LiveData<PagingData<AccountData>>{
-        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
+        return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE, enablePlaceholders = false, initialLoadSize = Constants.PAGE_SIZE),
+                remoteMediator = accountRepository.loadRemote(accountType)){
             accountRepository.getAccountList(accountType)
         }.flow.cachedIn(viewModelScope).asLiveData()
     }

@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.bills
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.BillDataDao
 import xyz.hisname.fireflyiii.data.local.dao.BillPaidDao
@@ -83,5 +84,8 @@ class BillPageSource(private val billsService: BillsService,
     }
 
     override val keyReuseSupported = true
+    override fun getRefreshKey(state: PagingState<Int, BillData>): Int? {
+        return 1
+    }
 
 }

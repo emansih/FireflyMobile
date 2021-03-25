@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.budget
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.BudgetListDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
@@ -105,5 +106,8 @@ class TransactionPagingSource(private val budgetService: BudgetService,
     }
 
     override val keyReuseSupported = true
+    override fun getRefreshKey(state: PagingState<Int, Transactions>): Int? {
+        return 1
+    }
 
 }

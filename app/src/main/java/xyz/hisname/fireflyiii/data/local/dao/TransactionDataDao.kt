@@ -200,5 +200,4 @@ abstract class TransactionDataDao {
     @Query("SELECT sum(amount) FROM transactionTable WHERE tags LIKE :tags AND transactionType =:transactionType AND (date BETWEEN :startDate AND :endDate) AND currency_code =:currencyCode")
     abstract suspend fun getTransactionSumByTagsAndTypeAndDateAndCurrency(tags: String, transactionType: String,
                                                                startDate: String, endDate: String, currencyCode: String): BigDecimal
-
 }

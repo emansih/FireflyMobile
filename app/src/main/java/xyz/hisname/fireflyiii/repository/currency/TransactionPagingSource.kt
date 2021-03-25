@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.currency
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
@@ -101,5 +102,8 @@ class TransactionPagingSource(private val currencyService: CurrencyService,
     override val keyReuseSupported = true
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
+    override fun getRefreshKey(state: PagingState<Int, Transactions>): Int? {
+        return 1
+    }
 
 }

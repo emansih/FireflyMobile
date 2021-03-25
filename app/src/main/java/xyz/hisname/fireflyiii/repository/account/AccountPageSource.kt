@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AccountsDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
@@ -57,7 +58,7 @@ class AccountPageSource(private val accountType: String,
                 } else {
                     null
                 }
-                return LoadResult.Page(accountsDataDao.getAccountsByType(accountType), previousKey, nextKey)
+                return LoadResult.Page(accountsDataDao.getAccountsListByType(accountType), previousKey, nextKey)
             } else {
                 return getOfflineData(params.key, previousKey)
             }
@@ -73,9 +74,13 @@ class AccountPageSource(private val accountType: String,
         } else {
             null
         }
-        return LoadResult.Page(accountsDataDao.getAccountsByType(accountType), previousKey, nextKey)
+        return LoadResult.Page(accountsDataDao.getAccountsListByType(accountType), previousKey, nextKey)
     }
 
     override val keyReuseSupported = true
+
+    override fun getRefreshKey(state: PagingState<Int, AccountData>): Int? {
+        return 1
+    }
 
 }

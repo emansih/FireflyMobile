@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.transaction
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
@@ -87,5 +88,8 @@ class TransactionSearchPagingSource(private val transactionService: TransactionS
     }
 
     override val keyReuseSupported = true
+    override fun getRefreshKey(state: PagingState<Int, String>): Int? {
+        return 1
+    }
 
 }

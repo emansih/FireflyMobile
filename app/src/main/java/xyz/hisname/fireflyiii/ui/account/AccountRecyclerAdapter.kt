@@ -45,11 +45,12 @@ class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
     }
 
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int){
+        // setIsRecyclable MUST BE SET TO false otherwise duplicate items will be shown
+        holder.setIsRecyclable(false)
         getItem(position)?.let{
             holder.bind(it, clickListener)
         }
     }
-
 
     inner class AccountViewHolder(itemView: AccountListItemBinding): RecyclerView.ViewHolder(itemView.root) {
         fun bind(data: AccountData, clickListener: (AccountData) -> Unit){
@@ -91,7 +92,7 @@ class AccountRecyclerAdapter(private val clickListener:(AccountData) -> Unit):
                 DiffUtil.ItemCallback<AccountData>() {
             override fun areItemsTheSame(oldAccountData: AccountData,
                                          newAccountData: AccountData) =
-                    oldAccountData == newAccountData
+                    oldAccountData.accountId == newAccountData.accountId
 
             override fun areContentsTheSame(oldAccountData: AccountData,
                                             newAccountData: AccountData) = oldAccountData == newAccountData

@@ -97,4 +97,7 @@ class TransactionPagingSource(private val transactionService: TransactionService
     override val keyReuseSupported = true
 
     private fun convertString(type: String) = type.substring(0,1).toLowerCase() + type.substring(1).toLowerCase()
+    override fun getRefreshKey(state: PagingState<Int, Transactions>): Int? {
+        return 1
+    }
 }

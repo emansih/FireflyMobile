@@ -30,6 +30,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.lifecycle.asLiveData
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,6 +47,7 @@ import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
+@OptIn(ExperimentalPagingApi::class)
 class ListAccountFragment: BaseFragment() {
 
     private val accountType by lazy { arguments?.getString("accountType") ?: "" }

@@ -20,6 +20,7 @@ package xyz.hisname.fireflyiii.repository.transaction
 
 import android.net.Uri
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -405,6 +406,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             return LoadResult.Page(transactionList, params.key, nextKey)
             }
         override val keyReuseSupported = true
+        override fun getRefreshKey(state: PagingState<Int, Transactions>): Int {
+            return 1
+        }
     }
 
 
@@ -454,6 +458,9 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
             }
         }
         override val keyReuseSupported = true
+        override fun getRefreshKey(state: PagingState<Int, String>): Int? {
+            return 1
+        }
 
     }
 

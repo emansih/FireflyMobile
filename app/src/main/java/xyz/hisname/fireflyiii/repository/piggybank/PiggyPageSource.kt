@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.piggybank
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.PiggyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
@@ -77,4 +78,7 @@ class PiggyPageSource(private val piggyDao: PiggyDataDao,
     }
 
     override val keyReuseSupported = true
+    override fun getRefreshKey(state: PagingState<Int, PiggyData>): Int? {
+        return 1
+    }
 }

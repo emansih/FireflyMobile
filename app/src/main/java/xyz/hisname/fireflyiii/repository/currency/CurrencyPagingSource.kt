@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.currency
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
@@ -77,5 +78,8 @@ class CurrencyPagingSource(private val currencyDataDao: CurrencyDataDao,
     }
 
     override val keyReuseSupported = true
+    override fun getRefreshKey(state: PagingState<Int, CurrencyData>): Int? {
+        return 1
+    }
 
 }

@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.account
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
@@ -66,5 +67,9 @@ class TransactionPageSource(private val transactionDataDao: TransactionDataDao,
                     DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate)),
                     previousKey, nextKey)
         }
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, Transactions>): Int {
+        return 1
     }
 }
