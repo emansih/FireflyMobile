@@ -101,6 +101,9 @@ abstract class TransactionDataDao {
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) ORDER BY date ASC, transaction_journal_id ASC")
     abstract suspend fun getTransactionByDate(startDate: String, endDate: String): MutableList<Transactions>
 
+    @Query("SELECT * FROM transactionTable WHERE tags LIKE :tags AND (date BETWEEN :startDate AND :endDate) ORDER BY date ASC, transaction_journal_id ASC")
+    abstract fun getTransactionByDateAndTag(startDate: String, endDate: String, tags: String): PagingSource<Int, Transactions>
+
     @Query("SELECT count(*) FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND transactionType = :transactionType")
     abstract suspend fun getTransactionByDateCount(startDate: String, endDate: String, transactionType: String): Int
 

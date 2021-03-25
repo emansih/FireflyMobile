@@ -89,4 +89,17 @@ interface TransactionService {
     @GET("${Constants.SEARCH_API_ENDPOINT}/transactions")
     suspend fun searchTransaction(@Query("query") transaction: String): Response<TransactionModel>
 
+
+    @GET("${Constants.ACCOUNTS_API_ENDPOINT}/{id}/transactions")
+    suspend fun getTransactionsByAccountId(@Path("id") id: Long,
+                                           @Query("page") page: Int,
+                                           @Query("start") startDate: String,
+                                           @Query("end") endDate: String,
+                                           @Query("type") type: String): Response<TransactionModel>
+
+    @GET("${Constants.TAGS_API_ENDPOINT}/{tag}/transactions")
+    suspend fun getTransactionByTag(@Path("tag") tagName: String,
+                                    @Query("page") page: Int,
+                                    @Query("start") startDate: String,
+                                    @Query("end") endDate: String): Response<TransactionModel>
 }

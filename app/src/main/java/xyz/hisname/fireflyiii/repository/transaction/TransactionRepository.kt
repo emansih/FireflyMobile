@@ -27,11 +27,9 @@ import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
-import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.ObjectSum
-import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
 import xyz.hisname.fireflyiii.repository.models.transaction.*
@@ -385,31 +383,44 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         return attachmentDao.getAttachmentFromJournalId(transactionJournalId)
     }
 
-    fun getTransactionByTagAndDate(startDate: String, endDate: String, tagName: String) = object : PagingSource<Int, Transactions>() {
-        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Transactions> {
-            val transactionList = mutableListOf<Transactions>()
-            try {
-                loadRemoteData(startDate, endDate, "all")
-                transactionList.addAll(transactionDao.getTransactionByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
-                        DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate)))
-                transactionList.forEachIndexed { index, transactions ->
-                    if(!transactions.tags.contains(tagName)){
-                        transactionList.removeAt(index)
+    @OptIn(ExperimentalPagingApi::class)
+    fun getTransactionByTagAndDate(startDate: String, endDate: String, tagName: String): PagingSource<Int, Transactions> {
+        object : RemoteMediator<Int, Transactions>(){
+            override suspend fun load(loadType: LoadType, state: PagingState<Int, Transactions>): MediatorResult {
+                var pageKey = 1
+                try {
+                    when (loadType) {
+                        LoadType.REFRESH -> {
+                            pageKey = 1
+                        }
+                        LoadType.PREPEND -> {
+                            return MediatorResult.Success(true)
+                        }
+                        LoadType.APPEND -> {
+                            pageKey++
+                        }
                     }
+                    val networkCall = transactionService.getTransactionByTag(tagName, pageKey, startDate, endDate)
+                    val responseBody = networkCall.body()
+                    if (responseBody != null && networkCall.isSuccessful) {
+                        responseBody.data.forEach { data ->
+                            data.transactionAttributes.transactions.forEach { transaction ->
+                                transactionDao.insert(transaction)
+                                transactionDao.insert(TransactionIndex(0, data.transactionId,
+                                        transaction.transaction_journal_id,
+                                        data.transactionAttributes.group_title))
+                            }
+                        }
+                    }
+                    return MediatorResult.Success(responseBody?.meta?.pagination?.total_pages ==
+                            responseBody?.meta?.pagination?.current_page)
+                } catch(exception: Exception){
+                    return MediatorResult.Error(exception)
                 }
-                } catch (exception: Exception){ }
-
-            val nextKey = if(params.key ?: 1 < (transactionList.size / Constants.PAGE_SIZE)){
-                params.key ?: 1 + 1
-            } else {
-                null
             }
-            return LoadResult.Page(transactionList, params.key, nextKey)
-            }
-        override val keyReuseSupported = true
-        override fun getRefreshKey(state: PagingState<Int, Transactions>): Int {
-            return 1
         }
+        return transactionDao.getTransactionByDateAndTag(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
+                DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), "%$tagName%")
     }
 
     @OptIn(ExperimentalPagingApi::class)
@@ -448,7 +459,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
 
     @OptIn(ExperimentalPagingApi::class)
     fun getTransactionByAccountAndDate(accountType: String, accountId: Long,
-                                       startDate: String, endDate: String, accountsService: AccountsService): PagingSource<Int, Transactions> {
+                                       startDate: String, endDate: String): PagingSource<Int, Transactions> {
         object : RemoteMediator<Int, Transactions>(){
             override suspend fun load(loadType: LoadType, state: PagingState<Int, Transactions>): MediatorResult {
                 var pageKey = 1
@@ -464,7 +475,7 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                             pageKey++
                         }
                     }
-                    val networkCall = accountsService.getTransactionsByAccountId(accountId, pageKey, startDate, endDate, accountType)
+                    val networkCall = transactionService.getTransactionsByAccountId(accountId, pageKey, startDate, endDate, accountType)
                     val responseBody = networkCall.body()
                     if (responseBody != null && networkCall.isSuccessful) {
                         if(pageKey == 1){

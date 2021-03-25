@@ -80,7 +80,7 @@ class TagDetailsViewModel(application: Application): BaseViewModel(application) 
         viewModelScope.launch(Dispatchers.IO){
             val tagAttribute = tagsRepository.getTagById(tagId)
             tagData.postValue(tagAttribute)
-            Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
+            Pager(PagingConfig(pageSize = Constants.PAGE_SIZE, enablePlaceholders = false)) {
                 transactionRepository.getTransactionByTagAndDate(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), tagAttribute.tagsAttributes.description)
             }.flow.insertDateSeparator().cachedIn(viewModelScope).collectLatest { pagingData ->
@@ -98,7 +98,7 @@ class TagDetailsViewModel(application: Application): BaseViewModel(application) 
         isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO){
             tagData.postValue(tagsRepository.getTagByName(nameOfTag))
-            Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)) {
+            Pager(PagingConfig(pageSize = Constants.PAGE_SIZE, enablePlaceholders = false)) {
                 transactionRepository.getTransactionByTagAndDate(DateTimeUtil.getStartOfMonth(),
                         DateTimeUtil.getEndOfMonth(), nameOfTag)
             }.flow.insertDateSeparator().cachedIn(viewModelScope).collectLatest { pagingData ->

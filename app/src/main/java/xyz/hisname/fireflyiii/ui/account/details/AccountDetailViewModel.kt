@@ -204,7 +204,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
     fun getTransactionList(accountId: Long) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE,
             enablePlaceholders = false)){
         transactionRepository.getTransactionByAccountAndDate(accountType, accountId, DateTimeUtil.getStartOfMonth(),
-                DateTimeUtil.getEndOfMonth(), accountService)
+                DateTimeUtil.getEndOfMonth())
     }.flow.insertDateSeparator().cachedIn(viewModelScope).asLiveData()
 
 
