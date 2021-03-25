@@ -21,6 +21,7 @@ allprojects {
                 includeGroupByRegex("com.android.*")
                 includeGroupByRegex ("androidx.*")
                 includeGroup("com.google.android.material")
+                includeGroup("com.google.devtools.ksp")
             }
         }
         mavenCentral()
