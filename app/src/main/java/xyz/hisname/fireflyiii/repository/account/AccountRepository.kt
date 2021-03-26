@@ -271,6 +271,12 @@ class AccountRepository(private val accountDao: AccountsDataDao,
 
     @OptIn(ExperimentalPagingApi::class)
     fun getAccountList(accountType: String): PagingSource<Int, AccountData>{
+        return accountDao.getAccountsByType(accountType)
+    }
+
+
+    @OptIn(ExperimentalPagingApi::class)
+    fun loadData(accountType: String) =
         object : RemoteMediator<Int, AccountData>(){
             override suspend fun load(loadType: LoadType, state: PagingState<Int, AccountData>): MediatorResult {
                 var pageKey = 1
@@ -303,8 +309,7 @@ class AccountRepository(private val accountDao: AccountsDataDao,
                 }
             }
         }
-        return accountDao.getAccountsByType(accountType)
-    }
+
 
     private suspend fun deleteAccountByType(accountType: String): Int = accountDao.deleteAccountByType(accountType)
 
