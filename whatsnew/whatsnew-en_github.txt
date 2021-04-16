@@ -1,4 +1,5 @@
-Small release
+This is an emergency fix for users running v5.5.7. Ensure that the app is able to communicate with the server before opening an issue. 
 
-Fix:
-- Fix bug where notes field is not correctly assigned in Tasker Plugin #160
+Fixes:
+- Fix various bugs due to Firefly III API updates #161 #162
+- Fix paging in account list
