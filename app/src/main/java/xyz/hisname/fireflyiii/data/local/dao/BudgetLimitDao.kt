@@ -29,9 +29,14 @@ abstract class BudgetLimitDao: BaseDao<BudgetLimitData> {
     @Query("DELETE FROM budgetLimit")
     abstract fun deleteAllBudgetLimit(): Int
 
-    @Query("SELECT amount FROM budgetlimit WHERE budget_id =:budgetId AND currency_symbol =:currencySymbol AND start =:startDate AND `end` =:endDate")
+    // For some reason this doesn't work... It is returning NULL
+   /* @Query("SELECT amount FROM budgetlimit WHERE budget_id =:budgetId AND currency_symbol =:currencySymbol AND start =:startDate AND `end` =:endDate")
     abstract fun getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId: Long, currencySymbol: String,
-                                                          startDate: String, endDate: String): BigDecimal
+                                                          startDate: String, endDate: String): BigDecimal*/
+
+    @Query("SELECT * FROM budgetlimit WHERE budget_id =:budgetId AND currency_symbol =:currencySymbol AND start =:startDate AND `end` =:endDate")
+    abstract fun getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId: Long, currencySymbol: String,
+                                                          startDate: String, endDate: String): List<BudgetLimitData>
 
     @Query("SELECT DISTINCT(currency_symbol) FROM budgetLimit WHERE budget_Id =:budgetId")
     abstract fun getUniqueCurrencySymbolInSpentByBudgetId(budgetId: Long): List<String>

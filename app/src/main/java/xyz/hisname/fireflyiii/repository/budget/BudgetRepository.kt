@@ -22,6 +22,7 @@ import androidx.annotation.WorkerThread
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
+import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
@@ -29,9 +30,14 @@ import xyz.hisname.fireflyiii.repository.models.budget.BudgetData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListSuccessModel
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
+import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
@@ -79,13 +85,23 @@ class BudgetRepository(private val budget: BudgetDataDao,
                     insertBudgetList(budgetList)
                 }
             }
-        } catch (exception: Exception){ }
+        } catch (exception: Exception){
+            Timber.d(exception)
+        }
         return spentDao.getAllActiveBudgetList(currencyCode)
     }
 
     suspend fun getConstraintBudgetWithCurrency(startDate: String, endDate: String,
-                                                currencyCode: String) =
-            budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
+                                                currencyCode: String): BigDecimal {
+        var amountToReturn = BigDecimal.ZERO
+        val budgetList = budget.getBudgetWithCurrency(startDate, endDate, currencyCode)
+        budgetList.forEach { budgetData ->
+            amountToReturn += budgetData.budgetAttributes.amount
+        }
+
+        return amountToReturn
+    }
+
 
     suspend fun getBudgetByCurrencyAndStartEndDate(startDate: String, endDate: String,
                                                    currencyCode: String) =
@@ -113,8 +129,15 @@ class BudgetRepository(private val budget: BudgetDataDao,
                     insertBudget(budget)
                 }
             }
-        } catch (exception: Exception){ }
-        return budget.getConstraintBudgetWithCurrency(startDate, endDate, currencyCode)
+        } catch (exception: Exception){
+            Timber.d(exception)
+        }
+        var amountToReturn = BigDecimal.ZERO
+        val budgetList = budget.getBudgetWithCurrency(startDate, endDate, currencyCode)
+        budgetList.forEach { budgetData ->
+            amountToReturn += budgetData.budgetAttributes.amount
+        }
+        return amountToReturn
     }
 
     suspend fun updateBudget(budgetId: Long, currencyCode: String, amount: String,
@@ -129,7 +152,8 @@ class BudgetRepository(private val budget: BudgetDataDao,
         }
     }
 
-    suspend fun getBudgetLimitByName(budgetName: String, startDate: String, endDate: String, currencySymbol: String): BigDecimal{
+    suspend fun getBudgetLimitByName(budgetName: String, startDate: String,
+                                     endDate: String, currencySymbol: String): BigDecimal{
         val budgetNameList = budgetList.searchBudgetName(budgetName)
         val budgetId = budgetNameList[0].budgetListId
         try {
@@ -142,7 +166,13 @@ class BudgetRepository(private val budget: BudgetDataDao,
                 }
             }
         } catch (exception: Exception){ }
-        return budgetLimitDao.getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId, currencySymbol, startDate, endDate)
+        val budgetLimitList = budgetLimitDao.getBudgetLimitByIdAndCurrencyCodeAndDate(budgetId,
+                currencySymbol, startDate, endDate)
+        var amountToReturn = BigDecimal.ZERO
+        budgetLimitList.forEach {  budgetLimitData ->
+            amountToReturn += budgetLimitData.attributes.amount
+        }
+        return amountToReturn
     }
 
     suspend fun getBudgetLimit(budgetId: Long, startDate: String, endDate: String){
@@ -226,8 +256,9 @@ class BudgetRepository(private val budget: BudgetDataDao,
                     insertBudget(budgetData)
                 }
             }
-
-        } catch (exception: Exception){ }
+        } catch (exception: Exception){
+            Timber.d(exception)
+        }
     }
 
     suspend fun getBudgetByName(budgetName: String) = budgetList.searchBudgetName(budgetName)

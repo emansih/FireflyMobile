@@ -36,7 +36,7 @@ class LocalDateAdapter: JsonAdapter<LocalDate>(){
         }
     }
 
-    private val formatter = DateTimeFormatter.ISO_DATE
+    private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     private fun fromNonNullString(nextString: String): LocalDate = LocalDate.parse(nextString, formatter)
 
 }

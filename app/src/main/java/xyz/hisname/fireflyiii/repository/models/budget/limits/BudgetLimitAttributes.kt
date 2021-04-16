@@ -20,6 +20,8 @@ package xyz.hisname.fireflyiii.repository.models.budget.limits
 
 import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.OffsetDateTime
 
 @JsonClass(generateAdapter = true)
 data class BudgetLimitAttributes(
@@ -30,7 +32,7 @@ data class BudgetLimitAttributes(
         val currency_id: Int,
         val currency_name: String,
         val currency_symbol: String,
-        val end: String,
-        val start: String,
+        val end: LocalDate,
+        val start: LocalDate,
         val updated_at: String
 )

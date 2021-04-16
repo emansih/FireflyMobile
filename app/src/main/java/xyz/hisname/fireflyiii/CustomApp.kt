@@ -19,6 +19,8 @@
 package xyz.hisname.fireflyiii
 
 import android.app.Application
+import kotlinx.coroutines.DEBUG_PROPERTY_NAME
+import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
 import org.acra.ACRA
 import org.acra.ReportField
 import org.acra.annotation.AcraCore
@@ -46,6 +48,7 @@ class CustomApp: Application() {
             if (BuildConfig.DEBUG == false) {
                 ACRA.init(this)
             } else {
+                System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
                 Timber.plant(Timber.DebugTree())
             }
         }.start()

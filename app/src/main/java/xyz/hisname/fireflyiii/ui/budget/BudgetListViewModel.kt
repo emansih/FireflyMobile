@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
@@ -94,7 +95,9 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                 endOfMonth = DateTimeUtil.getFutureEndOfMonth(monthCount)
             }
         }
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->
+            Timber.d(throwable)
+        }){
             val defaultCurrency = currencyRepository.defaultCurrency()
             currencySymbol = defaultCurrency.currencyAttributes.symbol
             currencyName.postValue(defaultCurrency.currencyAttributes.code)

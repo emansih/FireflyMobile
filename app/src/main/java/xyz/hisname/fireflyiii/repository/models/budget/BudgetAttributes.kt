@@ -21,18 +21,19 @@ package xyz.hisname.fireflyiii.repository.models.budget
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @JsonClass(generateAdapter = true)
 data class BudgetAttributes(
         val created_at: String,
         val updated_at: String,
-        val currency_id: Int,
+        val currency_id: String,
         val currency_code: String,
         val currency_symbol: String,
         val currency_decimal_places: Int,
         val amount: BigDecimal,
         @Json(name ="start")
-        val start_date: String,
+        val start_date: LocalDate,
         @Json(name ="end")
-        val end_date: String
+        val end_date: LocalDate
 )

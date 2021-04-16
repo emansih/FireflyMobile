@@ -28,12 +28,12 @@ import java.math.BigDecimal
 @JsonClass(generateAdapter = true)
 data class BudgetListAttributes(
         var active: Boolean?,
-        var created_at: String?,
+        var created_at: String,
         var name: String,
         var order: Int?,
         @Ignore
         var spent: List<Spent> = listOf(),
-        var updated_at: String?,
+        var updated_at: String,
         var auto_budget_type: BudgetType?,
         var auto_budget_currency_id: Long?,
         var auto_budget_currency_code: String?,

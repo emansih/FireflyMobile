@@ -37,6 +37,6 @@ data class Spent(
         var amount: BigDecimal,
         var currency_code: String,
         var currency_decimal_places: Int,
-        var currency_id: Int,
+        var currency_id: String,
         var currency_symbol: String
 )

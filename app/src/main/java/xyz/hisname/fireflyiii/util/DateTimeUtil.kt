@@ -65,8 +65,8 @@ object DateTimeUtil {
      * Output difference in *DAYS*
      */
     fun getDaysDifference(date: String?): String {
-        val todayDate = LocalDateTime.now().toLocalDate()
-        val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val todayDate = ZonedDateTime.now().toLocalDate()
+        val localDate = ZonedDateTime.parse(date).toLocalDate()
         return Duration.between(todayDate.atStartOfDay(), localDate.atStartOfDay()).toDays().toString()
     }
 
