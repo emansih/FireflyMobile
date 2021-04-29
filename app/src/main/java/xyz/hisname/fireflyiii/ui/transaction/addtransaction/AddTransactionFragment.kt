@@ -87,6 +87,8 @@ class AddTransactionFragment: BaseFragment() {
     private val transactionActivity by lazy { arguments?.getBoolean("FROM_TRANSACTION_ACTIVITY") }
     private val isTasker by lazy { arguments?.getBoolean("isTasker") ?: false }
     private val isFromNotification by lazy { requireActivity().intent.extras?.getBoolean("isFromNotification") ?: false }
+    private val description by lazy { requireActivity().intent.extras?.getString("description") ?: "" }
+    private val amount by lazy { requireActivity().intent.extras?.getString("amount") ?: "" }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
 
     private val addTransactionViewModel by lazy {
@@ -146,6 +148,16 @@ class AddTransactionFragment: BaseFragment() {
         setFab()
         setCalculator()
         contextSwitch()
+        setAutofilledFields()
+    }
+
+    private fun setAutofilledFields() {
+        if (amount != null) {
+            binding.transactionAmountEdittext.setText(amount)
+        }
+        if (description != null) {
+            binding.descriptionEdittext.setText(description)
+        }
     }
 
     private fun displayAttachment(){
