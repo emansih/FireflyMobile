@@ -1,5 +1,6 @@
-This is an emergency fix for users running v5.5.7. Ensure that the app is able to communicate with the server before opening an issue. 
+Small release. I have opened up [an API](https://github.com/emansih/FireflyMobile/commit/6ba53a72f66d08fc0216cfd92d9e5067222a5467) to allow consumers to interact with the main app via OCR. The first app to utilise it is made by Luis Morón.
 
-Fixes:
-- Fix various bugs due to Firefly III API updates #161 #162
-- Fix paging in account list
+You can find the app [here](https://github.com/luifermoron/ocrFireflyMobile). 
+
+
+N.B. This is **NOT** an endorsement. If you have any issues open an issue on the other repository. 
