@@ -46,9 +46,17 @@ Check the [wiki page](https://github.com/emansih/FireflyMobile/wiki/Authenticati
 
 ✔ Enhanced Features: Attach multiple attachments 📎 / add time 🕐 to your transactions 
 
+### Ecosystem
+Over the years, I have made this app as extensible as possible. Sometimes software cannot be merged into this repo becuase I would
+like to keep this software as _free_ as possible(Libre) to keep compliance with F-Droid policies and I don't want to be given a
+"Non-Free" label on F-Droid. 
+
+The following plugin(s) interact with this app to enhance your experience:
+
+- [ocrFireflyMobile](https://github.com/luifermoron/ocrFireflyMobile)
 
 
-#### Downloads
+### Downloads
 
 To get latest update notifications, either add [this RSS feed](https://github.com/emansih/FireflyMobile/releases.atom) or click on the watch button.  
 
@@ -67,6 +75,7 @@ Dashboard | Monitor your accounts | Stay within your budget |
 | ![5](fastlane/metadata/android/en-US/images/TransactionList.png) | ![6](fastlane/metadata/android/en-US/images/AddTransaction.png) | ![7](fastlane/metadata/android/en-US/images/BillDetails.png)
 
 Thanks to [Device Shots](https://deviceshots.com/) for the device frame!
+
 
 ## Contributing
 
