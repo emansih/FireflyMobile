@@ -1,6 +1,1 @@
-Small release. I have opened up [an API](https://github.com/emansih/FireflyMobile/commit/6ba53a72f66d08fc0216cfd92d9e5067222a5467) to allow consumers to interact with the main app via OCR. The first app to utilise it is made by Luis Morón.
-
-You can find the app [here](https://github.com/luifermoron/ocrFireflyMobile). 
-
-
-N.B. This is **NOT** an endorsement. If you have any issues open an issue on the other repository. 
+Fix a bug where OAuth will fail on Android 11 devices #168

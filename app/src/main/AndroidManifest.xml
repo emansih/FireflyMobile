@@ -33,6 +33,15 @@
         android:protectionLevel="signature"
         android:label="Allow apps with this permission to read your Firefly III dashboard data" />-->
 
+    <queries>
+        <!-- https://stackoverflow.com/questions/62535856/intent-resolveactivity-returns-null-in-api-30 -->
+        <!-- Issue #168 -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+    </queries>
+
     <application
         android:name=".CustomApp"
         android:allowBackup="true"
