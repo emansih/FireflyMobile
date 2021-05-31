@@ -90,6 +90,8 @@ class AddTransactionFragment: BaseFragment() {
     private val description by lazy { requireActivity().intent.extras?.getString("description") ?: "" }
     private val amount by lazy { requireActivity().intent.extras?.getString("amount") ?: "" }
     private val transactionType by lazy { arguments?.getString("transactionType") ?: "" }
+    private val transactionTime by lazy { requireActivity().intent.extras?.getString("time") ?: "" }
+    private val transactionDate by lazy  { requireActivity().intent.extras?.getString("date") ?: "" }
 
     private val addTransactionViewModel by lazy {
         if(isTasker){
@@ -152,11 +154,17 @@ class AddTransactionFragment: BaseFragment() {
     }
 
     private fun setAutofilledFields() {
-        if (amount != null) {
+        if (amount.isNotBlank()) {
             binding.transactionAmountEdittext.setText(amount)
         }
-        if (description != null) {
+        if (description.isNotBlank()) {
             binding.descriptionEdittext.setText(description)
+        }
+        if(transactionTime.isNotBlank()){
+            binding.timeEdittext.setText(transactionTime)
+        }
+        if(transactionDate.isNotBlank()){
+            binding.transactionDateEdittext.setText(transactionDate)
         }
     }
 

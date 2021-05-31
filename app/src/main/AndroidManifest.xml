@@ -98,11 +98,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="text/plain"/>
-            </intent-filter>
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
@@ -110,7 +105,12 @@
         <activity
             android:name=".ui.transaction.addtransaction.AddTransactionActivity"
             android:theme="@style/AppTheme"
+			android:exported="true"
             android:windowSoftInputMode="adjustPan">
+			<intent-filter>
+				<action android:name="firefly.hisname.PREFILL_TRANSACTION"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
         </activity>
 
         <receiver android:name=".receiver.TransactionReceiver"

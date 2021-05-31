@@ -127,16 +127,6 @@ class HomeActivity: BaseActivity(){
                 .show()
     }
 
-    private fun wasLaunchedWithText() : Boolean {
-        val intent = intent
-        val action = intent.action
-        val type = intent.type
-        if (Intent.ACTION_SEND == action && type != null) {
-            return type.startsWith("text/plain")
-        }
-        return false
-    }
-
     private fun setup(savedInstanceState: Bundle?){
         animateToolbar()
         setUpHeader(savedInstanceState)
@@ -144,36 +134,23 @@ class HomeActivity: BaseActivity(){
         setUpDrawer(savedInstanceState)
         supportActionBar?.title = ""
         setNavIcon()
-
-        val _wasLaunchedWithText = wasLaunchedWithText()
-        if (intent.getStringExtra("transaction") != null || _wasLaunchedWithText) {
-            val transaction = intent.getStringExtra("transaction")
-            if (_wasLaunchedWithText) {
-                var ocrIntent = Intent(this, AddTransactionActivity::class.java.apply { bundleOf("transactionType" to "Withdrawal")})
-                intent.getStringExtra("description")?.let { it ->
-                    ocrIntent.putExtra("description", it)
+        val transaction = intent.getStringExtra("transaction")
+        if (transaction != null) {
+            when (transaction) {
+                "Withdrawal" -> {
+                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                        bundleOf("transactionType" to "Withdrawal")
+                    }))
                 }
-                intent.getStringExtra("amount")?.let { it ->
-                    ocrIntent.putExtra("amount", it)
+                "Deposit" -> {
+                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                        bundleOf("transactionType" to "Deposit")
+                    }))
                 }
-                startActivity(ocrIntent)
-            } else {
-                when (transaction) {
-                    "Withdrawal" -> {
-                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                            bundleOf("transactionType" to "Withdrawal")
-                        }))
-                    }
-                    "Deposit" -> {
-                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                            bundleOf("transactionType" to "Deposit")
-                        }))
-                    }
-                    "Transfer" -> {
-                        startActivity(Intent(this, AddTransactionActivity::class.java.apply {
-                            bundleOf("transactionType" to "Transfer")
-                        }))
-                    }
+                "Transfer" -> {
+                    startActivity(Intent(this, AddTransactionActivity::class.java.apply {
+                        bundleOf("transactionType" to "Transfer")
+                    }))
                 }
             }
         }
