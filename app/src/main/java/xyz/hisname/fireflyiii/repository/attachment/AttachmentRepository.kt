@@ -18,11 +18,12 @@
 
 package xyz.hisname.fireflyiii.repository.attachment
 
-import android.app.Application
 import com.squareup.moshi.Moshi
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import okio.Okio
+import okio.buffer
+import okio.sink
+import okio.source
 import xyz.hisname.fireflyiii.BuildConfig
 import xyz.hisname.fireflyiii.data.local.dao.AttachmentDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
@@ -80,10 +81,12 @@ class AttachmentRepository(private val attachmentDao: AttachmentDataDao,
     }
 
     private fun tempDir(stream: InputStream?, tempDir: String, fileName: String): File {
-        Okio.source(stream).use {
-            a -> Okio.buffer(Okio.sink(File(tempDir + File.pathSeparator + fileName))).use {
-            b -> b.writeAll(a)
-        }
+        stream?.source().use {
+                a -> File(tempDir + File.pathSeparator + fileName).sink().buffer().use {
+            // !! is code smell.
+            // TODO: Fix this
+                b -> b.writeAll(a!!)
+                }
         }
         return File(tempDir + File.pathSeparator + fileName)
     }

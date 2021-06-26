@@ -2,11 +2,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         gradlePluginPortal()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.3")
+        classpath("com.android.tools.build:gradle:4.2.1")
         classpath(kotlin("gradle-plugin", Dependencies.kotlinVersion))
         classpath("com.project.starter:easylauncher:3.2.1")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.36.0")
@@ -33,7 +32,6 @@ allprojects {
                 includeGroup("com.github.florent37")
             }
         }
-        jcenter()
         dependencies{
             apply("$rootDir/buildSrc/src/main/java/Version.gradle")
         }
