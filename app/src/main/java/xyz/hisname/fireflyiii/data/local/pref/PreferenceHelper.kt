@@ -41,5 +41,6 @@ interface PreferenceHelper {
     var budgetIssue4394: Boolean
     var dateTimeFormat: Int
     var userDefinedDateTimeFormat: String
+    var userDefinedDownloadDirectory: String
     fun clearPref()
 }

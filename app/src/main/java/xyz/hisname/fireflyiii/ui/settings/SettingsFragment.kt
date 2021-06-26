@@ -18,8 +18,11 @@
 
 package xyz.hisname.fireflyiii.ui.settings
 
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
@@ -38,9 +41,13 @@ import com.mikepenz.iconics.utils.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
 import xyz.hisname.languagepack.LanguageChanger
+import java.io.File
 
 
 class SettingsFragment: BaseSettings() {
+
+    private lateinit var chooseFolder: ActivityResultLauncher<Uri>
+    private lateinit var userDownloadDirectoryPref: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_settings)
@@ -53,6 +60,7 @@ class SettingsFragment: BaseSettings() {
         setTutorial()
         setDeveloperOption()
         deleteItems()
+        userDefinedDirectory()
     }
 
     private fun setLanguagePref(){
@@ -213,6 +221,34 @@ class SettingsFragment: BaseSettings() {
                 replace(R.id.fragment_container, DeleteItemsFragment())
             }
             true
+        }
+    }
+
+    private fun userDefinedDirectory(){
+        userDownloadDirectoryPref = findPreference<Preference>("userDefinedDownloadDirectory") as Preference
+        val userPref = AppPref(sharedPref).userDefinedDownloadDirectory
+        userDownloadDirectoryPref.icon = IconicsDrawable(requireContext()).apply {
+            icon = GoogleMaterial.Icon.gmd_file_download
+            sizeDp = 24
+            colorRes = setIconColor()
+        }
+        val userDirectory = if(userPref.isEmpty()){
+            File(requireContext().getExternalFilesDir(null).toString()).toString()
+        } else {
+            userPref
+        }
+        userDownloadDirectoryPref.summary = userDirectory
+        userDownloadDirectoryPref.setOnPreferenceClickListener {
+            chooseFolder.launch(Uri.EMPTY)
+            true
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        chooseFolder = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folderChoosen ->
+            AppPref(sharedPref).userDefinedDownloadDirectory = folderChoosen.toString()
+            userDownloadDirectoryPref.summary = folderChoosen.toString()
         }
     }
 }

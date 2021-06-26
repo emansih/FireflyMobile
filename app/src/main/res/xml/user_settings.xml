@@ -31,6 +31,10 @@
         app:summary="Show flags next to currency"/>
 
     <Preference
+        app:key="userDefinedDownloadDirectory"
+        app:title="Download Directory" />
+
+    <Preference
         app:key="developer_options"
         app:title="Developer Options" />
 

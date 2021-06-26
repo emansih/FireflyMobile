@@ -144,5 +144,10 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getString("userDefinedDateTimeFormat", "") ?: ""
         set(value) = sharedPref.edit{ putString("userDefinedDateTimeFormat", value) }
 
+
+    override var userDefinedDownloadDirectory: String
+        get() = sharedPref.getString("userDefinedDownloadDirectory", "") ?: ""
+        set(value) = sharedPref.edit{ putString("userDefinedDownloadDirectory", value) }
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }
