@@ -1,1 +1,22 @@
-Fix a bug where OAuth will fail on Android 11 devices #168
+What's new: 
+- Cleaner way to prefill transactions(using Android intent)
+- Allow user to choose their default download directory
+
+Libraries / build tools update:
+- Update gradle version to 7.1
+- Android gradle plugin to 4.2.1
+- Kotlin stdlib to 1.5.20
+- Lifecycle version to 2.3.1
+- Room to 2.3.0
+- Coroutine to 1.5.0
+- AppCompat to 1.3.0
+- Fragment to 1.3.5
+- Annotation to 1.2.0
+- Recyclerview to 1.2.1
+- Material Design lib to 1.4.0-rc01
+- AndroidX Core to 1.6.0-rc01
+- Material Drawer to 8.4.1
+- FancyShowCaseView to 1.3.6
+- Tasker Plugin to 0.4.2
+- CalendarView to 1.0
+- Moshi to 1.12.0
