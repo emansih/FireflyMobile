@@ -39,7 +39,7 @@ fun Application.downloadFile(accessToken: String, attachmentData: AttachmentData
     } else {
         userPref
     }
-    request.setDestinationUri(userDirectory.toUri())
+    request.setDestinationUri(("$userDirectory/$fileToOpen").toUri())
     request.setMimeType(attachmentData.attachmentAttributes.mime)
     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
     downloadManager.enqueue(request)
