@@ -90,5 +90,5 @@ jobs:
           releaseFiles: ${{steps.sign_google_play.outputs.signedReleaseFile}}
           track: production
           inAppUpdatePriority: 5
-          userFraction: 0.9
+          userFraction: 1.0
           whatsNewDirectory: whatsnew
