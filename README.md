@@ -53,8 +53,8 @@ like to keep this software as _free_ as possible(Libre) to keep compliance with 
 
 The following plugin(s) interact with this app to enhance your experience:
 
-- [ocrFireflyMobile](https://github.com/luifermoron/ocrFireflyMobile)
-
+- [ocrFireflyMobile](https://github.com/luifermoron/ocrFireflyMobile) made by Luis Morón!
+- [FireflyWear](https://github.com/emansih/FireflyWear) made by me!
 
 ### Downloads
 
