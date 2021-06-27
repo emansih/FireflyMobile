@@ -21,21 +21,12 @@ package xyz.hisname.fireflyiii
 import android.app.Application
 import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
-import org.acra.ACRA
 import org.acra.ReportField
-import org.acra.annotation.AcraCore
-import org.acra.annotation.AcraMailSender
+import org.acra.config.mailSender
 import org.acra.data.StringFormat
-import org.acra.sender.EmailIntentSenderFactory
+import org.acra.ktx.initAcra
 import timber.log.Timber
 
-@AcraCore(reportFormat = StringFormat.KEY_VALUE_LIST,
-        reportSenderFactoryClasses = [EmailIntentSenderFactory::class], buildConfigClass = BuildConfig::class,
-        reportContent = [ReportField.REPORT_ID, ReportField.APP_VERSION_NAME,
-        ReportField.PHONE_MODEL, ReportField.BRAND, ReportField.PRODUCT, ReportField.ANDROID_VERSION,
-        ReportField.BUILD_CONFIG, ReportField.STACK_TRACE, ReportField.LOGCAT])
-@AcraMailSender(reportAsFile = true, mailTo = "", resSubject = R.string.urge_user_to_post_bug_on_github,
-        reportFileName = "Fireflyiii-mobile.txt")
 class CustomApp: Application() {
 
     override fun onCreate() {
@@ -46,7 +37,23 @@ class CustomApp: Application() {
     private fun newThread(){
         Thread {
             if (BuildConfig.DEBUG == false) {
-                ACRA.init(this)
+                initAcra {
+                    reportFormat = StringFormat.KEY_VALUE_LIST
+                    buildConfigClass = BuildConfig::class.java
+                    reportContent = arrayOf(ReportField.REPORT_ID, ReportField.APP_VERSION_NAME,
+                        ReportField.PHONE_MODEL, ReportField.BRAND, ReportField.PRODUCT, ReportField.ANDROID_VERSION,
+                        ReportField.BUILD_CONFIG, ReportField.STACK_TRACE, ReportField.LOGCAT)
+                    mailSender {
+                        reportAsFile = true
+                        mailTo = ""
+                        subject  = getString(R.string.urge_user_to_post_bug_on_github)
+                        body = "Hello! I am sorry that the application crashed. " +
+                                "Please review the attached log file and post it on" +
+                                " Github https://github.com/emansih/FireflyMobile/issues/new. I will " +
+                                "try to respond as soon as possible. Thank you!"
+                        reportFileName = "PhoturisIII_Bug_Report.txt"
+                    }
+                }
             } else {
                 System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
                 Timber.plant(Timber.DebugTree())

@@ -25,7 +25,7 @@ object Dependencies{
     private const val aboutLibVersion = "3.2.0-rc01"
     private const val glideVersion = "4.12.0"
     private const val nachosVersion = "1.2.0"
-    private const val acraVersion = "5.7.0"
+    private const val acraVersion = "5.8.3"
     private const val osmdroidVersion = "6.1.10"
     private const val jUnitVersion = "5.7.0"
     private const val espressoVersion = "3.1.1"
