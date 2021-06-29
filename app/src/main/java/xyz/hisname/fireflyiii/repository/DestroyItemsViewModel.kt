@@ -32,8 +32,7 @@ class DestroyItemsViewModel(application: Application): BaseViewModel(application
     fun deleteObject(objectToDelete: String){
         viewModelScope.launch(Dispatchers.IO) {
             val networkCall = genericService().create(DataService::class.java).destroyItem(objectToDelete)
-            val responseBody = networkCall.body()
-            if(responseBody != null && networkCall.code() == 204){
+            if(networkCall.code() == 204){
                 message.postValue("Deleted")
             } else {
                 message.postValue("There was an issue deleting")

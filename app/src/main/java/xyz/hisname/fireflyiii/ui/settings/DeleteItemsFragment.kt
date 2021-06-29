@@ -62,7 +62,7 @@ class DeleteItemsFragment: BaseSettings() {
             sizeDp = 24
         }
         deleteBudget.setOnPreferenceClickListener {
-            askUserConfirmation("budget")
+            askUserConfirmation("budgets")
             true
         }
         val deleteBills = findPreference<Preference>("delete_bills") as Preference
