@@ -18,7 +18,7 @@
 
 package xyz.hisname.fireflyiii.ui.transaction.details
 
-import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -31,8 +31,11 @@ import androidx.fragment.app.commit
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
 import xyz.hisname.fireflyiii.R
@@ -85,6 +88,7 @@ class TransactionDetailsFragment: BaseDetailFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getData()
+        setBottomNavigation()
         transactionDetailsViewModel.isLoading.observe(viewLifecycleOwner){ loading ->
             if(loading){
                 ProgressBar.animateView(binding.progressLayout.progressOverlay, View.VISIBLE, 0.4f, 200)
@@ -92,11 +96,6 @@ class TransactionDetailsFragment: BaseDetailFragment() {
                 ProgressBar.animateView(binding.progressLayout.progressOverlay, View.GONE, 0f, 200)
             }
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
     }
 
     private fun getData(){
@@ -226,14 +225,62 @@ class TransactionDetailsFragment: BaseDetailFragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.transaction_details_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    private fun setBottomNavigation(){
+        val shapeDrawable: MaterialShapeDrawable = binding.transactionDetailsBottomNavView.background as MaterialShapeDrawable
+        shapeDrawable.shapeAppearanceModel = shapeDrawable.shapeAppearanceModel
+            .toBuilder()
+            .setAllCorners(CornerFamily.ROUNDED, 16f)
+            .build()
+
+        val editIcon = IconicsDrawable(requireContext()).apply { icon = GoogleMaterial.Icon.gmd_edit }
+        val deleteIcon = IconicsDrawable(requireContext()).apply { icon = GoogleMaterial.Icon.gmd_delete }
+        val duplicateIcon = IconicsDrawable(requireContext()).apply { icon = GoogleMaterial.Icon.gmd_file_copy }
+
+        if(isDarkMode()) {
+            editIcon.colorRes = R.color.md_white_1000
+            deleteIcon.colorRes = R.color.md_white_1000
+            duplicateIcon.colorRes = R.color.md_white_1000
+        }
+
+        binding.transactionDetailsBottomNavView.itemIconTintList = null
+        binding.transactionDetailsBottomNavView.menu
+            .add(Menu.NONE, 1, Menu.NONE, "Edit").icon = editIcon
+        binding.transactionDetailsBottomNavView.menu
+            .add(Menu.NONE, 2, Menu.NONE, "Delete").icon = deleteIcon
+        binding.transactionDetailsBottomNavView.menu
+            .add(Menu.NONE, 3, Menu.NONE, "Duplicate")
+            .icon = duplicateIcon
+        binding.transactionDetailsBottomNavView.setOnItemSelectedListener { menuItem ->
+            when(menuItem.itemId) {
+                1 -> {
+                    editItem()
+                }
+                2 -> {
+                    deleteItem()
+                }
+                3 -> {
+                    duplicateTransaction()
+                }
+            }
+            true
+        }
+    }
+
+    private fun duplicateTransaction(){
+        val attachmentUri = arrayListOf<Uri>()
+        attachmentDataAdapter.forEach {  attachmentData ->
+            attachmentUri.add(attachmentData.attachmentAttributes.download_uri)
+        }
+        transactionDetailsViewModel.duplicationTransactionByJournalId(transactionJournalId,
+            attachmentUri).observe(viewLifecycleOwner){ message ->
+            toastInfo(message)
+        }
+
     }
 
     override fun deleteItem() {
         AlertDialog.Builder(requireContext())
-                .setTitle(resources.getString(R.string.delete_account_title, transactionDescription))
+                .setTitle(resources.getString(R.string.delete_transaction_title, transactionDescription))
                 .setMessage(resources.getString(R.string.delete_transaction_message, transactionDescription))
                 .setIcon(IconicsDrawable(requireContext()).apply {
                     icon = FontAwesome.Icon.faw_trash
@@ -241,7 +288,7 @@ class TransactionDetailsFragment: BaseDetailFragment() {
                     colorRes = R.color.md_green_600
                 })
                 .setPositiveButton(R.string.delete_permanently) { _, _ ->
-                    transactionDetailsViewModel.deleteTransaction(transactionJournalId).observe(this) {
+                    transactionDetailsViewModel.deleteTransaction(transactionJournalId).observe(viewLifecycleOwner) {
                         if (it) {
                             toastSuccess(resources.getString(R.string.transaction_deleted))
                             handleBack()

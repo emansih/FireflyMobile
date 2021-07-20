@@ -89,6 +89,47 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
                                       transactionType: String)= transactionDao.getUniqueBudgetByDate(DateTimeUtil.getStartOfDayInCalendarToEpoch(startDate),
             DateTimeUtil.getEndOfDayInCalendarToEpoch(endDate), currencyCode, transactionType)
 
+    suspend fun duplicationTransactionByJournalId(journalId: Long): ApiResponses<TransactionSuccessModel>{
+        val transaction = getTransactionByJournalId(journalId)
+        val transactionTags = if(transaction.tags.isNullOrEmpty()){
+            null
+        } else {
+            // Remove [ and ] from beginning and end of string
+            val beforeTags = transaction.tags.toString().substring(1)
+            beforeTags.substring(0, beforeTags.length - 1)
+        }
+        val date = transaction.date
+        val month = if(date.monthValue < 10){
+            "0${date.monthValue}"
+        } else {
+            date.monthValue.toString()
+        }
+        val day = if(date.dayOfMonth < 10){
+            "0${date.dayOfMonth}"
+        } else {
+            date.dayOfMonth.toString()
+        }
+        val dateToStore = date.year.toString() + "-"  + month + "-" + day
+
+        val time = date.toLocalTime()
+        val min = if(time.minute < 10){
+            "0${time.minute}"
+        } else {
+            time.minute.toString()
+        }
+        val hour = if(time.hour < 10){
+            "0${time.hour}"
+        } else {
+            time.hour.toString()
+        }
+
+        val timeToStore = "$hour:$min"
+        return addTransaction(transaction.destination_type, transaction.description, dateToStore,
+            timeToStore, transaction.piggy_bank_name, transaction.amount.toString(), transaction.source_name,
+        transaction.destination_name, transaction.currency_name, transaction.category_name, transactionTags,
+        transaction.budget_name, transaction.bill_name, transaction.notes)
+    }
+
     suspend fun getTransactionByJournalId(journalId: Long) = transactionDao.getTransactionByJournalId(journalId)
 
     suspend fun getTemporaryAttachment(journalId: Long) = transactionDao.getAttachmentByJournalId(journalId)

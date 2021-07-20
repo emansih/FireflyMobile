@@ -25,6 +25,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import xyz.hisname.fireflyiii.R
+import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.extension.consume
 
 abstract class BaseDetailFragment: BaseFragment(){
@@ -35,8 +36,11 @@ abstract class BaseDetailFragment: BaseFragment(){
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.detail_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+        // TODO: Remove this...
+        if(this.javaClass != TransactionDetailsFragment::class.java){
+            inflater.inflate(R.menu.detail_menu, menu)
+            super.onCreateOptionsMenu(menu, inflater)
+        }
     }
 
     override fun onAttach(context: Context) {
