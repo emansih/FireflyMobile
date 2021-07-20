@@ -124,10 +124,10 @@ class TransactionRepository(private val transactionDao: TransactionDataDao,
         }
 
         val timeToStore = "$hour:$min"
-        return addTransaction(transaction.destination_type, transaction.description, dateToStore,
+        return addTransaction(convertString(transaction.transactionType), transaction.description, dateToStore,
             timeToStore, transaction.piggy_bank_name, transaction.amount.toString(), transaction.source_name,
-        transaction.destination_name, transaction.currency_name, transaction.category_name, transactionTags,
-        transaction.budget_name, transaction.bill_name, transaction.notes)
+            transaction.destination_name, transaction.currency_code, transaction.category_name, transactionTags,
+            transaction.budget_name, transaction.bill_name, transaction.notes)
     }
 
     suspend fun getTransactionByJournalId(journalId: Long) = transactionDao.getTransactionByJournalId(journalId)
