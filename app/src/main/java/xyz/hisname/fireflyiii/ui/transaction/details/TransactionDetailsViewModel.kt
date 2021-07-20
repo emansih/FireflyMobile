@@ -96,7 +96,6 @@ class TransactionDetailsViewModel(application: Application): BaseViewModel(appli
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()
         viewModelScope.launch(Dispatchers.IO){
             val transactionId = transactionRepository.getTransactionIdFromJournalId(journalId)
-            transactionRepository.deleteTransactionById(transactionId)
             if(transactionId != 0L){
                 when (transactionRepository.deleteTransactionById(transactionId)) {
                     HttpConstants.FAILED -> {
