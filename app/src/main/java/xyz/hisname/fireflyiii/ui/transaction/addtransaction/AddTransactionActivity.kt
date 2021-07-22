@@ -50,7 +50,7 @@ class AddTransactionActivity: BaseActivity() {
     }
 
     private fun setBottomNav(){
-        binding.transactionBottomView.setOnNavigationItemSelectedListener{ item ->
+        binding.transactionBottomView.setOnItemSelectedListener { item ->
             when(item.itemId){
                 R.id.action_withdraw -> {
                     addTransactionViewModel.numTabs = 0
