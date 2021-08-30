@@ -247,7 +247,7 @@ class DashboardFragment: BaseFragment() {
             val depositHistory = arrayListOf(
                     BarEntry(0f, value.fifth.toFloat()),
                     BarEntry(1f, value.third.toFloat()),
-                    BarEntry(2f, value.fifth.toFloat()))
+                    BarEntry(2f, value.first.toFloat()))
 
             val withDrawalSets = BarDataSet(withDrawalHistory, resources.getString(R.string.withdrawal))
             val depositSets = BarDataSet(depositHistory, resources.getString(R.string.deposit))
