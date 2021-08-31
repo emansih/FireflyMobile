@@ -55,6 +55,7 @@ The following plugin(s) interact with this app to enhance your experience:
 
 - [ocrFireflyMobile](https://github.com/luifermoron/ocrFireflyMobile) made by Luis Morón!
 - [FireflyWear](https://github.com/emansih/FireflyWear) made by me!
+- [Photuris III OCR](https://github.com/emansih/photuris-iii-ocr) made by me!
 
 ### Downloads
 
