@@ -1,14 +1,1 @@
-Sorry for being inactive recently; The pandemic, life, uni and work has put me in a really bad place. I just feel really burnt out. 
-I will be putting development on hold till the end of Oct 2021. 
-
-
-Features:
-
-- Easier UI for single handed users while dealing with transactions
-- 
-
-Bug Fixes: 
-- Fix bug where duplicate transaction will fail
-- Fix bug where deleting will fail
-- Fix bug where loading indicator will not block when deleting transaction
-- Fix deposit data from current month(Fixes #177). Thanks to @leander091 for the fix!
+This release has no new features or bug fixes, just a translation update thanks to @fgnix
