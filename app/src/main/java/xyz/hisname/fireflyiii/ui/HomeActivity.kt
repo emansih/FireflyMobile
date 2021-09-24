@@ -26,6 +26,7 @@ import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
@@ -89,19 +90,18 @@ class HomeActivity: BaseActivity(){
             binding = ActivityBaseBinding.inflate(layoutInflater)
             val view = binding.root
             setContentView(view)
+            setup()
             if(keyguardUtil.isAppKeyguardEnabled()){
+                binding.biggerFragmentContainer.isInvisible = true
                 authenticator = Authenticator(this, ::handleResult)
                 authenticator.authenticate()
-            } else {
-                setup(savedInstanceState)
-                supportActionBar?.setHomeButtonEnabled(true)
             }
         }
     }
 
     private fun handleResult(result: AuthenticationResult) {
         when (result) {
-            is AuthenticationResult.Success -> setup(instanceState)
+            is AuthenticationResult.Success -> binding.biggerFragmentContainer.isInvisible = false
             is AuthenticationResult.RecoverableError -> displaySnackbar(result.message)
             is AuthenticationResult.UnrecoverableError -> {
                 if(result.code == BiometricPrompt.ERROR_NEGATIVE_BUTTON){
@@ -111,11 +111,14 @@ class HomeActivity: BaseActivity(){
                 }
                 finish()
             }
-            AuthenticationResult.Cancelled -> {
-                toastInfo("Cancel")
+            is AuthenticationResult.Cancelled -> {
+                toastInfo("Cancelled")
                 finish()
             }
-            AuthenticationResult.Failure -> {}
+            is AuthenticationResult.Failure -> {
+                toastError("Authentication failed")
+                finish()
+            }
         }
     }
 
@@ -127,11 +130,11 @@ class HomeActivity: BaseActivity(){
                 .show()
     }
 
-    private fun setup(savedInstanceState: Bundle?){
+    private fun setup(){
         animateToolbar()
-        setUpHeader(savedInstanceState)
+        setUpHeader(instanceState)
         setSupportActionBar(binding.activityToolbar)
-        setUpDrawer(savedInstanceState)
+        setUpDrawer(instanceState)
         supportActionBar?.title = ""
         setNavIcon()
         val transaction = intent.getStringExtra("transaction")
