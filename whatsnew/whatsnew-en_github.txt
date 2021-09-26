@@ -1,1 +1,1 @@
-This release has no new features or bug fixes, just a translation update thanks to @fgnix
+Fix navigation drawer not opening when clicking on hamburger button when security lock is enabled. #180
