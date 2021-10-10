@@ -269,7 +269,7 @@ class TransactionDetailsFragment: BaseDetailFragment() {
     private fun duplicateTransaction(){
         val attachmentUri = arrayListOf<Uri>()
         attachmentDataAdapter.forEach {  attachmentData ->
-            attachmentUri.add(attachmentData.attachmentAttributes.download_uri)
+            attachmentUri.add(attachmentData.attachmentAttributes.download_url)
         }
         transactionDetailsViewModel.duplicationTransactionByJournalId(transactionJournalId,
             attachmentUri).observe(viewLifecycleOwner){ message ->

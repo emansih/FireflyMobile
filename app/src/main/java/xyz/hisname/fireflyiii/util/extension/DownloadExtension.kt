@@ -29,7 +29,7 @@ import java.io.File
 
 fun Application.downloadFile(accessToken: String, attachmentData: AttachmentData, fileToOpen: File){
     val downloadManager = this.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-    val request = DownloadManager.Request(attachmentData.attachmentAttributes.download_uri)
+    val request = DownloadManager.Request(attachmentData.attachmentAttributes.download_url)
     request.addRequestHeader("Authorization", "Bearer $accessToken")
     request.setTitle("Downloading " + attachmentData.attachmentAttributes.filename)
     val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
