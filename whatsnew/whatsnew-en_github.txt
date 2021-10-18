@@ -1,1 +1,1 @@
-Fix navigation drawer not opening when clicking on hamburger button when security lock is enabled. #180
+Emergency bugfix for #184. Issue happens only on upgrade but not fresh install. 
