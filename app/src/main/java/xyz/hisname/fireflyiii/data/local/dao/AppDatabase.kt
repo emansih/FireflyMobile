@@ -39,6 +39,7 @@ import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 import xyz.hisname.fireflyiii.repository.models.category.CategoryFts
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
+import xyz.hisname.fireflyiii.repository.models.currency.CurrencyRemoteKeys
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyFts
 import xyz.hisname.fireflyiii.repository.models.tags.TagsData
@@ -50,8 +51,8 @@ import xyz.hisname.fireflyiii.util.TypeConverterUtil
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
     BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class,
-    Spent::class, BudgetLimitData::class, BillPaidDates::class, BillPayDates::class],
-        version = 29, exportSchema = false)
+    Spent::class, BudgetLimitData::class, BillPaidDates::class, BillPayDates::class, CurrencyRemoteKeys::class],
+        version = 30, exportSchema = false)
 @TypeConverters(TypeConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
@@ -69,6 +70,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun attachmentDataDao(): AttachmentDataDao
     abstract fun spentDataDao(): SpentDataDao
     abstract fun budgetLimitDao(): BudgetLimitDao
+    abstract fun currencyRemoteKeysDao(): CurrencyKeyDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

@@ -23,31 +23,39 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyPagingSource
+import xyz.hisname.fireflyiii.repository.currency.CurrencyRemoteMediator
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
+import kotlin.coroutines.CoroutineContext
 
 class CurrencyListViewModel(application: Application): BaseViewModel(application) {
 
-    private val currencyDao = AppDatabase.getInstance(application).currencyDataDao()
+    private val databaseInstance = AppDatabase.getInstance(application)
+    private val currencyDao = databaseInstance.currencyDataDao()
     private val currencyService = genericService().create(CurrencyService::class.java)
     private val currencyRepository = CurrencyRepository(currencyDao, currencyService)
+    private val currencyRemoteKeyDao = databaseInstance.currencyRemoteKeysDao()
 
-    fun getCurrencyList() =
-        Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-            CurrencyPagingSource(currencyDao, currencyService)
-        }.flow.cachedIn(viewModelScope).asLiveData()
-
+   @OptIn(ExperimentalPagingApi::class)
+    fun getCurrencyList() = Pager(
+        config = PagingConfig(
+            pageSize = Constants.PAGE_SIZE,
+            enablePlaceholders = false),
+       remoteMediator = CurrencyRemoteMediator(currencyDao, currencyService, currencyRemoteKeyDao)
+    ){
+       currencyDao.getCurrency()
+    }.flow.cachedIn(viewModelScope).distinctUntilChanged().asLiveData()
 
     fun deleteCurrency(currencyCode: String): LiveData<Boolean> {
         val isDeleted: MutableLiveData<Boolean> = MutableLiveData()

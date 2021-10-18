@@ -22,6 +22,7 @@ import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
@@ -29,18 +30,23 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.currency.CurrencyPagingSource
+import xyz.hisname.fireflyiii.repository.currency.CurrencyRemoteMediator
 
 class CurrencyBottomSheetViewModel(application: Application): BaseViewModel(application) {
 
     val currencyCode = MutableLiveData<String>()
     val currencyFullDetails = MutableLiveData<String>()
 
-    private val currencyDao = AppDatabase.getInstance(application).currencyDataDao()
+    private val databaseInstance = AppDatabase.getInstance(application)
+    private val currencyDao = databaseInstance.currencyDataDao()
     private val currencyService = genericService().create(CurrencyService::class.java)
+    private val currencyRemoteKeyDao = databaseInstance.currencyRemoteKeysDao()
 
-    fun getCurrencyList() =
-            Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-                CurrencyPagingSource(currencyDao, currencyService)
-            }.flow.cachedIn(viewModelScope).asLiveData()
+    @OptIn(ExperimentalPagingApi::class)
+    fun getCurrencyList() = Pager(
+        config = PagingConfig(pageSize = Constants.PAGE_SIZE),
+        remoteMediator = CurrencyRemoteMediator(currencyDao, currencyService, currencyRemoteKeyDao)
+    ){
+        currencyDao.getCurrency()
+    }.flow.cachedIn(viewModelScope).asLiveData()
 }

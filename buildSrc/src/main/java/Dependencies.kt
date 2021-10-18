@@ -39,7 +39,7 @@ object Dependencies{
     private const val taskerPluginVersion = "0.4.2"
     private const val moshiVersion = "1.12.0"
     private const val calendarViewVersion = "1.0.4"
-    private const val pagingLibVersion = "3.0.0-beta03"
+    private const val pagingLibVersion = "3.0.1"
     private const val viewPager2Version = "1.1.0-alpha01"
 
     val lifecyclerLiveDataCore = "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"

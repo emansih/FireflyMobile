@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.data.local.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
@@ -30,11 +31,8 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("SELECT * FROM currency ORDER BY name ASC LIMIT :currencyLimit")
     abstract fun getPaginatedCurrency(currencyLimit: Int): Flow<MutableList<CurrencyData>>
 
-    @Query("SELECT * FROM currency")
-    abstract suspend fun getCurrency(): List<CurrencyData>
-
-    @Query("SELECT COUNT(*) FROM currency")
-    abstract suspend fun getCurrencyCount(): Int
+    @Query("SELECT * FROM currency ORDER BY currencyId")
+    abstract fun getCurrency(): PagingSource<Int, CurrencyData>
 
     /* Sort currency according to their attributes
      * 1. Sort currency by their names in alphabetical order
