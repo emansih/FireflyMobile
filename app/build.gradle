@@ -65,9 +65,6 @@ android {
         viewBinding true
     }
 
-    aaptOptions {
-        ignoreAssetsPattern "NOTICE.txt"
-    }
 
     bundle {
         // Never set this to true otherwise we will have to depend on proprietary Play Core library
@@ -77,6 +74,9 @@ android {
     }
 
     configurations {all*.exclude group: 'com.android.support'}
+    androidResources {
+        ignoreAssetsPattern 'NOTICE.txt'
+    }
 }
 
 dependencies {
