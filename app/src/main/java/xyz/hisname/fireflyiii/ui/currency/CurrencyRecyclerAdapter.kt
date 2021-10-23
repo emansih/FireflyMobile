@@ -51,6 +51,10 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
         return CurrencyHolder(binding)
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
+
     override fun onBindViewHolder(holder: CurrencyHolder, position: Int){
         getItem(position)?.let{
             holder.bind(it, clickListener)

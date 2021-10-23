@@ -19,15 +19,10 @@
 package xyz.hisname.fireflyiii.ui.currency
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -37,7 +32,6 @@ import xyz.hisname.fireflyiii.repository.currency.CurrencyRemoteMediator
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
-import kotlin.coroutines.CoroutineContext
 
 class CurrencyListViewModel(application: Application): BaseViewModel(application) {
 
@@ -47,14 +41,13 @@ class CurrencyListViewModel(application: Application): BaseViewModel(application
     private val currencyRepository = CurrencyRepository(currencyDao, currencyService)
     private val currencyRemoteKeyDao = databaseInstance.currencyRemoteKeysDao()
 
-   @OptIn(ExperimentalPagingApi::class)
-    fun getCurrencyList() = Pager(
-        config = PagingConfig(
-            pageSize = Constants.PAGE_SIZE,
-            enablePlaceholders = false),
-       remoteMediator = CurrencyRemoteMediator(currencyDao, currencyService, currencyRemoteKeyDao)
+    @OptIn(ExperimentalPagingApi::class)
+    fun getCurrencyList() = Pager(config = PagingConfig(
+        pageSize = Constants.PAGE_SIZE,
+        enablePlaceholders = false),
+        remoteMediator = CurrencyRemoteMediator(currencyDao, currencyService, currencyRemoteKeyDao)
     ){
-       currencyDao.getCurrency()
+        currencyDao.getCurrency()
     }.flow.cachedIn(viewModelScope).distinctUntilChanged().asLiveData()
 
     fun deleteCurrency(currencyCode: String): LiveData<Boolean> {

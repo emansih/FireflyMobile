@@ -31,7 +31,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
     @Query("SELECT * FROM currency ORDER BY name ASC LIMIT :currencyLimit")
     abstract fun getPaginatedCurrency(currencyLimit: Int): Flow<MutableList<CurrencyData>>
 
-    @Query("SELECT * FROM currency ORDER BY currencyId")
+    @Query("SELECT * FROM currency ORDER BY currencyId ASC")
     abstract fun getCurrency(): PagingSource<Int, CurrencyData>
 
     /* Sort currency according to their attributes

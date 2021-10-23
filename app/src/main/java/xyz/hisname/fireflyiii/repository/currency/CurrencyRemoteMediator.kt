@@ -44,7 +44,6 @@ class CurrencyRemoteMediator(private val currencyDataDao: CurrencyDataDao,
                    currencyRemoteKeysDataDao.remoteKey().nextPageKey
                 }
             }
-
             val networkCall = currencyService.getPaginatedCurrency(loadKey ?: 1)
 
             if (loadType == LoadType.REFRESH) {
@@ -56,6 +55,7 @@ class CurrencyRemoteMediator(private val currencyDataDao: CurrencyDataDao,
             val currencyBody = networkCall.body()
             if(isSuccessful && currencyBody != null){
                 if(loadKey == 1){
+                    currencyDataDao.deleteAllCurrency()
                     currencyRemoteKeysDataDao.deleteCurrencyKey()
                 }
                 currencyRemoteKeysDataDao.insert(CurrencyRemoteKeys(currencyBody.meta.pagination.current_page,
