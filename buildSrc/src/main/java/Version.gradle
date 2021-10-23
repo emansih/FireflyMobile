@@ -23,6 +23,7 @@ ext {
         // Room
         implementation Dependencies.roomLibs
         implementation Dependencies.roomExtension
+        implementation Dependencies.roomPaging
         kapt Dependencies.roomCompiler
         //Paging
         implementation Dependencies.pagingLib
