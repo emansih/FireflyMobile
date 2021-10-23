@@ -17,25 +17,17 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipeContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout
-        android:id="@+id/swipeContainer"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layoutAnimation="@anim/layout_animation_fall_down" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layoutAnimation="@anim/layout_animation_fall_down"
-            />
+</xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout>
 
-    </xyz.hisname.fireflyiii.ui.base.BaseSwipeRefreshLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
