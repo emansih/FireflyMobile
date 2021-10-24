@@ -1,1 +1,29 @@
-Emergency bugfix for #184. Issue happens only on upgrade but not fresh install. 
+Minor enhancments for this release. Currently working on #174
+
+Optimisation: 
+- Certain layout should take lesser memory and inflate faster. 
+
+Bug fixes: 
+- Fix duplicate / wrong currency being shown in list. Fixes #182
+
+Build tools / libraries update:
+- Update gradle to 7.2
+- Android gradle plugin to 7.0.3
+- Update desugar lib to 1.1.5
+- Use SDK 31 for compiling
+- Update Lifecycle libs to 2.4.0-rc01
+- Update room libs to 2.4.0-beta01
+- Added room-paging to dependency
+- Update Coroutine libs to 1.5.2
+- Update AppCompat lib to 1.4.0-beta01
+- Update Annotation lib to 1.3.0-beta01
+- Update Material Design lib to 1.5.0-alpha04
+- Update CoreX lib to 1.7.0-rc01
+- Update constraintlayout lib to 2.1.1
+- Update WorkManager lib to 2.7.0
+- Update MaterialDrawer to 8.4.5
+- Update Iconics to 5.3.2
+- Update ACRA to 5.8.4
+- Update OSMDroid to 6.1.11
+- Update ViewPager2 to 1.1.0-beta01
+- Update Material Typeface to 4.0.0.2
