@@ -22,7 +22,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import xyz.hisname.fireflyiii.R
@@ -33,6 +32,7 @@ import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
+import xyz.hisname.fireflyiii.util.getUserEmail
 import kotlin.math.abs
 
 class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Unit):
@@ -77,8 +77,10 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
                 }
                 is SplitSeparator.TransactionItem -> {
                     val viewHolder = holder as TransactionViewHolder
-                    val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).dateTimeFormat
-                    val userDefinedTimePref = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).userDefinedDateTimeFormat
+                    val sharedPref = context.getSharedPreferences(
+                        context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
+                    val timePreference = AppPref(sharedPref).dateTimeFormat
+                    val userDefinedTimePref = AppPref(sharedPref).userDefinedDateTimeFormat
                     val transactionDescription = separator.transaction.description
                     val descriptionText = if(separator.transaction.isPending){
                         binding.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))

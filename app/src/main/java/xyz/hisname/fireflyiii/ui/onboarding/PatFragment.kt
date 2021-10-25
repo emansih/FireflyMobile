@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.ui.onboarding
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -35,10 +36,12 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.databinding.FragmentPatBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 class PatFragment: Fragment() {
 
-    private val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(requireContext()) }
+    private val sharedPref by lazy { requireContext().getSharedPreferences(
+        requireContext().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE) }
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
     private lateinit var fileUri: Uri
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>

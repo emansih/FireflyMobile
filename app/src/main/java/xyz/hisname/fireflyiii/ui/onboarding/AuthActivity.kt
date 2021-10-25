@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.onboarding
 
 import android.accounts.AccountManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -27,14 +28,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
-import androidx.preference.PreferenceManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.databinding.ActivityAuthBinding
@@ -42,12 +42,13 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackChangedListener  {
 
     private lateinit var authActivityViewModel: AuthActivityViewModel
     private val progressOverlay by bindView<View>(R.id.progress_overlay)
-    private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
+    private val accountManager by lazy { OldAuthenticatorManager(AccountManager.get(this))  }
     private lateinit var binding: ActivityAuthBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +59,7 @@ class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackC
         setContentView(view)
         authActivityViewModel = getViewModel(AuthActivityViewModel::class.java)
         if(savedInstanceState == null){
-            val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+            val sharedPref = getSharedPreferences(getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
             AppPref(sharedPref).isCustomCa = false
             supportFragmentManager.commit {
                 add(R.id.container, AuthChooserFragment())

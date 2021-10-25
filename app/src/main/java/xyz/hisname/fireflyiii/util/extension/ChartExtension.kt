@@ -18,14 +18,16 @@
 
 package xyz.hisname.fireflyiii.util.extension
 
-import androidx.preference.PreferenceManager
+import android.content.Context
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 fun PieChart.setData(data: PieChart.() -> Unit){
-    if(AppPref(PreferenceManager.getDefaultSharedPreferences(this.context)).nightModeEnabled){
+    if(AppPref(context.getSharedPreferences(
+            context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)).nightModeEnabled){
         legend.textColor = getCompatColor(R.color.md_white_1000)
         description.textColor = getCompatColor(R.color.md_white_1000)
 

@@ -20,34 +20,56 @@ package xyz.hisname.fireflyiii.repository
 
 import android.accounts.AccountManager
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.preference.PreferenceManager
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import retrofit2.Retrofit
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
+import xyz.hisname.fireflyiii.util.getUserEmail
 import xyz.hisname.fireflyiii.util.network.CustomCa
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 
 open class BaseViewModel(application: Application) : AndroidViewModel(application){
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData()
     val apiResponse: MutableLiveData<String> = MutableLiveData()
-    protected val accManager by lazy { AuthenticatorManager(AccountManager.get(getApplication()))  }
-    protected val sharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(getApplication()) }
+    protected val newManager by lazy { NewAccountManager(AccountManager.get(getApplication()), getApplication<Application>().getUserEmail()) }
+    protected val sharedPref by lazy {
+        getApplication<Application>().getSharedPreferences(
+            getApplication<Application>().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
+    }
 
     protected fun genericService(): Retrofit {
         val cert = AppPref(sharedPref).certValue
         return if (AppPref(sharedPref).isCustomCa) {
             val customCa = CustomCa(File(getApplication<Application>().filesDir.path + "/user_custom.pem"))
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
-                    accManager.accessToken, cert, customCa.getCustomTrust(), customCa.getCustomSSL())
+                newManager.accessToken, cert, customCa.getCustomTrust(), customCa.getCustomSSL())
         } else {
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
-                    accManager.accessToken, cert, null, null)
+                newManager.accessToken, cert, null, null)
+        }
+    }
+
+    protected fun getCurrentUserEmail(): String{
+        val activeUserFile = getApplication<Application>().applicationInfo.dataDir + "/current_active_user.txt"
+        if(!File(activeUserFile).exists()){
+            File(activeUserFile).createNewFile()
+            return ""
+        } else {
+            val bufferedReader = BufferedReader(FileReader(activeUserFile))
+            val userEmail = bufferedReader.readLine()
+            if(userEmail != null){
+                return userEmail
+            } else {
+                return ""
+            }
         }
     }
 

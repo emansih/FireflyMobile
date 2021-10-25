@@ -38,7 +38,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
+import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
@@ -54,7 +55,10 @@ import java.util.concurrent.TimeUnit
 // TODO: Remove explicit type arguments. Broken on pref(1.1.0-alpha05)
 class SettingsAccountFragment: BaseSettings() {
 
-    private val accManager by lazy { AuthenticatorManager(AccountManager.get(requireContext())) }
+    private val accManager by lazy {
+        NewAccountManager(AccountManager.get(requireContext()), globalViewModel.userEmail)
+    }
+
     private val authMethodPref by lazy { accManager.authMethod }
     private val authViewModel by lazy { getImprovedViewModel(AuthViewModel::class.java) }
 
@@ -89,7 +93,7 @@ class SettingsAccountFragment: BaseSettings() {
             refreshTokenInterval.isVisible = false
             refreshToken.isVisible = false
             tokenValidity.isVisible = false
-            accessTokenPref.summary = AuthenticatorManager(AccountManager.get(requireContext())).accessToken
+            accessTokenPref.summary = OldAuthenticatorManager(AccountManager.get(requireContext())).accessToken
             authMethod.summary = resources.getString(R.string.personal_access_token)
         }
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->
@@ -161,7 +165,7 @@ class SettingsAccountFragment: BaseSettings() {
         val logout = findPreference<Preference>("logout") as Preference
         logout.setOnPreferenceClickListener {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
-                AppDatabase.clearDb(requireContext())
+                AppDatabase.clearDb(requireContext(), globalViewModel.userEmail)
                 AppPref(sharedPref).clearPref()
                 accManager.destroyAccount()
             }

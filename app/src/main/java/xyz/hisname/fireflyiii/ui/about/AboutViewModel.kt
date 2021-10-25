@@ -34,8 +34,7 @@ class AboutViewModel(application: Application): BaseViewModel(application) {
 
     private val systemInfoRepository by lazy { SystemInfoRepository(
             genericService().create(SystemInfoService::class.java),
-            sharedPref,
-            accManager)
+            sharedPref, newManager)
     }
 
     private val appPref by lazy { AppPref(sharedPref) }

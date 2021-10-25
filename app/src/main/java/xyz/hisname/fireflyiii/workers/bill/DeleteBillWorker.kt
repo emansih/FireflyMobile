@@ -25,6 +25,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
+import xyz.hisname.fireflyiii.util.getUserEmail
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit
 
 class DeleteBillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val billDatabase by lazy { AppDatabase.getInstance(context).billDataDao() }
+    private val billDatabase by lazy { AppDatabase.getInstance(context, getCurrentUserEmail()).billDataDao() }
 
     companion object {
         fun initPeriodicWorker(billId: Long, context: Context){
@@ -42,7 +43,8 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
                 val billData = Data.Builder()
                         .putLong("billId", billId)
                         .build()
-                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() +
+                        "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType

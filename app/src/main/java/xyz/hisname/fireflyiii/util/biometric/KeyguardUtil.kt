@@ -21,8 +21,8 @@ package xyz.hisname.fireflyiii.util.biometric
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
-import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 class KeyguardUtil(private val activity: Activity) {
 
@@ -32,7 +32,8 @@ class KeyguardUtil(private val activity: Activity) {
     }
 
     fun isAppKeyguardEnabled(): Boolean{
-        return AppPref(PreferenceManager.getDefaultSharedPreferences(activity)).isKeyguardEnabled
+        return AppPref(activity.getSharedPreferences(
+            activity.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)).isKeyguardEnabled
     }
 
 }

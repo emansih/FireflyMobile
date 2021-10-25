@@ -19,19 +19,22 @@
 package xyz.hisname.fireflyiii.repository
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 class GlobalViewModel(application: Application): AndroidViewModel(application) {
 
+    var userEmail = ""
     var isDark: Boolean = false
         private set
 
     fun isDarkMode(): MutableLiveData<Boolean>{
         val darkModeLiveData: MutableLiveData<Boolean> = MutableLiveData()
-        val appPreference = AppPref(PreferenceManager.getDefaultSharedPreferences(getApplication()))
+        val appPreference = AppPref(getApplication<Application>().getSharedPreferences(
+            getApplication<Application>().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
         if(appPreference.nightModeEnabled){
             isDark =  true
             darkModeLiveData.postValue(true)

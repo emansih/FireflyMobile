@@ -34,7 +34,7 @@ import xyz.hisname.fireflyiii.repository.tags.TagsRepository
 class AddTagsViewModel(application: Application): BaseViewModel(application) {
 
     private val tagsRepository = TagsRepository(
-            AppDatabase.getInstance(application).tagsDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).tagsDataDao(),
             genericService().create(TagsService::class.java)
     )
 

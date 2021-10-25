@@ -18,12 +18,10 @@
 
 package xyz.hisname.fireflyiii.receiver
 
-import android.accounts.AccountManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -32,7 +30,6 @@ import com.mikepenz.iconics.utils.toAndroidIconCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
@@ -41,6 +38,9 @@ import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.showNotification
+import xyz.hisname.fireflyiii.util.getUserEmail
+import java.io.BufferedReader
+import java.io.FileReader
 import java.time.OffsetDateTime
 import java.util.concurrent.ThreadLocalRandom
 
@@ -48,8 +48,9 @@ import java.util.concurrent.ThreadLocalRandom
 class TransactionReceiver: BroadcastReceiver()  {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if(AppPref(PreferenceManager.getDefaultSharedPreferences(context)).baseUrl.isBlank() ||
-                AuthenticatorManager(AccountManager.get(context)).accessToken.isBlank()){
+
+        if(AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences",
+                Context.MODE_PRIVATE)).baseUrl.isBlank()){
             val onboarding = Intent(context, AuthActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
@@ -91,8 +92,8 @@ class TransactionReceiver: BroadcastReceiver()  {
                     .putString("destinationName", destinationName)
                     .putString("piggyBankName",piggyBank)
                     .putString("notes", notes)
-            val transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
-            val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
+            val transactionDatabase = AppDatabase.getInstance(context, getCurrentUserEmail(context)).transactionDataDao()
+            val currencyDatabase = AppDatabase.getInstance(context, getCurrentUserEmail(context)).currencyDataDao()
             var currency: CurrencyData
             runBlocking(Dispatchers.IO) {
                 currency = currencyDatabase.getCurrencyByCode(intent.getStringExtra("currency") ?: "")[0]
@@ -146,5 +147,10 @@ class TransactionReceiver: BroadcastReceiver()  {
                 )
             }
         }
+    }
+
+    private fun getCurrentUserEmail(context: Context): String{
+        val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
+        return bufferedReader.readLine()
     }
 }

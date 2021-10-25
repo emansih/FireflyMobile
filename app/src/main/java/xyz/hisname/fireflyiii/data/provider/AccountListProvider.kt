@@ -46,7 +46,7 @@ class AccountListProvider: ContentProvider() {
                        selectionArgs: Array<out String>?, sortOrder: String?): Cursor? {
         if (uriMatcher.match(uri) != -1){
             context?.let { nonNullContext ->
-                val accountDao = AppDatabase.getInstance(nonNullContext).accountDataDao()
+                val accountDao = AppDatabase.getInstance(nonNullContext, "").accountDataDao()
                 return accountDao.getAssetAccountCursor()
             }
         }

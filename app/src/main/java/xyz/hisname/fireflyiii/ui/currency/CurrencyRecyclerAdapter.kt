@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -33,6 +32,7 @@ import xyz.hisname.fireflyiii.databinding.CurrencyListBinding
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.util.Flags
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
                               private val clickListener:(CurrencyData) -> Unit):
@@ -40,7 +40,7 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
 
     private lateinit var context: Context
     private val isThumbnailEnabled by lazy {
-        AppPref(PreferenceManager.getDefaultSharedPreferences(context)).isCurrencyThumbnailEnabled
+        AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)).isCurrencyThumbnailEnabled
     }
     private var currencyListBinding: CurrencyListBinding? = null
     private val binding get() = currencyListBinding!!

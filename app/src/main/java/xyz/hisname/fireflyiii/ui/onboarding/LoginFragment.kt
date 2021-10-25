@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.ui.onboarding
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -31,19 +32,20 @@ import androidx.core.net.toUri
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.databinding.FragmentLoginBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 
 class LoginFragment: Fragment() {
 
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
-    private val sharedPref by lazy {  PreferenceManager.getDefaultSharedPreferences(requireContext()) }
+    private val sharedPref by lazy {  requireContext().getSharedPreferences(
+        requireContext().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE) }
     private var fileUri: Uri? = null
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var fragmentLoginBinding: FragmentLoginBinding? = null

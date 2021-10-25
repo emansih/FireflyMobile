@@ -33,7 +33,7 @@ import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 class AddCurrencyViewModel(application: Application): BaseViewModel(application) {
 
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application).currencyDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
 

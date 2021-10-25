@@ -36,7 +36,7 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 
 class AccountSearchViewModel(application: Application): BaseViewModel(application) {
 
-    private val accountDao = AppDatabase.getInstance(application).accountDataDao()
+    private val accountDao = AppDatabase.getInstance(application, getCurrentUserEmail()).accountDataDao()
     private val accountService = genericService().create(AccountsService::class.java)
     private val accountRepository = AccountRepository(accountDao, accountService)
 

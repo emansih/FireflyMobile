@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.dashboard
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
@@ -27,7 +28,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -44,23 +44,24 @@ import xyz.hisname.fireflyiii.repository.transaction.TransactionLimitSource
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.Sixple
+import xyz.hisname.fireflyiii.util.getUserEmail
 import xyz.hisname.fireflyiii.util.network.retrofitCallback
 import java.math.BigDecimal
 
 class DashboardViewModel(application: Application): BaseViewModel(application) {
 
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application).currencyDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
             genericService().create(CurrencyService::class.java))
     private val budgetRepository = BudgetRepository(
-            AppDatabase.getInstance(application).budgetDataDao(),
-            AppDatabase.getInstance(application).budgetListDataDao(),
-            AppDatabase.getInstance(application).spentDataDao(),
-            AppDatabase.getInstance(application).budgetLimitDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).budgetDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).budgetListDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).spentDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).budgetLimitDao(),
             genericService().create(BudgetService::class.java)
     )
 
-    private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
     private val transactionRepository = TransactionRepository(
             transactionDao, genericService().create(TransactionService::class.java)
     )
@@ -135,7 +136,10 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
 
 
     private fun getBasicSummary(currencyCode: String, currencySymbol: String){
-        val simpleData = SimpleData(PreferenceManager.getDefaultSharedPreferences(getApplication()))
+        val simpleData = SimpleData(
+            getApplication<Application>().getSharedPreferences(
+                getApplication<Application>().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
+        )
         val summaryService = genericService().create(SummaryService::class.java)
         summaryService.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),
                 currencyCode).enqueue(retrofitCallback({ response ->

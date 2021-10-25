@@ -19,13 +19,14 @@
 package xyz.hisname.fireflyiii.repository.userinfo
 
 import android.content.SharedPreferences
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
+import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 
 class SystemInfoRepository(private val systemInfoService: SystemInfoService?,
                            private val sharedPreferences: SharedPreferences,
-                           private val authenticationManager: AuthenticatorManager) {
+                           private val authenticationManager: NewAccountManager) {
 
     @Throws(Exception::class)
     suspend fun getCurrentUserInfo(){

@@ -23,7 +23,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -50,16 +49,16 @@ import java.io.File
 class TagDetailsViewModel(application: Application): BaseViewModel(application) {
 
     private val tagsRepository = TagsRepository(
-            AppDatabase.getInstance(application).tagsDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).tagsDataDao(),
             genericService().create(TagsService::class.java)
     )
 
     private val transactionRepository = TransactionRepository(
-            AppDatabase.getInstance(application).transactionDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao(),
             genericService().create(TransactionService::class.java)
     )
 
-    private val currencyRepository = CurrencyRepository(AppDatabase.getInstance(application).currencyDataDao(),
+    private val currencyRepository = CurrencyRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
 
@@ -68,7 +67,7 @@ class TagDetailsViewModel(application: Application): BaseViewModel(application) 
     val transactionSum = MutableLiveData<ArrayList<DetailModel>>()
 
     init {
-        Configuration.getInstance().load(application, PreferenceManager.getDefaultSharedPreferences(application))
+        Configuration.getInstance().load(application, sharedPref)
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().osmdroidBasePath = application.filesDir
         Configuration.getInstance().osmdroidTileCache = File(application.filesDir.toString() + "/tiles")

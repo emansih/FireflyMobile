@@ -34,7 +34,7 @@ import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 class DescriptionViewModel(application: Application): BaseViewModel(application) {
 
     private val transactionService = genericService().create(TransactionService::class.java)
-    private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
     private val transactionRepository = TransactionRepository(transactionDao, transactionService)
 
     val transactionName = MutableLiveData<String>()

@@ -29,7 +29,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
+import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
@@ -59,8 +60,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     private val customCaFile by lazy { File(applicationContext.filesDir.toString() + File.pathSeparator +  "user_custom.pem") }
     private val systemInfoRepository by lazy { SystemInfoRepository(
             genericService().create(SystemInfoService::class.java),
-            sharedPref,
-            accManager)
+            sharedPref, newManager)
     }
     private lateinit var repository: AccountRepository
 
@@ -79,13 +79,13 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             FileUtils.saveCaFile(fileUri, getApplication())
         }
         authInit(accessToken, baseUrl)
-        val accountDao = AppDatabase.getInstance(applicationContext).accountDataDao()
+        val accountDao = AppDatabase.getInstance(applicationContext, getCurrentUserEmail()).accountDataDao()
         val accountsService = genericService().create(AccountsService::class.java)
         repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){
             try {
                 repository.authViaPat()
-                AuthenticatorManager(accountManager).authMethod = "pat"
+                OldAuthenticatorManager(accountManager).authMethod = "pat"
                 isAuthenticated.postValue(true)
             } catch (exception: UnknownServiceException){
                 FileUtils.deleteCaFile(customCaFile)
@@ -121,6 +121,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         if(fileUri != null && fileUri.toString().isNotBlank()) {
             FileUtils.saveCaFile(fileUri, getApplication())
         }
+        val accManager = NewAccountManager(AccountManager.get(getApplication()), "")
         authInit("", baseUrl)
         accManager.clientId = clientId
         accManager.secretKey = clientSecret
@@ -143,6 +144,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                     } else {
                         Constants.REDIRECT_URI
                     }
+                    val accManager = NewAccountManager(AccountManager.get(getApplication()), "")
                     val oAuthService = genericService().create(OAuthService::class.java)
                     networkCall = oAuthService.getAccessToken(code.trim(), accManager.clientId,
                             accManager.secretKey, redirectUri)
@@ -180,6 +182,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
 
     fun setDemo(code: String){
         authInit("", "https://demo.firefly-iii.org")
+        val accManager = NewAccountManager(AccountManager.get(getApplication()), " (Demo)")
         accManager.clientId = "2"
         accManager.secretKey = "tfWoJQbmV88Fxej1ysAPIxFireflyIIIApiToken"
         getAccessToken(code, true)
@@ -209,9 +212,8 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
 
     private fun authInit(accessToken: String, baseUrl: String){
         FireflyClient.destroyInstance()
-        accManager.destroyAccount()
-        AuthenticatorManager(accountManager).initializeAccount()
-        AuthenticatorManager(accountManager).accessToken = accessToken.trim()
+        OldAuthenticatorManager(accountManager).initializeAccount()
+        OldAuthenticatorManager(accountManager).accessToken = accessToken.trim()
         AppPref(sharedPref).baseUrl = baseUrl
     }
 }

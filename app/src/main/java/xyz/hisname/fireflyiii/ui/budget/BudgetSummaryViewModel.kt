@@ -49,16 +49,16 @@ class BudgetSummaryViewModel(application: Application): BaseViewModel(applicatio
 
     private val currencyService = genericService().create(CurrencyService::class.java)
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application).currencyDataDao(), currencyService)
+            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(), currencyService)
 
     private val transactionService = genericService().create(TransactionService::class.java)
-    private val transactionDataDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val transactionDataDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
     private val transactionRepository = TransactionRepository(transactionDataDao, transactionService)
 
-    private val spentDao = AppDatabase.getInstance(application).spentDataDao()
-    private val budgetLimitDao = AppDatabase.getInstance(application).budgetLimitDao()
-    private val budgetDao = AppDatabase.getInstance(application).budgetDataDao()
-    private val budgetListDao = AppDatabase.getInstance(application).budgetListDataDao()
+    private val spentDao = AppDatabase.getInstance(application, getCurrentUserEmail()).spentDataDao()
+    private val budgetLimitDao = AppDatabase.getInstance(application, getCurrentUserEmail()).budgetLimitDao()
+    private val budgetDao = AppDatabase.getInstance(application, getCurrentUserEmail()).budgetDataDao()
+    private val budgetListDao = AppDatabase.getInstance(application, getCurrentUserEmail()).budgetListDataDao()
     private val budgetService = genericService().create(BudgetService::class.java)
 
     private val budgetRepository = BudgetRepository(budgetDao, budgetListDao, spentDao, budgetLimitDao, budgetService)

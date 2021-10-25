@@ -46,14 +46,14 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
 
 
     private val budgetRepository = BudgetRepository(
-            AppDatabase.getInstance(application).budgetDataDao(),
-            AppDatabase.getInstance(application).budgetListDataDao(),
-            AppDatabase.getInstance(application).spentDataDao(),
-            AppDatabase.getInstance(application).budgetLimitDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).budgetDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).budgetListDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).spentDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).budgetLimitDao(),
             genericService().create(BudgetService::class.java)
     )
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application).currencyDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
     private var monthCount: Long = 0

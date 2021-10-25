@@ -20,12 +20,13 @@ package xyz.hisname.fireflyiii.data.provider
 
 import android.content.ContentProvider
 import android.content.ContentValues
+import android.content.Context
 import android.content.UriMatcher
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
-import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.data.local.pref.SimpleData
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 class SimpleDataProvider: ContentProvider() {
 
@@ -49,9 +50,14 @@ class SimpleDataProvider: ContentProvider() {
                        sortOrder: String?): Cursor? {
         if (uriMatcher.match(uri) != -1){
             cursor = MatrixCursor(arrayOf("Balance", "Bills To Pay", "Paid", "Left To Spend", "Per Day", "Net Worth"))
-            val simpleData = SimpleData(PreferenceManager.getDefaultSharedPreferences(context))
-            cursor?.addRow(arrayListOf(simpleData.balance, simpleData.unPaidBills, simpleData.paidBills,
-                    simpleData.leftToSpend, simpleData.leftToSpendPerDay, simpleData.networthValue))
+            if(!context?.getUserEmail().isNullOrBlank()){
+                val sharedPref = context?.getSharedPreferences(context?.getUserEmail() + "-user-preferences.xml", Context.MODE_PRIVATE)
+                if (sharedPref != null){
+                    val simpleData = SimpleData(sharedPref)
+                    cursor?.addRow(arrayListOf(simpleData.balance, simpleData.unPaidBills, simpleData.paidBills,
+                        simpleData.leftToSpend, simpleData.leftToSpendPerDay, simpleData.networthValue))
+                }
+            }
         }
         return cursor
     }
@@ -69,4 +75,5 @@ class SimpleDataProvider: ContentProvider() {
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?,
                         selectionArgs: Array<out String>?) = 0
+
 }

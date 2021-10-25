@@ -21,8 +21,6 @@ package xyz.hisname.fireflyiii.workers.account
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
-import androidx.core.text.toSpannable
-import androidx.preference.PreferenceManager
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -36,8 +34,10 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
+import xyz.hisname.fireflyiii.util.getUserEmail
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
-import java.io.File
+import java.io.BufferedReader
+import java.io.FileReader
 import java.math.BigDecimal
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
@@ -79,7 +79,8 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     WorkManager.getInstance(context).getWorkInfosByTag(
                             "add_periodic_account_$accountName" + "_" + accountType).get()
             if(accountTag == null || accountTag.size == 0){
-                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() +
+                        "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
@@ -95,8 +96,10 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                         .build()
                 WorkManager.getInstance(context).enqueue(accountWork)
                 runBlocking(Dispatchers.IO) {
-                    val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
-                    val currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
+                    val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
+                    val userEmail = bufferedReader.readLine()
+                    val accountDatabase = AppDatabase.getInstance(context, userEmail).accountDataDao()
+                    val currencyDatabase = AppDatabase.getInstance(context, userEmail).currencyDataDao()
                     val currencyData =
                                 currencyDatabase.getCurrencyByCode(currencyCode ?: "")[0]
                     val currencySymbol = currencyData.currencyAttributes.symbol
@@ -118,7 +121,9 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
 
         fun cancelWorker(accountName: String, accountType: String, context: Context){
             runBlocking(Dispatchers.IO) {
-                val accountDatabase = AppDatabase.getInstance(context).accountDataDao()
+                val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
+                val userEmail = bufferedReader.readLine()
+                val accountDatabase = AppDatabase.getInstance(context, userEmail).accountDataDao()
                 accountDatabase.deleteAccountByTypeAndName(accountType, accountName)
                 accountDatabase
             }
@@ -147,7 +152,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val notes = inputData.getString("notes")
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val accountRepository = AccountRepository(
-                AppDatabase.getInstance(context).accountDataDao(),
+                AppDatabase.getInstance(context, getCurrentUserEmail()).accountDataDao(),
                 genericService.create(AccountsService::class.java)
         )
         val addAccount = accountRepository.addAccount(name, accountType, currencyCode,

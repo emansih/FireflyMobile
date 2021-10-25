@@ -19,20 +19,19 @@
 package xyz.hisname.fireflyiii.workers.account
 
 import android.content.Context
-import androidx.preference.PreferenceManager
 import androidx.work.*
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
+import xyz.hisname.fireflyiii.util.getUserEmail
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 class DeleteAccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val accountDatabase by lazy { AppDatabase.getInstance(context).accountDataDao() }
+    private val accountDatabase by lazy { AppDatabase.getInstance(context, getCurrentUserEmail()).accountDataDao() }
 
     companion object {
         fun initPeriodicWorker(accountId: Long, context: Context){
@@ -42,7 +41,8 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                 val accountData = Data.Builder()
                         .putLong("accountId", accountId)
                         .build()
-                val appPref = AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() +
+                        "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType

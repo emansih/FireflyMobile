@@ -45,11 +45,11 @@ import java.io.File
 class PiggyDetailViewModel(application: Application): BaseViewModel(application) {
 
     private val piggyRepository = PiggyRepository(
-            AppDatabase.getInstance(application).piggyDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).piggyDataDao(),
             genericService().create(PiggybankService::class.java)
     )
 
-    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
 
     var accountId: Long = 0
         private set
@@ -96,7 +96,7 @@ class PiggyDetailViewModel(application: Application): BaseViewModel(application)
         val fileName = attachmentData.attachmentAttributes.filename
         val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
                 File.separator + fileName)
-        getApplication<Application>().downloadFile(accManager.accessToken, attachmentData, fileToOpen)
+        getApplication<Application>().downloadFile(newManager.accessToken, attachmentData, fileToOpen)
         getApplication<Application>().registerReceiver(object : BroadcastReceiver(){
             override fun onReceive(context: Context, intent: Intent) {
                 downloadedFile.postValue(fileToOpen)

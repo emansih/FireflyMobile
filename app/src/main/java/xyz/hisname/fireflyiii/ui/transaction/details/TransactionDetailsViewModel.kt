@@ -46,9 +46,9 @@ import java.io.File
 class TransactionDetailsViewModel(application: Application): BaseViewModel(application) {
 
     private val transactionService = genericService().create(TransactionService::class.java)
-    private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
     private val transactionRepository = TransactionRepository(transactionDao, transactionService)
-    private val attachmentDao =  AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentDao =  AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
     val transactionAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun duplicationTransactionByJournalId(journalId: Long, fileUri: List<Uri>): MutableLiveData<String>{
@@ -119,7 +119,7 @@ class TransactionDetailsViewModel(application: Application): BaseViewModel(appli
         val fileName = attachmentData.attachmentAttributes.filename
         val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
                 File.separator + fileName)
-        getApplication<Application>().downloadFile(accManager.accessToken, attachmentData, fileToOpen)
+        getApplication<Application>().downloadFile(newManager.accessToken, attachmentData, fileToOpen)
         getApplication<Application>().registerReceiver(object : BroadcastReceiver(){
             override fun onReceive(context: Context, intent: Intent) {
                 downloadedFile.postValue(fileToOpen)

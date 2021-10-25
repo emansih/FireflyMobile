@@ -22,7 +22,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import xyz.hisname.fireflyiii.R
@@ -31,6 +30,7 @@ import xyz.hisname.fireflyiii.databinding.RecentTransactionListBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
+import xyz.hisname.fireflyiii.util.getUserEmail
 
 class TransactionAdapter(private val clickListener:(Transactions) -> Unit):
         PagingDataAdapter<Transactions, TransactionAdapter.TransactionViewHolder>(DIFF_CALLBACK) {
@@ -53,8 +53,10 @@ class TransactionAdapter(private val clickListener:(Transactions) -> Unit):
 
     inner class TransactionViewHolder(view: RecentTransactionListBinding): RecyclerView.ViewHolder(view.root) {
         fun bind(transactionAttributes: Transactions, clickListener: (Transactions) -> Unit){
-            val timePreference = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).dateTimeFormat
-            val userDefinedDateTime = AppPref(PreferenceManager.getDefaultSharedPreferences(context)).userDefinedDateTimeFormat
+            val sharedPref = context.getSharedPreferences(
+                context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
+            val timePreference = AppPref(sharedPref).dateTimeFormat
+            val userDefinedDateTime = AppPref(sharedPref).userDefinedDateTimeFormat
             val transactionDescription = transactionAttributes.description
             val descriptionText = if(transactionAttributes.isPending){
                 binding.transactionNameText.setTextColor(context.getCompatColor(R.color.md_red_500))

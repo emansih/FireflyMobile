@@ -24,12 +24,12 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.getUserEmail
 import xyz.hisname.languagepack.LanguageChanger
 
 @SuppressLint("Registered")
@@ -68,6 +68,7 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     protected fun sharedPref(context: Context): AppPref{
-        return AppPref(PreferenceManager.getDefaultSharedPreferences(context))
+        return AppPref(context.getSharedPreferences(
+            getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
     }
 }

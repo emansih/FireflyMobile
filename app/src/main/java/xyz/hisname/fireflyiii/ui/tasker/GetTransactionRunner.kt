@@ -23,7 +23,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.net.toUri
-import androidx.preference.PreferenceManager
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerAction
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResult
@@ -32,7 +31,7 @@ import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultSucess
 import kotlinx.coroutines.runBlocking
 import net.dinglisch.android.tasker.TaskerPlugin
 import retrofit2.Retrofit
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
@@ -41,16 +40,19 @@ import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
+import xyz.hisname.fireflyiii.util.getUserEmail
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 
 class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTransactionOutput>() {
 
 
     private lateinit var customCa: CustomCa
     private lateinit var sharedPref: SharedPreferences
-    private lateinit var accountManager: AuthenticatorManager
+    private lateinit var accountManager: OldAuthenticatorManager
     private lateinit var transactionDatabase: TransactionDataDao
     private lateinit var currencyDatabase: CurrencyDataDao
 
@@ -78,10 +80,13 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
 
     override fun run(context: Context, input: TaskerInput<GetTransactionInput>): TaskerPluginResult<GetTransactionOutput> {
         replaceVariable(input)
-        transactionDatabase = AppDatabase.getInstance(context).transactionDataDao()
-        currencyDatabase = AppDatabase.getInstance(context).currencyDataDao()
-        accountManager = AuthenticatorManager(AccountManager.get(context))
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
+        val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
+        val userEmail = bufferedReader.readLine()
+        transactionDatabase = AppDatabase.getInstance(context, userEmail).transactionDataDao()
+        currencyDatabase = AppDatabase.getInstance(context, userEmail).currencyDataDao()
+        accountManager = OldAuthenticatorManager(AccountManager.get(context))
+        sharedPref = context.getSharedPreferences(
+            context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
         customCa = CustomCa(File(context.filesDir.path + "/user_custom.pem"))
         val transactionType = input.regular.transactionType ?: ""
         val transactionDescription = input.regular.transactionDescription ?: ""

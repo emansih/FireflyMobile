@@ -46,15 +46,15 @@ import java.net.UnknownHostException
 class AddAccountViewModel(application: Application): BaseViewModel(application) {
 
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application).currencyDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
     private val accountRepository = AccountRepository(
-            AppDatabase.getInstance(application).accountDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).accountDataDao(),
             genericService().create(AccountsService::class.java)
     )
 
-    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
     private val attachmentService = genericService().create(AttachmentService::class.java)
     private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
 

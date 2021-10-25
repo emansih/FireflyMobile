@@ -55,15 +55,15 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
 
     private val accountService = genericService().create(AccountsService::class.java)
 
-    private val accountRepository = AccountRepository(AppDatabase.getInstance(application).accountDataDao(), accountService)
+    private val accountRepository = AccountRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).accountDataDao(), accountService)
 
-    private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
+    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
 
     private val transactionRepository = TransactionRepository(
             transactionDao, genericService().create(TransactionService::class.java)
     )
 
-    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
     private var accountType = ""
     var currencySymbol = ""
         private set
@@ -234,7 +234,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
         val fileName = attachmentData.attachmentAttributes.filename
         val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
                 File.separator + fileName)
-        getApplication<Application>().downloadFile(accManager.accessToken, attachmentData, fileToOpen)
+        getApplication<Application>().downloadFile(newManager.accessToken, attachmentData, fileToOpen)
         getApplication<Application>().registerReceiver(object : BroadcastReceiver(){
             override fun onReceive(context: Context, intent: Intent) {
                 downloadedFile.postValue(fileToOpen)

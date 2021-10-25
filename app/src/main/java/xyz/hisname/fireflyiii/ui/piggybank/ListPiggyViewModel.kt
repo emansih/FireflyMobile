@@ -41,7 +41,7 @@ import xyz.hisname.fireflyiii.workers.piggybank.DeletePiggyWorker
 
 class ListPiggyViewModel(application: Application): BaseViewModel(application) {
 
-    private val piggyDao = AppDatabase.getInstance(application).piggyDataDao()
+    private val piggyDao = AppDatabase.getInstance(application, getCurrentUserEmail()).piggyDataDao()
     private val piggyService = genericService().create(PiggybankService::class.java)
     private val piggyRepository = PiggyRepository(piggyDao, piggyService)
 

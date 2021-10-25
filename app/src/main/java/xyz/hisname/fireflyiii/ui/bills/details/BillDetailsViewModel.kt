@@ -57,11 +57,11 @@ import java.time.LocalDate
 class BillDetailsViewModel(application: Application): BaseViewModel(application) {
 
 
-    private val billPayDao = AppDatabase.getInstance(application).billPayDao()
-    private val billDao = AppDatabase.getInstance(application).billDataDao()
-    private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
-    private val transactionDao = AppDatabase.getInstance(application).transactionDataDao()
-    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val billPayDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPayDao()
+    private val billDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao()
+    private val billPaidDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPaidDao()
+    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
     private val billService = genericService().create(BillsService::class.java)
     private val billPayRepository = BillPayRepository(billPayDao, billService)
     private val billRepository = BillRepository(billDao, billService)
@@ -129,7 +129,7 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
         val fileName = attachmentData.attachmentAttributes.filename
         val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
                 File.separator + fileName)
-        getApplication<Application>().downloadFile(accManager.accessToken, attachmentData, fileToOpen)
+        getApplication<Application>().downloadFile(newManager.accessToken, attachmentData, fileToOpen)
         getApplication<Application>().registerReceiver(object : BroadcastReceiver(){
             override fun onReceive(context: Context, intent: Intent) {
                 downloadedFile.postValue(fileToOpen)

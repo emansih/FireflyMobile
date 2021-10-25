@@ -24,6 +24,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
@@ -42,7 +43,7 @@ import com.mikepenz.materialdrawer.model.*
 import com.mikepenz.materialdrawer.model.interfaces.*
 import com.mikepenz.materialdrawer.widget.AccountHeaderView
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.account.AuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.databinding.ActivityBaseBinding
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
@@ -52,7 +53,6 @@ import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
-import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
@@ -62,12 +62,14 @@ import xyz.hisname.fireflyiii.util.biometric.AuthenticationResult
 import xyz.hisname.fireflyiii.util.biometric.Authenticator
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 
 
 class HomeActivity: BaseActivity(){
 
     private lateinit var headerResult: AccountHeaderView
-    private val accountManager by lazy { AuthenticatorManager(AccountManager.get(this))  }
     private val keyguardUtil by lazy { KeyguardUtil(this) }
     private var instanceState: Bundle? = null
     private lateinit var authenticator: Authenticator
@@ -80,22 +82,16 @@ class HomeActivity: BaseActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(accountManager.authMethod.isBlank()|| sharedPref(this).baseUrl.isBlank()){
-            AuthenticatorManager(AccountManager.get(this)).destroyAccount()
-            val onboardingActivity = Intent(this, AuthActivity::class.java)
-            startActivity(onboardingActivity)
-            finish()
-        } else {
-            instanceState = savedInstanceState
-            binding = ActivityBaseBinding.inflate(layoutInflater)
-            val view = binding.root
-            setContentView(view)
-            setup()
-            if(keyguardUtil.isAppKeyguardEnabled()){
-                binding.biggerFragmentContainer.isInvisible = true
-                authenticator = Authenticator(this, ::handleResult)
-                authenticator.authenticate()
-            }
+        instanceState = savedInstanceState
+        binding = ActivityBaseBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+        homeViewModel.migrateFirefly()
+        setup()
+        if(keyguardUtil.isAppKeyguardEnabled()){
+            binding.biggerFragmentContainer.isInvisible = true
+            authenticator = Authenticator(this, ::handleResult)
+            authenticator.authenticate()
         }
     }
 
@@ -163,20 +159,52 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
-        val profile = ProfileDrawerItem().apply {
-            nameText = AuthenticatorManager(AccountManager.get(this@HomeActivity)).userEmail
-            isNameShown = true
-            
-            descriptionText = sharedPref(this@HomeActivity).userRole
+        val sharedPrefDir = File(applicationInfo.dataDir + "/shared_prefs")
+        val fileList = sharedPrefDir.listFiles()
+        val profileArray = arrayListOf<ProfileDrawerItem>()
+        fileList?.forEach { file ->
+            val fileName = file.name
+            if(fileName.endsWith("-user-preferences.xml")){
+                val userEmailFromPref = fileName.dropLast(21)
+                profileArray.add(
+                    ProfileDrawerItem().apply {
+                        nameText = userEmailFromPref
+                        isNameShown = true
+                        // TODO: Read user's role from custom shared pref
+                        descriptionText = ""
+                    }
+                )
+            }
         }
         headerResult = AccountHeaderView(this).apply {
-            addProfile(profile,0)
+            profileArray.forEachIndexed { index, profileDrawerItem ->
+                addProfile(profileDrawerItem, index)
+            }
+            // TODO: Add remove account option here
+            addProfile(ProfileSettingDrawerItem().apply { nameText = "Add Account"
+                descriptionText = "Add new Firefly III Account"
+                iconDrawable = IconicsDrawable(context, GoogleMaterial.Icon.gmd_add).apply {
+                    actionBar();
+                    paddingDp = 5
+                }.mutate()
+                isIconTinted = true
+                identifier = 100000
+            }, profileArray.size)
             withSavedInstance(savedInstanceState)
         }
         headerResult.accountHeaderBackground.setBackgroundColor(getCompatColor(R.color.colorAccent))
-
+        headerResult.onAccountHeaderListener = { view, profile, current ->
+            val switchedEmail = profile.name?.textString.toString()
+            globalViewModel.userEmail = switchedEmail
+            try {
+                FileWriter(applicationInfo.dataDir + "/current_active_user.txt", false).use { writer ->
+                    writer.write(switchedEmail)
+                }
+            } catch (e: IOException) { }
+            false
+        }
+        globalViewModel.userEmail = homeViewModel.userEmail
     }
-
 
     private fun setUpDrawer(savedInstanceState: Bundle?){
         val dashboard = PrimaryDrawerItem().apply {

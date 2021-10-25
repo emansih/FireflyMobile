@@ -46,6 +46,8 @@ import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.TypeConverterUtil
+import java.math.BigInteger
+import java.security.MessageDigest
 
 
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
@@ -75,16 +77,40 @@ abstract class AppDatabase: RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: Context): AppDatabase {
+        /*fun getInstance(context: Context, userEmail: String, userUrl: String): AppDatabase {
+            val md = MessageDigest.getInstance("MD5")
+            val md5Hash = BigInteger(1, md.digest((userEmail + "_" + userUrl).toByteArray())).toString(16).padStart(32, '0')
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(context,
-                        AppDatabase::class.java, Constants.DB_NAME)
+                        AppDatabase::class.java, "$md5Hash-photuris.db"
+                )
                         .setQueryExecutor(Dispatchers.IO.asExecutor())
                         .fallbackToDestructiveMigration()
                         .build().also { INSTANCE = it }
             }
+        }*/
+
+        fun getInstance(context: Context, userEmail: String): AppDatabase {
+           // val md = MessageDigest.getInstance("MD5")
+           // val md5Hash = BigInteger(1, md.digest((userEmail + "_" + userUrl).toByteArray())).toString(16).padStart(32, '0')
+            return INSTANCE ?: synchronized(this){
+                INSTANCE ?: Room.databaseBuilder(context,
+                    AppDatabase::class.java, "$userEmail-photuris.db"
+                )
+                    .setQueryExecutor(Dispatchers.IO.asExecutor())
+                    .fallbackToDestructiveMigration()
+                    .build().also { INSTANCE = it }
+            }
         }
 
-        fun clearDb(context: Context) = getInstance(context).clearAllTables()
+        fun destroyInstance(){
+            INSTANCE = null
+        }
+
+        /*fun clearDb(context: Context, userEmail: String, userUrl: String) =
+            getInstance(context, userEmail, userUrl).clearAllTables()*/
+
+        fun clearDb(context: Context, userEmail: String) =
+            getInstance(context, userEmail).clearAllTables()
     }
 }

@@ -36,7 +36,7 @@ import java.net.UnknownHostException
 class AddCategoryViewModel(application: Application): BaseViewModel(application) {
 
     private val categoryService by lazy { genericService().create(CategoryService::class.java) }
-    private val categoryDataDao = AppDatabase.getInstance(application).categoryDataDao()
+    private val categoryDataDao = AppDatabase.getInstance(application, getCurrentUserEmail()).categoryDataDao()
     private val repository = CategoryRepository(categoryDataDao, categoryService)
 
     fun getCategoryById(categoryId: Long): LiveData<CategoryData>{

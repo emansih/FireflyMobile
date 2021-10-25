@@ -35,7 +35,7 @@ import xyz.hisname.fireflyiii.repository.category.CategorySearchPageSearch
 class CategoriesDialogViewModel(application: Application): BaseViewModel(application) {
 
     private val categoryService = genericService().create(CategoryService::class.java)
-    private val categoryDao = AppDatabase.getInstance(application).categoryDataDao()
+    private val categoryDao = AppDatabase.getInstance(application, getCurrentUserEmail()).categoryDataDao()
     val categoryName = MutableLiveData<String>()
 
     // load everything on first load

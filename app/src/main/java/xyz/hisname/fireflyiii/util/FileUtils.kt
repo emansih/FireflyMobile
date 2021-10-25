@@ -216,3 +216,10 @@ fun Context.openFile(filePath: File): Intent{
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
     return Intent.createChooser(fileIntent, "Open File")
 }
+
+fun Context.getUserEmail(): String{
+    val activeUserFile = this.applicationInfo.dataDir + "/current_active_user.txt"
+    val bufferedReader = BufferedReader(FileReader(activeUserFile))
+    val userEmail = bufferedReader.readLine()
+    return userEmail ?: ""
+}

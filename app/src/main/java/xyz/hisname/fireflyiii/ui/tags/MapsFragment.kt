@@ -40,7 +40,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceManager
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
@@ -59,6 +58,7 @@ import xyz.hisname.fireflyiii.repository.models.nominatim.LocationSearchModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
+import xyz.hisname.fireflyiii.util.getUserEmail
 import java.io.File
 
 class MapsFragment: BaseFragment() {
@@ -96,7 +96,8 @@ class MapsFragment: BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+            Configuration.getInstance().load(requireContext(), requireContext().getSharedPreferences(
+            requireContext().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
         Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")

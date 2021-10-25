@@ -57,7 +57,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     private val transactionService = genericService().create(TransactionService::class.java)
 
     private val transactionRepository = TransactionRepository(
-            AppDatabase.getInstance(application).transactionDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao(),
             transactionService
     )
 
@@ -66,45 +66,45 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     )
 
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application).currencyDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
     private val accountRepository = AccountRepository(
-            AppDatabase.getInstance(application).accountDataDao(),
+            AppDatabase.getInstance(application, getCurrentUserEmail()).accountDataDao(),
             genericService().create(AccountsService::class.java)
     )
 
-    private val attachmentDao = AppDatabase.getInstance(getApplication()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
     private val attachmentService = genericService().create(AttachmentService::class.java)
     private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
 
 
     // We do lazy init here because a user might not type anything inside category edit text
     private val categoryRepository by lazy {
-        CategoryRepository(AppDatabase.getInstance(application).categoryDataDao(),
+        CategoryRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).categoryDataDao(),
                 genericService().create(CategoryService::class.java))
     }
     private val piggyRepository by lazy {
-        PiggyRepository(AppDatabase.getInstance(application).piggyDataDao(),
+        PiggyRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).piggyDataDao(),
                 genericService().create(PiggybankService::class.java))
     }
 
     private val billRepository by lazy {
-        BillRepository(AppDatabase.getInstance(application).billDataDao(),
+        BillRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao(),
             genericService().create(BillsService::class.java))
     }
 
     private val budgetService by lazy { genericService().create(BudgetService::class.java) }
-    private val spentDao by lazy { AppDatabase.getInstance(application).spentDataDao() }
-    private val budgetLimitDao by lazy { AppDatabase.getInstance(application).budgetLimitDao() }
-    private val budgetDao by lazy { AppDatabase.getInstance(application).budgetDataDao() }
-    private val budgetListDao by lazy { AppDatabase.getInstance(application).budgetListDataDao() }
+    private val spentDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).spentDataDao() }
+    private val budgetLimitDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).budgetLimitDao() }
+    private val budgetDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).budgetDataDao() }
+    private val budgetListDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).budgetListDataDao() }
     private val budgetRepository by lazy {
         BudgetRepository(budgetDao, budgetListDao, spentDao, budgetLimitDao, budgetService)
     }
 
     private val tagsRepository by lazy {
-        TagsRepository(AppDatabase.getInstance(application).tagsDataDao(),
+        TagsRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).tagsDataDao(),
                 genericService().create(TagsService::class.java))
     }
 

@@ -39,7 +39,7 @@ import xyz.hisname.fireflyiii.workers.account.DeleteAccountWorker
 class ListAccountViewModel(application: Application): BaseViewModel(application) {
 
     private val accountService = genericService().create(AccountsService::class.java)
-    private val accountsDataDao = AppDatabase.getInstance(getApplication()).accountDataDao()
+    private val accountsDataDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).accountDataDao()
     private val accountRepository = AccountRepository(accountsDataDao, accountService)
 
     fun getAccountList(accountType: String): LiveData<PagingData<AccountData>>{

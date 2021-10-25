@@ -27,10 +27,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
@@ -46,11 +44,11 @@ import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 class ListBillViewModel(application: Application): BaseViewModel(application) {
 
     private val billService = genericService().create(BillsService::class.java)
-    private val billDataDao = AppDatabase.getInstance(application).billDataDao()
-    private val billPaidDao = AppDatabase.getInstance(application).billPaidDao()
+    private val billDataDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao()
+    private val billPaidDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPaidDao()
     private val billRepository = BillRepository(billDataDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
-    private val billPayDao = AppDatabase.getInstance(application).billPayDao()
+    private val billPayDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPayDao()
 
     fun getBillList(): LiveData<PagingData<BillData>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
