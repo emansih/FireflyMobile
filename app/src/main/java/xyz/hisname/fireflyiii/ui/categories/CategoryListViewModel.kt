@@ -39,7 +39,7 @@ import xyz.hisname.fireflyiii.workers.category.DeleteCategoryWorker
 
 class CategoryListViewModel(application: Application): BaseViewModel(application) {
 
-    private val categoryDao = AppDatabase.getInstance(application, getCurrentUserEmail()).categoryDataDao()
+    private val categoryDao = AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao()
     private val categoryService = genericService().create(CategoryService::class.java)
     private val categoryRepository = CategoryRepository(categoryDao, categoryService)
 

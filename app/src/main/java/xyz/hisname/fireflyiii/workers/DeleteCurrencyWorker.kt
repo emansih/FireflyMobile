@@ -24,12 +24,12 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import java.time.Duration
 
 class DeleteCurrencyWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
-    private val currencyDatabase by lazy { AppDatabase.getInstance(context, getCurrentUserEmail()).currencyDataDao() }
+    private val currencyDatabase by lazy { AppDatabase.getInstance(context, getUniqueHash()).currencyDataDao() }
 
     companion object {
         fun initPeriodicWorker(currencyId: Long, context: Context) {
@@ -39,7 +39,8 @@ class DeleteCurrencyWorker(private val context: Context, workerParameters: Worke
                 val currencyData = Data.Builder()
                         .putLong("currencyId", currencyId)
                         .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString()
+                        + "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType

@@ -45,11 +45,11 @@ import java.io.File
 class PiggyDetailViewModel(application: Application): BaseViewModel(application) {
 
     private val piggyRepository = PiggyRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).piggyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).piggyDataDao(),
             genericService().create(PiggybankService::class.java)
     )
 
-    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getUniqueHash()).attachmentDataDao()
 
     var accountId: Long = 0
         private set

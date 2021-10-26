@@ -37,7 +37,7 @@ class CurrencyBottomSheetViewModel(application: Application): BaseViewModel(appl
     val currencyCode = MutableLiveData<String>()
     val currencyFullDetails = MutableLiveData<String>()
 
-    private val databaseInstance = AppDatabase.getInstance(application, getCurrentUserEmail())
+    private val databaseInstance = AppDatabase.getInstance(application, getUniqueHash())
     private val currencyDao = databaseInstance.currencyDataDao()
     private val currencyService = genericService().create(CurrencyService::class.java)
     private val currencyRemoteKeyDao = databaseInstance.currencyRemoteKeysDao()

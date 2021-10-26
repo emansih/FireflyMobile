@@ -31,17 +31,16 @@ import androidx.core.net.toUri
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.databinding.FragmentPatBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class PatFragment: Fragment() {
 
     private val sharedPref by lazy { requireContext().getSharedPreferences(
-        requireContext().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE) }
+        requireContext().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE) }
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
     private lateinit var fileUri: Uri
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>

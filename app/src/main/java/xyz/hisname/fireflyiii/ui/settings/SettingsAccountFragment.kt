@@ -47,6 +47,7 @@ import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -165,7 +166,7 @@ class SettingsAccountFragment: BaseSettings() {
         val logout = findPreference<Preference>("logout") as Preference
         logout.setOnPreferenceClickListener {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
-                AppDatabase.clearDb(requireContext(), globalViewModel.userEmail)
+                AppDatabase.clearDb(requireContext(), requireContext().getUniqueHash())
                 AppPref(sharedPref).clearPref()
                 accManager.destroyAccount()
             }

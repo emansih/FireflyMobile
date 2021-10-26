@@ -44,11 +44,11 @@ import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 class ListBillViewModel(application: Application): BaseViewModel(application) {
 
     private val billService = genericService().create(BillsService::class.java)
-    private val billDataDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao()
-    private val billPaidDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPaidDao()
+    private val billDataDao = AppDatabase.getInstance(application, getUniqueHash()).billDataDao()
+    private val billPaidDao = AppDatabase.getInstance(application, getUniqueHash()).billPaidDao()
     private val billRepository = BillRepository(billDataDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
-    private val billPayDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPayDao()
+    private val billPayDao = AppDatabase.getInstance(application, getUniqueHash()).billPayDao()
 
     fun getBillList(): LiveData<PagingData<BillData>> {
         return Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){

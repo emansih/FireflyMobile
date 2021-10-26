@@ -42,7 +42,7 @@ import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackChangedListener  {
 
@@ -59,7 +59,7 @@ class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackC
         setContentView(view)
         authActivityViewModel = getViewModel(AuthActivityViewModel::class.java)
         if(savedInstanceState == null){
-            val sharedPref = getSharedPreferences(getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
+            val sharedPref = getSharedPreferences(getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
             AppPref(sharedPref).isCustomCa = false
             supportFragmentManager.commit {
                 add(R.id.container, AuthChooserFragment())

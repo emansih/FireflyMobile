@@ -38,14 +38,13 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.databinding.FragmentLoginBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.getUserEmail
-
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class LoginFragment: Fragment() {
 
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
     private val sharedPref by lazy {  requireContext().getSharedPreferences(
-        requireContext().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE) }
+        requireContext().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE) }
     private var fileUri: Uri? = null
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var fragmentLoginBinding: FragmentLoginBinding? = null

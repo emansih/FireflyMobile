@@ -57,11 +57,11 @@ import java.time.LocalDate
 class BillDetailsViewModel(application: Application): BaseViewModel(application) {
 
 
-    private val billPayDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPayDao()
-    private val billDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao()
-    private val billPaidDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPaidDao()
-    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
-    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
+    private val billPayDao = AppDatabase.getInstance(application, getUniqueHash()).billPayDao()
+    private val billDao = AppDatabase.getInstance(application, getUniqueHash()).billDataDao()
+    private val billPaidDao = AppDatabase.getInstance(application, getUniqueHash()).billPaidDao()
+    private val transactionDao = AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getUniqueHash()).attachmentDataDao()
     private val billService = genericService().create(BillsService::class.java)
     private val billPayRepository = BillPayRepository(billPayDao, billService)
     private val billRepository = BillRepository(billDao, billService)

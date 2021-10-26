@@ -55,15 +55,15 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
 
     private val accountService = genericService().create(AccountsService::class.java)
 
-    private val accountRepository = AccountRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).accountDataDao(), accountService)
+    private val accountRepository = AccountRepository(AppDatabase.getInstance(application, getUniqueHash()).accountDataDao(), accountService)
 
-    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
+    private val transactionDao = AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao()
 
     private val transactionRepository = TransactionRepository(
             transactionDao, genericService().create(TransactionService::class.java)
     )
 
-    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getUniqueHash()).attachmentDataDao()
     private var accountType = ""
     var currencySymbol = ""
         private set

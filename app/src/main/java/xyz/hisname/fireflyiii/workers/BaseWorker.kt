@@ -19,19 +19,16 @@
 package xyz.hisname.fireflyiii.workers
 
 import android.accounts.AccountManager
-import android.app.Application
 import android.content.Context
-import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.CustomCa
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
+import java.util.*
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
@@ -40,12 +37,11 @@ abstract class BaseWorker(private val context: Context, workerParams: WorkerPara
     private val baseUrl by lazy { AppPref(sharedPref).baseUrl }
     private val accessToken by lazy { OldAuthenticatorManager(AccountManager.get(context)).accessToken }
     val genericService by lazy { FireflyClient.getClient(baseUrl,accessToken, AppPref(sharedPref).certValue, getTrust(), getSslSocket()) }
-    protected val sharedPref by lazy { context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)}
-    private val customCa by lazy { CustomCa(File(context.filesDir.path + "/user_custom.pem")) }
+    protected val sharedPref by lazy { context.getSharedPreferences(getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)}
+    private val customCa by lazy { CustomCa(File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem")) }
 
-    protected fun getCurrentUserEmail(): String{
-        val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-        return bufferedReader.readLine()
+    protected fun getUniqueHash(): UUID {
+        return context.getUniqueHash()
     }
 
     private fun getTrust(): X509TrustManager?{

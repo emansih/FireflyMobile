@@ -34,10 +34,8 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
-import java.io.BufferedReader
-import java.io.FileReader
 import java.math.BigDecimal
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
@@ -79,7 +77,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                     WorkManager.getInstance(context).getWorkInfosByTag(
                             "add_periodic_account_$accountName" + "_" + accountType).get()
             if(accountTag == null || accountTag.size == 0){
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() +
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() +
                         "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
@@ -96,10 +94,8 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                         .build()
                 WorkManager.getInstance(context).enqueue(accountWork)
                 runBlocking(Dispatchers.IO) {
-                    val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-                    val userEmail = bufferedReader.readLine()
-                    val accountDatabase = AppDatabase.getInstance(context, userEmail).accountDataDao()
-                    val currencyDatabase = AppDatabase.getInstance(context, userEmail).currencyDataDao()
+                    val accountDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).accountDataDao()
+                    val currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
                     val currencyData =
                                 currencyDatabase.getCurrencyByCode(currencyCode ?: "")[0]
                     val currencySymbol = currencyData.currencyAttributes.symbol
@@ -121,9 +117,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
 
         fun cancelWorker(accountName: String, accountType: String, context: Context){
             runBlocking(Dispatchers.IO) {
-                val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-                val userEmail = bufferedReader.readLine()
-                val accountDatabase = AppDatabase.getInstance(context, userEmail).accountDataDao()
+                val accountDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).accountDataDao()
                 accountDatabase.deleteAccountByTypeAndName(accountType, accountName)
                 accountDatabase
             }
@@ -152,7 +146,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val notes = inputData.getString("notes")
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val accountRepository = AccountRepository(
-                AppDatabase.getInstance(context, getCurrentUserEmail()).accountDataDao(),
+                AppDatabase.getInstance(context, getUniqueHash()).accountDataDao(),
                 genericService.create(AccountsService::class.java)
         )
         val addAccount = accountRepository.addAccount(name, accountType, currencyCode,

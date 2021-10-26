@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
 import android.accounts.AccountManager
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
@@ -40,12 +41,10 @@ import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
 
 class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTransactionOutput>() {
 
@@ -80,14 +79,12 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
 
     override fun run(context: Context, input: TaskerInput<GetTransactionInput>): TaskerPluginResult<GetTransactionOutput> {
         replaceVariable(input)
-        val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-        val userEmail = bufferedReader.readLine()
-        transactionDatabase = AppDatabase.getInstance(context, userEmail).transactionDataDao()
-        currencyDatabase = AppDatabase.getInstance(context, userEmail).currencyDataDao()
+        transactionDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).transactionDataDao()
+        currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
         accountManager = OldAuthenticatorManager(AccountManager.get(context))
         sharedPref = context.getSharedPreferences(
-            context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
-        customCa = CustomCa(File(context.filesDir.path + "/user_custom.pem"))
+            context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
+        customCa = CustomCa(File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem"))
         val transactionType = input.regular.transactionType ?: ""
         val transactionDescription = input.regular.transactionDescription ?: ""
         val transactionAmount = input.regular.transactionAmount ?: ""

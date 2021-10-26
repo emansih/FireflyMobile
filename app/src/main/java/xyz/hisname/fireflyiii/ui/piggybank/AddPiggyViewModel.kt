@@ -52,15 +52,15 @@ import java.net.UnknownHostException
 class AddPiggyViewModel(application: Application): BaseViewModel(application) {
 
     private val piggyRepository = PiggyRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).piggyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).piggyDataDao(),
             genericService().create(PiggybankService::class.java)
     )
 
     private val accountRepository = AccountRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).accountDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).accountDataDao(),
             genericService().create(AccountsService::class.java)
     )
-    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getUniqueHash()).attachmentDataDao()
     private val attachmentService = genericService().create(AttachmentService::class.java)
     private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
     private val shadowAccountList = arrayListOf<String>()

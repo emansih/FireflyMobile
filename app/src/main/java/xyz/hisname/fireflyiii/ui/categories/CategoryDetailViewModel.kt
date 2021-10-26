@@ -44,8 +44,8 @@ import xyz.hisname.fireflyiii.workers.category.DeleteCategoryWorker
 class CategoryDetailViewModel(application: Application): BaseViewModel(application) {
 
     private val categoryService = genericService().create(CategoryService::class.java)
-    private val categoryDao = AppDatabase.getInstance(application, getCurrentUserEmail()).categoryDataDao()
-    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
+    private val categoryDao = AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao()
+    private val transactionDao = AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao()
     private val categoryRepository = CategoryRepository(categoryDao, categoryService, transactionDao)
     private var catId: Long = 0L
     val withdrawData: MutableLiveData<List<Float>> = MutableLiveData()

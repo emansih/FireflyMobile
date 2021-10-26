@@ -33,7 +33,7 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.io.BufferedReader
@@ -56,7 +56,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val group = inputData.getString("group") ?: ""
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val piggyWorkManagerId = inputData.getLong("piggyWorkManagerId", 0)
-        val piggyRepository = PiggyRepository(AppDatabase.getInstance(context, getCurrentUserEmail()).piggyDataDao(),
+        val piggyRepository = PiggyRepository(AppDatabase.getInstance(context, getUniqueHash()).piggyDataDao(),
                 genericService.create(PiggybankService::class.java))
         val addPiggy = piggyRepository.addPiggyBank(name, accountId.toLong(), targetAmount,
                 currentAmount, startDate, endDate, notes, group)
@@ -119,7 +119,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             val piggyTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_piggy_periodic_$piggyWorkManagerId").get()
             if(piggyTag == null || piggyTag.size == 0){
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
@@ -135,12 +135,10 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                         .build()
                 WorkManager.getInstance(context).enqueue(piggyBankWork)
                 runBlocking(Dispatchers.IO){
-                    val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-                    val userEmail = bufferedReader.readLine()
-                    val piggyDatabase = AppDatabase.getInstance(context, userEmail).piggyDataDao()
-                    val accountDatabase = AppDatabase.getInstance(context, userEmail).accountDataDao()
+                    val piggyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).piggyDataDao()
+                    val accountDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).accountDataDao()
                     val account = accountDatabase.getAccountById(accountId.toLong())
-                    val defaultCurrency = AppDatabase.getInstance(context, userEmail).currencyDataDao().getDefaultCurrency()
+                    val defaultCurrency = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao().getDefaultCurrency()
                     val currencyCode = defaultCurrency.currencyAttributes.code
                     val currencySymbol = defaultCurrency.currencyAttributes.symbol
                     val currencyDp = defaultCurrency.currencyAttributes.decimal_places
@@ -162,9 +160,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
 
         fun cancelWorker(piggyId: Long, context: Context){
             runBlocking(Dispatchers.IO){
-                val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-                val userEmail = bufferedReader.readLine()
-                val piggyDatabase = AppDatabase.getInstance(context, userEmail).piggyDataDao()
+                val piggyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).piggyDataDao()
                 piggyDatabase.deletePiggyById(piggyId)
             }
             WorkManager.getInstance(context).cancelAllWorkByTag("add_piggy_periodic_$piggyId")

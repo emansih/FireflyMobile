@@ -22,16 +22,17 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import androidx.preference.PreferenceManager
 import androidx.preference.PreferenceFragmentCompat
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 abstract class BaseSettings: PreferenceFragmentCompat() {
 
-    protected val sharedPref by lazy { requireContext().getSharedPreferences(
-        requireContext().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE) }
+    protected val sharedPref by lazy {
+        requireContext().getSharedPreferences(
+        requireContext().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
+    }
     protected val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
     override fun setDivider(divider: Drawable) {
         super.setDivider(ColorDrawable(Color.GRAY))

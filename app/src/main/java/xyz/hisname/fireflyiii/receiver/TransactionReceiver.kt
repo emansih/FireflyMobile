@@ -38,9 +38,7 @@ import xyz.hisname.fireflyiii.workers.transaction.TransactionWorker
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUserEmail
-import java.io.BufferedReader
-import java.io.FileReader
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import java.time.OffsetDateTime
 import java.util.concurrent.ThreadLocalRandom
 
@@ -49,7 +47,7 @@ class TransactionReceiver: BroadcastReceiver()  {
 
     override fun onReceive(context: Context, intent: Intent) {
 
-        if(AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences",
+        if(AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences",
                 Context.MODE_PRIVATE)).baseUrl.isBlank()){
             val onboarding = Intent(context, AuthActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -92,8 +90,8 @@ class TransactionReceiver: BroadcastReceiver()  {
                     .putString("destinationName", destinationName)
                     .putString("piggyBankName",piggyBank)
                     .putString("notes", notes)
-            val transactionDatabase = AppDatabase.getInstance(context, getCurrentUserEmail(context)).transactionDataDao()
-            val currencyDatabase = AppDatabase.getInstance(context, getCurrentUserEmail(context)).currencyDataDao()
+            val transactionDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).transactionDataDao()
+            val currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
             var currency: CurrencyData
             runBlocking(Dispatchers.IO) {
                 currency = currencyDatabase.getCurrencyByCode(intent.getStringExtra("currency") ?: "")[0]
@@ -147,10 +145,5 @@ class TransactionReceiver: BroadcastReceiver()  {
                 )
             }
         }
-    }
-
-    private fun getCurrentUserEmail(context: Context): String{
-        val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-        return bufferedReader.readLine()
     }
 }

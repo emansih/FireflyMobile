@@ -196,11 +196,7 @@ class HomeActivity: BaseActivity(){
         headerResult.onAccountHeaderListener = { view, profile, current ->
             val switchedEmail = profile.name?.textString.toString()
             globalViewModel.userEmail = switchedEmail
-            try {
-                FileWriter(applicationInfo.dataDir + "/current_active_user.txt", false).use { writer ->
-                    writer.write(switchedEmail)
-                }
-            } catch (e: IOException) { }
+            homeViewModel.updateActiveUser(switchedEmail)
             false
         }
         globalViewModel.userEmail = homeViewModel.userEmail

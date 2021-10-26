@@ -34,7 +34,7 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 class ListTagsViewModel(application: Application): BaseViewModel(application) {
 
     private val tagsRepository = TagsRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).tagsDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
             genericService().create(TagsService::class.java)
     )
 

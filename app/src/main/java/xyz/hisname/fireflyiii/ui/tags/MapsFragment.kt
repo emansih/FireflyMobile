@@ -58,7 +58,7 @@ import xyz.hisname.fireflyiii.repository.models.nominatim.LocationSearchModel
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import java.io.File
 
 class MapsFragment: BaseFragment() {
@@ -97,7 +97,7 @@ class MapsFragment: BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
             Configuration.getInstance().load(requireContext(), requireContext().getSharedPreferences(
-            requireContext().getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+            requireContext().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().osmdroidBasePath = requireContext().filesDir
         Configuration.getInstance().osmdroidTileCache = File(requireContext().filesDir.toString() + "/tiles")

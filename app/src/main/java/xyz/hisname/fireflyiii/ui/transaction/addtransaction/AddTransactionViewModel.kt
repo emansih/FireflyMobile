@@ -57,7 +57,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     private val transactionService = genericService().create(TransactionService::class.java)
 
     private val transactionRepository = TransactionRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao(),
             transactionService
     )
 
@@ -66,45 +66,45 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     )
 
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
     private val accountRepository = AccountRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).accountDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).accountDataDao(),
             genericService().create(AccountsService::class.java)
     )
 
-    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getUniqueHash()).attachmentDataDao()
     private val attachmentService = genericService().create(AttachmentService::class.java)
     private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
 
 
     // We do lazy init here because a user might not type anything inside category edit text
     private val categoryRepository by lazy {
-        CategoryRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).categoryDataDao(),
+        CategoryRepository(AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao(),
                 genericService().create(CategoryService::class.java))
     }
     private val piggyRepository by lazy {
-        PiggyRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).piggyDataDao(),
+        PiggyRepository(AppDatabase.getInstance(application, getUniqueHash()).piggyDataDao(),
                 genericService().create(PiggybankService::class.java))
     }
 
     private val billRepository by lazy {
-        BillRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao(),
+        BillRepository(AppDatabase.getInstance(application, getUniqueHash()).billDataDao(),
             genericService().create(BillsService::class.java))
     }
 
     private val budgetService by lazy { genericService().create(BudgetService::class.java) }
-    private val spentDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).spentDataDao() }
-    private val budgetLimitDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).budgetLimitDao() }
-    private val budgetDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).budgetDataDao() }
-    private val budgetListDao by lazy { AppDatabase.getInstance(application, getCurrentUserEmail()).budgetListDataDao() }
+    private val spentDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).spentDataDao() }
+    private val budgetLimitDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).budgetLimitDao() }
+    private val budgetDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).budgetDataDao() }
+    private val budgetListDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).budgetListDataDao() }
     private val budgetRepository by lazy {
         BudgetRepository(budgetDao, budgetListDao, spentDao, budgetLimitDao, budgetService)
     }
 
     private val tagsRepository by lazy {
-        TagsRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).tagsDataDao(),
+        TagsRepository(AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
                 genericService().create(TagsService::class.java))
     }
 

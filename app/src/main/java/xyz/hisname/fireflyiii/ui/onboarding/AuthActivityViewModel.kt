@@ -57,7 +57,9 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
 
     private val applicationContext = getApplication<Application>()
     private val accountManager = AccountManager.get(applicationContext)
-    private val customCaFile by lazy { File(applicationContext.filesDir.toString() + File.pathSeparator +  "user_custom.pem") }
+    private val customCaFile by lazy {
+        File(getApplication<Application>().filesDir.path + "/" + getUniqueHash() + ".pem")
+    }
     private val systemInfoRepository by lazy { SystemInfoRepository(
             genericService().create(SystemInfoService::class.java),
             sharedPref, newManager)
@@ -79,7 +81,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             FileUtils.saveCaFile(fileUri, getApplication())
         }
         authInit(accessToken, baseUrl)
-        val accountDao = AppDatabase.getInstance(applicationContext, getCurrentUserEmail()).accountDataDao()
+        val accountDao = AppDatabase.getInstance(applicationContext, getUniqueHash()).accountDataDao()
         val accountsService = genericService().create(AccountsService::class.java)
         repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){

@@ -46,9 +46,9 @@ import java.io.File
 class TransactionDetailsViewModel(application: Application): BaseViewModel(application) {
 
     private val transactionService = genericService().create(TransactionService::class.java)
-    private val transactionDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
+    private val transactionDao = AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao()
     private val transactionRepository = TransactionRepository(transactionDao, transactionService)
-    private val attachmentDao =  AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
+    private val attachmentDao =  AppDatabase.getInstance(getApplication(), getUniqueHash()).attachmentDataDao()
     val transactionAttachment = MutableLiveData<List<AttachmentData>>()
 
     fun duplicationTransactionByJournalId(journalId: Long, fileUri: List<Uri>): MutableLiveData<String>{

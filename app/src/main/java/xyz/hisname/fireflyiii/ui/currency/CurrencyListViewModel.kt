@@ -35,7 +35,7 @@ import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
 
 class CurrencyListViewModel(application: Application): BaseViewModel(application) {
 
-    private val databaseInstance = AppDatabase.getInstance(application, getCurrentUserEmail())
+    private val databaseInstance = AppDatabase.getInstance(application, getUniqueHash())
     private val currencyDao = databaseInstance.currencyDataDao()
     private val currencyService = genericService().create(CurrencyService::class.java)
     private val currencyRepository = CurrencyRepository(currencyDao, currencyService)

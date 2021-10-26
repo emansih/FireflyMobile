@@ -22,7 +22,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import androidx.preference.PreferenceManager
 import androidx.work.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
@@ -31,9 +30,8 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.util.FileUtils
-import xyz.hisname.fireflyiii.util.extension.downloadFile
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class AttachmentWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
@@ -41,7 +39,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
 
     companion object {
         fun initWorker(fileUri: List<Uri>, objectId: Long, context: Context, attachableType: AttachableType): LiveData<List<WorkInfo>> {
-            val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+            val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
             val battery = appPref.workManagerLowBattery
             val networkType = appPref.workManagerNetworkType
             val requireCharging = appPref.workManagerRequireCharging
@@ -75,7 +73,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
         val objectId = inputData.getLong("objectId", 0)
         val fileUri = inputData.getString("fileUri")
         val service = genericService.create(AttachmentService::class.java)
-        val attachmentDao = AppDatabase.getInstance(context, getCurrentUserEmail()).attachmentDataDao()
+        val attachmentDao = AppDatabase.getInstance(context, context.getUniqueHash()).attachmentDataDao()
         val attachmentRepository = AttachmentRepository(attachmentDao, service)
         val fileName = FileUtils.getFileName(context, fileUri?.toUri() ?: Uri.EMPTY)
         try {

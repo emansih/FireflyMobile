@@ -32,7 +32,7 @@ import xyz.hisname.fireflyiii.databinding.CurrencyListBinding
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
 import xyz.hisname.fireflyiii.util.Flags
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
                               private val clickListener:(CurrencyData) -> Unit):
@@ -40,7 +40,7 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
 
     private lateinit var context: Context
     private val isThumbnailEnabled by lazy {
-        AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)).isCurrencyThumbnailEnabled
+        AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)).isCurrencyThumbnailEnabled
     }
     private var currencyListBinding: CurrencyListBinding? = null
     private val binding get() = currencyListBinding!!

@@ -30,8 +30,9 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
+import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import java.io.*
+import java.util.*
 
 // https://gist.github.com/micer/ae5de2984dbbdb386dd262782cfdb39c
 class FileUtils {
@@ -64,11 +65,11 @@ class FileUtils {
         fun saveCaFile(fileUri: Uri, context: Context) {
             var count: Int
             val data = ByteArray(4096)
-            val fileDestination = "user_custom.pem"
+            val fileDestination = context.getUniqueHash().toString() + ".pem"
             val inputStream = context.contentResolver.openInputStream(fileUri)
             context.deleteFile(fileDestination)
             val bufferredInputStream = BufferedInputStream(inputStream, 8192)
-            val output = FileOutputStream(context.filesDir.toString() + "/user_custom.pem")
+            val output = FileOutputStream(context.filesDir.toString() + "/" + context.getUniqueHash() + ".pem")
             while (bufferredInputStream.read(data).also { count = it } != -1) {
                 output.write(data, 0, count)
             }
@@ -217,9 +218,8 @@ fun Context.openFile(filePath: File): Intent{
     return Intent.createChooser(fileIntent, "Open File")
 }
 
-fun Context.getUserEmail(): String{
-    val activeUserFile = this.applicationInfo.dataDir + "/current_active_user.txt"
-    val bufferedReader = BufferedReader(FileReader(activeUserFile))
-    val userEmail = bufferedReader.readLine()
-    return userEmail ?: ""
+fun Context.getUniqueHash(): UUID {
+    return UUID.fromString(
+        FireflyUserDatabase.getInstance(this).fireflyUserDao().getCurrentActiveUserEmail()
+    )
 }

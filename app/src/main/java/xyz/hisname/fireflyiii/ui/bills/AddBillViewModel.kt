@@ -48,15 +48,15 @@ import java.net.UnknownHostException
 class AddBillViewModel(application: Application): BaseViewModel(application) {
 
     private val billRepository = BillRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).billDataDao(),
             genericService().create(BillsService::class.java)
     )
 
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
-    private val attachmentDao = AppDatabase.getInstance(getApplication(), getCurrentUserEmail()).attachmentDataDao()
+    private val attachmentDao = AppDatabase.getInstance(getApplication(), getUniqueHash()).attachmentDataDao()
     private val attachmentService = genericService().create(AttachmentService::class.java)
     private val attachmentRepository = AttachmentRepository(attachmentDao, attachmentService)
 

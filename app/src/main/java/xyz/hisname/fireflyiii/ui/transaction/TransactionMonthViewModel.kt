@@ -25,7 +25,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
@@ -35,7 +34,6 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.transaction.SplitSeparator
-import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionPagingSource
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.util.DateTimeUtil
@@ -46,11 +44,11 @@ import java.math.RoundingMode
 class TransactionMonthViewModel(application: Application): BaseViewModel(application) {
 
 
-    private val transactionDataDao = AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao()
+    private val transactionDataDao = AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao()
     private val transactionService = genericService().create(TransactionService::class.java)
     private val transactionRepository = TransactionRepository(transactionDataDao, transactionService)
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
 

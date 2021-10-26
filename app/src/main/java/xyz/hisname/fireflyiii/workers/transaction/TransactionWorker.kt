@@ -40,7 +40,7 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.io.BufferedReader
@@ -55,7 +55,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
     override suspend fun doWork(): Result {
         val transactionService =  genericService.create(TransactionService::class.java)
         val transactionRepository = TransactionRepository(
-                AppDatabase.getInstance(context, getCurrentUserEmail()).transactionDataDao(), transactionService)
+                AppDatabase.getInstance(context, getUniqueHash()).transactionDataDao(), transactionService)
         val tempRepository = TransactionRepository(
                 TmpDatabase.getInstance(context).transactionDataDao(), transactionService)
         val masterTransactionId = inputData.getLong("masterTransactionId", 0)
@@ -202,7 +202,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
             val transactionTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_transaction_$transactionWorkManagerId").get()
             if (transactionTag == null || transactionTag.size == 0) {
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
@@ -228,7 +228,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
             val transactionTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_transaction_$masterTransactionId").get()
             if (transactionTag == null || transactionTag.size == 0) {
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
@@ -251,10 +251,8 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         }
 
         fun cancelWorker(fakeTransactionId: Long, context: Context){
-            val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-            val currentEmail = bufferedReader.readLine()
             runBlocking(Dispatchers.IO) {
-                val transactionDatabase = AppDatabase.getInstance(context, currentEmail).transactionDataDao()
+                val transactionDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).transactionDataDao()
                 transactionDatabase.deleteTransactionByJournalId(fakeTransactionId)
             }
             WorkManager.getInstance(context).cancelAllWorkByTag("add_periodic_transaction_$fakeTransactionId")

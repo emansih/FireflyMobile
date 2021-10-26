@@ -34,10 +34,8 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
-import java.io.BufferedReader
-import java.io.FileReader
 import java.time.Duration
 import java.time.LocalDate
 import java.util.concurrent.ThreadLocalRandom
@@ -58,7 +56,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val billWorkManagerId = inputData.getLong("billWorkManagerId", 0)
         val billRepository = BillRepository(
-                AppDatabase.getInstance(context, getCurrentUserEmail()).billDataDao(),
+                AppDatabase.getInstance(context, getUniqueHash()).billDataDao(),
                 genericService.create(BillsService::class.java)
         )
 
@@ -122,7 +120,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
             val billTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_bill_periodic_$billWorkManagerId").get()
             if(billTag == null || billTag.size == 0) {
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
@@ -138,10 +136,8 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                         .build()
                 WorkManager.getInstance(context).enqueue(billWork)
                 runBlocking(Dispatchers.IO){
-                    val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-                    val userEmail = bufferedReader.readLine()
-                    val billDatabase = AppDatabase.getInstance(context, userEmail).billDataDao()
-                    val currencyDatabase = AppDatabase.getInstance(context, userEmail).currencyDataDao()
+                    val billDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).billDataDao()
+                    val currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
                     val currency = currencyDatabase.getCurrencyByCode(currencyCode)[0]
                     billDatabase.insert(
                             BillData(
@@ -160,9 +156,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
 
         fun cancelWorker(billId: Long, context: Context){
             runBlocking(Dispatchers.IO){
-                val bufferedReader = BufferedReader(FileReader(context.applicationInfo.dataDir + "/current_active_user.txt"))
-                val userEmail = bufferedReader.readLine()
-                val billDatabase = AppDatabase.getInstance(context, userEmail).billDataDao()
+                val billDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).billDataDao()
                 billDatabase.deleteBillById(billId)
             }
             WorkManager.getInstance(context).cancelAllWorkByTag("add_bill_periodic_$billId")

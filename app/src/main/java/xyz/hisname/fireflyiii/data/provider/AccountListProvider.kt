@@ -27,6 +27,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
+import java.util.*
 
 class AccountListProvider: ContentProvider() {
 
@@ -46,7 +48,11 @@ class AccountListProvider: ContentProvider() {
                        selectionArgs: Array<out String>?, sortOrder: String?): Cursor? {
         if (uriMatcher.match(uri) != -1){
             context?.let { nonNullContext ->
-                val accountDao = AppDatabase.getInstance(nonNullContext, "").accountDataDao()
+                val accountDao = AppDatabase.getInstance(nonNullContext,
+                    UUID.fromString(
+                        FireflyUserDatabase.getInstance(nonNullContext)
+                            .fireflyUserDao().getUniqueHash())
+                ).accountDataDao()
                 return accountDao.getAssetAccountCursor()
             }
         }

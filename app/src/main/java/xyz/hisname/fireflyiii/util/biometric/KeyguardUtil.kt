@@ -22,7 +22,7 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class KeyguardUtil(private val activity: Activity) {
 
@@ -33,7 +33,7 @@ class KeyguardUtil(private val activity: Activity) {
 
     fun isAppKeyguardEnabled(): Boolean{
         return AppPref(activity.getSharedPreferences(
-            activity.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)).isKeyguardEnabled
+            activity.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)).isKeyguardEnabled
     }
 
 }

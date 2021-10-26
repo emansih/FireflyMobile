@@ -49,16 +49,16 @@ import java.io.File
 class TagDetailsViewModel(application: Application): BaseViewModel(application) {
 
     private val tagsRepository = TagsRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).tagsDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
             genericService().create(TagsService::class.java)
     )
 
     private val transactionRepository = TransactionRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).transactionDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao(),
             genericService().create(TransactionService::class.java)
     )
 
-    private val currencyRepository = CurrencyRepository(AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
+    private val currencyRepository = CurrencyRepository(AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
             genericService().create(CurrencyService::class.java)
     )
 

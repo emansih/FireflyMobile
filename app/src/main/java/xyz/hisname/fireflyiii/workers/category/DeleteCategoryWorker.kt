@@ -24,7 +24,7 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
@@ -32,7 +32,7 @@ import java.time.Duration
 
 class DeleteCategoryWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val categoryDao by lazy { AppDatabase.getInstance(context, getCurrentUserEmail()).categoryDataDao() }
+    private val categoryDao by lazy { AppDatabase.getInstance(context, getUniqueHash()).categoryDataDao() }
 
     companion object {
         fun initPeriodicWorker(categoryId: Long, context: Context) {
@@ -42,7 +42,7 @@ class DeleteCategoryWorker(private val context: Context, workerParameters: Worke
                 val categoryData = Data.Builder()
                         .putLong("categoryId", categoryId)
                         .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType

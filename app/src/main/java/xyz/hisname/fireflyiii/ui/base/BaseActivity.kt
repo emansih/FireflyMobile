@@ -29,7 +29,7 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.languagepack.LanguageChanger
 
 @SuppressLint("Registered")
@@ -69,6 +69,6 @@ open class BaseActivity: AppCompatActivity() {
 
     protected fun sharedPref(context: Context): AppPref{
         return AppPref(context.getSharedPreferences(
-            getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+            getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
     }
 }

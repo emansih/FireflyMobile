@@ -24,7 +24,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import java.io.File
 
 fun Application.downloadFile(accessToken: String, attachmentData: AttachmentData, fileToOpen: File){
@@ -32,7 +32,7 @@ fun Application.downloadFile(accessToken: String, attachmentData: AttachmentData
     val request = DownloadManager.Request(attachmentData.attachmentAttributes.download_url)
     request.addRequestHeader("Authorization", "Bearer $accessToken")
     request.setTitle("Downloading " + attachmentData.attachmentAttributes.filename)
-    val sharedPref = this.getSharedPreferences(this.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
+    val sharedPref = this.getSharedPreferences(this.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
     val userPref = AppPref(sharedPref).userDefinedDownloadDirectory
     val userDirectory = if(userPref.isEmpty()){
         File(getExternalFilesDir(null).toString()).toString()

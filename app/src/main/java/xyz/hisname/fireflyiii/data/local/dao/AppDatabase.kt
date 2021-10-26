@@ -25,7 +25,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentData
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
@@ -46,8 +45,7 @@ import xyz.hisname.fireflyiii.repository.models.tags.TagsData
 import xyz.hisname.fireflyiii.repository.models.transaction.TransactionIndex
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.util.TypeConverterUtil
-import java.math.BigInteger
-import java.security.MessageDigest
+import java.util.*
 
 
 @Database(entities = [PiggyData::class, PiggyFts::class, BillData::class, AccountData::class, CurrencyData::class,
@@ -77,25 +75,10 @@ abstract class AppDatabase: RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
 
-        /*fun getInstance(context: Context, userEmail: String, userUrl: String): AppDatabase {
-            val md = MessageDigest.getInstance("MD5")
-            val md5Hash = BigInteger(1, md.digest((userEmail + "_" + userUrl).toByteArray())).toString(16).padStart(32, '0')
+        fun getInstance(context: Context, randomHash: UUID): AppDatabase {
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(context,
-                        AppDatabase::class.java, "$md5Hash-photuris.db"
-                )
-                        .setQueryExecutor(Dispatchers.IO.asExecutor())
-                        .fallbackToDestructiveMigration()
-                        .build().also { INSTANCE = it }
-            }
-        }*/
-
-        fun getInstance(context: Context, userEmail: String): AppDatabase {
-           // val md = MessageDigest.getInstance("MD5")
-           // val md5Hash = BigInteger(1, md.digest((userEmail + "_" + userUrl).toByteArray())).toString(16).padStart(32, '0')
-            return INSTANCE ?: synchronized(this){
-                INSTANCE ?: Room.databaseBuilder(context,
-                    AppDatabase::class.java, "$userEmail-photuris.db"
+                    AppDatabase::class.java, "$randomHash-photuris.db"
                 )
                     .setQueryExecutor(Dispatchers.IO.asExecutor())
                     .fallbackToDestructiveMigration()
@@ -107,10 +90,7 @@ abstract class AppDatabase: RoomDatabase() {
             INSTANCE = null
         }
 
-        /*fun clearDb(context: Context, userEmail: String, userUrl: String) =
-            getInstance(context, userEmail, userUrl).clearAllTables()*/
-
-        fun clearDb(context: Context, userEmail: String) =
-            getInstance(context, userEmail).clearAllTables()
+        fun clearDb(context: Context, randomHash: UUID) =
+            getInstance(context, randomHash).clearAllTables()
     }
 }

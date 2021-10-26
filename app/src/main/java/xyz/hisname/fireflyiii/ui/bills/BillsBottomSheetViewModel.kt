@@ -39,14 +39,14 @@ import java.math.BigDecimal
 class BillsBottomSheetViewModel(application: Application): BaseViewModel(application) {
 
     private val billService = genericService().create(BillsService::class.java)
-    private val billDataDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billDataDao()
-    private val billPaidDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPaidDao()
-    private val billPayDao = AppDatabase.getInstance(application, getCurrentUserEmail()).billPayDao()
+    private val billDataDao = AppDatabase.getInstance(application, getUniqueHash()).billDataDao()
+    private val billPaidDao = AppDatabase.getInstance(application, getUniqueHash()).billPaidDao()
+    private val billPayDao = AppDatabase.getInstance(application, getUniqueHash()).billPayDao()
     private val billRepository = BillRepository(billDataDao, billService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billService)
 
     private val currencyRepository = CurrencyRepository(
-            AppDatabase.getInstance(application, getCurrentUserEmail()).currencyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
             genericService().create(CurrencyService::class.java))
     val billPayableToday = MutableLiveData<String>()
 

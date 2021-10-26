@@ -25,7 +25,7 @@ import android.os.Bundle
 import android.widget.RemoteViews
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.SimpleData
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class BalanceWidget: AppWidgetProvider() {
 
@@ -43,7 +43,7 @@ class BalanceWidget: AppWidgetProvider() {
     }
 
     private fun simpleData(context: Context): SimpleData{
-        return SimpleData(context.getSharedPreferences(context.getUserEmail() + "-user-preferences",
+        return SimpleData(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences",
             Context.MODE_PRIVATE))
     }
 

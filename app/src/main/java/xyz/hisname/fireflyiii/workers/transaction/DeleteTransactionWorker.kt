@@ -24,14 +24,14 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
 
 class DeleteTransactionWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val transactionDatabase by lazy { AppDatabase.getInstance(context, getCurrentUserEmail()).transactionDataDao() }
+    private val transactionDatabase by lazy { AppDatabase.getInstance(context, getUniqueHash()).transactionDataDao() }
 
     override suspend fun doWork(): Result {
         val transactionId = inputData.getLong("transactionId", 0)
@@ -59,7 +59,7 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
                 val transactionData = Data.Builder()
                         .putLong("transactionId", transactionId)
                         .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType

@@ -20,7 +20,6 @@ package xyz.hisname.fireflyiii.util.extension
 
 import android.app.Activity
 import android.content.Context
-import androidx.preference.PreferenceManager
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.annotation.StringRes
@@ -29,7 +28,7 @@ import me.toptas.fancyshowcase.FocusShape
 import me.toptas.fancyshowcase.listener.DismissListener
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
-import xyz.hisname.fireflyiii.util.getUserEmail
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import androidx.fragment.app.Fragment as SupportFragment
 
 
@@ -43,7 +42,7 @@ fun Activity.showCase(@StringRes title: Int, showOnce: String, layout: View,  fi
                       dismissListener: DismissListener? = null): FancyShowCaseView{
     val enterAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_from_left)
     val exitAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_to_right)
-    val sharedPref = this.getSharedPreferences(this.getUserEmail() + "-user-preferences", Context.MODE_PRIVATE)
+    val sharedPref = this.getSharedPreferences(this.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
     val showCaseView = FancyShowCaseView.Builder(this)
             .focusOn(layout)
             .title(resources.getString(title))
