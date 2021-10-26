@@ -74,6 +74,10 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
         return count
     }
 
+    fun getFireflyUsers(): List<FireflyUsers>{
+        return FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getAllUser()
+    }
+
     fun migrateFirefly(){
         /* Migration routine:
          * 1. Check if old database exists(firefly.db)

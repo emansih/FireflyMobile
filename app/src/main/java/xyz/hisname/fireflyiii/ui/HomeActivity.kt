@@ -18,13 +18,11 @@
 
 package xyz.hisname.fireflyiii.ui
 
-import android.accounts.AccountManager
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
@@ -43,7 +41,6 @@ import com.mikepenz.materialdrawer.model.*
 import com.mikepenz.materialdrawer.model.interfaces.*
 import com.mikepenz.materialdrawer.widget.AccountHeaderView
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.databinding.ActivityBaseBinding
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
@@ -63,8 +60,6 @@ import xyz.hisname.fireflyiii.util.biometric.Authenticator
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
 import xyz.hisname.fireflyiii.util.extension.*
 import java.io.File
-import java.io.FileWriter
-import java.io.IOException
 
 
 class HomeActivity: BaseActivity(){
@@ -159,29 +154,23 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
-        val sharedPrefDir = File(applicationInfo.dataDir + "/shared_prefs")
-        val fileList = sharedPrefDir.listFiles()
         val profileArray = arrayListOf<ProfileDrawerItem>()
-        fileList?.forEach { file ->
-            val fileName = file.name
-            if(fileName.endsWith("-user-preferences.xml")){
-                val userEmailFromPref = fileName.dropLast(21)
-                profileArray.add(
-                    ProfileDrawerItem().apply {
-                        nameText = userEmailFromPref
-                        isNameShown = true
-                        // TODO: Read user's role from custom shared pref
-                        descriptionText = ""
-                    }
-                )
-            }
+        homeViewModel.getFireflyUsers().forEach { fireflyUsers ->
+            profileArray.add(
+                ProfileDrawerItem().apply {
+                    nameText = fireflyUsers.userEmail
+                    isNameShown = true
+                    descriptionText = fireflyUsers.userHost
+                }
+            )
         }
         headerResult = AccountHeaderView(this).apply {
             profileArray.forEachIndexed { index, profileDrawerItem ->
                 addProfile(profileDrawerItem, index)
             }
             // TODO: Add remove account option here
-            addProfile(ProfileSettingDrawerItem().apply { nameText = "Add Account"
+            addProfile(ProfileSettingDrawerItem().apply {
+                nameText = "Add Account"
                 descriptionText = "Add new Firefly III Account"
                 iconDrawable = IconicsDrawable(context, GoogleMaterial.Icon.gmd_add).apply {
                     actionBar();
