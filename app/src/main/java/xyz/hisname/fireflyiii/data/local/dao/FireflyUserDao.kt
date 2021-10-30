@@ -22,4 +22,13 @@ abstract class FireflyUserDao: BaseDao<FireflyUsers> {
     @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE userEmail =:userName AND userHost =:userUrl")
     abstract fun updateActiveUser(userName: String, userUrl: String, activeUser: Boolean = true)
 
+    @Query("DELETE FROM firefly_users WHERE activeUser =:isActive")
+    abstract fun deleteCurrentUser(isActive: Boolean = true)
+
+    @Query("DELETE FROM firefly_users WHERE id =:primaryKey")
+    abstract fun deleteUserByPrimaryKey(primaryKey: Long)
+
+    @Query("SELECT * FROM firefly_users WHERE id =:primaryKey")
+    abstract fun getUerByPrimaryKey(primaryKey: Long): FireflyUsers
+
 }

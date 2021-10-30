@@ -67,7 +67,7 @@ class TagDetailsViewModel(application: Application): BaseViewModel(application) 
     val transactionSum = MutableLiveData<ArrayList<DetailModel>>()
 
     init {
-        Configuration.getInstance().load(application, sharedPref)
+        Configuration.getInstance().load(application, sharedPref())
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().osmdroidBasePath = application.filesDir
         Configuration.getInstance().osmdroidTileCache = File(application.filesDir.toString() + "/tiles")

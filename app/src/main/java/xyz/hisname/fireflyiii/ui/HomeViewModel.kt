@@ -49,13 +49,11 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     private val billPayDao = AppDatabase.getInstance(application, getUniqueHash()).billPayDao()
     private val billRepository = BillRepository(billDataDao, billsService)
     private val billPaidRepository = BillsPaidRepository(billPaidDao, billsService)
+    private val fireflyUserDatabase by lazy { FireflyUserDatabase.getInstance(application).fireflyUserDao() }
     val userEmail = getActiveUserEmail()
 
-    fun updateActiveUser(userEmail: String){
-        FireflyUserDatabase.getInstance(getApplication())
-            .fireflyUserDao()
-            .updateActiveUser(userEmail,
-                AppPref(sharedPref).baseUrl)
+    fun updateActiveUser(userEmail: String, userHost: String){
+        fireflyUserDatabase.updateActiveUser(userEmail, userHost)
     }
 
     fun getNoOfBillsDueToday(): LiveData<Int> {
@@ -75,7 +73,23 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun getFireflyUsers(): List<FireflyUsers>{
-        return FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getAllUser()
+        return fireflyUserDatabase.getAllUser()
+    }
+
+    fun removeFireflyAccounts(listOfAccounts: List<Int>){
+        if (listOfAccounts.isNotEmpty()){
+            listOfAccounts.forEach { account ->
+                val fireflyUser = fireflyUserDatabase.getUerByPrimaryKey(account.toLong())
+                fireflyUser.activeUser
+                File(getApplication<Application>().applicationInfo.dataDir + "/shared_prefs/" + fireflyUser.uniqueHash
+                        + "-user-preferences.xml").delete()
+                fireflyUserDatabase.deleteUserByPrimaryKey(account.toLong())
+                // TODO: 1. Remove account from account manager here
+                //       2. Check if default account is deleted. If it is deleted, set first row in database as default
+            }
+            FireflyClient.destroyInstance()
+        }
+
     }
 
     fun migrateFirefly(){
@@ -118,9 +132,9 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             //newAccountManager.tokenExpiry = accountTokenExpiry
             newAccountManager.userEmail = authEmail
             viewModelScope.launch(Dispatchers.IO){
-                FireflyUserDatabase.getInstance(application).fireflyUserDao().insert(
+                fireflyUserDatabase.insert(
                     FireflyUsers(
-                        0L, uniqueHash, authEmail, AppPref(sharedPref).baseUrl, true
+                        0L, uniqueHash, authEmail, AppPref(sharedPref()).baseUrl, true
                     )
                 )
             }

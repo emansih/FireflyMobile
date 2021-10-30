@@ -209,14 +209,14 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
     }
 
     private fun checkVersion(){
-        if(!AppPref(sharedPref).budgetIssue4394){
+        if(!AppPref(sharedPref()).budgetIssue4394){
             val systemInfoRepository = SystemInfoRepository(
                     genericService().create(SystemInfoService::class.java),
-                    sharedPref, newManager)
+                    sharedPref(), newManager())
             viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->  }){
                 systemInfoRepository.getUserSystem()
             }
-            val fireflyVersion = AppPref(sharedPref).serverVersion
+            val fireflyVersion = AppPref(sharedPref()).serverVersion
             if(fireflyVersion.contentEquals("5.5.0-beta.1")){
                 unSupportedVersion.postValue(true)
             } else {

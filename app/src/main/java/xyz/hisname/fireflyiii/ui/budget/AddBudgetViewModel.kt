@@ -135,7 +135,7 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun doNotShowAgain(status: Boolean){
-        AppPref(sharedPref).budgetIssue4394 = status
+        AppPref(sharedPref()).budgetIssue4394 = status
     }
 
     fun getBudgetById(budgetId: Long, currencySymbol: String): LiveData<BudgetListData>{
@@ -150,14 +150,14 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
     }
 
     private fun checkVersion(){
-        if(!AppPref(sharedPref).budgetIssue4394){
+        if(!AppPref(sharedPref()).budgetIssue4394){
             val systemInfoRepository = SystemInfoRepository(
                     genericService().create(SystemInfoService::class.java),
-                    sharedPref, newManager)
+                    sharedPref(), newManager())
             viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->  }){
                 systemInfoRepository.getUserSystem()
             }
-            val fireflyVersion = AppPref(sharedPref).serverVersion
+            val fireflyVersion = AppPref(sharedPref()).serverVersion
             if(fireflyVersion.contentEquals("5.5.0-beta.1")){
                 unSupportedVersion.postValue(true)
             } else {

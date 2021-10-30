@@ -34,10 +34,10 @@ class AboutViewModel(application: Application): BaseViewModel(application) {
 
     private val systemInfoRepository by lazy { SystemInfoRepository(
             genericService().create(SystemInfoService::class.java),
-            sharedPref, newManager)
+            sharedPref(), newManager())
     }
 
-    private val appPref by lazy { AppPref(sharedPref) }
+    private val appPref by lazy { AppPref(sharedPref()) }
 
     var serverVersion = appPref.serverVersion
     var apiVersion = appPref.remoteApiVersion

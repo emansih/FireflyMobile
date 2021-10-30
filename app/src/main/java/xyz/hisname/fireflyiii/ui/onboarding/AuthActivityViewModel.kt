@@ -62,7 +62,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     }
     private val systemInfoRepository by lazy { SystemInfoRepository(
             genericService().create(SystemInfoService::class.java),
-            sharedPref, newManager)
+            sharedPref(), newManager())
     }
     private lateinit var repository: AccountRepository
 
@@ -216,6 +216,6 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         FireflyClient.destroyInstance()
         OldAuthenticatorManager(accountManager).initializeAccount()
         OldAuthenticatorManager(accountManager).accessToken = accessToken.trim()
-        AppPref(sharedPref).baseUrl = baseUrl
+        AppPref(sharedPref()).baseUrl = baseUrl
     }
 }

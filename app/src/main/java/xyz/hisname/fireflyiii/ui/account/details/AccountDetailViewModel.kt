@@ -234,7 +234,7 @@ class AccountDetailViewModel(application: Application): BaseViewModel(applicatio
         val fileName = attachmentData.attachmentAttributes.filename
         val fileToOpen = File(getApplication<Application>().getExternalFilesDir(null).toString() +
                 File.separator + fileName)
-        getApplication<Application>().downloadFile(newManager.accessToken, attachmentData, fileToOpen)
+        getApplication<Application>().downloadFile(newManager().accessToken, attachmentData, fileToOpen)
         getApplication<Application>().registerReceiver(object : BroadcastReceiver(){
             override fun onReceive(context: Context, intent: Intent) {
                 downloadedFile.postValue(fileToOpen)

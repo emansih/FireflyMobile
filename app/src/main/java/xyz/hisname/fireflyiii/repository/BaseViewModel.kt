@@ -38,24 +38,25 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData()
     val apiResponse: MutableLiveData<String> = MutableLiveData()
-    protected val newManager by lazy {
+
+    protected fun newManager() =
         NewAccountManager(AccountManager.get(getApplication()),
             FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getCurrentActiveUserEmail())
-    }
-    protected val sharedPref by lazy {
+
+    protected fun sharedPref() =
         getApplication<Application>().getSharedPreferences(
             getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
-    }
+
 
     protected fun genericService(): Retrofit {
-        val cert = AppPref(sharedPref).certValue
+        val cert = AppPref(sharedPref()).certValue
         val fireflyUrl = FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getCurrentActiveUserUrl()
-        return if (AppPref(sharedPref).isCustomCa) {
+        return if (AppPref(sharedPref()).isCustomCa) {
             val customCa = CustomCa(File(getApplication<Application>().filesDir.path + "/" + getUniqueHash() + ".pem"))
-            FireflyClient.getClient(fireflyUrl, newManager.accessToken, cert,
+            FireflyClient.getClient(fireflyUrl, newManager().accessToken, cert,
                 customCa.getCustomTrust(), customCa.getCustomSSL())
         } else {
-            FireflyClient.getClient(fireflyUrl, newManager.accessToken, cert, null, null)
+            FireflyClient.getClient(fireflyUrl, newManager().accessToken, cert, null, null)
         }
     }
 
