@@ -42,7 +42,7 @@ class PatFragment: Fragment() {
     private val sharedPref by lazy { requireContext().getSharedPreferences(
         requireContext().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE) }
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
-    private lateinit var fileUri: Uri
+    private var fileUri: Uri? = null
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var fragmentPatBinding: FragmentPatBinding? = null
     private val binding get() = fragmentPatBinding!!
@@ -66,7 +66,7 @@ class PatFragment: Fragment() {
             if(fileChoosen != null){
                 fileUri = fileChoosen
                 binding.certPath.isVisible = true
-                binding.certPath.text = FileUtils.getPathFromUri(requireContext(), fileUri)
+                binding.certPath.text = FileUtils.getPathFromUri(requireContext(), fileChoosen)
             } else {
                 binding.selfSignedCheckbox.isChecked = false
             }
@@ -77,7 +77,7 @@ class PatFragment: Fragment() {
         binding.fireflySignIn.setOnClickListener {
             hideKeyboard()
             authViewModel.authViaPat(binding.fireflyUrlEdittext.getString(),
-                    binding.fireflyAccessEdittext.getString(), binding.certPath.text.toString().toUri())
+                    binding.fireflyAccessEdittext.getString(), fileUri)
         }
     }
 
