@@ -53,7 +53,9 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     val userEmail = getActiveUserEmail()
 
     fun updateActiveUser(userEmail: String, userHost: String){
-        fireflyUserDatabase.updateActiveUser(userEmail, userHost)
+        viewModelScope.launch(Dispatchers.IO) {
+            fireflyUserDatabase.updateActiveUser(userEmail, userHost)
+        }
     }
 
     fun getNoOfBillsDueToday(): LiveData<Int> {
