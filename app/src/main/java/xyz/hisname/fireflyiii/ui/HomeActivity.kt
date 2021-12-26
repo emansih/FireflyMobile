@@ -18,7 +18,6 @@
 
 package xyz.hisname.fireflyiii.ui
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -63,8 +62,6 @@ import xyz.hisname.fireflyiii.util.biometric.AuthenticationResult
 import xyz.hisname.fireflyiii.util.biometric.Authenticator
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import java.io.File
-
 
 class HomeActivity: BaseActivity(){
 
@@ -164,44 +161,36 @@ class HomeActivity: BaseActivity(){
     }
 
     private fun setUpHeader(savedInstanceState: Bundle?){
-        val profileArray = arrayListOf<ProfileDrawerItem>()
+        headerResult = AccountHeaderView(this)
         homeViewModel.getFireflyUsers().observe(this){ fireflyUsers ->
-            fireflyUsers.forEach { fireflyUser ->
-                profileArray.add(
-                    ProfileDrawerItem().apply {
-                        nameText = fireflyUser.userEmail
-                        isNameShown = true
-                        descriptionText = fireflyUser.userHost
-                    }
-                )
+            fireflyUsers.forEachIndexed { indexed, fireflyUser ->
+                headerResult.addProfile(ProfileDrawerItem().apply {
+                    nameText = fireflyUser.userEmail
+                    isNameShown = true
+                    descriptionText = fireflyUser.userHost
+                }, indexed)
             }
-
-        }
-        headerResult = AccountHeaderView(this).apply {
-            profileArray.forEachIndexed { index, profileDrawerItem ->
-                addProfile(profileDrawerItem, index)
-            }
-            addProfile(ProfileSettingDrawerItem().apply {
+            headerResult.addProfile(ProfileSettingDrawerItem().apply {
                 nameText = "Add Account"
                 descriptionText = "Add new Firefly III Account"
-                iconDrawable = IconicsDrawable(context, GoogleMaterial.Icon.gmd_add).apply {
+                iconDrawable = IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_add).apply {
                     actionBar()
                     paddingDp = 5
                 }.mutate()
                 isIconTinted = true
                 identifier = 100000
-            }, profileArray.size)
-            addProfile(ProfileSettingDrawerItem().apply {
+            }, fireflyUsers.size)
+            headerResult.addProfile(ProfileSettingDrawerItem().apply {
                 nameText = "Remove Account"
-                descriptionText = "Remove current Firfly III Account"
-                iconDrawable = IconicsDrawable(context, GoogleMaterial.Icon.gmd_remove).apply {
+                descriptionText = "Remove current Firefly III Account"
+                iconDrawable = IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_remove).apply {
                     actionBar()
                     paddingDp = 5
                 }.mutate()
                 isIconTinted = true
                 identifier = 100001
-            }, profileArray.size + 1)
-            withSavedInstance(savedInstanceState)
+            }, fireflyUsers.size + 1)
+            headerResult.withSavedInstance(savedInstanceState)
         }
         headerResult.accountHeaderBackground.setBackgroundColor(getCompatColor(R.color.colorAccent))
         headerResult.onAccountHeaderListener = { view, profile, current ->
