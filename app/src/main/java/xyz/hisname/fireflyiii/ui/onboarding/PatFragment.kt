@@ -27,7 +27,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -76,6 +75,7 @@ class PatFragment: Fragment() {
     private fun signInButtonClick(){
         binding.fireflySignIn.setOnClickListener {
             hideKeyboard()
+            authViewModel.baseUrl.postValue(binding.fireflyUrlEdittext.getString())
             authViewModel.authViaPat(binding.fireflyUrlEdittext.getString(),
                     binding.fireflyAccessEdittext.getString(), fileUri)
         }

@@ -52,7 +52,7 @@ import java.util.*
     Transactions::class, TransactionIndex::class, CategoryData::class, CategoryFts::class, BudgetData::class,
     BudgetListData::class, BudgetListFts::class, TagsData::class, AttachmentData::class,
     Spent::class, BudgetLimitData::class, BillPaidDates::class, BillPayDates::class, CurrencyRemoteKeys::class],
-        version = 30, exportSchema = false)
+        version = 40, exportSchema = false)
 @TypeConverters(TypeConverterUtil::class)
 abstract class AppDatabase: RoomDatabase() {
 
@@ -75,7 +75,7 @@ abstract class AppDatabase: RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
 
-        fun getInstance(context: Context, randomHash: UUID): AppDatabase {
+        fun getInstance(context: Context, randomHash: String): AppDatabase {
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(context,
                     AppDatabase::class.java, "$randomHash-photuris.db"
@@ -90,7 +90,7 @@ abstract class AppDatabase: RoomDatabase() {
             INSTANCE = null
         }
 
-        fun clearDb(context: Context, randomHash: UUID) =
+        fun clearDb(context: Context, randomHash: String) =
             getInstance(context, randomHash).clearAllTables()
     }
 }

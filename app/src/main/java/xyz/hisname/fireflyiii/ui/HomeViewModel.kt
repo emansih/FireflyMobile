@@ -43,12 +43,12 @@ import java.util.*
 
 class HomeViewModel(application: Application): BaseViewModel(application) {
 
-    private val billsService = genericService().create(BillsService::class.java)
-    private val billDataDao = AppDatabase.getInstance(application, getUniqueHash()).billDataDao()
-    private val billPaidDao = AppDatabase.getInstance(application, getUniqueHash()).billPaidDao()
-    private val billPayDao = AppDatabase.getInstance(application, getUniqueHash()).billPayDao()
-    private val billRepository = BillRepository(billDataDao, billsService)
-    private val billPaidRepository = BillsPaidRepository(billPaidDao, billsService)
+    private val billsService by lazy { genericService().create(BillsService::class.java) }
+    private val billDataDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).billDataDao() }
+    private val billPaidDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).billPaidDao() }
+    private val billPayDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).billPayDao() }
+    private val billRepository by lazy { BillRepository(billDataDao, billsService) }
+    private val billPaidRepository by lazy { BillsPaidRepository(billPaidDao, billsService) }
     private val fireflyUserDatabase by lazy { FireflyUserDatabase.getInstance(application).fireflyUserDao() }
     val userEmail = getActiveUserEmail()
 
@@ -72,8 +72,12 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
         return count
     }
 
-    fun getFireflyUsers(): List<FireflyUsers>{
-        return fireflyUserDatabase.getAllUser()
+    fun getFireflyUsers(): LiveData<List<FireflyUsers>>{
+        val usersLiveData = MutableLiveData<List<FireflyUsers>>()
+        viewModelScope.launch(Dispatchers.IO){
+            usersLiveData.postValue(fireflyUserDatabase.getAllUser())
+        }
+        return usersLiveData
     }
 
     fun removeFireflyAccounts(listOfAccounts: List<Int>){
@@ -95,33 +99,41 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     fun migrateFirefly(){
         /* Migration routine:
          * 1. Check if old database exists(firefly.db)
-         *      - If it exists rename it to user's email-photuris.db(demo@firefly-photuris.db)
+         *      - If it exists rename it to uniquehash-photuris.db
          *      - If it does not exist, user is a new user
-         * 2. Rename user's account
-         * 3. Rename shared preference
-         * 4. Rename custom CA file(if it exists)
+         * 2. Add user to user account database
+         * 3. Rename user's account
+         * 4. Rename shared preference
+         * 5. Rename custom CA file(if it exists)
          */
         val application = getApplication<Application>()
         val oldDatabase = application.getDatabasePath(Constants.DB_NAME)
-        val accManager = OldAuthenticatorManager(AccountManager.get(getApplication()))
-        val uniqueHash = UUID.randomUUID().toString()
-        val authEmail = accManager.userEmail
+
         if (oldDatabase.exists()){
+            val accManager = OldAuthenticatorManager(AccountManager.get(getApplication()))
+            val authEmail = accManager.userEmail
+            val uniqueHash = UUID.randomUUID().toString()
             AppDatabase.destroyInstance()
             oldDatabase.renameTo(File(application.getDatabasePath("$uniqueHash-photuris.db").toString()))
             oldDatabase.delete()
             FireflyClient.destroyInstance()
-        }
-        if(!accManager.userEmail.isNullOrBlank()){
+            val userHost = AppPref(oldSharedPref).baseUrl
+            viewModelScope.launch(Dispatchers.IO){
+                fireflyUserDatabase.insert(
+                    FireflyUsers(
+                        0L, uniqueHash, authEmail, userHost, true
+                    )
+                )
+            }
             val accountSecretKey = accManager.secretKey
             val accountAccessToken = accManager.accessToken
             val accountClientId = accManager.clientId
             // This is throwing NULL for some reason
-           // val accountTokenExpiry = accManager.tokenExpiry
+            // val accountTokenExpiry = accManager.tokenExpiry
             val accountRefreshToken = accManager.refreshToken
             val accountAuthMethod = accManager.authMethod
             accManager.destroyAccount()
-            val newAccountManager = NewAccountManager(AccountManager.get(application), authEmail)
+            val newAccountManager = NewAccountManager(AccountManager.get(application), UUID.randomUUID().toString())
             newAccountManager.initializeAccount()
             newAccountManager.secretKey = accountSecretKey
             newAccountManager.accessToken = accountAccessToken
@@ -131,13 +143,6 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             // TODO: Fix this before releasing
             //newAccountManager.tokenExpiry = accountTokenExpiry
             newAccountManager.userEmail = authEmail
-            viewModelScope.launch(Dispatchers.IO){
-                fireflyUserDatabase.insert(
-                    FireflyUsers(
-                        0L, uniqueHash, authEmail, AppPref(sharedPref()).baseUrl, true
-                    )
-                )
-            }
         }
         val fileArray = File(application.applicationInfo.dataDir + "/shared_prefs").listFiles()
         fileArray?.forEach {  file ->

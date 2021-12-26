@@ -22,6 +22,18 @@ abstract class FireflyUserDao: BaseDao<FireflyUsers> {
     @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE userEmail =:userName AND userHost =:userUrl")
     abstract fun updateActiveUser(userName: String, userUrl: String, activeUser: Boolean = true)
 
+    @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE uniqueHash =:uniqueHash")
+    abstract fun updateActiveUser(uniqueHash: String, activeUser: Boolean)
+
+    @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE userEmail =:email")
+    abstract fun updateActiveUserEmail(email: String, activeUser: Boolean = true)
+
+    @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE userHost =:userUrl")
+    abstract fun updateActiveUserHost(userUrl: String, activeUser: Boolean = true)
+
+    @Query("UPDATE firefly_users SET activeUser =:activeUser")
+    abstract fun unsetDefaultUser(activeUser: Boolean = false)
+
     @Query("DELETE FROM firefly_users WHERE activeUser =:isActive")
     abstract fun deleteCurrentUser(isActive: Boolean = true)
 

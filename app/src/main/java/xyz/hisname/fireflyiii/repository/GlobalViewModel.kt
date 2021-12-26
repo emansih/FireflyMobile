@@ -28,13 +28,14 @@ import xyz.hisname.fireflyiii.util.getUniqueHash
 class GlobalViewModel(application: Application): AndroidViewModel(application) {
 
     var userEmail = ""
+    var userHost = ""
     var isDark: Boolean = false
         private set
 
     fun isDarkMode(): MutableLiveData<Boolean>{
+        val uniqueHash = getApplication<Application>().getUniqueHash()
         val darkModeLiveData: MutableLiveData<Boolean> = MutableLiveData()
-        val appPreference = AppPref(getApplication<Application>().getSharedPreferences(
-            getApplication<Application>().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+        val appPreference = AppPref(getApplication<Application>().getSharedPreferences("$uniqueHash-user-preferences", Context.MODE_PRIVATE))
         if(appPreference.nightModeEnabled){
             isDark =  true
             darkModeLiveData.postValue(true)

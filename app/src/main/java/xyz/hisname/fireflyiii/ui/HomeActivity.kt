@@ -53,6 +53,7 @@ import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
 import xyz.hisname.fireflyiii.ui.currency.CurrencyListFragment
 import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
+import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.ui.transaction.list.TransactionFragment
 import xyz.hisname.fireflyiii.ui.piggybank.ListPiggyFragment
 import xyz.hisname.fireflyiii.ui.settings.SettingsFragment
@@ -83,13 +84,19 @@ class HomeActivity: BaseActivity(){
         instanceState = savedInstanceState
         binding = ActivityBaseBinding.inflate(layoutInflater)
         val view = binding.root
-        setContentView(view)
-        homeViewModel.migrateFirefly()
-        setup()
-        if(keyguardUtil.isAppKeyguardEnabled()){
-            binding.biggerFragmentContainer.isInvisible = true
-            authenticator = Authenticator(this, ::handleResult)
-            authenticator.authenticate()
+        // It can be `NULL`, don't be fooled by lint
+        if(homeViewModel.userEmail == null){
+            startActivity(Intent(this, AuthActivity::class.java))
+            finish()
+        } else {
+            setContentView(view)
+            homeViewModel.migrateFirefly()
+            setup()
+            if(keyguardUtil.isAppKeyguardEnabled()){
+                binding.biggerFragmentContainer.isInvisible = true
+                authenticator = Authenticator(this, ::handleResult)
+                authenticator.authenticate()
+            }
         }
     }
 
@@ -158,14 +165,17 @@ class HomeActivity: BaseActivity(){
 
     private fun setUpHeader(savedInstanceState: Bundle?){
         val profileArray = arrayListOf<ProfileDrawerItem>()
-        homeViewModel.getFireflyUsers().forEach { fireflyUsers ->
-            profileArray.add(
-                ProfileDrawerItem().apply {
-                    nameText = fireflyUsers.userEmail
-                    isNameShown = true
-                    descriptionText = fireflyUsers.userHost
-                }
-            )
+        homeViewModel.getFireflyUsers().observe(this){ fireflyUsers ->
+            fireflyUsers.forEach { fireflyUser ->
+                profileArray.add(
+                    ProfileDrawerItem().apply {
+                        nameText = fireflyUser.userEmail
+                        isNameShown = true
+                        descriptionText = fireflyUser.userHost
+                    }
+                )
+            }
+
         }
         headerResult = AccountHeaderView(this).apply {
             profileArray.forEachIndexed { index, profileDrawerItem ->
@@ -198,6 +208,7 @@ class HomeActivity: BaseActivity(){
             val switchedEmail = profile.name?.textString.toString()
             val userHost = profile.description?.textString.toString()
             globalViewModel.userEmail = switchedEmail
+            globalViewModel.userHost = userHost
             homeViewModel.updateActiveUser(switchedEmail, userHost)
             false
         }
@@ -470,10 +481,11 @@ class HomeActivity: BaseActivity(){
                     // Remove account
                     100001L -> {
                         val fireflyUsers = arrayOf<CharSequence>()
-                        homeViewModel.getFireflyUsers().forEachIndexed { index, users ->
-                            fireflyUsers[index] = users.userHost + "-" + users.userEmail
+                        homeViewModel.getFireflyUsers().observe(this@HomeActivity){ fireflyUser ->
+                            fireflyUser.forEachIndexed { index, users ->
+                                fireflyUsers[index] = users.userHost + "-" + users.userEmail
+                            }
                         }
-
                         val checkedItems = BooleanArray(fireflyUsers.size)
                         val userChecked = arrayListOf<Int>()
                         AlertDialog.Builder(this@HomeActivity)

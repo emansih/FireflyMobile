@@ -49,9 +49,8 @@ class AccountListProvider: ContentProvider() {
         if (uriMatcher.match(uri) != -1){
             context?.let { nonNullContext ->
                 val accountDao = AppDatabase.getInstance(nonNullContext,
-                    UUID.fromString(
-                        FireflyUserDatabase.getInstance(nonNullContext)
-                            .fireflyUserDao().getUniqueHash())
+                    FireflyUserDatabase.getInstance(nonNullContext)
+                            .fireflyUserDao().getUniqueHash()
                 ).accountDataDao()
                 return accountDao.getAssetAccountCursor()
             }

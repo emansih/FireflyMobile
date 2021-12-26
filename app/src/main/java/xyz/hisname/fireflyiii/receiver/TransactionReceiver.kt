@@ -46,8 +46,8 @@ import java.util.concurrent.ThreadLocalRandom
 class TransactionReceiver: BroadcastReceiver()  {
 
     override fun onReceive(context: Context, intent: Intent) {
-
-        if(AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences",
+        val uniqueHash = context.getUniqueHash()
+        if(AppPref(context.getSharedPreferences(uniqueHash + "-user-preferences",
                 Context.MODE_PRIVATE)).baseUrl.isBlank()){
             val onboarding = Intent(context, AuthActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -90,8 +90,8 @@ class TransactionReceiver: BroadcastReceiver()  {
                     .putString("destinationName", destinationName)
                     .putString("piggyBankName",piggyBank)
                     .putString("notes", notes)
-            val transactionDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).transactionDataDao()
-            val currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
+            val transactionDatabase = AppDatabase.getInstance(context, uniqueHash).transactionDataDao()
+            val currencyDatabase = AppDatabase.getInstance(context, uniqueHash).currencyDataDao()
             var currency: CurrencyData
             runBlocking(Dispatchers.IO) {
                 currency = currencyDatabase.getCurrencyByCode(intent.getStringExtra("currency") ?: "")[0]

@@ -50,8 +50,9 @@ class SimpleDataProvider: ContentProvider() {
                        sortOrder: String?): Cursor? {
         if (uriMatcher.match(uri) != -1){
             cursor = MatrixCursor(arrayOf("Balance", "Bills To Pay", "Paid", "Left To Spend", "Per Day", "Net Worth"))
-            if(!context?.getUniqueHash().toString().isBlank()){
-                val sharedPref = context?.getSharedPreferences(context?.getUniqueHash().toString() + "-user-preferences.xml", Context.MODE_PRIVATE)
+            val uniqueHash = context?.getUniqueHash() ?: ""
+            if(uniqueHash.isNotBlank()){
+                val sharedPref = context?.getSharedPreferences("$uniqueHash-user-preferences.xml", Context.MODE_PRIVATE)
                 if (sharedPref != null){
                     val simpleData = SimpleData(sharedPref)
                     cursor?.addRow(arrayListOf(simpleData.balance, simpleData.unPaidBills, simpleData.paidBills,

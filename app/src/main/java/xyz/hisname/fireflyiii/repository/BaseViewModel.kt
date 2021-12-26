@@ -24,6 +24,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
@@ -32,42 +33,57 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import java.io.File
-import java.util.*
 
 open class BaseViewModel(application: Application) : AndroidViewModel(application){
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData()
     val apiResponse: MutableLiveData<String> = MutableLiveData()
 
-    protected fun newManager() =
-        NewAccountManager(AccountManager.get(getApplication()),
-            FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getCurrentActiveUserEmail())
+    protected fun newManager(): NewAccountManager{
+        return NewAccountManager(AccountManager.get(getApplication()), getUniqueHash())
+    }
+
 
     protected fun sharedPref() =
         getApplication<Application>().getSharedPreferences(
-            getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
+            getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
 
+    @Deprecated("Use sharedPref() instead")
+    protected val oldSharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(getApplication()) }
 
     protected fun genericService(): Retrofit {
         val cert = AppPref(sharedPref()).certValue
-        val fireflyUrl = FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getCurrentActiveUserUrl()
         return if (AppPref(sharedPref()).isCustomCa) {
             val customCa = CustomCa(File(getApplication<Application>().filesDir.path + "/" + getUniqueHash() + ".pem"))
-            FireflyClient.getClient(fireflyUrl, newManager().accessToken, cert,
+            FireflyClient.getClient(getActiveUserUrl(), newManager().accessToken, cert,
                 customCa.getCustomTrust(), customCa.getCustomSSL())
         } else {
-            FireflyClient.getClient(fireflyUrl, newManager().accessToken, cert, null, null)
+            FireflyClient.getClient(getActiveUserUrl(), newManager().accessToken, cert, null, null)
         }
     }
 
-    protected fun getUniqueHash(): UUID {
-        return UUID.fromString(
-            FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getUniqueHash()
-        )
+    protected fun getUniqueHash(): String {
+        val uniqueHash: String
+        runBlocking(Dispatchers.IO){
+            uniqueHash = FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getUniqueHash()
+        }
+        return uniqueHash
     }
 
     protected fun getActiveUserEmail(): String {
-        return FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getCurrentActiveUserEmail()
+        val activeUserEmail: String
+        runBlocking(Dispatchers.IO){
+            activeUserEmail = FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getCurrentActiveUserEmail()
+        }
+        return activeUserEmail
+    }
+
+    private fun getActiveUserUrl(): String {
+        val activeUrl: String
+        runBlocking(Dispatchers.IO){
+            activeUrl = FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getCurrentActiveUserUrl()
+        }
+        return activeUrl
     }
 
     override fun onCleared() {

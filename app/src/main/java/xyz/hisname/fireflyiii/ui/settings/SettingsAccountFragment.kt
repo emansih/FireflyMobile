@@ -33,14 +33,11 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
@@ -56,16 +53,21 @@ import java.util.concurrent.TimeUnit
 // TODO: Remove explicit type arguments. Broken on pref(1.1.0-alpha05)
 class SettingsAccountFragment: BaseSettings() {
 
-    private val accManager by lazy {
-        NewAccountManager(AccountManager.get(requireContext()), globalViewModel.userEmail)
-    }
-
-    private val authMethodPref by lazy { accManager.authMethod }
+    private val authMethodPref by lazy { accManager().authMethod }
     private val authViewModel by lazy { getImprovedViewModel(AuthViewModel::class.java) }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.user_account_settings)
         setAccountSection()
+    }
+
+    private fun accManager(): NewAccountManager{
+        val newAccountManager: NewAccountManager
+        runBlocking(Dispatchers.IO) {
+            newAccountManager = NewAccountManager(AccountManager.get(requireContext()),
+                FireflyUserDatabase.getInstance(requireContext()).fireflyUserDao().getUniqueHash())
+        }
+        return newAccountManager
     }
 
     private fun setAccountSection(){
@@ -78,7 +80,7 @@ class SettingsAccountFragment: BaseSettings() {
         val accessTokenPref = findPreference<EditTextPreference>("access_token") as EditTextPreference
         accessTokenPref.apply {
             title = "Access Token"
-            summary = accManager.secretKey
+            summary = accManager().secretKey
         }
         val authMethod = findPreference<Preference>("auth_method") as Preference
         val tokenValidity = findPreference<Preference>("auth_token_time") as Preference
@@ -88,13 +90,13 @@ class SettingsAccountFragment: BaseSettings() {
 
         if(Objects.equals(authMethodPref, "oauth")){
             authMethod.summary = "Open Authentication"
-            tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager.tokenExpiry)
+            tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager().tokenExpiry)
         } else {
             autoRefreshToken.isVisible = false
             refreshTokenInterval.isVisible = false
             refreshToken.isVisible = false
             tokenValidity.isVisible = false
-            accessTokenPref.summary = OldAuthenticatorManager(AccountManager.get(requireContext())).accessToken
+            accessTokenPref.summary = accManager().accessToken
             authMethod.summary = resources.getString(R.string.personal_access_token)
         }
         fireflyUrlPref.setOnPreferenceChangeListener { preference, newValue  ->
@@ -112,7 +114,7 @@ class SettingsAccountFragment: BaseSettings() {
             authViewModel.getRefreshToken().observe(viewLifecycleOwner) { success ->
                 if(success){
                     toastSuccess("Token refresh success!")
-                    tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager.tokenExpiry)
+                    tokenValidity.summary = DateTimeUtil.convertEpochToHumanTime(accManager().tokenExpiry)
                 } else {
                     toastError("There was an error refreshing your token")
                 }
@@ -168,7 +170,7 @@ class SettingsAccountFragment: BaseSettings() {
             GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
                 AppDatabase.clearDb(requireContext(), requireContext().getUniqueHash())
                 AppPref(sharedPref).clearPref()
-                accManager.destroyAccount()
+                accManager().destroyAccount()
             }
             val loginActivity = Intent(requireActivity(), AuthActivity::class.java)
             startActivity(loginActivity)

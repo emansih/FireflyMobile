@@ -30,7 +30,6 @@ import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.getUniqueHash
-import xyz.hisname.languagepack.LanguageChanger
 
 @SuppressLint("Registered")
 open class BaseActivity: AppCompatActivity() {
@@ -55,10 +54,9 @@ open class BaseActivity: AppCompatActivity() {
         }
     }
 
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LanguageChanger.init(newBase,
-                sharedPref(newBase).languagePref))
-    }
+    /*override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LanguageChanger.init(newBase, sharedPref(newBase).languagePref))
+    }*/
 
     override fun applyOverrideConfiguration(overrideConfiguration: Configuration) {
         val uiMode = overrideConfiguration.uiMode
@@ -68,7 +66,6 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     protected fun sharedPref(context: Context): AppPref{
-        return AppPref(context.getSharedPreferences(
-            getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+        return AppPref(context.getSharedPreferences(context.getUniqueHash()+ "-user-preferences", Context.MODE_PRIVATE))
     }
 }

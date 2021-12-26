@@ -40,7 +40,7 @@ abstract class BaseWorker(private val context: Context, workerParams: WorkerPara
     protected val sharedPref by lazy { context.getSharedPreferences(getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)}
     private val customCa by lazy { CustomCa(File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem")) }
 
-    protected fun getUniqueHash(): UUID {
+    protected fun getUniqueHash(): String {
         return context.getUniqueHash()
     }
 

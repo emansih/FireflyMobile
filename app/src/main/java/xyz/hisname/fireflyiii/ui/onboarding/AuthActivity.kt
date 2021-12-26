@@ -136,12 +136,12 @@ class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackC
     override fun onResume() {
         super.onResume()
         val uri = intent.data
-        if(uri != null &&  accountManager.authMethod.isBlank()){
+        if(uri != null){
             hideKeyboard()
             val code = uri.getQueryParameter("code")
             if(uri.toString().startsWith(Constants.REDIRECT_URI)){
                 if(code != null && code.isNotBlank() && code.isNotEmpty()) {
-                    authActivityViewModel.getAccessToken(code)
+                    authActivityViewModel.getAccessToken(code, false, "", authActivityViewModel.baseUrl.value ?: "")
                 } else {
                     showDialog()
                 }

@@ -18,9 +18,11 @@
 
 package xyz.hisname.fireflyiii.repository.userinfo
 
+import android.accounts.Account
+import android.accounts.AccountManager
 import android.content.SharedPreferences
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 
@@ -28,11 +30,18 @@ class SystemInfoRepository(private val systemInfoService: SystemInfoService?,
                            private val sharedPreferences: SharedPreferences,
                            private val authenticationManager: NewAccountManager) {
 
+    // Currently this method does too much things. "Should" refactor
     @Throws(Exception::class)
-    suspend fun getCurrentUserInfo(){
+    suspend fun getCurrentUserInfo(baseUrl: String, accountManager: AccountManager,
+                                   fireflyUserDatabase: FireflyUserDatabase){
         val userAttribute = systemInfoService?.getCurrentUserInfo()?.body()?.userData?.userAttributes
         if (userAttribute != null) {
-            authenticationManager.userEmail = userAttribute.email
+            val authMethod = authenticationManager.authMethod
+            val newAccountManager = NewAccountManager(accountManager, fireflyUserDatabase.fireflyUserDao().getUniqueHash())
+            newAccountManager.authMethod = authMethod
+            fireflyUserDatabase.fireflyUserDao().updateActiveUserEmail(userAttribute.email)
+            fireflyUserDatabase.fireflyUserDao().updateActiveUserHost(baseUrl)
+            // On single account systems, role will null
             if(userAttribute.role != null){
                 AppPref(sharedPreferences).userRole = userAttribute.role
             }

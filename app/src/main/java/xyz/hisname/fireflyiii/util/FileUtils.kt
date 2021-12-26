@@ -30,6 +30,8 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import java.io.*
 import java.util.*
@@ -62,14 +64,13 @@ class FileUtils {
             return fileContent.toString()
         }
 
-        fun saveCaFile(fileUri: Uri, context: Context) {
+        fun saveCaFile(fileUri: Uri, context: Context, uniqueHash: String) {
             var count: Int
             val data = ByteArray(4096)
-            val fileDestination = context.getUniqueHash().toString() + ".pem"
             val inputStream = context.contentResolver.openInputStream(fileUri)
-            context.deleteFile(fileDestination)
+            context.deleteFile("$uniqueHash.pem")
             val bufferredInputStream = BufferedInputStream(inputStream, 8192)
-            val output = FileOutputStream(context.filesDir.toString() + "/" + context.getUniqueHash() + ".pem")
+            val output = FileOutputStream(context.filesDir.toString() + "/" + uniqueHash + ".pem")
             while (bufferredInputStream.read(data).also { count = it } != -1) {
                 output.write(data, 0, count)
             }
@@ -218,8 +219,10 @@ fun Context.openFile(filePath: File): Intent{
     return Intent.createChooser(fileIntent, "Open File")
 }
 
-fun Context.getUniqueHash(): UUID {
-    return UUID.fromString(
-        FireflyUserDatabase.getInstance(this).fireflyUserDao().getCurrentActiveUserEmail()
-    )
+fun Context.getUniqueHash(): String {
+    val uniqueHash: String
+    runBlocking(Dispatchers.IO) {
+        uniqueHash = FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao().getCurrentActiveUserEmail()
+    }
+    return uniqueHash
 }

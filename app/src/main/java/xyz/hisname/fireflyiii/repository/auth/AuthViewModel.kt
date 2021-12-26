@@ -39,7 +39,7 @@ class AuthViewModel(application: Application): BaseViewModel(application) {
     fun getRefreshToken(): LiveData<Boolean> {
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                val newAccountManager = NewAccountManager(AccountManager.get(getApplication()), getActiveUserEmail())
+                val newAccountManager = NewAccountManager(AccountManager.get(getApplication()), getUniqueHash())
                 val networkCall = oAuthService.getRefreshToken("refresh_token",
                     newAccountManager.refreshToken, newAccountManager.clientId,
                     newAccountManager.secretKey)

@@ -18,6 +18,7 @@
 
 package xyz.hisname.fireflyiii.ui.onboarding
 
+import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Application
 import android.net.Uri
@@ -32,6 +33,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
 import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
+import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.AccountsService
@@ -39,6 +41,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.account.AccountRepository
+import xyz.hisname.fireflyiii.repository.models.FireflyUsers
 import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
 import xyz.hisname.fireflyiii.repository.userinfo.SystemInfoRepository
 import xyz.hisname.fireflyiii.util.FileUtils
@@ -46,6 +49,7 @@ import xyz.hisname.fireflyiii.util.extension.isAscii
 import java.io.File
 import java.net.UnknownServiceException
 import java.security.cert.CertificateException
+import java.util.*
 
 class AuthActivityViewModel(application: Application): BaseViewModel(application) {
 
@@ -65,7 +69,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             sharedPref(), newManager())
     }
     private lateinit var repository: AccountRepository
-
+    private lateinit var authenticatorManager: NewAccountManager
 
     fun authViaPat(baseUrl: String, accessToken: String, fileUri: Uri?) {
         if(accessToken.isEmpty()){
@@ -77,17 +81,28 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             return
         }
         isLoading.postValue(true)
-        if(fileUri != null && fileUri.toString().isNotBlank()) {
-            FileUtils.saveCaFile(fileUri, getApplication())
+        viewModelScope.launch(Dispatchers.IO){
+            val accountHash = authInit(accessToken, baseUrl)
+            val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
+            val activeUserHash = fireflyUserDao.getUniqueHash()
+            if(activeUserHash.isNotBlank()){
+                fireflyUserDao.updateActiveUser(activeUserHash, false)
+            }
+            fireflyUserDao.insert(
+                FireflyUsers(0, accountHash, "", baseUrl, true)
+            )
+            if(fileUri != null && fileUri.toString().isNotBlank()) {
+                FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
+            }
         }
-        authInit(accessToken, baseUrl)
+
         val accountDao = AppDatabase.getInstance(applicationContext, getUniqueHash()).accountDataDao()
         val accountsService = genericService().create(AccountsService::class.java)
         repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){
             try {
                 repository.authViaPat()
-                OldAuthenticatorManager(accountManager).authMethod = "pat"
+                authenticatorManager.authMethod = "pat"
                 isAuthenticated.postValue(true)
             } catch (exception: UnknownServiceException){
                 FileUtils.deleteCaFile(customCaFile)
@@ -120,17 +135,28 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             showInfoMessage.postValue("Client ID Required!")
             return false
         }
+        val accountHash = authInit("", baseUrl)
         if(fileUri != null && fileUri.toString().isNotBlank()) {
-            FileUtils.saveCaFile(fileUri, getApplication())
+            viewModelScope.launch(Dispatchers.IO){
+                val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
+                val activeUserHash = fireflyUserDao.getUniqueHash()
+                if(activeUserHash.isNotBlank()){
+                    fireflyUserDao.updateActiveUser(activeUserHash, false)
+                }
+                fireflyUserDao.insert(
+                    FireflyUsers(0, accountHash, "", baseUrl, true)
+                )
+                if(fileUri.toString().isNotBlank()) {
+                    FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
+                }
+            }
         }
-        val accManager = NewAccountManager(AccountManager.get(getApplication()), "")
-        authInit("", baseUrl)
-        accManager.clientId = clientId
-        accManager.secretKey = clientSecret
+        authenticatorManager.clientId = clientId
+        authenticatorManager.secretKey = clientSecret
         return true
     }
 
-    fun getAccessToken(code: String, isDemo: Boolean = false){
+    fun getAccessToken(code: String, isDemo: Boolean = false, email: String, hostUrl : String){
         isLoading.postValue(true)
         if (!code.isAscii()) {
             // Issue #46 on Github
@@ -146,17 +172,15 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                     } else {
                         Constants.REDIRECT_URI
                     }
-                    val accManager = NewAccountManager(AccountManager.get(getApplication()), "")
                     val oAuthService = genericService().create(OAuthService::class.java)
-                    networkCall = oAuthService.getAccessToken(code.trim(), accManager.clientId,
-                            accManager.secretKey, redirectUri)
+                    networkCall = oAuthService.getAccessToken(code.trim(), authenticatorManager.clientId, authenticatorManager.secretKey, redirectUri)
                     val authResponse = networkCall?.body()
                     val errorBody = networkCall?.errorBody()
                     if (authResponse != null && networkCall?.isSuccessful != false) {
-                        accManager.accessToken = authResponse.access_token.trim()
-                        accManager.refreshToken = authResponse.refresh_token.trim()
-                        accManager.tokenExpiry = authResponse.expires_in
-                        accManager.authMethod = "oauth"
+                        authenticatorManager.accessToken = authResponse.access_token.trim()
+                        authenticatorManager.refreshToken = authResponse.refresh_token.trim()
+                        authenticatorManager.tokenExpiry = authResponse.expires_in
+                        authenticatorManager.authMethod = "oauth"
                         isAuthenticated.postValue(true)
                     } else if(errorBody != null){
                         FileUtils.deleteCaFile(customCaFile)
@@ -183,11 +207,18 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     }
 
     fun setDemo(code: String){
-        authInit("", "https://demo.firefly-iii.org")
-        val accManager = NewAccountManager(AccountManager.get(getApplication()), " (Demo)")
-        accManager.clientId = "2"
-        accManager.secretKey = "tfWoJQbmV88Fxej1ysAPIxFireflyIIIApiToken"
-        getAccessToken(code, true)
+        val accountHash = authInit("", "https://demo.firefly-iii.org")
+        authenticatorManager.clientId = "2"
+        authenticatorManager.secretKey = "tfWoJQbmV88Fxej1ysAPIxFireflyIIIApiToken"
+        viewModelScope.launch(Dispatchers.IO){
+            val fireflyUserDao = FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
+            // This is now the default account. We unset the previous default(if it exists) and set demo as default
+            fireflyUserDao.unsetDefaultUser()
+            fireflyUserDao.insert(FireflyUsers(
+                0, accountHash,  "demo@firefly", "https://demo.firefly-iii.org", true
+            ))
+        }
+        getAccessToken(code, true, "demo@firefly", "https://demo.firefly-iii.org")
     }
 
     fun getUser(): LiveData<Boolean> {
@@ -195,7 +226,12 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
             apiOk.postValue(false)
         }) {
-            systemInfoRepository.getCurrentUserInfo()
+            val url = FireflyUserDatabase
+                .getInstance(applicationContext)
+                .fireflyUserDao()
+                .getCurrentActiveUserUrl()
+            systemInfoRepository.getCurrentUserInfo(url,
+                accountManager, FireflyUserDatabase.getInstance(applicationContext))
             apiOk.postValue(true)
         }
         return apiOk
@@ -212,10 +248,13 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         return apiOk
     }
 
-    private fun authInit(accessToken: String, baseUrl: String){
+    private fun authInit(accessToken: String, baseUrl: String): String{
+        val uuid = UUID.randomUUID().toString()
         FireflyClient.destroyInstance()
-        OldAuthenticatorManager(accountManager).initializeAccount()
-        OldAuthenticatorManager(accountManager).accessToken = accessToken.trim()
+        authenticatorManager = NewAccountManager(accountManager, uuid)
+        authenticatorManager.initializeAccount()
+        authenticatorManager.accessToken = accessToken.trim()
         AppPref(sharedPref()).baseUrl = baseUrl
+        return uuid
     }
 }

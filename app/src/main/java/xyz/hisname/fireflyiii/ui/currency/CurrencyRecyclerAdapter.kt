@@ -26,6 +26,8 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.databinding.CurrencyListBinding
@@ -40,7 +42,11 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
 
     private lateinit var context: Context
     private val isThumbnailEnabled by lazy {
-        AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)).isCurrencyThumbnailEnabled
+        val uniqueHash: String
+        runBlocking(Dispatchers.IO) {
+            uniqueHash = context.getUniqueHash()
+        }
+        AppPref(context.getSharedPreferences("$uniqueHash-user-preferences", Context.MODE_PRIVATE)).isCurrencyThumbnailEnabled
     }
     private var currencyListBinding: CurrencyListBinding? = null
     private val binding get() = currencyListBinding!!

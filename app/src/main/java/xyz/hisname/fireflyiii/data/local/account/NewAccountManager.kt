@@ -6,9 +6,9 @@ import androidx.core.os.bundleOf
 import java.util.concurrent.TimeUnit
 
 class NewAccountManager (private val accountManager: AccountManager,
-                         private val accountEmail: String) {
+                         private val accountHash: String) {
 
-    private val account by lazy { Account("Firefly III - $accountEmail", "OAUTH") }
+    private val account by lazy { Account(accountHash, "OAUTH") }
 
     var secretKey
         get() = accountManager.getUserData(account, "SECRET_KEY") ?: ""
@@ -39,11 +39,8 @@ class NewAccountManager (private val accountManager: AccountManager,
         get() = accountManager.getUserData(account, "AUTH_METHOD") ?: ""
         set(value) = accountManager.setUserData(account, "AUTH_METHOD", value)
 
-    fun destroyAccount() {
-        val accountList = accountManager.getAccountsByType("OAUTH")
-        for(items in accountList){
-            accountManager.removeAccount(items, null, null, null)
-        }
+    fun destroyAccount(){
+        accountManager.removeAccount(account, null, null, null)
     }
 
     var tokenExpiry
