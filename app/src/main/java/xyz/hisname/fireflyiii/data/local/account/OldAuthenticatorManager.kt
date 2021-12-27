@@ -23,7 +23,7 @@ import android.accounts.AccountManager
 import androidx.core.os.bundleOf
 import java.util.concurrent.TimeUnit
 
-@Deprecated("This class is outdated and should **NOT** be used as it does not support multi user mode.")
+@Deprecated("This class is outdated and should **NOT** be used as it does not support multi user mode.", replaceWith = ReplaceWith("NewAccountManager(accountManager, uid)"))
 class OldAuthenticatorManager(private val accountManager: AccountManager): AccountHelper {
 
     private val account by lazy { Account("Firefly III Mobile", "OAUTH") }

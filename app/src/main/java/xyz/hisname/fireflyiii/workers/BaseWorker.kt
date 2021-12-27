@@ -22,7 +22,7 @@ import android.accounts.AccountManager
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.util.getUniqueHash
@@ -34,7 +34,7 @@ import javax.net.ssl.X509TrustManager
 abstract class BaseWorker(private val context: Context, workerParams: WorkerParameters): CoroutineWorker(context, workerParams){
 
     private val baseUrl by lazy { AppPref(sharedPref).baseUrl }
-    private val accessToken by lazy { OldAuthenticatorManager(AccountManager.get(context)).accessToken }
+    private val accessToken by lazy { NewAccountManager(AccountManager.get(context), getUniqueHash()).accessToken }
     val genericService by lazy { FireflyClient.getClient(baseUrl,accessToken, AppPref(sharedPref).certValue, getTrust(), getSslSocket()) }
     protected val sharedPref by lazy { context.getSharedPreferences(getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)}
     private val customCa by lazy { CustomCa(customCaFile) }

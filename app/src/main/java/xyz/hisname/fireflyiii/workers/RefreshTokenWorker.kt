@@ -22,14 +22,14 @@ import android.accounts.AccountManager
 import android.content.Context
 import androidx.work.*
 import retrofit2.Response
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
 import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
 
 class RefreshTokenWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
-    private val accManager by lazy { OldAuthenticatorManager(AccountManager.get(context)) }
+    private val accManager by lazy { NewAccountManager(AccountManager.get(context), getUniqueHash()) }
 
     override suspend fun doWork(): Result {
         val networkCall: Response<AuthModel>?

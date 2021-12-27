@@ -31,7 +31,7 @@ import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultSucess
 import kotlinx.coroutines.runBlocking
 import net.dinglisch.android.tasker.TaskerPlugin
 import retrofit2.Retrofit
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
+import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
@@ -49,7 +49,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
 
 
     private lateinit var sharedPref: SharedPreferences
-    private lateinit var accountManager: OldAuthenticatorManager
+    private lateinit var accountManager: NewAccountManager
     private lateinit var transactionDatabase: TransactionDataDao
     private lateinit var currencyDatabase: CurrencyDataDao
 
@@ -81,7 +81,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         replaceVariable(input)
         transactionDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).transactionDataDao()
         currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
-        accountManager = OldAuthenticatorManager(AccountManager.get(context))
+        accountManager = NewAccountManager(AccountManager.get(context), context.getUniqueHash())
         sharedPref = context.getSharedPreferences(
             context.getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
         val transactionType = input.regular.transactionType ?: ""
