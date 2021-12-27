@@ -82,18 +82,18 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
         return usersLiveData
     }
 
-    fun removeFireflyAccounts(listOfAccounts: List<Int>){
-        if (listOfAccounts.isNotEmpty()){
-            listOfAccounts.forEach { account ->
-                val fireflyUser = fireflyUserDatabase.getUerByPrimaryKey(account.toLong())
-                fireflyUser.activeUser
-                File(getApplication<Application>().applicationInfo.dataDir + "/shared_prefs/" + fireflyUser.uniqueHash
-                        + "-user-preferences.xml").delete()
-                fireflyUserDatabase.deleteUserByPrimaryKey(account.toLong())
-                // TODO: 1. Remove account from account manager here
-                //       2. Check if default account is deleted. If it is deleted, set first row in database as default
-            }
-            FireflyClient.destroyInstance()
+    fun removeFireflyAccounts(fireflyUsers: FireflyUsers){
+        viewModelScope.launch(Dispatchers.IO){
+            val fireflyUser = fireflyUserDatabase.getUserByHostAndEmail(fireflyUsers.userHost, fireflyUsers.userEmail)
+            File(getApplication<Application>().applicationInfo.dataDir + "/shared_prefs/" + fireflyUser.uniqueHash
+                    + "-user-preferences.xml").delete()
+            fireflyUserDatabase.deleteUserByPrimaryKey(fireflyUser.id)
+            File(getApplication<Application>().applicationInfo.dataDir + "/databases/" + fireflyUser.uniqueHash
+                    + "-photuris.db").delete()
+            // TODO: 1. Remove account from account manager here
+            //       2. Check if default account is deleted. If it is deleted, set first row in database as default
+            val accountManager = NewAccountManager(AccountManager.get(getApplication()), fireflyUser.uniqueHash)
+            accountManager.destroyAccount()
         }
 
     }

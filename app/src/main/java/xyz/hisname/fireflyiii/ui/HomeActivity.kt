@@ -180,25 +180,62 @@ class HomeActivity: BaseActivity(){
                 isIconTinted = true
                 identifier = 100000
             }, fireflyUsers.size)
-            headerResult.addProfile(ProfileSettingDrawerItem().apply {
-                nameText = "Remove Account"
-                descriptionText = "Remove current Firefly III Account"
-                iconDrawable = IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_remove).apply {
-                    actionBar()
-                    paddingDp = 5
-                }.mutate()
-                isIconTinted = true
-                identifier = 100001
-            }, fireflyUsers.size + 1)
-            headerResult.withSavedInstance(savedInstanceState)
+            // Only allow users to remove account if there are more than 1 account present
+            if(fireflyUsers.size > 1){
+                headerResult.addProfile(ProfileSettingDrawerItem().apply {
+                    nameText = "Remove Account"
+                    descriptionText = "Remove current Firefly III Account"
+                    iconDrawable = IconicsDrawable(this@HomeActivity, GoogleMaterial.Icon.gmd_remove).apply {
+                        actionBar()
+                        paddingDp = 5
+                    }.mutate()
+                    isIconTinted = true
+                    identifier = 5555
+                }, fireflyUsers.size + 1)
+            }
+
         }
+        headerResult.withSavedInstance(savedInstanceState)
         headerResult.accountHeaderBackground.setBackgroundColor(getCompatColor(R.color.colorAccent))
         headerResult.onAccountHeaderListener = { view, profile, current ->
-            val switchedEmail = profile.name?.textString.toString()
-            val userHost = profile.description?.textString.toString()
-            globalViewModel.userEmail = switchedEmail
-            globalViewModel.userHost = userHost
-            homeViewModel.updateActiveUser(switchedEmail, userHost)
+            if(profile is IDrawerItem<*> && profile.identifier == 5555L){
+                homeViewModel.getFireflyUsers().observe(this@HomeActivity) { appUsers ->
+                    val fireflyUsers = arrayOfNulls<CharSequence>(appUsers.size)
+                    appUsers.forEachIndexed { index, users ->
+                        fireflyUsers[index] = "Host: " + users.userHost + " \n Account: " + users.userEmail
+                    }
+                    val checkedItems = BooleanArray(appUsers.size)
+                    val userChecked = arrayListOf<Int>()
+                    AlertDialog.Builder(this@HomeActivity)
+                        .setTitle("Choose account(s) to delete")
+                        .setMultiChoiceItems(fireflyUsers, checkedItems) { dialog, which, isChecked ->
+                            if (isChecked) {
+                                userChecked.add(which)
+                            } else {
+                                userChecked.remove(which)
+                            }
+                        }
+                        .setPositiveButton("OK") { _, _ ->
+                            var shouldRestart = false
+                            userChecked.forEach { checked ->
+                                shouldRestart = appUsers[checked].activeUser
+                                homeViewModel.removeFireflyAccounts(appUsers[checked])
+                            }
+                            if(shouldRestart){
+                                toastInfo("Please restart app for changes to take effect", Toast.LENGTH_LONG)
+                                finish()
+                            }
+                        }
+                        .show()
+                }
+            } else {
+                val switchedEmail = profile.name?.textString.toString()
+                val userHost = profile.description?.textString.toString()
+                globalViewModel.userEmail = switchedEmail
+                globalViewModel.userHost = userHost
+                homeViewModel.updateActiveUser(switchedEmail, userHost)
+            }
+
             false
         }
         globalViewModel.userEmail = homeViewModel.userEmail
@@ -465,33 +502,6 @@ class HomeActivity: BaseActivity(){
                     }
                     22L -> {
                         changeFragment(CurrencyListFragment())
-                    }
-
-                    // Remove account
-                    100001L -> {
-                        val fireflyUsers = arrayOf<CharSequence>()
-                        homeViewModel.getFireflyUsers().observe(this@HomeActivity){ fireflyUser ->
-                            fireflyUser.forEachIndexed { index, users ->
-                                fireflyUsers[index] = users.userHost + "-" + users.userEmail
-                            }
-                        }
-                        val checkedItems = BooleanArray(fireflyUsers.size)
-                        val userChecked = arrayListOf<Int>()
-                        AlertDialog.Builder(this@HomeActivity)
-                            .setTitle("Choose account(s) to delete")
-                            .setMultiChoiceItems(fireflyUsers, checkedItems) { dialog, which, isChecked ->
-                                if (isChecked) {
-                                    userChecked.add(which)
-                                } else {
-                                    userChecked.remove(which)
-                                }
-                            }
-                            .setPositiveButton("OK") { _, _ ->
-                                homeViewModel.removeFireflyAccounts(userChecked)
-                                toastInfo("Please restart app", Toast.LENGTH_LONG)
-                                finish()
-                            }
-                            .show()
                     }
                     else -> {
 
