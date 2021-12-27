@@ -23,6 +23,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
@@ -52,9 +53,12 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     private val fireflyUserDatabase by lazy { FireflyUserDatabase.getInstance(application).fireflyUserDao() }
     val userEmail = getActiveUserEmail()
 
-    fun updateActiveUser(userEmail: String, userHost: String){
+    fun updateActiveUser(userId: Long){
         viewModelScope.launch(Dispatchers.IO) {
-            fireflyUserDatabase.updateActiveUser(userEmail, userHost)
+            fireflyUserDatabase.removeActiveUser()
+            fireflyUserDatabase.updateActiveUser(userId)
+            FireflyUserDatabase.destroyInstance()
+            FireflyClient.destroyInstance()
         }
     }
 
@@ -128,6 +132,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             oldDatabase.renameTo(File(application.getDatabasePath("$uniqueHash-photuris.db").toString()))
             oldDatabase.delete()
             FireflyClient.destroyInstance()
+            val oldSharedPref = PreferenceManager.getDefaultSharedPreferences(getApplication())
             val userHost = AppPref(oldSharedPref).baseUrl
             viewModelScope.launch(Dispatchers.IO){
                 fireflyUserDatabase.insert(
@@ -153,7 +158,6 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             newAccountManager.authMethod = accountAuthMethod
             // TODO: Fix this before releasing
             //newAccountManager.tokenExpiry = accountTokenExpiry
-            newAccountManager.userEmail = authEmail
         }
         val fileArray = File(application.applicationInfo.dataDir + "/shared_prefs").listFiles()
         fileArray?.forEach {  file ->
@@ -161,9 +165,9 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
                 file.renameTo(File(application.applicationInfo.dataDir + "/shared_prefs/" + getUniqueHash() + "-user-preferences.xml"))
             }
         }
-        val customCaFile = File(getApplication<Application>().filesDir.path + "/user_custom.pem")
+        val customCaFile = File(application.applicationInfo.dataDir + "/user_custom.pem")
         if(customCaFile.exists()){
-            customCaFile.renameTo(File(getApplication<Application>().filesDir.path + "/" + getUniqueHash() + ".pem"))
+            customCaFile.renameTo(File(application.applicationInfo.dataDir + "/" + getUniqueHash() + ".pem"))
             customCaFile.delete()
         }
     }

@@ -222,7 +222,7 @@ fun Context.openFile(filePath: File): Intent{
 fun Context.getUniqueHash(): String {
     val uniqueHash: String
     runBlocking(Dispatchers.IO) {
-        uniqueHash = FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao().getCurrentActiveUserEmail()
+        uniqueHash = FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao().getUniqueHash()
     }
     return uniqueHash
 }

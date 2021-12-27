@@ -50,12 +50,6 @@ class NewAccountManager (private val accountManager: AccountManager,
                     TimeUnit.MINUTES.toMillis(value)).toString())
         }
 
-    var userEmail
-        get() = accountManager.getUserData(account, "USER_EMAIL") ?: "demo@firefly"
-        set(value) {
-            accountManager.setUserData(account, "USER_EMAIL", value)
-        }
-
     fun initializeAccount() {
         accountManager.addAccountExplicitly(account, "", bundleOf())
     }

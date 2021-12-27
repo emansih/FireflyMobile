@@ -138,7 +138,7 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
     private fun getBasicSummary(currencyCode: String, currencySymbol: String){
         val simpleData = SimpleData(
             getApplication<Application>().getSharedPreferences(
-                getApplication<Application>().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
+                getApplication<Application>().getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
         )
         val summaryService = genericService().create(SummaryService::class.java)
         summaryService.getBasicSummary(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth(),

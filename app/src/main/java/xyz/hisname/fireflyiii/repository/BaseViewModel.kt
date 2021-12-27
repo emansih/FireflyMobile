@@ -48,9 +48,6 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
         getApplication<Application>().getSharedPreferences(
             getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
 
-    @Deprecated("Use sharedPref() instead")
-    protected val oldSharedPref by lazy { PreferenceManager.getDefaultSharedPreferences(getApplication()) }
-
     protected fun genericService(): Retrofit {
         val cert = AppPref(sharedPref()).certValue
         return if (AppPref(sharedPref()).isCustomCa) {

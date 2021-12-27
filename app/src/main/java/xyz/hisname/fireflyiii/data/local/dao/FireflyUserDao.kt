@@ -19,8 +19,12 @@ abstract class FireflyUserDao: BaseDao<FireflyUsers> {
     @Query("SELECT uniqueHash FROM firefly_users WHERE activeUser =:isActive")
     abstract fun getUniqueHash(isActive: Boolean = true): String
 
-    @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE userEmail =:userName AND userHost =:userUrl")
-    abstract fun updateActiveUser(userName: String, userUrl: String, activeUser: Boolean = true)
+    @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE id =:userId")
+    abstract fun updateActiveUser(userId: Long, activeUser: Boolean = true)
+
+    // Questionable piece of code....
+    @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE activeUser =:aactiveUser")
+    abstract fun removeActiveUser(activeUser: Boolean = false, aactiveUser: Boolean = true)
 
     @Query("UPDATE firefly_users SET activeUser =:activeUser WHERE uniqueHash =:uniqueHash")
     abstract fun updateActiveUser(uniqueHash: String, activeUser: Boolean)

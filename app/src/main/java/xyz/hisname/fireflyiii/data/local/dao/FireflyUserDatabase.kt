@@ -28,5 +28,9 @@ abstract class FireflyUserDatabase: RoomDatabase()  {
                     .build().also { INSTANCE = it }
             }
         }
+
+        fun destroyInstance(){
+            INSTANCE = null
+        }
     }
 }
