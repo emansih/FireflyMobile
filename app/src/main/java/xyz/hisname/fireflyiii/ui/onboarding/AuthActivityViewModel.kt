@@ -81,11 +81,13 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             return
         }
         isLoading.postValue(true)
+        val accountHash = authInit(accessToken, baseUrl)
+
         viewModelScope.launch(Dispatchers.IO){
-            val accountHash = authInit(accessToken, baseUrl)
             val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
             val activeUserHash = fireflyUserDao.getUniqueHash()
-            if(activeUserHash.isNotBlank()){
+            // Don't believe in lint! activeUserHash can be `NULL`. I should probably fix this....
+            if(activeUserHash != null && activeUserHash.isNotBlank()){
                 fireflyUserDao.updateActiveUser(activeUserHash, false)
             }
             fireflyUserDao.insert(
@@ -96,7 +98,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             }
         }
 
-        val accountDao = AppDatabase.getInstance(applicationContext, getUniqueHash()).accountDataDao()
+        val accountDao = AppDatabase.getInstance(applicationContext, accountHash).accountDataDao()
         val accountsService = genericService().create(AccountsService::class.java)
         repository = AccountRepository(accountDao, accountsService)
         viewModelScope.launch(Dispatchers.IO){
