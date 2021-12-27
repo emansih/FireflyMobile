@@ -18,7 +18,6 @@
 
 package xyz.hisname.fireflyiii.repository.userinfo
 
-import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.SharedPreferences
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager

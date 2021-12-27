@@ -40,6 +40,6 @@ abstract class FireflyUserDao: BaseDao<FireflyUsers> {
     @Query("DELETE FROM firefly_users WHERE id =:primaryKey")
     abstract fun deleteUserByPrimaryKey(primaryKey: Long)
 
-    @Query("SELECT * FROM firefly_users WHERE userHost=:host AND userEmail=:email")
-    abstract fun getUserByHostAndEmail(host: String, email: String): FireflyUsers
+    @Query("SELECT * FROM firefly_users WHERE uniqueHash=:uniqueHash")
+    abstract fun getUserByHash(uniqueHash: String): FireflyUsers
 }

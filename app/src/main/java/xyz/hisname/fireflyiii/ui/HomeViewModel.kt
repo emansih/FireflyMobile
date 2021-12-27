@@ -84,7 +84,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
 
     fun removeFireflyAccounts(fireflyUsers: FireflyUsers){
         viewModelScope.launch(Dispatchers.IO){
-            val fireflyUser = fireflyUserDatabase.getUserByHostAndEmail(fireflyUsers.userHost, fireflyUsers.userEmail)
+            val fireflyUser = fireflyUserDatabase.getUserByHash(fireflyUsers.uniqueHash)
             File(getApplication<Application>().applicationInfo.dataDir + "/shared_prefs/" + fireflyUser.uniqueHash
                     + "-user-preferences.xml").delete()
             fireflyUserDatabase.deleteUserByPrimaryKey(fireflyUser.id)
