@@ -39,7 +39,4 @@ abstract class FireflyUserDao: BaseDao<FireflyUsers> {
 
     @Query("SELECT * FROM firefly_users WHERE uniqueHash=:uniqueHash")
     abstract fun getUserByHash(uniqueHash: String): FireflyUsers
-
-    @Query("UPDATE firefly_users WHERE ")
-    abstract fun setFirstUserAsDefault()
 }
