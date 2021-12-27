@@ -216,8 +216,6 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         authenticatorManager.secretKey = "tfWoJQbmV88Fxej1ysAPIxFireflyIIIApiToken"
         viewModelScope.launch(Dispatchers.IO){
             val fireflyUserDao = FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
-            // This is now the default account. We unset the previous default(if it exists) and set demo as default
-            fireflyUserDao.unsetDefaultUser()
             fireflyUserDao.insert(FireflyUsers(
                 0, accountHash,  "demo@firefly", "https://demo.firefly-iii.org", true
             ))

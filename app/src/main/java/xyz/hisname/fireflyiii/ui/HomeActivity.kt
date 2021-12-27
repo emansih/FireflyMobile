@@ -44,6 +44,7 @@ import com.mikepenz.materialdrawer.model.interfaces.*
 import com.mikepenz.materialdrawer.widget.AccountHeaderView
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.ActivityBaseBinding
+import xyz.hisname.fireflyiii.repository.models.FireflyUsers
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -217,10 +218,12 @@ class HomeActivity: BaseActivity(){
                         }
                         .setPositiveButton("OK") { _, _ ->
                             var shouldRestart = false
+                            val userToDelete = arrayListOf<FireflyUsers>()
                             userChecked.forEach { checked ->
                                 shouldRestart = appUsers[checked].activeUser
-                                homeViewModel.removeFireflyAccounts(appUsers[checked])
+                                userToDelete.add(appUsers[checked])
                             }
+                            homeViewModel.removeFireflyAccounts(userToDelete)
                             if(shouldRestart){
                                 toastInfo("Please restart app for changes to take effect", Toast.LENGTH_LONG)
                                 finish()

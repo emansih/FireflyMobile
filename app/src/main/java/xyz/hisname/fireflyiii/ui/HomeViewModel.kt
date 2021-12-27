@@ -82,18 +82,27 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
         return usersLiveData
     }
 
-    fun removeFireflyAccounts(fireflyUsers: FireflyUsers){
+    fun removeFireflyAccounts(fireflyUsers: List<FireflyUsers>){
         viewModelScope.launch(Dispatchers.IO){
-            val fireflyUser = fireflyUserDatabase.getUserByHash(fireflyUsers.uniqueHash)
-            File(getApplication<Application>().applicationInfo.dataDir + "/shared_prefs/" + fireflyUser.uniqueHash
-                    + "-user-preferences.xml").delete()
-            fireflyUserDatabase.deleteUserByPrimaryKey(fireflyUser.id)
-            File(getApplication<Application>().applicationInfo.dataDir + "/databases/" + fireflyUser.uniqueHash
-                    + "-photuris.db").delete()
-            // TODO: 1. Remove account from account manager here
-            //       2. Check if default account is deleted. If it is deleted, set first row in database as default
-            val accountManager = NewAccountManager(AccountManager.get(getApplication()), fireflyUser.uniqueHash)
-            accountManager.destroyAccount()
+            var isDefault = false
+            val allUsers = fireflyUserDatabase.getAllUser()
+            fireflyUsers.forEach { user ->
+                val fireflyUser = fireflyUserDatabase.getUserByHash(user.uniqueHash)
+                isDefault = fireflyUser.activeUser
+                File(getApplication<Application>().applicationInfo.dataDir + "/shared_prefs/" + fireflyUser.uniqueHash
+                        + "-user-preferences.xml").delete()
+                fireflyUserDatabase.deleteUserByPrimaryKey(fireflyUser.id)
+                File(getApplication<Application>().applicationInfo.dataDir + "/databases/" + fireflyUser.uniqueHash
+                        + "-photuris.db").delete()
+                File(getApplication<Application>().applicationInfo.dataDir + fireflyUser.uniqueHash + ".pem").delete()
+                val accountManager = NewAccountManager(AccountManager.get(getApplication()), fireflyUser.uniqueHash)
+                accountManager.destroyAccount()
+            }
+            // Check if all users are being deleted. can't set a default user if there are no users in DB.
+            if(isDefault && allUsers.size != fireflyUsers.size){
+                val uniqueHash = fireflyUserDatabase.getAllUser()[0].uniqueHash
+                fireflyUserDatabase.updateActiveUser(uniqueHash, true)
+            }
         }
 
     }
