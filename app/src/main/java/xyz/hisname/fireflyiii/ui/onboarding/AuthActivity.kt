@@ -34,21 +34,17 @@ import com.mikepenz.iconics.utils.icon
 import com.mikepenz.iconics.utils.sizeDp
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.databinding.ActivityAuthBinding
 import xyz.hisname.fireflyiii.ui.ProgressBar
 import xyz.hisname.fireflyiii.ui.base.AccountAuthenticatorActivity
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getViewModel
-import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackChangedListener  {
 
     private lateinit var authActivityViewModel: AuthActivityViewModel
     private val progressOverlay by bindView<View>(R.id.progress_overlay)
-    private val accountManager by lazy { OldAuthenticatorManager(AccountManager.get(this))  }
     private lateinit var binding: ActivityAuthBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +55,6 @@ class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackC
         setContentView(view)
         authActivityViewModel = getViewModel(AuthActivityViewModel::class.java)
         if(savedInstanceState == null){
-            val sharedPref = getSharedPreferences(getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
-            AppPref(sharedPref).isCustomCa = false
             supportFragmentManager.commit {
                 add(R.id.container, AuthChooserFragment())
             }
@@ -141,7 +135,7 @@ class AuthActivity: AccountAuthenticatorActivity(), FragmentManager.OnBackStackC
             val code = uri.getQueryParameter("code")
             if(uri.toString().startsWith(Constants.REDIRECT_URI)){
                 if(code != null && code.isNotBlank() && code.isNotEmpty()) {
-                    authActivityViewModel.getAccessToken(code, false, "", authActivityViewModel.baseUrl.value ?: "")
+                    authActivityViewModel.getAccessToken(code, false)
                 } else {
                     showDialog()
                 }

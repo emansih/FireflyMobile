@@ -169,6 +169,7 @@ class HomeActivity: BaseActivity(){
                     nameText = fireflyUser.userEmail
                     isNameShown = true
                     descriptionText = fireflyUser.userHost
+                    identifier = fireflyUser.id
                 }, indexed)
             }
             headerResult.addProfile(ProfileSettingDrawerItem().apply {
@@ -220,6 +221,7 @@ class HomeActivity: BaseActivity(){
                             var shouldRestart = false
                             val userToDelete = arrayListOf<FireflyUsers>()
                             userChecked.forEach { checked ->
+                                headerResult.removeProfile(checked)
                                 shouldRestart = appUsers[checked].activeUser
                                 userToDelete.add(appUsers[checked])
                             }
@@ -231,14 +233,19 @@ class HomeActivity: BaseActivity(){
                         }
                         .show()
                 }
+            } else if(profile is IDrawerItem<*> && profile.identifier == 100000L){
+                startActivity(Intent(this, AuthActivity::class.java))
             } else {
                 val switchedEmail = profile.name?.textString.toString()
                 val userHost = profile.description?.textString.toString()
                 globalViewModel.userEmail = switchedEmail
                 globalViewModel.userHost = userHost
-                homeViewModel.updateActiveUser(switchedEmail, userHost)
+                homeViewModel.updateActiveUser(profile.identifier)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container,
+                        DashboardFragment(), "dash")
+                    .commit()
             }
-
             false
         }
         globalViewModel.userEmail = homeViewModel.userEmail

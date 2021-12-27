@@ -18,9 +18,9 @@
 
 package xyz.hisname.fireflyiii.ui.onboarding
 
-import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Application
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
-import xyz.hisname.fireflyiii.data.local.account.OldAuthenticatorManager
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
@@ -160,7 +159,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         return true
     }
 
-    fun getAccessToken(code: String, isDemo: Boolean = false, email: String, hostUrl : String){
+    fun getAccessToken(code: String, isDemo: Boolean = false){
         isLoading.postValue(true)
         if (!code.isAscii()) {
             // Issue #46 on Github
@@ -168,6 +167,8 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             isAuthenticated.postValue(false)
             showErrorMessage.postValue("Bearer Token contains invalid Characters!")
         } else {
+            FireflyClient.destroyInstance()
+            FireflyUserDatabase.destroyInstance()
             var networkCall: Response<AuthModel>?
             viewModelScope.launch(Dispatchers.IO) {
                 try {
@@ -177,7 +178,8 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                         Constants.REDIRECT_URI
                     }
                     val oAuthService = genericService().create(OAuthService::class.java)
-                    networkCall = oAuthService.getAccessToken(code.trim(), authenticatorManager.clientId, authenticatorManager.secretKey, redirectUri)
+                    networkCall = oAuthService.getAccessToken(code.trim(), authenticatorManager.clientId,
+                        authenticatorManager.secretKey, redirectUri)
                     val authResponse = networkCall?.body()
                     val errorBody = networkCall?.errorBody()
                     if (authResponse != null && networkCall?.isSuccessful != false) {
@@ -220,7 +222,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                 0, accountHash,  "demo@firefly", "https://demo.firefly-iii.org", true
             ))
         }
-        getAccessToken(code, true, "demo@firefly", "https://demo.firefly-iii.org")
+        getAccessToken(code, true)
     }
 
     fun getUser(): LiveData<Boolean> {
@@ -253,10 +255,13 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     private fun authInit(accessToken: String, baseUrl: String): String{
         val uuid = UUID.randomUUID().toString()
         FireflyClient.destroyInstance()
+        FireflyUserDatabase.destroyInstance()
         authenticatorManager = NewAccountManager(accountManager, uuid)
         authenticatorManager.initializeAccount()
         authenticatorManager.accessToken = accessToken.trim()
-        AppPref(sharedPref()).baseUrl = baseUrl
+        val sharePref = getApplication<Application>().getSharedPreferences(
+            "$uuid-user-preferences", Context.MODE_PRIVATE)
+        AppPref(sharePref).baseUrl = baseUrl
         return uuid
     }
 }
