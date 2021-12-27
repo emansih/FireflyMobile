@@ -216,6 +216,13 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
         authenticatorManager.secretKey = "tfWoJQbmV88Fxej1ysAPIxFireflyIIIApiToken"
         viewModelScope.launch(Dispatchers.IO){
             val fireflyUserDao = FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
+            // Check if there is an active user
+            val activeUserHash = fireflyUserDao.getUniqueHash()
+            // Don't believe in lint! activeUserHash can be `NULL`. I should probably fix this....
+            if(activeUserHash != null && activeUserHash.isNotBlank()){
+                fireflyUserDao.updateActiveUser(activeUserHash, false)
+            }
+
             fireflyUserDao.insert(FireflyUsers(
                 0, accountHash,  "demo@firefly", "https://demo.firefly-iii.org", true
             ))
