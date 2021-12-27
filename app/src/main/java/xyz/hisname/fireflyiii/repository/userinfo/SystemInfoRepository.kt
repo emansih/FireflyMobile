@@ -35,11 +35,12 @@ class SystemInfoRepository(private val systemInfoService: SystemInfoService?,
                                    fireflyUserDatabase: FireflyUserDatabase){
         val userAttribute = systemInfoService?.getCurrentUserInfo()?.body()?.userData?.userAttributes
         if (userAttribute != null) {
+            val uniqueHash = fireflyUserDatabase.fireflyUserDao().getUniqueHash()
+            fireflyUserDatabase.fireflyUserDao().updateActiveUserEmail(uniqueHash, userAttribute.email)
+            fireflyUserDatabase.fireflyUserDao().updateActiveUserHost(uniqueHash, baseUrl)
             val authMethod = authenticationManager.authMethod
-            val newAccountManager = NewAccountManager(accountManager, fireflyUserDatabase.fireflyUserDao().getUniqueHash())
+            val newAccountManager = NewAccountManager(accountManager, uniqueHash)
             newAccountManager.authMethod = authMethod
-            fireflyUserDatabase.fireflyUserDao().updateActiveUserEmail(userAttribute.email)
-            fireflyUserDatabase.fireflyUserDao().updateActiveUserHost(baseUrl)
             // On single account systems, role will null
             if(userAttribute.role != null){
                 AppPref(sharedPreferences).userRole = userAttribute.role

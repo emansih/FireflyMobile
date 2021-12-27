@@ -136,19 +136,21 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             return false
         }
         val accountHash = authInit("", baseUrl)
+        viewModelScope.launch(Dispatchers.IO) {
+            val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
+            // Check if there is an active user
+            val activeUserHash = fireflyUserDao.getUniqueHash()
+            // Don't believe in lint! activeUserHash can be `NULL`. I should probably fix this....
+            if(activeUserHash != null && activeUserHash.isNotBlank()){
+                fireflyUserDao.updateActiveUser(activeUserHash, false)
+            }
+            fireflyUserDao.insert(
+                FireflyUsers(0, accountHash, "", baseUrl, true)
+            )
+        }
         if(fileUri != null && fileUri.toString().isNotBlank()) {
-            viewModelScope.launch(Dispatchers.IO){
-                val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
-                val activeUserHash = fireflyUserDao.getUniqueHash()
-                if(activeUserHash.isNotBlank()){
-                    fireflyUserDao.updateActiveUser(activeUserHash, false)
-                }
-                fireflyUserDao.insert(
-                    FireflyUsers(0, accountHash, "", baseUrl, true)
-                )
-                if(fileUri.toString().isNotBlank()) {
-                    FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
-                }
+            if(fileUri.toString().isNotBlank()) {
+                FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
             }
         }
         authenticatorManager.clientId = clientId
