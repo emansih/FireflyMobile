@@ -150,9 +150,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             )
         }
         if(fileUri != null && fileUri.toString().isNotBlank()) {
-            if(fileUri.toString().isNotBlank()) {
-                FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
-            }
+            FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
         }
         authenticatorManager.clientId = clientId
         authenticatorManager.secretKey = clientSecret

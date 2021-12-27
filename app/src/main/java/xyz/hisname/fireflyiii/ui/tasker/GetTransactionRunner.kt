@@ -19,7 +19,6 @@
 package xyz.hisname.fireflyiii.ui.tasker
 
 import android.accounts.AccountManager
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
@@ -49,15 +48,16 @@ import java.io.File
 class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTransactionOutput>() {
 
 
-    private lateinit var customCa: CustomCa
     private lateinit var sharedPref: SharedPreferences
     private lateinit var accountManager: OldAuthenticatorManager
     private lateinit var transactionDatabase: TransactionDataDao
     private lateinit var currencyDatabase: CurrencyDataDao
 
-    private fun genericService(): Retrofit {
+    private fun genericService(context: Context): Retrofit {
         val cert = AppPref(sharedPref).certValue
-        return if (AppPref(sharedPref).isCustomCa) {
+        val certFile = File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem")
+        return if (certFile.exists()) {
+            val customCa = CustomCa(certFile)
             FireflyClient.getClient(AppPref(sharedPref).baseUrl,
                     accountManager.accessToken, cert, customCa.getCustomTrust(), customCa.getCustomSSL())
         } else {
@@ -83,8 +83,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
         currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
         accountManager = OldAuthenticatorManager(AccountManager.get(context))
         sharedPref = context.getSharedPreferences(
-            context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
-        customCa = CustomCa(File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem"))
+            context.getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
         val transactionType = input.regular.transactionType ?: ""
         val transactionDescription = input.regular.transactionDescription ?: ""
         val transactionAmount = input.regular.transactionAmount ?: ""
@@ -122,7 +121,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                                        category: String?, tags: String?, budgetName: String?, billName: String?,
                                        notes: String?, fileUri: List<Uri>, context: Context): TaskerPluginResult<Unit>{
 
-        val transactionRepository = TransactionRepository(transactionDatabase, genericService().create(TransactionService::class.java))
+        val transactionRepository = TransactionRepository(transactionDatabase, genericService(context).create(TransactionService::class.java))
         val addTransaction = transactionRepository.addTransaction(type,description, date, time,
                 piggyBankName, amount, sourceName, destinationName, currencyName, category, tags, budgetName, billName, notes)
         return when {

@@ -28,7 +28,6 @@ import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import java.io.File
-import java.util.*
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 
@@ -37,15 +36,16 @@ abstract class BaseWorker(private val context: Context, workerParams: WorkerPara
     private val baseUrl by lazy { AppPref(sharedPref).baseUrl }
     private val accessToken by lazy { OldAuthenticatorManager(AccountManager.get(context)).accessToken }
     val genericService by lazy { FireflyClient.getClient(baseUrl,accessToken, AppPref(sharedPref).certValue, getTrust(), getSslSocket()) }
-    protected val sharedPref by lazy { context.getSharedPreferences(getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)}
-    private val customCa by lazy { CustomCa(File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem")) }
+    protected val sharedPref by lazy { context.getSharedPreferences(getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)}
+    private val customCa by lazy { CustomCa(customCaFile) }
+    private val customCaFile by lazy { File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem") }
 
     protected fun getUniqueHash(): String {
         return context.getUniqueHash()
     }
 
     private fun getTrust(): X509TrustManager?{
-        return if(AppPref(sharedPref).isCustomCa){
+        return if(customCaFile.exists()){
             customCa.getCustomTrust()
         } else {
             null
@@ -53,7 +53,7 @@ abstract class BaseWorker(private val context: Context, workerParams: WorkerPara
     }
 
     private fun getSslSocket(): SSLSocketFactory?{
-        return if(AppPref(sharedPref).isCustomCa){
+        return if(customCaFile.exists()){
             customCa.getCustomSSL()
         } else {
             null

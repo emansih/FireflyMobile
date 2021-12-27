@@ -32,7 +32,6 @@ interface PreferenceHelper {
     var languagePref: String
     var nightModeEnabled: Boolean
     var isKeyguardEnabled: Boolean
-    var isCustomCa: Boolean
     var isCurrencyThumbnailEnabled: Boolean
     var workManagerDelay: Long
     var workManagerLowBattery: Boolean

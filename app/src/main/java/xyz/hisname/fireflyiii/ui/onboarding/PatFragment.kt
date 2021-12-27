@@ -30,7 +30,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.databinding.FragmentPatBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
@@ -83,7 +82,6 @@ class PatFragment: Fragment() {
 
     private fun setWidgets(){
         binding.selfSignedCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
-            AppPref(sharedPref).isCustomCa = isChecked
             if(isChecked){
                 openSaf()
             } else {

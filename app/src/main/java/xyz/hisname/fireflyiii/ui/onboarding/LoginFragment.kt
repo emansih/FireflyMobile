@@ -34,7 +34,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.databinding.FragmentLoginBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
@@ -44,7 +43,7 @@ class LoginFragment: Fragment() {
 
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
     private val sharedPref by lazy {  requireContext().getSharedPreferences(
-        requireContext().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE) }
+        requireContext().getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE) }
     private var fileUri: Uri? = null
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var fragmentLoginBinding: FragmentLoginBinding? = null
@@ -78,7 +77,6 @@ class LoginFragment: Fragment() {
 
     private fun setWidget(){
         binding.selfSignedCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
-            AppPref(sharedPref).isCustomCa = isChecked
             if(isChecked){
                 openSaf()
             } else {

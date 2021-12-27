@@ -24,7 +24,6 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
@@ -50,8 +49,9 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
 
     protected fun genericService(): Retrofit {
         val cert = AppPref(sharedPref()).certValue
-        return if (AppPref(sharedPref()).isCustomCa) {
-            val customCa = CustomCa(File(getApplication<Application>().filesDir.path + "/" + getUniqueHash() + ".pem"))
+        val certFile = File(getApplication<Application>().filesDir.path + "/" + getUniqueHash() + ".pem")
+        return if (certFile.exists()) {
+            val customCa = CustomCa(certFile)
             FireflyClient.getClient(getActiveUserUrl(), newManager().accessToken, cert,
                 customCa.getCustomTrust(), customCa.getCustomSSL())
         } else {
