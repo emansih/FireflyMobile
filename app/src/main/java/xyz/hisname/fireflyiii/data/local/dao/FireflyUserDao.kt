@@ -7,7 +7,7 @@ import xyz.hisname.fireflyiii.repository.models.FireflyUsers
 @Dao
 abstract class FireflyUserDao: BaseDao<FireflyUsers> {
 
-    @Query("SELECT * FROM firefly_users")
+    @Query("SELECT * FROM firefly_users ORDER BY activeUser DESC")
     abstract fun getAllUser(): List<FireflyUsers>
 
     @Query("SELECT userEmail FROM firefly_users WHERE activeUser =:isActive")
