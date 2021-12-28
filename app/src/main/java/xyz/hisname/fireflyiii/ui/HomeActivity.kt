@@ -220,11 +220,19 @@ class HomeActivity: BaseActivity(){
                             var shouldRestart = false
                             val userToDelete = arrayListOf<FireflyUsers>()
                             userChecked.forEach { checked ->
-                                headerResult.removeProfile(checked - 1)
+                                headerResult.removeProfile(checked)
                                 shouldRestart = appUsers[checked].activeUser
                                 userToDelete.add(appUsers[checked])
                             }
                             homeViewModel.removeFireflyAccounts(userToDelete)
+                            /* We hide remove account when there are only 3 items in headerResult
+                             * 1. Default Account
+                             * 2. Add Account
+                             * 3. Remove Account
+                             */
+                            if(headerResult.profiles?.size == 3){
+                                headerResult.removeProfileByIdentifier(5555)
+                            }
                             if(shouldRestart){
                                 toastInfo("Please restart app for changes to take effect", Toast.LENGTH_LONG)
                                 finish()
