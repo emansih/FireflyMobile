@@ -51,7 +51,13 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     private val billRepository by lazy { BillRepository(billDataDao, billsService) }
     private val billPaidRepository by lazy { BillsPaidRepository(billPaidDao, billsService) }
     private val fireflyUserDatabase by lazy { FireflyUserDatabase.getInstance(application).fireflyUserDao() }
-    val userEmail = getActiveUserEmail()
+
+    fun shouldGoToAuth(): Boolean{
+        val application = getApplication<Application>()
+        val oldDatabase = application.getDatabasePath(Constants.DB_NAME)
+        // It can be `NULL`, don't be fooled by lint
+        return getActiveUserEmail() == null || oldDatabase.exists()
+    }
 
     fun updateActiveUser(userId: Long){
         viewModelScope.launch(Dispatchers.IO) {
@@ -123,11 +129,11 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
          */
         val application = getApplication<Application>()
         val oldDatabase = application.getDatabasePath(Constants.DB_NAME)
+        val uniqueHash = UUID.randomUUID().toString()
 
         if (oldDatabase.exists()){
             val accManager = OldAuthenticatorManager(AccountManager.get(getApplication()))
             val authEmail = accManager.userEmail
-            val uniqueHash = UUID.randomUUID().toString()
             AppDatabase.destroyInstance()
             oldDatabase.renameTo(File(application.getDatabasePath("$uniqueHash-photuris.db").toString()))
             oldDatabase.delete()
@@ -144,30 +150,28 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             val accountSecretKey = accManager.secretKey
             val accountAccessToken = accManager.accessToken
             val accountClientId = accManager.clientId
-            // This is throwing NULL for some reason
-            // val accountTokenExpiry = accManager.tokenExpiry
+            val accountTokenExpiry = accManager.tokenExpiry
             val accountRefreshToken = accManager.refreshToken
             val accountAuthMethod = accManager.authMethod
             accManager.destroyAccount()
-            val newAccountManager = NewAccountManager(AccountManager.get(application), UUID.randomUUID().toString())
+            val newAccountManager = NewAccountManager(AccountManager.get(application), uniqueHash)
             newAccountManager.initializeAccount()
             newAccountManager.secretKey = accountSecretKey
             newAccountManager.accessToken = accountAccessToken
             newAccountManager.clientId = accountClientId
             newAccountManager.refreshToken = accountRefreshToken
             newAccountManager.authMethod = accountAuthMethod
-            // TODO: Fix this before releasing
-            //newAccountManager.tokenExpiry = accountTokenExpiry
+            newAccountManager.tokenExpiry = accountTokenExpiry
         }
         val fileArray = File(application.applicationInfo.dataDir + "/shared_prefs").listFiles()
         fileArray?.forEach {  file ->
             if(file.name.startsWith("xyz.hisname.fireflyiii") && file.name.endsWith("preferences.xml")){
-                file.renameTo(File(application.applicationInfo.dataDir + "/shared_prefs/" + getUniqueHash() + "-user-preferences.xml"))
+                file.renameTo(File(application.applicationInfo.dataDir + "/shared_prefs/" + uniqueHash + "-user-preferences.xml"))
             }
         }
         val customCaFile = File(application.applicationInfo.dataDir + "/user_custom.pem")
         if(customCaFile.exists()){
-            customCaFile.renameTo(File(application.applicationInfo.dataDir + "/" + getUniqueHash() + ".pem"))
+            customCaFile.renameTo(File(application.applicationInfo.dataDir + "/" + uniqueHash + ".pem"))
             customCaFile.delete()
         }
     }
