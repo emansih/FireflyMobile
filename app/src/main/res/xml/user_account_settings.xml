@@ -56,9 +56,4 @@
         app:useSimpleSummaryProvider="true">
     </EditTextPreference>
 
-    <Preference
-        app:iconSpaceReserved="false"
-        app:key="logout"
-        app:title="Logout" />
-
 </PreferenceScreen>

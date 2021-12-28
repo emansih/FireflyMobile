@@ -20,7 +20,6 @@ package xyz.hisname.fireflyiii.ui.settings
 
 import android.accounts.AccountManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
 import androidx.appcompat.app.AlertDialog
@@ -36,15 +35,12 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.*
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
-import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
-import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -163,19 +159,6 @@ class SettingsAccountFragment: BaseSettings() {
                             .build())
                     .build()
             WorkManager.getInstance(requireContext()).enqueue(workBuilder)
-            true
-        }
-        val logout = findPreference<Preference>("logout") as Preference
-        logout.setOnPreferenceClickListener {
-            GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT) {
-                AppDatabase.clearDb(requireContext(), requireContext().getUniqueHash())
-                AppPref(sharedPref).clearPref()
-                accManager().destroyAccount()
-            }
-            val loginActivity = Intent(requireActivity(), AuthActivity::class.java)
-            startActivity(loginActivity)
-            FireflyClient.destroyInstance()
-            requireActivity().finish()
             true
         }
     }
