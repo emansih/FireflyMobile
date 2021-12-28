@@ -174,4 +174,22 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             customCaFile.delete()
         }
     }
+
+    fun deleteUnusedAccount(){
+        viewModelScope.launch(Dispatchers.IO){
+            val accountArray = arrayListOf<String>()
+            AccountManager.get(getApplication()).accounts.forEach { account ->
+                accountArray.add(account.name)
+            }
+
+            val userArray = arrayListOf<String>()
+            fireflyUserDatabase.getAllUser().forEach { fireflyUsers ->
+                userArray.add(fireflyUsers.uniqueHash)
+            }
+            val accountToRemove = accountArray.filterNot { userArray.contains(it) }
+            accountToRemove.forEach { uuid ->
+                NewAccountManager(AccountManager.get(getApplication()), uuid).destroyAccount()
+            }
+        }
+    }
 }
