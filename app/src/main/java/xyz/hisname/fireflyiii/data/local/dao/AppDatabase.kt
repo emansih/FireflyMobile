@@ -87,6 +87,9 @@ abstract class AppDatabase: RoomDatabase() {
         }
 
         fun destroyInstance(){
+            if (INSTANCE?.isOpen == true) {
+                INSTANCE?.close()
+            }
             INSTANCE = null
         }
 

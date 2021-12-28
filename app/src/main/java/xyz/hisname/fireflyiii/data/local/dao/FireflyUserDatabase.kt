@@ -30,6 +30,9 @@ abstract class FireflyUserDatabase: RoomDatabase()  {
         }
 
         fun destroyInstance(){
+            if (INSTANCE?.isOpen == true) {
+                INSTANCE?.close()
+            }
             INSTANCE = null
         }
     }
