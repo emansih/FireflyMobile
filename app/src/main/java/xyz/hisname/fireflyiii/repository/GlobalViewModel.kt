@@ -27,8 +27,6 @@ import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class GlobalViewModel(application: Application): AndroidViewModel(application) {
 
-    var userEmail = ""
-    var userHost = ""
     var isDark: Boolean = false
         private set
 

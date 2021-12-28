@@ -82,8 +82,7 @@ class HomeActivity: BaseActivity(){
         instanceState = savedInstanceState
         binding = ActivityBaseBinding.inflate(layoutInflater)
         val view = binding.root
-        // It can be `NULL`, don't be fooled by lint
-        if(homeViewModel.userEmail == null){
+        if(!homeViewModel.shouldGoToAuth()){
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
         } else {
@@ -236,10 +235,6 @@ class HomeActivity: BaseActivity(){
             } else if(profile is IDrawerItem<*> && profile.identifier == 100000L){
                 startActivity(Intent(this, AuthActivity::class.java))
             } else {
-                val switchedEmail = profile.name?.textString.toString()
-                val userHost = profile.description?.textString.toString()
-                globalViewModel.userEmail = switchedEmail
-                globalViewModel.userHost = userHost
                 homeViewModel.updateActiveUser(profile.identifier)
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container,
@@ -248,7 +243,6 @@ class HomeActivity: BaseActivity(){
             }
             false
         }
-        globalViewModel.userEmail = homeViewModel.userEmail
     }
 
     private fun setUpDrawer(savedInstanceState: Bundle?){
