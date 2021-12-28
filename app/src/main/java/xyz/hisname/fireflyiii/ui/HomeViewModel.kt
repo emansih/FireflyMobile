@@ -56,7 +56,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
         val application = getApplication<Application>()
         val oldDatabase = application.getDatabasePath(Constants.DB_NAME)
         // It can be `NULL`, don't be fooled by lint
-        return getActiveUserEmail() == null || !oldDatabase.exists()
+        return getActiveUserEmail() == null && !oldDatabase.exists()
     }
 
     fun updateActiveUser(userId: Long){

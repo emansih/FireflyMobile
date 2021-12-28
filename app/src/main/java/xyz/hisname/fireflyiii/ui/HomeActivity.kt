@@ -82,7 +82,7 @@ class HomeActivity: BaseActivity(){
         instanceState = savedInstanceState
         binding = ActivityBaseBinding.inflate(layoutInflater)
         val view = binding.root
-        if(!homeViewModel.shouldGoToAuth()){
+        if(homeViewModel.shouldGoToAuth()){
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
         } else {
@@ -220,7 +220,7 @@ class HomeActivity: BaseActivity(){
                             var shouldRestart = false
                             val userToDelete = arrayListOf<FireflyUsers>()
                             userChecked.forEach { checked ->
-                                headerResult.removeProfile(checked)
+                                headerResult.removeProfile(checked - 1)
                                 shouldRestart = appUsers[checked].activeUser
                                 userToDelete.add(appUsers[checked])
                             }
