@@ -55,11 +55,10 @@ class FireflyAccountAuthenticator(private val context: Context): AbstractAccount
 
     @Throws(NetworkErrorException::class)
     override fun addAccount(response: AccountAuthenticatorResponse, accountType: String, authTokenType: String?,
-                            requiredFeatures: Array<String>?, options: Bundle?): Bundle? {
+                            requiredFeatures: Array<String>?, options: Bundle?): Bundle {
         val accountManager = context.getSystemService(Context.ACCOUNT_SERVICE) as AccountManager
         val accounts = accountManager.getAccountsByType("OAUTH")
-        lateinit var activityToLaunch: Intent
-        activityToLaunch = if(accounts.isEmpty()){
+        val activityToLaunch = if(accounts.isEmpty()){
             Intent(context, AuthActivity::class.java)
         } else {
             Intent(context, HomeActivity::class.java)

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 class NewAccountManager (private val accountManager: AccountManager,
                          private val accountHash: String) {
 
-    private val account by lazy { Account(accountHash, "OAUTH") }
+    private val account by lazy { Account(accountHash, "hisname.xyz") }
 
     var secretKey
         get() = accountManager.getUserData(account, "SECRET_KEY") ?: ""
