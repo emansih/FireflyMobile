@@ -109,6 +109,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
                 File(getApplication<Application>().applicationInfo.dataDir + fireflyUser.uniqueHash + ".pem").delete()
                 val accountManager = NewAccountManager(AccountManager.get(getApplication()), fireflyUser.uniqueHash)
                 accountManager.destroyAccount()
+                WorkManager.getInstance(getApplication()).cancelAllWorkByTag(user.uniqueHash)
             }
             // Check if all users are being deleted. can't set a default user if there are no users in DB.
             if(isDefault && allUsers.size != fireflyUsers.size){
@@ -116,7 +117,6 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
                 fireflyUserDatabase.updateActiveUser(uniqueHash, true)
             }
         }
-
     }
 
     fun migrateFirefly(){

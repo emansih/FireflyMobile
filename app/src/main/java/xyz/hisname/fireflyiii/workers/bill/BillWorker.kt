@@ -126,14 +126,15 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val billWork = PeriodicWorkRequestBuilder<BillWorker>(Duration.ofMinutes(delay))
-                        .setInputData(billData.build())
-                        .addTag("add_bill_periodic_$billWorkManagerId"  + "_$uuid")
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(networkType)
-                                .setRequiresBatteryNotLow(battery)
-                                .setRequiresCharging(requireCharging)
-                                .build())
-                        .build()
+                    .setInputData(billData.build())
+                    .addTag("add_bill_periodic_$billWorkManagerId"  + "_$uuid")
+                    .addTag(uuid)
+                    .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(networkType)
+                        .setRequiresBatteryNotLow(battery)
+                        .setRequiresCharging(requireCharging)
+                        .build())
+                    .build()
                 WorkManager.getInstance(context).enqueue(billWork)
                 runBlocking(Dispatchers.IO){
                     val billDatabase = AppDatabase.getInstance(context, uuid).billDataDao()

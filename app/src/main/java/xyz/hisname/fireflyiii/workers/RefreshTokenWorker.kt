@@ -42,6 +42,7 @@ class RefreshTokenWorker(private val context: Context, workerParameters: WorkerP
                 .Builder(RefreshTokenWorker::class.java, time, TimeUnit.HOURS)
                 .setInputData(data)
                 .addTag("refresh_worker_$uuid")
+                .addTag(uuid)
                 .setConstraints(Constraints.Builder()
                     .setRequiresCharging(true)
                     .setRequiredNetworkType(NetworkType.CONNECTED)

@@ -47,6 +47,7 @@ class DeleteCurrencyWorker(private val context: Context, workerParameters: Worke
                     PeriodicWorkRequestBuilder<DeleteCurrencyWorker>(Duration.ofMinutes(delay))
                         .setInputData(currencyData)
                         .addTag("delete_currency_periodic$currencyId"  + "_$uuid")
+                        .addTag(uuid)
                         .setConstraints(
                             Constraints.Builder()
                                 .setRequiredNetworkType(networkType)

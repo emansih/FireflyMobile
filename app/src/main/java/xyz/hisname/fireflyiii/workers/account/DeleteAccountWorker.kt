@@ -47,14 +47,15 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val deleteAccountWork = PeriodicWorkRequestBuilder<DeleteAccountWorker>(Duration.ofMinutes(delay))
-                        .setInputData(accountData)
-                        .addTag("delete_periodic_account_$accountId" + "_$uuid")
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(networkType)
-                                .setRequiresBatteryNotLow(battery)
-                                .setRequiresCharging(requireCharging)
-                                .build())
-                        .build()
+                    .setInputData(accountData)
+                    .addTag("delete_periodic_account_$accountId" + "_$uuid")
+                    .addTag(uuid)
+                    .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(networkType)
+                        .setRequiresBatteryNotLow(battery)
+                        .setRequiresCharging(requireCharging)
+                        .build())
+                    .build()
                 WorkManager.getInstance(context).enqueue(deleteAccountWork)
             }
         }

@@ -46,14 +46,15 @@ class DeleteCategoryWorker(private val context: Context, workerParameters: Worke
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val deleteCategoryWork = PeriodicWorkRequestBuilder<DeleteCurrencyWorker>(Duration.ofMinutes(delay))
-                        .setInputData(categoryData)
-                        .addTag("delete_periodic_category_$categoryId" + "_$uuid")
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(networkType)
-                                .setRequiresBatteryNotLow(battery)
-                                .setRequiresCharging(requireCharging)
-                                .build())
-                        .build()
+                    .setInputData(categoryData)
+                    .addTag("delete_periodic_category_$categoryId" + "_$uuid")
+                    .addTag(uuid)
+                    .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(networkType)
+                        .setRequiresBatteryNotLow(battery)
+                        .setRequiresCharging(requireCharging)
+                        .build())
+                    .build()
                 WorkManager.getInstance(context).enqueue(deleteCategoryWork)
             }
         }

@@ -54,6 +54,7 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
                         .setInputData(dataBuilder.putString("attachableType", attachableType.name).build())
                         .setInputData(dataBuilder.putString("uuid", uuid).build())
                         .addTag("add_attachment_tag_$objectId"  + "_$uuid")
+                        .addTag(uuid)
                         .setConstraints(Constraints.Builder()
                             .setRequiredNetworkType(networkType)
                             .setRequiresBatteryNotLow(battery)

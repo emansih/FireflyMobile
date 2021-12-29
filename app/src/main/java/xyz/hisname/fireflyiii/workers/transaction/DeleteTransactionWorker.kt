@@ -64,8 +64,9 @@ class DeleteTransactionWorker(private val context: Context, workerParameters: Wo
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val transactionWork = PeriodicWorkRequestBuilder<DeleteTransactionWorker>(Duration.ofMinutes(delay))
-                        .setInputData(transactionData)
-                        .setConstraints(Constraints.Builder()
+                    .setInputData(transactionData)
+                    .addTag(uuid)
+                    .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
                                 .setRequiresCharging(requireCharging)

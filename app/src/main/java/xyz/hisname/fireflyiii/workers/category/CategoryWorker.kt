@@ -46,14 +46,15 @@ class CategoryWorker(private val context: Context, workerParameters: WorkerParam
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val deleteCategoryWork = PeriodicWorkRequestBuilder<CategoryWorker>(Duration.ofMinutes(delay))
-                        .setInputData(categoryData)
-                        .addTag("periodic_category_$categoryName" + "_$uuid")
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(networkType)
-                                .setRequiresBatteryNotLow(battery)
-                                .setRequiresCharging(requireCharging)
-                                .build())
-                        .build()
+                    .setInputData(categoryData)
+                    .addTag("periodic_category_$categoryName" + "_$uuid")
+                    .addTag(uuid)
+                    .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(networkType)
+                        .setRequiresBatteryNotLow(battery)
+                        .setRequiresCharging(requireCharging)
+                        .build())
+                    .build()
                 WorkManager.getInstance(context).enqueue(deleteCategoryWork)
             }
         }

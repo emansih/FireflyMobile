@@ -83,14 +83,15 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val accountWork = PeriodicWorkRequestBuilder<AccountWorker>(Duration.ofMinutes(delay))
-                        .setInputData(accountData.build())
-                        .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(networkType)
-                                .setRequiresBatteryNotLow(battery)
-                                .setRequiresCharging(requireCharging)
-                                .build())
-                        .addTag("add_periodic_account_$accountName" + "_" + accountType + "_$uuid")
-                        .build()
+                    .setInputData(accountData.build())
+                    .addTag(uuid)
+                    .addTag("add_periodic_account_$accountName" + "_" + accountType + "_$uuid")
+                    .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(networkType)
+                        .setRequiresBatteryNotLow(battery)
+                        .setRequiresCharging(requireCharging)
+                        .build())
+                    .build()
                 WorkManager.getInstance(context).enqueue(accountWork)
                 runBlocking(Dispatchers.IO) {
                     val accountDatabase = AppDatabase.getInstance(context, uuid).accountDataDao()

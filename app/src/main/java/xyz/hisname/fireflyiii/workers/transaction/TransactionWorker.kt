@@ -215,8 +215,9 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                                 .setRequiresBatteryNotLow(battery)
                                 .setRequiresCharging(requireCharging)
                                 .build())
-                        .addTag("add_periodic_transaction_$transactionWorkManagerId")
-                        .build()
+                    .addTag("add_periodic_transaction_$transactionWorkManagerId")
+                    .addTag(uuid)
+                    .build()
                 WorkManager.getInstance(context).enqueue(transactionWork)
             }
         }
@@ -242,8 +243,9 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                             .setRequiresBatteryNotLow(battery)
                             .setRequiresCharging(requireCharging)
                             .build())
-                        .addTag("add_periodic_transaction_$masterTransactionId" + "_$uuid")
-                        .build()
+                    .addTag("add_periodic_transaction_$masterTransactionId" + "_$uuid")
+                    .addTag(uuid)
+                    .build()
                 WorkManager.getInstance(context).enqueue(transactionWork)
             }
         }
