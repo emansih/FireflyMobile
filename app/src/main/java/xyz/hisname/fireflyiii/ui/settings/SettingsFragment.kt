@@ -146,6 +146,11 @@ class SettingsFragment: BaseSettings() {
             sizeDp = 24
             colorRes = setIconColor()
         }
+        thumbnailPref.setOnPreferenceChangeListener { preference, newValue ->
+            val thumbNail = newValue as Boolean
+            AppPref(sharedPref).isCurrencyThumbnailEnabled = thumbNail
+            true
+        }
     }
 
     private fun setTutorial(){
@@ -206,6 +211,11 @@ class SettingsFragment: BaseSettings() {
             sizeDp = 24
             colorRes = setIconColor()
         }
+        keyguardPref.setOnPreferenceChangeListener { preference, newValue ->
+            val keyGuard = newValue as Boolean
+            AppPref(sharedPref).isKeyguardEnabled = keyGuard
+            true
+        }
     }
 
     private fun deleteItems(){
@@ -248,8 +258,10 @@ class SettingsFragment: BaseSettings() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         chooseFolder = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folderChoosen ->
-            AppPref(sharedPref).userDefinedDownloadDirectory = folderChoosen.toString()
-            userDownloadDirectoryPref.summary = folderChoosen.toString()
+            if(folderChoosen != null){
+                AppPref(sharedPref).userDefinedDownloadDirectory = folderChoosen.toString()
+                userDownloadDirectoryPref.summary = folderChoosen.toString()
+            }
         }
     }
 }

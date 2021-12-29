@@ -53,6 +53,10 @@ class TransactionSettings: BaseSettings() {
 
     private fun setDateTimeFormat(){
         val dateTimeFormat = findPreference<ListPreference>("dateTimeFormat") as ListPreference
+        dateTimeFormat.setOnPreferenceChangeListener { preference, newValue ->
+            AppPref(sharedPref).dateTimeFormat = newValue.toString().toInt()
+            true
+        }
         if(AppPref(sharedPref).userDefinedDateTimeFormat.isNotEmpty()){
             dateTimeFormat.isEnabled = false
         }
