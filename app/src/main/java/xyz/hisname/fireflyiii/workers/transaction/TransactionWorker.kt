@@ -54,7 +54,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
         val transactionRepository = TransactionRepository(
                 AppDatabase.getInstance(context, uuid).transactionDataDao(), transactionService)
         val tempRepository = TransactionRepository(
-                TmpDatabase.getInstance(context).transactionDataDao(), transactionService)
+                TmpDatabase.getInstance(context, uuid).transactionDataDao(), transactionService)
         val masterTransactionId = inputData.getLong("masterTransactionId", 0)
         val groupTitle = inputData.getString("groupTitle")
         if(masterTransactionId != 0L){

@@ -53,7 +53,7 @@ import java.net.UnknownHostException
 class AddTransactionViewModel(application: Application): BaseViewModel(application) {
 
 
-    private val temporaryDb = TmpDatabase.getInstance(application)
+    private val temporaryDb = TmpDatabase.getInstance(application, getUniqueHash())
     private val transactionService = genericService().create(TransactionService::class.java)
 
     private val transactionRepository = TransactionRepository(

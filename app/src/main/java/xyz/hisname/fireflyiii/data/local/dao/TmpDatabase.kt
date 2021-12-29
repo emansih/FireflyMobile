@@ -42,10 +42,10 @@ abstract class TmpDatabase: RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: TmpDatabase? = null
 
-        fun getInstance(context: Context): TmpDatabase{
+        fun getInstance(context: Context, uuid: String): TmpDatabase{
             return INSTANCE ?: synchronized(this){
                 INSTANCE ?: Room.databaseBuilder(context,
-                        TmpDatabase::class.java,"temp-"  + Constants.DB_NAME)
+                        TmpDatabase::class.java,"$uuid-temp-"  + Constants.DB_NAME)
                         .setQueryExecutor(Dispatchers.IO.asExecutor())
                         .build().also { INSTANCE = it }
             }

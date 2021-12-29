@@ -128,7 +128,8 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
          * 3. Rename user's account
          * 4. Rename shared preference
          * 5. Rename custom CA file(if it exists)
-         * 6. Cancel existing work manager work(s) and re-queue them and make them multi user aware
+         * 6. Cancel existing work manager work(s) and re-queue them and make them multi user aware(Only cancel refresh_token work)
+         * 7. Rename tmp database
          */
         val application = getApplication<Application>()
         val oldDatabase = application.getDatabasePath(Constants.DB_NAME)
@@ -172,11 +173,20 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
                     file.renameTo(File(application.applicationInfo.dataDir + "/shared_prefs/" + uniqueHash + "-user-preferences.xml"))
                 }
             }
-            val appPreference = AppPref(getApplication<Application>().getSharedPreferences("$uniqueHash-user-preferences", Context.MODE_PRIVATE))
-            val workManagerDelayPref = appPreference.workManagerDelayPref
-            // User has enabled work manager if pref is more than 0
-            if(workManagerDelayPref.toLong() > 0){
-                RefreshTokenWorker.migrateWorkerV1ToV2(WorkManager.getInstance(getApplication()), uniqueHash, workManagerDelayPref.toLong())
+            val refreshTokenPref = getApplication<Application>()
+                .getSharedPreferences("$uniqueHash-user-preferences", Context.MODE_PRIVATE)
+                .getBoolean("auto_refresh_token", false)
+            val refreshTokenInterval = getApplication<Application>()
+                .getSharedPreferences("$uniqueHash-user-preferences", Context.MODE_PRIVATE)
+                .getLong("refresh_token_interval", 0)
+
+            // User has enabled refreshing token preference
+            if(refreshTokenPref && refreshTokenInterval > 0){
+                RefreshTokenWorker.migrateWorkerV1ToV2(WorkManager.getInstance(getApplication()), uniqueHash, refreshTokenInterval)
+            }
+            val tmpDb = File("temp-" + Constants.DB_NAME)
+            if(tmpDb.exists()){
+                tmpDb.renameTo(File(application.getDatabasePath("$uniqueHash-temp-" + Constants.DB_NAME).toString()))
             }
         }
 

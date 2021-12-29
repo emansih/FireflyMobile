@@ -32,14 +32,14 @@ class RefreshTokenWorker(private val context: Context, workerParameters: WorkerP
 
     companion object {
         // Worker migration from single user to multi user
-        fun migrateWorkerV1ToV2(workManager: WorkManager, uuid: String, time: Long){
+        fun migrateWorkerV1ToV2(workManager: WorkManager, uuid: String, interval: Long){
             val refreshWorker = workManager.getWorkInfosByTag("refresh_worker")
             refreshWorker.cancel(true)
             val data = Data.Builder()
                 .putString("uuid", uuid)
                 .build()
             val workBuilder = PeriodicWorkRequest
-                .Builder(RefreshTokenWorker::class.java, time, TimeUnit.HOURS)
+                .Builder(RefreshTokenWorker::class.java, interval, TimeUnit.HOURS)
                 .setInputData(data)
                 .addTag("refresh_worker_$uuid")
                 .addTag(uuid)
