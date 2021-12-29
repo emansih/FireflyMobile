@@ -34,7 +34,8 @@ abstract class BaseSettings: PreferenceFragmentCompat() {
         requireContext().getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
     }
     protected val globalViewModel by lazy { getViewModel(GlobalViewModel::class.java) }
-    override fun setDivider(divider: Drawable) {
+    
+    override fun setDivider(divider: Drawable?) {
         super.setDivider(ColorDrawable(Color.GRAY))
     }
 }
