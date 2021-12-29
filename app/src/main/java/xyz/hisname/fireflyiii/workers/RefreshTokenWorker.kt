@@ -26,16 +26,38 @@ import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.OAuthService
 import xyz.hisname.fireflyiii.repository.models.auth.AuthModel
+import java.util.concurrent.TimeUnit
 
 class RefreshTokenWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
-    private val accManager by lazy { NewAccountManager(AccountManager.get(context), getUniqueHash()) }
+    companion object {
+        // Worker migration from single user to multi user
+        fun migrateWorkerV1ToV2(workManager: WorkManager, uuid: String, time: Long){
+            val refreshWorker = workManager.getWorkInfosByTag("refresh_worker")
+            refreshWorker.cancel(true)
+            val data = Data.Builder()
+                .putString("uuid", uuid)
+                .build()
+            val workBuilder = PeriodicWorkRequest
+                .Builder(RefreshTokenWorker::class.java, time, TimeUnit.HOURS)
+                .setInputData(data)
+                .addTag("refresh_worker_$uuid")
+                .setConstraints(Constraints.Builder()
+                    .setRequiresCharging(true)
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresBatteryNotLow(true)
+                    .build())
+                .build()
+            workManager.enqueue(workBuilder)
+        }
+    }
 
     override suspend fun doWork(): Result {
         val networkCall: Response<AuthModel>?
         var workResult: Result
         try {
-            networkCall = genericService.create(OAuthService::class.java).getRefreshToken("refresh_token",
+            val accManager = NewAccountManager(AccountManager.get(context), uuid)
+            networkCall = genericService(uuid).create(OAuthService::class.java).getRefreshToken("refresh_token",
                     accManager.refreshToken, accManager.clientId,
                     accManager.secretKey)
             val authResponse = networkCall.body()

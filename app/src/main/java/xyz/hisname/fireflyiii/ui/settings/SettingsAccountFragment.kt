@@ -41,6 +41,7 @@ import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.repository.auth.AuthViewModel
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.extension.*
+import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -151,7 +152,7 @@ class SettingsAccountFragment: BaseSettings() {
         refreshTokenInterval.setOnPreferenceChangeListener { _, newValue ->
             val workBuilder = PeriodicWorkRequest
                     .Builder(RefreshTokenWorker::class.java, newValue.toString().toLong(), TimeUnit.HOURS)
-                    .addTag("refresh_worker")
+                    .addTag("refresh_worker_" + requireContext().getUniqueHash())
                     .setConstraints(Constraints.Builder()
                             .setRequiresCharging(true)
                             .setRequiredNetworkType(NetworkType.CONNECTED)

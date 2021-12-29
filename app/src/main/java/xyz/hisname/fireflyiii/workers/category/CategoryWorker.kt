@@ -26,31 +26,28 @@ import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
 
 class CategoryWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val categoryDao by lazy { AppDatabase.getInstance(context, getUniqueHash()).categoryDataDao() }
-
-
     companion object {
-        fun initPeriodicWorker(categoryName: String, context: Context) {
+        fun initPeriodicWorker(categoryName: String, context: Context, uuid: String) {
             val categoryTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("periodic_category_$categoryName").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("periodic_category_$categoryName" + "_$uuid").get()
             if (categoryTag == null || categoryTag.size == 0) {
                 val categoryData = Data.Builder()
-                        .putString("categoryName", categoryName)
-                        .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+                    .putString("categoryName", categoryName)
+                    .putString("uuid", uuid)
+                    .build()
+                val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val deleteCategoryWork = PeriodicWorkRequestBuilder<CategoryWorker>(Duration.ofMinutes(delay))
                         .setInputData(categoryData)
-                        .addTag("periodic_category_$categoryName")
+                        .addTag("periodic_category_$categoryName" + "_$uuid")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
@@ -61,20 +58,21 @@ class CategoryWorker(private val context: Context, workerParameters: WorkerParam
             }
         }
 
-        fun cancelWorker(categoryName: String, context: Context){
-            WorkManager.getInstance(context).cancelAllWorkByTag("periodic_category_$categoryName")
+        fun cancelWorker(categoryName: String, context: Context, uuid: String){
+            WorkManager.getInstance(context).cancelAllWorkByTag("periodic_category_$categoryName" + "_$uuid")
         }
     }
 
 
     override suspend fun doWork(): Result {
+        val categoryDao = AppDatabase.getInstance(context, uuid).categoryDataDao()
         val categoryName = inputData.getString("categoryName")
-        val repository = CategoryRepository(categoryDao, genericService.create(CategoryService::class.java))
+        val repository = CategoryRepository(categoryDao, genericService(uuid).create(CategoryService::class.java))
         val addCategory =  repository.addCategory(categoryName ?: "")
         when {
             addCategory.response != null -> {
                 context.showNotification("Category Added", context.getString(R.string.category_added, categoryName), R.drawable.app_icon)
-                cancelWorker(categoryName ?: "", context)
+                cancelWorker(categoryName ?: "", context, uuid)
                 return Result.success()
             }
             addCategory.errorMessage != null -> {
@@ -86,7 +84,7 @@ class CategoryWorker(private val context: Context, workerParameters: WorkerParam
             }
             else -> {
                 context.showNotification("Error Adding $categoryName", "Please try again later", R.drawable.app_icon)
-                cancelWorker(categoryName ?: "", context)
+                cancelWorker(categoryName ?: "", context, uuid)
                 return Result.failure()
             }
         }

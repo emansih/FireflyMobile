@@ -31,17 +31,16 @@ import java.time.Duration
 
 class DeleteAccountWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val accountDatabase by lazy { AppDatabase.getInstance(context, getUniqueHash()).accountDataDao() }
-
     companion object {
-        fun initPeriodicWorker(accountId: Long, context: Context){
+        fun initPeriodicWorker(accountId: Long, context: Context, uuid: String){
             val accountTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_account_$accountId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_account_$accountId" + "_$uuid").get()
             if(accountTag == null || accountTag.size == 0) {
                 val accountData = Data.Builder()
-                        .putLong("accountId", accountId)
-                        .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() +
+                    .putLong("accountId", accountId)
+                    .putString("uuid", uuid)
+                    .build()
+                val appPref = AppPref(context.getSharedPreferences(uuid +
                         "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
@@ -49,7 +48,7 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
                 val requireCharging = appPref.workManagerRequireCharging
                 val deleteAccountWork = PeriodicWorkRequestBuilder<DeleteAccountWorker>(Duration.ofMinutes(delay))
                         .setInputData(accountData)
-                        .addTag("delete_periodic_account_$accountId")
+                        .addTag("delete_periodic_account_$accountId" + "_$uuid")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
@@ -60,18 +59,19 @@ class DeleteAccountWorker(private val context: Context, workerParameters: Worker
             }
         }
 
-        fun cancelWorker(accountId: Long, context: Context){
-            WorkManager.getInstance(context).cancelAllWorkByTag("delete_periodic_account_$accountId")
+        fun cancelWorker(accountId: Long, context: Context, uuid: String){
+            WorkManager.getInstance(context).cancelAllWorkByTag("delete_periodic_account_$accountId" + "_$uuid")
         }
     }
 
     override suspend fun doWork(): Result {
+        val accountDatabase = AppDatabase.getInstance(context, uuid).accountDataDao()
         val accountId = inputData.getLong("accountId", 0L)
-        val accountService = genericService.create(AccountsService::class.java)
+        val accountService = genericService(uuid).create(AccountsService::class.java)
         val repository = AccountRepository(accountDatabase, accountService)
         return when(repository.deleteAccountById(accountId)){
             HttpConstants.NO_CONTENT_SUCCESS -> {
-                cancelWorker(accountId, context)
+                cancelWorker(accountId, context, uuid)
                 Result.success()
             }
             HttpConstants.FAILED -> {

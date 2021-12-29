@@ -24,7 +24,6 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
 import xyz.hisname.fireflyiii.repository.category.CategoryRepository
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.workers.DeleteCurrencyWorker
@@ -32,24 +31,23 @@ import java.time.Duration
 
 class DeleteCategoryWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val categoryDao by lazy { AppDatabase.getInstance(context, getUniqueHash()).categoryDataDao() }
-
     companion object {
-        fun initPeriodicWorker(categoryId: Long, context: Context) {
+        fun initPeriodicWorker(categoryId: Long, context: Context, uuid: String) {
             val categoryTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_category_$categoryId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_category_$categoryId" + "_$uuid").get()
             if (categoryTag == null || categoryTag.size == 0) {
                 val categoryData = Data.Builder()
-                        .putLong("categoryId", categoryId)
-                        .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+                    .putLong("categoryId", categoryId)
+                    .putString("uuid", uuid)
+                    .build()
+                val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val deleteCategoryWork = PeriodicWorkRequestBuilder<DeleteCurrencyWorker>(Duration.ofMinutes(delay))
                         .setInputData(categoryData)
-                        .addTag("delete_periodic_category_$categoryId")
+                        .addTag("delete_periodic_category_$categoryId" + "_$uuid")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
@@ -66,8 +64,9 @@ class DeleteCategoryWorker(private val context: Context, workerParameters: Worke
     }
 
     override suspend fun doWork(): Result {
+        val categoryDao = AppDatabase.getInstance(context, uuid).categoryDataDao()
         val categoryId = inputData.getLong("categoryId", 0)
-        val repository = CategoryRepository(categoryDao, genericService.create(CategoryService::class.java))
+        val repository = CategoryRepository(categoryDao, genericService(uuid).create(CategoryService::class.java))
         return when (repository.deleteCategoryById(categoryId)) {
             HttpConstants.NO_CONTENT_SUCCESS -> {
                 cancelWorker(categoryId, context)

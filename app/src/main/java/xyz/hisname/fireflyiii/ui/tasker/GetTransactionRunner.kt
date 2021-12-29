@@ -129,7 +129,7 @@ class GetTransactionRunner: TaskerPluginRunnerAction<GetTransactionInput, GetTra
                 if(fileUri.isNotEmpty()){
                     addTransaction.response.data.transactionAttributes.transactions.forEach { transactions ->
                         AttachmentWorker.initWorker(fileUri, transactions.transaction_journal_id,
-                                context, AttachableType.TRANSACTION)
+                                context, AttachableType.TRANSACTION, context.getUniqueHash())
                     }
                 }
                 TaskerPluginResultSucess(GetTransactionOutput(addTransaction.response.toString())) as TaskerPluginResult<Unit>

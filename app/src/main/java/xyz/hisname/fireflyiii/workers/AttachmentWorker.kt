@@ -31,15 +31,14 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class AttachmentWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters)  {
 
 
 
     companion object {
-        fun initWorker(fileUri: List<Uri>, objectId: Long, context: Context, attachableType: AttachableType): LiveData<List<WorkInfo>> {
-            val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+        fun initWorker(fileUri: List<Uri>, objectId: Long, context: Context, attachableType: AttachableType, uuid: String): LiveData<List<WorkInfo>> {
+            val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
             val battery = appPref.workManagerLowBattery
             val networkType = appPref.workManagerNetworkType
             val requireCharging = appPref.workManagerRequireCharging
@@ -47,19 +46,20 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
             val arrayOfRequest = arrayListOf<OneTimeWorkRequest>()
             fileUri.forEach { uri ->
                 val attachmentTag =
-                        WorkManager.getInstance(context).getWorkInfosByTag("add_attachment_tag_$objectId" + "_$attachableType").get()
+                        WorkManager.getInstance(context).getWorkInfosByTag("add_attachment_tag_$objectId" + "_$attachableType" + "_$uuid").get()
                 if(attachmentTag == null || attachmentTag.size == 0){
                     val attachmentWork = OneTimeWorkRequestBuilder<AttachmentWorker>()
-                            .setInputData(dataBuilder.putLong("objectId", objectId).build())
-                            .setInputData(dataBuilder.putString("fileUri", uri.toString()).build())
-                            .setInputData(dataBuilder.putString("attachableType", attachableType.name).build())
-                            .addTag("add_attachment_tag_$objectId")
-                            .setConstraints(Constraints.Builder()
-                                    .setRequiredNetworkType(networkType)
-                                    .setRequiresBatteryNotLow(battery)
-                                    .setRequiresCharging(requireCharging)
-                                    .build())
-                            .build()
+                        .setInputData(dataBuilder.putLong("objectId", objectId).build())
+                        .setInputData(dataBuilder.putString("fileUri", uri.toString()).build())
+                        .setInputData(dataBuilder.putString("attachableType", attachableType.name).build())
+                        .setInputData(dataBuilder.putString("uuid", uuid).build())
+                        .addTag("add_attachment_tag_$objectId"  + "_$uuid")
+                        .setConstraints(Constraints.Builder()
+                            .setRequiredNetworkType(networkType)
+                            .setRequiresBatteryNotLow(battery)
+                            .setRequiresCharging(requireCharging)
+                            .build())
+                        .build()
                     arrayOfRequest.add(attachmentWork)
                 }
             }
@@ -72,8 +72,8 @@ class AttachmentWorker(private val context: Context, workerParameters: WorkerPar
     override suspend fun doWork(): Result {
         val objectId = inputData.getLong("objectId", 0)
         val fileUri = inputData.getString("fileUri")
-        val service = genericService.create(AttachmentService::class.java)
-        val attachmentDao = AppDatabase.getInstance(context, context.getUniqueHash()).attachmentDataDao()
+        val service = genericService(uuid).create(AttachmentService::class.java)
+        val attachmentDao = AppDatabase.getInstance(context, uuid).attachmentDataDao()
         val attachmentRepository = AttachmentRepository(attachmentDao, service)
         val fileName = FileUtils.getFileName(context, fileUri?.toUri() ?: Uri.EMPTY)
         try {

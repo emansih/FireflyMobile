@@ -33,11 +33,8 @@ import xyz.hisname.fireflyiii.repository.models.piggy.PiggyAttributes
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyData
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.BaseWorker
-import java.io.BufferedReader
-import java.io.FileReader
 import java.time.Duration
 import java.util.concurrent.ThreadLocalRandom
 
@@ -56,8 +53,8 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
         val group = inputData.getString("group") ?: ""
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val piggyWorkManagerId = inputData.getLong("piggyWorkManagerId", 0)
-        val piggyRepository = PiggyRepository(AppDatabase.getInstance(context, getUniqueHash()).piggyDataDao(),
-                genericService.create(PiggybankService::class.java))
+        val piggyRepository = PiggyRepository(AppDatabase.getInstance(context, uuid).piggyDataDao(),
+                genericService(uuid).create(PiggybankService::class.java))
         val addPiggy = piggyRepository.addPiggyBank(name, accountId.toLong(), targetAmount,
                 currentAmount, startDate, endDate, notes, group)
         when {
@@ -77,14 +74,14 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                         arrayOfUri.add(array.replace("\\s".toRegex(), "").toUri())
                     }
                     AttachmentWorker.initWorker(arrayOfUri, addPiggy.response.data.piggyId,
-                            context, AttachableType.PIGGYBANK)
+                            context, AttachableType.PIGGYBANK, uuid)
                 }
 
                 return Result.success()
             }
             addPiggy.errorMessage != null -> {
                 context.showNotification("Error Adding $name", addPiggy.errorMessage, channelIcon)
-                cancelWorker(piggyWorkManagerId, context)
+                cancelWorker(piggyWorkManagerId, context, uuid)
                 return Result.failure()
             }
             addPiggy.error != null -> {
@@ -92,7 +89,7 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             }
             else -> {
                 context.showNotification("Error Adding $name", "Please try again later", channelIcon)
-                cancelWorker(piggyWorkManagerId, context)
+                cancelWorker(piggyWorkManagerId, context, uuid)
                 return Result.failure()
             }
         }
@@ -101,32 +98,33 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
     companion object {
         fun initWorker(context: Context, name: String, accountId: String, targetAmount: String,
                        currentAmount: String?, startDate: String?, endDate: String?,
-                       notes: String?,  group: String?, fileArray: ArrayList<Uri>){
+                       notes: String?,  group: String?, fileArray: ArrayList<Uri>, uuid: String){
             val piggyWorkManagerId = ThreadLocalRandom.current().nextLong()
             val piggyData = Data.Builder()
-                    .putString("name", name)
-                    .putString("accountId", accountId)
-                    .putString("targetAmount", targetAmount)
-                    .putString("currentAmount", currentAmount)
-                    .putString("startDate", startDate)
-                    .putString("endDate", endDate)
-                    .putString("notes", notes)
-                    .putString("group", group)
-                    .putLong("piggyWorkManagerId", piggyWorkManagerId)
+                .putString("name", name)
+                .putString("accountId", accountId)
+                .putString("targetAmount", targetAmount)
+                .putString("currentAmount", currentAmount)
+                .putString("startDate", startDate)
+                .putString("endDate", endDate)
+                .putString("notes", notes)
+                .putString("group", group)
+                .putLong("piggyWorkManagerId", piggyWorkManagerId)
+                .putString("uuid", uuid)
             if(fileArray.isNotEmpty()){
                 piggyData.putString("filesToUpload", fileArray.toString())
             }
             val piggyTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("add_piggy_periodic_$piggyWorkManagerId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("add_piggy_periodic_$piggyWorkManagerId" + "_$uuid").get()
             if(piggyTag == null || piggyTag.size == 0){
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val piggyBankWork = PeriodicWorkRequestBuilder<PiggyBankWorker>(Duration.ofMinutes(delay))
                         .setInputData(piggyData.build())
-                        .addTag("add_piggy_periodic_$piggyWorkManagerId")
+                        .addTag("add_piggy_periodic_$piggyWorkManagerId" + "_$uuid")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
@@ -135,10 +133,10 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
                         .build()
                 WorkManager.getInstance(context).enqueue(piggyBankWork)
                 runBlocking(Dispatchers.IO){
-                    val piggyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).piggyDataDao()
-                    val accountDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).accountDataDao()
+                    val piggyDatabase = AppDatabase.getInstance(context, uuid).piggyDataDao()
+                    val accountDatabase = AppDatabase.getInstance(context, uuid).accountDataDao()
                     val account = accountDatabase.getAccountById(accountId.toLong())
-                    val defaultCurrency = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao().getDefaultCurrency()
+                    val defaultCurrency = AppDatabase.getInstance(context, uuid).currencyDataDao().getDefaultCurrency()
                     val currencyCode = defaultCurrency.currencyAttributes.code
                     val currencySymbol = defaultCurrency.currencyAttributes.symbol
                     val currencyDp = defaultCurrency.currencyAttributes.decimal_places
@@ -158,12 +156,12 @@ class PiggyBankWorker(private val context: Context, workerParameters: WorkerPara
             }
         }
 
-        fun cancelWorker(piggyId: Long, context: Context){
+        fun cancelWorker(piggyId: Long, context: Context, uuid: String){
             runBlocking(Dispatchers.IO){
-                val piggyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).piggyDataDao()
+                val piggyDatabase = AppDatabase.getInstance(context, uuid).piggyDataDao()
                 piggyDatabase.deletePiggyById(piggyId)
             }
-            WorkManager.getInstance(context).cancelAllWorkByTag("add_piggy_periodic_$piggyId")
+            WorkManager.getInstance(context).cancelAllWorkByTag("add_piggy_periodic_$piggyId" + "_$uuid")
         }
     }
 

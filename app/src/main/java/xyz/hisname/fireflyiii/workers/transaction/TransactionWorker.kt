@@ -40,11 +40,8 @@ import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
 import xyz.hisname.fireflyiii.ui.transaction.addtransaction.AddTransactionActivity
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import xyz.hisname.fireflyiii.workers.BaseWorker
-import java.io.BufferedReader
-import java.io.FileReader
 import java.net.UnknownHostException
 import java.time.Duration
 
@@ -53,9 +50,9 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
     private val channelIcon = R.drawable.ic_refresh
 
     override suspend fun doWork(): Result {
-        val transactionService =  genericService.create(TransactionService::class.java)
+        val transactionService =  genericService(uuid).create(TransactionService::class.java)
         val transactionRepository = TransactionRepository(
-                AppDatabase.getInstance(context, getUniqueHash()).transactionDataDao(), transactionService)
+                AppDatabase.getInstance(context, uuid).transactionDataDao(), transactionService)
         val tempRepository = TransactionRepository(
                 TmpDatabase.getInstance(context).transactionDataDao(), transactionService)
         val masterTransactionId = inputData.getLong("masterTransactionId", 0)
@@ -75,20 +72,20 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                                     uriArray.add(attachment.toUri())
                                 }
                                 AttachmentWorker.initWorker(uriArray,
-                                        transaction.transaction_journal_id, context,
-                                        AttachableType.TRANSACTION)
+                                    transaction.transaction_journal_id, context,
+                                        AttachableType.TRANSACTION, uuid)
                             }
                             tempRepository.removeInternalReference(addTransaction.response)
                         }
                     }
-                    cancelWorker(masterTransactionId, context)
+                    cancelWorker(masterTransactionId, context, uuid)
                     tempRepository.deletePendingTransactionFromId(masterTransactionId)
                     context.showNotification(context.resources.getString(R.string.transaction_added), groupTitle ?: "", channelIcon)
                     return Result.success()
                 }
                 addTransaction.errorMessage != null -> {
                     context.showNotification("Error Adding $groupTitle", addTransaction.errorMessage, channelIcon)
-                    cancelWorker(masterTransactionId, context)
+                    cancelWorker(masterTransactionId, context, uuid)
                     return Result.failure()
                 }
                 addTransaction.error != null -> {
@@ -96,7 +93,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                         Result.retry()
                     } else {
                         context.showNotification("Error Adding $groupTitle", addTransaction.error.localizedMessage, channelIcon)
-                        cancelWorker(masterTransactionId, context)
+                        cancelWorker(masterTransactionId, context, uuid)
                         Result.failure()
                     }
                 }
@@ -147,9 +144,9 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                             journalId = transactions.transaction_journal_id
                         }
                         AttachmentWorker.initWorker(arrayOfUri, journalId,
-                                context, AttachableType.TRANSACTION)
+                                context, AttachableType.TRANSACTION, uuid)
                     }
-                    cancelWorker(transactionWorkManagerId, context)
+                    cancelWorker(transactionWorkManagerId, context, uuid)
                     return Result.success()
                 }
                 addTransaction.errorMessage != null -> {
@@ -177,7 +174,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                             PendingIntent.getActivity(context, 0, transactionIntent,
                                     PendingIntent.FLAG_UPDATE_CURRENT),
                             context.getString(R.string.edit), icon)
-                    cancelWorker(transactionWorkManagerId, context)
+                    cancelWorker(transactionWorkManagerId, context, uuid)
                     return Result.failure()
                 }
                 addTransaction.error != null -> {
@@ -185,7 +182,7 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
                         Result.retry()
                     } else {
                         context.showNotification("Error Adding $groupTitle", addTransaction.error.localizedMessage, channelIcon)
-                        cancelWorker(masterTransactionId, context)
+                        cancelWorker(masterTransactionId, context, uuid)
                         Result.failure()
                     }
                 }
@@ -198,16 +195,16 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
 
     companion object {
         fun initWorker(context: Context, dataBuilder: Data.Builder,
-                       type: String, transactionWorkManagerId: Long, fileArray: ArrayList<Uri>) {
+                       type: String, transactionWorkManagerId: Long, fileArray: ArrayList<Uri>, uuid: String) {
             val transactionTag =
                     WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_transaction_$transactionWorkManagerId").get()
             if (transactionTag == null || transactionTag.size == 0) {
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
-                dataBuilder.putString("transactionType", type)
+                dataBuilder.putString("transactionType", type).putString("uuid", uuid)
                 if(fileArray.isNotEmpty()){
                     dataBuilder.putString("filesToUpload", fileArray.toString())
                 }
@@ -224,38 +221,39 @@ class TransactionWorker(private val context: Context, workerParameters: WorkerPa
             }
         }
 
-        fun initWorker(context: Context, groupTitle: String, masterTransactionId: Long){
+        fun initWorker(context: Context, groupTitle: String, masterTransactionId: Long, uuid: String){
             val transactionTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_transaction_$masterTransactionId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("add_periodic_transaction_$masterTransactionId" + "_$uuid").get()
             if (transactionTag == null || transactionTag.size == 0) {
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val dataBuilder = Data.Builder()
-                        .putLong("masterTransactionId", masterTransactionId)
-                        .putString("groupTitle", groupTitle)
-                        .build()
+                    .putLong("masterTransactionId", masterTransactionId)
+                    .putString("groupTitle", groupTitle)
+                    .putString("uuid", uuid)
+                    .build()
                 val transactionWork = PeriodicWorkRequestBuilder<TransactionWorker>(Duration.ofMinutes(delay))
                         .setInputData(dataBuilder)
                         .setConstraints(Constraints.Builder()
-                                .setRequiredNetworkType(networkType)
-                                .setRequiresBatteryNotLow(battery)
-                                .setRequiresCharging(requireCharging)
-                                .build())
-                        .addTag("add_periodic_transaction_$masterTransactionId")
+                            .setRequiredNetworkType(networkType)
+                            .setRequiresBatteryNotLow(battery)
+                            .setRequiresCharging(requireCharging)
+                            .build())
+                        .addTag("add_periodic_transaction_$masterTransactionId" + "_$uuid")
                         .build()
                 WorkManager.getInstance(context).enqueue(transactionWork)
             }
         }
 
-        fun cancelWorker(fakeTransactionId: Long, context: Context){
+        fun cancelWorker(fakeTransactionId: Long, context: Context, uuid: String){
             runBlocking(Dispatchers.IO) {
-                val transactionDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).transactionDataDao()
+                val transactionDatabase = AppDatabase.getInstance(context, uuid).transactionDataDao()
                 transactionDatabase.deleteTransactionByJournalId(fakeTransactionId)
             }
-            WorkManager.getInstance(context).cancelAllWorkByTag("add_periodic_transaction_$fakeTransactionId")
+            WorkManager.getInstance(context).cancelAllWorkByTag("add_periodic_transaction_$fakeTransactionId" + "_$uuid")
         }
 
     }

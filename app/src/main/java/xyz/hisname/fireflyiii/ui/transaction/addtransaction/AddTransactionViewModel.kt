@@ -206,7 +206,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
 
     fun uploadFile(transactionJournalId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>>{
         return AttachmentWorker.initWorker(fileToUpload, transactionJournalId,
-                getApplication<Application>(), AttachableType.TRANSACTION)
+                getApplication<Application>(), AttachableType.TRANSACTION, getUniqueHash())
     }
 
     fun deleteAttachment(data: AttachmentData): LiveData<Boolean>{
@@ -264,7 +264,7 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
                 addTransaction.error != null -> {
                     if(addTransaction.error is UnknownHostException){
                         TransactionWorker.initWorker(getApplication(), groupTitle,
-                                transactionMasterId)
+                                transactionMasterId, getUniqueHash())
                         apiResponse.postValue(Pair(true,
                                 getApplication<Application>().getString(R.string.data_added_when_user_online,
                                         groupTitle)))

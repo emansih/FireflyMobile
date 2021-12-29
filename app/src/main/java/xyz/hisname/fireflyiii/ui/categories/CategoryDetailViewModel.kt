@@ -76,7 +76,7 @@ class CategoryDetailViewModel(application: Application): BaseViewModel(applicati
                 // Don't ask me why... It will throw an exception even though it is successful
                 HttpConstants.FAILED -> {
                     isDeleted.postValue(false)
-                    DeleteCategoryWorker.initPeriodicWorker(catId, getApplication())
+                    DeleteCategoryWorker.initPeriodicWorker(catId, getApplication(), getUniqueHash())
                 }
                 HttpConstants.UNAUTHORISED -> {
                     isDeleted.postValue(false)

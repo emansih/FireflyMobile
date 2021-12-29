@@ -90,7 +90,7 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
 
     fun uploadFile(billId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>> {
         return AttachmentWorker.initWorker(fileToUpload, billId,
-                getApplication<Application>(), AttachableType.BILL)
+                getApplication<Application>(), AttachableType.BILL, getUniqueHash())
     }
 
         fun addBill(name: String, amountMin: String, amountMax: String, date: String, repeatFreq: String,
@@ -116,7 +116,7 @@ class AddBillViewModel(application: Application): BaseViewModel(application) {
                         apiResponse.postValue(Pair(true,
                                 getApplication<Application>().getString(R.string.data_added_when_user_online, "Bill")))
                         BillWorker.initWorker(getApplication(), name, amountMin, amountMax, date, repeatFreq,
-                                skip, currencyCode, notes, fileToUpload)
+                                skip, currencyCode, notes, fileToUpload, getUniqueHash())
                     } else {
                         apiResponse.postValue(Pair(false, addBill.error.localizedMessage))
                     }

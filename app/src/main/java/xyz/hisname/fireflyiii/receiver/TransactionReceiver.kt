@@ -76,20 +76,21 @@ class TransactionReceiver: BroadcastReceiver()  {
             val bill = intent.getStringExtra("bill")
             val notes = intent.getStringExtra("notes")
             val transactionData = Data.Builder()
-                    .putString("description", description)
-                    .putString("date", date)
-                    .putString("time", time)
-                    .putString("amount", transactionAmount)
-                    .putString("currency", intent.getStringExtra("currency"))
-                    .putString("tags", tags)
-                    .putString("categoryName", category)
-                    .putString("bill", bill)
-                    .putString("budgetName", budget)
-                    .putLong("transactionWorkManagerId", transactionWorkManagerId)
-                    .putString("sourceName", sourceName)
-                    .putString("destinationName", destinationName)
-                    .putString("piggyBankName",piggyBank)
-                    .putString("notes", notes)
+                .putString("description", description)
+                .putString("date", date)
+                .putString("time", time)
+                .putString("amount", transactionAmount)
+                .putString("currency", intent.getStringExtra("currency"))
+                .putString("tags", tags)
+                .putString("categoryName", category)
+                .putString("bill", bill)
+                .putString("budgetName", budget)
+                .putLong("transactionWorkManagerId", transactionWorkManagerId)
+                .putString("sourceName", sourceName)
+                .putString("destinationName", destinationName)
+                .putString("piggyBankName",piggyBank)
+                .putString("notes", notes)
+                .putString("uuid", uniqueHash)
             val transactionDatabase = AppDatabase.getInstance(context, uniqueHash).transactionDataDao()
             val currencyDatabase = AppDatabase.getInstance(context, uniqueHash).currencyDataDao()
             var currency: CurrencyData
@@ -105,17 +106,17 @@ class TransactionReceiver: BroadcastReceiver()  {
             when (intent.action) {
                 "firefly.hisname.ADD_DEPOSIT" -> {
                     TransactionWorker.initWorker(context, transactionData, "deposit",
-                            transactionWorkManagerId, arrayListOf())
+                            transactionWorkManagerId, arrayListOf(), uniqueHash)
                     transactionType = "deposit"
                 }
                 "firefly.hisname.ADD_WITHDRAW" -> {
                     TransactionWorker.initWorker(context, transactionData, "withdrawal",
-                            transactionWorkManagerId, arrayListOf())
+                            transactionWorkManagerId, arrayListOf(), uniqueHash)
                     transactionType = "withdrawal"
                 }
                 "firefly.hisname.ADD_TRANSFER" -> {
                     TransactionWorker.initWorker(context, transactionData, "transfer",
-                            transactionWorkManagerId, arrayListOf())
+                            transactionWorkManagerId, arrayListOf(), uniqueHash)
                     transactionType = "transfer"
                 }
                 else -> { }

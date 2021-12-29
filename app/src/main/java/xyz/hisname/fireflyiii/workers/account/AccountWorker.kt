@@ -34,7 +34,6 @@ import xyz.hisname.fireflyiii.repository.models.accounts.AccountAttributes
 import xyz.hisname.fireflyiii.repository.models.accounts.AccountData
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import java.math.BigDecimal
 import java.time.Duration
@@ -51,7 +50,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                        openingBalance: String? = "0", openingBalanceDate: String?, accountRole: String?,
                        virtualBalance: String?, includeInNetWorth: Boolean, notes: String?, liabilityType: String?,
                        liabilityAmount: String?, liabilityStartDate: String?, interest: String?,
-                       interestPeriod: String?, fileArray: ArrayList<Uri>){
+                       interestPeriod: String?, fileArray: ArrayList<Uri>, uuid: String){
             val accountData = Data.Builder()
                     .putString("name", accountName)
                     .putString("type", accountType)
@@ -75,9 +74,9 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
             }
             val accountTag =
                     WorkManager.getInstance(context).getWorkInfosByTag(
-                            "add_periodic_account_$accountName" + "_" + accountType).get()
+                            "add_periodic_account_$accountName" + "_" + accountType + "_$uuid").get()
             if(accountTag == null || accountTag.size == 0){
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() +
+                val appPref = AppPref(context.getSharedPreferences(uuid +
                         "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
@@ -90,12 +89,12 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                                 .setRequiresBatteryNotLow(battery)
                                 .setRequiresCharging(requireCharging)
                                 .build())
-                        .addTag("add_periodic_account_$accountName" + "_" + accountType)
+                        .addTag("add_periodic_account_$accountName" + "_" + accountType + "_$uuid")
                         .build()
                 WorkManager.getInstance(context).enqueue(accountWork)
                 runBlocking(Dispatchers.IO) {
-                    val accountDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).accountDataDao()
-                    val currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
+                    val accountDatabase = AppDatabase.getInstance(context, uuid).accountDataDao()
+                    val currencyDatabase = AppDatabase.getInstance(context, uuid).currencyDataDao()
                     val currencyData =
                                 currencyDatabase.getCurrencyByCode(currencyCode ?: "")[0]
                     val currencySymbol = currencyData.currencyAttributes.symbol
@@ -115,13 +114,13 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
             }
         }
 
-        fun cancelWorker(accountName: String, accountType: String, context: Context){
+        fun cancelWorker(accountName: String, accountType: String, context: Context, uuid: String){
             runBlocking(Dispatchers.IO) {
-                val accountDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).accountDataDao()
+                val accountDatabase = AppDatabase.getInstance(context, uuid).accountDataDao()
                 accountDatabase.deleteAccountByTypeAndName(accountType, accountName)
                 accountDatabase
             }
-            WorkManager.getInstance(context).cancelAllWorkByTag("add_periodic_account_$accountName" + "_" + accountType)
+            WorkManager.getInstance(context).cancelAllWorkByTag("add_periodic_account_$accountName" + "_" + accountType + "_$uuid")
         }
 
     }
@@ -146,8 +145,8 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
         val notes = inputData.getString("notes")
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val accountRepository = AccountRepository(
-                AppDatabase.getInstance(context, getUniqueHash()).accountDataDao(),
-                genericService.create(AccountsService::class.java)
+                AppDatabase.getInstance(context, uuid).accountDataDao(),
+                genericService(uuid).create(AccountsService::class.java)
         )
         val addAccount = accountRepository.addAccount(name, accountType, currencyCode,
                 iBanString, bicString, accountNumber, openingBalance, openingBalanceDate,
@@ -155,7 +154,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                 liabilityStartDate, interest, interestPeriod)
         when {
             addAccount.response != null -> {
-                cancelWorker(name,accountType, context)
+                cancelWorker(name,accountType, context, uuid)
                 context.showNotification("Account Added", "$name was added successfully!", channelIcon)
                 if(fileArray.isNotEmpty()){
                     // Remove [ and ] in the string
@@ -169,7 +168,7 @@ class AccountWorker(private val context: Context, workerParameters: WorkerParame
                         arrayOfUri.add(array.replace("\\s".toRegex(), "").toUri())
                     }
                     AttachmentWorker.initWorker(arrayOfUri, addAccount.response.data.accountId,
-                            context, AttachableType.Account)
+                            context, AttachableType.Account, uuid)
                 }
                 return Result.success()
             }

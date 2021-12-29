@@ -87,7 +87,7 @@ class AddCategoryViewModel(application: Application): BaseViewModel(application)
                 }
                 addCategory.error != null -> {
                     if (addCategory.error is UnknownHostException) {
-                        CategoryWorker.initPeriodicWorker(categoryName, getApplication())
+                        CategoryWorker.initPeriodicWorker(categoryName, getApplication(), getUniqueHash())
                         apiResponse.postValue(Pair(true, getApplication<Application>().getString(R.string.data_added_when_user_online, "Category")))
                     } else {
                         apiResponse.postValue(Pair(false, addCategory.error.localizedMessage))

@@ -60,7 +60,7 @@ class ListPiggyViewModel(application: Application): BaseViewModel(application) {
                 when (piggyRepository.deletePiggyById(piggyId.toLong())) {
                     HttpConstants.FAILED -> {
                         isDeleted.postValue(false)
-                        DeletePiggyWorker.initPeriodicWorker(piggyId.toLong(), getApplication())
+                        DeletePiggyWorker.initPeriodicWorker(piggyId.toLong(), getApplication(), getUniqueHash())
                     }
                     HttpConstants.UNAUTHORISED -> {
                         isDeleted.postValue(false)

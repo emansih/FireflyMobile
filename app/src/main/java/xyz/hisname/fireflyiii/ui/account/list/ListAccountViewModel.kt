@@ -58,7 +58,7 @@ class ListAccountViewModel(application: Application): BaseViewModel(application)
                 when (accountRepository.deleteAccountById(accountId.toLong())) {
                     HttpConstants.FAILED -> {
                         isDeleted.postValue(false)
-                        DeleteAccountWorker.initPeriodicWorker(accountId.toLong(), getApplication())
+                        DeleteAccountWorker.initPeriodicWorker(accountId.toLong(), getApplication(), getUniqueHash())
                     }
                     HttpConstants.UNAUTHORISED -> {
                         isDeleted.postValue(false)

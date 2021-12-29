@@ -122,7 +122,7 @@ class TransactionFragmentViewModel(application: Application): BaseViewModel(appl
                 when (transactionRepository.deleteTransactionById(transactionId)) {
                     HttpConstants.FAILED -> {
                         isDeleted.postValue(false)
-                        DeleteTransactionWorker.setupWorker(transactionJournalId.toLong(), getApplication())
+                        DeleteTransactionWorker.setupWorker(transactionJournalId.toLong(), getApplication(), getUniqueHash())
                     }
                     HttpConstants.UNAUTHORISED -> {
                         isDeleted.postValue(false)

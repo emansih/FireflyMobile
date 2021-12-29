@@ -105,7 +105,7 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
 
     fun uploadFile(accountId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>> {
         return AttachmentWorker.initWorker(fileToUpload, accountId,
-                getApplication<Application>(), AttachableType.Account)
+                getApplication<Application>(), AttachableType.Account, getUniqueHash())
     }
 
         fun addAccount(accountName: String, accountType: String,
@@ -136,7 +136,7 @@ class AddAccountViewModel(application: Application): BaseViewModel(application) 
                         AccountWorker.initWorker(getApplication(), accountName, accountType, currencyCode,
                                 iban, bic, accountNumber, openingBalance, openingBalanceDate,
                                 accountRole, virtualBalance, includeInNetWorth, notes, liabilityType, liabilityAmount,
-                                liabilityStartDate, interest, interestPeriod, fileToUpload)
+                                liabilityStartDate, interest, interestPeriod, fileToUpload, getUniqueHash())
                     } else {
                         apiResponse.postValue(Pair(false, addAccount.error.localizedMessage))
                     }

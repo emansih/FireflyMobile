@@ -24,24 +24,22 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.PiggybankService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.piggybank.PiggyRepository
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
 
 class DeletePiggyWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val piggyDataBase by lazy { AppDatabase.getInstance(context, getUniqueHash()).piggyDataDao() }
-
     companion object {
-        fun initPeriodicWorker(piggyId: Long, context: Context){
+        fun initPeriodicWorker(piggyId: Long, context: Context, uuid: String){
             val piggyTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_piggy_$piggyId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_periodic_piggy_$piggyId" + "_$uuid").get()
             if (piggyTag == null || piggyTag.size == 0) {
                 val piggyData = Data.Builder()
-                        .putLong("piggyId", piggyId)
-                        .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE))
+                    .putLong("piggyId", piggyId)
+                    .putString("uuid", uuid)
+                    .build()
+                val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
@@ -65,8 +63,9 @@ class DeletePiggyWorker(private val context: Context, workerParameters: WorkerPa
     }
 
     override suspend fun doWork(): Result {
+        val piggyDataBase = AppDatabase.getInstance(context, uuid).piggyDataDao()
         val piggyId = inputData.getLong("piggyId", 0)
-        val repository = PiggyRepository(piggyDataBase, genericService.create(PiggybankService::class.java))
+        val repository = PiggyRepository(piggyDataBase, genericService(uuid).create(PiggybankService::class.java))
         return when (repository.deletePiggyById(piggyId)) {
             HttpConstants.NO_CONTENT_SUCCESS -> {
                 cancelWorker(piggyId, context)

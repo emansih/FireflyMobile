@@ -64,7 +64,7 @@ class CurrencyListViewModel(application: Application): BaseViewModel(application
                     isDeleted.postValue(false)
                     val currencyId = currencyList[0].currencyId
                     if(currencyId != 0L){
-                        DeleteCurrencyWorker.initPeriodicWorker(currencyId, getApplication())
+                        DeleteCurrencyWorker.initPeriodicWorker(currencyId, getApplication(), getUniqueHash())
                     }
                 }
                 HttpConstants.UNAUTHORISED -> {

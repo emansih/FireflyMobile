@@ -90,7 +90,7 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
                     apiResponse.postValue(Pair(true, "Stored new budget"))
                     if(fileToUpload.isNotEmpty()) {
                         AttachmentWorker.initWorker(fileToUpload,
-                                addBudget.response.data.budgetListId, getApplication<Application>(), AttachableType.BUDGET)
+                                addBudget.response.data.budgetListId, getApplication<Application>(), AttachableType.BUDGET, getUniqueHash())
                     }
                 }
                 addBudget.errorMessage != null -> {

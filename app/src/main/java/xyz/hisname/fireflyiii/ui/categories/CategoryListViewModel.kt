@@ -58,7 +58,7 @@ class CategoryListViewModel(application: Application): BaseViewModel(application
                 when (categoryRepository.deleteCategoryById(categoryId.toLong())) {
                     HttpConstants.FAILED -> {
                         isDeleted.postValue(false)
-                        DeleteCategoryWorker.initPeriodicWorker(categoryId.toLong(), getApplication())
+                        DeleteCategoryWorker.initPeriodicWorker(categoryId.toLong(), getApplication(), getUniqueHash())
                     }
                     HttpConstants.UNAUTHORISED -> {
                         isDeleted.postValue(false)

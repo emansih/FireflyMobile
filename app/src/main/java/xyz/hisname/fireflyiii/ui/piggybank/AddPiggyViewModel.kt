@@ -125,7 +125,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
 
     fun uploadFile(piggyBankId: Long, fileToUpload: ArrayList<Uri>): LiveData<List<WorkInfo>>{
         return AttachmentWorker.initWorker(fileToUpload, piggyBankId, getApplication<Application>(),
-                AttachableType.PIGGYBANK)
+                AttachableType.PIGGYBANK, getUniqueHash())
     }
 
     fun addPiggyBank(piggyName: String, currentAmount: String?, notes: String?,
@@ -154,7 +154,7 @@ class AddPiggyViewModel(application: Application): BaseViewModel(application) {
                     addPiggyBank.error != null -> {
                         if (addPiggyBank.error is UnknownHostException) {
                             PiggyBankWorker.initWorker(getApplication(), piggyName, accountId.toString(), targetAmount,
-                                    currentAmount, startDate, targetDate, notes, group, fileToUpload)
+                                    currentAmount, startDate, targetDate, notes, group, fileToUpload, getUniqueHash())
                             apiResponse.postValue(Pair(true, getApplication<Application>().getString(R.string.data_added_when_user_online, "Piggy Bank")))
                         } else {
                             apiResponse.postValue(Pair(false, addPiggyBank.error.localizedMessage))

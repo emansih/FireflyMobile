@@ -85,7 +85,7 @@ class ListBillViewModel(application: Application): BaseViewModel(application) {
                 when (billRepository.deleteBillById(billId.toLong())) {
                     HttpConstants.FAILED -> {
                         isDeleted.postValue(false)
-                        DeleteBillWorker.initPeriodicWorker(billId.toLong(), getApplication())
+                        DeleteBillWorker.initPeriodicWorker(billId.toLong(), getApplication(), getUniqueHash())
                     }
                     HttpConstants.UNAUTHORISED -> {
                         isDeleted.postValue(false)

@@ -24,24 +24,23 @@ import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import java.time.Duration
 
 class DeleteBillWorker(private val context: Context, workerParameters: WorkerParameters): BaseWorker(context, workerParameters) {
 
-    private val billDatabase by lazy { AppDatabase.getInstance(context, getUniqueHash()).billDataDao() }
 
     companion object {
-        fun initPeriodicWorker(billId: Long, context: Context){
+        fun initPeriodicWorker(billId: Long, context: Context, uuid: String){
             val billTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("delete_bill_periodic_$billId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("delete_bill_periodic_$billId" + "_$uuid").get()
             if(billTag == null || billTag.size == 0) {
                 val billData = Data.Builder()
-                        .putLong("billId", billId)
-                        .build()
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash().toString() +
+                    .putLong("billId", billId)
+                    .putString("uuid", uuid)
+                    .build()
+                val appPref = AppPref(context.getSharedPreferences(uuid +
                         "-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
@@ -49,7 +48,7 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
                 val requireCharging = appPref.workManagerRequireCharging
                 val deleteBillWork = PeriodicWorkRequestBuilder<DeleteBillWorker>(Duration.ofMinutes(delay))
                         .setInputData(billData)
-                        .addTag("delete_bill_periodic_$billId")
+                        .addTag("delete_bill_periodic_$billId" + "_$uuid")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
@@ -60,18 +59,19 @@ class DeleteBillWorker(private val context: Context, workerParameters: WorkerPar
             }
         }
 
-        fun cancelWorker(billId: Long, context: Context){
-            WorkManager.getInstance(context).cancelAllWorkByTag("delete_bill_periodic_$billId")
+        fun cancelWorker(billId: Long, context: Context, uuid: String){
+            WorkManager.getInstance(context).cancelAllWorkByTag("delete_bill_periodic_$billId" + "_$uuid")
         }
     }
 
     override suspend fun doWork(): Result {
+        val billDatabase =  AppDatabase.getInstance(context, uuid).billDataDao()
         val billId = inputData.getLong("billId", 0)
-        val billService = genericService.create(BillsService::class.java)
+        val billService = genericService(uuid).create(BillsService::class.java)
         val repository = BillRepository(billDatabase, billService)
         return when(repository.deleteBillById(billId)){
             HttpConstants.NO_CONTENT_SUCCESS -> {
-                cancelWorker(billId, context)
+                cancelWorker(billId, context, uuid)
                 Result.success()
             }
             HttpConstants.FAILED -> {

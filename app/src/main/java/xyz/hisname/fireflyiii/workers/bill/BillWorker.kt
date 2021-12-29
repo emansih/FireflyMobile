@@ -34,7 +34,6 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillAttributes
 import xyz.hisname.fireflyiii.repository.models.bills.BillData
 import xyz.hisname.fireflyiii.workers.BaseWorker
 import xyz.hisname.fireflyiii.util.extension.showNotification
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 import java.time.Duration
 import java.time.LocalDate
@@ -56,8 +55,8 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
         val fileArray = inputData.getString("filesToUpload") ?: ""
         val billWorkManagerId = inputData.getLong("billWorkManagerId", 0)
         val billRepository = BillRepository(
-                AppDatabase.getInstance(context, getUniqueHash()).billDataDao(),
-                genericService.create(BillsService::class.java)
+                AppDatabase.getInstance(context, uuid).billDataDao(),
+                genericService(uuid).create(BillsService::class.java)
         )
 
         val addBill = billRepository.addBill(name, minAmount,
@@ -79,13 +78,13 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                         arrayOfUri.add(array.replace("\\s".toRegex(), "").toUri())
                     }
                     AttachmentWorker.initWorker(arrayOfUri, addBill.response.data.billId,
-                            context, AttachableType.BILL)
+                            context, AttachableType.BILL, uuid)
                 }
                 return Result.success()
             }
             addBill.errorMessage != null -> {
                 context.showNotification("Error Adding $name", addBill.errorMessage, channelIcon)
-                cancelWorker(billWorkManagerId, context)
+                cancelWorker(billWorkManagerId, context, uuid)
                 return Result.failure()
             }
             addBill.error != null -> {
@@ -93,7 +92,7 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
             }
             else -> {
                 context.showNotification("Error Adding $name", "Please try again later", channelIcon)
-                cancelWorker(billWorkManagerId, context)
+                cancelWorker(billWorkManagerId, context, uuid)
                 return Result.failure()
             }
         }
@@ -102,32 +101,33 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
     companion object {
         fun initWorker(context: Context, name: String, minAmount: String, maxAmount: String,
                        billDate: String, repeatFreq: String, skip: String, currencyCode: String,
-                       notes: String?, fileArray: ArrayList<Uri>){
+                       notes: String?, fileArray: ArrayList<Uri>, uuid: String){
             val billWorkManagerId = ThreadLocalRandom.current().nextLong()
             val billData = Data.Builder()
-                    .putString("name", name)
-                    .putString("minAmount", minAmount)
-                    .putString("maxAmount", maxAmount)
-                    .putString("billDate", billDate)
-                    .putString("repeatFreq", repeatFreq)
-                    .putString("skip", skip)
-                    .putString("currencyCode", currencyCode)
-                    .putString("notes", notes)
-                    .putLong("billWorkManagerId", billWorkManagerId)
+                .putString("name", name)
+                .putString("minAmount", minAmount)
+                .putString("maxAmount", maxAmount)
+                .putString("billDate", billDate)
+                .putString("repeatFreq", repeatFreq)
+                .putString("skip", skip)
+                .putString("currencyCode", currencyCode)
+                .putString("notes", notes)
+                .putLong("billWorkManagerId", billWorkManagerId)
+                .putString("uuid", uuid)
             if(fileArray.isNotEmpty()){
                 billData.putString("filesToUpload", fileArray.toString())
             }
             val billTag =
-                    WorkManager.getInstance(context).getWorkInfosByTag("add_bill_periodic_$billWorkManagerId").get()
+                    WorkManager.getInstance(context).getWorkInfosByTag("add_bill_periodic_$billWorkManagerId"  + "_$uuid").get()
             if(billTag == null || billTag.size == 0) {
-                val appPref = AppPref(context.getSharedPreferences(context.getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE))
+                val appPref = AppPref(context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE))
                 val delay = appPref.workManagerDelay
                 val battery = appPref.workManagerLowBattery
                 val networkType = appPref.workManagerNetworkType
                 val requireCharging = appPref.workManagerRequireCharging
                 val billWork = PeriodicWorkRequestBuilder<BillWorker>(Duration.ofMinutes(delay))
                         .setInputData(billData.build())
-                        .addTag("add_bill_periodic_$billWorkManagerId")
+                        .addTag("add_bill_periodic_$billWorkManagerId"  + "_$uuid")
                         .setConstraints(Constraints.Builder()
                                 .setRequiredNetworkType(networkType)
                                 .setRequiresBatteryNotLow(battery)
@@ -136,8 +136,8 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
                         .build()
                 WorkManager.getInstance(context).enqueue(billWork)
                 runBlocking(Dispatchers.IO){
-                    val billDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).billDataDao()
-                    val currencyDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).currencyDataDao()
+                    val billDatabase = AppDatabase.getInstance(context, uuid).billDataDao()
+                    val currencyDatabase = AppDatabase.getInstance(context, uuid).currencyDataDao()
                     val currency = currencyDatabase.getCurrencyByCode(currencyCode)[0]
                     billDatabase.insert(
                             BillData(
@@ -154,12 +154,12 @@ class BillWorker(private val context: Context, workerParameters: WorkerParameter
             }
         }
 
-        fun cancelWorker(billId: Long, context: Context){
+        fun cancelWorker(billId: Long, context: Context, uuid: String){
             runBlocking(Dispatchers.IO){
-                val billDatabase = AppDatabase.getInstance(context, context.getUniqueHash()).billDataDao()
+                val billDatabase = AppDatabase.getInstance(context, uuid).billDataDao()
                 billDatabase.deleteBillById(billId)
             }
-            WorkManager.getInstance(context).cancelAllWorkByTag("add_bill_periodic_$billId")
+            WorkManager.getInstance(context).cancelAllWorkByTag("add_bill_periodic_$billId"  + "_$uuid")
         }
     }
 }

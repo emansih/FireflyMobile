@@ -20,10 +20,12 @@ package xyz.hisname.fireflyiii.ui
 
 import android.accounts.AccountManager
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
+import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
@@ -39,6 +41,7 @@ import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.bills.BillsPaidRepository
 import xyz.hisname.fireflyiii.repository.models.FireflyUsers
 import xyz.hisname.fireflyiii.util.DateTimeUtil
+import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
 import java.io.File
 import java.util.*
 
@@ -125,6 +128,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
          * 3. Rename user's account
          * 4. Rename shared preference
          * 5. Rename custom CA file(if it exists)
+         * 6. Cancel existing work manager work(s) and re-queue them and make them multi user aware
          */
         val application = getApplication<Application>()
         val oldDatabase = application.getDatabasePath(Constants.DB_NAME)
@@ -161,13 +165,21 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             newAccountManager.refreshToken = accountRefreshToken
             newAccountManager.authMethod = accountAuthMethod
             newAccountManager.tokenExpiry = accountTokenExpiry
-        }
-        val fileArray = File(application.applicationInfo.dataDir + "/shared_prefs").listFiles()
-        fileArray?.forEach {  file ->
-            if(file.name.startsWith("xyz.hisname.fireflyiii") && file.name.endsWith("preferences.xml")){
-                file.renameTo(File(application.applicationInfo.dataDir + "/shared_prefs/" + uniqueHash + "-user-preferences.xml"))
+
+            val fileArray = File(application.applicationInfo.dataDir + "/shared_prefs").listFiles()
+            fileArray?.forEach {  file ->
+                if(file.name.startsWith("xyz.hisname.fireflyiii") && file.name.endsWith("preferences.xml")){
+                    file.renameTo(File(application.applicationInfo.dataDir + "/shared_prefs/" + uniqueHash + "-user-preferences.xml"))
+                }
+            }
+            val appPreference = AppPref(getApplication<Application>().getSharedPreferences("$uniqueHash-user-preferences", Context.MODE_PRIVATE))
+            val workManagerDelayPref = appPreference.workManagerDelayPref
+            // User has enabled work manager if pref is more than 0
+            if(workManagerDelayPref.toLong() > 0){
+                RefreshTokenWorker.migrateWorkerV1ToV2(WorkManager.getInstance(getApplication()), uniqueHash, workManagerDelayPref.toLong())
             }
         }
+
         val customCaFile = File(application.applicationInfo.dataDir + "/user_custom.pem")
         if(customCaFile.exists()){
             customCaFile.renameTo(File(application.applicationInfo.dataDir + "/" + uniqueHash + ".pem"))

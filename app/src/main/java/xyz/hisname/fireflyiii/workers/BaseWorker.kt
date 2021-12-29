@@ -22,10 +22,10 @@ import android.accounts.AccountManager
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import retrofit2.Retrofit
 import xyz.hisname.fireflyiii.data.local.account.NewAccountManager
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
-import xyz.hisname.fireflyiii.util.getUniqueHash
 import xyz.hisname.fireflyiii.util.network.CustomCa
 import java.io.File
 import javax.net.ssl.SSLSocketFactory
@@ -33,18 +33,9 @@ import javax.net.ssl.X509TrustManager
 
 abstract class BaseWorker(private val context: Context, workerParams: WorkerParameters): CoroutineWorker(context, workerParams){
 
-    private val baseUrl by lazy { AppPref(sharedPref).baseUrl }
-    private val accessToken by lazy { NewAccountManager(AccountManager.get(context), getUniqueHash()).accessToken }
-    val genericService by lazy { FireflyClient.getClient(baseUrl,accessToken, AppPref(sharedPref).certValue, getTrust(), getSslSocket()) }
-    protected val sharedPref by lazy { context.getSharedPreferences(getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)}
-    private val customCa by lazy { CustomCa(customCaFile) }
-    private val customCaFile by lazy { File(context.filesDir.path + "/" + context.getUniqueHash() + ".pem") }
+    val uuid = inputData.getString("uuid") ?: ""
 
-    protected fun getUniqueHash(): String {
-        return context.getUniqueHash()
-    }
-
-    private fun getTrust(): X509TrustManager?{
+    private fun getTrust(customCa: CustomCa, customCaFile: File): X509TrustManager?{
         return if(customCaFile.exists()){
             customCa.getCustomTrust()
         } else {
@@ -52,11 +43,25 @@ abstract class BaseWorker(private val context: Context, workerParams: WorkerPara
         }
     }
 
-    private fun getSslSocket(): SSLSocketFactory?{
+    private fun getSslSocket(customCa: CustomCa, customCaFile: File): SSLSocketFactory?{
         return if(customCaFile.exists()){
             customCa.getCustomSSL()
         } else {
             null
         }
+    }
+
+    protected fun genericService(uuid: String): Retrofit{
+        val baseUrl = appPref(uuid).baseUrl
+        val customCaFile = File(context.filesDir.path + "/" + uuid + ".pem")
+        val customCa = CustomCa(customCaFile)
+        val accessToken = NewAccountManager(AccountManager.get(context), uuid).accessToken
+        return FireflyClient.getClient(baseUrl, accessToken, appPref(uuid).certValue,
+            getTrust(customCa, customCaFile), getSslSocket(customCa, customCaFile))
+    }
+
+    protected fun appPref(uuid: String): AppPref {
+        val sharedPref = context.getSharedPreferences("$uuid-user-preferences", Context.MODE_PRIVATE)
+        return AppPref(sharedPref)
     }
 }

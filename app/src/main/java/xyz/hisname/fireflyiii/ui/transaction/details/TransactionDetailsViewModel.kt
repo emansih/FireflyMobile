@@ -61,7 +61,7 @@ class TransactionDetailsViewModel(application: Application): BaseViewModel(appli
                     if(fileUri.isNotEmpty()){
                         addTransaction.response.data.transactionAttributes.transactions.forEach { transactions ->
                             AttachmentWorker.initWorker(fileUri, transactions.transaction_journal_id,
-                                getApplication(), AttachableType.TRANSACTION)
+                                getApplication(), AttachableType.TRANSACTION, getUniqueHash())
                         }
                     }
                     message.postValue("Duplicate success!")
@@ -100,7 +100,7 @@ class TransactionDetailsViewModel(application: Application): BaseViewModel(appli
                 when (transactionRepository.deleteTransactionById(transactionId)) {
                     HttpConstants.FAILED -> {
                         isDeleted.postValue(false)
-                        DeleteTransactionWorker.setupWorker(journalId, getApplication())
+                        DeleteTransactionWorker.setupWorker(journalId, getApplication(), getUniqueHash())
                     }
                     HttpConstants.UNAUTHORISED -> {
                         isDeleted.postValue(false)
