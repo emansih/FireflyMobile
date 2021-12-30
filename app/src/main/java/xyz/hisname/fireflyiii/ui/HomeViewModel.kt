@@ -211,7 +211,47 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             val accountToRemove = accountArray.filterNot { userArray.contains(it) }
             accountToRemove.forEach { uuid ->
                 NewAccountManager(AccountManager.get(getApplication()), uuid).destroyAccount()
+                val customCaFile = File(getApplication<Application>().applicationInfo.dataDir
+                        + "/" + uuid + ".pem")
+                val customPref = File(getApplication<Application>().applicationInfo.dataDir
+                        + "/shared_prefs/" + uuid + "-user-preferences.xml")
+                if(customCaFile.exists()){
+                    customCaFile.delete()
+                }
+                customPref.delete()
             }
         }
+    }
+
+    /* Check for consistency since a user can delete an account in account manager. When the
+     * app accesses the data stored in account manager, empty string(s) will be returned. That is not
+     * what we want.
+     *
+     * We will set the first row as default user and remove any files that belong to previous default user
+     */
+    fun accountDoesNotExistInAccountManager(): LiveData<Boolean> {
+        val accessToken = newManager().accessToken
+        val shouldGoToAuth = MutableLiveData<Boolean>()
+        if(accessToken.isBlank()){
+            viewModelScope.launch(Dispatchers.IO){
+                fireflyUserDatabase.deleteCurrentUser()
+                val customCaFile = File(getApplication<Application>().applicationInfo.dataDir
+                        + "/" + getUniqueHash() + ".pem")
+                val customPref = File(getApplication<Application>().applicationInfo.dataDir
+                        + "/shared_prefs/" + getUniqueHash() + "-user-preferences.xml")
+                if(customCaFile.exists()){
+                    customCaFile.delete()
+                }
+                customPref.delete()
+                val fireflyUsers = fireflyUserDatabase.getAllUser()
+                if(fireflyUsers.isNotEmpty()){
+                    fireflyUserDatabase.updateActiveUser(fireflyUsers[0].uniqueHash, true)
+                }
+                shouldGoToAuth.postValue(accessToken.isBlank() && fireflyUsers.isEmpty())
+            }
+        } else {
+            shouldGoToAuth.postValue(false)
+        }
+        return shouldGoToAuth
     }
 }
