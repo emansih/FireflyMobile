@@ -86,22 +86,15 @@ class HomeActivity: BaseActivity(){
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
         } else {
-            homeViewModel.accountDoesNotExistInAccountManager().observe(this){ exist ->
-                if(exist){
-                    startActivity(Intent(this, AuthActivity::class.java))
-                    finish()
-                } else {
-                    setContentView(view)
-                    homeViewModel.migrateFirefly()
-                    setup()
-                    if(keyguardUtil.isAppKeyguardEnabled()){
-                        binding.biggerFragmentContainer.isInvisible = true
-                        authenticator = Authenticator(this, ::handleResult)
-                        authenticator.authenticate()
-                    }
-                    homeViewModel.deleteUnusedAccount()
-                }
+            setContentView(view)
+            homeViewModel.migrateFirefly()
+            setup()
+            if(keyguardUtil.isAppKeyguardEnabled()){
+                binding.biggerFragmentContainer.isInvisible = true
+                authenticator = Authenticator(this, ::handleResult)
+                authenticator.authenticate()
             }
+            homeViewModel.deleteUnusedAccount()
         }
     }
 

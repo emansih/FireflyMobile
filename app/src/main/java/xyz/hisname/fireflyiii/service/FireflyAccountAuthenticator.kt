@@ -24,8 +24,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import xyz.hisname.fireflyiii.ui.HomeActivity
+import xyz.hisname.fireflyiii.Constants
+import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
+import java.io.File
 
 class FireflyAccountAuthenticator(private val context: Context): AbstractAccountAuthenticator(context) {
 
@@ -53,16 +55,26 @@ class FireflyAccountAuthenticator(private val context: Context): AbstractAccount
 
     override fun editProperties(response: AccountAuthenticatorResponse, accountType: String) = null
 
-    @Throws(NetworkErrorException::class)
     override fun addAccount(response: AccountAuthenticatorResponse, accountType: String, authTokenType: String?,
                             requiredFeatures: Array<String>?, options: Bundle?): Bundle {
-        val accountManager = context.getSystemService(Context.ACCOUNT_SERVICE) as AccountManager
-        val accounts = accountManager.getAccountsByType("OAUTH")
-        val activityToLaunch = if(accounts.isEmpty()){
-            Intent(context, AuthActivity::class.java)
-        } else {
-            Intent(context, HomeActivity::class.java)
+        return bundleOf(AccountManager.KEY_INTENT to  Intent(context, AuthActivity::class.java))
+    }
+
+    override fun getAccountRemovalAllowed(response: AccountAuthenticatorResponse, account: Account): Bundle {
+        val fireflyUserDatabase = FireflyUserDatabase.getInstance(context).fireflyUserDao()
+        fireflyUserDatabase.deleteCurrentUser()
+        val customCaFile = File(context.applicationInfo.dataDir + "/" + account.name + ".pem")
+        val customPref = File(context.applicationInfo.dataDir + "/shared_prefs/" + account.name + "-user-preferences.xml")
+        if(customCaFile.exists()){
+            customCaFile.delete()
         }
-        return bundleOf(AccountManager.KEY_INTENT to activityToLaunch)
+        customPref.delete()
+        val fireflyUsers = fireflyUserDatabase.getAllUser()
+        if(fireflyUsers.isNotEmpty()){
+            fireflyUserDatabase.updateActiveUser(fireflyUsers[0].uniqueHash, true)
+        }
+        File(context.getDatabasePath(account.name + "-temp-" + Constants.DB_NAME).toString()).delete()
+        File(context.getDatabasePath(account.name + "-photuris.db").toString()).delete()
+        return super.getAccountRemovalAllowed(response, account)
     }
 }
