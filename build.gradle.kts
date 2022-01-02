@@ -27,11 +27,11 @@ allprojects {
         maven("https://jitpack.io")
         // TODO: Remove by end of Dec 2021
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
-        maven("https://dl.bintray.com/florent37/maven") {
+        /*maven("https://dl.bintray.com/florent37/maven") {
             content{
                 includeGroup("com.github.florent37")
             }
-        }
+        }*/
         dependencies{
             apply("$rootDir/buildSrc/src/main/java/Version.gradle")
         }
