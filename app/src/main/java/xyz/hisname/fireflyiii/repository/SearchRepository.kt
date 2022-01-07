@@ -21,7 +21,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
     suspend fun searchEverywhere(query: String): List<SearchModelItem> {
         val combineArray = arrayListOf<SearchModelItem>()
         try {
-            Stream.of(searchBudget(query), searchAccounts(query), searchCategory(query),
+            Stream.of(/*searchBudget(query),*/ searchAccounts(query), searchCategory(query),
                 searchPiggyBanks(query), searchTags(query), searchTransaction(query),
                 searchCurrencies(query), searchBill(query)).forEach { searchModelItemList ->
                         combineArray.addAll(searchModelItemList)
@@ -148,7 +148,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
                     tagsQueries.add(SearchModelItem(searchModelItem.id,
-                        searchModelItem.name, "Tag"))
+                        searchModelItem.name, "Tags"))
                 }
             } else {
                 val tagsList = tagsDataDao.searchTags("%$query%")
@@ -185,7 +185,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
                         if (transactionBody != null && webservice.isSuccessful){
                             transactionBody.data.forEach { data ->
                                 data.transactionAttributes.transactions.forEach { transactions ->
-                                    transactionQueries.add(SearchModelItem(searchModelItem.id,
+                                    transactionQueries.add(SearchModelItem(transactions.transaction_journal_id,
                                         searchModelItem.name + " (" + transactions.date.toLocalDate() + ")", transactions.transactionType))
                                 }
                             }

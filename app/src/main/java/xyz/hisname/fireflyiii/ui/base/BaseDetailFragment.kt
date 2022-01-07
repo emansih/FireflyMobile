@@ -41,6 +41,9 @@ abstract class BaseDetailFragment: BaseFragment(){
             inflater.inflate(R.menu.detail_menu, menu)
             super.onCreateOptionsMenu(menu, inflater)
         }
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
+            .menu.findItem(R.id.appWideSearch)
+            .isVisible = false
     }
 
     override fun onAttach(context: Context) {

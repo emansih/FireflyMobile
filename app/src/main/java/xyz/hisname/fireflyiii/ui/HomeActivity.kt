@@ -596,6 +596,10 @@ class HomeActivity: BaseActivity(){
                         || fragment is ListTagsFragment
                         || fragment is CurrencyListFragment
                         || fragment is BudgetListFragment)
+                val menuItem = binding.activityToolbar.menu.findItem(R.id.appWideSearch)
+                if(menuItem != null){
+                    menuItem.isVisible = fragment is DashboardFragment
+                }
             }
         }
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
@@ -608,6 +612,10 @@ class HomeActivity: BaseActivity(){
                     || fragment is CurrencyListFragment
                     || fragment is BudgetListFragment)
             binding.addTransactionExtended.isVisible = fragment is DashboardFragment
+            val menuItem = binding.activityToolbar.menu.findItem(R.id.appWideSearch)
+            if(menuItem != null){
+                menuItem.isVisible = fragment is DashboardFragment
+            }
         }
         drawerToggle.setToolbarNavigationClickListener {
             onBackPressed()
@@ -644,12 +652,12 @@ class HomeActivity: BaseActivity(){
                     val cursor = MatrixCursor(columns)
                     val temp = arrayOf<Any>(0, "", "")
                     items.forEachIndexed { i, s ->
-                        temp[0] = i
+                        temp[0] = items[i].id
                         temp[1] = items[i].name
                         temp[2] = items[i].type ?: ""
                         cursor.addRow(temp)
                     }
-                    val adapter = SearchAdapter(this@HomeActivity, cursor)
+                    val adapter = SearchAdapter(this@HomeActivity, cursor, supportFragmentManager)
                     search.suggestionsAdapter = adapter
                 }
                 return true
