@@ -64,6 +64,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             AppDatabase.getInstance(application, getUniqueHash()).piggyDataDao(),
             AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
             AppDatabase.getInstance(application, getUniqueHash()).budgetListDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).budgetLimitDao(),
             billDataDao,
             AppDatabase.getInstance(application, getUniqueHash()).accountDataDao(),
             AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao(),

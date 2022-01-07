@@ -15,6 +15,7 @@ import androidx.fragment.app.commit
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.ui.account.details.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.bills.details.BillDetailsFragment
+import xyz.hisname.fireflyiii.ui.budget.AddBudgetFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoryDetailsFragment
 import xyz.hisname.fireflyiii.ui.currency.AddCurrencyFragment
 import xyz.hisname.fireflyiii.ui.piggybank.details.PiggyDetailFragment
@@ -42,7 +43,13 @@ class SearchAdapter(private val activity: Activity, cursor: Cursor,
         val searchedId = cursor.getLong(0)
         val searchedResult = cursor.getString(1)
         val searchedResultType = cursor.getString(2)
-        searchedItem.text = searchedResult
+        val searchedResultCurrency = cursor.getString(3)
+        val parsedCurrency = if(searchedResultCurrency.isNotBlank()){
+            "($searchedResultCurrency)"
+        } else {
+            ""
+        }
+        searchedItem.text = "$searchedResult $parsedCurrency"
         searchedItemType.text = searchedResultType
         searchedLayout.setOnClickListener {
             activity.hideKeyboard()
@@ -55,7 +62,12 @@ class SearchAdapter(private val activity: Activity, cursor: Cursor,
                     addToBackStack(null)
                 }
             } else if(searchedResultType.contains("Budget")){
-               // Deliberately empty since we need currency symbol
+                supportManager.commit {
+                    replace(R.id.bigger_fragment_container, AddBudgetFragment().apply {
+                        arguments = bundleOf("budgetId" to searchedId, "currencySymbol" to searchedResultCurrency)
+                    })
+                    addToBackStack(null)
+                }
             } else if(searchedResultType.contains("Category")){
                 supportManager.commit {
                     replace(R.id.fragment_container, CategoryDetailsFragment().apply {

@@ -640,7 +640,7 @@ class HomeActivity: BaseActivity(){
         menuInflater.inflate(R.menu.search_menu, menu)
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val search = menu.findItem(R.id.appWideSearch).actionView as SearchView
-        val columns =  arrayOf("_id", "text", "subtext")
+        val columns =  arrayOf("_id", "text", "subtext", "currency")
         search.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         search.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String): Boolean {
@@ -650,11 +650,12 @@ class HomeActivity: BaseActivity(){
             override fun onQueryTextChange(newText: String): Boolean {
                 homeViewModel.searchFirefly(newText).observe(this@HomeActivity){ items ->
                     val cursor = MatrixCursor(columns)
-                    val temp = arrayOf<Any>(0, "", "")
+                    val temp = arrayOf<Any>(0, "", "", "")
                     items.forEachIndexed { i, s ->
                         temp[0] = items[i].id
                         temp[1] = items[i].name
                         temp[2] = items[i].type ?: ""
+                        temp[3] = items[i].currencySymbol ?: ""
                         cursor.addRow(temp)
                     }
                     val adapter = SearchAdapter(this@HomeActivity, cursor, supportFragmentManager)

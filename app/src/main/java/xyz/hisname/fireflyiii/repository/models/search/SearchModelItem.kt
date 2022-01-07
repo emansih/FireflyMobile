@@ -1,5 +1,6 @@
 package xyz.hisname.fireflyiii.repository.models.search
 
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /* Supported endpoints:
@@ -16,5 +17,7 @@ import com.squareup.moshi.JsonClass
 data class SearchModelItem(
     val id: Long,
     val name: String,
-    val type: String?
+    val type: String?,
+    @Json(name = "currency_symbol")
+    val currencySymbol: String?
 )

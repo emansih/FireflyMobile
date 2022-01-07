@@ -11,6 +11,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
                        private val piggyDao: PiggyDataDao,
                        private val currencyDao: CurrencyDataDao,
                        private val budgetList: BudgetListDataDao,
+                       private val budgetLimitDao: BudgetLimitDao,
                        private val billDao: BillDataDao,
                        private val accountDao: AccountsDataDao,
                        private val categoryDataDao: CategoryDataDao,
@@ -21,7 +22,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
     suspend fun searchEverywhere(query: String): List<SearchModelItem> {
         val combineArray = arrayListOf<SearchModelItem>()
         try {
-            Stream.of(/*searchBudget(query),*/ searchAccounts(query), searchCategory(query),
+            Stream.of(searchBudget(query), searchAccounts(query), searchCategory(query),
                 searchPiggyBanks(query), searchTags(query), searchTransaction(query),
                 searchCurrencies(query), searchBill(query)).forEach { searchModelItemList ->
                         combineArray.addAll(searchModelItemList)
@@ -37,21 +38,48 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             val body = webservice.body()
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
-                    budgetQueries.add(SearchModelItem(searchModelItem.id,
-                        searchModelItem.name, "Budget"))
+                    // Currency parameter in budget is optional
+                    val budgetCurrency = budgetLimitDao.getUniqueCurrencySymbolInSpentByBudgetId(searchModelItem.id)
+                    if(budgetCurrency.isNotEmpty()){
+                        budgetCurrency.forEach { currencySymbol ->
+                            budgetQueries.add(SearchModelItem(searchModelItem.id,
+                                searchModelItem.name, "Budget", currencySymbol))
+                        }
+                    } else {
+                        budgetQueries.add(SearchModelItem(searchModelItem.id,
+                            searchModelItem.name, "Budget", ""))
+                    }
                 }
             } else {
                 val budgetList = budgetList.searchBudgetName("%$query%")
                 budgetList.forEach { budgetListData ->
-                    budgetQueries.add(SearchModelItem(budgetListData.budgetListId,
-                        budgetListData.budgetListAttributes.name, "Budget"))
+                    // Currency parameter in budget is optional
+                    val budgetCurrency = budgetLimitDao.getUniqueCurrencySymbolInSpentByBudgetId(budgetListData.budgetListId)
+                    if(budgetCurrency.isNotEmpty()){
+                        budgetCurrency.forEach { currencySymbol ->
+                            budgetQueries.add(SearchModelItem(budgetListData.budgetListId,
+                                budgetListData.budgetListAttributes.name, "Budget", currencySymbol))
+                        }
+                    } else {
+                        budgetQueries.add(SearchModelItem(budgetListData.budgetListId,
+                            budgetListData.budgetListAttributes.name, "Budget", ""))
+                    }
                 }
             }
         } catch (exception: Exception){
             val budgetList = budgetList.searchBudgetName("%$query%")
             budgetList.forEach { budgetListData ->
-                budgetQueries.add(SearchModelItem(budgetListData.budgetListId,
-                    budgetListData.budgetListAttributes.name, "Budget"))
+                // Currency parameter in budget is optional
+                val budgetCurrency = budgetLimitDao.getUniqueCurrencySymbolInSpentByBudgetId(budgetListData.budgetListId)
+                if(budgetCurrency.isNotEmpty()){
+                    budgetCurrency.forEach { currencySymbol ->
+                        budgetQueries.add(SearchModelItem(budgetListData.budgetListId,
+                            budgetListData.budgetListAttributes.name, "Budget", currencySymbol))
+                    }
+                } else {
+                    budgetQueries.add(SearchModelItem(budgetListData.budgetListId,
+                        budgetListData.budgetListAttributes.name, "Budget", ""))
+                }
             }
         }
         return budgetQueries
@@ -65,14 +93,14 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
                     accountQueries.add(SearchModelItem(searchModelItem.id,
-                        searchModelItem.name, searchModelItem.type))
+                        searchModelItem.name, searchModelItem.type, searchModelItem.currencySymbol))
                 }
             } else {
                 val accountList = accountDao.searchAccountByName("%$query%")
                 accountList.forEach { accountListData ->
                     accountQueries.add(SearchModelItem(accountListData.accountId,
                         accountListData.accountAttributes.name,
-                        accountListData.accountAttributes.type))
+                        accountListData.accountAttributes.type, accountListData.accountAttributes.currency_symbol))
                 }
             }
         } catch (exception: Exception){
@@ -80,7 +108,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             accountList.forEach { accountListData ->
                 accountQueries.add(SearchModelItem(accountListData.accountId,
                     accountListData.accountAttributes.name,
-                    accountListData.accountAttributes.type))
+                    accountListData.accountAttributes.type, accountListData.accountAttributes.currency_symbol))
             }
         }
         return accountQueries
@@ -94,20 +122,20 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
                     categoryQueries.add(SearchModelItem(searchModelItem.id,
-                        searchModelItem.name, "Category"))
+                        searchModelItem.name, "Category", ""))
                 }
             } else {
                 val categoryList = categoryDataDao.searchCategory("%$query%")
                 categoryList.forEach { categoryListData ->
                     categoryQueries.add(SearchModelItem(categoryListData.categoryId,
-                        categoryListData.categoryAttributes.name, "Category"))
+                        categoryListData.categoryAttributes.name, "Category", ""))
                 }
             }
         } catch (exception: Exception){
             val categoryList = categoryDataDao.searchCategory("%$query%")
             categoryList.forEach { categoryListData ->
                 categoryQueries.add(SearchModelItem(categoryListData.categoryId,
-                    categoryListData.categoryAttributes.name, "Category"))
+                    categoryListData.categoryAttributes.name, "Category", ""))
             }
         }
         return categoryQueries
@@ -121,20 +149,20 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
                     piggyBankQueries.add(SearchModelItem(searchModelItem.id,
-                        searchModelItem.name, "Piggy Bank"))
+                        searchModelItem.name, "Piggy Bank", searchModelItem.currencySymbol))
                 }
             } else {
                 val piggyBankList = piggyDao.searchPiggyByName("%$query%")
                 piggyBankList.forEach { piggyBankListData ->
                     piggyBankQueries.add(SearchModelItem(piggyBankListData.piggyId,
-                        piggyBankListData.piggyAttributes.name, "Piggy Bank"))
+                        piggyBankListData.piggyAttributes.name, "Piggy Bank", piggyBankListData.piggyAttributes.currency_symbol))
                 }
             }
         } catch (exception: Exception){
             val piggyBankList = piggyDao.searchPiggyByName("%$query%")
             piggyBankList.forEach { piggyBankListData ->
                 piggyBankQueries.add(SearchModelItem(piggyBankListData.piggyId,
-                    piggyBankListData.piggyAttributes.name, "Piggy Bank"))
+                    piggyBankListData.piggyAttributes.name, "Piggy Bank", piggyBankListData.piggyAttributes.currency_symbol))
             }
         }
         return piggyBankQueries
@@ -148,20 +176,20 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
                     tagsQueries.add(SearchModelItem(searchModelItem.id,
-                        searchModelItem.name, "Tags"))
+                        searchModelItem.name, "Tags", ""))
                 }
             } else {
                 val tagsList = tagsDataDao.searchTags("%$query%")
                 tagsList.forEach { tagListData ->
                     tagsQueries.add(SearchModelItem(tagListData.tagsId,
-                        tagListData.tagsAttributes.description, "Tags"))
+                        tagListData.tagsAttributes.description, "Tags", ""))
                 }
             }
         } catch (exception: Exception){
             val tagsList = tagsDataDao.searchTags("%$query%")
             tagsList.forEach { tagListData ->
                 tagsQueries.add(SearchModelItem(tagListData.tagsId,
-                    tagListData.tagsAttributes.description, "Tags"))
+                    tagListData.tagsAttributes.description, "Tags", ""))
             }
         }
         return tagsQueries
@@ -186,7 +214,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
                             transactionBody.data.forEach { data ->
                                 data.transactionAttributes.transactions.forEach { transactions ->
                                     transactionQueries.add(SearchModelItem(transactions.transaction_journal_id,
-                                        searchModelItem.name + " (" + transactions.date.toLocalDate() + ")", transactions.transactionType))
+                                        searchModelItem.name + " (" + transactions.date.toLocalDate() + ")", transactions.transactionType, transactions.currency_symbol))
                                 }
                             }
                         }
@@ -196,21 +224,22 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
                     val transactionList = transactionDao.searchTransactionListByDescription("%$query%")
                     transactionList.forEach { transaction ->
                         transactionQueries.add(SearchModelItem(transaction.transaction_journal_id,
-                            transaction.description + " (" + transaction.date.toLocalDate() + ")", transaction.transactionType))
+                            transaction.description + " (" + transaction.date.toLocalDate() + ")", transaction.transactionType, transaction.currency_symbol))
                     }
                 }
             } else {
                 val transactionList = transactionDao.searchTransactionListByDescription("%$query%")
                 transactionList.forEach { transaction ->
                     transactionQueries.add(SearchModelItem(transaction.transaction_journal_id,
-                        transaction.description + " (" + transaction.date.toLocalDate() + ")", transaction.transactionType))
+                        transaction.description + " (" + transaction.date.toLocalDate() + ")", transaction.transactionType, transaction.currency_symbol))
                 }
             }
         } catch (exception: Exception){
             val transactionList = transactionDao.searchTransactionListByDescription("%$query%")
             transactionList.forEach { transaction ->
                 transactionQueries.add(SearchModelItem(transaction.transaction_journal_id,
-                    transaction.description + " (" + transaction.date.toLocalDate() + ")", transaction.transactionType))
+                    transaction.description + " (" + transaction.date.toLocalDate() + ")",
+                    transaction.transactionType, transaction.currency_symbol))
             }
         }
         return transactionQueries
@@ -223,15 +252,15 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             val body = webservice.body()
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
+                    // `currencySymbol` will always be `NULL` because Firefly III returns `symbol`
                     currencyQueries.add(SearchModelItem(searchModelItem.id,
-                            searchModelItem.name, "Currency"))
+                            searchModelItem.name, "Currency", searchModelItem.currencySymbol))
                 }
             } else {
                 val currencyList = currencyDao.searchCurrency("%$query%")
                 currencyList.forEach { currency ->
                     currencyQueries.add(SearchModelItem(currency.currencyId,
-                        currency.currencyAttributes.name + " (" +
-                                currency.currencyAttributes.symbol + ")", "Currency"))
+                        currency.currencyAttributes.name , "Currency", currency.currencyAttributes.symbol))
                 }
             }
         } catch (exception: Exception){
@@ -239,7 +268,7 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             currencyList.forEach { currency ->
                 currencyQueries.add(SearchModelItem(currency.currencyId,
                     currency.currencyAttributes.name + " (" +
-                            currency.currencyAttributes.symbol + ")", "Currency"))
+                            currency.currencyAttributes.symbol + ")", "Currency", currency.currencyAttributes.symbol))
             }
         }
         return currencyQueries
@@ -253,20 +282,20 @@ class SearchRepository(private val transactionDao: TransactionDataDao,
             if (body != null && webservice.isSuccessful){
                 body.forEach { searchModelItem ->
                     billQueries.add(SearchModelItem(searchModelItem.id,
-                        searchModelItem.name, "Bills"))
+                        searchModelItem.name, "Bills", ""))
                 }
             } else {
                 val billsList = billDao.searchBills("%$query%")
                 billsList.forEach { bill ->
                     billQueries.add(SearchModelItem(bill.billId,
-                        bill.billAttributes.name, "Bills"))
+                        bill.billAttributes.name, "Bills", ""))
                 }
             }
         } catch (exception: Exception){
             val billsList = billDao.searchBills("%$query%")
             billsList.forEach { bill ->
                 billQueries.add(SearchModelItem(bill.billId,
-                    bill.billAttributes.name, "Bills"))
+                    bill.billAttributes.name, "Bills", ""))
             }
         }
         return billQueries
