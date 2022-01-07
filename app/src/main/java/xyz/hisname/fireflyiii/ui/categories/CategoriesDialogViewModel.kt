@@ -28,6 +28,7 @@ import androidx.paging.cachedIn
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SearchService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.category.CategoryPageSource
 import xyz.hisname.fireflyiii.repository.category.CategorySearchPageSearch
@@ -35,6 +36,7 @@ import xyz.hisname.fireflyiii.repository.category.CategorySearchPageSearch
 class CategoriesDialogViewModel(application: Application): BaseViewModel(application) {
 
     private val categoryService = genericService().create(CategoryService::class.java)
+    private val searchService = genericService().create(SearchService::class.java)
     private val categoryDao = AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao()
     val categoryName = MutableLiveData<String>()
 
@@ -44,7 +46,7 @@ class CategoriesDialogViewModel(application: Application): BaseViewModel(applica
     }.flow.cachedIn(viewModelScope).asLiveData()
 
     fun searchCategoryList(searchName: String) = Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
-        CategorySearchPageSearch(searchName, categoryDao, categoryService)
+        CategorySearchPageSearch(searchName, categoryDao, searchService)
     }.flow.cachedIn(viewModelScope).asLiveData()
 
 }

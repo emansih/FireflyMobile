@@ -22,6 +22,7 @@ import androidx.annotation.WorkerThread
 import com.squareup.moshi.Moshi
 import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.TagsDataDao
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SearchService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TagsService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.error.ErrorModel
@@ -33,7 +34,8 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 @Suppress("RedundantSuspendModifier")
 @WorkerThread
 class TagsRepository(private val tagsDataDao: TagsDataDao,
-                     private val tagsService: TagsService) {
+                     private val tagsService: TagsService,
+                     private val searchService: SearchService? = null) {
 
     suspend fun allTags(): MutableList<TagsData>{
         try {
@@ -80,13 +82,14 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
         try {
             val tag = tagsDataDao.getTagByName(tagName)
             if (tag.tagsAttributes.description.isEmpty()){
-                val networkCall = tagsService.searchTag(tagName)
+                checkNotNull(searchService)
+                val networkCall = searchService.searchTags(tagName)
                 val responseBody = networkCall.body()
                 if(responseBody != null && networkCall.isSuccessful){
                     responseBody.forEach {  tagsItems ->
                         tagsDataDao.insert(TagsData(
                                 TagsAttributes("","","",
-                                        tagsItems.tag, "", "", "", ""),
+                                        tagsItems.name, "", "", "", ""),
                                 tagsItems.id
                         ))
                     }
@@ -98,13 +101,14 @@ class TagsRepository(private val tagsDataDao: TagsDataDao,
 
     suspend fun searchTag(tagName: String): List<String>{
         try {
-            val networkCall = tagsService.searchTag(tagName)
+            checkNotNull(searchService)
+            val networkCall = searchService.searchTags(tagName)
             val responseBody = networkCall.body()
             if(responseBody != null && networkCall.isSuccessful){
                 responseBody.forEach {  tagsItems ->
                     tagsDataDao.insert(TagsData(
                             TagsAttributes("","","",
-                                    tagsItems.tag, "", "", "", ""),
+                                    tagsItems.name, "", "", "", ""),
                             tagsItems.id
                     ))
                 }

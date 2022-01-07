@@ -20,10 +20,8 @@ package xyz.hisname.fireflyiii.data.remote.firefly.api
 
 import retrofit2.Response
 import retrofit2.http.*
-import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.Constants.Companion.PIGGY_BANK_API_ENDPOINT
 import xyz.hisname.fireflyiii.repository.models.attachment.AttachmentModel
-import xyz.hisname.fireflyiii.repository.models.autocomplete.PiggybankItems
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggyModel
 import xyz.hisname.fireflyiii.repository.models.piggy.PiggySuccessModel
 
@@ -56,9 +54,6 @@ interface PiggybankService {
                                 @Field("target_date") targetDate: String?,
                                 @Field("notes") notes: String?,
                                 @Field("group") group: String?): Response<PiggySuccessModel>
-
-    @GET("${Constants.SEARCH_API_ENDPOINT}/piggy-banks")
-    suspend fun searchPiggybank(query: String): Response<List<PiggybankItems>>
 
     @GET("${PIGGY_BANK_API_ENDPOINT}/{id}/attachments")
     suspend fun getPiggyBankAttachment(@Path("id") piggyId: Long): Response<AttachmentModel>

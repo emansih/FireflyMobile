@@ -82,7 +82,8 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     // We do lazy init here because a user might not type anything inside category edit text
     private val categoryRepository by lazy {
         CategoryRepository(AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao(),
-                genericService().create(CategoryService::class.java))
+            genericService().create(CategoryService::class.java), null,
+            genericService().create(SearchService::class.java))
     }
     private val piggyRepository by lazy {
         PiggyRepository(AppDatabase.getInstance(application, getUniqueHash()).piggyDataDao(),
@@ -104,8 +105,10 @@ class AddTransactionViewModel(application: Application): BaseViewModel(applicati
     }
 
     private val tagsRepository by lazy {
-        TagsRepository(AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
-                genericService().create(TagsService::class.java))
+        TagsRepository(
+            AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
+            genericService().create(TagsService::class.java),
+            genericService().create(SearchService::class.java))
     }
 
     var currency = ""

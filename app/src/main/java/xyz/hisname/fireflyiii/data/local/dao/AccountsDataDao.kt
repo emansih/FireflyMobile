@@ -59,6 +59,9 @@ abstract class AccountsDataDao: BaseDao<AccountData> {
     @Query("SELECT distinct name FROM accounts WHERE name LIKE :name AND type LIKE :type")
     abstract fun searchAccountByNameAndType(type: String, name: String): List<String>
 
+    @Query("SELECT * FROM accounts WHERE name LIKE :name")
+    abstract fun searchAccountByName(name: String): List<AccountData>
+
     @Query("SELECT * FROM accounts WHERE name LIKE :name AND type =:type ORDER BY accountId ASC")
     abstract fun searchAccountDataByNameAndType(type: String, name: String): PagingSource<Int, AccountData>
 

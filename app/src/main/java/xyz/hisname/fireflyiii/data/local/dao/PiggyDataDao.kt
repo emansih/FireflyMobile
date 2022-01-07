@@ -45,4 +45,7 @@ abstract class PiggyDataDao: BaseDao<PiggyData>{
     @Query("SELECT * FROM piggy WHERE piggyId = :piggyId")
     abstract fun getPiggyFromId(piggyId: Long): PiggyData
 
+    @Query("SELECT * FROM piggy WHERE name LIKE :name")
+    abstract fun searchPiggyByName(name: String): List<PiggyData>
+
 }

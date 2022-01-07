@@ -134,6 +134,9 @@ abstract class TransactionDataDao {
     @Query("SELECT distinct description FROM transactionTable WHERE description LIKE :description")
     abstract fun getTransactionListByDescription(description: String): List<String>
 
+    @Query("SELECT * FROM transactionTable WHERE description LIKE :description")
+    abstract fun searchTransactionListByDescription(description: String): List<Transactions>
+
     @Query("SELECT * FROM transactionTable WHERE (date BETWEEN :startDate AND :endDate) AND bill_id = :billId ORDER BY date ASC")
     abstract suspend fun getTransactionListByDateAndBill(billId: Long, startDate: String, endDate: String): MutableList<Transactions>
 

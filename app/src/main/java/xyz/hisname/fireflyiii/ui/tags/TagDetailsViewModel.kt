@@ -32,6 +32,7 @@ import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SearchService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TagsService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
@@ -49,8 +50,9 @@ import java.io.File
 class TagDetailsViewModel(application: Application): BaseViewModel(application) {
 
     private val tagsRepository = TagsRepository(
-            AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
-            genericService().create(TagsService::class.java)
+        AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
+        genericService().create(TagsService::class.java),
+        genericService().create(SearchService::class.java)
     )
 
     private val transactionRepository = TransactionRepository(

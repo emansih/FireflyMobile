@@ -71,4 +71,7 @@ abstract class CurrencyDataDao: BaseDao<CurrencyData> {
 
     @Query("SELECT currency.name FROM bills JOIN currency ON bills.currency_id = currency.currencyId WHERE billId =:billId")
     abstract suspend fun getCurrencyFromBill(billId: Long): String
+
+    @Query("SELECT * FROM currency WHERE name LIKE :name")
+    abstract fun searchCurrency(name: String): List<CurrencyData>
 }

@@ -21,17 +21,17 @@ package xyz.hisname.fireflyiii.repository.category
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
-import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SearchService
 import xyz.hisname.fireflyiii.repository.models.category.CategoryAttributes
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 
 class CategorySearchPageSearch(private val searchName: String,
                                private val categoryDataDao: CategoryDataDao,
-                               private val categoryService: CategoryService): PagingSource<Int, CategoryData>() {
+                               private val searchService: SearchService): PagingSource<Int, CategoryData>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CategoryData> {
         return try {
-            val networkCall = categoryService.searchCategory(searchName)
+            val networkCall = searchService.searchCategories(searchName)
             val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 responseBody.forEach { category ->
@@ -45,7 +45,7 @@ class CategorySearchPageSearch(private val searchName: String,
     }
 
     override val keyReuseSupported = true
-    override fun getRefreshKey(state: PagingState<Int, CategoryData>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, CategoryData>): Int {
         return 1
     }
 }

@@ -23,6 +23,7 @@ import retrofit2.Response
 import xyz.hisname.fireflyiii.data.local.dao.CategoryDataDao
 import xyz.hisname.fireflyiii.data.local.dao.TransactionDataDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CategoryService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.SearchService
 import xyz.hisname.fireflyiii.repository.models.ApiResponses
 import xyz.hisname.fireflyiii.repository.models.category.CategoryAttributes
 import xyz.hisname.fireflyiii.repository.models.category.CategoryData
@@ -37,12 +38,14 @@ import java.math.BigDecimal
 @Suppress("RedundantSuspendModifier")
 class CategoryRepository(private val categoryDao: CategoryDataDao,
                          private val categoryService: CategoryService,
-                         private val transactionDao: TransactionDataDao? = null){
+                         private val transactionDao: TransactionDataDao? = null,
+                         private val searchService: SearchService? = null){
 
 
     suspend fun searchCategoryByName(categoryName: String): List<CategoryData> {
         try {
-            val networkCall = categoryService.searchCategory(categoryName)
+            checkNotNull(searchService)
+            val networkCall = searchService.searchCategories(categoryName)
             val responseBody = networkCall.body()
             if (responseBody != null && networkCall.isSuccessful) {
                 responseBody.forEach { category ->

@@ -45,4 +45,8 @@ abstract class BillDataDao: BaseDao<BillData>{
 
     @Query("SELECT * FROM bills WHERE billId IN (SELECT id FROM billPayList WHERE payDates =:date)")
     abstract fun getBillDueFromDate(date: String): List<BillData>
+
+    @Query("SELECT * FROM bills WHERE name LIKE :name")
+    abstract fun searchBills(name: String): List<BillData>
+
 }

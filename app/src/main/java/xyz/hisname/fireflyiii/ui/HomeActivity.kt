@@ -18,13 +18,18 @@
 
 package xyz.hisname.fireflyiii.ui
 
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.database.MatrixCursor
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
@@ -45,6 +50,7 @@ import com.mikepenz.materialdrawer.widget.AccountHeaderView
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.ActivityBaseBinding
 import xyz.hisname.fireflyiii.repository.models.FireflyUsers
+import xyz.hisname.fireflyiii.repository.models.search.SearchModelItem
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -619,7 +625,37 @@ class HomeActivity: BaseActivity(){
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(binding.slider?.saveInstanceState(outState) ?: outState)
+        super.onSaveInstanceState(binding.slider.saveInstanceState(outState))
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.search_menu, menu)
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val search = menu.findItem(R.id.appWideSearch).actionView as SearchView
+        val columns =  arrayOf("_id", "text", "subtext")
+        search.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        search.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                homeViewModel.searchFirefly(newText).observe(this@HomeActivity){ items ->
+                    val cursor = MatrixCursor(columns)
+                    val temp = arrayOf<Any>(0, "", "")
+                    items.forEachIndexed { i, s ->
+                        temp[0] = i
+                        temp[1] = items[i].name
+                        temp[2] = items[i].type ?: ""
+                        cursor.addRow(temp)
+                    }
+                    val adapter = SearchAdapter(this@HomeActivity, cursor)
+                    search.suggestionsAdapter = adapter
+                }
+                return true
+            }
+        })
+        return super.onCreateOptionsMenu(menu)
     }
 
 }
