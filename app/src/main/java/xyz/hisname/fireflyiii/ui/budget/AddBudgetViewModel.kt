@@ -149,6 +149,15 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
         return budgetAttributesLiveData
     }
 
+    fun getBudgetByIdWithoutSymbol(budgetId: Long): LiveData<BudgetListData>{
+        val budgetAttributesLiveData = MutableLiveData<BudgetListData>()
+        viewModelScope.launch(Dispatchers.IO){
+            val budgetListData = budgetRepository.getBudgetListIdById(budgetId)
+            budgetAttributesLiveData.postValue(budgetListData)
+        }
+        return budgetAttributesLiveData
+    }
+
     private fun checkVersion(){
         if(!AppPref(sharedPref()).budgetIssue4394){
             val systemInfoRepository = SystemInfoRepository(

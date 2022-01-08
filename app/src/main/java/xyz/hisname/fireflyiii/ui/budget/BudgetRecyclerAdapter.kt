@@ -20,6 +20,7 @@ package xyz.hisname.fireflyiii.ui.budget
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +29,8 @@ import xyz.hisname.fireflyiii.repository.models.budget.ChildIndividualBudget
 import xyz.hisname.fireflyiii.repository.models.budget.IndividualBudget
 
 class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
-                            private val clickListener:(ChildIndividualBudget) -> Unit):
+                            private val clickListener:(ChildIndividualBudget) -> Unit,
+                            private val emptyChildListener: (Long) -> Unit):
         RecyclerView.Adapter<BudgetRecyclerAdapter.BudgetHolder>() {
 
     private var budgetListItemBinding: BudgetListItemBinding? = null
@@ -51,6 +53,12 @@ class BudgetRecyclerAdapter(private val budgetData: List<IndividualBudget>,
             if(budgetData[position].listOfChildIndividualBudget.size > 1){
                 childRecyclerView.addItemDecoration(DividerItemDecoration(childRecyclerView.context, DividerItemDecoration.VERTICAL))
             }
+
+            if(budgetData[position].listOfChildIndividualBudget.isEmpty()){
+                binding.headerIndicator.isGone = true
+                binding.budgetItemList.setOnClickListener { emptyChildListener(budgetData[position].sourceBudgetId) }
+            }
+
             childRecyclerView.layoutManager = layoutManager
             childRecyclerView.adapter = childItemAdapter
         }

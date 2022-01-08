@@ -154,9 +154,7 @@ class BudgetListViewModel(application: Application): BaseViewModel(application) 
                     childBudgetList.add(ChildIndividualBudget(budgetListId, spentAmount, userBudgetAmount, uniqueSymbol))
                 }
             }
-            if(childBudgetList.isNotEmpty()){
-                individualBudgetList.add(IndividualBudget(budgetName, childBudgetList))
-            }
+            individualBudgetList.add(IndividualBudget(budgetId, budgetName, childBudgetList))
         }
         individualBudget.postValue(individualBudgetList)
         isLoading.postValue(false)

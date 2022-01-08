@@ -42,6 +42,7 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.BaseSwipeLayoutBinding
 import xyz.hisname.fireflyiii.databinding.BudgetListItemBinding
 import xyz.hisname.fireflyiii.databinding.FragmentBudgetListBinding
+import xyz.hisname.fireflyiii.repository.models.budget.ChildIndividualBudget
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.util.extension.*
 import xyz.hisname.fireflyiii.util.extension.getImprovedViewModel
@@ -158,11 +159,18 @@ class BudgetListFragment: BaseFragment(){
     private fun setRecyclerView(){
         baseSwipeBinding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         budgetListViewModel.individualBudget.observe(viewLifecycleOwner){ budgetData ->
-            val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData){ cid ->
+            val budgetRecyclerAdapter = BudgetRecyclerAdapter(budgetData, { child: ChildIndividualBudget ->
                 parentFragmentManager.commit {
                     replace(R.id.bigger_fragment_container, AddBudgetFragment().apply {
-                        arguments = bundleOf("budgetId" to cid.budgetLimitId,
-                                "currencySymbol" to cid.currencySymbol)
+                        arguments = bundleOf("budgetId" to child.budgetLimitId,
+                            "currencySymbol" to child.currencySymbol)
+                    })
+                    addToBackStack(null)
+                }
+            }){ adult: Long ->
+                parentFragmentManager.commit {
+                    replace(R.id.bigger_fragment_container, AddBudgetFragment().apply {
+                        arguments = bundleOf("budgetId" to adult)
                     })
                     addToBackStack(null)
                 }

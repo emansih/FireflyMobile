@@ -19,6 +19,7 @@
 package xyz.hisname.fireflyiii.repository.models.budget
 
 data class IndividualBudget(
+        val sourceBudgetId: Long,
         val budgetName: String,
         val listOfChildIndividualBudget: List<ChildIndividualBudget>
 )

@@ -97,8 +97,17 @@ class AddBudgetFragment: BaseAddObjectFragment() {
                 dialog.findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
             }
         }
-        if(budgetId != 0L){
+        if(budgetId != 0L && currencySymbol.isNotBlank()){
             updateBudgetUi()
+        }
+        if(currencySymbol.isEmpty()){
+            updateBudgetUiWithoutCurrency()
+        }
+    }
+
+    private fun updateBudgetUiWithoutCurrency(){
+        addBudgetViewModel.getBudgetByIdWithoutSymbol(budgetId).observe(viewLifecycleOwner){ budget ->
+            binding.budgetNameEditText.setText(budget.budgetListAttributes.name)
         }
     }
 
