@@ -19,32 +19,12 @@
 package xyz.hisname.fireflyiii.ui.base
 
 import android.content.Context
-import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import xyz.hisname.fireflyiii.R
-import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.extension.consume
 
 abstract class BaseDetailFragment: BaseFragment(){
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        // TODO: Remove this...
-        if(this.javaClass != TransactionDetailsFragment::class.java){
-            inflater.inflate(R.menu.detail_menu, menu)
-            super.onCreateOptionsMenu(menu, inflater)
-        }
-        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
-            .menu.findItem(R.id.appWideSearch)
-            .isVisible = false
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
