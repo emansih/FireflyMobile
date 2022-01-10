@@ -1,21 +1,13 @@
-Hello everyone! I have been busy recently having recently graduated and working a full time job now. New features and bug fixes may be slow.
-This is a major update as I have added support for multi user support (#174). A lot of work was put into this to migrate exisiting users 
-seamlessly. If you are intending to use this as a single user, nothing to worry about! If you are intending to use this app for multiple 
-domains / emails, any exisitng offline jobs(pending transaction / attachments / bills) will use whatever default account that was set.
-If you have no exisiting offline jobs, you are all clear. 
+First release for 2022! There isn't much changes in this version.
 
-This will be the last release for 2021. Merry Christmas and happy new year everyone!
+Feature:
+- You can now search for Transactions, Bills, Budgets, Piggy banks, Categories, Currencies, Accounts and Tags
+in the Dashboard. 
 
-Build tools / libraries update:
-- Android Lifecycle library version to 2.4.0
-- Room library to 2.4.0
-- Kotlin Coroutine to 1.6.0
-- App Compat to 1.4.0
-- Fragment to 1.4.0
-- Material Design to 1.6.0-alpha01
-- Core to 1.7.0
-- ConstraintLayout to 2.1.2
-- Android Preference to 1.2.0-rc01
-- Work Manager to 2.7.1
-- Biometrics to 1.2.0-alpha04
-- Paging to 3.1.0
+Bug Fix:
+- Currency listing should now display the correct items when clicking. 
+- Fix a bug where budgets does not show in budget list when no currency is attached to it. 
+
+Libraries / Build tools update:
+- Update Android Gradle plugin to 7.0.4
+- The app now targets Java 11
