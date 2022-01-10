@@ -18,21 +18,15 @@
 
 package xyz.hisname.fireflyiii.ui
 
-import android.app.SearchManager
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.database.MatrixCursor
 import android.os.Bundle
-import android.view.Menu
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
-import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -600,10 +594,6 @@ class HomeActivity: BaseActivity(){
                         || fragment is ListTagsFragment
                         || fragment is CurrencyListFragment
                         || fragment is BudgetListFragment)
-                val menuItem = binding.activityToolbar.menu.findItem(R.id.appWideSearch)
-                if(menuItem != null){
-                    menuItem.isVisible = fragment is DashboardFragment
-                }
             }
         }
         supportFragmentManager.addFragmentOnAttachListener { _, fragment ->
@@ -616,10 +606,6 @@ class HomeActivity: BaseActivity(){
                     || fragment is CurrencyListFragment
                     || fragment is BudgetListFragment)
             binding.addTransactionExtended.isVisible = fragment is DashboardFragment
-            val menuItem = binding.activityToolbar.menu.findItem(R.id.appWideSearch)
-            if(menuItem != null){
-                menuItem.isVisible = fragment is DashboardFragment
-            }
         }
         drawerToggle.setToolbarNavigationClickListener {
             onBackPressed()
@@ -638,51 +624,6 @@ class HomeActivity: BaseActivity(){
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(binding.slider.saveInstanceState(outState))
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.search_menu, menu)
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val search = menu.findItem(R.id.appWideSearch).actionView as SearchView
-        val columns =  arrayOf("_id", "text", "subtext", "currency")
-        search.setOnSearchClickListener {
-            search.setBackgroundColor(getCompatColor(R.color.md_white_1000))
-            binding.activityBaseRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-            drawerToggle.isDrawerIndicatorEnabled = false
-            searchActivated = true
-        }
-        search.setOnCloseListener {
-            search.setBackgroundColor(getCompatColor(R.color.colorPrimary))
-            binding.activityBaseRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-            supportActionBar?.setDisplayHomeAsUpEnabled(false)
-            drawerToggle.isDrawerIndicatorEnabled = true
-            searchActivated = false
-            false
-        }
-        search.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        search.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                homeViewModel.searchFirefly(newText).observe(this@HomeActivity){ items ->
-                    val cursor = MatrixCursor(columns)
-                    val temp = arrayOf<Any>(0, "", "", "")
-                    items.forEachIndexed { i, s ->
-                        temp[0] = items[i].id
-                        temp[1] = items[i].name
-                        temp[2] = items[i].type ?: ""
-                        temp[3] = items[i].currencySymbol ?: ""
-                        cursor.addRow(temp)
-                    }
-                    val adapter = SearchAdapter(this@HomeActivity, cursor, supportFragmentManager)
-                    search.suggestionsAdapter = adapter
-                }
-                return true
-            }
-        })
-        return super.onCreateOptionsMenu(menu)
     }
 
 }

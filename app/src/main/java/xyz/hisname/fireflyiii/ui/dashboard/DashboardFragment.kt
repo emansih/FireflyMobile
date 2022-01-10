@@ -19,17 +19,18 @@
 package xyz.hisname.fireflyiii.ui.dashboard
 
 import android.animation.ObjectAnimator
+import android.app.SearchManager
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.database.MatrixCursor
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -57,6 +58,7 @@ import com.mikepenz.iconics.utils.sizeDp
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentDashboardBinding
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
+import xyz.hisname.fireflyiii.ui.SearchAdapter
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
 import xyz.hisname.fireflyiii.ui.bills.BillsBottomSheet
 import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
@@ -81,6 +83,7 @@ class DashboardFragment: BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         fragmentDashboardBinding = FragmentDashboardBinding.inflate(inflater, container, false)
         val view = binding.root
+        setHasOptionsMenu(true)
         return view
     }
 
@@ -443,5 +446,36 @@ class DashboardFragment: BaseFragment() {
                         })
                     }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.search_menu, menu)
+        val searchManager = requireContext().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val search = menu.findItem(R.id.appWideSearch).actionView as SearchView
+        val columns =  arrayOf("_id", "text", "subtext", "currency")
+        search.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+        search.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                dashboardView.searchFirefly(newText).observe(viewLifecycleOwner){ items ->
+                    val cursor = MatrixCursor(columns)
+                    val temp = arrayOf<Any>(0, "", "", "")
+                    items.forEachIndexed { i, s ->
+                        temp[0] = items[i].id
+                        temp[1] = items[i].name
+                        temp[2] = items[i].type ?: ""
+                        temp[3] = items[i].currencySymbol ?: ""
+                        cursor.addRow(temp)
+                    }
+                    val adapter = SearchAdapter(requireActivity(), cursor, parentFragmentManager)
+                    search.suggestionsAdapter = adapter
+                }
+                return true
+            }
+        })
     }
 }

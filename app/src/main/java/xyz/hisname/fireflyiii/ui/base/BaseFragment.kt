@@ -21,7 +21,6 @@ package xyz.hisname.fireflyiii.ui.base
 import android.os.Bundle
 import android.view.*
 import android.widget.FrameLayout
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -30,8 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.repository.GlobalViewModel
-import xyz.hisname.fireflyiii.ui.dashboard.DashboardFragment
-import xyz.hisname.fireflyiii.ui.transaction.details.TransactionDetailsFragment
 import xyz.hisname.fireflyiii.util.animation.CircularReveal
 import xyz.hisname.fireflyiii.util.extension.bindView
 import xyz.hisname.fireflyiii.util.extension.getViewModel
@@ -57,20 +54,5 @@ abstract class BaseFragment: Fragment() {
     protected fun showReveal(rootLayout: View) = CircularReveal(rootLayout).showReveal(revealX, revealY)
 
     protected fun isDarkMode() = globalViewModel.isDark
-
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        // TODO: Remove this...
-        if(this.javaClass != TransactionDetailsFragment::class.java
-            && this.javaClass != DashboardFragment::class.java){
-                inflater.inflate(R.menu.detail_menu, menu)
-            super.onCreateOptionsMenu(menu, inflater)
-        }
-        if(this.javaClass != DashboardFragment::class.java){
-            setHasOptionsMenu(true)
-            requireActivity().findViewById<Toolbar>(R.id.activity_toolbar)
-                .menu.findItem(R.id.appWideSearch).isVisible = false
-        }
-    }
 
 }

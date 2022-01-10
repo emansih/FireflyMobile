@@ -32,13 +32,12 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.SimpleData
-import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.SummaryService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
+import xyz.hisname.fireflyiii.data.remote.firefly.api.*
 import xyz.hisname.fireflyiii.repository.BaseViewModel
+import xyz.hisname.fireflyiii.repository.SearchRepository
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
 import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
+import xyz.hisname.fireflyiii.repository.models.search.SearchModelItem
 import xyz.hisname.fireflyiii.repository.models.transaction.Transactions
 import xyz.hisname.fireflyiii.repository.transaction.TransactionLimitSource
 import xyz.hisname.fireflyiii.repository.transaction.TransactionRepository
@@ -65,6 +64,20 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
     private val transactionRepository = TransactionRepository(
             transactionDao, genericService().create(TransactionService::class.java)
     )
+
+    private val searchRepository by lazy {
+        SearchRepository(AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).piggyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).budgetListDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).budgetLimitDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).billDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).accountDataDao(),
+            AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao(),
+            genericService().create(SearchService::class.java),
+            genericService().create(TransactionService::class.java))
+    }
 
     private lateinit var currencyCode: String
     val currencySymbol: MutableLiveData<String> = MutableLiveData()
@@ -346,5 +359,14 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
         return Pager(PagingConfig(5)) {
             TransactionLimitSource(5, transactionDao)
         }.flow.cachedIn(viewModelScope).asLiveData()
+    }
+
+
+    fun searchFirefly(query: String): LiveData<List<SearchModelItem>>{
+        val searchedItems = MutableLiveData<List<SearchModelItem>>()
+        viewModelScope.launch(Dispatchers.IO){
+            searchedItems.postValue(searchRepository.searchEverywhere(query))
+        }
+        return searchedItems
     }
 }
