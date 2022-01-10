@@ -32,6 +32,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -50,7 +51,6 @@ import com.mikepenz.materialdrawer.widget.AccountHeaderView
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.ActivityBaseBinding
 import xyz.hisname.fireflyiii.repository.models.FireflyUsers
-import xyz.hisname.fireflyiii.repository.models.search.SearchModelItem
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
@@ -82,6 +82,8 @@ class HomeActivity: BaseActivity(){
             binding.activityBaseRoot, binding.activityToolbar,
             com.mikepenz.materialdrawer.R.string.material_drawer_open,
             com.mikepenz.materialdrawer.R.string.material_drawer_close) }
+    private var searchActivated = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -555,7 +557,9 @@ class HomeActivity: BaseActivity(){
             when (supportFragmentManager.backStackEntryCount) {
                 0 -> {
                     if (supportFragmentManager.findFragmentByTag("dash") is DashboardFragment) {
-                        finish()
+                        if(!searchActivated){
+                            finish()
+                        }
                     } else {
                         // This is a dirty hack!
                         supportFragmentManager.fragments.forEach { fragment ->
@@ -641,6 +645,20 @@ class HomeActivity: BaseActivity(){
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val search = menu.findItem(R.id.appWideSearch).actionView as SearchView
         val columns =  arrayOf("_id", "text", "subtext", "currency")
+        search.setOnSearchClickListener {
+            search.setBackgroundColor(getCompatColor(R.color.md_white_1000))
+            binding.activityBaseRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            drawerToggle.isDrawerIndicatorEnabled = false
+            searchActivated = true
+        }
+        search.setOnCloseListener {
+            search.setBackgroundColor(getCompatColor(R.color.colorPrimary))
+            binding.activityBaseRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            drawerToggle.isDrawerIndicatorEnabled = true
+            searchActivated = false
+            false
+        }
         search.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         search.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String): Boolean {
