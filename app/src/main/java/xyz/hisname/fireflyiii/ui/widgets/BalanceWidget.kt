@@ -43,7 +43,7 @@ class BalanceWidget: AppWidgetProvider() {
     }
 
     private fun simpleData(context: Context): SimpleData{
-        return SimpleData(context.getSharedPreferences(context.getUniqueHash().toString() + "-user-preferences",
+        return SimpleData(context.getSharedPreferences(context.getUniqueHash() + "-user-preferences",
             Context.MODE_PRIVATE))
     }
 
