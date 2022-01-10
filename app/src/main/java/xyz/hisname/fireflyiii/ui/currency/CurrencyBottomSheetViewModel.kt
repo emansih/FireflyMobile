@@ -40,7 +40,7 @@ class CurrencyBottomSheetViewModel(application: Application): BaseViewModel(appl
     private val databaseInstance = AppDatabase.getInstance(application, getUniqueHash())
     private val currencyDao = databaseInstance.currencyDataDao()
     private val currencyService = genericService().create(CurrencyService::class.java)
-    private val currencyRemoteKeyDao = databaseInstance.currencyRemoteKeysDao()
+   /* private val currencyRemoteKeyDao = databaseInstance.currencyRemoteKeysDao()
 
     @OptIn(ExperimentalPagingApi::class)
     fun getCurrencyList() = Pager(
@@ -48,5 +48,9 @@ class CurrencyBottomSheetViewModel(application: Application): BaseViewModel(appl
         remoteMediator = CurrencyRemoteMediator(currencyDao, currencyService, currencyRemoteKeyDao)
     ){
         currencyDao.getCurrency()
+    }.flow.cachedIn(viewModelScope).asLiveData()*/
+
+    fun getCurrencyList() =  Pager(PagingConfig(pageSize = Constants.PAGE_SIZE)){
+        CurrencyRemoteMediator(currencyDao, currencyService)
     }.flow.cachedIn(viewModelScope).asLiveData()
 }

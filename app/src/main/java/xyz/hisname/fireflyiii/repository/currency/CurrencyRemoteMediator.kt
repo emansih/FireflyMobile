@@ -19,63 +19,66 @@
 package xyz.hisname.fireflyiii.repository.currency
 
 import androidx.paging.*
-import retrofit2.HttpException
+import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.CurrencyDataDao
-import xyz.hisname.fireflyiii.data.local.dao.CurrencyKeyDao
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
 import xyz.hisname.fireflyiii.repository.models.currency.CurrencyData
-import xyz.hisname.fireflyiii.repository.models.currency.CurrencyRemoteKeys
-import java.io.IOException
 
-@OptIn(ExperimentalPagingApi::class)
 class CurrencyRemoteMediator(private val currencyDataDao: CurrencyDataDao,
-                             private val currencyService: CurrencyService,
-                             private val currencyRemoteKeysDataDao: CurrencyKeyDao): RemoteMediator<Int, CurrencyData>() {
+                             private val currencyService: CurrencyService/*,
+                             private val currencyRemoteKeysDataDao: CurrencyKeyDao*/): PagingSource<Int, CurrencyData>() {
 
-    override suspend fun load(loadType: LoadType, state: PagingState<Int, CurrencyData>): MediatorResult {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CurrencyData> {
+        val paramKey = params.key
+        val previousKey = if(paramKey != null){
+            if(paramKey - 1 == 0){
+                null
+            } else {
+                paramKey - 1
+            }
+        } else {
+            null
+        }
         try {
-            val loadKey = when (loadType) {
-                LoadType.REFRESH -> {
-                    currencyRemoteKeysDataDao.deleteCurrencyKey()
+            val networkCall = currencyService.getPaginatedCurrency(params.key ?: 1)
+            val responseBody = networkCall.body()
+            if (responseBody != null && networkCall.isSuccessful) {
+                if (params.key == null) {
+                    currencyDataDao.deleteAllCurrency()
+                }
+                responseBody.data.forEach { data ->
+                    currencyDataDao.insert(data)
+                }
+            }
+            val pagination = responseBody?.meta?.pagination
+            if(pagination != null){
+                val nextKey = if(pagination.current_page < pagination.total_pages){
+                    pagination.current_page + 1
+                } else {
                     null
                 }
-                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> {
-                   currencyRemoteKeysDataDao.remoteKey().nextPageKey
-                }
+                return LoadResult.Page(currencyDataDao.getSortedCurrency(), previousKey, nextKey)
+            } else {
+                return getOfflineData(params.key, previousKey)
             }
-            val networkCall = currencyService.getPaginatedCurrency(loadKey ?: 1)
-
-            if (loadType == LoadType.REFRESH) {
-                currencyDataDao.deleteAllCurrency()
-                currencyRemoteKeysDataDao.deleteCurrencyKey()
-            }
-
-            val isSuccessful = networkCall.isSuccessful
-            val currencyBody = networkCall.body()
-            if(isSuccessful && currencyBody != null){
-                if(loadKey == 1){
-                    currencyDataDao.deleteAllCurrency()
-                    currencyRemoteKeysDataDao.deleteCurrencyKey()
-                }
-                currencyRemoteKeysDataDao.insert(CurrencyRemoteKeys(currencyBody.meta.pagination.current_page,
-                    currencyBody.meta.pagination.current_page + 1))
-
-                currencyBody.data.forEach { currencyData ->
-                    currencyDataDao.insert(currencyData)
-                }
-            }
-
-            return MediatorResult.Success(endOfPaginationReached = currencyBody?.data?.isEmpty() ?: true)
-        } catch (e: IOException) {
-            return MediatorResult.Error(e)
-        } catch (e: HttpException) {
-            return MediatorResult.Error(e)
+        } catch (exception: Exception){
+            return getOfflineData(params.key, previousKey)
         }
     }
 
-    override suspend fun initialize(): InitializeAction {
-        return InitializeAction.LAUNCH_INITIAL_REFRESH
+    private suspend fun getOfflineData(paramKey: Int?, previousKey: Int?): LoadResult<Int, CurrencyData>{
+        val numberOfRows = currencyDataDao.getSortedCurrency().size
+        val nextKey = if(paramKey ?: 1 < (numberOfRows / Constants.PAGE_SIZE)){
+            paramKey ?: 1 + 1
+        } else {
+            null
+        }
+        return LoadResult.Page(currencyDataDao.getSortedCurrency(), previousKey, nextKey)
+
     }
+
+    override val keyReuseSupported = true
+
+    override fun getRefreshKey(state: PagingState<Int, CurrencyData>) = 1
 
 }
