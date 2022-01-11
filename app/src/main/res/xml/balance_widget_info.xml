@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="180dp"
     android:minHeight="40dp"
-    android:previewImage="@drawable/ic_balance_scale_solid"
+    android:previewImage="@drawable/balance_widget"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 
