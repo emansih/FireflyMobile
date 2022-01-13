@@ -18,7 +18,10 @@
 
 package xyz.hisname.fireflyiii.ui.account.list
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +32,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
@@ -45,6 +47,7 @@ import xyz.hisname.fireflyiii.ui.account.AccountRecyclerAdapter
 import xyz.hisname.fireflyiii.ui.account.AddAccountFragment
 import xyz.hisname.fireflyiii.ui.account.details.AccountDetailFragment
 import xyz.hisname.fireflyiii.ui.base.BaseFragment
+import xyz.hisname.fireflyiii.ui.widgets.AccountListWidget
 import xyz.hisname.fireflyiii.util.extension.*
 import java.util.*
 
@@ -71,6 +74,16 @@ class ListAccountFragment: BaseFragment() {
         pullToRefresh()
         initFab()
         enableDragAndDrop()
+        updateHomeScreenWidget()
+    }
+
+    private fun updateHomeScreenWidget(){
+        val updateIntent = Intent(requireContext(), AccountListWidget::class.java)
+        updateIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        val ids = AppWidgetManager.getInstance(requireContext())
+            .getAppWidgetIds(ComponentName(requireContext(), AccountListWidget::class.java))
+        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        requireActivity().sendBroadcast(updateIntent)
     }
 
     private fun enableDragAndDrop(){

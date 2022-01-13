@@ -41,5 +41,6 @@ interface PreferenceHelper {
     var dateTimeFormat: Int
     var userDefinedDateTimeFormat: String
     var userDefinedDownloadDirectory: String
+    var accountListHomeScreenWidget: String
     fun clearPref()
 }

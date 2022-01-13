@@ -145,5 +145,9 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getString("userDefinedDownloadDirectory", "") ?: ""
         set(value) = sharedPref.edit{ putString("userDefinedDownloadDirectory", value) }
 
+    override var accountListHomeScreenWidget: String
+        get() = sharedPref.getString("accountListHomeScreenWidget", "") ?: "asset"
+        set(value) = sharedPref.edit{ putString("accountListHomeScreenWidget", value) }
+
     override fun clearPref() = sharedPref.edit().clear().apply()
 }

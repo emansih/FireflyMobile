@@ -81,7 +81,17 @@
                 android:resource="@xml/balance_widget_info" />
         </receiver>
 
-       <receiver android:name=".ui.widgets.BillsToPayWidget">
+        <receiver android:name=".ui.widgets.AccountListWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/account_list_widget_info" />
+        </receiver>
+
+
+        <receiver android:name=".ui.widgets.BillsToPayWidget">
              <intent-filter>
                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
              </intent-filter>
@@ -200,6 +210,10 @@
             android:enabled="true"
             android:exported="true">
         </provider>
+
+        <service android:name=".service.AccountListWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
 
         <!--
         <provider
