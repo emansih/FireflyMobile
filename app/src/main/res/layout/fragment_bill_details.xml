@@ -39,6 +39,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
+        <!-- This needs a lot more testing. Defer enabling in production -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/alarmCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"
+            android:text="Enable Reminder For This Bill"
+            app:layout_constraintStart_toStartOf="@+id/billInfoCard"
+            app:layout_constraintTop_toBottomOf="@+id/billInfoCard" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/notesCard"
             android:layout_width="match_parent"
@@ -48,7 +60,7 @@
             android:layout_marginTop="12dp"
             app:layout_constraintStart_toStartOf="@+id/billInfoCard"
             app:layout_constraintEnd_toEndOf="@+id/billInfoCard"
-            app:layout_constraintTop_toBottomOf="@+id/billInfoCard">
+            app:layout_constraintTop_toBottomOf="@+id/alarmCheckbox">
 
             <TextView
                 android:id="@+id/notesText"

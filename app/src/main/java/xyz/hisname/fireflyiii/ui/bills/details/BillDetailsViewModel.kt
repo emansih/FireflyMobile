@@ -18,26 +18,28 @@
 
 package xyz.hisname.fireflyiii.ui.bills.details
 
+import android.Manifest
+import android.app.AlarmManager
 import android.app.Application
 import android.app.DownloadManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
-import xyz.hisname.fireflyiii.data.remote.firefly.api.AttachmentService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
+import xyz.hisname.fireflyiii.receiver.BillReminderReceiver
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.attachment.AttachmentRepository
 import xyz.hisname.fireflyiii.repository.bills.BillPayRepository
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.bills.BillsPaidRepository
@@ -53,6 +55,7 @@ import xyz.hisname.fireflyiii.util.network.HttpConstants
 import xyz.hisname.fireflyiii.workers.bill.DeleteBillWorker
 import java.io.File
 import java.time.LocalDate
+import java.time.OffsetDateTime
 
 class BillDetailsViewModel(application: Application): BaseViewModel(application) {
 
@@ -138,4 +141,25 @@ class BillDetailsViewModel(application: Application): BaseViewModel(application)
         return downloadedFile
     }
 
+    @RequiresPermission(value = Manifest.permission.SCHEDULE_EXACT_ALARM, conditional = true)
+    fun setBillReminder(alarmManager: AlarmManager, isEnabled: Boolean){
+        viewModelScope.launch(Dispatchers.IO){
+            if(isEnabled){
+                val billAttribute = billRepository.getBillById(billId).billAttributes
+                billAttribute.pay_dates.forEach { payDate ->
+                    val timeToTrigger = OffsetDateTime.parse(payDate).toEpochSecond().times(1000)
+                    alarmManager.setExact(AlarmManager.RTC, timeToTrigger,
+                        PendingIntent.getBroadcast(getApplication(), 111,
+                            Intent(getApplication(), BillReminderReceiver::class.java).apply {
+                                putExtra("billId", billId)
+                                putExtra("userId", getUniqueHash()) }, PendingIntent.FLAG_UPDATE_CURRENT))
+                }
+            } else {
+                alarmManager.cancel(PendingIntent.getBroadcast(getApplication(), 111,
+                    Intent(getApplication(), BillReminderReceiver::class.java).apply {
+                    putExtra("billId", billId)
+                    putExtra("userId", getUniqueHash()) }, PendingIntent.FLAG_UPDATE_CURRENT))
+            }
+        }
+    }
 }

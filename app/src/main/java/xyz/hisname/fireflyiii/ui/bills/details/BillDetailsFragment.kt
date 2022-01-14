@@ -18,7 +18,11 @@
 
 package xyz.hisname.fireflyiii.ui.bills.details
 
+import android.app.AlarmManager
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -93,6 +97,7 @@ class BillDetailsFragment: BaseDetailFragment() {
         getPayDates(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
         getPaidDates(DateTimeUtil.getStartOfMonth(), DateTimeUtil.getEndOfMonth())
         progressCircle()
+        //setReminder()
         binding.transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.transactionRecyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         binding.transactionRecyclerView.adapter = transactionAdapter
@@ -306,6 +311,36 @@ class BillDetailsFragment: BaseDetailFragment() {
         } else {
             getCompatColor(R.color.md_black_1000)
         }
+    }
+
+    // TODO: 14 Jan 2022
+    // This needs a lot more testing. Alarms on Android is a mess.
+    // Alternative to Alarm Manager is using Work Manager but there is no guarantee that the work
+    // will be fired.
+    // We shall defer enabling in production
+    private fun setReminder(){
+        binding.alarmCheckbox.setOnClickListener {
+            val alarmManager = requireActivity().getSystemService(AlarmManager::class.java) as AlarmManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if(alarmManager.canScheduleExactAlarms()){
+                    billDetailsViewModel.setBillReminder(alarmManager, binding.alarmCheckbox.isChecked)
+                } else {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Permission Required")
+                        .setMessage("Devices running Android S onwards requires a special Alarm permission. " +
+                                "Please enable it in settings")
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            val intent = Intent()
+                            intent.action = ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                            requireActivity().startActivity(intent)
+                        }
+                        .show()
+                }
+            } else {
+                billDetailsViewModel.setBillReminder(alarmManager, binding.alarmCheckbox.isChecked)
+            }
+        }
+
     }
 
     override fun deleteItem() {

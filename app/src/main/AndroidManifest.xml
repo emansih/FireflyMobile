@@ -141,6 +141,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".receiver.BillReminderReceiver"
+            android:exported="false"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".GenericReceiver">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
