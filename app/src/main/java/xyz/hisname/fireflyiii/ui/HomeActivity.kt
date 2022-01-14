@@ -20,6 +20,7 @@ package xyz.hisname.fireflyiii.ui
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.*
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -27,8 +28,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricPrompt
 import androidx.core.os.bundleOf
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.*
 import com.google.android.material.snackbar.Snackbar
@@ -48,6 +47,7 @@ import xyz.hisname.fireflyiii.repository.models.FireflyUsers
 import xyz.hisname.fireflyiii.ui.about.AboutFragment
 import xyz.hisname.fireflyiii.ui.account.list.ListAccountFragment
 import xyz.hisname.fireflyiii.ui.base.BaseActivity
+import xyz.hisname.fireflyiii.ui.base.ViewDrawable
 import xyz.hisname.fireflyiii.ui.bills.list.ListBillFragment
 import xyz.hisname.fireflyiii.ui.budget.BudgetListFragment
 import xyz.hisname.fireflyiii.ui.categories.CategoriesFragment
@@ -170,6 +170,7 @@ class HomeActivity: BaseActivity(){
                 headerResult.addProfile(ProfileDrawerItem().apply {
                     nameText = fireflyUser.userEmail
                     isNameShown = true
+                    iconDrawable = ViewDrawable(fireflyUser.userEmail.first().toString())
                     descriptionText = fireflyUser.userHost
                     identifier = fireflyUser.id
                 }, indexed)
