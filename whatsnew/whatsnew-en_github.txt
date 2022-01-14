@@ -1,13 +1,8 @@
-First release for 2022! There isn't much changes in this version.
+What's new:
+- Bills To Pay home screen widget preview actually shows the preview now
+- Balance home screen widget preview actually shows the preview now
+- Added a new account list home screen widget
+- The nav drawer profile shows an alphabet instead of a human profile. It allows multi user to better identify and switch quickly. 
 
-Feature:
-- You can now search for Transactions, Bills, Budgets, Piggy banks, Categories, Currencies, Accounts and Tags
-in the Dashboard. 
-
-Bug Fix:
-- Currency listing should now display the correct items when clicking. 
-- Fix a bug where budgets does not show in budget list when no currency is attached to it. 
-
-Libraries / Build tools update:
-- Update Android Gradle plugin to 7.0.4
-- The app now targets Java 11
+Bug Fixes:
+- If you are using home screen widgets, the widgets are now legible on certain wallpapers
