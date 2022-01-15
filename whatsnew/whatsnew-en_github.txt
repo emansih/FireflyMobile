@@ -1,8 +1,3 @@
-What's new:
-- Bills To Pay home screen widget preview actually shows the preview now
-- Balance home screen widget preview actually shows the preview now
-- Added a new account list home screen widget
-- The nav drawer profile shows an alphabet instead of a human profile. It allows multi user to better identify and switch quickly. 
+Emergency release related to release builds. (#192)
 
-Bug Fixes:
-- If you are using home screen widgets, the widgets are now legible on certain wallpapers
+- This release fixes crash on startup when source and target is Java 11. I have rolled back to Java 8 as a fix.
