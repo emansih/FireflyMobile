@@ -3,7 +3,7 @@ object Dependencies{
     const val minSdk = 23
     const val targetSdk = 30
     const val compileSdk = 31
-    const val kotlinVersion = "1.5.20"
+    const val kotlinVersion = "1.6.10"
     private const val retrofitVersion = "2.9.0"
     private const val lifecycleVersion = "2.4.0"
     private const val roomVersion = "2.4.0"
@@ -37,7 +37,7 @@ object Dependencies{
     private const val biometricVersion = "1.2.0-alpha04"
     private const val testVersion = "1.3.0-alpha03"
     private const val taskerPluginVersion = "0.4.2"
-    private const val moshiVersion = "1.12.0"
+    private const val moshiVersion = "1.13.0"
     private const val calendarViewVersion = "1.0.4"
     private const val pagingLibVersion = "3.1.0"
     private const val viewPager2Version = "1.1.0-beta01"
