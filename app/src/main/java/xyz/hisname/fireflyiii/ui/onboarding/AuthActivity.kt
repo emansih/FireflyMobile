@@ -18,8 +18,6 @@
 
 package xyz.hisname.fireflyiii.ui.onboarding
 
-import android.accounts.AccountManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View

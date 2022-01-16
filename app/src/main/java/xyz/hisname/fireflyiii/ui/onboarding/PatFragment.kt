@@ -18,7 +18,6 @@
 
 package xyz.hisname.fireflyiii.ui.onboarding
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -33,12 +32,9 @@ import androidx.fragment.app.Fragment
 import xyz.hisname.fireflyiii.databinding.FragmentPatBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class PatFragment: Fragment() {
 
-    private val sharedPref by lazy { requireContext().getSharedPreferences(
-        requireContext().getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE) }
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
     private var fileUri: Uri? = null
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
@@ -55,7 +51,6 @@ class PatFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setWidgets()
         signInButtonClick()
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

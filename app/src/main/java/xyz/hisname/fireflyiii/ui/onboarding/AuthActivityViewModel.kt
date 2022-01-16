@@ -80,9 +80,9 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             return
         }
         isLoading.postValue(true)
-        val accountHash = authInit(accessToken, baseUrl)
 
         viewModelScope.launch(Dispatchers.IO){
+            val accountHash = authInit(accessToken, baseUrl)
             val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
             val activeUserHash = fireflyUserDao.getUniqueHash()
             // Don't believe in lint! activeUserHash can be `NULL`. I should probably fix this....
@@ -95,12 +95,9 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             if(fileUri != null && fileUri.toString().isNotBlank()) {
                 FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
             }
-        }
-
-        val accountDao = AppDatabase.getInstance(applicationContext, accountHash).accountDataDao()
-        val accountsService = genericService().create(AccountsService::class.java)
-        repository = AccountRepository(accountDao, accountsService)
-        viewModelScope.launch(Dispatchers.IO){
+            val accountDao = AppDatabase.getInstance(applicationContext, accountHash).accountDataDao()
+            val accountsService = genericService().create(AccountsService::class.java)
+            repository = AccountRepository(accountDao, accountsService)
             try {
                 repository.authViaPat()
                 authenticatorManager.authMethod = "pat"
@@ -166,7 +163,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             showErrorMessage.postValue("Bearer Token contains invalid Characters!")
         } else {
             FireflyClient.destroyInstance()
-            FireflyUserDatabase.destroyInstance()
+           // FireflyUserDatabase.destroyInstance()
             var networkCall: Response<AuthModel>?
             viewModelScope.launch(Dispatchers.IO) {
                 try {
@@ -260,7 +257,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
     private fun authInit(accessToken: String, baseUrl: String): String{
         val uuid = UUID.randomUUID().toString()
         FireflyClient.destroyInstance()
-        FireflyUserDatabase.destroyInstance()
+        //FireflyUserDatabase.destroyInstance()
         authenticatorManager = NewAccountManager(accountManager, uuid)
         authenticatorManager.initializeAccount()
         authenticatorManager.accessToken = accessToken.trim()
