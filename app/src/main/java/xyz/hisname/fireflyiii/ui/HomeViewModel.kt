@@ -36,14 +36,10 @@ import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.FireflyClient
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BillsService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.SearchService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.TransactionService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
-import xyz.hisname.fireflyiii.repository.SearchRepository
 import xyz.hisname.fireflyiii.repository.bills.BillRepository
 import xyz.hisname.fireflyiii.repository.bills.BillsPaidRepository
 import xyz.hisname.fireflyiii.repository.models.FireflyUsers
-import xyz.hisname.fireflyiii.repository.models.search.SearchModelItem
 import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.workers.RefreshTokenWorker
 import java.io.File
@@ -58,24 +54,10 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     private val billRepository by lazy { BillRepository(billDataDao, billsService) }
     private val billPaidRepository by lazy { BillsPaidRepository(billPaidDao, billsService) }
     private val fireflyUserDatabase by lazy { FireflyUserDatabase.getInstance(application).fireflyUserDao() }
-    private val searchRepository by lazy {
-        SearchRepository(AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao(),
-            AppDatabase.getInstance(application, getUniqueHash()).tagsDataDao(),
-            AppDatabase.getInstance(application, getUniqueHash()).piggyDataDao(),
-            AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
-            AppDatabase.getInstance(application, getUniqueHash()).budgetListDataDao(),
-            AppDatabase.getInstance(application, getUniqueHash()).budgetLimitDao(),
-            billDataDao,
-            AppDatabase.getInstance(application, getUniqueHash()).accountDataDao(),
-            AppDatabase.getInstance(application, getUniqueHash()).categoryDataDao(),
-            genericService().create(SearchService::class.java),
-            genericService().create(TransactionService::class.java))
-    }
 
     fun shouldGoToAuth(): Boolean{
         val application = getApplication<Application>()
         val oldDatabase = application.getDatabasePath(Constants.DB_NAME)
-        // It can be `NULL`, don't be fooled by lint
         return getActiveUserEmail() == null && !oldDatabase.exists()
     }
 
@@ -241,11 +223,4 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
         }
     }
 
-    fun searchFirefly(query: String): LiveData<List<SearchModelItem>>{
-        val searchedItems = MutableLiveData<List<SearchModelItem>>()
-        viewModelScope.launch(Dispatchers.IO){
-            searchedItems.postValue(searchRepository.searchEverywhere(query))
-        }
-        return searchedItems
-    }
 }

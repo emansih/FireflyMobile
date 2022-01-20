@@ -24,8 +24,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.Constants
 import xyz.hisname.fireflyiii.data.local.dao.FireflyUserDatabase
+import xyz.hisname.fireflyiii.repository.models.FireflyUsers
 import xyz.hisname.fireflyiii.ui.onboarding.AuthActivity
 import java.io.File
 
@@ -62,16 +65,23 @@ class FireflyAccountAuthenticator(private val context: Context): AbstractAccount
 
     override fun getAccountRemovalAllowed(response: AccountAuthenticatorResponse, account: Account): Bundle {
         val fireflyUserDatabase = FireflyUserDatabase.getInstance(context).fireflyUserDao()
-        fireflyUserDatabase.deleteCurrentUser()
+        runBlocking(Dispatchers.IO){
+            fireflyUserDatabase.deleteCurrentUser()
+        }
         val customCaFile = File(context.applicationInfo.dataDir + "/" + account.name + ".pem")
         val customPref = File(context.applicationInfo.dataDir + "/shared_prefs/" + account.name + "-user-preferences.xml")
         if(customCaFile.exists()){
             customCaFile.delete()
         }
         customPref.delete()
-        val fireflyUsers = fireflyUserDatabase.getAllUser()
+        val fireflyUsers: List<FireflyUsers>
+        runBlocking(Dispatchers.IO) {
+            fireflyUsers =  fireflyUserDatabase.getAllUser()
+        }
         if(fireflyUsers.isNotEmpty()){
-            fireflyUserDatabase.updateActiveUser(fireflyUsers[0].uniqueHash, true)
+           runBlocking(Dispatchers.IO){
+               fireflyUserDatabase.updateActiveUser(fireflyUsers[0].uniqueHash, true)
+           }
         }
         File(context.getDatabasePath(account.name + "-temp-" + Constants.DB_NAME).toString()).delete()
         File(context.getDatabasePath(account.name + "-photuris.db").toString()).delete()

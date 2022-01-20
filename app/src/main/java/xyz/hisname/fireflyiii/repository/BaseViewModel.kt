@@ -21,6 +21,7 @@ package xyz.hisname.fireflyiii.repository
 import android.accounts.AccountManager
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -38,14 +39,17 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     val isLoading: MutableLiveData<Boolean> = MutableLiveData()
     val apiResponse: MutableLiveData<String> = MutableLiveData()
 
+    private val fireflyUserDao by lazy { UserRepository(FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao()) }
+
     protected fun newManager(): NewAccountManager{
         return NewAccountManager(AccountManager.get(getApplication()), getUniqueHash())
     }
 
 
-    protected fun sharedPref() =
-        getApplication<Application>().getSharedPreferences(
+    protected fun sharedPref(): SharedPreferences {
+        return getApplication<Application>().getSharedPreferences(
             getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
+    }
 
     protected fun genericService(): Retrofit {
         val cert = AppPref(sharedPref()).certValue
@@ -62,7 +66,7 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     protected fun getUniqueHash(): String {
         val uniqueHash: String
         runBlocking(Dispatchers.IO){
-            uniqueHash = FireflyUserDatabase.getInstance(getApplication()).fireflyUserDao().getUniqueHash()
+            uniqueHash = fireflyUserDao.getDefaultUserUniqueHash()
         }
         return uniqueHash
     }

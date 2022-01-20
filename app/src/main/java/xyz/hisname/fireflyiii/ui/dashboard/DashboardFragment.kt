@@ -39,6 +39,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -76,7 +77,8 @@ import java.math.BigDecimal
 class DashboardFragment: BaseFragment() {
 
     private val transactionExtendedFab by bindView<ExtendedFloatingActionButton>(R.id.addTransactionExtended)
-    private val dashboardView by lazy { getImprovedViewModel(DashboardViewModel::class.java) }
+  //  private val dashboardView by lazy { getImprovedViewModel(DashboardViewModel::class.java) }
+    private val dashboardView: DashboardViewModel by viewModels()
     private var fragmentDashboardBinding: FragmentDashboardBinding? = null
     private val binding get() = fragmentDashboardBinding!!
 

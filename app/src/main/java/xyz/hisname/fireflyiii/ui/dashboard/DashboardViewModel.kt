@@ -49,21 +49,25 @@ import java.math.BigDecimal
 
 class DashboardViewModel(application: Application): BaseViewModel(application) {
 
-    private val currencyRepository = CurrencyRepository(
+    private val currencyRepository by lazy {
+        CurrencyRepository(
             AppDatabase.getInstance(application, getUniqueHash()).currencyDataDao(),
             genericService().create(CurrencyService::class.java))
-    private val budgetRepository = BudgetRepository(
+    }
+    private val budgetRepository by lazy {
+        BudgetRepository(
             AppDatabase.getInstance(application, getUniqueHash()).budgetDataDao(),
             AppDatabase.getInstance(application, getUniqueHash()).budgetListDataDao(),
             AppDatabase.getInstance(application, getUniqueHash()).spentDataDao(),
             AppDatabase.getInstance(application, getUniqueHash()).budgetLimitDao(),
             genericService().create(BudgetService::class.java)
-    )
+        )
+    }
 
-    private val transactionDao = AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao()
-    private val transactionRepository = TransactionRepository(
-            transactionDao, genericService().create(TransactionService::class.java)
-    )
+    private val transactionDao by lazy { AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao() }
+    private val transactionRepository by lazy { TransactionRepository(
+        transactionDao, genericService().create(TransactionService::class.java))
+    }
 
     private val searchRepository by lazy {
         SearchRepository(AppDatabase.getInstance(application, getUniqueHash()).transactionDataDao(),
@@ -138,7 +142,7 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
             if(currencyList.currencyId != null && currencyList.currencyId != 0L){
                 currencySymbol.postValue(currencyList.currencyAttributes.symbol)
                 currencyCode = currencyList.currencyAttributes.code
-                getBasicSummary(currencyList.currencyAttributes.code, currencyList.currencyAttributes.symbol)
+                getBasicSummary(currencyList.currencyAttributes.code)
                 getPieChartData(currencyList.currencyAttributes.code, currencyList.currencyAttributes.symbol)
                 setNetEarnings(currencyList.currencyAttributes.code, currencyList.currencyAttributes.symbol)
             } else {
@@ -148,7 +152,7 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
     }
 
 
-    private fun getBasicSummary(currencyCode: String, currencySymbol: String){
+    private fun getBasicSummary(currencyCode: String){
         val simpleData = SimpleData(
             getApplication<Application>().getSharedPreferences(
                 getApplication<Application>().getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE)
