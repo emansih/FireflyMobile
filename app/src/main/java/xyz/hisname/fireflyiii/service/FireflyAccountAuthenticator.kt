@@ -64,27 +64,27 @@ class FireflyAccountAuthenticator(private val context: Context): AbstractAccount
     }
 
     override fun getAccountRemovalAllowed(response: AccountAuthenticatorResponse, account: Account): Bundle {
-        val fireflyUserDatabase = FireflyUserDatabase.getInstance(context).fireflyUserDao()
         runBlocking(Dispatchers.IO){
+            val fireflyUserDatabase = FireflyUserDatabase.getInstance(context).fireflyUserDao()
             fireflyUserDatabase.deleteCurrentUser()
+            val customCaFile = File(context.applicationInfo.dataDir + "/" + account.name + ".pem")
+            val customPref = File(context.applicationInfo.dataDir + "/shared_prefs/" + account.name + "-user-preferences.xml")
+            if(customCaFile.exists()){
+                customCaFile.delete()
+            }
+            customPref.delete()
+            val fireflyUsers: List<FireflyUsers>
+            runBlocking(Dispatchers.IO) {
+                fireflyUsers =  fireflyUserDatabase.getAllUser()
+            }
+            if(fireflyUsers.isNotEmpty()){
+                runBlocking(Dispatchers.IO){
+                    fireflyUserDatabase.updateActiveUser(fireflyUsers[0].uniqueHash, true)
+                }
+            }
+            File(context.getDatabasePath(account.name + "-temp-" + Constants.DB_NAME).toString()).delete()
+            File(context.getDatabasePath(account.name + "-photuris.db").toString()).delete()
         }
-        val customCaFile = File(context.applicationInfo.dataDir + "/" + account.name + ".pem")
-        val customPref = File(context.applicationInfo.dataDir + "/shared_prefs/" + account.name + "-user-preferences.xml")
-        if(customCaFile.exists()){
-            customCaFile.delete()
-        }
-        customPref.delete()
-        val fireflyUsers: List<FireflyUsers>
-        runBlocking(Dispatchers.IO) {
-            fireflyUsers =  fireflyUserDatabase.getAllUser()
-        }
-        if(fireflyUsers.isNotEmpty()){
-           runBlocking(Dispatchers.IO){
-               fireflyUserDatabase.updateActiveUser(fireflyUsers[0].uniqueHash, true)
-           }
-        }
-        File(context.getDatabasePath(account.name + "-temp-" + Constants.DB_NAME).toString()).delete()
-        File(context.getDatabasePath(account.name + "-photuris.db").toString()).delete()
         return super.getAccountRemovalAllowed(response, account)
     }
 }

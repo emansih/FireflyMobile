@@ -133,8 +133,8 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             showInfoMessage.postValue("Client ID Required!")
             return false
         }
-        val accountHash = authInit("", baseUrl)
         viewModelScope.launch(Dispatchers.IO) {
+            val accountHash = authInit("", baseUrl)
             val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
             // Check if there is an active user
             val activeUserHash = fireflyUserDao.getUniqueHash()
@@ -145,12 +145,12 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             fireflyUserDao.insert(
                 FireflyUsers(0, accountHash, "", baseUrl, true)
             )
+            if(fileUri != null && fileUri.toString().isNotBlank()) {
+                FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
+            }
+            authenticatorManager.clientId = clientId
+            authenticatorManager.secretKey = clientSecret
         }
-        if(fileUri != null && fileUri.toString().isNotBlank()) {
-            FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
-        }
-        authenticatorManager.clientId = clientId
-        authenticatorManager.secretKey = clientSecret
         return true
     }
 
