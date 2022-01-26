@@ -18,7 +18,6 @@
 
 package xyz.hisname.fireflyiii.ui.onboarding
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -37,13 +36,10 @@ import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.FragmentLoginBinding
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
-import xyz.hisname.fireflyiii.util.getUniqueHash
 
 class LoginFragment: Fragment() {
 
     private val authViewModel by lazy { getViewModel(AuthActivityViewModel::class.java) }
-    private val sharedPref by lazy {  requireContext().getSharedPreferences(
-        requireContext().getUniqueHash() + "-user-preferences", Context.MODE_PRIVATE) }
     private var fileUri: Uri? = null
     private lateinit var chooseDocument: ActivityResultLauncher<Array<String>>
     private var fragmentLoginBinding: FragmentLoginBinding? = null

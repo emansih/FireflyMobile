@@ -80,7 +80,6 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             return
         }
         isLoading.postValue(true)
-
         viewModelScope.launch(Dispatchers.IO){
             val accountHash = authInit(accessToken, baseUrl)
             val fireflyUserDao =  FireflyUserDatabase.getInstance(applicationContext).fireflyUserDao()
@@ -95,7 +94,7 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
             if(fileUri != null && fileUri.toString().isNotBlank()) {
                 FileUtils.saveCaFile(fileUri, getApplication(), accountHash)
             }
-            val accountDao = AppDatabase.getInstance(applicationContext, accountHash).accountDataDao()
+            val accountDao = AppDatabase.getInstance(applicationContext, getUniqueHash()).accountDataDao()
             val accountsService = genericService().create(AccountsService::class.java)
             repository = AccountRepository(accountDao, accountsService)
             try {
@@ -103,17 +102,16 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                 authenticatorManager.authMethod = "pat"
                 isAuthenticated.postValue(true)
             } catch (exception: UnknownServiceException){
-                FileUtils.deleteCaFile(customCaFile)
                 showErrorMessage.postValue("http is not supported. Please use https")
                 isAuthenticated.postValue(false)
             } catch (certificateException: CertificateException){
-                FileUtils.deleteCaFile(customCaFile)
                 showErrorMessage.postValue("Are you using self signed cert?")
                 isAuthenticated.postValue(false)
             } catch (exception: Exception){
-                FileUtils.deleteCaFile(customCaFile)
                 showErrorMessage.postValue(exception.localizedMessage)
                 isAuthenticated.postValue(false)
+            } finally {
+                FileUtils.deleteCaFile(customCaFile)
             }
             isLoading.postValue(false)
         }
@@ -202,8 +200,8 @@ class AuthActivityViewModel(application: Application): BaseViewModel(application
                     showErrorMessage.postValue(exception.localizedMessage)
                     isAuthenticated.postValue(false)
                 }
+                isLoading.postValue(false)
             }
-            isLoading.postValue(false)
         }
     }
 
