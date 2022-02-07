@@ -33,7 +33,7 @@ internal class CustomCa(private val customCert: File) {
     private val trustManager by lazy { customTrustManager(customCaFileToString()) }
 
     fun getCustomSSL(): SSLSocketFactory{
-        val sslContext = SSLContext.getDefault()
+        val sslContext = SSLContext.getInstance("TLS")
         sslContext.init(null, arrayOf<TrustManager>(trustManager), SecureRandom())
         return sslContext.socketFactory
     }
