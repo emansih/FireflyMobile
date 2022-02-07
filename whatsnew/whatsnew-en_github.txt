@@ -1,1 +1,1 @@
-Fix #192 #193 #194 #195 #196 #197 
+Fix a bug where app will not work if you are using custom SSL certs(self signed). 
