@@ -39,9 +39,7 @@ class NewAccountManager (private val accountManager: AccountManager,
         get() = accountManager.getUserData(account, "AUTH_METHOD") ?: ""
         set(value) = accountManager.setUserData(account, "AUTH_METHOD", value)
 
-    fun destroyAccount(){
-        accountManager.removeAccount(account, null, null, null)
-    }
+    fun destroyAccount() = accountManager.removeAccount(account, null, null, null)
 
     var tokenExpiry
         get() = accountManager.getUserData(account, "token_expires_in").toLong()

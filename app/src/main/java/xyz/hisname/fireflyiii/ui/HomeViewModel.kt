@@ -88,34 +88,28 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     fun getFireflyUsers(): LiveData<List<FireflyUsers>>{
         val usersLiveData = MutableLiveData<List<FireflyUsers>>()
         viewModelScope.launch(Dispatchers.IO){
+            removeInvalidFireflyAccounts()
             usersLiveData.postValue(fireflyUserDatabase.getAllUser())
         }
         return usersLiveData
     }
 
+    private suspend fun removeInvalidFireflyAccounts() {
+        fireflyUserDatabase.getAllUser()
+            .filter { it.userEmail.isEmpty() }
+            .forEach { removeFireflyAccount(it.uniqueHash) }
+    }
+
     fun removeFireflyAccounts(fireflyUsers: List<FireflyUsers>){
         viewModelScope.launch(Dispatchers.IO){
-            var isDefault = false
-            val allUsers = fireflyUserDatabase.getAllUser()
-            fireflyUsers.forEach { user ->
-                val fireflyUser = fireflyUserDatabase.getUserByHash(user.uniqueHash)
-                isDefault = fireflyUser.activeUser
-                File(getApplication<Application>().applicationInfo.dataDir + "/shared_prefs/" + fireflyUser.uniqueHash
-                        + "-user-preferences.xml").delete()
-                fireflyUserDatabase.deleteUserByPrimaryKey(fireflyUser.id)
-                File(getApplication<Application>().applicationInfo.dataDir + "/databases/" + fireflyUser.uniqueHash
-                        + "-photuris.db").delete()
-                File(getApplication<Application>().applicationInfo.dataDir + fireflyUser.uniqueHash + ".pem").delete()
-                val accountManager = NewAccountManager(AccountManager.get(getApplication()), fireflyUser.uniqueHash)
-                accountManager.destroyAccount()
-                WorkManager.getInstance(getApplication()).cancelAllWorkByTag(user.uniqueHash)
-            }
-            // Check if all users are being deleted. can't set a default user if there are no users in DB.
-            if(isDefault && allUsers.size != fireflyUsers.size){
-                val uniqueHash = fireflyUserDatabase.getAllUser()[0].uniqueHash
-                fireflyUserDatabase.updateActiveUser(uniqueHash, true)
-            }
+            fireflyUsers.forEach { removeFireflyAccount(it.uniqueHash) }
         }
+    }
+
+    private fun removeFireflyAccount(uuid: String) {
+        val app = getApplication<Application>()
+        val accountManager = NewAccountManager(AccountManager.get(app), uuid)
+        accountManager.destroyAccount().result
     }
 
     fun migrateFirefly(){
@@ -207,19 +201,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
                 userArray.add(fireflyUsers.uniqueHash)
             }
             val accountToRemove = accountArray.filterNot { userArray.contains(it) }
-            accountToRemove.forEach { uuid ->
-                NewAccountManager(AccountManager.get(getApplication()), uuid).destroyAccount()
-                val customCaFile = File(getApplication<Application>().applicationInfo.dataDir
-                        + "/" + uuid + ".pem")
-                val customPref = File(getApplication<Application>().applicationInfo.dataDir
-                        + "/shared_prefs/" + uuid + "-user-preferences.xml")
-                if(customCaFile.exists()){
-                    customCaFile.delete()
-                }
-                customPref.delete()
-                File(getApplication<Application>().getDatabasePath("$uuid-temp-" + Constants.DB_NAME).toString()).delete()
-                File(getApplication<Application>().getDatabasePath("$uuid-photuris.db").toString()).delete()
-            }
+            accountToRemove.forEach { removeFireflyAccount(it) }
         }
     }
 

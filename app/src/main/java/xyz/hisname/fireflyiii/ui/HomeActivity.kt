@@ -98,7 +98,7 @@ class HomeActivity: BaseActivity(){
                 authenticator = Authenticator(this, ::handleResult)
                 authenticator.authenticate()
             }
-            //homeViewModel.deleteUnusedAccount()
+            homeViewModel.deleteUnusedAccount()
         }
     }
 
