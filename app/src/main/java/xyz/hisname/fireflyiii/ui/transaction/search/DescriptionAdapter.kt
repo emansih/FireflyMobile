@@ -29,14 +29,10 @@ import xyz.hisname.fireflyiii.databinding.DescriptionListItemBinding
 class DescriptionAdapter(private val clickListener:(String) -> Unit):
         PagingDataAdapter<String, DescriptionAdapter.DescriptionViewHolder>(DIFF_CALLBACK) {
 
-    private lateinit var context: Context
-    private var descriptionListItemBinding: DescriptionListItemBinding? = null
-    private val binding get() = descriptionListItemBinding!!
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DescriptionViewHolder {
-        context = parent.context
-        descriptionListItemBinding = DescriptionListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DescriptionViewHolder(binding)
+        val context = parent.context
+        val itemView = DescriptionListItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        return DescriptionViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: DescriptionViewHolder, position: Int){
@@ -45,10 +41,12 @@ class DescriptionAdapter(private val clickListener:(String) -> Unit):
         }
     }
 
-    inner class DescriptionViewHolder(view: DescriptionListItemBinding): RecyclerView.ViewHolder(view.root) {
+    inner class DescriptionViewHolder(
+        private val view: DescriptionListItemBinding
+    ): RecyclerView.ViewHolder(view.root) {
         fun bind(description: String, clickListener: (String) -> Unit){
-            binding.description.text = description
-            binding.root.setOnClickListener {clickListener(description)}
+            view.description.text = description
+            view.root.setOnClickListener {clickListener(description)}
         }
     }
 

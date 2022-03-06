@@ -32,14 +32,12 @@ class TransactionMonthRecyclerView(private val items: List<TransactionAmountMont
         RecyclerView.Adapter<TransactionMonthRecyclerView.TransactionAdapter>() {
 
     private lateinit var context: Context
-    private var transactionCardDetails: TransactionCardDetailsBinding? = null
-    private val binding get() = transactionCardDetails!!
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionAdapter {
         context = parent.context
-        transactionCardDetails = TransactionCardDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TransactionAdapter(binding)
+        val itemView = TransactionCardDetailsBinding.inflate(LayoutInflater.from(context), parent, false)
+        return TransactionAdapter(itemView)
     }
 
     override fun getItemCount() = items.size
@@ -47,22 +45,24 @@ class TransactionMonthRecyclerView(private val items: List<TransactionAmountMont
     override fun onBindViewHolder(holder: TransactionAdapter, position: Int) = holder.bind(items[position], position)
 
 
-    inner class TransactionAdapter(view: TransactionCardDetailsBinding): RecyclerView.ViewHolder(view.root) {
+    inner class TransactionAdapter(
+        private val view: TransactionCardDetailsBinding
+    ): RecyclerView.ViewHolder(view.root) {
         fun bind(transactionData: TransactionAmountMonth, click: Int) {
-            binding.transactionFreq.text = transactionData.transactionFreq.toString()
-            binding.spentAmount.text = transactionData.transactionAmount
-            binding.transactionCardDate.text = transactionData.monthYear
+            view.transactionFreq.text = transactionData.transactionFreq.toString()
+            view.spentAmount.text = transactionData.transactionAmount
+            view.transactionCardDate.text = transactionData.monthYear
             if(transactionData.transactionType.contentEquals("Withdrawal")){
-                binding.transactionTypeText.setText(R.string.spent)
-                binding.spentAmount.setTextColor(context.getCompatColor(R.color.md_red_500))
+                view.transactionTypeText.setText(R.string.spent)
+                view.spentAmount.setTextColor(context.getCompatColor(R.color.md_red_500))
             } else if(transactionData.transactionType.contentEquals("Deposit")){
-                binding.transactionTypeText.setText(R.string.earned)
-                binding.spentAmount.setTextColor(context.getCompatColor(R.color.md_green_500))
+                view.transactionTypeText.setText(R.string.earned)
+                view.spentAmount.setTextColor(context.getCompatColor(R.color.md_green_500))
             } else {
-                binding.transactionTypeText.setText(R.string.transfer)
-                binding.spentAmount.setTextColor(context.getCompatColor(R.color.md_green_500))
+                view.transactionTypeText.setText(R.string.transfer)
+                view.spentAmount.setTextColor(context.getCompatColor(R.color.md_green_500))
             }
-            binding.root.setOnClickListener { clickListener(click) }
+            view.root.setOnClickListener { clickListener(click) }
         }
     }
 

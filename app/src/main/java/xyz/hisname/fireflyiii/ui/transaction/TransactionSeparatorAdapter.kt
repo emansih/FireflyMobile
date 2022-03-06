@@ -36,24 +36,19 @@ import xyz.hisname.fireflyiii.util.getUniqueHash
 import kotlin.math.abs
 
 class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Unit):
-        PagingDataAdapter<SplitSeparator, RecyclerView.ViewHolder>(DIFF_CALLBACK){
+        PagingDataAdapter<SplitSeparator, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
     private lateinit var context: Context
-    private var recentTransactionListBinding: RecentTransactionListBinding? = null
-    private val binding get() = recentTransactionListBinding!!
-    private var transactionItemSeparatorBinding: TransactionItemSeparatorBinding? = null
-    private val separatorBinding get() = transactionItemSeparatorBinding!!
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         context = parent.context
         return when(viewType){
             R.layout.recent_transaction_list -> {
-                recentTransactionListBinding = RecentTransactionListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val binding = RecentTransactionListBinding.inflate(LayoutInflater.from(context), parent, false)
                 TransactionViewHolder(binding)
             }
             else -> {
-                transactionItemSeparatorBinding = TransactionItemSeparatorBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val separatorBinding = TransactionItemSeparatorBinding.inflate(LayoutInflater.from(context), parent, false)
                 SplitSeparatorViewHolder(separatorBinding)
             }
         }
@@ -73,10 +68,13 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
         transactionModel.let { separator ->
             when(separator){
                 is SplitSeparator.SeparatorItem -> {
+                    val viewHolder = holder as SplitSeparatorViewHolder
+                    val separatorBinding = viewHolder.view
                     separatorBinding.separatorDescription.text = separator.description
                 }
                 is SplitSeparator.TransactionItem -> {
                     val viewHolder = holder as TransactionViewHolder
+                    val binding = viewHolder.view
                     val sharedPref = context.getSharedPreferences(
                         context.getUniqueHash().toString() + "-user-preferences", Context.MODE_PRIVATE)
                     val timePreference = AppPref(sharedPref).dateTimeFormat
@@ -109,8 +107,12 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
     }
 
 
-    class TransactionViewHolder(view: RecentTransactionListBinding) : RecyclerView.ViewHolder(view.root)
-    class SplitSeparatorViewHolder(view: TransactionItemSeparatorBinding) : RecyclerView.ViewHolder(view.root)
+    class TransactionViewHolder(
+        val view: RecentTransactionListBinding
+    ) : RecyclerView.ViewHolder(view.root)
+    class SplitSeparatorViewHolder(
+        val view: TransactionItemSeparatorBinding
+    ) : RecyclerView.ViewHolder(view.root)
 
 
     companion object {

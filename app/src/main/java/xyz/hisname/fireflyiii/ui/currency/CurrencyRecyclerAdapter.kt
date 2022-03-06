@@ -48,13 +48,11 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
         }
         AppPref(context.getSharedPreferences("$uniqueHash-user-preferences", Context.MODE_PRIVATE)).isCurrencyThumbnailEnabled
     }
-    private var currencyListBinding: CurrencyListBinding? = null
-    private val binding get() = currencyListBinding!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyHolder {
         context = parent.context
-        currencyListBinding = CurrencyListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CurrencyHolder(binding)
+        val itemView = CurrencyListBinding.inflate(LayoutInflater.from(context), parent, false)
+        return CurrencyHolder(itemView)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -67,25 +65,27 @@ class CurrencyRecyclerAdapter(private val shouldShowDisabled: Boolean = true,
         }
     }
 
-    inner class CurrencyHolder(itemView: CurrencyListBinding): RecyclerView.ViewHolder(itemView.root){
+    inner class CurrencyHolder(
+        private val currencyView: CurrencyListBinding
+    ): RecyclerView.ViewHolder(currencyView.root){
         fun bind(currencyData: CurrencyData, clickListener: (CurrencyData) -> Unit){
             val currency = currencyData.currencyAttributes
-            binding.currencySymbol.text = currency.symbol
-            binding.currencyCode.text = currency.code
+            currencyView.currencySymbol.text = currency.symbol
+            currencyView.currencyCode.text = currency.code
             if(shouldShowDisabled){
                 if(!currency.enabled){
-                    binding.currencyName.text = currency.name + " (" + currency.code + ")" + " (Disabled)"
-                    binding.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
-                    binding.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
+                    currencyView.currencyName.text = currency.name + " (" + currency.code + ")" + " (Disabled)"
+                    currencyView.currencyName.setTextColor(context.getCompatColor(R.color.md_grey_400))
+                    currencyView.currencySymbol.setTextColor(context.getCompatColor(R.color.md_grey_400))
                 }
             }
-            binding.currencyName.text = currency.name + " (" + currency.code + ")"
+            currencyView.currencyName.text = currency.name + " (" + currency.code + ")"
             if(isThumbnailEnabled) {
-                binding.flagImage.isVisible = true
+                currencyView.flagImage.isVisible = true
                 Glide.with(context)
                         .load(Flags.getFlagByIso(currency.code))
                         .error(R.drawable.unknown)
-                        .into(binding.flagImage)
+                        .into(currencyView.flagImage)
             }
             itemView.setOnClickListener {
                 clickListener(currencyData)

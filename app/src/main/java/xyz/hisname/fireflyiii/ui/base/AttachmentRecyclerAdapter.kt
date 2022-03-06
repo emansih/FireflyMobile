@@ -39,24 +39,23 @@ class AttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
         RecyclerView.Adapter<AttachmentRecyclerAdapter.AttachmentAdapter>() {
 
     private lateinit var context: Context
-    private var transactionAttachmentItemsBinding: TransactionAttachmentItemsBinding? = null
-    private val binding get() = transactionAttachmentItemsBinding!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentAdapter {
         context = parent.context
-        transactionAttachmentItemsBinding = TransactionAttachmentItemsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AttachmentAdapter(binding)
-
+        val itemView = TransactionAttachmentItemsBinding.inflate(LayoutInflater.from(context), parent, false)
+        return AttachmentAdapter(itemView)
     }
 
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: AttachmentAdapter, position: Int) = holder.bind(items[position], clickListener, position)
 
-    inner class AttachmentAdapter(view: TransactionAttachmentItemsBinding): RecyclerView.ViewHolder(view.root) {
+    inner class AttachmentAdapter(
+        private val view: TransactionAttachmentItemsBinding
+    ): RecyclerView.ViewHolder(view.root) {
         fun bind(attachmentData: AttachmentData, clickListener: (AttachmentData) -> Unit, removeItemListener: Int){
             val fileName = attachmentData.attachmentAttributes.filename
-            binding.attachmentName.text = fileName
+            view.attachmentName.text = fileName
             if(shouldShowDownload) {
                 val downloadedFile = File(context.getExternalFilesDir(null).toString() + File.separator + fileName)
                 if (downloadedFile.exists()) {
@@ -64,22 +63,22 @@ class AttachmentRecyclerAdapter(private val items: MutableList<AttachmentData>,
                         icon = GoogleMaterial.Icon.gmd_folder_open
                         colorRes = R.color.md_yellow_700
                         sizeDp = 12
-                    }).into(binding.downloadButton)
+                    }).into(view.downloadButton)
                 } else {
                     Glide.with(context).load(IconicsDrawable(context).apply {
                         icon = GoogleMaterial.Icon.gmd_file_download
                         colorRes = R.color.md_green_500
                         sizeDp = 12
-                    }).into(binding.downloadButton)
+                    }).into(view.downloadButton)
                 }
             } else {
-                binding.downloadButton.setImageDrawable(IconicsDrawable(context, GoogleMaterial.Icon.gmd_close).apply {
+                view.downloadButton.setImageDrawable(IconicsDrawable(context, GoogleMaterial.Icon.gmd_close).apply {
                     colorRes = R.color.md_red_500
                     sizeDp = 12
                 })
-                binding.downloadButton.setOnClickListener { removeItemListener(removeItemListener) }
+                view.downloadButton.setOnClickListener { removeItemListener(removeItemListener) }
             }
-            binding.downloadButton.setOnClickListener { clickListener(attachmentData) }
+            view.downloadButton.setOnClickListener { clickListener(attachmentData) }
             itemView.setOnClickListener { clickListener(attachmentData) }
         }
     }

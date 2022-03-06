@@ -34,14 +34,12 @@ import xyz.hisname.fireflyiii.repository.models.bills.BillsStatusModel
 
 class BillsStatusRecyclerAdapter(private val billStatus: List<BillsStatusModel>): RecyclerView.Adapter<BillsStatusRecyclerAdapter.BillsStatusHolder>() {
 
-    private var billDialogRecyclerBinding: BillDialogRecyclerViewBinding? = null
-    private val binding get() = billDialogRecyclerBinding!!
     private lateinit var context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BillsStatusHolder {
         context = parent.context
-        billDialogRecyclerBinding = BillDialogRecyclerViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return BillsStatusHolder(binding)
+        val itemView = BillDialogRecyclerViewBinding.inflate(LayoutInflater.from(context), parent, false)
+        return BillsStatusHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: BillsStatusHolder, position: Int) {
@@ -50,25 +48,27 @@ class BillsStatusRecyclerAdapter(private val billStatus: List<BillsStatusModel>)
 
     override fun getItemCount() = billStatus.size
 
-    inner class BillsStatusHolder(itemView: BillDialogRecyclerViewBinding): RecyclerView.ViewHolder(itemView.root) {
+    inner class BillsStatusHolder(
+        private val view: BillDialogRecyclerViewBinding
+    ): RecyclerView.ViewHolder(view.root) {
         fun bind(billStatusModel: BillsStatusModel) {
-            binding.billName.text = billStatusModel.billName
-            binding.billAmount.text = context.getString(R.string.bill_amount,
+            view.billName.text = billStatusModel.billName
+            view.billAmount.text = context.getString(R.string.bill_amount,
                     billStatusModel.billCurrency, billStatusModel.billAmount)
             if(billStatusModel.isBillPaid){
-                binding.billStatusImage.setImageDrawable(IconicsDrawable(context).apply {
+                view.billStatusImage.setImageDrawable(IconicsDrawable(context).apply {
                     icon = GoogleMaterial.Icon.gmd_check
                     color = IconicsColor.colorInt(context.getColor(R.color.md_green_500))
                     sizeDp = 24
                 })
             } else {
-                binding.billStatusImage.setImageDrawable(IconicsDrawable(context).apply {
+                view.billStatusImage.setImageDrawable(IconicsDrawable(context).apply {
                     icon = FontAwesome.Icon.faw_info_circle
                     color = IconicsColor.colorInt(context.getColor(R.color.md_red_500))
                     sizeDp = 24
                 })
             }
-            binding.billId.text = billStatusModel.billId.toString()
+            view.billId.text = billStatusModel.billId.toString()
         }
     }
 }
