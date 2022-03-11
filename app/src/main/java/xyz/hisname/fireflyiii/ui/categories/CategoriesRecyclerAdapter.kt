@@ -30,28 +30,27 @@ import xyz.hisname.fireflyiii.repository.models.category.CategoryData
 class CategoriesRecyclerAdapter(private val clickListener:(CategoryData) -> Unit):
         PagingDataAdapter<CategoryData, CategoriesRecyclerAdapter.CategoryHolder>(DIFF_CALLBACK) {
 
-    private lateinit var context: Context
-    private var categoryListItemBinding: CategoryListItemBinding? = null
-    private val binding get() = categoryListItemBinding!!
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryHolder {
-        context = parent.context
-        categoryListItemBinding = CategoryListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CategoryHolder(binding)
+        val context = parent.context
+        val itemView = CategoryListItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        return CategoryHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: CategoryHolder, position: Int){
+    override fun onBindViewHolder(holder: CategoryHolder, position: Int) {
         getItem(position)?.let{
             holder.bind(it, clickListener)
         }
     }
 
-    inner class CategoryHolder(itemView: CategoryListItemBinding): RecyclerView.ViewHolder(itemView.root) {
+    inner class CategoryHolder(
+        private val categoryView: CategoryListItemBinding
+    ): RecyclerView.ViewHolder(categoryView.root) {
+
         fun bind(categoryData: CategoryData, clickListener: (CategoryData) -> Unit) {
             val categoryDataSet = categoryData.categoryAttributes
-            binding.categoryName.text = categoryDataSet.name
-            binding.categoryId.text = categoryData.categoryId.toString()
-            binding.root.setOnClickListener { clickListener(categoryData) }
+            categoryView.categoryName.text = categoryDataSet.name
+            categoryView.categoryId.text = categoryData.categoryId.toString()
+            categoryView.root.setOnClickListener { clickListener(categoryData) }
         }
     }
 

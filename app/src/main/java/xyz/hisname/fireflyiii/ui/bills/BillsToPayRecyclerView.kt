@@ -30,16 +30,13 @@ import java.math.BigDecimal
 class BillsToPayRecyclerView(private val budgetData: List<BillData>,
                              private val clickListener:(BillData) -> Unit):
         RecyclerView.Adapter<BillsToPayRecyclerView.BillsToPayHolder>() {
-
     private lateinit var context: Context
-    private var billsToPayItemBinding: BillsToPayItemBinding? = null
-    private val binding get() = billsToPayItemBinding!!
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BillsToPayHolder {
         context = parent.context
-        billsToPayItemBinding = BillsToPayItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return BillsToPayHolder(binding)
+        val itemView = BillsToPayItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        return BillsToPayHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: BillsToPayHolder, position: Int) {
@@ -48,17 +45,19 @@ class BillsToPayRecyclerView(private val budgetData: List<BillData>,
 
     override fun getItemCount() = budgetData.size
 
-    inner class BillsToPayHolder(itemView: BillsToPayItemBinding): RecyclerView.ViewHolder(itemView.root) {
-        fun bind(billData: BillData, clickListener: (BillData) -> Unit){
+    inner class BillsToPayHolder(
+        private val view: BillsToPayItemBinding
+    ): RecyclerView.ViewHolder(view.root) {
+        fun bind(billData: BillData, clickListener: (BillData) -> Unit) {
             val billResponse = billData.billAttributes
             val billName = billResponse.name
             val amountToDisplay = billResponse.amount_max
                     .plus(billResponse.amount_min)
                     .div(BigDecimal.valueOf(2))
-            binding.billName.text = billName
-            binding.billAmount.text = context.getString(R.string.bill_amount,
+            view.billName.text = billName
+            view.billAmount.text = context.getString(R.string.bill_amount,
                     billResponse.currency_symbol, amountToDisplay)
-            binding.root.setOnClickListener{clickListener(billData)}
+            view.root.setOnClickListener{clickListener(billData)}
         }
     }
 }

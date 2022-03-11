@@ -34,13 +34,11 @@ class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
         PagingDataAdapter<BillData, BillsRecyclerAdapter.BillsHolder>(DIFF_CALLBACK) {
 
     private lateinit var context: Context
-    private var billsListItemBinding: BillsListItemBinding? = null
-    private val binding get() = billsListItemBinding!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BillsHolder {
         context = parent.context
-        billsListItemBinding = BillsListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return BillsHolder(binding)
+        val itemView = BillsListItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        return BillsHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: BillsHolder, position: Int) {
@@ -49,29 +47,31 @@ class BillsRecyclerAdapter(private val clickListener:(BillData) -> Unit):
         }
     }
 
-    inner class BillsHolder(itemView: BillsListItemBinding): RecyclerView.ViewHolder(itemView.root) {
+    inner class BillsHolder(
+        private val billView: BillsListItemBinding
+    ): RecyclerView.ViewHolder(billView.root) {
         fun bind(billData: BillData, clickListener: (BillData) -> Unit){
             val billResponse = billData.billAttributes
             var billName = billResponse.name
             val isPending = billResponse.isPending
             if(isPending){
                 billName = "$billName (Pending)"
-                binding.billName.setTextColor(context.getCompatColor(R.color.md_red_500))
+                billView.billName.setTextColor(context.getCompatColor(R.color.md_red_500))
             }
-            binding.billName.text = billName
+            billView.billName.text = billName
             val amountToDisplay = billResponse.amount_max
                     .plus(billResponse.amount_min)
                     .div(BigDecimal.valueOf(2))
-            binding.billAmount.text = context.getString(R.string.bill_amount,
+            billView.billAmount.text = context.getString(R.string.bill_amount,
                     billResponse.currency_symbol, amountToDisplay)
             val freq = billResponse.repeat_freq
-            binding.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
+            billView.billFreq.text = freq.substring(0,1).toUpperCase() + freq.substring(1)
 
             val nextMatch = billResponse.next_expected_match
             if(nextMatch != null){
-                binding.billNextDueDate.text = billResponse.next_expected_match
+                billView.billNextDueDate.text = billResponse.next_expected_match
             }
-            binding.billId.text = billData.billId.toString()
+            billView.billId.text = billData.billId.toString()
             itemView.setOnClickListener{clickListener(billData)}
         }
     }

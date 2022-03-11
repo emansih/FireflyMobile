@@ -35,16 +35,12 @@ import kotlin.math.abs
 
 class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
         PagingDataAdapter<PiggyData, PiggyRecyclerAdapter.PiggyHolder>(DIFF_CALLBACK){
-
     private lateinit var context: Context
-    private var piggyListItemBinding: PiggyListItemBinding? = null
-    private val binding get() = piggyListItemBinding!!
-
-
+    
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PiggyHolder {
         context = parent.context
-        piggyListItemBinding = PiggyListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PiggyHolder(binding)
+        val itemView = PiggyListItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        return PiggyHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: PiggyHolder, position: Int){
@@ -54,7 +50,9 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
     }
 
 
-    inner class PiggyHolder(itemView: PiggyListItemBinding): RecyclerView.ViewHolder(itemView.root) {
+    inner class PiggyHolder(
+        private val piggyView: PiggyListItemBinding
+    ): RecyclerView.ViewHolder(piggyView.root) {
         fun bind(piggyData: PiggyData, clickListener: (PiggyData) -> Unit){
             val piggyBankData = piggyData.piggyAttributes
             var piggyBankName = piggyBankData.name
@@ -63,26 +61,26 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
                 piggyBankName = piggyBankName.substring(0,17) + "..."
             }
             if(isPending){
-                binding.piggyName.setTextColor(context.getCompatColor(R.color.md_red_500))
+                piggyView.piggyName.setTextColor(context.getCompatColor(R.color.md_red_500))
                 piggyBankName = "$piggyBankName (Pending)"
             }
-            binding.piggyName.text = piggyBankName
-            binding.goalSave.text = piggyBankData.currency_symbol + " " + piggyBankData.current_amount + " / "  +
+            piggyView.piggyName.text = piggyBankName
+            piggyView.goalSave.text = piggyBankData.currency_symbol + " " + piggyBankData.current_amount + " / "  +
                     piggyBankData.currency_symbol + " " + piggyBankData.target_amount.toString()
             val percentage = piggyBankData.percentage ?: 0
             if(percentage <= 15){
-                binding.goalProgressBar.progressDrawable.colorFilter =
+                piggyView.goalProgressBar.progressDrawable.colorFilter =
                         BlendModeColorFilterCompat.createBlendModeColorFilterCompat(context.getCompatColor(R.color.md_red_700),
                                 BlendModeCompat.SRC_ATOP)
             } else if(percentage <= 50){
-                binding.goalProgressBar.progressDrawable.colorFilter =
+                piggyView.goalProgressBar.progressDrawable.colorFilter =
                         BlendModeColorFilterCompat.createBlendModeColorFilterCompat(context.getCompatColor(R.color.md_green_500),
                         BlendModeCompat.SRC_ATOP)
             }
-            binding.currentlySaved.text = percentage.toString() + "%"
-            binding.goalProgressBar.progress = percentage
+            piggyView.currentlySaved.text = percentage.toString() + "%"
+            piggyView.goalProgressBar.progress = percentage
             val targetDate = piggyBankData.target_date
-            binding.timeLeft.let {
+            piggyView.timeLeft.let {
                 if(!targetDate.isNullOrBlank()){
                     if(piggyBankData.percentage != 100){
                         val daysDiff = DateTimeUtil.getDaysDifference(targetDate).toInt()
@@ -104,8 +102,8 @@ class PiggyRecyclerAdapter(private val clickListener:(PiggyData) -> Unit):
                     it.text = "No target Date"
                 }
             }
-            binding.piggyId.text = piggyData.piggyId.toString()
-            binding.piggyCard.setOnClickListener{clickListener(piggyData)}
+            piggyView.piggyId.text = piggyData.piggyId.toString()
+            piggyView.piggyCard.setOnClickListener{clickListener(piggyData)}
         }
     }
 
