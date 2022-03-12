@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import androidx.work.WorkManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import xyz.hisname.fireflyiii.Constants
@@ -65,25 +66,24 @@ class FireflyAccountAuthenticator(private val context: Context): AbstractAccount
 
     override fun getAccountRemovalAllowed(response: AccountAuthenticatorResponse, account: Account): Bundle {
         runBlocking(Dispatchers.IO){
-            val fireflyUserDatabase = FireflyUserDatabase.getInstance(context).fireflyUserDao()
-            fireflyUserDatabase.deleteCurrentUser()
-            val customCaFile = File(context.applicationInfo.dataDir + "/" + account.name + ".pem")
-            val customPref = File(context.applicationInfo.dataDir + "/shared_prefs/" + account.name + "-user-preferences.xml")
-            if(customCaFile.exists()){
-                customCaFile.delete()
-            }
-            customPref.delete()
-            val fireflyUsers: List<FireflyUsers>
-            runBlocking(Dispatchers.IO) {
-                fireflyUsers =  fireflyUserDatabase.getAllUser()
-            }
-            if(fireflyUsers.isNotEmpty()){
-                runBlocking(Dispatchers.IO){
-                    fireflyUserDatabase.updateActiveUser(fireflyUsers[0].uniqueHash, true)
+            context.deleteDatabase(account.name + "-photuris.db")
+            context.deleteDatabase(account.name + "-temp-" + Constants.DB_NAME + "-photuris.db")
+            context.deleteFile(account.name + ".pem")
+            val sharedPrefDir = File(context.applicationInfo.dataDir + "/shared_prefs")
+            sharedPrefDir.resolve(account.name + "-user-preferences.xml").delete()
+
+            val fireflyUserDao = FireflyUserDatabase.getInstance(context).fireflyUserDao()
+            val userToBeDeleted = fireflyUserDao.getUserByHash(account.name)
+            if (userToBeDeleted != null) {
+                fireflyUserDao.deleteUserByPrimaryKey(userToBeDeleted.id)
+
+                val fireflyUsers = fireflyUserDao.getAllUser()
+                if(userToBeDeleted.activeUser && fireflyUsers.isNotEmpty()){
+                    fireflyUserDao.updateActiveUser(fireflyUsers[0].uniqueHash, true)
                 }
             }
-            File(context.getDatabasePath(account.name + "-temp-" + Constants.DB_NAME).toString()).delete()
-            File(context.getDatabasePath(account.name + "-photuris.db").toString()).delete()
+
+            WorkManager.getInstance(context).cancelAllWorkByTag(account.name)
         }
         return super.getAccountRemovalAllowed(response, account)
     }
