@@ -1,1 +1,2 @@
-Fix a bug where app will not work if you are using custom SSL certs(self signed). 
+Fix bug where account authentication will fail when user enters the wrong credentials for the first time. (@teldosa)
+Fix bug where recyclerview will show duplicate data. (@teldosa)
