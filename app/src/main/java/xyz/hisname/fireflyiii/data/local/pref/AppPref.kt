@@ -133,7 +133,7 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
      * 7 -> MMM dd yyyy HH:mm
      */
     override var dateTimeFormat: Int
-        get() = (sharedPref.getString("dateTimeFormat", "0") ?: "0").toInt()
+        get() = sharedPref.getInt("dateTimeFormat", 0)
         set(value) = sharedPref.edit{ putInt("dateTimeFormat", value) }
 
     override var userDefinedDateTimeFormat: String
