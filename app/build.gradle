@@ -5,7 +5,6 @@ apply plugin: 'com.starter.easylauncher'
 apply plugin: "com.github.ben-manes.versions"
 
 android {
-    kotlinOptions.useIR = true
     compileSdkVersion(Dependencies.compileSdk)
     defaultConfig {
         applicationId "xyz.hisname.fireflyiii"
