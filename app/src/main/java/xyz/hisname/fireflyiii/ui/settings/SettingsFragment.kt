@@ -75,7 +75,10 @@ class SettingsFragment : BaseSettings() {
             else
                 Locale.forLanguageTag(langCode)
         }
-        languagePref.entries = availableLocales.map { it.displayName }.toTypedArray()
+        languagePref.entries = availableLocales.map { locale ->
+            locale.getDisplayName(locale)
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
+        }.toTypedArray()
         languagePref.entryValues = TRANSLATION_ARRAY
 
         val localesList = AppCompatDelegate.getApplicationLocales()
