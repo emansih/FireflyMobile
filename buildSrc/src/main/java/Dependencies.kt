@@ -8,7 +8,7 @@ object Dependencies{
     private const val lifecycleVersion = "2.4.0"
     private const val roomVersion = "2.4.0"
     private const val coroutineVersion = "1.6.0"
-    private const val appCompatVersion = "1.4.0"
+    private const val appCompatVersion = "1.6.0-rc01"
     private const val androidxFragmentVersion = "1.4.0"
     private const val androidxAnnotationVersion = "1.3.0-beta01"
     private const val androidxRecyclerViewVersion = "1.3.0-alpha01"
