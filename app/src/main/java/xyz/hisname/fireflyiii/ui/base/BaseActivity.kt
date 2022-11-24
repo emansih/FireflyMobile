@@ -30,7 +30,6 @@ import xyz.hisname.fireflyiii.repository.GlobalViewModel
 import xyz.hisname.fireflyiii.util.extension.getCompatColor
 import xyz.hisname.fireflyiii.util.extension.getViewModel
 import xyz.hisname.fireflyiii.util.getUniqueHash
-import xyz.hisname.languagepack.LanguageChanger
 
 @SuppressLint("Registered")
 open class BaseActivity: AppCompatActivity() {
@@ -53,10 +52,6 @@ open class BaseActivity: AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }
-    }
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LanguageChanger.init(newBase, sharedPref(newBase).languagePref))
     }
 
     override fun applyOverrideConfiguration(overrideConfiguration: Configuration) {

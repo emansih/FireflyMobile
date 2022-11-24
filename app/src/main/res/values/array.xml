@@ -40,32 +40,6 @@
         <item>60</item>
     </string-array>
 
-    <string-array name="language_string">
-        <item>English</item>
-        <item>Deutsch</item>
-        <item>正體中文</item>
-        <item>简体中文</item>
-        <item>Français</item>
-        <item>Italiano</item>
-        <item>Nederlands</item>
-        <item>Español </item>
-        <item>Русский</item>
-        <item>Português do Brasil</item>
-    </string-array>
-
-    <string-array name="language_values">
-        <item>en</item>
-        <item>de</item>
-        <item>zh-rTW</item>
-        <item>zh-rCN</item>
-        <item>fr</item>
-        <item>it</item>
-        <item>nl</item>
-        <item>es</item>
-        <item>ru</item>
-        <item>pt-rBR</item>
-    </string-array>
-
     <string-array name="networkType">
         <item>Connected</item>
         <item>Un-Metered</item>

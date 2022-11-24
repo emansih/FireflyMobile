@@ -52,10 +52,6 @@ class AppPref(private val sharedPref: SharedPreferences): PreferenceHelper {
         get() = sharedPref.getString("cert_value", "") ?: ""
         set(value) = sharedPref.edit { putString("cert_value", value) }
 
-    override var languagePref: String
-        get() = sharedPref.getString("language_pref", "") ?: "en"
-        set(value) = sharedPref.edit{ putString("language_pref", value)}
-
     override var nightModeEnabled: Boolean
         get() = sharedPref.getBoolean("night_mode", false)
         set(value) = sharedPref.edit { putBoolean("night_mode", value) }
