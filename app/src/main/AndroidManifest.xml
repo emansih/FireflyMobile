@@ -50,10 +50,13 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:theme="@style/AppTheme.StartUpTheme">
+        android:theme="@style/AppTheme.StartUpTheme"
+        tools:ignore="UnusedAttribute">
 
-        <activity android:name=".ui.onboarding.AuthActivity"
-            android:launchMode= "singleTask">
+        <activity
+            android:name=".ui.onboarding.AuthActivity"
+            android:launchMode= "singleTask"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -73,7 +76,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".ui.widgets.BalanceWidget">
+        <receiver
+            android:name=".ui.widgets.BalanceWidget"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -82,7 +87,9 @@
                 android:resource="@xml/balance_widget_info" />
         </receiver>
 
-        <receiver android:name=".ui.widgets.AccountListWidget">
+        <receiver
+            android:name=".ui.widgets.AccountListWidget"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -92,7 +99,9 @@
         </receiver>
 
 
-        <receiver android:name=".ui.widgets.BillsToPayWidget">
+        <receiver
+            android:name=".ui.widgets.BillsToPayWidget"
+            android:exported="true">
              <intent-filter>
                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
              </intent-filter>
@@ -103,7 +112,8 @@
 
         <activity
             android:name=".ui.HomeActivity"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -150,13 +160,17 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".GenericReceiver">
+        <receiver
+            android:name=".GenericReceiver"
+            android:exported="false">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.FireflyAuthenticatorService">
+        <service
+            android:name=".service.FireflyAuthenticatorService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -195,7 +209,8 @@
             android:name=".service.TransactionTilesService"
             android:icon="@drawable/ic_refresh"
             android:label="@string/transaction"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
