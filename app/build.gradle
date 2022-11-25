@@ -74,7 +74,10 @@ android {
         }
     }
 
-    configurations {all*.exclude group: 'com.android.support'}
+    configurations {
+        all*.exclude group: 'com.android.support'
+        all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+    }
     androidResources {
         ignoreAssetsPattern 'NOTICE.txt'
     }
@@ -98,7 +101,7 @@ dependencies {
     implementation Dependencies.googleMaterialIcons
     implementation Dependencies.fontAwesome
 
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.0'
 
     implementation Dependencies.toasty
     implementation Dependencies.chart
@@ -117,3 +120,5 @@ dependencies {
     implementation project(path: ":languagepack")
 
 }
+
+build.dependsOn(['checkClasspath'])
