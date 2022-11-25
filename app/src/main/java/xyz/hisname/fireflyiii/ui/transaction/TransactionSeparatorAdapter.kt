@@ -102,6 +102,7 @@ class TransactionSeparatorAdapter(private val clickListener:(Transactions) -> Un
                     }
                     binding.listItem.setOnClickListener {clickListener(separator.transaction)}
                 }
+                else -> null
             }
         }
     }

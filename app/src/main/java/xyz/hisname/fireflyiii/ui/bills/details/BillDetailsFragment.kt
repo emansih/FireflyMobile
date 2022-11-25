@@ -34,11 +34,11 @@ import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.kizitonwose.calendarview.CalendarView
-import com.kizitonwose.calendarview.model.CalendarDay
-import com.kizitonwose.calendarview.model.DayOwner
-import com.kizitonwose.calendarview.ui.DayBinder
-import com.kizitonwose.calendarview.ui.ViewContainer
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.view.CalendarView
+import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.ViewContainer
 import xyz.hisname.fireflyiii.R
 import xyz.hisname.fireflyiii.databinding.CalendarDayBinding
 import xyz.hisname.fireflyiii.databinding.DetailsCardBinding
@@ -149,15 +149,15 @@ class BillDetailsFragment: BaseDetailFragment() {
             val onDayText = CalendarDayBinding.bind(view).dayText
         }
 
-        binding.payDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
-            override fun bind(container: DayViewContainer, day: CalendarDay) {
-                container.day = day
+        binding.payDatesCalendarView.dayBinder = object: MonthDayBinder<DayViewContainer>{
+            override fun bind(container: DayViewContainer, data: CalendarDay) {
+                container.day = data
                 val textView = container.onDayText
-                textView.text = day.date.dayOfMonth.toString()
-                if (day.owner == DayOwner.THIS_MONTH) {
+                textView.text = data.date.dayOfMonth.toString()
+                if (data.position == DayPosition.MonthDate) {
                     if (selectedPayDays.isNotEmpty()){
-                        selectedPayDays.forEach { data ->
-                            if(data == day.date){
+                        selectedPayDays.forEach { day ->
+                            if(day == data.date){
                                 textView.setBackgroundColor(getCompatColor(R.color.md_red_400))
                             } else {
                                 textView.setTextColor(setDayNightTheme())
@@ -208,21 +208,21 @@ class BillDetailsFragment: BaseDetailFragment() {
             }
         }
 
-        binding.paidDatesCalendarView.dayBinder = object: DayBinder<DayViewContainer>{
-            override fun bind(container: DayViewContainer, day: CalendarDay) {
-                container.day = day
+        binding.paidDatesCalendarView.dayBinder = object: MonthDayBinder<DayViewContainer>{
+            override fun bind(container: DayViewContainer, data: CalendarDay) {
+                container.day = data
                 val textView = container.onDayText
                 val divider = container.legendDivider
-                textView.text = day.date.dayOfMonth.toString()
-                if (day.owner == DayOwner.THIS_MONTH) {
+                textView.text = data.date.dayOfMonth.toString()
+                if (data.position == DayPosition.MonthDate) {
                     if (selectedPaidDays.isNotEmpty()){
-                        selectedPaidDays.forEach { data ->
-                            if(data == day.date){
+                        selectedPaidDays.forEach { day ->
+                            if(day == data.date){
                                 divider.setBackgroundColor(getCompatColor(R.color.md_green_500))
                             }
                         }
                     }
-                    if(selectedDate == day.date){
+                    if(selectedDate == data.date){
                         textView.setBackgroundColor(getCompatColor(R.color.md_green_500))
                     }
                     textView.setTextColor(setDayNightTheme())
@@ -251,7 +251,7 @@ class BillDetailsFragment: BaseDetailFragment() {
         calendarView.setup(startMonth, endMonth,
                 WeekFields.of(Locale.getDefault()).firstDayOfWeek)
         calendarView.scrollToMonth(currentMonth)
-        calendarView.updateMonthConfiguration()
+        calendarView.updateMonthData()
     }
 
     private fun progressCircle(){

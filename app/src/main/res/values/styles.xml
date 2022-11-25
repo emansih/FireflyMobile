@@ -57,7 +57,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <!-- Here we setting appcompat’s actionBarStyle -->
-        <item name="drawerArrowStyle">@style/MaterialDrawer.DrawerArrowStyle</item>
+        <!-- <item name="drawerArrowStyle">@style/Widget.MaterialDrawerStyle</item> -->
     </style>
 
     <style name="CalculatorButton" parent="Widget.AppCompat.Button">

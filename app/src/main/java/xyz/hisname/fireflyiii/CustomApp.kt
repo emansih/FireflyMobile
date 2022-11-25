@@ -40,7 +40,7 @@ class CustomApp: Application() {
                 initAcra {
                     reportFormat = StringFormat.KEY_VALUE_LIST
                     buildConfigClass = BuildConfig::class.java
-                    reportContent = arrayOf(ReportField.REPORT_ID, ReportField.APP_VERSION_NAME,
+                    reportContent = listOf(ReportField.REPORT_ID, ReportField.APP_VERSION_NAME,
                         ReportField.PHONE_MODEL, ReportField.BRAND, ReportField.PRODUCT, ReportField.ANDROID_VERSION,
                         ReportField.BUILD_CONFIG, ReportField.STACK_TRACE, ReportField.LOGCAT)
                     mailSender {
