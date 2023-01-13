@@ -8,7 +8,7 @@ ext {
     androidx = Group {
         implementation Dependencies.appCompat
         implementation Dependencies.androidxFragment
-        compileOnly Dependencies.androidxAnnotation
+        implementation Dependencies.androidxAnnotation
         implementation Dependencies.androidxRecyclerView
         implementation Dependencies.androidxCore
         implementation Dependencies.androidxConstraintLayout
@@ -66,7 +66,7 @@ ext {
         testImplementation Dependencies.jUnitParameter
 
         testImplementation Dependencies.mockWebServer
-        androidTestImplementation Dependencies.testRunner
+        androidTestImplementation Dependencies.androidTest
         androidTestUtil Dependencies.testOrchestrator
     }
 }

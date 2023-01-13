@@ -85,15 +85,14 @@
                         app:layout_constraintTop_toBottomOf="@+id/buttonSummaryPanel"
                         app:layout_constraintStart_toStartOf="parent"/>
 
-                    <com.kizitonwose.calendarview.CalendarView
+                    <com.kizitonwose.calendar.view.CalendarView
                         android:id="@+id/transaction_calendar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:cv_dayViewResource="@layout/calendar_day"
                         app:cv_orientation="horizontal"
                         app:cv_outDateStyle="endOfRow"
-                        app:cv_inDateStyle="allMonths"
-                        app:cv_scrollMode="paged"
+                        app:cv_scrollPaged="true"
                         app:layout_constraintTop_toBottomOf="@+id/legendLayout"
                         app:layout_constraintStart_toStartOf="parent"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>

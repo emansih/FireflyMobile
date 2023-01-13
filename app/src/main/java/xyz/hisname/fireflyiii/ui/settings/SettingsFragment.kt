@@ -23,11 +23,13 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.os.LocaleListCompat
 import xyz.hisname.fireflyiii.R
 import androidx.fragment.app.commit
 import androidx.preference.CheckBoxPreference
@@ -40,13 +42,14 @@ import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.*
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.util.biometric.KeyguardUtil
-import xyz.hisname.languagepack.LanguageChanger
+import xyz.hisname.languagepack.BuildConfig.TRANSLATION_ARRAY
 import java.io.File
+import java.util.Locale
 
 
-class SettingsFragment: BaseSettings() {
+class SettingsFragment : BaseSettings() {
 
-    private lateinit var chooseFolder: ActivityResultLauncher<Uri>
+    private lateinit var chooseFolder: ActivityResultLauncher<Uri?>
     private lateinit var userDownloadDirectoryPref: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -63,18 +66,30 @@ class SettingsFragment: BaseSettings() {
         userDefinedDirectory()
     }
 
-    private fun setLanguagePref(){
+    private fun setLanguagePref() {
         val languagePref = findPreference<ListPreference>("language_pref") as ListPreference
-        languagePref.value = AppPref(sharedPref).languagePref
+        val availableLocales = TRANSLATION_ARRAY.map { langCode ->
+            val hasCountry = langCode.contains("-")
+            if (hasCountry)
+                langCode.split("-").let { Locale(it[0], it[1]) }
+            else
+                Locale.forLanguageTag(langCode)
+        }
+        languagePref.entries = availableLocales.map { locale ->
+            locale.getDisplayName(locale)
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
+        }.toTypedArray()
+        languagePref.entryValues = TRANSLATION_ARRAY
+
+        val localesList = AppCompatDelegate.getApplicationLocales()
+        val locales = (0 until localesList.size()).mapNotNull { localesList.get(it) }
+        val currentLanguage = locales.find { availableLocales.contains(it) } ?: Locale.ENGLISH
+
+        languagePref.value = currentLanguage.language
         languagePref.setOnPreferenceChangeListener { _, newValue ->
-            AppPref(sharedPref).languagePref = newValue.toString()
-            LanguageChanger.init(requireContext(), AppPref(sharedPref).languagePref)
-            val coordinatorLayout = requireActivity().findViewById<CoordinatorLayout>(R.id.coordinatorlayout)
-            Snackbar.make(coordinatorLayout, "Restart to apply changes", Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok){
-                        ActivityCompat.recreate(requireActivity())
-                    }
-                    .show()
+            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(newValue.toString())
+            AppCompatDelegate.setApplicationLocales(appLocale)
+
             true
         }
         languagePref.icon = IconicsDrawable(requireContext()).apply {
@@ -84,7 +99,7 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun setAccountSection(){
+    private fun setAccountSection() {
         val accountOptions = findPreference<Preference>("account_options") as Preference
         accountOptions.setOnPreferenceClickListener {
             parentFragmentManager.commit {
@@ -101,7 +116,7 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun setTransactionSection(){
+    private fun setTransactionSection() {
         val transactionSettings = findPreference<Preference>("transaction_settings") as Preference
         transactionSettings.setOnPreferenceClickListener {
             parentFragmentManager.commit {
@@ -119,17 +134,18 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun setNightModeSection(){
+    private fun setNightModeSection() {
         val nightModePref = findPreference<CheckBoxPreference>("night_mode") as CheckBoxPreference
         nightModePref.setOnPreferenceChangeListener { preference, newValue ->
             val nightMode = newValue as Boolean
             AppPref(sharedPref).nightModeEnabled = nightMode
-            val coordinatorLayout = requireActivity().findViewById<CoordinatorLayout>(R.id.coordinatorlayout)
+            val coordinatorLayout =
+                requireActivity().findViewById<CoordinatorLayout>(R.id.coordinatorlayout)
             Snackbar.make(coordinatorLayout, "Restart to apply changes", Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok){
-                        ActivityCompat.recreate(requireActivity())
-                    }
-                    .show()
+                .setAction(android.R.string.ok) {
+                    ActivityCompat.recreate(requireActivity())
+                }
+                .show()
             true
         }
         nightModePref.icon = IconicsDrawable(requireContext()).apply {
@@ -139,8 +155,9 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun setThumbnail(){
-        val thumbnailPref = findPreference<CheckBoxPreference>("currencyThumbnail") as CheckBoxPreference
+    private fun setThumbnail() {
+        val thumbnailPref =
+            findPreference<CheckBoxPreference>("currencyThumbnail") as CheckBoxPreference
         thumbnailPref.icon = IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_attach_money
             sizeDp = 24
@@ -153,7 +170,7 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun setTutorial(){
+    private fun setTutorial() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val tutorialSetting = findPreference<Preference>("tutorial_setting") as Preference
             tutorialSetting.isVisible = true
@@ -169,7 +186,7 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun setDeveloperOption(){
+    private fun setDeveloperOption() {
         val developerSettings = findPreference<Preference>("developer_options") as Preference
         developerSettings.setOnPreferenceClickListener {
             parentFragmentManager.commit {
@@ -188,23 +205,29 @@ class SettingsFragment: BaseSettings() {
 
     override fun onResume() {
         super.onResume()
-        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title = resources.getString(R.string.settings)
+        requireActivity().findViewById<Toolbar>(R.id.activity_toolbar).title =
+            resources.getString(R.string.settings)
     }
 
-    private fun setIconColor(): Int{
-        return if(globalViewModel.isDark){
+    private fun setIconColor(): Int {
+        return if (globalViewModel.isDark) {
             R.color.md_white_1000
         } else {
             R.color.md_black_1000
         }
     }
 
-    private fun setPinCode(){
+    private fun setPinCode() {
         val keyguardPref = findPreference<Preference>("keyguard") as Preference
-        if(!KeyguardUtil(requireActivity()).isDeviceKeyguardEnabled() || BiometricManager.from(requireContext()).canAuthenticate(
-                BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL) != BIOMETRIC_SUCCESS){
+        if (!KeyguardUtil(requireActivity()).isDeviceKeyguardEnabled() || BiometricManager.from(
+                requireContext()
+            ).canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            ) != BIOMETRIC_SUCCESS
+        ) {
             keyguardPref.isSelectable = false
-            keyguardPref.summary = "Please enable pin / password / biometrics in your device settings"
+            keyguardPref.summary =
+                "Please enable pin / password / biometrics in your device settings"
         }
         keyguardPref.icon = IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_lock
@@ -218,7 +241,7 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun deleteItems(){
+    private fun deleteItems() {
         val deleteData = findPreference<Preference>("delete_data") as Preference
         deleteData.icon = IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_delete_forever
@@ -235,15 +258,16 @@ class SettingsFragment: BaseSettings() {
         }
     }
 
-    private fun userDefinedDirectory(){
-        userDownloadDirectoryPref = findPreference<Preference>("userDefinedDownloadDirectory") as Preference
+    private fun userDefinedDirectory() {
+        userDownloadDirectoryPref =
+            findPreference<Preference>("userDefinedDownloadDirectory") as Preference
         val userPref = AppPref(sharedPref).userDefinedDownloadDirectory
         userDownloadDirectoryPref.icon = IconicsDrawable(requireContext()).apply {
             icon = GoogleMaterial.Icon.gmd_file_download
             sizeDp = 24
             colorRes = setIconColor()
         }
-        val userDirectory = if(userPref.isEmpty()){
+        val userDirectory = if (userPref.isEmpty()) {
             File(requireContext().getExternalFilesDir(null).toString()).toString()
         } else {
             userPref
@@ -257,11 +281,12 @@ class SettingsFragment: BaseSettings() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        chooseFolder = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folderChoosen ->
-            if(folderChoosen != null){
-                AppPref(sharedPref).userDefinedDownloadDirectory = folderChoosen.toString()
-                userDownloadDirectoryPref.summary = folderChoosen.toString()
+        chooseFolder =
+            registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { folderChoosen ->
+                if (folderChoosen != null) {
+                    AppPref(sharedPref).userDefinedDownloadDirectory = folderChoosen.toString()
+                    userDownloadDirectoryPref.summary = folderChoosen.toString()
+                }
             }
-        }
     }
 }

@@ -44,10 +44,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.kizitonwose.calendarview.model.CalendarDay
-import com.kizitonwose.calendarview.model.DayOwner
-import com.kizitonwose.calendarview.ui.DayBinder
-import com.kizitonwose.calendarview.ui.ViewContainer
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.ViewContainer
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import com.mikepenz.iconics.utils.sizeDp
@@ -168,7 +168,7 @@ class TransactionFragment: BaseFragment(){
                 view.setOnClickListener {
                     selectedDates.clear()
                     dateRange.clear()
-                    if (day.owner == DayOwner.THIS_MONTH) {
+                    if (day.position == DayPosition.MonthDate) {
                         selectedDate = day.date
                         selectedDates.clear()
                         binding.transactionCalendar.notifyCalendarChanged()
@@ -221,25 +221,25 @@ class TransactionFragment: BaseFragment(){
                 }
             }
         }
-        binding.transactionCalendar.dayBinder = object: DayBinder<DayViewContainer>{
-            override fun bind(container: DayViewContainer, day: CalendarDay) {
-                container.day = day
+        binding.transactionCalendar.dayBinder = object: MonthDayBinder<DayViewContainer>{
+            override fun bind(container: DayViewContainer, data: CalendarDay) {
+                container.day = data
                 val textView = container.onDayText
-                textView.text = day.date.dayOfMonth.toString()
+                textView.text = data.date.dayOfMonth.toString()
                 setShowCase(textView)
-                if (day.owner == DayOwner.THIS_MONTH) {
+                if (data.position == DayPosition.MonthDate) {
                     when {
-                        selectedDates.contains(day.date) -> {
+                        selectedDates.contains(data.date) -> {
                             if (selectedDates.size != 2){
                                 dateRange.clear()
                             }
                             textView.setTextColor(setDayNightTheme())
                             textView.setBackgroundResource(R.drawable.today_bg)
                         }
-                        dateRange.contains(day.date) -> {
+                        dateRange.contains(data.date) -> {
                             textView.setBackgroundResource(R.drawable.today_bg)
                         }
-                        selectedDate == day.date -> {
+                        selectedDate == data.date -> {
                             if(selectedDate == today){
                                 textView.setTextColor(getCompatColor(R.color.md_red_800))
                             } else {
@@ -269,10 +269,9 @@ class TransactionFragment: BaseFragment(){
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusYears(80)
         val endMonth = currentMonth.plusYears(20)
-        binding.transactionCalendar.setupAsync(startMonth, endMonth, DayOfWeek.SUNDAY){
-            binding.transactionCalendar.scrollToMonth(currentMonth)
-            binding.transactionCalendar.updateMonthConfiguration()
-        }
+        binding.transactionCalendar.setup(startMonth, endMonth, DayOfWeek.SUNDAY)
+        binding.transactionCalendar.scrollToMonth(currentMonth)
+        binding.transactionCalendar.updateMonthData()
     }
 
     private fun dragAndDrop(){

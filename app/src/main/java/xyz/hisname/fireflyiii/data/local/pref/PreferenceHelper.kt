@@ -29,7 +29,6 @@ interface PreferenceHelper {
     var serverVersion: String
     var userOs: String
     var certValue: String
-    var languagePref: String
     var nightModeEnabled: Boolean
     var isKeyguardEnabled: Boolean
     var isCurrencyThumbnailEnabled: Boolean
