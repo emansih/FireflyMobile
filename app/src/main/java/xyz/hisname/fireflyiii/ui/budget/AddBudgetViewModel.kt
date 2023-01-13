@@ -30,7 +30,6 @@ import xyz.hisname.fireflyiii.data.local.dao.AppDatabase
 import xyz.hisname.fireflyiii.data.local.pref.AppPref
 import xyz.hisname.fireflyiii.data.remote.firefly.api.BudgetService
 import xyz.hisname.fireflyiii.data.remote.firefly.api.CurrencyService
-import xyz.hisname.fireflyiii.data.remote.firefly.api.SystemInfoService
 import xyz.hisname.fireflyiii.repository.BaseViewModel
 import xyz.hisname.fireflyiii.repository.attachment.AttachableType
 import xyz.hisname.fireflyiii.repository.budget.BudgetRepository
@@ -38,8 +37,6 @@ import xyz.hisname.fireflyiii.repository.currency.CurrencyRepository
 import xyz.hisname.fireflyiii.repository.models.budget.budgetList.BudgetListData
 import xyz.hisname.fireflyiii.repository.budget.BudgetType
 import xyz.hisname.fireflyiii.repository.models.budget.limits.BudgetLimitData
-import xyz.hisname.fireflyiii.repository.userinfo.SystemInfoRepository
-import xyz.hisname.fireflyiii.util.Version
 import xyz.hisname.fireflyiii.workers.AttachmentWorker
 
 class AddBudgetViewModel(application: Application): BaseViewModel(application) {
@@ -59,10 +56,6 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
 
     var currency = ""
     val budgetLimitAttributesLiveData = MutableLiveData<BudgetLimitData>()
-
-    init {
-        checkVersion()
-    }
 
     fun getDefaultCurrency(): LiveData<String>{
         val currencyToDisplay = MutableLiveData<String>()
@@ -156,25 +149,5 @@ class AddBudgetViewModel(application: Application): BaseViewModel(application) {
             budgetAttributesLiveData.postValue(budgetListData)
         }
         return budgetAttributesLiveData
-    }
-
-    private fun checkVersion(){
-        if(!AppPref(sharedPref()).budgetIssue4394){
-            val systemInfoRepository = SystemInfoRepository(
-                    genericService().create(SystemInfoService::class.java),
-                    sharedPref(), newManager())
-            viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { coroutineContext, throwable ->  }){
-                systemInfoRepository.getUserSystem()
-            }
-            val fireflyVersion = AppPref(sharedPref()).serverVersion
-            if(fireflyVersion.contentEquals("5.5.0-beta.1")){
-                unSupportedVersion.postValue(true)
-            } else {
-                if(Version(fireflyVersion) == Version("5.4.6") ||
-                        Version(fireflyVersion).compareTo(Version("5.5.0")) == -1){
-                    unSupportedVersion.postValue(true)
-                }
-            }
-        }
     }
 }
