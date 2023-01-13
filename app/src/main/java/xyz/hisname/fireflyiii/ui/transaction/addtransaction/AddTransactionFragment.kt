@@ -79,6 +79,7 @@ import xyz.hisname.fireflyiii.util.DateTimeUtil
 import xyz.hisname.fireflyiii.util.FileUtils
 import xyz.hisname.fireflyiii.util.extension.*
 import java.io.File
+import java.time.LocalTime
 import java.util.*
 
 class AddTransactionFragment: BaseFragment() {
@@ -745,9 +746,13 @@ class AddTransactionFragment: BaseFragment() {
                                 binding.timeEdittext.compoundDrawables[2].bounds.width())) {
                     showTaskerVariable(binding.timeEdittext)
                 } else {
+                    val hour = LocalTime.now().hour
+                    val min = LocalTime.now().minute
                     val materialTimePicker = MaterialTimePicker.Builder()
-                            .setTimeFormat(TimeFormat.CLOCK_24H)
-                            .build()
+                        .setTimeFormat(TimeFormat.CLOCK_24H)
+                        .setHour(hour)
+                        .setMinute(min)
+                        .build()
                     materialTimePicker.show(parentFragmentManager, "timePickerDialog")
                     materialTimePicker.addOnPositiveButtonClickListener { _ ->
                         val min = if(materialTimePicker.minute < 10){
