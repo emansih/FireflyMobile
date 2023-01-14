@@ -79,6 +79,7 @@ android {
     androidResources {
         ignoreAssetsPattern 'NOTICE.txt'
     }
+    namespace 'xyz.hisname.fireflyiii'
 }
 
 dependencies {

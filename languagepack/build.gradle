@@ -23,6 +23,7 @@ android {
             targetCompatibility JavaVersion.VERSION_1_8
         }
     }
+    namespace 'xyz.hisname.languagepack'
 
 }
 
