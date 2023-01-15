@@ -204,6 +204,7 @@
             android:name=".service.TransactionTilesService"
             android:icon="@drawable/ic_refresh"
             android:label="@string/transaction"
+            android:exported="true"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>

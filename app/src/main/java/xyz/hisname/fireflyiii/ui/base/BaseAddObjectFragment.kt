@@ -44,7 +44,7 @@ abstract class BaseAddObjectFragment: BaseFragment() {
         circularReveal.duration = 400
         circularReveal.interpolator = BakedBezierInterpolator.FADE_OUT_CURVE
         circularReveal.addListener(object : AnimatorListenerAdapter(){
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
                 try {
                     parentFragmentManager.popBackStack()
