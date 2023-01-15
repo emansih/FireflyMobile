@@ -1,2 +1,13 @@
-Fix bug where account authentication will fail when user enters the wrong credentials for the first time. (@teldosa)
-Fix bug where recyclerview will show duplicate data. (@teldosa)
+Sorry I have been busy with life. Updates have been terribly slow(the last update was nearly a year ago!) but I will try to work on this whenever I can. I started off this project while in school and I currently hold a full time job, it's hard to juggle between work, life commitments and this project. 
+
+
+So what has changed?
+
+- Fixed security settings for Android 10. #224
+- Fixed bug where changing date time setting will crash
+- Updated new app icon! (@ArnyminerZ)
+- Fixed bug where clicking on budget screen will crash on certain version of Firefly III
+- User's local time will now be shown when clicking on the time field when adding a new transaction
+- Update target and compile SDK to 33
+- Update Android gradle plugin to 7.4.0
+- Update gradle wrapper to 7.5
