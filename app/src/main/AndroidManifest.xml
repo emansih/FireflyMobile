@@ -22,6 +22,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
+    <!-- https://developer.android.com/google/play/requirements/target-sdk#pre12 -->
+    <!-- Location: Users can request apps to retrieve only approximate location information.
+    You must request the ACCESS_COARSE_LOCATION permission any time you request ACCESS_FINE_LOCATION. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.VIBRATE"/>
@@ -51,7 +55,8 @@
         android:theme="@style/AppTheme.StartUpTheme">
 
         <activity android:name=".ui.onboarding.AuthActivity"
-            android:launchMode= "singleTask">
+            android:launchMode= "singleTask"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -71,7 +76,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".ui.widgets.BalanceWidget">
+        <receiver android:name=".ui.widgets.BalanceWidget"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -80,7 +86,8 @@
                 android:resource="@xml/balance_widget_info" />
         </receiver>
 
-        <receiver android:name=".ui.widgets.AccountListWidget">
+        <receiver android:name=".ui.widgets.AccountListWidget"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -90,7 +97,8 @@
         </receiver>
 
 
-        <receiver android:name=".ui.widgets.BillsToPayWidget">
+        <receiver android:name=".ui.widgets.BillsToPayWidget"
+            android:exported="false">
              <intent-filter>
                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
              </intent-filter>
@@ -101,7 +109,8 @@
 
         <activity
             android:name=".ui.HomeActivity"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -148,13 +157,15 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".GenericReceiver">
+        <receiver android:name=".GenericReceiver"
+            android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.FireflyAuthenticatorService">
+        <service android:name=".service.FireflyAuthenticatorService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
