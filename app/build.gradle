@@ -21,10 +21,10 @@ android {
         vectorDrawables.useSupportLibrary = true
         def appConfigFile = file('config.properties')
         def hostName = ""
-        if(appConfigFile.exists()){
+        if (appConfigFile.exists()) {
             Properties appConfig = new Properties()
             appConfig.load(new FileInputStream(appConfigFile))
-            if(appConfig['config.hostname'] != null){
+            if (appConfig['config.hostname'] != null) {
                 hostName = appConfig['config.hostname']
                 manifestPlaceholders = [host: hostName.replaceAll('"', '')]
             }
@@ -39,29 +39,28 @@ android {
     }
 
     buildTypes {
-         release {
-            postprocessing {
-                removeUnusedCode true
-                removeUnusedResources true
-                obfuscate false
-                optimizeCode true
-                proguardFiles = ['proguard-rules.pro']
-            }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+            )
         }
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
             minifyEnabled false
         }
-        // Do not use `JavaVersion.VERSION_11`! Will cause issues on `release` builds due to Proguard
-        // Needs more investigation before using 11.  See issue #192
-        compileOptions {
-            coreLibraryDesugaringEnabled true
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
     }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11
 
     buildFeatures {
         viewBinding true
@@ -75,7 +74,7 @@ android {
         }
     }
 
-    configurations {all*.exclude group: 'com.android.support'}
+    configurations { all*.exclude group: 'com.android.support' }
     androidResources {
         ignoreAssetsPattern 'NOTICE.txt'
     }
